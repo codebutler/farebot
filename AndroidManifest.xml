@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AndroidManifest.xml
+
+  Copyright (C) 2011 Eric Butler
+
+  Authors:
+  Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="com.codebutler.farebot">
+
+    <uses-sdk android:minSdkVersion="9" />
+    <uses-permission android:name="android.permission.NFC" />
+    
+    <application 
+        android:label="@string/app_name"
+        android:debuggable="true">
+        
+         <activity android:name=".activities.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/com.codebutler.farebot.card" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.ReadingTagActivity" android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name=".activities.CardInfoActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/com.codebutler.farebot.card" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.AdvancedCardInfoActivity" />
+        <activity android:name=".activities.DesfireCardRawDataActivity"/>
+        <activity android:name=".activities.CardHWDetailActivity" />
+
+        <provider
+            android:name="com.codebutler.farebot.provider.CardProvider"
+            android:authorities="com.codebutler.farebot.cardprovider" />
+
+    </application>
+</manifest>

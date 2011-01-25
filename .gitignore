@@ -1,0 +1,10 @@
+build/
+out/
+dist/
+bin/
+gen/
+classes/
+.DS_Store
+.idea
+local.properties
+*.iws

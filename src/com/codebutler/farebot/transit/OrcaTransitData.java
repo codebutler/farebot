@@ -1,0 +1,248 @@
+/*
+ * OrcaTransitData.java
+ *
+ * Copyright (C) 2011 Eric Butler
+ *
+ * Authors:
+ * Eric Butler <eric@codebutler.com>
+ *
+ * Thanks to:
+ * Karl Koscher <supersat@cs.washington.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.codebutler.farebot.transit;
+
+import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.mifare.DesfireCard;
+import com.codebutler.farebot.mifare.DesfireFile;
+import com.codebutler.farebot.mifare.DesfireFileSettings;
+import com.codebutler.farebot.mifare.MifareCard;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.text.NumberFormat;
+import java.util.*;
+
+public class OrcaTransitData extends TransitData
+{
+    private int      mSerialNumber;
+    private double   mBalance;
+    private Trip[]   mTrips;
+
+    public static boolean check (MifareCard card)
+    {
+        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
+    }
+
+    public OrcaTransitData (MifareCard card)
+    {
+        DesfireCard desfireCard = (DesfireCard) card;
+
+        byte[] data = desfireCard.getApplication(0xffffff).getFile(0x0f).getData();
+        mSerialNumber = Utils.byteArrayToInt(data, 5, 3);
+
+        data = desfireCard.getApplication(0x3010f2).getFile(0x04).getData();
+        mBalance = Utils.byteArrayToInt(data, 41, 2);
+
+        mTrips = parseTrips(desfireCard);
+    }
+
+    @Override
+    public String getCardName () {
+        return "ORCA Card";
+    }
+
+    @Override
+    public String getBalanceString () {
+        return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100);
+    }
+
+    @Override
+    public int getSerialNumber () {
+        return mSerialNumber;
+    }
+
+    @Override
+    public Trip[] getTrips () {
+        return mTrips;
+    }
+
+    private Trip[] parseTrips (DesfireCard card)
+    {
+        DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
+        DesfireFileSettings.RecordDesfireFileSettings settings = (DesfireFileSettings.RecordDesfireFileSettings) file.getFileSettings();
+
+        byte[] data = file.getData();
+
+        List<Trip> result = new ArrayList<Trip>();
+
+        if (settings != null) {
+            for (int i = 0; i < settings.curRecords; i++) {
+                int offset = settings.recordSize * i;
+                byte[] record = ArrayUtils.subarray(data, offset, offset + settings.recordSize);
+
+                result.add(createTrip(record));
+            }
+        }
+        
+        Trip[] useLog = result.toArray(new Trip[result.size()]);
+        Arrays.sort(useLog, new Comparator<Trip>() {
+            public int compare(Trip trip, Trip trip1) {
+                return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
+            }
+        });
+
+        return useLog;
+    }
+
+    private Trip createTrip (byte[] useData)
+    {
+        long timestamp, coachNum, fare, newBalance, agency, transType;
+
+        long[] usefulData = new long[useData.length];
+
+        for (int i = 0; i < useData.length; i++) {
+            usefulData[i] = ((long)useData[i]) & 0xFF;
+        }
+
+        timestamp =
+                ((0x0F & usefulData[3]) << 28) |
+                (usefulData[4] << 20) |
+                (usefulData[5] << 12) |
+                (usefulData[6] << 4)  |
+                (usefulData[7] >> 4);
+
+        coachNum   = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
+        fare       = (usefulData[15] << 7) | (usefulData[16] >> 1);
+        newBalance = (usefulData[34] << 8) | usefulData[35];
+        agency     = usefulData[3] >> 4;
+        transType  = (usefulData[17]);
+
+        return new OrcaTrip(timestamp, coachNum, fare, newBalance, agency, transType);
+    }
+
+    public static class OrcaTrip extends Trip
+    {
+        private final long mTimestamp;
+        private final long mCoachNum;
+        private final long mFare;
+        private final long mNewBalance;
+        private final long mAgency;
+        private final long mTransType;
+
+        private static Station[] sLinkStations = new Station[] {
+            new Station("Westlake Station",                   "47.6113968", "-122.337502"),
+            new Station("University Station",                 "47.6072502", "-122.335754"),
+            new Station("Pioneer Square Station",             "47.6021461", "-122.33107"),
+            new Station("International District Station",     "47.5976601", "-122.328217"),
+            new Station("Stadium Station",                    "47.5918121", "-122.327354"),
+            new Station("SODO Station",                       "47.5799484", "-122.327515"),
+            new Station("Beacon Hill Station",                "47.5791245", "-122.311287"),
+            new Station("Mount Baker Station",                "47.5764389", "-122.297737"),
+            new Station("Columbia City Station",              "47.5589523", "-122.292343"),
+            new Station("Othello Station",                    "47.5375366", "-122.281471"),
+            new Station("Rainier Beach Station",              "47.5222626", "-122.279579"),
+            new Station("Tukwila International Blvd Station", "47.4642754", "-122.288391"),
+            new Station("Seatac Airport Station",             "47.4445305", "-122.297012")
+        };
+
+        public OrcaTrip (long timestamp, long coachNum, long fare, long newBalance, long agency, long transType)
+        {
+            mTimestamp  = timestamp;
+            mCoachNum   = coachNum;
+            mFare       = fare;
+            mNewBalance = newBalance;
+            mAgency     = agency;
+            mTransType  = transType;
+        }
+
+        @Override
+        public long getTimestamp() {
+            return mTimestamp;
+        }
+
+        @Override
+        public String getAgencyName () {
+            switch ((int) mAgency) {
+                case 0x02:
+                    return "Community Transit";
+                case 0x04:
+                    return "King County Metro Transit";
+                case 0x06:
+                    return "Pierce Transit";
+                case 0x07:
+                    return "Sound Transit";
+            }
+            return "Unknown Agency";
+        }
+
+        @Override
+        public String getShortAgencyName () {
+            switch ((int) mAgency) {
+                case 0x02:
+                    return "CT";
+                case 0x04:
+                    return "KCM";
+                case 0x06:
+                    return "PT";
+                case 0x07:
+                    return "ST";
+            }
+            return "Unknown";
+        }
+
+        @Override
+        public String getRouteName () {
+            if (mAgency == 0x07 && mCoachNum > 10000) {
+                return "Link Light Rail";
+            } else {
+                // FIXME: Need to find bus route #s
+                return "(Unknown Route)";
+            }
+        }
+
+        @Override
+        public String getStationName () {
+            if (mAgency == 0x07 && mCoachNum > 10000) {
+                return sLinkStations[(((int) mCoachNum) % 1000) - 193].getName();
+            } else {
+                return "Coach #" + String.valueOf(mCoachNum);
+            }
+        }
+
+        @Override
+        public String getFareString () {
+            return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100);
+        }
+
+        @Override
+        public double getFare () {
+            return mFare;
+        }
+
+        @Override
+        public String getBalanceString () {
+            return NumberFormat.getCurrencyInstance(Locale.US).format(mNewBalance / 100);
+        }
+
+        @Override
+        public Station getStation() {
+            if (mAgency == 0x07 && mCoachNum > 1000) {
+                return sLinkStations[(((int) mCoachNum) % 1000) - 193];
+            }
+            return null;
+        }
+    }
+}
