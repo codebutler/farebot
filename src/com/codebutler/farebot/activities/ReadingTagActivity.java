@@ -26,7 +26,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
-import android.nfc.INfcTag;
 import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,9 +38,6 @@ import com.codebutler.farebot.mifare.MifareCard;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.nfc.NfcInternal;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 public class ReadingTagActivity extends Activity
 {
@@ -84,7 +80,7 @@ public class ReadingTagActivity extends Activity
                         if (cardType.equals("Iso14443-4"))
                             return DesfireCard.dumpTag(id, tagObject);
                         else
-                            throw new Exception("Unsupported card type: " + cardType);
+                            throw new Exception(String.format("Unsupported card type: %s\nSerial: %s", cardType, Utils.getHexString(id)));
                     } catch (Exception ex) {
                         mException = ex;
                         return null;

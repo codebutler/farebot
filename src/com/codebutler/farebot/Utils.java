@@ -37,12 +37,11 @@ public class Utils
 {
     public static void showErrorAndFinish (final Activity activity, Exception ex)
     {
-        String text = (ex.getMessage() == null) ? ex.toString() : ex.getMessage();
-        Log.e(activity.getClass().getName(), text);
+        Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
         ex.printStackTrace();
 
         new AlertDialog.Builder(activity)
-            .setMessage(text)
+            .setMessage(Utils.getErrorMessage(ex))
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface arg0, int arg1) {
@@ -121,5 +120,24 @@ public class Utils
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         transformer.transform(source, result);
         return stringWriter.getBuffer().toString();
+    }
+
+    public static String getErrorMessage (Throwable ex)
+    {
+        String errorMessage = null;
+        if (ex.getCause() != null) {
+            errorMessage = ex.getCause().getLocalizedMessage();
+            if (errorMessage == null)
+                errorMessage = ex.getCause().getMessage();
+            if (errorMessage == null)
+                errorMessage = ex.getCause().toString();
+        } else {
+            errorMessage = ex.getLocalizedMessage();
+            if (errorMessage == null)
+                errorMessage = ex.getMessage();
+            if (errorMessage == null)
+                errorMessage = ex.toString();
+        }
+        return errorMessage;
     }
 }
