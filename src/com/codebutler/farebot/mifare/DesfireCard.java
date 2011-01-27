@@ -60,7 +60,7 @@ public class DesfireCard extends MifareCard
                         data = desfireTag.readFile(fileId);
                     else
                         data = desfireTag.readRecord(fileId);
-                    files.add(new DesfireFile(fileId, settings, data));
+                    files.add(DesfireFile.create(fileId, settings, data));
                 } catch (Exception ex) {
                     files.add(new DesfireFile.InvalidDesfireFile(fileId, ex.toString()));
                 }
@@ -207,7 +207,7 @@ public class DesfireCard extends MifareCard
                     }
 
                     byte[] fileData = Base64.decode(dataElement.getTextContent().trim(), Base64.DEFAULT);
-                    files[y] = new DesfireFile(fileId, fileSettings, fileData);
+                    files[y] = DesfireFile.create(fileId, fileSettings, fileData);
                 } else {
                     Element errorElement = (Element) fileElement.getElementsByTagName("error").item(0);
                     files[y] = new InvalidDesfireFile(fileId, errorElement.getTextContent());

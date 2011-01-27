@@ -27,10 +27,9 @@ package com.codebutler.farebot.transit;
 
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.DesfireFile;
-import com.codebutler.farebot.mifare.DesfireFileSettings;
+import com.codebutler.farebot.mifare.DesfireFile.RecordDesfireFile;
+import com.codebutler.farebot.mifare.DesfireRecord;
 import com.codebutler.farebot.mifare.MifareCard;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -81,23 +80,15 @@ public class OrcaTransitData extends TransitData
 
     private Trip[] parseTrips (DesfireCard card)
     {
-        DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
-        DesfireFileSettings.RecordDesfireFileSettings settings = (DesfireFileSettings.RecordDesfireFileSettings) file.getFileSettings();
-
-        byte[] data = file.getData();
+        RecordDesfireFile file = (RecordDesfireFile) card.getApplication(0x3010f2).getFile(0x02);
 
         List<Trip> result = new ArrayList<Trip>();
 
-        if (settings != null) {
-            for (int i = 0; i < settings.curRecords; i++) {
-                int offset = settings.recordSize * i;
-                byte[] record = ArrayUtils.subarray(data, offset, offset + settings.recordSize);
-
-                result.add(createTrip(record));
-            }
+        Trip[] useLog = new Trip[file.getRecords().length];
+        for (int i = 0; i < useLog.length; i++) {
+            useLog[i] = createTrip(file.getRecords()[i]);
         }
-        
-        Trip[] useLog = result.toArray(new Trip[result.size()]);
+
         Arrays.sort(useLog, new Comparator<Trip>() {
             public int compare(Trip trip, Trip trip1) {
                 return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
@@ -107,10 +98,11 @@ public class OrcaTransitData extends TransitData
         return useLog;
     }
 
-    private Trip createTrip (byte[] useData)
+    private Trip createTrip (DesfireRecord record)
     {
         long timestamp, coachNum, fare, newBalance, agency, transType;
 
+        byte[] useData = record.getData();
         long[] usefulData = new long[useData.length];
 
         for (int i = 0; i < useData.length; i++) {
@@ -118,11 +110,11 @@ public class OrcaTransitData extends TransitData
         }
 
         timestamp =
-                ((0x0F & usefulData[3]) << 28) |
-                (usefulData[4] << 20) |
-                (usefulData[5] << 12) |
-                (usefulData[6] << 4)  |
-                (usefulData[7] >> 4);
+            ((0x0F & usefulData[3]) << 28) |
+            (usefulData[4] << 20) |
+            (usefulData[5] << 12) |
+            (usefulData[6] << 4)  |
+            (usefulData[7] >> 4);
 
         coachNum   = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
         fare       = (usefulData[15] << 7) | (usefulData[16] >> 1);
