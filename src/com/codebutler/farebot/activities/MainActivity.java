@@ -30,6 +30,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -105,5 +106,22 @@ public class MainActivity extends ListActivity
     {
         Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
         startActivity(new Intent(Intent.ACTION_VIEW, uri));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item)
+    {
+        if (item.getItemId() == R.id.about) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://codebutler.github.com/farebot")));
+            return true;
+        }
+        return false;
     }
 }

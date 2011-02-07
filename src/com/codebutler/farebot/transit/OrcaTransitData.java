@@ -27,6 +27,7 @@ package com.codebutler.farebot.transit;
 
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireCard;
+import com.codebutler.farebot.mifare.DesfireFile;
 import com.codebutler.farebot.mifare.DesfireFile.RecordDesfireFile;
 import com.codebutler.farebot.mifare.DesfireRecord;
 import com.codebutler.farebot.mifare.MifareCard;
@@ -80,22 +81,27 @@ public class OrcaTransitData extends TransitData
 
     private Trip[] parseTrips (DesfireCard card)
     {
-        RecordDesfireFile file = (RecordDesfireFile) card.getApplication(0x3010f2).getFile(0x02);
+        DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
 
-        List<Trip> result = new ArrayList<Trip>();
+        if (file instanceof RecordDesfireFile) {
+            RecordDesfireFile recordFile = (RecordDesfireFile) card.getApplication(0x3010f2).getFile(0x02);
 
-        Trip[] useLog = new Trip[file.getRecords().length];
-        for (int i = 0; i < useLog.length; i++) {
-            useLog[i] = createTrip(file.getRecords()[i]);
-        }
+            List<Trip> result = new ArrayList<Trip>();
 
-        Arrays.sort(useLog, new Comparator<Trip>() {
-            public int compare(Trip trip, Trip trip1) {
-                return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
+            Trip[] useLog = new Trip[recordFile.getRecords().length];
+            for (int i = 0; i < useLog.length; i++) {
+                useLog[i] = createTrip(recordFile.getRecords()[i]);
             }
-        });
 
-        return useLog;
+            Arrays.sort(useLog, new Comparator<Trip>() {
+                public int compare(Trip trip, Trip trip1) {
+                    return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
+                }
+            });
+
+            return useLog;
+        }
+        return null;
     }
 
     private Trip createTrip (DesfireRecord record)

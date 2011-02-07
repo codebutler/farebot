@@ -81,7 +81,8 @@ public class CardInfoActivity extends ListActivity
         ((TextView) findViewById(R.id.serial_text_view)).setText(String.valueOf(transitData.getSerialNumber()));
         ((TextView) findViewById(R.id.balance_text_view)).setText(transitData.getBalanceString());
 
-        setListAdapter(new UseLogListAdapter(this, transitData.getTrips()));
+        if (transitData.getTrips() != null)
+            setListAdapter(new UseLogListAdapter(this, transitData.getTrips()));
     }
 
     @Override
