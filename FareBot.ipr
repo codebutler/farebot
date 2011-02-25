@@ -31,17 +31,7 @@
     <module2copyright />
     <LanguageOptions name="XML">
       <option name="fileTypeOverride" value="3" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="block" value="true" />
-      <option name="separateBefore" value="false" />
-      <option name="separateAfter" value="false" />
       <option name="prefixLines" value="false" />
-      <option name="lenBefore" value="80" />
-      <option name="lenAfter" value="80" />
-      <option name="box" value="false" />
-      <option name="filler" value=" " />
     </LanguageOptions>
   </component>
   <component name="DependencyValidationManager">

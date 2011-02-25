@@ -22,12 +22,10 @@
 
 package com.codebutler.farebot.mifare;
 
-import android.nfc.NfcAdapter;
+import android.nfc.tech.IsoDep;
 import com.codebutler.farebot.Utils;
-import com.codebutler.nfc.NfcInternal;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Method;
 
 public class DesfireProtocol
 {
@@ -46,11 +44,11 @@ public class DesfireProtocol
     static final byte PERMISSION_DENIED = (byte) 0x9D;
     static final byte ADDITIONAL_FRAME  = (byte) 0xAF;
 
-    private Object mTagObject;
+    private IsoDep mTagTech;
 
-    public DesfireProtocol(Object tagObject)
+    public DesfireProtocol(IsoDep tagTech)
     {
-        mTagObject = tagObject;
+        mTagTech = tagTech;
     }
 
     public DesfireManufacturingData getManufacturingData() throws Exception
@@ -132,7 +130,7 @@ public class DesfireProtocol
     {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        byte[] recvBuffer = NfcInternal.transceive(mTagObject, wrapMessage(command, parameters));
+        byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, parameters));
 
         while (true) {
             if (recvBuffer[recvBuffer.length - 2] != (byte) 0x91)
@@ -144,11 +142,11 @@ public class DesfireProtocol
             if (status == OPERATION_OK) {
                 break;
             } else if (status == ADDITIONAL_FRAME) {
-                recvBuffer = NfcInternal.transceive(mTagObject, wrapMessage(GET_ADDITIONAL_FRAME, null));
+                recvBuffer = mTagTech.transceive(wrapMessage(GET_ADDITIONAL_FRAME, null));
             } else if (status == PERMISSION_DENIED) {
                 throw new Exception("Permission denied");
             } else {
-                throw new Exception("Unknown status code: " + Integer.toHexString(status));
+                throw new Exception("Unknown status code: " + Integer.toHexString(status & 0xFF));
             }
         }
         

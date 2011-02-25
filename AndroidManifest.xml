@@ -24,10 +24,10 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codebutler.farebot"
-    android:versionCode="1"
-    android:versionName="0.1">
+    android:versionCode="2"
+    android:versionName="0.2">
 
-    <uses-sdk android:minSdkVersion="9" />
+    <uses-sdk android:minSdkVersion="10" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" />
     

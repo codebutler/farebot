@@ -22,6 +22,8 @@
 
 package com.codebutler.farebot.mifare;
 
+import android.nfc.Tag;
+import android.nfc.tech.IsoDep;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
@@ -39,41 +41,53 @@ public class DesfireCard extends MifareCard
     private DesfireManufacturingData mManfData;
     private DesfireApplication[]     mApplications;
 
-    public static DesfireCard dumpTag (byte[] tagId, Object tagObject) throws Exception
+    public static DesfireCard dumpTag (byte[] tagId, Tag tag) throws Exception
     {
         List<DesfireApplication> apps = new ArrayList<DesfireApplication>();
 
-        DesfireProtocol desfireTag = new DesfireProtocol(tagObject);
+        IsoDep tech = IsoDep.get(tag);
 
-        DesfireManufacturingData manufData = desfireTag.getManufacturingData();
+        tech.connect();
 
-        for (int appId : desfireTag.getAppList()) {
-            desfireTag.selectApp(appId);
+        DesfireManufacturingData manufData;
+        DesfireApplication[]     appsArray;
+        
+        try {
+            DesfireProtocol desfireTag = new DesfireProtocol(tech);
 
-            List<DesfireFile> files = new ArrayList<DesfireFile>();
+            manufData = desfireTag.getManufacturingData();
 
-            for (int fileId : desfireTag.getFileList()) {
-                try {
-                    DesfireFileSettings settings = desfireTag.getFileSettings(fileId);
-                    byte[] data = null;
-                    if (settings instanceof DesfireFileSettings.StandardDesfireFileSettings)
-                        data = desfireTag.readFile(fileId);
-                    else
-                        data = desfireTag.readRecord(fileId);
-                    files.add(DesfireFile.create(fileId, settings, data));
-                } catch (Exception ex) {
-                    files.add(new DesfireFile.InvalidDesfireFile(fileId, ex.toString()));
+            for (int appId : desfireTag.getAppList()) {
+                desfireTag.selectApp(appId);
+
+                List<DesfireFile> files = new ArrayList<DesfireFile>();
+
+                for (int fileId : desfireTag.getFileList()) {
+                    try {
+                        DesfireFileSettings settings = desfireTag.getFileSettings(fileId);
+                        byte[] data = null;
+                        if (settings instanceof DesfireFileSettings.StandardDesfireFileSettings)
+                            data = desfireTag.readFile(fileId);
+                        else
+                            data = desfireTag.readRecord(fileId);
+                        files.add(DesfireFile.create(fileId, settings, data));
+                    } catch (Exception ex) {
+                        files.add(new DesfireFile.InvalidDesfireFile(fileId, ex.toString()));
+                    }
                 }
+
+                DesfireFile[] filesArray = new DesfireFile[files.size()];
+                files.toArray(filesArray);
+
+                apps.add(new DesfireApplication(appId, filesArray));
             }
 
-            DesfireFile[] filesArray = new DesfireFile[files.size()];
-            files.toArray(filesArray);
-            
-            apps.add(new DesfireApplication(appId, filesArray));
+            appsArray = new DesfireApplication[apps.size()];
+            apps.toArray(appsArray);
+        } finally {
+            if (tech.isConnected())
+                tech.close();
         }
-
-        DesfireApplication[] appsArray = new DesfireApplication[apps.size()];
-        apps.toArray(appsArray);
 
         return new DesfireCard(tagId, manufData, appsArray);
     }

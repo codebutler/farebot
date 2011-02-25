@@ -23,21 +23,23 @@
 package com.codebutler.farebot.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.MifareCard;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
-import com.codebutler.nfc.NfcInternal;
+import org.apache.commons.lang.ArrayUtils;
 
 public class ReadingTagActivity extends Activity
 {
@@ -63,24 +65,19 @@ public class ReadingTagActivity extends Activity
         try {
             Bundle extras = intent.getExtras();
             
-            final byte[] id = extras.getByteArray(NfcAdapter.EXTRA_ID);
-            Log.d("MainActivity", "Found tag with id: " + Utils.getHexString(id));
-            
-            final Object tagObject = extras.getParcelable("android.nfc.extra.TAG");
+            final Tag      tag   = (Tag) extras.getParcelable("android.nfc.extra.TAG");;
+            final String[] techs = tag.getTechList();
 
-            new AsyncTask<Object, String, MifareCard>() {
+            new AsyncTask<Void, String, MifareCard>() {
                 Exception mException;
                 
                 @Override
-                protected MifareCard doInBackground (Object... params) {
+                protected MifareCard doInBackground (Void... params) {
                     try {
-                        Object tagObject = params[0];
-                        String cardType = NfcInternal.getCardType(tagObject);
-
-                        if (cardType.equals("Iso14443-4"))
-                            return DesfireCard.dumpTag(id, tagObject);
+                        if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
+                            return DesfireCard.dumpTag(tag.getId(), tag);
                         else
-                            throw new Exception(String.format("Unsupported card type: %s\nSerial: %s", cardType, Utils.getHexString(id)));
+                            throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
                     } catch (Exception ex) {
                         mException = ex;
                         return null;
@@ -90,7 +87,21 @@ public class ReadingTagActivity extends Activity
                 @Override
                 protected void onPostExecute (MifareCard card) {
                     if (mException != null) {
-                        Utils.showErrorAndFinish(ReadingTagActivity.this, mException);
+                        if (mException instanceof UnsupportedTagException) {
+                            UnsupportedTagException ex = (UnsupportedTagException) mException;
+                            new AlertDialog.Builder(ReadingTagActivity.this)
+                                .setTitle("Unsupported Tag")
+                                .setMessage(ex.getMessage())
+                                .setCancelable(false)
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick (DialogInterface arg0, int arg1) {
+                                        finish();
+                                    }
+                                })
+                                .show();
+                        } else {
+                            Utils.showErrorAndFinish(ReadingTagActivity.this, mException);
+                        }
                         return;
                     }
 
@@ -115,7 +126,7 @@ public class ReadingTagActivity extends Activity
                     textView.setText(values[0]);
                 }
                 
-            }.execute(tagObject);
+            }.execute();
             
         } catch (Exception ex) {
             Utils.showErrorAndFinish(this, ex);
