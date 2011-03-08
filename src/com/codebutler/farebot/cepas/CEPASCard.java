@@ -40,6 +40,7 @@ import com.codebutler.farebot.mifare.DesfireFileSettings.RecordDesfireFileSettin
 import com.codebutler.farebot.mifare.DesfireFileSettings.StandardDesfireFileSettings;
 import com.codebutler.farebot.mifare.MifareCard.CardType;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -112,10 +113,13 @@ public class CEPASCard extends MifareCard
             source.readByteArray(tagId);
 
             CEPASPurse[] purses = new CEPASPurse[source.readInt()];
-            source.readTypedArray(purses, CEPASPurse.CREATOR);
-            
+            for(int i=0; i<purses.length; i++)
+            	purses[i] = (CEPASPurse) source.readParcelable(CEPASPurse.class.getClassLoader()); 
+
             CEPASHistory[] histories = new CEPASHistory[source.readInt()];
-            source.readTypedArray(histories, CEPASHistory.CREATOR);
+            for(int i=0; i<histories.length; i++)
+            	histories[i] = (CEPASHistory) source.readParcelable(CEPASHistory.class.getClassLoader()); 
+
 
             return new CEPASCard(tagId, purses, histories);
         }
@@ -129,9 +133,11 @@ public class CEPASCard extends MifareCard
     {
         super.writeToParcel(parcel, flags);
         parcel.writeInt(mPurses.length);
-        parcel.writeTypedArray(mPurses, flags);
+        for(int i=0; i<mPurses.length; i++)
+        	parcel.writeParcelable(mPurses[i], flags);
         parcel.writeInt(mHistories.length);
-        parcel.writeTypedArray(mHistories, flags);
+        for(int i=0; i<mHistories.length; i++)
+        	parcel.writeParcelable(mHistories[i], flags);
     }
     
     public int describeContents ()
@@ -139,8 +145,6 @@ public class CEPASCard extends MifareCard
         return 0;
     }
 
-    // FIXME: This is such a mess!
-    
     public static CEPASCard fromXML (byte[] cardId, Element rootElement)
     {
         NodeList purseElements = ((Element) rootElement.getElementsByTagName("purses").item(0)).getElementsByTagName("purse");

@@ -151,7 +151,7 @@ public class CardInfoActivity extends ListActivity
             timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
             routeTextView.setText(trip.getShortAgencyName() + " " + trip.getRouteName());
 
-            if (trip.getFare() > 0) {
+            if (trip.getFare() != 0) {
                 fareTextView.setText(trip.getFareString());
             } else {
                 fareTextView.setText("");

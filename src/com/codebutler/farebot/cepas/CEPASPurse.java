@@ -57,6 +57,9 @@ public class CEPASPurse implements Parcelable
     private final CEPASTransaction 	mLastTransactionRecord;
     private final byte[] 			mIssuerSpecificData;
     private final byte 				mLastTransactionDebitOptionsByte;
+    
+    private final boolean			mIsValid;
+    private final String			mErrorMessage;
 
     public static CEPASPurse create (int purseId, byte[] purseData)
     {
@@ -99,14 +102,46 @@ public class CEPASPurse implements Parcelable
     	mLastTransactionRecord = lastTransactionRecord;
     	mIssuerSpecificData = issuerSpecificData;
     	mLastTransactionDebitOptionsByte = lastTransactionDebitOptionsByte;
+    	mIsValid = true;
+    	mErrorMessage = "";
     }
 
+    public CEPASPurse(int purseId, String errorMessage)
+    {
+
+    	mId = purseId;
+    	mCepasVersion = 0;
+    	mPurseStatus = 0;
+    	mPurseBalance = 0;
+    	mAutoLoadAmount = 0;
+    	mCAN = null;
+    	mCSN = null;
+    	mPurseExpiryDate = 0;
+    	mPurseCreationDate = 0;
+    	mLastCreditTransactionTRP = 0;
+    	mLastCreditTransactionHeader = null;
+    	mLogfileRecordCount = 0;
+    	mIssuerDataLength = 0;
+    	mLastTransactionTRP = 0;
+    	mLastTransactionRecord = null;
+    	mIssuerSpecificData = null;
+    	mLastTransactionDebitOptionsByte = 0;
+    	mIsValid = false;
+    	mErrorMessage = errorMessage;
+    }
 
     public CEPASPurse (int purseId, byte[] purseData)
     {
     	int tmp;
-    	if(purseData == null)
+    	if(purseData == null) {
     		purseData = new byte[128];
+    		mIsValid = false;
+    		mErrorMessage = "";
+    	}
+    	else {
+    		mIsValid = true;
+    		mErrorMessage = "";
+    	}
     	
         mId       = purseId;
         mCepasVersion = purseData[0];
@@ -235,19 +270,67 @@ public class CEPASPurse implements Parcelable
 		return mLastTransactionDebitOptionsByte;
 	}
 
+	public boolean isValidPurse() {
+		return mIsValid;
+	}
+	
+	public String getErrorMessage() {
+		return mErrorMessage;
+	}
 
 	public static final Parcelable.Creator<CEPASPurse> CREATOR = new Parcelable.Creator<CEPASPurse>() {
         public CEPASPurse createFromParcel(Parcel source) {
             int purseId = source.readInt();
+            byte 			 cepasVersion;
+            byte 			 purseStatus;
+            int 			 purseBalance;
+            int 			 autoLoadAmount;
+            byte[] 			 CAN;
+            byte[] 			 CSN;
+            int				 purseExpiryDate;
+            int				 purseCreationDate;
+            int 			 lastCreditTransactionTRP;
+            byte[] 			 lastCreditTransactionHeader;
+            byte 			 logfileRecordCount;
+            int				 issuerDataLength;
+            int 			 lastTransactionTRP;
+            CEPASTransaction lastTransactionRecord;
+            byte[] 			 issuerSpecificData;
+            byte 			 lastTransactionDebitOptionsByte;
 
-            boolean isError = (source.readInt() == 1);
 
-                int    dataLength = source.readInt();
-                byte[] purseData   = new byte[dataLength];
-                source.readByteArray(purseData);
-
-                return CEPASPurse.create(purseId, purseData);
-        }
+            if(source.readInt() == 0)
+            	return new CEPASPurse(purseId, source.readString());
+            else {
+            	cepasVersion = source.readByte();
+            	purseStatus = source.readByte();
+            	purseBalance = source.readInt();
+            	autoLoadAmount = source.readInt();
+            	CAN = new byte[source.readInt()];
+            	source.readByteArray(CAN);
+            	CSN = new byte[source.readInt()];
+            	source.readByteArray(CSN);
+            	purseExpiryDate = source.readInt();
+            	purseCreationDate = source.readInt();
+            	lastCreditTransactionTRP = source.readInt();
+            	lastCreditTransactionHeader = new byte[source.readInt()];
+            	source.readByteArray(lastCreditTransactionHeader);
+            	logfileRecordCount = source.readByte();
+            	issuerDataLength = source.readInt();
+            	lastTransactionTRP = source.readInt();
+            	lastTransactionRecord = (CEPASTransaction) source.readParcelable(CEPASTransaction.class.getClassLoader());
+            	issuerSpecificData = new byte[source.readInt()];
+            	source.readByteArray(issuerSpecificData);
+            	lastTransactionDebitOptionsByte = source.readByte();
+                return new CEPASPurse(purseId, cepasVersion, purseStatus, purseBalance,
+  					  autoLoadAmount, CAN, CSN, purseExpiryDate,
+  					  purseCreationDate,
+  					  lastCreditTransactionTRP, lastCreditTransactionHeader,
+  					  logfileRecordCount, issuerDataLength,
+  					  lastTransactionTRP, lastTransactionRecord,
+  					  issuerSpecificData, lastTransactionDebitOptionsByte);
+            }
+       }
 
         public CEPASPurse[] newArray (int size) {
             return new CEPASPurse[size];
@@ -257,23 +340,33 @@ public class CEPASPurse implements Parcelable
     public void writeToParcel (Parcel parcel, int flags)
     {
         parcel.writeInt(mId);
-        parcel.writeByte(mCepasVersion);
-        parcel.writeByte(mPurseStatus);
-        parcel.writeInt(mPurseBalance);
-        parcel.writeInt(mAutoLoadAmount);
-        parcel.writeByteArray(mCAN);
-        parcel.writeByteArray(mCSN);
-        parcel.writeInt(mPurseExpiryDate);
-        parcel.writeInt(mPurseCreationDate);
-        parcel.writeInt(mLastCreditTransactionTRP);
-        parcel.writeByteArray(mLastCreditTransactionHeader);
-        parcel.writeByte(mLogfileRecordCount);
-        parcel.writeInt(mIssuerDataLength);
-        parcel.writeInt(mLastTransactionTRP);
-        parcel.writeParcelable(mLastTransactionRecord, flags);
-        parcel.writeByteArray(mIssuerSpecificData);
-        parcel.writeByte(mLastTransactionDebitOptionsByte);
-
+        if(!mIsValid) {
+        	parcel.writeInt(0);
+        	parcel.writeString(mErrorMessage);
+        }
+        else {
+        	parcel.writeInt(1);
+        	parcel.writeByte(mCepasVersion);
+        	parcel.writeByte(mPurseStatus);
+        	parcel.writeInt(mPurseBalance);
+        	parcel.writeInt(mAutoLoadAmount);
+        	parcel.writeInt(mCAN.length);
+        	parcel.writeByteArray(mCAN);
+        	parcel.writeInt(mCSN.length);
+        	parcel.writeByteArray(mCSN);
+	        parcel.writeInt(mPurseExpiryDate);
+	        parcel.writeInt(mPurseCreationDate);
+	        parcel.writeInt(mLastCreditTransactionTRP);
+	        parcel.writeInt(mLastCreditTransactionHeader.length);
+	        parcel.writeByteArray(mLastCreditTransactionHeader);
+	        parcel.writeByte(mLogfileRecordCount);
+	        parcel.writeInt(mIssuerDataLength);
+	        parcel.writeInt(mLastTransactionTRP);
+	        parcel.writeParcelable(mLastTransactionRecord, flags);
+	        parcel.writeInt(mIssuerSpecificData.length);
+	        parcel.writeByteArray(mIssuerSpecificData);
+	        parcel.writeByte(mLastTransactionDebitOptionsByte);
+        }
     }
 
     public int describeContents ()
@@ -303,7 +396,7 @@ public class CEPASPurse implements Parcelable
         
         id = Integer.parseInt(element.getAttribute("id"));
     	if(element.getAttribute("valid").equals("false"))
-    		return new InvalidCEPASPurse(id, element.getAttribute("error"));
+    		return new CEPASPurse(id, element.getAttribute("error"));
     	
         cepasVersion = Byte.parseByte(element.getAttribute("cepas-version"));
         purseStatus = Byte.parseByte(element.getAttribute("purse-status"));
@@ -335,10 +428,10 @@ public class CEPASPurse implements Parcelable
     public Element toXML(Document doc) throws Exception
     {
     	Element purse = doc.createElement("purse");
-    	if(this instanceof InvalidCEPASPurse) {
+    	if(!mIsValid) {
     		purse.setAttribute("id", Integer.toString(mId));
     		purse.setAttribute("valid", "false");
-    		purse.setAttribute("error", ((InvalidCEPASPurse)this).getErrorMessage());
+    		purse.setAttribute("error", getErrorMessage());
     	}
     	else {
     		purse.setAttribute("valid", "true");
@@ -362,22 +455,5 @@ public class CEPASPurse implements Parcelable
     	}
     	
     	return purse;
-    }
-    
-    
-    public static class InvalidCEPASPurse extends CEPASPurse
-    {
-        private String mErrorMessage;
-
-        public InvalidCEPASPurse (int fileId, String errorMessage)
-        {
-            super(fileId, null);
-            mErrorMessage = errorMessage;
-        }
-
-        public String getErrorMessage () {
-            return mErrorMessage;
-        }
-    }
-
+    }    
 }

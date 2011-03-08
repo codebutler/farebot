@@ -37,6 +37,7 @@ import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import org.apache.commons.lang.ArrayUtils;
@@ -74,7 +75,9 @@ public class ReadingTagActivity extends Activity
                 @Override
                 protected MifareCard doInBackground (Void... params) {
                     try {
-                        if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
+                    	if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB"))
+                    		return CEPASCard.dumpTag(tag.getId(), tag);
+                    	else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
                             return DesfireCard.dumpTag(tag.getId(), tag);
                         else
                             throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));

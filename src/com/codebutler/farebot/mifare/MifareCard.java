@@ -25,6 +25,8 @@ package com.codebutler.farebot.mifare;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.cepas.CEPASCard;
+import com.codebutler.farebot.transit.EZLinkTransitData;
 import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import org.w3c.dom.Document;
@@ -54,6 +56,8 @@ public abstract class MifareCard implements Parcelable
     {
         if (OrcaTransitData.check(this))
             return new OrcaTransitData(this);
+        if (EZLinkTransitData.check(this))
+        	return new EZLinkTransitData(this);
         return null;
     }
 
@@ -70,6 +74,8 @@ public abstract class MifareCard implements Parcelable
         switch (type) {
             case MifareDesfire:
                 return DesfireCard.fromXml(id, rootElement);
+            case CEPAS:
+            	return CEPASCard.fromXML(id, rootElement);
             default:
                 throw new UnsupportedOperationException("Unsupported card type: " + type);
         }
@@ -98,7 +104,8 @@ public abstract class MifareCard implements Parcelable
     {
         MifareClassic(0),
         MifareUltralight(1),
-        MifareDesfire(2);
+        MifareDesfire(2),
+        CEPAS(3);
 
         private int mValue;
 
@@ -121,6 +128,8 @@ public abstract class MifareCard implements Parcelable
                     return "MIFARE Ultralight";
                 case 2:
                     return "MIFARE DESFire";
+                case 3:
+                	return "CEPAS";
                 default:
                     return "Unknown";
             }

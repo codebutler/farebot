@@ -22,10 +22,6 @@
 
 package com.codebutler.farebot.cepas;
 
-import com.codebutler.farebot.cepas.CEPASPurse.InvalidCEPASPurse;
-import com.codebutler.farebot.cepas.CEPASHistory.InvalidCEPASHistory;
-
-
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
@@ -64,7 +60,7 @@ public class CEPASProtocol
     	if(purseBuff != null)
     		return new CEPASPurse(purseId, purseBuff);
     	else
-    		return new InvalidCEPASPurse(purseId, "No purse found");
+    		return new CEPASPurse(purseId, "No purse found");
     }
     
     public CEPASHistory getHistory(int purseId) throws Exception
@@ -74,7 +70,7 @@ public class CEPASProtocol
     	if(historyBuff != null)
     		return new CEPASHistory(purseId, historyBuff);
     	else
-    		return new InvalidCEPASHistory(purseId, "No history found");
+    		return new CEPASHistory(purseId, "No history found");
     }
     
     private byte[] sendRequest (byte command, byte p1, byte p2, byte Lc, byte[] parameters) throws Exception

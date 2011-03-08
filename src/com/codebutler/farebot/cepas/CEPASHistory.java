@@ -26,8 +26,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.codebutler.farebot.cepas.CEPASPurse.InvalidCEPASPurse;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -37,6 +35,8 @@ public class CEPASHistory implements Parcelable
     private int                 mId;
     private CEPASTransaction[] mTransactions;
     private static CEPASTransaction[] emptyTransaction = new CEPASTransaction[0];
+    private final boolean mIsValid;
+    private final String mErrorMessage;
     
     public static CEPASHistory create (int purseId, byte[] purseData)
     {
@@ -48,6 +48,8 @@ public class CEPASHistory implements Parcelable
         mId       = purseId;
         
         if(purseData != null) {
+        	mIsValid = true;
+        	mErrorMessage = "";
         	int recordSize = 16;
         	int purseCount = purseData.length / recordSize;
         	mTransactions = new CEPASTransaction[purseCount];
@@ -59,14 +61,25 @@ public class CEPASHistory implements Parcelable
         		mTransactions[i/tempData.length] = new CEPASTransaction(tempData);
         	}
         }
-        else
+        else {
+        	mIsValid = false;
+        	mErrorMessage = "";
         	mTransactions = emptyTransaction;
+        }
         Log.d("CEPASHistory", "There are " + mTransactions.length + " record in purse " + mId);
+    }
+    
+    public CEPASHistory(int purseId, String errorMessage) {
+    	mId = purseId;
+    	mErrorMessage = errorMessage;
+    	mIsValid = false;
     }
     
     public CEPASHistory (int purseId, CEPASTransaction[] transactions) {
     	mTransactions = transactions;
     	mId = purseId;
+    	mIsValid = true;
+    	mErrorMessage = "";
     }
 
     public int getId () {
@@ -76,15 +89,28 @@ public class CEPASHistory implements Parcelable
     public CEPASTransaction[] getTransactions () {
         return mTransactions;
     }
+    
+    public boolean isValid() {
+    	return mIsValid;
+    }
 
+    public String getErrorMessage() {
+    	return mErrorMessage;
+    }
     
     
     public static final Parcelable.Creator<CEPASHistory> CREATOR = new Parcelable.Creator<CEPASHistory>() {
         public CEPASHistory createFromParcel(Parcel source) {
             int purseId = source.readInt();
-            CEPASTransaction[] transactions = (CEPASTransaction[]) source.readParcelableArray(CEPASTransaction.class.getClassLoader()); 
 
-            return new CEPASHistory(purseId, transactions);
+            if(source.readInt() == 1) {
+            	CEPASTransaction[] transactions = new CEPASTransaction[source.readInt()];
+            	for(int i=0; i<transactions.length; i++)
+            		transactions[i] = source.readParcelable(CEPASTransaction.class.getClassLoader());
+            	return new CEPASHistory(purseId, transactions);
+            }
+            else
+            	return new CEPASHistory(purseId, source.readString());
         }
 
         public CEPASHistory[] newArray (int size) {
@@ -95,7 +121,16 @@ public class CEPASHistory implements Parcelable
     public void writeToParcel (Parcel parcel, int flags)
     {
     	parcel.writeInt(mId);
-    	parcel.writeParcelableArray((Parcelable[])mTransactions, flags);
+    	if(mIsValid) {
+    		parcel.writeInt(1);
+    		parcel.writeInt(mTransactions.length);
+    		for(int i=0; i<mTransactions.length; i++)
+    			parcel.writeParcelable(mTransactions[i], flags);
+    	}
+    	else {
+    		parcel.writeInt(0);
+    		parcel.writeString(mErrorMessage);
+    	}
     }
 
     public int describeContents ()
@@ -108,7 +143,7 @@ public class CEPASHistory implements Parcelable
     {
     	int id = Integer.parseInt(element.getAttribute("id"));
     	if(element.getAttribute("valid").equals("false"))
-    		return new InvalidCEPASHistory(id, element.getAttribute("error"));
+    		return new CEPASHistory(id, element.getAttribute("error"));
 
         NodeList historyElements = ((Element) element.getElementsByTagName("history").item(0)).getElementsByTagName("transaction");
 
@@ -123,9 +158,9 @@ public class CEPASHistory implements Parcelable
     {
     	Element history = doc.createElement("history");
     	history.setAttribute("id", Integer.toString(mId));
-    	if(this instanceof InvalidCEPASHistory) {
+    	if(!mIsValid) {
     		history.setAttribute("valid", "false");
-    		history.setAttribute("error", ((InvalidCEPASHistory)this).getErrorMessage());
+    		history.setAttribute("error", getErrorMessage());
     	}
     	else {
     		history.setAttribute("valid", "true");
@@ -134,21 +169,5 @@ public class CEPASHistory implements Parcelable
     	}
     	return history;
     }
-    
-    
-    
-    public static class InvalidCEPASHistory extends CEPASHistory
-    {
-        private String mErrorMessage;
-
-        public InvalidCEPASHistory (int fileId, String errorMessage)
-        {
-            super(fileId, new byte[0]);
-            mErrorMessage = errorMessage;
-        }
-
-        public String getErrorMessage () {
-            return mErrorMessage;
-        }
-    }
+        
 }

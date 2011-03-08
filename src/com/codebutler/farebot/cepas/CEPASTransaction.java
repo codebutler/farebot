@@ -12,6 +12,12 @@ public class CEPASTransaction implements Parcelable {
 	private final int mDate;
 	private final String mUserData;
 	
+	public enum TransactionType {
+		MRT,
+		BUS,
+		BUS_REFUND,
+		UNKNOWN,
+	}
 	
 	public CEPASTransaction(byte[] rawData) {
 		int tmp;
@@ -45,9 +51,16 @@ public class CEPASTransaction implements Parcelable {
 		mUserData = userData;
 	}
 	
-	public byte getType() {
-		return mType;
+	public TransactionType getType() {
+		if(mType == 48)
+			return TransactionType.MRT;
+		if(mType == 49)
+			return TransactionType.BUS;
+		if(mType == 118)
+			return TransactionType.BUS_REFUND;
+		return TransactionType.UNKNOWN;
 	}
+	
 	public int getAmount() {
 		return mAmount;
 	}
