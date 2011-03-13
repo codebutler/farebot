@@ -29,8 +29,10 @@ public abstract class Trip
     public abstract String getAgencyName ();
     public abstract String getShortAgencyName ();
     public abstract String getFareString ();
-    public abstract String getStationName ();
     public abstract String getBalanceString ();
-    public abstract Station getStation ();
+    public abstract String getStartStationName ();
+    public abstract Station getStartStation ();
+    public abstract String getEndStationName ();
+    public abstract Station getEndStation ();
     public abstract double getFare ();
 }

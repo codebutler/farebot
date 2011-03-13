@@ -432,7 +432,7 @@ public class EZLinkTransitData extends TransitData
     }
 
     @Override
-    public int getSerialNumber () {
+    public long getSerialNumber () {
         return mSerialNumber;
     }
 
@@ -507,26 +507,6 @@ public class EZLinkTransitData extends TransitData
         }
 
         @Override
-        public String getStationName () {
-            if (mTransaction.getUserData().charAt(3) == '-') {
-                String startStationAbbr = mTransaction.getUserData().substring(0,3);
-                String endStationAbbr   = mTransaction.getUserData().substring(4,7);
-
-                MRTStation startStation = EZLinkTransitData.getStation(startStationAbbr);
-                MRTStation endStation   = EZLinkTransitData.getStation(endStationAbbr);
-
-                if (startStation != null)
-                    startStationAbbr = startStation.getName();
-                
-                if (endStation != null)
-                    endStationAbbr = endStation.getName();
-
-                return startStationAbbr + " - " + endStationAbbr;
-            }
-            return mTransaction.getUserData();
-        }
-
-        @Override
         public String getFareString () {
             String result = NumberFormat.getCurrencyInstance(new Locale("en", "SG")).format(mTransaction.getAmount() / 100.0);
             if (mTransaction.getAmount() < 0)
@@ -545,9 +525,39 @@ public class EZLinkTransitData extends TransitData
         }
 
         @Override
-        public Station getStation () {
-            // FIXME: Need to figure out how to deal with having start and end stations.
+        public Station getStartStation () {
         	return null;
+        }
+
+        @Override
+        public Station getEndStation () {
+            return null;
+        }
+
+        @Override
+        public String getStartStationName () {
+            if (mTransaction.getUserData().charAt(3) == '-') {
+                String startStationAbbr = mTransaction.getUserData().substring(0,3);
+                MRTStation startStation = EZLinkTransitData.getStation(startStationAbbr);
+                if (startStation != null)
+                    return startStation.getName();
+                else
+                    return startStationAbbr;
+            }
+            return mTransaction.getUserData();
+        }
+
+        @Override
+        public String getEndStationName () {
+            if (mTransaction.getUserData().charAt(3) == '-') {
+                String endStationAbbr   = mTransaction.getUserData().substring(4,7);
+                MRTStation endStation   = EZLinkTransitData.getStation(endStationAbbr);
+                if (endStation != null)
+                    return endStation.getName();
+                else
+                    return endStationAbbr;
+            }
+            return mTransaction.getUserData();
         }
     }
 }

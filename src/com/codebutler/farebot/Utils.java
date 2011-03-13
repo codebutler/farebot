@@ -98,14 +98,25 @@ public class Utils
     public static int byteArrayToInt(byte[] b, int offset) {
         return byteArrayToInt(b, offset, b.length);
     }
-
-    public static int byteArrayToInt(byte[] b, int offset, int length) {
-        int value = 0;
+    
+    public static long byteArrayToLong(byte[] b, int offset, int length) {
+        long value = 0;
         for (int i = 0; i < length; i++) {
             int shift = (length - 1 - i) * 8;
             value += (b[i + offset] & 0x000000FF) << shift;
         }
         return value;
+    }
+    
+    public static int byteArrayToInt(byte[] b, int offset, int length) {
+    	return (int) byteArrayToLong(b, offset, length);
+    }
+    
+    public static byte[] byteArraySlice(byte[] b, int offset, int length) {
+        byte[] ret = new byte[length];
+        for (int i = 0; i < length; i++)
+        	ret[i] = b[offset+i];
+        return ret;
     }
 
     public static String xmlDocumentToString (Document doc) throws Exception

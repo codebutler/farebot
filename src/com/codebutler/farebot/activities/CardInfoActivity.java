@@ -30,8 +30,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -53,6 +54,7 @@ public class CardInfoActivity extends ListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_info);
+        registerForContextMenu(findViewById(android.R.id.list));
 
         Uri uri = getIntent().getData();
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
@@ -86,14 +88,30 @@ public class CardInfoActivity extends ListActivity
     }
 
     @Override
-    protected void onListItemClick (ListView l, View v, int position, long id)
+    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
+        int position = ((AdapterContextMenuInfo) menuInfo).position;
         Trip trip = (Trip) getListAdapter().getItem(position);
-        Station station = trip.getStation();
-        if (station != null) {
-            Uri uri = Uri.parse(String.format("geo:0,0?q=%s,%s (%s)", station.getLatitude(), station.getLongitude(), station.getName()));
-            startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        }
+
+        if (trip.getStartStation() != null)
+            menu.add(Menu.NONE, 1, 1, String.format("Map of %s", trip.getStartStation().getName()));
+
+        if (trip.getEndStation() != null)
+            menu.add(Menu.NONE, 2, 2, String.format("Map of %s", trip.getEndStation().getName()));
+    }
+
+    @Override
+    public boolean onContextItemSelected (MenuItem item)
+    {
+        int position = ((AdapterContextMenuInfo) item.getMenuInfo()).position;
+        Trip trip = (Trip) getListAdapter().getItem(position);
+
+        Station station = (item.getItemId() == 1) ? trip.getStartStation() : trip.getEndStation();
+
+        Uri uri = Uri.parse(String.format("geo:0,0?q=%s,%s (%s)", station.getLatitude(), station.getLongitude(), station.getName()));
+        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+
+        return true;
     }
 
     @Override
@@ -149,7 +167,11 @@ public class CardInfoActivity extends ListActivity
 
             dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
             timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
-            routeTextView.setText(trip.getShortAgencyName() + " " + trip.getRouteName());
+
+            if (trip.getRouteName() != null)
+                routeTextView.setText(String.format("%s %s", trip.getShortAgencyName(), trip.getRouteName()));
+            else
+                routeTextView.setText(trip.getShortAgencyName());
 
             if (trip.getFare() != 0) {
                 fareTextView.setText(trip.getFareString());
@@ -157,8 +179,15 @@ public class CardInfoActivity extends ListActivity
                 fareTextView.setText("");
             }
 
-            stationTextView.setText(trip.getStationName());
-
+            if (trip.getStartStationName() != null && trip.getEndStationName() != null) {
+                stationTextView.setText(String.format("%s → %s", trip.getStartStationName(), trip.getEndStationName()));
+                stationTextView.setVisibility(View.VISIBLE);
+            } else if (trip.getStartStationName() != null) {
+                stationTextView.setText(trip.getStartStationName());
+                stationTextView.setVisibility(View.VISIBLE);
+            } else {
+                stationTextView.setVisibility(View.GONE);
+            }
             return convertView;
         }
     }

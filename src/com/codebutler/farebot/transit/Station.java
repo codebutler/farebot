@@ -24,17 +24,27 @@ package com.codebutler.farebot.transit;
 
 public class Station
 {
-    private final String mName, mLatitude, mLongitude;
-    
+    private final String mName, mShortName, mLatitude, mLongitude;
+
     public Station (String name, String latitude, String longitude)
     {
+        this(name, name, latitude, longitude);
+    }
+
+    public Station (String name, String shortName, String latitude, String longitude)
+    {
         mName      = name;
+        mShortName = shortName;
         mLatitude  = latitude;
         mLongitude = longitude;
     }
 
     public String getName () {
         return mName;
+    }
+
+    public String getShortName () {
+        return mShortName;
     }
 
     public String getLatitude () {

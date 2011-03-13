@@ -70,8 +70,8 @@ public class OrcaTransitData extends TransitData
     }
 
     @Override
-    public int getSerialNumber () {
-        return mSerialNumber;
+    public long getSerialNumber () {
+        return (long) mSerialNumber;
     }
 
     @Override
@@ -212,15 +212,6 @@ public class OrcaTransitData extends TransitData
         }
 
         @Override
-        public String getStationName () {
-            if (mAgency == 0x07 && mCoachNum > 10000) {
-                return sLinkStations[(((int) mCoachNum) % 1000) - 193].getName();
-            } else {
-                return "Coach #" + String.valueOf(mCoachNum);
-            }
-        }
-
-        @Override
         public String getFareString () {
             return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100);
         }
@@ -236,10 +227,31 @@ public class OrcaTransitData extends TransitData
         }
 
         @Override
-        public Station getStation() {
+        public Station getStartStation() {
             if (mAgency == 0x07 && mCoachNum > 1000) {
                 return sLinkStations[(((int) mCoachNum) % 1000) - 193];
             }
+            return null;
+        }
+
+        @Override
+        public String getStartStationName () {
+            if (mAgency == 0x07 && mCoachNum > 10000) {
+                return sLinkStations[(((int) mCoachNum) % 1000) - 193].getName();
+            } else {
+                return "Coach #" + String.valueOf(mCoachNum);
+            }
+        }
+
+        @Override
+        public String getEndStationName () {
+            // Clipper tracks destination in a separate record
+            return null;
+        }
+
+        @Override
+        public Station getEndStation () {
+            // Clipper tracks destination in a separate record
             return null;
         }
     }
