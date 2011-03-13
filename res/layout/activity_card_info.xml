@@ -60,8 +60,8 @@
     </LinearLayout>
 
     <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@android:id/text1"
+        android:id="@+id/recent_trips_header"
+        android:visibility="gone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingTop="2dip"
@@ -70,9 +70,29 @@
         android:text="@string/recent_trips"
         style="?android:attr/listSeparatorTextViewStyle" />
 
-    <ListView
-    android:id="@android:id/list"
+    <TabHost
+        android:id="@android:id/tabhost"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown_card"
+                android:id="@+id/unknown_text_view"
+                android:visibility="gone" />
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" />
+        </LinearLayout>
+    </TabHost>
 </LinearLayout>

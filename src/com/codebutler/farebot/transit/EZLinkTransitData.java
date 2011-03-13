@@ -441,6 +441,11 @@ public class EZLinkTransitData extends TransitData
         return mTrips;
     }
 
+    @Override
+    public Refill[] getRefills () {
+        return null;
+    }
+
     private Trip[] parseTrips (CEPASCard card)
     {
     	CEPASTransaction[] transactions = card.getHistory(3).getTransactions();
@@ -537,7 +542,7 @@ public class EZLinkTransitData extends TransitData
         @Override
         public String getStartStationName () {
             if (mTransaction.getUserData().charAt(3) == '-') {
-                String startStationAbbr = mTransaction.getUserData().substring(0,3);
+                String startStationAbbr = mTransaction.getUserData().substring(0, 3);
                 MRTStation startStation = EZLinkTransitData.getStation(startStationAbbr);
                 if (startStation != null)
                     return startStation.getName();

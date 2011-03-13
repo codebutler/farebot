@@ -1,5 +1,5 @@
 /*
- * TransitData.java
+ * Refill.java
  *
  * Copyright (C) 2011 Eric Butler
  *
@@ -22,11 +22,13 @@
 
 package com.codebutler.farebot.transit;
 
-public abstract class TransitData
+public abstract class Refill
 {
-    public abstract String getBalanceString ();
-    public abstract long getSerialNumber ();
-    public abstract Trip[] getTrips ();
-    public abstract Refill[] getRefills ();
-    public abstract String getCardName ();
+    public abstract long getTimestamp ();
+    
+    public abstract String getAgencyName ();
+    public abstract String getShortAgencyName ();
+
+    public abstract long getAmount ();
+    public abstract String getAmountString ();
 }

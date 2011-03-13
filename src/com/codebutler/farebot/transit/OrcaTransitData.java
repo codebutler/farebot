@@ -79,6 +79,11 @@ public class OrcaTransitData extends TransitData
         return mTrips;
     }
 
+    @Override
+    public Refill[] getRefills () {
+        return null;
+    }
+
     private Trip[] parseTrips (DesfireCard card)
     {
         DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);

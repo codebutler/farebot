@@ -22,30 +22,23 @@
 
 package com.codebutler.farebot.activities;
 
-import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Context;
+import android.app.TabActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ArrayAdapter;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.MifareCard;
 import com.codebutler.farebot.provider.CardsTableColumns;
-import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.Trip;
 
-import java.text.DateFormat;
-import java.util.Date;
-
-public class CardInfoActivity extends ListActivity
+public class CardInfoActivity extends TabActivity
 {
     private MifareCard mCard;
 
@@ -54,7 +47,6 @@ public class CardInfoActivity extends ListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_info);
-        registerForContextMenu(findViewById(android.R.id.list));
 
         Uri uri = getIntent().getData();
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
@@ -83,35 +75,29 @@ public class CardInfoActivity extends ListActivity
         ((TextView) findViewById(R.id.serial_text_view)).setText(String.valueOf(transitData.getSerialNumber()));
         ((TextView) findViewById(R.id.balance_text_view)).setText(transitData.getBalanceString());
 
-        if (transitData.getTrips() != null)
-            setListAdapter(new UseLogListAdapter(this, transitData.getTrips()));
-    }
+        TabSpec tabSpec;
+        Intent  intent;
 
-    @Override
-    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        int position = ((AdapterContextMenuInfo) menuInfo).position;
-        Trip trip = (Trip) getListAdapter().getItem(position);
+        intent = new Intent(this, CardTripsActivity.class);
+        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
 
-        if (trip.getStartStation() != null)
-            menu.add(Menu.NONE, 1, 1, String.format("Map of %s", trip.getStartStation().getName()));
+        tabSpec = getTabHost().newTabSpec("trips")
+            .setContent(intent)
+            .setIndicator(getString(R.string.recent_trips));
+        getTabHost().addTab(tabSpec);
 
-        if (trip.getEndStation() != null)
-            menu.add(Menu.NONE, 2, 2, String.format("Map of %s", trip.getEndStation().getName()));
-    }
+        intent = new Intent(this, CardRefillsActivity.class);
+        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
+        
+        tabSpec = getTabHost().newTabSpec("refills")
+            .setContent(intent)
+            .setIndicator(getString(R.string.recent_refills));
+        getTabHost().addTab(tabSpec);
 
-    @Override
-    public boolean onContextItemSelected (MenuItem item)
-    {
-        int position = ((AdapterContextMenuInfo) item.getMenuInfo()).position;
-        Trip trip = (Trip) getListAdapter().getItem(position);
-
-        Station station = (item.getItemId() == 1) ? trip.getStartStation() : trip.getEndStation();
-
-        Uri uri = Uri.parse(String.format("geo:0,0?q=%s,%s (%s)", station.getLatitude(), station.getLongitude(), station.getName()));
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-
-        return true;
+        if (transitData.getRefills() == null) {
+            findViewById(R.id.recent_trips_header).setVisibility(View.VISIBLE);
+            getTabHost().getTabWidget().setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -136,59 +122,5 @@ public class CardInfoActivity extends ListActivity
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
         intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
         startActivity(intent);
-    }
-
-    private static class UseLogListAdapter extends ArrayAdapter<Trip>
-    {
-        public UseLogListAdapter (Context context, Trip[] items)
-        {
-            super(context, 0, items);
-        }
-
-        @Override
-        public View getView (int position, View convertView, ViewGroup parent)
-        {
-            Activity activity = (Activity) getContext();
-            LayoutInflater inflater = activity.getLayoutInflater();
-
-            if (convertView == null) {
-                convertView = inflater.inflate(R.layout.trip_item, null);
-            }
-
-            Trip trip = (Trip) getItem(position);
-
-            Date date = new Date(trip.getTimestamp() * 1000);
-
-            TextView dateTextView    = (TextView) convertView.findViewById(R.id.date_text_view);
-            TextView timeTextView    = (TextView) convertView.findViewById(R.id.time_text_view);
-            TextView routeTextView   = (TextView) convertView.findViewById(R.id.route_text_view);
-            TextView fareTextView    = (TextView) convertView.findViewById(R.id.fare_text_view);
-            TextView stationTextView = (TextView) convertView.findViewById(R.id.station_text_view);
-
-            dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
-            timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
-
-            if (trip.getRouteName() != null)
-                routeTextView.setText(String.format("%s %s", trip.getShortAgencyName(), trip.getRouteName()));
-            else
-                routeTextView.setText(trip.getShortAgencyName());
-
-            if (trip.getFare() != 0) {
-                fareTextView.setText(trip.getFareString());
-            } else {
-                fareTextView.setText("");
-            }
-
-            if (trip.getStartStationName() != null && trip.getEndStationName() != null) {
-                stationTextView.setText(String.format("%s → %s", trip.getStartStationName(), trip.getEndStationName()));
-                stationTextView.setVisibility(View.VISIBLE);
-            } else if (trip.getStartStationName() != null) {
-                stationTextView.setText(trip.getStartStationName());
-                stationTextView.setVisibility(View.VISIBLE);
-            } else {
-                stationTextView.setVisibility(View.GONE);
-            }
-            return convertView;
-        }
     }
 }

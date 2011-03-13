@@ -244,7 +244,7 @@ public class ClipperTransitData extends TransitData
         }
 
         @Override
-        public long getTimestamp() {
+        public long getTimestamp () {
             return mTimestamp;
         }
 
@@ -337,7 +337,8 @@ public class ClipperTransitData extends TransitData
         	}
         }
     }
-    public static class ClipperRefill // extends ???
+
+    public static class ClipperRefill extends Refill
     {
         private final long mTimestamp;
         private final long mAmount;
@@ -352,27 +353,31 @@ public class ClipperTransitData extends TransitData
             mAgency     = agency;
         }
 
-        // @Override
-        public long getTimestamp() {
+        @Override
+        public long getTimestamp () {
             return mTimestamp;
         }
 
-        // @Override
-        public long getAmount() {
+        @Override
+        public long getAmount () {
             return mAmount;
         }
 
-        // @Override
-        public long getMachineID() {
+        @Override
+        public String getAmountString () {
+            return NumberFormat.getCurrencyInstance(Locale.US).format(mAmount / 100);
+        }
+
+        public long getMachineID () {
             return mMachineID;
         }
 
-        // @Override
+        @Override
         public String getAgencyName () {
         	return ClipperTransitData.getAgencyName((int)mAgency);
         }
 
-        // @Override
+        @Override
         public String getShortAgencyName () {
         	return ClipperTransitData.getShortAgencyName((int)mAgency);
         }

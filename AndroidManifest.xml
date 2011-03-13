@@ -77,6 +77,8 @@
         <activity android:name=".activities.AdvancedCardInfoActivity" />
         <activity android:name=".activities.DesfireCardRawDataActivity"/>
         <activity android:name=".activities.CardHWDetailActivity" />
+        <activity android:name=".activities.CardTripsActivity"/>
+        <activity android:name=".activities.CardRefillsActivity"/>
 
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"

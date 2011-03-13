@@ -53,7 +53,7 @@ public abstract class MifareCard implements Parcelable
         return mTagId;
     }
 
-    public TransitData parseTransitData()
+    public TransitData parseTransitData ()
     {
         if (OrcaTransitData.check(this))
             return new OrcaTransitData(this);
@@ -84,7 +84,7 @@ public abstract class MifareCard implements Parcelable
         }
     }
 
-    public Element toXML() throws Exception
+    public Element toXML () throws Exception
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = builder.newDocument();
