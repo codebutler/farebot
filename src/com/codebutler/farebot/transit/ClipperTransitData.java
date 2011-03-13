@@ -71,6 +71,7 @@ public class ClipperTransitData extends TransitData
 
         mTrips = parseTrips(desfireCard);
         mRefills = parseRefills(desfireCard);
+        setBalances();
     }
 
     @Override
@@ -201,6 +202,25 @@ public class ClipperTransitData extends TransitData
         return new ClipperRefill(timestamp, amount, agency, machineid);
     }
 
+    private void setBalances()
+    {
+    	int trip_idx = 0;
+    	int refill_idx = 0;
+    	long balance = (long) mBalance;
+
+    	while (trip_idx < mTrips.length) {
+    		while (refill_idx < mRefills.length &&
+    				mRefills[refill_idx].getTimestamp() >
+    					mTrips[trip_idx].getTimestamp()) {
+    			balance -= mRefills[refill_idx].mAmount;
+    			refill_idx++;
+    		}
+    		((ClipperTrip)mTrips[trip_idx]).mBalance = balance;
+    		balance += ((ClipperTrip)mTrips[trip_idx]).mFare;
+    		trip_idx++;
+    	}
+    }
+    
     public static String getAgencyName(int agency)
     {
         switch (agency) {
@@ -233,6 +253,7 @@ public class ClipperTransitData extends TransitData
         private final long mAgency;
         private final long mFrom;
         private final long mTo;
+        private long mBalance;
 
         public ClipperTrip (long timestamp, long fare, long agency, long from, long to)
         {
@@ -241,6 +262,7 @@ public class ClipperTransitData extends TransitData
             mAgency     = agency;
             mFrom       = from;
             mTo         = to;
+            mBalance    = 0;
         }
 
         @Override
@@ -279,8 +301,7 @@ public class ClipperTransitData extends TransitData
 
         @Override
         public String getBalanceString () {
-        	// FIXME: Clipper trips don't have the remaining balance
-            return NumberFormat.getCurrencyInstance(Locale.US).format(0 / 100);
+            return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.0);
         }
 
         @Override
