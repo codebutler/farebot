@@ -76,7 +76,7 @@ public class MainActivity extends ListActivity
                     textView1.setText("Error");
                 }
 
-                textView2.setText(String.format("%s Ñ %s", MifareCard.CardType.values()[type].toString(), serial));
+                textView2.setText(String.format("%s - %s", MifareCard.CardType.values()[type].toString(), serial));
             }
         });
 
