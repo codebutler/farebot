@@ -101,7 +101,7 @@ public class Utils
     
     public static long byteArrayToLong(byte[] b, int offset, int length) {
         long value = 0;
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length  && i < b.length; i++) {
             int shift = (length - 1 - i) * 8;
             value += (b[i + offset] & 0x000000FF) << shift;
         }

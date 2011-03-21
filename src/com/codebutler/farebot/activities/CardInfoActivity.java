@@ -64,7 +64,12 @@ public class CardInfoActivity extends TabActivity
             return;
         }
 
-        TransitData transitData = mCard.parseTransitData();
+        TransitData transitData = null;
+        try {
+            transitData = mCard.parseTransitData();
+        } catch (Exception ex) {
+            Utils.showErrorAndFinish(this, ex);
+        }
         if (transitData == null) {
             showAdvancedInfo();
             finish();
