@@ -64,9 +64,17 @@ public class CardInfoActivity extends TabActivity
             return;
         }
 
-        TransitData transitData = mCard.parseTransitData();
+        TransitData transitData = null;
+        try {
+            transitData = mCard.parseTransitData();
+        } catch (Exception ex) {
+            showAdvancedInfo(Utils.getErrorMessage(ex));
+            finish();
+            return;
+        }
+
         if (transitData == null) {
-            showAdvancedInfo();
+            showAdvancedInfo("Unknown card data. Only ORCA and Clipper cards are currently supported.");
             finish();
             return;
         }
@@ -111,16 +119,18 @@ public class CardInfoActivity extends TabActivity
     public boolean onOptionsItemSelected (MenuItem item)
     {
         if (item.getItemId() == R.id.advanced_info) {
-            showAdvancedInfo();
+            showAdvancedInfo(null);
             return true;
         }
         return false;
     }
 
-    private void showAdvancedInfo ()
+    private void showAdvancedInfo (String message)
     {
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
         intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
+        if (message != null)
+            intent.putExtra(AdvancedCardInfoActivity.EXTRA_MESSAGE, message);
         startActivity(intent);
     }
 }

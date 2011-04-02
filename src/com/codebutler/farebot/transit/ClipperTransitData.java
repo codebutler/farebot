@@ -41,16 +41,21 @@ public class ClipperTransitData extends TransitData
     private Trip[]          mTrips;
     private ClipperRefill[] mRefills;
 
-    private static final int  RECORD_LENGTH = 32;
-    private static final int  AGENCY_BART   = 0x04;
-    private static final int  AGENCY_GGT    = 0x0b;
-    private static final int  AGENCY_MUNI   = 0x12;
-    private static final long EPOCH_OFFSET  = 0x83aa7f18;
+    private static final int  RECORD_LENGTH   = 32;
+    private static final int  AGENCY_BART     = 0x04;
+    private static final int  AGENCY_CALTRAIN = 0x06;
+    private static final int  AGENCY_GGT      = 0x0b;
+    private static final int  AGENCY_MUNI     = 0x12;
+    private static final long EPOCH_OFFSET    = 0x83aa7f18;
 
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {
         {
+            put((long)0x07, new Station("Civic Center Station", "Civic Center", "37.779538", "-122.413788"));
             put((long)0x08, new Station("Powell Street Station", "Powell St.", "37.784970", "-122.40701"));
+            put((long)0x0a, new Station("Embarcadero Station", "Embarcadero", "37.793086", "-122.396276"));
+            put((long)0x29, new Station("San Bruno Station", "San Bruno", "37.63714", "-122.415622"));
             put((long)0x2a, new Station("San Francisco Int'l Airport Station", "SFO", "37.61590", "-122.39263"));
+            put((long)0x2b, new Station("Milbrae Station", "Milbrae", "37.599935", "-122.386478"));
         }
     };
 
@@ -63,14 +68,34 @@ public class ClipperTransitData extends TransitData
     {
         DesfireCard desfireCard = (DesfireCard) card;
 
-        byte[] data = desfireCard.getApplication(0x9011f2).getFile(0x08).getData();
-        mSerialNumber = Utils.byteArrayToLong(data, 1, 4);
+        byte[] data;
 
-        data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
-        mBalance = Utils.byteArrayToInt(data, 18, 2);
+        try {
+            data = desfireCard.getApplication(0x9011f2).getFile(0x08).getData();
+            mSerialNumber = Utils.byteArrayToLong(data, 1, 4);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing Clipper serial", ex);
+        }
 
-        mTrips = parseTrips(desfireCard);
-        mRefills = parseRefills(desfireCard);
+        try {
+            data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
+            mBalance = Utils.byteArrayToInt(data, 18, 2);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing Clipper balance", ex);
+        }
+
+        try {
+            mTrips = parseTrips(desfireCard);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing Clipper trips", ex);
+        }
+
+        try {
+            mRefills = parseRefills(desfireCard);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing Clipper refills", ex);
+        }
+
         setBalances();
     }
 
@@ -226,6 +251,8 @@ public class ClipperTransitData extends TransitData
         switch (agency) {
         case AGENCY_BART:
             return "Bay Area Rapid Transit";
+        case AGENCY_CALTRAIN:
+            return "Caltrain";
         case AGENCY_GGT:
             return "Golden Gate Transit";
         case AGENCY_MUNI:
@@ -238,6 +265,8 @@ public class ClipperTransitData extends TransitData
         switch (agency) {
             case AGENCY_BART:
                 return "BART";
+            case AGENCY_CALTRAIN:
+                return "Caltrain";
             case AGENCY_GGT:
                 return "GGT";
             case AGENCY_MUNI:
@@ -334,7 +363,7 @@ public class ClipperTransitData extends TransitData
                     return "Station #0x" + Long.toString(mFrom, 16);
         	} else if (mAgency == AGENCY_MUNI) {
         		return null; // Coach number is not collected
-        	} else if (mAgency == AGENCY_GGT) {
+        	} else if (mAgency == AGENCY_GGT || mAgency == AGENCY_CALTRAIN) {
         		return "Zone #" + mFrom;
         	} else {
         		return "(Unknown Station)";
@@ -351,7 +380,9 @@ public class ClipperTransitData extends TransitData
                     return "Station #0x" + Long.toString(mTo, 16);
             } else if (mAgency == AGENCY_MUNI) {
         		return null; // Coach number is not collected
-        	} else if (mAgency == AGENCY_GGT) {
+        	} else if (mAgency == AGENCY_GGT || mAgency == AGENCY_CALTRAIN) {
+        		if (mTo == 0xffff)
+        			return "(End of line)";
         		return "Zone #" + mTo;
         	} else {
         		return "(Unknown Station)";
@@ -386,7 +417,7 @@ public class ClipperTransitData extends TransitData
 
         @Override
         public String getAmountString () {
-            return NumberFormat.getCurrencyInstance(Locale.US).format(mAmount / 100);
+            return NumberFormat.getCurrencyInstance(Locale.US).format((double)mAmount / 100.0);
         }
 
         public long getMachineID () {

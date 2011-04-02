@@ -50,13 +50,27 @@ public class OrcaTransitData extends TransitData
     {
         DesfireCard desfireCard = (DesfireCard) card;
 
-        byte[] data = desfireCard.getApplication(0xffffff).getFile(0x0f).getData();
-        mSerialNumber = Utils.byteArrayToInt(data, 5, 3);
+        byte[] data;
 
-        data = desfireCard.getApplication(0x3010f2).getFile(0x04).getData();
-        mBalance = Utils.byteArrayToInt(data, 41, 2);
+        try {
+            data = desfireCard.getApplication(0xffffff).getFile(0x0f).getData();
+            mSerialNumber = Utils.byteArrayToInt(data, 5, 3);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing ORCA serial", ex);
+        }
 
-        mTrips = parseTrips(desfireCard);
+        try {
+            data = desfireCard.getApplication(0x3010f2).getFile(0x04).getData();
+            mBalance = Utils.byteArrayToInt(data, 41, 2);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing ORCA balance", ex);
+        }
+
+        try {
+            mTrips = parseTrips(desfireCard);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing ORCA trips", ex);
+        }
     }
 
     @Override

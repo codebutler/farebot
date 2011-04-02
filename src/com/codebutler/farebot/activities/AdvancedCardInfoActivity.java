@@ -31,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -39,7 +40,8 @@ import com.codebutler.farebot.mifare.MifareCard;
 
 public class AdvancedCardInfoActivity extends TabActivity
 {
-    public static String EXTRA_CARD = "com.codebutler.farebot.EXTRA_CARD";
+    public static String EXTRA_CARD    = "com.codebutler.farebot.EXTRA_CARD";
+    public static String EXTRA_MESSAGE = "com.codebutler.farebot.EXTRA_MESSAGE";
 
     private MifareCard mCard;
     
@@ -50,9 +52,15 @@ public class AdvancedCardInfoActivity extends TabActivity
         setContentView(R.layout.activity_advanced_card_info);
 
         mCard = (MifareCard) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
-        if (mCard.parseTransitData() == null) {
-            findViewById(R.id.unknown_text_view).setVisibility(View.VISIBLE);
-        }       
+
+        ((TextView) findViewById(R.id.card_type_text_view)).setText(mCard.getCardType().toString());
+        ((TextView) findViewById(R.id.card_serial_text_view)).setText(Utils.getHexString(mCard.getTagId(), "<error>"));
+
+        if (getIntent().hasExtra(EXTRA_MESSAGE)) {
+            String message = getIntent().getStringExtra(EXTRA_MESSAGE);
+            ((TextView) findViewById(R.id.error_text_view)).setText(message);
+            findViewById(R.id.error_text_view).setVisibility(View.VISIBLE);
+        }
 
         TabHost tabHost = getTabHost();
 

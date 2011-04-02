@@ -23,7 +23,8 @@
 
 <resources>
     <string name="app_name">FareBot</string>
-    <string name="loading">Loading...</string>
+    <string name="reading_card">Reading Card</string>
+    <string name="dont_move">Do not move card</string>
     <string name="advanced_info">Advanced Info</string>
     <string name="delete_card">Delete Card</string>
     <string name="unknown_card">Unknown Card</string>

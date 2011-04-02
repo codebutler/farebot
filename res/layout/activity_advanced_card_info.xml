@@ -30,11 +30,28 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
+
+        <TextView
+            android:id="@+id/card_type_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/card_serial_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp" />
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/unknown_card"
-            android:id="@+id/unknown_text_view"
+            android:id="@+id/error_text_view"
+            android:paddingTop="8dip"
+            android:paddingBottom="8dip"
+            android:textColor="#FFFF0000"
+            android:textStyle="bold"
             android:visibility="gone" />
         <TabWidget
             android:id="@android:id/tabs"

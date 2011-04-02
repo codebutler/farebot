@@ -91,15 +91,26 @@ public class Utils
     }
     */
     
-    public static int byteArrayToInt(byte[] b) {
+    public static int byteArrayToInt(byte[] b)
+    {
         return byteArrayToInt(b, 0);
     }
     
-    public static int byteArrayToInt(byte[] b, int offset) {
+    public static int byteArrayToInt(byte[] b, int offset)
+    {
         return byteArrayToInt(b, offset, b.length);
     }
     
-    public static long byteArrayToLong(byte[] b, int offset, int length) {
+    public static int byteArrayToInt(byte[] b, int offset, int length)
+    {
+    	return (int) byteArrayToLong(b, offset, length);
+    }
+
+    public static long byteArrayToLong(byte[] b, int offset, int length)
+    {
+        if (b.length < length)
+            throw new IllegalArgumentException("length must be less than or equal to b.length");
+
         long value = 0;
         for (int i = 0; i < length; i++) {
             int shift = (length - 1 - i) * 8;
@@ -107,11 +118,7 @@ public class Utils
         }
         return value;
     }
-    
-    public static int byteArrayToInt(byte[] b, int offset, int length) {
-    	return (int) byteArrayToLong(b, offset, length);
-    }
-    
+
     public static byte[] byteArraySlice(byte[] b, int offset, int length) {
         byte[] ret = new byte[length];
         for (int i = 0; i < length; i++)
@@ -135,20 +142,23 @@ public class Utils
 
     public static String getErrorMessage (Throwable ex)
     {
-        String errorMessage = null;
+        String errorMessage = ex.getLocalizedMessage();
+        if (errorMessage == null)
+            errorMessage = ex.getMessage();
+        if (errorMessage == null)
+            errorMessage = ex.toString();
+
         if (ex.getCause() != null) {
-            errorMessage = ex.getCause().getLocalizedMessage();
-            if (errorMessage == null)
-                errorMessage = ex.getCause().getMessage();
-            if (errorMessage == null)
-                errorMessage = ex.getCause().toString();
-        } else {
-            errorMessage = ex.getLocalizedMessage();
-            if (errorMessage == null)
-                errorMessage = ex.getMessage();
-            if (errorMessage == null)
-                errorMessage = ex.toString();
+            String causeMessage = ex.getCause().getLocalizedMessage();
+            if (causeMessage == null)
+                causeMessage = ex.getCause().getMessage();
+            if (causeMessage == null)
+                causeMessage = ex.getCause().toString();
+
+            if (causeMessage != null)
+                errorMessage += ": " + causeMessage;
         }
+
         return errorMessage;
     }
 }
