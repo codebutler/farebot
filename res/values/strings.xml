@@ -36,5 +36,8 @@
     <string name="recent_refills">Recent Refills</string>
     <string name="no_trip_data">No trips found. Has this card been used?</string>
     <string name="no_refill_data">No refills found. Has this card only been used with a pass?</string>
+    <string name="import_xml">Import XML</string>
+    <string name="import_clipboard">Import from Clipboard</string>
+    <string name="import_file">Import from File</string>
     <string name="about">About</string>
 </resources>

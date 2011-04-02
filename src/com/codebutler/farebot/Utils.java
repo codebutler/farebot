@@ -35,6 +35,14 @@ import java.io.StringWriter;
 
 public class Utils
 {
+    public static void showError (final Activity activity, Exception ex)
+    {
+        Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
+        new AlertDialog.Builder(activity)
+            .setMessage(Utils.getErrorMessage(ex))
+            .show();
+    }
+
     public static void showErrorAndFinish (final Activity activity, Exception ex)
     {
         Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));

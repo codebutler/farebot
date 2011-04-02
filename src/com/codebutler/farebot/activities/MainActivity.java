@@ -121,7 +121,53 @@ public class MainActivity extends ListActivity
         if (item.getItemId() == R.id.about) {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://codebutler.github.com/farebot")));
             return true;
+        } else if (item.getItemId() == R.id.import_file) {
+            Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
+
+            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+            i.putExtra(Intent.EXTRA_STREAM, uri);
+            i.setType("application/xml");
+            startActivityForResult(Intent.createChooser(i, "Select File"), SELECT_FILE);
+        } else if (item.getItemId() == R.id.import_clipboard) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            importXML(clipboard.getText().toString());
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult (int requestCode, int resultCode, Intent data)
+    {
+        try {
+            if (resultCode == RESULT_OK && requestCode == SELECT_FILE) {
+                Uri uri = data.getData();
+                String xml = org.apache.commons.io.FileUtils.readFileToString(new File(uri.getPath()));
+                importXML(xml);
+            }
+        } catch (Exception ex) {
+            Utils.showError(this, ex);
+        }
+    }
+
+    private void importXML (String xml)
+    {
+        try {
+            MifareCard card = MifareCard.fromXml(xml);
+
+            ContentValues values = new ContentValues();
+            values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());
+            values.put(CardsTableColumns.TAG_SERIAL, Utils.getHexString(card.getTagId()));
+            values.put(CardsTableColumns.DATA, xml);
+
+            Uri uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
+
+            ((ResourceCursorAdapter) getListAdapter()).notifyDataSetChanged();
+
+            Toast.makeText(this, "XML imported!", 5).show();
+
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (Exception ex) {
+            Utils.showError(this, ex);
+        }
     }
 }

@@ -24,6 +24,16 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/import_xml"
+        android:title="@string/import_xml">
+        <menu>
+            <item android:id="@+id/import_clipboard"
+                  android:title="@string/import_clipboard" />
+            <item android:id="@+id/import_file"
+                  android:title="@string/import_file" />
+        </menu>
+    </item>
+    <item
         android:id="@+id/about"
         android:title="@string/about" />
 </menu>
