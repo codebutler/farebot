@@ -24,24 +24,28 @@ package com.codebutler.farebot.activities;
 
 import android.app.ListActivity;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.ClipboardManager;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.ResourceCursorAdapter;
-import android.widget.TextView;
+import android.widget.*;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.MifareCard;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitData;
+
+import java.io.File;
 
 public class MainActivity extends ListActivity
 {
