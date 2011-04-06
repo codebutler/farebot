@@ -32,7 +32,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.ClipboardManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,12 +48,25 @@ import java.io.File;
 
 public class MainActivity extends ListActivity
 {
+    private static final int SELECT_FILE = 1;
+
+    private static final String[] PROJECTION = new String[] {
+        CardsTableColumns._ID,
+        CardsTableColumns.TYPE,
+        CardsTableColumns.TAG_SERIAL,
+        CardsTableColumns.DATA 
+    };
+
     @Override
     protected void onCreate (Bundle bundle)
     {
         super.onCreate(bundle);
 
-        Cursor cursor = getContentResolver().query(CardProvider.CONTENT_URI_CARD, new String[] { "type", "serial", "data" }, null, null, null);
+        Cursor cursor = getContentResolver().query(CardProvider.CONTENT_URI_CARD,
+            PROJECTION,
+            null,
+            null,
+            CardsTableColumns._ID + " DESC");
         startManagingCursor(cursor);
 
         setListAdapter(new ResourceCursorAdapter(this, android.R.layout.simple_list_item_2, cursor) {

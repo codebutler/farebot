@@ -74,7 +74,7 @@ public class CardProvider extends ContentProvider
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        Cursor cursor = builder.query(db, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = builder.query(db, null, selection, selectionArgs, null, null, sortOrder);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
