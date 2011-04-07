@@ -24,7 +24,6 @@ package com.codebutler.farebot.activities;
 
 import android.app.ListActivity;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -37,12 +36,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.codebutler.farebot.ExportHelper;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitData;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 
@@ -50,23 +52,14 @@ public class MainActivity extends ListActivity
 {
     private static final int SELECT_FILE = 1;
 
-    private static final String[] PROJECTION = new String[] {
-        CardsTableColumns._ID,
-        CardsTableColumns.TYPE,
-        CardsTableColumns.TAG_SERIAL,
-        CardsTableColumns.DATA 
-    };
+    private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
 
     @Override
     protected void onCreate (Bundle bundle)
     {
         super.onCreate(bundle);
 
-        Cursor cursor = getContentResolver().query(CardProvider.CONTENT_URI_CARD,
-            PROJECTION,
-            null,
-            null,
-            CardsTableColumns._ID + " DESC");
+        Cursor cursor = CardDBHelper.createCursor(this);
         startManagingCursor(cursor);
 
         setListAdapter(new ResourceCursorAdapter(this, android.R.layout.simple_list_item_2, cursor) {
@@ -134,19 +127,51 @@ public class MainActivity extends ListActivity
     @Override
     public boolean onOptionsItemSelected (MenuItem item)
     {
-        if (item.getItemId() == R.id.about) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://codebutler.github.com/farebot")));
-            return true;
-        } else if (item.getItemId() == R.id.import_file) {
-            Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
+        try {
+            if (item.getItemId() == R.id.about) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://codebutler.github.com/farebot")));
+                return true;
 
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.putExtra(Intent.EXTRA_STREAM, uri);
-            i.setType("application/xml");
-            startActivityForResult(Intent.createChooser(i, "Select File"), SELECT_FILE);
-        } else if (item.getItemId() == R.id.import_clipboard) {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            importXML(clipboard.getText().toString());
+            } else if (item.getItemId() == R.id.import_clipboard) {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                onCardsImported(ExportHelper.importCardsXml(this, clipboard.getText().toString()));
+                return true;
+
+            } else if (item.getItemId() == R.id.import_file) {
+                Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.putExtra(Intent.EXTRA_STREAM, uri);
+                i.setType("application/xml");
+                startActivityForResult(Intent.createChooser(i, "Select File"), SELECT_FILE);
+                return true;
+
+            } else if (item.getItemId() == R.id.import_sd) {
+                String xml = FileUtils.readFileToString(new File(SD_EXPORT_PATH));
+                onCardsImported(ExportHelper.importCardsXml(this, xml));
+                return true;
+
+            } else if (item.getItemId() == R.id.copy_xml) {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                clipboard.setText(ExportHelper.exportCardsXml(this));
+                Toast.makeText(this, "Copied to clipboard.", 5).show();
+                return true;
+
+            } else if (item.getItemId() == R.id.share_xml) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, ExportHelper.exportCardsXml(this));
+                startActivity(intent);
+                return true;
+
+            } else if (item.getItemId() == R.id.save_xml) {
+                String xml = ExportHelper.exportCardsXml(this);
+                File file = new File(SD_EXPORT_PATH);
+                FileUtils.writeStringToFile(file, xml, "UTF-8");
+                Toast.makeText(this, "Wrote FareBot-Export.xml to USB Storage.", 5).show();
+                return true;
+            }
+        } catch (Exception ex) {
+            Utils.showError(this, ex);
         }
         return false;
     }
@@ -158,32 +183,21 @@ public class MainActivity extends ListActivity
             if (resultCode == RESULT_OK && requestCode == SELECT_FILE) {
                 Uri uri = data.getData();
                 String xml = org.apache.commons.io.FileUtils.readFileToString(new File(uri.getPath()));
-                importXML(xml);
+                onCardsImported(ExportHelper.importCardsXml(this, xml));
             }
         } catch (Exception ex) {
             Utils.showError(this, ex);
         }
     }
 
-    private void importXML (String xml)
+    private void onCardsImported (Uri[] uris)
     {
-        try {
-            MifareCard card = MifareCard.fromXml(xml);
-
-            ContentValues values = new ContentValues();
-            values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());
-            values.put(CardsTableColumns.TAG_SERIAL, Utils.getHexString(card.getTagId()));
-            values.put(CardsTableColumns.DATA, xml);
-
-            Uri uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
-
-            ((ResourceCursorAdapter) getListAdapter()).notifyDataSetChanged();
-
-            Toast.makeText(this, "XML imported!", 5).show();
-
-            startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        } catch (Exception ex) {
-            Utils.showError(this, ex);
+        ((ResourceCursorAdapter) getListAdapter()).notifyDataSetChanged();
+        if (uris.length == 1) {
+            Toast.makeText(this, "Card imported!", 5).show();
+            startActivity(new Intent(Intent.ACTION_VIEW, uris[0]));
+        } else {
+            Toast.makeText(this, "Cards Imported: " + uris.length, 5).show();
         }
     }
 }

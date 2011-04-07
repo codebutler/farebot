@@ -68,11 +68,11 @@ public abstract class MifareCard implements Parcelable
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = builder.parse(new InputSource(new StringReader(xml)));
-        
+
         Element rootElement = doc.getDocumentElement();
 
         CardType type = CardType.class.getEnumConstants()[Integer.parseInt(rootElement.getAttribute("type"))];
-        byte[] id     = Utils.hexStringToByteArray(rootElement.getAttribute("id"));
+        byte[]   id   = Utils.hexStringToByteArray(rootElement.getAttribute("id"));
 
         switch (type) {
             case MifareDesfire:

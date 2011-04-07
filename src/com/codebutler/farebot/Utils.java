@@ -26,7 +26,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.util.Log;
-import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -37,7 +37,7 @@ public class Utils
 {
     public static void showError (final Activity activity, Exception ex)
     {
-        Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
+        Log.e(activity.getClass().getName(), ex.getMessage(), ex);
         new AlertDialog.Builder(activity)
             .setMessage(Utils.getErrorMessage(ex))
             .show();
@@ -127,17 +127,18 @@ public class Utils
         return value;
     }
 
-    public static byte[] byteArraySlice(byte[] b, int offset, int length) {
+    public static byte[] byteArraySlice(byte[] b, int offset, int length)
+    {
         byte[] ret = new byte[length];
         for (int i = 0; i < length; i++)
         	ret[i] = b[offset+i];
         return ret;
     }
 
-    public static String xmlDocumentToString (Document doc) throws Exception
+    public static String xmlNodeToString (Node node) throws Exception
     {
         // The amount of code required to do simple things in Java is incredible.
-        Source source = new DOMSource(doc);
+        Source source = new DOMSource(node);
         StringWriter stringWriter = new StringWriter();
         Result result = new StreamResult(stringWriter);
         TransformerFactory factory = TransformerFactory.newInstance();

@@ -97,7 +97,7 @@ public class AdvancedCardInfoActivity extends TabActivity
     public boolean onOptionsItemSelected (MenuItem item)
     {
         try {
-            String xml = Utils.xmlDocumentToString(mCard.toXML().getOwnerDocument());
+            String xml = Utils.xmlNodeToString(mCard.toXML().getOwnerDocument());
             if (item.getItemId() == R.id.copy_xml) {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(xml);

@@ -109,7 +109,7 @@ public class ReadingTagActivity extends Activity
                     }
 
                     try {
-                        String cardXml = Utils.xmlDocumentToString(card.toXML().getOwnerDocument());
+                        String cardXml = Utils.xmlNodeToString(card.toXML().getOwnerDocument());
 
                         ContentValues values = new ContentValues();
                         values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());

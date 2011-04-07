@@ -23,8 +23,12 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/copy_xml"
-          android:title="@string/copy_xml" />
-    <item android:id="@+id/share_xml"
-          android:title="@string/share_xml" />
+    <item android:title="@string/export">
+        <menu>
+            <item android:id="@+id/copy_xml"
+                  android:title="@string/copy_xml" />
+            <item android:id="@+id/share_xml"
+                  android:title="@string/share_xml" />
+        </menu>
+    </item>
 </menu>

@@ -30,14 +30,18 @@
     <string name="unknown_card">Unknown Card</string>
     <string name="hw_detail">Manufacturing Info</string>
     <string name="data">Raw Data</string>
-    <string name="copy_xml">Copy XML</string>
-    <string name="share_xml">Share XML</string>
+    <string name="copy_xml">Copy</string>
+    <string name="share_xml">Share</string>
+    <string name="save_xml">Save to USB Storage</string>
     <string name="recent_trips">Recent Trips</string>
     <string name="recent_refills">Recent Refills</string>
     <string name="no_trip_data">No trips found. Has this card been used?</string>
     <string name="no_refill_data">No refills found. Has this card only been used with a pass?</string>
-    <string name="import_xml">Import XML</string>
+    <string name="import_xml">Import</string>
     <string name="import_clipboard">Import from Clipboard</string>
     <string name="import_file">Import from File</string>
+    <string name="import_sd">Import from USB Storage</string>
+    <string name="export">Export</string>
+    <string name="export_all">Export All</string>
     <string name="about">About</string>
 </resources>
