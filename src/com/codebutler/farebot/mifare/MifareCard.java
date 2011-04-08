@@ -37,14 +37,17 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
+import java.util.Date;
 
 public abstract class MifareCard implements Parcelable
 {
     private byte[] mTagId;
+    private Date   mScannedAt;
 
-    protected MifareCard (byte[] tagId)
+    protected MifareCard (byte[] tagId, Date scannedAt)
     {
-        mTagId = tagId;
+        mTagId     = tagId;
+        mScannedAt = scannedAt;
     }
 
     public abstract CardType getCardType();
@@ -53,6 +56,10 @@ public abstract class MifareCard implements Parcelable
         return mTagId;
     }
 
+    public Date getScannedAt () {
+        return mScannedAt;
+    }
+    
     public TransitData parseTransitData ()
     {
         if (OrcaTransitData.check(this))
@@ -71,14 +78,14 @@ public abstract class MifareCard implements Parcelable
 
         Element rootElement = doc.getDocumentElement();
 
-        CardType type = CardType.class.getEnumConstants()[Integer.parseInt(rootElement.getAttribute("type"))];
-        byte[]   id   = Utils.hexStringToByteArray(rootElement.getAttribute("id"));
-
+        CardType type      = CardType.class.getEnumConstants()[Integer.parseInt(rootElement.getAttribute("type"))];
+        byte[]   id        = Utils.hexStringToByteArray(rootElement.getAttribute("id"));
+        Date     scannedAt = rootElement.hasAttribute("scanned_at") ? new Date(Long.valueOf(rootElement.getAttribute("scanned_at"))) : new Date(0);
         switch (type) {
             case MifareDesfire:
-                return DesfireCard.fromXml(id, rootElement);
+                return DesfireCard.fromXml(id, scannedAt, rootElement);
             case CEPAS:
-            	return CEPASCard.fromXML(id, rootElement);
+            	return CEPASCard.fromXML(id, scannedAt, rootElement);
             default:
                 throw new UnsupportedOperationException("Unsupported card type: " + type);
         }
@@ -92,6 +99,7 @@ public abstract class MifareCard implements Parcelable
         Element element = doc.createElement("card");
         element.setAttribute("type", String.valueOf(getCardType().toInteger()));
         element.setAttribute("id", Utils.getHexString(mTagId));
+        element.setAttribute("scanned_at", Long.toString(mScannedAt.getTime()));
         doc.appendChild(element);
 
         return doc.getDocumentElement();
@@ -101,6 +109,7 @@ public abstract class MifareCard implements Parcelable
     {
         parcel.writeInt(mTagId.length);
         parcel.writeByteArray(mTagId);
+        parcel.writeLong(mScannedAt.getTime());
     }
 
     public enum CardType

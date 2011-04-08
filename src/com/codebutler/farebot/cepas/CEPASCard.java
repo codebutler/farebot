@@ -31,6 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.util.Date;
+
 public class CEPASCard extends MifareCard
 {
     private CEPASPurse[]   mPurses;
@@ -60,12 +62,12 @@ public class CEPASCard extends MifareCard
                 tech.close();
         }
 
-        return new CEPASCard(tagId, cepasPurses, cepasHistories);
+        return new CEPASCard(tagId, new Date(), cepasPurses, cepasHistories);
     }
 
-    private CEPASCard (byte[] tagId, CEPASPurse[] purses, CEPASHistory[] histories)
+    private CEPASCard (byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories)
     {
-        super(tagId);
+        super(tagId, scannedAt);
         mPurses = purses;
         mHistories = histories;
     }
@@ -91,6 +93,8 @@ public class CEPASCard extends MifareCard
             byte[] tagId = new byte[tagIdLength];
             source.readByteArray(tagId);
 
+            Date scannedAt = new Date(source.readLong());
+
             CEPASPurse[] purses = new CEPASPurse[source.readInt()];
             for(int i=0; i<purses.length; i++)
                 purses[i] = (CEPASPurse) source.readParcelable(CEPASPurse.class.getClassLoader());
@@ -100,7 +104,7 @@ public class CEPASCard extends MifareCard
                 histories[i] = (CEPASHistory) source.readParcelable(CEPASHistory.class.getClassLoader());
 
 
-            return new CEPASCard(tagId, purses, histories);
+            return new CEPASCard(tagId, scannedAt, purses, histories);
         }
 
         public CEPASCard[] newArray (int size) {
@@ -126,7 +130,7 @@ public class CEPASCard extends MifareCard
         return 0;
     }
 
-    public static CEPASCard fromXML (byte[] cardId, Element rootElement)
+    public static CEPASCard fromXML (byte[] cardId, Date scannedAt, Element rootElement)
     {
         NodeList purseElements = ((Element) rootElement.getElementsByTagName("purses").item(0)).getElementsByTagName("purse");
         CEPASPurse[] purses = new CEPASPurse[purseElements.getLength()];
@@ -138,7 +142,7 @@ public class CEPASCard extends MifareCard
         for(int i = 0; i < historyElements.getLength(); i++)
             histories[i] = CEPASHistory.fromXML((Element)historyElements.item(i));
 
-        return new CEPASCard(cardId, purses, histories);
+        return new CEPASCard(cardId, scannedAt, purses, histories);
     }
 
     public Element toXML () throws Exception

@@ -35,9 +35,9 @@ import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.MifareCard;
-import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import org.apache.commons.lang.ArrayUtils;
@@ -115,6 +115,7 @@ public class ReadingTagActivity extends Activity
                         values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());
                         values.put(CardsTableColumns.TAG_SERIAL, Utils.getHexString(card.getTagId()));
                         values.put(CardsTableColumns.DATA, cardXml);
+                        values.put(CardsTableColumns.SCANNED_AT, card.getScannedAt().getTime());
 
                         Uri uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
                         startActivity(new Intent(Intent.ACTION_VIEW, uri));

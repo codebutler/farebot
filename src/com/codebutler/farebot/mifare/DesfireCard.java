@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DesfireCard extends MifareCard
@@ -89,12 +90,12 @@ public class DesfireCard extends MifareCard
                 tech.close();
         }
 
-        return new DesfireCard(tagId, manufData, appsArray);
+        return new DesfireCard(tagId, new Date(), manufData, appsArray);
     }
 
-    DesfireCard(byte[] tagId, DesfireManufacturingData manfData, DesfireApplication apps[])
+    DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication apps[])
     {
-        super(tagId);
+        super(tagId, scannedAt);
         mManfData     = manfData;
         mApplications = apps;
     }
@@ -127,12 +128,14 @@ public class DesfireCard extends MifareCard
             byte[] tagId = new byte[tagIdLength];
             source.readByteArray(tagId);
 
+            Date scannedAt = new Date(source.readLong());
+
             DesfireManufacturingData manfData = source.readParcelable(DesfireManufacturingData.class.getClassLoader());
 
             DesfireApplication[] apps = new DesfireApplication[source.readInt()];
             source.readTypedArray(apps, DesfireApplication.CREATOR);
 
-            return new DesfireCard(tagId, manfData, apps);
+            return new DesfireCard(tagId, scannedAt, manfData, apps);
         }
 
         public DesfireCard[] newArray (int size) {
@@ -155,7 +158,7 @@ public class DesfireCard extends MifareCard
 
     // FIXME: This is such a mess!
     
-    public static DesfireCard fromXml (byte[] cardId, Element element)
+    public static DesfireCard fromXml (byte[] cardId, Date scannedAt, Element element)
     {
         Element appsElement = (Element) element.getElementsByTagName("applications").item(0);
 
@@ -233,7 +236,7 @@ public class DesfireCard extends MifareCard
 
         DesfireManufacturingData manfData = DesfireManufacturingData.fromXml((Element)element.getElementsByTagName("manufacturing-data").item(0));
         
-        return new DesfireCard(cardId, manfData, apps);
+        return new DesfireCard(cardId, scannedAt, manfData, apps);
     }
 
     public Element toXML() throws Exception

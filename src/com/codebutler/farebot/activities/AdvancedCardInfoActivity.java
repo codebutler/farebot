@@ -38,6 +38,9 @@ import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.MifareCard;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class AdvancedCardInfoActivity extends TabActivity
 {
     public static String EXTRA_CARD    = "com.codebutler.farebot.EXTRA_CARD";
@@ -55,6 +58,13 @@ public class AdvancedCardInfoActivity extends TabActivity
 
         ((TextView) findViewById(R.id.card_type_text_view)).setText(mCard.getCardType().toString());
         ((TextView) findViewById(R.id.card_serial_text_view)).setText(Utils.getHexString(mCard.getTagId(), "<error>"));
+
+        if (mCard.getScannedAt().getTime() > 0) {
+            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(mCard.getScannedAt());
+            String time = new SimpleDateFormat("h:m a", Locale.US).format(mCard.getScannedAt());
+            ((TextView) findViewById(R.id.scanned_at)).setText(String.format("Scanned on %s at %s.", date, time));
+        } else
+            findViewById(R.id.scanned_at).setVisibility(View.GONE);
 
         if (getIntent().hasExtra(EXTRA_MESSAGE)) {
             String message = getIntent().getStringExtra(EXTRA_MESSAGE);

@@ -95,6 +95,7 @@ public class ExportHelper
         values.put(CardsTableColumns.TYPE, cardElement.getAttribute("type"));
         values.put(CardsTableColumns.TAG_SERIAL, cardElement.getAttribute("id"));
         values.put(CardsTableColumns.DATA, xml);
+        values.put(CardsTableColumns.SCANNED_AT, cardElement.getAttribute("scanned_at"));
 
         return context.getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
     }
