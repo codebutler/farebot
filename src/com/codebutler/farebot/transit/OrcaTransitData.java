@@ -226,7 +226,8 @@ public class OrcaTransitData extends TransitData
                 return "Link Light Rail";
             } else {
                 // FIXME: Need to find bus route #s
-                return "(Unknown Route)";
+                //return "(Unknown Route)";
+                return null;
             }
         }
 

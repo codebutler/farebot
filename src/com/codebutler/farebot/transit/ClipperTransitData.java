@@ -340,7 +340,8 @@ public class ClipperTransitData extends TransitData
                 return sFerryRoutes.get(mRoute);
             } else {
                 // FIXME: Need to find bus route #s
-                return "(Route 0x" + Long.toString(mRoute, 16) + ")";
+                // return "(Route 0x" + Long.toString(mRoute, 16) + ")";
+                return null;
             }
         }
 
