@@ -36,8 +36,10 @@ public class CEPASTransaction implements Parcelable
 
     public enum TransactionType {
         MRT,
+        OLD_MRT, /* Old MRT transit info is unhyphenated */
         BUS,
         BUS_REFUND,
+        CREATION,
         UNKNOWN,
     }
 
@@ -78,10 +80,14 @@ public class CEPASTransaction implements Parcelable
     public TransactionType getType() {
         if (mType == 48)
             return TransactionType.MRT;
+        if (mType == 117)
+        	return TransactionType.OLD_MRT;
         if (mType == 49)
             return TransactionType.BUS;
         if (mType == 118)
             return TransactionType.BUS_REFUND;
+        if (mType == -16)
+        	return TransactionType.CREATION;
         return TransactionType.UNKNOWN;
     }
 
