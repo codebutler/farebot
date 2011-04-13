@@ -67,10 +67,9 @@
 
     <TextView
         android:id="@+id/fare_text_view"
-        android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center_vertical"
         android:padding="6dip"
         android:gravity="right|center_vertical"
-        android:textSize="18sp" />
+        android:textSize="18sp" android:layout_width="70dp"/>
 </LinearLayout>
