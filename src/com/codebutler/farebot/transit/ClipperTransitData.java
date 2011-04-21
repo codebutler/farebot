@@ -76,9 +76,11 @@ public class ClipperTransitData extends TransitData
     };
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {
         {
+            put((long)0x5, new Station("24th St. Mission Station", "24th St.", "37.75226", "-122.41849"));
             put((long)0x07, new Station("Civic Center Station", "Civic Center", "37.779538", "-122.413788"));
             put((long)0x08, new Station("Powell Street Station", "Powell St.", "37.784970", "-122.40701"));
             put((long)0x0a, new Station("Embarcadero Station", "Embarcadero", "37.793086", "-122.396276"));
+            put((long)0xd, new Station("19th Street Oakland Station", "19th St.", "37.80762", "-122.26886"));
             put((long)0x1c, new Station("Richmond Station", "Richmond", "37.93730", "-122.35338"));
             put((long)0x24, new Station("Union City Station", "Union City", "37.591203", "-122.017854"));
             put((long)0x29, new Station("San Bruno Station", "San Bruno", "37.63714", "-122.415622"));
