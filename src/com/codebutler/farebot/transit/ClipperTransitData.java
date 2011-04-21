@@ -42,19 +42,45 @@ public class ClipperTransitData extends TransitData
     private ClipperRefill[] mRefills;
 
     private static final int  RECORD_LENGTH   = 32;
+    private static final int  AGENCY_ACTRAN   = 0x01;
     private static final int  AGENCY_BART     = 0x04;
     private static final int  AGENCY_CALTRAIN = 0x06;
     private static final int  AGENCY_GGT      = 0x0b;
+    private static final int  AGENCY_VTA      = 0x11;
     private static final int  AGENCY_MUNI     = 0x12;
     private static final int  AGENCY_FERRY    = 0x19;
 
     private static final long EPOCH_OFFSET    = 0x83aa7f18;
 
+    private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() {
+        {
+            put(AGENCY_ACTRAN, "Alameda-Contra Costa Tranist District");
+            put(AGENCY_BART, "Bay Area Rapid Transit");
+            put(AGENCY_CALTRAIN, "Caltrain");
+            put(AGENCY_GGT, "Golden Gate Transit");
+            put(AGENCY_VTA, "Santa Clara Valley Transportation Authority");
+            put(AGENCY_MUNI, "San Franncisco Municipal");
+            put(AGENCY_FERRY, "Golden Gate Ferry");
+        }
+    };
+    private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {
+        {
+            put(AGENCY_ACTRAN, "ACTranist");
+            put(AGENCY_BART, "BART");
+            put(AGENCY_CALTRAIN, "Caltrain");
+            put(AGENCY_GGT, "GGT");
+            put(AGENCY_VTA, "VTA");
+            put(AGENCY_MUNI, "Muni");
+            put(AGENCY_FERRY, "Ferry");
+        }
+    };
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {
         {
             put((long)0x07, new Station("Civic Center Station", "Civic Center", "37.779538", "-122.413788"));
             put((long)0x08, new Station("Powell Street Station", "Powell St.", "37.784970", "-122.40701"));
             put((long)0x0a, new Station("Embarcadero Station", "Embarcadero", "37.793086", "-122.396276"));
+            put((long)0x1c, new Station("Richmond Station", "Richmond", "37.93730", "-122.35338"));
+            put((long)0x24, new Station("Union City Station", "Union City", "37.591203", "-122.017854"));
             put((long)0x29, new Station("San Bruno Station", "San Bruno", "37.63714", "-122.415622"));
             put((long)0x2a, new Station("San Francisco Int'l Airport Station", "SFO", "37.61590", "-122.39263"));
             put((long)0x2b, new Station("Milbrae Station", "Milbrae", "37.599935", "-122.386478"));
@@ -152,31 +178,33 @@ public class ClipperTransitData extends TransitData
         byte [] data = file.getData();
         int pos = data.length - RECORD_LENGTH;
         List<Trip> result = new ArrayList<Trip>();
-        Trip lastTrip = null;
         while (pos > 0) {
             byte[] slice = Utils.byteArraySlice(data, pos, RECORD_LENGTH);
             Trip trip = createTrip(slice);
             if (trip != null) {
-                if (lastTrip != null &&
-                    lastTrip.getTimestamp() == trip.getTimestamp()) {
+                int idx = Collections.binarySearch(result, trip,
+                    new Comparator<Trip>() {
+                        public int compare(Trip trip, Trip trip1) {
+                            return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
+                        }
+                    });
+                if (idx >= 0) {
                     /*
-                     *  Some transaction types are temporary -- remove previous instance
-                     *  if the next entry has the same start timestamp.
+                     *  Some transaction types are temporary -- remove previous
+                     *  instance if there is an an entry with the same start
+                     *  timestamp.
                      */
-                    result.remove(lastTrip);
+                    result.remove(idx);
+                } else {
+                    /* Convert idx back into the insertion point */
+                    idx = -(idx + 1);
                 }
-                result.add(trip);
+                result.add(idx, trip);
             }
-            lastTrip = trip;
             pos -= RECORD_LENGTH;
         }
         Trip[] useLog = new Trip[result.size()];
-        useLog = result.toArray(useLog);
-        Arrays.sort(useLog, new Comparator<Trip>() {
-            public int compare(Trip trip, Trip trip1) {
-                return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
-            }
-        });
+        result.toArray(useLog);
         return useLog;
     }
 
@@ -266,33 +294,15 @@ public class ClipperTransitData extends TransitData
 
     public static String getAgencyName(int agency)
     {
-        switch (agency) {
-        case AGENCY_BART:
-            return "Bay Area Rapid Transit";
-        case AGENCY_CALTRAIN:
-            return "Caltrain";
-        case AGENCY_GGT:
-            return "Golden Gate Transit";
-        case AGENCY_MUNI:
-            return "San Franncisco Municipal";
-        case AGENCY_FERRY:
-            return "Golden Gate Ferry";
+        if (sAgencies.containsKey(agency)) {
+            return sAgencies.get(agency);
         }
         return "Unknown Agency (0x" + Long.toString(agency, 16) + ")";
     }
 
     public static String getShortAgencyName (int agency) {
-        switch (agency) {
-            case AGENCY_BART:
-                return "BART";
-            case AGENCY_CALTRAIN:
-                return "Caltrain";
-            case AGENCY_GGT:
-                return "GGT";
-            case AGENCY_MUNI:
-                return "MUNI";
-            case AGENCY_FERRY:
-                return "Ferry";
+        if (sShortAgencies.containsKey(agency)) {
+            return sShortAgencies.get(agency);
         }
         return "UNK(0x" + Long.toString(agency, 16) + ")";
     }
