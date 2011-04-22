@@ -54,18 +54,18 @@ public class ClipperTransitData extends TransitData
 
     private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() {
         {
-            put(AGENCY_ACTRAN, "Alameda-Contra Costa Tranist District");
+            put(AGENCY_ACTRAN, "Alameda-Contra Costa Transit District");
             put(AGENCY_BART, "Bay Area Rapid Transit");
             put(AGENCY_CALTRAIN, "Caltrain");
             put(AGENCY_GGT, "Golden Gate Transit");
             put(AGENCY_VTA, "Santa Clara Valley Transportation Authority");
-            put(AGENCY_MUNI, "San Franncisco Municipal");
+            put(AGENCY_MUNI, "San Francisco Municipal");
             put(AGENCY_FERRY, "Golden Gate Ferry");
         }
     };
     private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {
         {
-            put(AGENCY_ACTRAN, "ACTranist");
+            put(AGENCY_ACTRAN, "ACTransit");
             put(AGENCY_BART, "BART");
             put(AGENCY_CALTRAIN, "Caltrain");
             put(AGENCY_GGT, "GGT");
