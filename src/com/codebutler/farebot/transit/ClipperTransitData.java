@@ -81,6 +81,9 @@ public class ClipperTransitData extends TransitData
             put((long)0x08, new Station("Powell Street Station", "Powell St.", "37.784970", "-122.40701"));
             put((long)0x0a, new Station("Embarcadero Station", "Embarcadero", "37.793086", "-122.396276"));
             put((long)0xd, new Station("19th Street Oakland Station", "19th St.", "37.80762", "-122.26886"));
+            put((long)0x18, new Station("Downtown Berkeley Station", "Berkeley", "37.869868", "-122.268051"));
+            put((long)0x19, new Station("North Berkeley Station", "North Berkeley", "37.874026", "-122.283882"));
+            put((long)0x1a, new Station("El Cerrito Plaza Station", "El Cerrito Plaza", "37.903959", "-122.299271"));
             put((long)0x1c, new Station("Richmond Station", "Richmond", "37.93730", "-122.35338"));
             put((long)0x24, new Station("Union City Station", "Union City", "37.591203", "-122.017854"));
             put((long)0x29, new Station("San Bruno Station", "San Bruno", "37.63714", "-122.415622"));
