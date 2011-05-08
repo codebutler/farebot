@@ -10,7 +10,7 @@ Read data from MIFARE public transit cards using your NFC-equipped Android phone
 
 * [Karl Koscher][3] (ORCA Support)
 * [Sean Cross][4] (CEPES Support)
-* Anoymous Contributor (Clipper Support)
+* Anonymous Contributor (Clipper Support)
 
 ## Supported Protocols
 
