@@ -34,7 +34,7 @@ import java.util.TreeMap;
 
 public class EZLinkTransitData extends TransitData
 {
-    private int    mSerialNumber;
+    private String mSerialNumber;
     private double mBalance;
     private Trip[] mTrips;
 
@@ -428,7 +428,7 @@ public class EZLinkTransitData extends TransitData
     {
         CEPASCard cepasCard = (CEPASCard) card;
 
-        mSerialNumber = Utils.byteArrayToInt(cepasCard.getPurse(3).getCSN(), 0, 8);
+        mSerialNumber = Utils.getHexString(cepasCard.getPurse(3).getCAN(), "<Error>");
         mBalance      = cepasCard.getPurse(3).getPurseBalance();
         mTrips        = parseTrips(cepasCard);
     }
@@ -444,7 +444,7 @@ public class EZLinkTransitData extends TransitData
     }
 
     @Override
-    public long getSerialNumber () {
+    public String getSerialNumber () {
         return mSerialNumber;
     }
 

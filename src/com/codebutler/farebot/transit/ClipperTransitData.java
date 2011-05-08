@@ -163,8 +163,8 @@ public class ClipperTransitData extends TransitData
     }
 
     @Override
-    public long getSerialNumber () {
-        return mSerialNumber;
+    public String getSerialNumber () {
+        return Long.toString(mSerialNumber);
     }
 
     @Override

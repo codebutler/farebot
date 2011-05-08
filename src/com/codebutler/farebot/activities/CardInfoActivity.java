@@ -80,7 +80,7 @@ public class CardInfoActivity extends TabActivity
         }
 
         ((TextView) findViewById(R.id.card_name_text_view)).setText(transitData.getCardName());
-        ((TextView) findViewById(R.id.serial_text_view)).setText(String.valueOf(transitData.getSerialNumber()));
+        ((TextView) findViewById(R.id.serial_text_view)).setText(transitData.getSerialNumber());
         ((TextView) findViewById(R.id.balance_text_view)).setText(transitData.getBalanceString());
 
         TabSpec tabSpec;

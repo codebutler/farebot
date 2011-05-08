@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit;
 public abstract class TransitData
 {
     public abstract String getBalanceString ();
-    public abstract long getSerialNumber ();
+    public abstract String getSerialNumber ();
     public abstract Trip[] getTrips ();
     public abstract Refill[] getRefills ();
     public abstract String getCardName ();

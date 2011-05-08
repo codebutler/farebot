@@ -84,8 +84,8 @@ public class OrcaTransitData extends TransitData
     }
 
     @Override
-    public long getSerialNumber () {
-        return (long) mSerialNumber;
+    public String getSerialNumber () {
+        return Integer.toString(mSerialNumber);
     }
 
     @Override
