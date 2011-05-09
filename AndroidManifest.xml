@@ -80,6 +80,7 @@
         <activity android:name=".activities.CardHWDetailActivity" />
         <activity android:name=".activities.CardTripsActivity"/>
         <activity android:name=".activities.CardRefillsActivity"/>
+        <activity android:name=".activities.FareBotPreferenceActivity"/>
 
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"

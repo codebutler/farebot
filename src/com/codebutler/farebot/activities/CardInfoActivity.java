@@ -24,9 +24,13 @@ package com.codebutler.farebot.activities;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +44,19 @@ import com.codebutler.farebot.transit.TransitData;
 
 public class CardInfoActivity extends TabActivity
 {
-    private MifareCard mCard;
+    public static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
+
+    private MifareCard  mCard;
+    private TransitData mTransitData;
+
+    private TextToSpeech   mTTS = null;
+    private OnInitListener mTTSInitListener = new OnInitListener() {
+        public void onInit (int status) {
+            if (status == TextToSpeech.SUCCESS) {
+                mTTS.speak(getString(R.string.balance_speech, mTransitData.getBalanceString()), TextToSpeech.QUEUE_FLUSH, null);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,24 +80,23 @@ public class CardInfoActivity extends TabActivity
             return;
         }
 
-        TransitData transitData = null;
         try {
-            transitData = mCard.parseTransitData();
+            mTransitData = mCard.parseTransitData();
         } catch (Exception ex) {
             showAdvancedInfo(Utils.getErrorMessage(ex));
             finish();
             return;
         }
 
-        if (transitData == null) {
+        if (mTransitData == null) {
             showAdvancedInfo("Unknown card data. Only ORCA and Clipper cards are currently supported.");
             finish();
             return;
         }
 
-        ((TextView) findViewById(R.id.card_name_text_view)).setText(transitData.getCardName());
-        ((TextView) findViewById(R.id.serial_text_view)).setText(transitData.getSerialNumber());
-        ((TextView) findViewById(R.id.balance_text_view)).setText(transitData.getBalanceString());
+        ((TextView) findViewById(R.id.card_name_text_view)).setText(mTransitData.getCardName());
+        ((TextView) findViewById(R.id.serial_text_view)).setText(mTransitData.getSerialNumber());
+        ((TextView) findViewById(R.id.balance_text_view)).setText(mTransitData.getBalanceString());
 
         TabSpec tabSpec;
         Intent  intent;
@@ -102,9 +117,16 @@ public class CardInfoActivity extends TabActivity
             .setIndicator(getString(R.string.recent_refills));
         getTabHost().addTab(tabSpec);
 
-        if (transitData.getRefills() == null) {
+        if (mTransitData.getRefills() == null) {
             findViewById(R.id.recent_trips_header).setVisibility(View.VISIBLE);
             getTabHost().getTabWidget().setVisibility(View.GONE);
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean speakBalanceEnabled   = prefs.getBoolean("pref_key_speak_balance", false);
+        boolean speakBalanceRequested = getIntent().getBooleanExtra(SPEAK_BALANCE_EXTRA, false);
+        if (speakBalanceEnabled && speakBalanceRequested) {
+            mTTS = new TextToSpeech(this, mTTSInitListener);
         }
     }
 

@@ -169,6 +169,9 @@ public class MainActivity extends ListActivity
                 FileUtils.writeStringToFile(file, xml, "UTF-8");
                 Toast.makeText(this, "Wrote FareBot-Export.xml to USB Storage.", 5).show();
                 return true;
+
+            } else if (item.getItemId() == R.id.prefs) {
+                startActivity(new Intent(this, FareBotPreferenceActivity.class));
             }
         } catch (Exception ex) {
             Utils.showError(this, ex);

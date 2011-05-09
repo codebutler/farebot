@@ -118,7 +118,10 @@ public class ReadingTagActivity extends Activity
                         values.put(CardsTableColumns.SCANNED_AT, card.getScannedAt().getTime());
 
                         Uri uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
-                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        intent.putExtra(CardInfoActivity.SPEAK_BALANCE_EXTRA, true);
+                        startActivity(intent);
                         finish();
                     } catch (Exception ex) {
                         Utils.showErrorAndFinish(ReadingTagActivity.this, ex);

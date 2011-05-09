@@ -48,6 +48,12 @@
                   android:title="@string/save_xml" />
         </menu>
     </item>
-    <item android:id="@+id/about"
-          android:title="@string/about" />
+    <item
+        android:id="@+id/prefs"
+        android:title="@string/preferences"
+        android:icon="@android:drawable/ic_menu_preferences" />
+    <item
+        android:id="@+id/about"
+        android:title="@string/about"
+        android:icon="@android:drawable/ic_menu_info_details" />
 </menu>

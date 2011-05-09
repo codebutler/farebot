@@ -44,4 +44,10 @@
     <string name="export">Export</string>
     <string name="export_all">Export All</string>
     <string name="about">About</string>
+    <string name="preferences">Preferences</string>
+    <string name="accessibility">Accessibility</string>
+    <string name="speak_balance">Speak Balance</string>
+    <string name="speak_balance_summary">Proof of concept</string>
+
+    <string name="balance_speech">Balance %s</string>
 </resources>
