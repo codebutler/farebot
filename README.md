@@ -15,13 +15,13 @@ Read data from MIFARE public transit cards using your NFC-equipped Android phone
 ## Supported Protocols
 
 * [MIFARE DESFire][6]
-* [CEPAS][2] (Work In Progress)
+* [CEPAS][2]
 
 ## Supported Cards
 
 * [ORCA][0] - Seattle, WA, USA
 * [Clipper][1] - San Francisco, CA, USA
-* [EZ-Link][7] (Work In Progress) - Singapore
+* [EZ-Link][7] - Singapore
 
 ## Supported Phones
 
