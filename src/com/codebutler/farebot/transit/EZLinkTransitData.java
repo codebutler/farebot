@@ -594,7 +594,7 @@ public class EZLinkTransitData extends TransitData
                 else
                     return endStationAbbr;
             }
-            return mTransaction.getUserData();
+            return null;
         }
     }
 }
