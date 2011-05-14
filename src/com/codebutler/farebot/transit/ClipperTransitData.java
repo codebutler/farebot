@@ -37,7 +37,7 @@ import java.util.*;
 public class ClipperTransitData extends TransitData
 {
     private long            mSerialNumber;
-    private double          mBalance;
+    private short           mBalance;
     private Trip[]          mTrips;
     private ClipperRefill[] mRefills;
 
@@ -132,7 +132,7 @@ public class ClipperTransitData extends TransitData
 
         try {
             data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
-            mBalance = Utils.byteArrayToInt(data, 18, 2);
+            mBalance = (short) (((0xFF & data[18]) << 8) | (0xFF & data[19]));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Clipper balance", ex);
         }
@@ -159,7 +159,7 @@ public class ClipperTransitData extends TransitData
 
     @Override
     public String getBalanceString () {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100);
+        return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100.0);
     }
 
     @Override
