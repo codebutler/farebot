@@ -23,11 +23,17 @@
 package com.codebutler.farebot.activities;
 
 import android.app.ListActivity;
+import android.app.PendingIntent;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
+import android.nfc.tech.IsoDep;
+import android.nfc.tech.MifareClassic;
+import android.nfc.tech.MifareUltralight;
+import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.ClipboardManager;
@@ -58,6 +64,9 @@ public class MainActivity extends ListActivity
     private static final int SELECT_FILE = 1;
 
     private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
+    private NfcAdapter mAdapter;
+    private PendingIntent mPendingIntent;
+    private String[][] mTechLists;
 
     private Map<String, TransitIdentity> mDataCache;
 
@@ -74,10 +83,10 @@ public class MainActivity extends ListActivity
 
         setListAdapter(new ResourceCursorAdapter(this, android.R.layout.simple_list_item_2, cursor) {
             @Override
-            public void bindView (View view, Context context, Cursor cursor) {
-                int    type    = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-                String serial  = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-                Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+            public void bindView(View view, Context context, Cursor cursor) {
+                int    type      = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
+                String serial    = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
+                Date   scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
 
                 if (!mDataCache.containsKey(serial)) {
                     String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
@@ -91,7 +100,7 @@ public class MainActivity extends ListActivity
                 TransitIdentity identity = mDataCache.get(serial);
                 
                 TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
-                TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
+                TextView textView2 = (TextView) view.findViewById(android.R.id.text2);                  
 
                 if (identity != null) {
                     if (identity.getSerialNumber() != null) {
@@ -104,12 +113,37 @@ public class MainActivity extends ListActivity
                     textView1.setText(getString(R.string.unknown_card));
                     textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
                 }
+            }
 
-                textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
+            @Override
+            protected void onContentChanged() {
+                super.onContentChanged();
+                mDataCache.clear();
+                updateUI();
             }
         });
 
         registerForContextMenu(getListView());
+
+        mAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        Intent intent = new Intent(this, ReadingTagActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        
+        mTechLists = new String[][] {
+            new String[] { IsoDep.class.getName() },
+            new String[] { MifareClassic.class.getName() },
+            new String[] { MifareUltralight.class.getName() },
+            new String[] { NfcF.class.getName() }
+        };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAdapter.enableForegroundDispatch(this, mPendingIntent, null, mTechLists);
+        updateUI();
     }
 
     @Override
@@ -221,6 +255,17 @@ public class MainActivity extends ListActivity
             startActivity(new Intent(Intent.ACTION_VIEW, uris[0]));
         } else {
             Toast.makeText(this, "Cards Imported: " + uris.length, 5).show();
+        }
+    }
+
+    private void updateUI ()
+    {
+        if (getListAdapter().getCount() == 0) {
+            findViewById(android.R.id.list).setVisibility(View.GONE);
+            findViewById(R.id.no_cards).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(android.R.id.list).setVisibility(View.VISIBLE);
+            findViewById(R.id.no_cards).setVisibility(View.GONE);
         }
     }
 }
