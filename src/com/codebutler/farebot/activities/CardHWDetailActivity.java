@@ -34,6 +34,7 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.cepas.CEPASPurse;
+import com.codebutler.farebot.felica.FelicaCard;
 import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.mifare.Card.CardType;
 import com.codebutler.farebot.mifare.DesfireCard;
@@ -113,6 +114,11 @@ public class CardHWDetailActivity extends ListActivity
             items.add(new ListItem("Logfile Record Count", Byte.toString(purse.getLogfileRecordCount())));
             items.add(new ListItem("Issuer Data Length", Integer.toString(purse.getIssuerDataLength())));
             items.add(new ListItem("Issuer-specific Data", Utils.getHexString(purse.getIssuerSpecificData(), "<Error>")));
+        }
+        else if (mCard.getCardType() == CardType.FeliCa) {
+            FelicaCard card = (FelicaCard) mCard;
+            items.add(new ListItem("IDm", Utils.getHexString(card.getIDm().getBytes(), "err")));
+            items.add(new ListItem("PMm", Utils.getHexString(card.getPMm().getBytes(), "err")));
         }
 
         setListAdapter(new HWDetailListAdapter(this, items));

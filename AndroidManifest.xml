@@ -35,7 +35,8 @@
     <application 
         android:label="@string/app_name"
         android:icon="@drawable/launcher_icon"
-        android:debuggable="true">
+        android:debuggable="true"
+        android:name=".FareBotApplication">
         
          <activity android:name=".activities.MainActivity">
             <intent-filter>
@@ -51,7 +52,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.ReadingTagActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true">
+        <activity
+            android:name=".activities.ReadingTagActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:noHistory="true"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -75,8 +80,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.AdvancedCardInfoActivity" />
+
+        <activity
+            android:name=".activities.AdvancedCardInfoActivity"
+            android:configChanges="orientation" />
+
         <activity android:name=".activities.DesfireCardRawDataActivity"/>
+        <activity android:name=".activities.FelicaCardRawDataActivity" />
         <activity android:name=".activities.CardHWDetailActivity" />
         <activity android:name=".activities.CardTripsActivity"/>
         <activity android:name=".activities.CardRefillsActivity"/>

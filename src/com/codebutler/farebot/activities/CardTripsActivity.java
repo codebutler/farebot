@@ -36,6 +36,7 @@ import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.transit.Station;
+import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
 import org.apache.commons.lang.StringUtils;
@@ -111,7 +112,9 @@ public class CardTripsActivity extends ListActivity
                 convertView = inflater.inflate(R.layout.trip_item, null);
             }
 
-            Trip trip = (Trip) getItem(position);
+            Trip trip = getItem(position);
+            
+            boolean hasTime = (!(trip instanceof SuicaTransitData.SuicaTrip) || ((SuicaTransitData.SuicaTrip)trip).hasTime());
 
             Date date = new Date(trip.getTimestamp() * 1000);
 
@@ -122,7 +125,13 @@ public class CardTripsActivity extends ListActivity
             TextView stationTextView = (TextView) convertView.findViewById(R.id.station_text_view);
 
             dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
-            timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
+            
+            if (hasTime) {
+                timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
+                timeTextView.setVisibility(View.VISIBLE);
+            } else {
+                timeTextView.setVisibility(View.GONE);
+            }
 
             List<String> routeText = new ArrayList<String>();
             if (trip.getShortAgencyName() != null)
