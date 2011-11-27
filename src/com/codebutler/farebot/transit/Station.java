@@ -22,8 +22,10 @@
 
 package com.codebutler.farebot.transit;
 
-public class Station
-{
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Station implements Parcelable {
     private final String mCompanyName, mLineName, mStationName, mShortStationName, mLatitude, mLongitude;
 
     public Station(String stationName, String latitude, String longitude) {
@@ -41,6 +43,24 @@ public class Station
         mShortStationName = shortStationName;
         mLatitude         = latitude;
         mLongitude        = longitude;
+    }
+    
+    public static Creator<Station> CREATOR = new Creator<Station>() {
+        public Station createFromParcel(Parcel parcel) {
+            return new Station(parcel);
+        }
+        public Station[] newArray(int size) {
+            return new Station[size];
+        }
+    };
+
+    private Station(Parcel parcel) {
+        mCompanyName      = parcel.readString();
+        mLineName         = parcel.readString();
+        mStationName      = parcel.readString();
+        mShortStationName = parcel.readString();
+        mLatitude         = parcel.readString();
+        mLongitude        = parcel.readString();
     }
 
     public String getStationName () {
@@ -65,5 +85,18 @@ public class Station
 
     public String getLongitude () {
         return mLongitude;
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mCompanyName);
+        parcel.writeString(mLineName);
+        parcel.writeString(mStationName);
+        parcel.writeString(mShortStationName);
+        parcel.writeString(mLatitude);
+        parcel.writeString(mLongitude);
     }
 }

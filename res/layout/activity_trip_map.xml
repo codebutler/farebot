@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  activity_trip_map.xml                                                 
+                                                                       
+  Copyright (C) 2011 Eric Butler                                       
+                                                                       
+  Authors:                                                             
+  Eric Butler <eric@codebutler.com>                                    
+                                                                       
+  This program is free software: you can redistribute it and/or modify 
+  it under the terms of the GNU General Public License as published by 
+  the Free Software Foundation, either version 3 of the License, or    
+  (at your option) any later version.                                  
+                                                                       
+  This program is distributed in the hope that it will be useful,      
+  but WITHOUT ANY WARRANTY; without even the implied warranty of       
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        
+  GNU General Public License for more details.                         
+                                                                       
+  You should have received a copy of the GNU General Public License    
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout    
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <TextView
+                    android:id="@+id/route_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/stations_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/datetime_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/fare_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:padding="6dip"
+            android:gravity="right|center_vertical"
+            android:textSize="17sp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+
+    <com.google.android.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:clickable="true"
+        android:enabled="true"
+        android:apiKey="00QbXq3nuMZY8l7NaU_rZ95MV61SLwcqrBteSUw" />
+</LinearLayout>

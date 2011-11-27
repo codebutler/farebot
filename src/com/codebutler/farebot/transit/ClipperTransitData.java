@@ -26,10 +26,11 @@
 
 package com.codebutler.farebot.transit;
 
+import android.os.Parcel;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireFile;
-import com.codebutler.farebot.mifare.Card;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -350,6 +351,27 @@ public class ClipperTransitData extends TransitData
             mBalance    = 0;
         }
 
+        public static Creator<ClipperTrip> CREATOR = new Creator<ClipperTrip>() {
+            public ClipperTrip createFromParcel(Parcel parcel) {
+                return new ClipperTrip(parcel);
+            }
+
+            public ClipperTrip[] newArray(int size) {
+                return new ClipperTrip[size];
+            }
+        };
+
+        private ClipperTrip (Parcel parcel)
+        {
+            mTimestamp = parcel.readLong();
+            mFare      = parcel.readLong();
+            mAgency    = parcel.readLong();
+            mFrom      = parcel.readLong();
+            mTo        = parcel.readLong();
+            mRoute     = parcel.readLong();
+            mBalance   = parcel.readLong();
+        }
+
         @Override
         public long getTimestamp () {
             return mTimestamp;
@@ -455,6 +477,31 @@ public class ClipperTransitData extends TransitData
             } else {
                 return "(Unknown Station)";
             }
+        }
+
+        @Override
+        public Mode getMode() {
+            if (mAgency == AGENCY_BART)
+                return Mode.METRO;
+            if (mAgency == AGENCY_MUNI) 
+                return Mode.BUS; // FIXME: or Mode.TRAM for "Muni Metro"
+            if (mAgency == AGENCY_FERRY)
+                return Mode.FERRY;
+            return Mode.OTHER;
+        }
+
+        public void writeToParcel(Parcel parcel, int flags) {
+            parcel.writeLong(mTimestamp);
+            parcel.writeLong(mFare);
+            parcel.writeLong(mAgency);
+            parcel.writeLong(mFrom);
+            parcel.writeLong(mTo);
+            parcel.writeLong(mRoute);
+            parcel.writeLong(mBalance);
+        }
+
+        public int describeContents() {
+            return 0;
         }
     }
 

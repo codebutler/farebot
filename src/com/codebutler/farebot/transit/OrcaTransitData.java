@@ -25,12 +25,13 @@
 
 package com.codebutler.farebot.transit;
 
+import android.os.Parcel;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireFile;
 import com.codebutler.farebot.mifare.DesfireFile.RecordDesfireFile;
 import com.codebutler.farebot.mifare.DesfireRecord;
-import com.codebutler.farebot.mifare.Card;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -180,6 +181,26 @@ public class OrcaTransitData extends TransitData
             mAgency     = usefulData[3] >> 4;
             mTransType  = (usefulData[17]);            
         }
+        
+        public static Creator<OrcaTrip> CREATOR = new Creator<OrcaTrip>() {
+            public OrcaTrip createFromParcel(Parcel parcel) {
+                return new OrcaTrip(parcel);
+            }
+
+            public OrcaTrip[] newArray(int size) {
+                return new OrcaTrip[size];
+            }
+        };
+
+        private OrcaTrip (Parcel parcel)
+        {
+            mTimestamp  = parcel.readLong();
+            mCoachNum   = parcel.readLong();
+            mFare       = parcel.readLong();
+            mNewBalance = parcel.readLong();
+            mAgency     = parcel.readLong();
+            mTransType  = parcel.readLong();
+        }
 
         @Override
         public long getTimestamp() {
@@ -218,7 +239,7 @@ public class OrcaTransitData extends TransitData
 
         @Override
         public String getRouteName () {
-            if (mAgency == 0x07 && mCoachNum > 10000) {
+            if (isLink()) {
                 return "Link Light Rail";
             } else {
                 // FIXME: Need to find bus route #s
@@ -244,7 +265,7 @@ public class OrcaTransitData extends TransitData
 
         @Override
         public Station getStartStation() {
-            if (mAgency == 0x07 && mCoachNum > 1000) {
+            if (isLink()) {
                 return sLinkStations[(((int) mCoachNum) % 1000) - 193];
             }
             return null;
@@ -252,7 +273,7 @@ public class OrcaTransitData extends TransitData
 
         @Override
         public String getStartStationName () {
-            if (mAgency == 0x07 && mCoachNum > 10000) {
+            if (isLink()) {
                 return sLinkStations[(((int) mCoachNum) % 1000) - 193].getStationName();
             } else {
                 return "Coach #" + String.valueOf(mCoachNum);
@@ -271,8 +292,31 @@ public class OrcaTransitData extends TransitData
             return null;
         }
 
+        @Override
+        public Mode getMode() {
+            return (isLink()) ? Mode.METRO : Mode.BUS;
+        }
+
         public long getCoachNumber() {
             return mCoachNum;
+        }
+
+        public void writeToParcel(Parcel parcel, int flags)
+        {
+            parcel.writeLong(mTimestamp);
+            parcel.writeLong(mCoachNum);
+            parcel.writeLong(mFare);
+            parcel.writeLong(mNewBalance);
+            parcel.writeLong(mAgency);
+            parcel.writeLong(mTransType);
+        }
+
+        public int describeContents() {
+            return 0;
+        }
+
+        private boolean isLink () {
+            return (mAgency == 0x07 && mCoachNum > 10000);
         }
     }
 }

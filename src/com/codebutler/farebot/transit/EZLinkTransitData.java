@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit;
 
+import android.os.Parcel;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.cepas.CEPASTransaction;
@@ -487,6 +488,20 @@ public class EZLinkTransitData extends TransitData
         {
         	mTransaction = transaction;
         }
+        
+        private EZLinkTrip (Parcel parcel) 
+        {
+            mTransaction = parcel.readParcelable(CEPASTransaction.class.getClassLoader());
+        }
+        
+        public static Creator<EZLinkTrip> CREATOR = new Creator<EZLinkTrip>() {
+            public EZLinkTrip createFromParcel(Parcel parcel) {
+                return new EZLinkTrip(parcel);
+            }
+            public EZLinkTrip[] newArray(int size) {
+                return new EZLinkTrip[size];
+            }
+        };
 
         @Override
         public long getTimestamp() {
@@ -600,6 +615,23 @@ public class EZLinkTransitData extends TransitData
                     return endStationAbbr;
             }
             return null;
+        }
+        
+        @Override
+        public Mode getMode() {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS)
+                return Mode.BUS;
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
+                return Mode.METRO;
+            return Mode.OTHER;
+        }
+
+        public void writeToParcel(Parcel parcel, int flags) {
+            parcel.writeParcelable(mTransaction, flags);
+        }
+
+        public int describeContents() {
+            return 0;
         }
     }
 }

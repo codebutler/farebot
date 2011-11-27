@@ -22,7 +22,13 @@
 
 package com.codebutler.farebot.transit;
 
-public abstract class Trip
+import android.os.Parcelable;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class Trip implements Parcelable
 {
     public abstract long getTimestamp();
     public abstract String getRouteName ();
@@ -35,4 +41,33 @@ public abstract class Trip
     public abstract String getEndStationName ();
     public abstract Station getEndStation ();
     public abstract double getFare ();
+    public abstract Mode getMode();
+
+    public static boolean hasLocation(Station station) {
+        return ((station != null) && ((station.getLatitude() != null) || station.getLongitude() != null));
+    }
+
+    public static String formatStationNames(Trip trip) {
+        List<String> stationText = new ArrayList<String>();
+        if (trip.getStartStationName() != null)
+            stationText.add(trip.getStartStationName());
+        if (trip.getEndStationName() != null && (!trip.getEndStationName().equals(trip.getStartStationName())))
+            stationText.add(trip.getEndStationName());
+
+        if (stationText.size() > 0) {
+            return StringUtils.join(stationText, " → ");
+        } else {
+            return null;
+        }
+    }
+
+    public enum Mode {
+        BUS,
+        TRAIN,
+        TRAM,
+        METRO,
+        FERRY,
+        PRODUCTS,
+        OTHER
+    }
 }

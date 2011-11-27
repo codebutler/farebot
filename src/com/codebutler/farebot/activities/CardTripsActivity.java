@@ -26,16 +26,17 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.text.Html;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.mifare.Card;
-import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
@@ -67,32 +68,17 @@ public class CardTripsActivity extends ListActivity
             findViewById(R.id.error_text).setVisibility(View.VISIBLE);
         }
     }
-
+    
     @Override
-    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        int position = ((AdapterContextMenuInfo) menuInfo).position;
+    protected void onListItemClick(ListView l, View v, int position, long id) {
         Trip trip = (Trip) getListAdapter().getItem(position);
 
-        if (trip.getStartStation() != null)
-            menu.add(Menu.NONE, 1, 1, String.format("Map of %s", trip.getStartStation().getStationName()));
-
-        if (trip.getEndStation() != null)
-            menu.add(Menu.NONE, 2, 2, String.format("Map of %s", trip.getEndStation().getStationName()));
-    }
-
-    @Override
-    public boolean onContextItemSelected (MenuItem item)
-    {
-        int position = ((AdapterContextMenuInfo) item.getMenuInfo()).position;
-        Trip trip = (Trip) getListAdapter().getItem(position);
-
-        Station station = (item.getItemId() == 1) ? trip.getStartStation() : trip.getEndStation();
-
-        Uri uri = Uri.parse(String.format("geo:0,0?q=%s,%s (%s)", station.getLatitude(), station.getLongitude(), station.getStationName()));
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-
-        return true;
+        if (!(Trip.hasLocation(trip.getStartStation())) && (!Trip.hasLocation(trip.getEndStation())))
+            return;
+        
+        Intent intent = new Intent(this, TripMapActivity.class);
+        intent.putExtra(TripMapActivity.TRIP_EXTRA, trip);
+        startActivity(intent);
     }
 
     private static class UseLogListAdapter extends ArrayAdapter<Trip>
@@ -118,11 +104,26 @@ public class CardTripsActivity extends ListActivity
 
             Date date = new Date(trip.getTimestamp() * 1000);
 
-            TextView dateTextView    = (TextView) convertView.findViewById(R.id.date_text_view);
-            TextView timeTextView    = (TextView) convertView.findViewById(R.id.time_text_view);
-            TextView routeTextView   = (TextView) convertView.findViewById(R.id.route_text_view);
-            TextView fareTextView    = (TextView) convertView.findViewById(R.id.fare_text_view);
-            TextView stationTextView = (TextView) convertView.findViewById(R.id.station_text_view);
+            ImageView iconImageView   = (ImageView) convertView.findViewById(R.id.icon_image_view);
+            TextView  dateTextView    = (TextView)  convertView.findViewById(R.id.date_text_view);
+            TextView  timeTextView    = (TextView)  convertView.findViewById(R.id.time_text_view);
+            TextView  routeTextView   = (TextView)  convertView.findViewById(R.id.route_text_view);
+            TextView  fareTextView    = (TextView)  convertView.findViewById(R.id.fare_text_view);
+            TextView  stationTextView = (TextView)  convertView.findViewById(R.id.station_text_view);
+
+            if (trip.getMode() == Trip.Mode.BUS) {
+                iconImageView.setImageResource(R.drawable.bus);
+            } else if (trip.getMode() == Trip.Mode.TRAIN) {
+                iconImageView.setImageResource(R.drawable.train);
+            } else if (trip.getMode() == Trip.Mode.TRAM) {
+                iconImageView.setImageResource(R.drawable.tram);
+            } else if (trip.getMode() == Trip.Mode.METRO) {
+                iconImageView.setImageResource(R.drawable.metro);
+            } else if (trip.getMode() == Trip.Mode.FERRY) {
+                iconImageView.setImageResource(R.drawable.ferry);
+            } else {
+                iconImageView.setImageDrawable(null); // FIXME
+            }
 
             dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
             
@@ -135,12 +136,12 @@ public class CardTripsActivity extends ListActivity
 
             List<String> routeText = new ArrayList<String>();
             if (trip.getShortAgencyName() != null)
-                routeText.add(trip.getShortAgencyName());
+                routeText.add("<b>" + trip.getShortAgencyName() + "</b>");
             if (trip.getRouteName() != null)
                 routeText.add(trip.getRouteName());
             
             if (routeText.size() > 0) {
-                routeTextView.setText(StringUtils.join(routeText, " "));
+                routeTextView.setText(Html.fromHtml(StringUtils.join(routeText, " ")));
                 routeTextView.setVisibility(View.VISIBLE);
             } else {
                 routeTextView.setVisibility(View.GONE);
@@ -152,14 +153,9 @@ public class CardTripsActivity extends ListActivity
                 fareTextView.setText("");
             }
 
-            List<String> stationText = new ArrayList<String>();
-            if (trip.getStartStationName() != null)
-                stationText.add(trip.getStartStationName());
-            if (trip.getEndStationName() != null && (!trip.getEndStationName().equals(trip.getStartStationName())))
-                stationText.add(trip.getEndStationName());
-
-            if (stationText.size() > 0) {
-                stationTextView.setText(StringUtils.join(stationText, " → "));
+            String stationText = Trip.formatStationNames(trip);
+            if (stationText != null) {
+                stationTextView.setText(stationText);
                 stationTextView.setVisibility(View.VISIBLE);
             } else {
                 stationTextView.setVisibility(View.GONE);
