@@ -118,6 +118,16 @@ public class ClipperTransitData extends TransitData
     {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
     }
+    
+    public static TransitIdentity parseTransitIdentity (Card card)
+    {
+        try {
+           byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
+           return new TransitIdentity("Clipper Card", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
+       } catch (Exception ex) {
+           throw new RuntimeException("Error parsing Clipper serial", ex);
+       }
+    }
 
     public ClipperTransitData (Card card)
     {

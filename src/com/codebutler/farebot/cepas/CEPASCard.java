@@ -29,6 +29,7 @@ import android.os.Parcelable;
 import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.transit.EZLinkTransitData;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitIdentity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -77,6 +78,13 @@ public class CEPASCard extends Card
     @Override
     public CardType getCardType () {
         return CardType.CEPAS;
+    }
+
+    @Override
+    public TransitIdentity parseTransitIdentity() {
+        if (EZLinkTransitData.check(this))
+            EZLinkTransitData.parseTransitIdentity(this);
+        return null;
     }
 
     @Override

@@ -46,6 +46,16 @@ public class OrcaTransitData extends TransitData
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
     }
 
+    public static TransitIdentity parseTransitIdentity(Card card)
+    {
+        try {
+            byte[] data = ((DesfireCard) card).getApplication(0xffffff).getFile(0x0f).getData();
+            return new TransitIdentity("ORCA Card", String.valueOf(Utils.byteArrayToInt(data, 5, 3)));
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing ORCA serial", ex);
+        }
+    }
+
     public OrcaTransitData (Card card)
     {
         DesfireCard desfireCard = (DesfireCard) card;

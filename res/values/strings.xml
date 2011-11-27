@@ -48,6 +48,7 @@
     <string name="accessibility">Accessibility</string>
     <string name="speak_balance">Speak Balance</string>
     <string name="speak_balance_summary">Proof of concept</string>
-
     <string name="balance_speech">Balance %s</string>
+
+    <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
 </resources>

@@ -43,10 +43,15 @@ import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitIdentity;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends ListActivity
 {
@@ -54,10 +59,15 @@ public class MainActivity extends ListActivity
 
     private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
 
+    private Map<String, TransitIdentity> mDataCache;
+
     @Override
     protected void onCreate (Bundle bundle)
     {
         super.onCreate(bundle);
+        setContentView(R.layout.activity_main);
+
+        mDataCache = new HashMap<String, TransitIdentity>();
 
         Cursor cursor = CardDBHelper.createCursor(this);
         startManagingCursor(cursor);
@@ -65,24 +75,34 @@ public class MainActivity extends ListActivity
         setListAdapter(new ResourceCursorAdapter(this, android.R.layout.simple_list_item_2, cursor) {
             @Override
             public void bindView (View view, Context context, Cursor cursor) {
-                int    type   = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-                String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-                String data   = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
+                int    type    = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
+                String serial  = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
+                Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
 
+                if (!mDataCache.containsKey(serial)) {
+                    String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
+                    try {
+                        mDataCache.put(serial, Card.fromXml(data).parseTransitIdentity());
+                    } catch (Exception ex) {
+                        mDataCache.put(serial, new TransitIdentity("Error: " + ex, null));
+                    }
+                }
+
+                TransitIdentity identity = mDataCache.get(serial);
+                
                 TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
                 TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
 
-                try {
-                    // This may end up being too slow.
-                    Card card = Card.fromXml(data);
-                    TransitData transitData = card.parseTransitData();
-                    if (transitData != null) {
-                        textView1.setText(String.format("%s: %s", transitData.getCardName(), transitData.getSerialNumber()));
+                if (identity != null) {
+                    if (identity.getSerialNumber() != null) {
+                        textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
                     } else {
-                        textView1.setText("Unknown Card");
+                        textView1.setText(identity.getName());
                     }
-                } catch (Exception ex) {
-                    textView1.setText("Error");
+                    textView2.setText(getString(R.string.scanned_at_format, SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(scannedAt), SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(scannedAt)));
+                } else {
+                    textView1.setText(getString(R.string.unknown_card));
+                    textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
                 }
 
                 textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));

@@ -32,6 +32,7 @@ import com.codebutler.farebot.mifare.DesfireFile.InvalidDesfireFile;
 import com.codebutler.farebot.transit.ClipperTransitData;
 import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitIdentity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -108,6 +109,15 @@ public class DesfireCard extends Card
         return CardType.MifareDesfire;
     }
 
+    @Override
+    public TransitIdentity parseTransitIdentity() {
+        if (OrcaTransitData.check(this))
+            return OrcaTransitData.parseTransitIdentity(this);
+        if (ClipperTransitData.check(this))
+            return ClipperTransitData.parseTransitIdentity(this);
+        return null;
+    }
+    
     @Override
     public TransitData parseTransitData() {
         if (OrcaTransitData.check(this))

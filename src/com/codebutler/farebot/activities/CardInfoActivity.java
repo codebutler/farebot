@@ -97,8 +97,14 @@ public class CardInfoActivity extends TabActivity
         }
 
         ((TextView) findViewById(R.id.card_name_text_view)).setText(mTransitData.getCardName());
-        ((TextView) findViewById(R.id.serial_text_view)).setText(mTransitData.getSerialNumber());
         ((TextView) findViewById(R.id.balance_text_view)).setText(mTransitData.getBalanceString());
+        
+        if (mTransitData.getSerialNumber() != null) {
+            ((TextView) findViewById(R.id.serial_text_view)).setText(mTransitData.getSerialNumber());
+            findViewById(R.id.serial_text_view).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.serial_text_view).setVisibility(View.GONE);
+        }
 
         TabSpec tabSpec;
         Intent  intent;

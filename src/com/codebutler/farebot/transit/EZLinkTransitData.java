@@ -424,6 +424,11 @@ public class EZLinkTransitData extends TransitData
         return (card instanceof CEPASCard);
     }
 
+    public static TransitIdentity parseTransitIdentity(Card card)
+    {
+        return new TransitIdentity("EZ-Link", Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>"));
+    }
+
     public EZLinkTransitData (Card card)
     {
         CEPASCard cepasCard = (CEPASCard) card;

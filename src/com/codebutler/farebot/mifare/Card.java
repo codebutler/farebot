@@ -30,6 +30,7 @@ import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.felica.FelicaCard;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitIdentity;
 import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -95,6 +96,7 @@ public abstract class Card implements Parcelable
         return mScannedAt;
     }
 
+    public abstract TransitIdentity parseTransitIdentity();
     public abstract TransitData parseTransitData ();
 
     public Element toXML () throws Exception
