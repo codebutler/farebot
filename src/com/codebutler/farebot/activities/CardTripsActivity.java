@@ -32,7 +32,6 @@ import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.mifare.Card;
@@ -75,10 +74,10 @@ public class CardTripsActivity extends ListActivity
         Trip trip = (Trip) getListAdapter().getItem(position);
 
         if (trip.getStartStation() != null)
-            menu.add(Menu.NONE, 1, 1, String.format("Map of %s", trip.getStartStation().getName()));
+            menu.add(Menu.NONE, 1, 1, String.format("Map of %s", trip.getStartStation().getStationName()));
 
         if (trip.getEndStation() != null)
-            menu.add(Menu.NONE, 2, 2, String.format("Map of %s", trip.getEndStation().getName()));
+            menu.add(Menu.NONE, 2, 2, String.format("Map of %s", trip.getEndStation().getStationName()));
     }
 
     @Override
@@ -89,11 +88,11 @@ public class CardTripsActivity extends ListActivity
 
         Station station = (item.getItemId() == 1) ? trip.getStartStation() : trip.getEndStation();
 
-        Uri uri = Uri.parse(String.format("geo:0,0?q=%s,%s (%s)", station.getLatitude(), station.getLongitude(), station.getName()));
+        Uri uri = Uri.parse(String.format("geo:0,0?q=%s,%s (%s)", station.getLatitude(), station.getLongitude(), station.getStationName()));
         startActivity(new Intent(Intent.ACTION_VIEW, uri));
 
         return true;
-    }    
+    }
 
     private static class UseLogListAdapter extends ArrayAdapter<Trip>
     {
@@ -125,10 +124,18 @@ public class CardTripsActivity extends ListActivity
             dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
             timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
 
+            List<String> routeText = new ArrayList<String>();
+            if (trip.getShortAgencyName() != null)
+                routeText.add(trip.getShortAgencyName());
             if (trip.getRouteName() != null)
-                routeTextView.setText(String.format("%s %s", trip.getShortAgencyName(), trip.getRouteName()));
-            else
-                routeTextView.setText(trip.getShortAgencyName());
+                routeText.add(trip.getRouteName());
+            
+            if (routeText.size() > 0) {
+                routeTextView.setText(StringUtils.join(routeText, " "));
+                routeTextView.setVisibility(View.VISIBLE);
+            } else {
+                routeTextView.setVisibility(View.GONE);
+            }
 
             if (trip.getFare() != 0) {
                 fareTextView.setText(trip.getFareString());
@@ -136,15 +143,19 @@ public class CardTripsActivity extends ListActivity
                 fareTextView.setText("");
             }
 
-            if (trip.getStartStationName() != null && trip.getEndStationName() != null) {
-                stationTextView.setText(String.format("%s → %s", trip.getStartStationName(), trip.getEndStationName()));
-                stationTextView.setVisibility(View.VISIBLE);
-            } else if (trip.getStartStationName() != null) {
-                stationTextView.setText(trip.getStartStationName());
+            List<String> stationText = new ArrayList<String>();
+            if (trip.getStartStationName() != null)
+                stationText.add(trip.getStartStationName());
+            if (trip.getEndStationName() != null && (!trip.getEndStationName().equals(trip.getStartStationName())))
+                stationText.add(trip.getEndStationName());
+
+            if (stationText.size() > 0) {
+                stationTextView.setText(StringUtils.join(stationText, " → "));
                 stationTextView.setVisibility(View.VISIBLE);
             } else {
                 stationTextView.setVisibility(View.GONE);
             }
+
             return convertView;
         }
     }

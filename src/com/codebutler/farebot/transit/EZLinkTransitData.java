@@ -574,7 +574,7 @@ public class EZLinkTransitData extends TransitData
                 String startStationAbbr = mTransaction.getUserData().substring(0, 3);
                 MRTStation startStation = EZLinkTransitData.getStation(startStationAbbr);
                 if (startStation != null)
-                    return startStation.getName();
+                    return startStation.getStationName();
                 else
                     return startStationAbbr;
             }
@@ -590,7 +590,7 @@ public class EZLinkTransitData extends TransitData
                 String endStationAbbr   = mTransaction.getUserData().substring(4,7);
                 MRTStation endStation   = EZLinkTransitData.getStation(endStationAbbr);
                 if (endStation != null)
-                    return endStation.getName();
+                    return endStation.getStationName();
                 else
                     return endStationAbbr;
             }

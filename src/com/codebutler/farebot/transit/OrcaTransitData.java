@@ -109,7 +109,7 @@ public class OrcaTransitData extends TransitData
 
             Trip[] useLog = new Trip[recordFile.getRecords().length];
             for (int i = 0; i < useLog.length; i++) {
-                useLog[i] = createTrip(recordFile.getRecords()[i]);
+                useLog[i] = new OrcaTrip(recordFile.getRecords()[i]);
             }
 
             Arrays.sort(useLog, new Comparator<Trip>() {
@@ -123,33 +123,6 @@ public class OrcaTransitData extends TransitData
         return null;
     }
 
-    private Trip createTrip (DesfireRecord record)
-    {
-        long timestamp, coachNum, fare, newBalance, agency, transType;
-
-        byte[] useData = record.getData();
-        long[] usefulData = new long[useData.length];
-
-        for (int i = 0; i < useData.length; i++) {
-            usefulData[i] = ((long)useData[i]) & 0xFF;
-        }
-
-        timestamp =
-            ((0x0F & usefulData[3]) << 28) |
-            (usefulData[4] << 20) |
-            (usefulData[5] << 12) |
-            (usefulData[6] << 4)  |
-            (usefulData[7] >> 4);
-
-        coachNum   = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
-        fare       = (usefulData[15] << 7) | (usefulData[16] >> 1);
-        newBalance = (usefulData[34] << 8) | usefulData[35];
-        agency     = usefulData[3] >> 4;
-        transType  = (usefulData[17]);
-
-        return new OrcaTrip(timestamp, coachNum, fare, newBalance, agency, transType);
-    }
-
     public static class OrcaTrip extends Trip
     {
         private final long mTimestamp;
@@ -160,29 +133,42 @@ public class OrcaTransitData extends TransitData
         private final long mTransType;
 
         private static Station[] sLinkStations = new Station[] {
-            new Station("Westlake Station",                   "47.6113968", "-122.337502"),
-            new Station("University Station",                 "47.6072502", "-122.335754"),
-            new Station("Pioneer Square Station",             "47.6021461", "-122.33107"),
-            new Station("International District Station",     "47.5976601", "-122.328217"),
-            new Station("Stadium Station",                    "47.5918121", "-122.327354"),
-            new Station("SODO Station",                       "47.5799484", "-122.327515"),
-            new Station("Beacon Hill Station",                "47.5791245", "-122.311287"),
-            new Station("Mount Baker Station",                "47.5764389", "-122.297737"),
-            new Station("Columbia City Station",              "47.5589523", "-122.292343"),
-            new Station("Othello Station",                    "47.5375366", "-122.281471"),
-            new Station("Rainier Beach Station",              "47.5222626", "-122.279579"),
-            new Station("Tukwila International Blvd Station", "47.4642754", "-122.288391"),
-            new Station("Seatac Airport Station",             "47.4445305", "-122.297012")
+            new Station("Westlake Station",                   "Westlake",      "47.6113968", "-122.337502"),
+            new Station("University Station",                 "University",    "47.6072502", "-122.335754"),
+            new Station("Pioneer Square Station",             "Pioneer Sq",    "47.6021461", "-122.33107"),
+            new Station("International District Station",     "ID",            "47.5976601", "-122.328217"),
+            new Station("Stadium Station",                    "Stadium",       "47.5918121", "-122.327354"),
+            new Station("SODO Station",                       "SODO",          "47.5799484", "-122.327515"),
+            new Station("Beacon Hill Station",                "Beacon Hill",   "47.5791245", "-122.311287"),
+            new Station("Mount Baker Station",                "Mount Baker",   "47.5764389", "-122.297737"),
+            new Station("Columbia City Station",              "Columbia City", "47.5589523", "-122.292343"),
+            new Station("Othello Station",                    "Othello",       "47.5375366", "-122.281471"),
+            new Station("Rainier Beach Station",              "Rainier Beach", "47.5222626", "-122.279579"),
+            new Station("Tukwila International Blvd Station", "Tukwila",       "47.4642754", "-122.288391"),
+            new Station("Seatac Airport Station",             "Sea-Tac",       "47.4445305", "-122.297012")
         };
-
-        public OrcaTrip (long timestamp, long coachNum, long fare, long newBalance, long agency, long transType)
+        
+        public OrcaTrip (DesfireRecord record)
         {
-            mTimestamp  = timestamp;
-            mCoachNum   = coachNum;
-            mFare       = fare;
-            mNewBalance = newBalance;
-            mAgency     = agency;
-            mTransType  = transType;
+            byte[] useData = record.getData();
+            long[] usefulData = new long[useData.length];
+    
+            for (int i = 0; i < useData.length; i++) {
+                usefulData[i] = ((long)useData[i]) & 0xFF;
+            }
+    
+            mTimestamp =
+                ((0x0F & usefulData[3]) << 28) |
+                (usefulData[4] << 20) |
+                (usefulData[5] << 12) |
+                (usefulData[6] << 4)  |
+                (usefulData[7] >> 4);
+    
+            mCoachNum   = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
+            mFare       = (usefulData[15] << 7) | (usefulData[16] >> 1);
+            mNewBalance = (usefulData[34] << 8) | usefulData[35];
+            mAgency     = usefulData[3] >> 4;
+            mTransType  = (usefulData[17]);            
         }
 
         @Override
@@ -257,7 +243,7 @@ public class OrcaTransitData extends TransitData
         @Override
         public String getStartStationName () {
             if (mAgency == 0x07 && mCoachNum > 10000) {
-                return sLinkStations[(((int) mCoachNum) % 1000) - 193].getName();
+                return sLinkStations[(((int) mCoachNum) % 1000) - 193].getStationName();
             } else {
                 return "Coach #" + String.valueOf(mCoachNum);
             }
@@ -265,14 +251,18 @@ public class OrcaTransitData extends TransitData
 
         @Override
         public String getEndStationName () {
-            // Clipper tracks destination in a separate record
+            // ORCA tracks destination in a separate record
             return null;
         }
 
         @Override
         public Station getEndStation () {
-            // Clipper tracks destination in a separate record
+            // ORCA tracks destination in a separate record
             return null;
+        }
+
+        public long getCoachNumber() {
+            return mCoachNum;
         }
     }
 }
