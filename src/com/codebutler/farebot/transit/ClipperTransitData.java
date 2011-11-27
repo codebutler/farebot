@@ -205,24 +205,26 @@ public class ClipperTransitData extends TransitData
             byte[] slice = Utils.byteArraySlice(data, pos, RECORD_LENGTH);
             Trip trip = createTrip(slice);
             if (trip != null) {
-                int idx = Collections.binarySearch(result, trip,
-                    new Comparator<Trip>() {
-                        public int compare(Trip trip, Trip trip1) {
-                            return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
-                        }
-                    });
-                if (idx >= 0) {
-                    /*
-                     *  Some transaction types are temporary -- remove previous
-                     *  instance if there is an an entry with the same start
-                     *  timestamp.
-                     */
-                    result.remove(idx);
-                } else {
-                    /* Convert idx back into the insertion point */
-                    idx = -(idx + 1);
-                }
-                result.add(idx, trip);
+//                int idx = Collections.binarySearch(result, trip,
+//                    new Comparator<Trip>() {
+//                        public int compare(Trip trip, Trip trip1) {
+//                            return Long.valueOf(trip1.getTimestamp()).compareTo(trip.getTimestamp());
+//                        }
+//                    });
+//                if (idx >= 0) {
+//                    /*
+//                     *  Some transaction types are temporary -- remove previous
+//                     *  instance if there is an an entry with the same start
+//                     *  timestamp.
+//                     */
+//                    result.remove(idx);
+//                } else {
+//                    /* Convert idx back into the insertion point */
+//                    idx = -(idx + 1);
+//                }
+//                result.add(idx, trip);
+
+                result.add(trip);
             }
             pos -= RECORD_LENGTH;
         }
@@ -242,7 +244,7 @@ public class ClipperTransitData extends TransitData
         to        = Utils.byteArrayToLong(useData, 0x16, 2);
         route     = Utils.byteArrayToLong(useData, 0x1c, 2);
 
-        if (timestamp == 0)
+        if (agency == 0)
             return null;
 
         // Use a magic number to offset the timestamp
