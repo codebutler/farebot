@@ -39,7 +39,7 @@ import android.widget.*;
 import com.codebutler.farebot.ExportHelper;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
@@ -74,7 +74,7 @@ public class MainActivity extends ListActivity
 
                 try {
                     // This may end up being too slow.
-                    MifareCard card = MifareCard.fromXml(data);
+                    Card card = Card.fromXml(data);
                     TransitData transitData = card.parseTransitData();
                     if (transitData != null) {
                         textView1.setText(String.format("%s: %s", transitData.getCardName(), transitData.getSerialNumber()));
@@ -85,7 +85,7 @@ public class MainActivity extends ListActivity
                     textView1.setText("Error");
                 }
 
-                textView2.setText(String.format("%s - %s", MifareCard.CardType.values()[type].toString(), serial));
+                textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
             }
         });
 

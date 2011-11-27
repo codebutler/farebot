@@ -35,8 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.felica.FelicaCard;
 import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -46,7 +47,7 @@ public class AdvancedCardInfoActivity extends TabActivity
     public static String EXTRA_CARD    = "com.codebutler.farebot.EXTRA_CARD";
     public static String EXTRA_MESSAGE = "com.codebutler.farebot.EXTRA_MESSAGE";
 
-    private MifareCard mCard;
+    private Card mCard;
     
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -54,7 +55,7 @@ public class AdvancedCardInfoActivity extends TabActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_card_info);
 
-        mCard = (MifareCard) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = (Card) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
 
         ((TextView) findViewById(R.id.card_type_text_view)).setText(mCard.getCardType().toString());
         ((TextView) findViewById(R.id.card_serial_text_view)).setText(Utils.getHexString(mCard.getTagId(), "<error>"));

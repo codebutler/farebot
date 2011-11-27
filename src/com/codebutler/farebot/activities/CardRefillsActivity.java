@@ -32,7 +32,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitData;
 
@@ -41,14 +41,14 @@ import java.util.Date;
 
 public class CardRefillsActivity extends ListActivity
 {
-    private MifareCard mCard;
+    private Card mCard;
 
     public void onCreate (Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_refills);
 
-        mCard = (MifareCard) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = (Card) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
 
         TransitData transitData = mCard.parseTransitData();
 

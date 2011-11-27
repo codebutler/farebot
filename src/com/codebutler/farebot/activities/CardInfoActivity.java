@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +39,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitData;
 
@@ -46,7 +47,7 @@ public class CardInfoActivity extends TabActivity
 {
     public static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
 
-    private MifareCard  mCard;
+    private Card mCard;
     private TransitData mTransitData;
 
     private TextToSpeech   mTTS = null;
@@ -74,7 +75,7 @@ public class CardInfoActivity extends TabActivity
         String data   = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
 
         try {
-            mCard = MifareCard.fromXml(data);
+            mCard = Card.fromXml(data);
         } catch (Exception ex) {
             Utils.showErrorAndFinish(this, ex);
             return;
@@ -83,13 +84,14 @@ public class CardInfoActivity extends TabActivity
         try {
             mTransitData = mCard.parseTransitData();
         } catch (Exception ex) {
+            Log.e("CardInfoActivity", "Error parsing transit data", ex);
             showAdvancedInfo(Utils.getErrorMessage(ex));
             finish();
             return;
         }
 
         if (mTransitData == null) {
-            showAdvancedInfo("Unknown card data. Only ORCA and Clipper cards are currently supported.");
+            showAdvancedInfo("Unsupported card data.");
             finish();
             return;
         }

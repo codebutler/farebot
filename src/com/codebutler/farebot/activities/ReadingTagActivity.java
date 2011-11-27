@@ -28,19 +28,18 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.cepas.CEPASCard;
-import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
-import org.apache.commons.lang.ArrayUtils;
 
 public class ReadingTagActivity extends Activity
 {
@@ -64,23 +63,16 @@ public class ReadingTagActivity extends Activity
         final TextView textView = (TextView) findViewById(R.id.textView);
         
         try {
-            Bundle extras = intent.getExtras();
+            final Tag tag      = (Tag) intent.getParcelableExtra("android.nfc.extra.TAG");
+            final byte[] tagId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
             
-            final Tag      tag   = (Tag) extras.getParcelable("android.nfc.extra.TAG");;
-            final String[] techs = tag.getTechList();
-
-            new AsyncTask<Void, String, MifareCard>() {
+            new AsyncTask<Void, String, Card>() {
                 Exception mException;
                 
                 @Override
-                protected MifareCard doInBackground (Void... params) {
+                protected Card doInBackground (Void... params) {
                     try {
-                    	if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB"))
-                    		return CEPASCard.dumpTag(tag.getId(), tag);
-                    	else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
-                            return DesfireCard.dumpTag(tag.getId(), tag);
-                        else
-                            throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
+                        return Card.dumpTag(tagId, tag);
                     } catch (Exception ex) {
                         mException = ex;
                         return null;
@@ -88,7 +80,7 @@ public class ReadingTagActivity extends Activity
                 }
 
                 @Override
-                protected void onPostExecute (MifareCard card) {
+                protected void onPostExecute (Card card) {
                     if (mException != null) {
                         if (mException instanceof UnsupportedTagException) {
                             UnsupportedTagException ex = (UnsupportedTagException) mException;
@@ -110,6 +102,11 @@ public class ReadingTagActivity extends Activity
 
                     try {
                         String cardXml = Utils.xmlNodeToString(card.toXML().getOwnerDocument());
+
+                        Log.d("ReadingTagActivity", "Got Card XML");
+                        for (String line : cardXml.split("\n")) {
+                            Log.d("ReadingTagActivity", "Got Card XML: " + line);
+                        }
 
                         ContentValues values = new ContentValues();
                         values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());

@@ -29,7 +29,7 @@ package com.codebutler.farebot.transit;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireFile;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -113,12 +113,12 @@ public class ClipperTransitData extends TransitData
     };
 
 
-    public static boolean check (MifareCard card)
+    public static boolean check (Card card)
     {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
     }
 
-    public ClipperTransitData (MifareCard card)
+    public ClipperTransitData (Card card)
     {
         DesfireCard desfireCard = (DesfireCard) card;
 

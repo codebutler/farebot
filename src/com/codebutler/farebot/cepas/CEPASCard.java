@@ -26,19 +26,21 @@ import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.transit.EZLinkTransitData;
+import com.codebutler.farebot.transit.TransitData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.Date;
 
-public class CEPASCard extends MifareCard
+public class CEPASCard extends Card
 {
     private CEPASPurse[]   mPurses;
     private CEPASHistory[] mHistories;
 
-    public static CEPASCard dumpTag (byte[] tagId, Tag tag) throws Exception
+    public static CEPASCard dumpTag (Tag tag) throws Exception
     {
         IsoDep tech = IsoDep.get(tag);
 
@@ -62,7 +64,7 @@ public class CEPASCard extends MifareCard
                 tech.close();
         }
 
-        return new CEPASCard(tagId, new Date(), cepasPurses, cepasHistories);
+        return new CEPASCard(tag.getId(), new Date(), cepasPurses, cepasHistories);
     }
 
     private CEPASCard (byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories)
@@ -75,6 +77,13 @@ public class CEPASCard extends MifareCard
     @Override
     public CardType getCardType () {
         return CardType.CEPAS;
+    }
+
+    @Override
+    public TransitData parseTransitData() {
+        if (EZLinkTransitData.check(this))
+           return new EZLinkTransitData(this);
+        return null;
     }
 
     public CEPASPurse getPurse (int purse)
@@ -123,11 +132,6 @@ public class CEPASCard extends MifareCard
         parcel.writeInt(mHistories.length);
         for (int i = 0; i < mHistories.length; i++)
             parcel.writeParcelable(mHistories[i], flags);
-    }
-
-    public int describeContents ()
-    {
-        return 0;
     }
 
     public static CEPASCard fromXML (byte[] cardId, Date scannedAt, Element rootElement)

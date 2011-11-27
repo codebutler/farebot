@@ -30,7 +30,7 @@ import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireFile;
 import com.codebutler.farebot.mifare.DesfireFile.RecordDesfireFile;
 import com.codebutler.farebot.mifare.DesfireRecord;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -41,12 +41,12 @@ public class OrcaTransitData extends TransitData
     private double   mBalance;
     private Trip[]   mTrips;
 
-    public static boolean check (MifareCard card)
+    public static boolean check (Card card)
     {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
     }
 
-    public OrcaTransitData (MifareCard card)
+    public OrcaTransitData (Card card)
     {
         DesfireCard desfireCard = (DesfireCard) card;
 

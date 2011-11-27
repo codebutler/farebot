@@ -34,10 +34,10 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.cepas.CEPASPurse;
+import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.mifare.Card.CardType;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireManufacturingData;
-import com.codebutler.farebot.mifare.MifareCard;
-import com.codebutler.farebot.mifare.MifareCard.CardType;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -47,7 +47,7 @@ import java.util.Locale;
 
 public class CardHWDetailActivity extends ListActivity
 {
-    private MifareCard mCard;
+    private Card mCard;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)

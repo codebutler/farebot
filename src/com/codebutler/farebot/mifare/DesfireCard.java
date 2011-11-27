@@ -29,6 +29,9 @@ import android.os.Parcelable;
 import android.util.Base64;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.DesfireFile.InvalidDesfireFile;
+import com.codebutler.farebot.transit.ClipperTransitData;
+import com.codebutler.farebot.transit.OrcaTransitData;
+import com.codebutler.farebot.transit.TransitData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -37,12 +40,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DesfireCard extends MifareCard
+public class DesfireCard extends Card
 {
     private DesfireManufacturingData mManfData;
     private DesfireApplication[]     mApplications;
 
-    public static DesfireCard dumpTag (byte[] tagId, Tag tag) throws Exception
+    public static DesfireCard dumpTag (Tag tag) throws Exception
     {
         List<DesfireApplication> apps = new ArrayList<DesfireApplication>();
 
@@ -90,7 +93,7 @@ public class DesfireCard extends MifareCard
                 tech.close();
         }
 
-        return new DesfireCard(tagId, new Date(), manufData, appsArray);
+        return new DesfireCard(tag.getId(), new Date(), manufData, appsArray);
     }
 
     DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication apps[])
@@ -103,6 +106,15 @@ public class DesfireCard extends MifareCard
     @Override
     public CardType getCardType () {
         return CardType.MifareDesfire;
+    }
+
+    @Override
+    public TransitData parseTransitData() {
+        if (OrcaTransitData.check(this))
+            return new OrcaTransitData(this);
+        if (ClipperTransitData.check(this))
+            return new ClipperTransitData(this);
+        return null;
     }
 
     public DesfireApplication[] getApplications () {
@@ -151,11 +163,6 @@ public class DesfireCard extends MifareCard
         parcel.writeTypedArray(mApplications, flags);
     }
     
-    public int describeContents ()
-    {
-        return 0;
-    }
-
     // FIXME: This is such a mess!
     
     public static DesfireCard fromXml (byte[] cardId, Date scannedAt, Element element)

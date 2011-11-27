@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.cepas.CEPASTransaction;
-import com.codebutler.farebot.mifare.MifareCard;
+import com.codebutler.farebot.mifare.Card;
 
 import java.text.NumberFormat;
 import java.util.HashSet;
@@ -419,12 +419,12 @@ public class EZLinkTransitData extends TransitData
     	return mrtStations.get(code);
     }
 
-    public static boolean check (MifareCard card)
+    public static boolean check (Card card)
     {
         return (card instanceof CEPASCard);
     }
 
-    public EZLinkTransitData (MifareCard card)
+    public EZLinkTransitData (Card card)
     {
         CEPASCard cepasCard = (CEPASCard) card;
 

@@ -1,5 +1,5 @@
 /*
- * MifareCard.java
+ * Card.java
  *
  * Copyright (C) 2011 Eric Butler
  *
@@ -22,14 +22,15 @@
 
 package com.codebutler.farebot.mifare;
 
+import android.nfc.Tag;
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.cepas.CEPASCard;
-import com.codebutler.farebot.transit.ClipperTransitData;
-import com.codebutler.farebot.transit.EZLinkTransitData;
-import com.codebutler.farebot.transit.OrcaTransitData;
+import com.codebutler.farebot.felica.FelicaCard;
 import com.codebutler.farebot.transit.TransitData;
+import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -39,39 +40,30 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.util.Date;
 
-public abstract class MifareCard implements Parcelable
+public abstract class Card implements Parcelable
 {
     private byte[] mTagId;
     private Date   mScannedAt;
 
-    protected MifareCard (byte[] tagId, Date scannedAt)
+    protected Card(byte[] tagId, Date scannedAt)
     {
         mTagId     = tagId;
         mScannedAt = scannedAt;
     }
 
-    public abstract CardType getCardType();
-
-    public byte[] getTagId () {
-        return mTagId;
+    public static Card dumpTag(byte[] tagId, Tag tag) throws Exception {
+        final String[] techs = tag.getTechList();
+        if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB"))
+            return CEPASCard.dumpTag(tag);
+        else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
+            return DesfireCard.dumpTag(tag);
+        else if (ArrayUtils.contains(techs, "android.nfc.tech.NfcF"))
+            return FelicaCard.dumpTag(tagId, tag);
+        else
+            throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
     }
 
-    public Date getScannedAt () {
-        return mScannedAt;
-    }
-    
-    public TransitData parseTransitData ()
-    {
-        if (OrcaTransitData.check(this))
-            return new OrcaTransitData(this);
-        if (ClipperTransitData.check(this))
-            return new ClipperTransitData(this);
-        if (EZLinkTransitData.check(this))
-           return new EZLinkTransitData(this);
-        return null;
-    }
-
-    public static MifareCard fromXml (String xml) throws Exception
+    public static Card fromXml (String xml) throws Exception
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = builder.parse(new InputSource(new StringReader(xml)));
@@ -86,10 +78,24 @@ public abstract class MifareCard implements Parcelable
                 return DesfireCard.fromXml(id, scannedAt, rootElement);
             case CEPAS:
             	return CEPASCard.fromXML(id, scannedAt, rootElement);
+            case FeliCa:
+                return FelicaCard.fromXml(id, scannedAt, rootElement);
             default:
                 throw new UnsupportedOperationException("Unsupported card type: " + type);
         }
     }
+
+    public abstract CardType getCardType();
+
+    public byte[] getTagId () {
+        return mTagId;
+    }
+
+    public Date getScannedAt () {
+        return mScannedAt;
+    }
+
+    public abstract TransitData parseTransitData ();
 
     public Element toXML () throws Exception
     {
@@ -111,13 +117,19 @@ public abstract class MifareCard implements Parcelable
         parcel.writeByteArray(mTagId);
         parcel.writeLong(mScannedAt.getTime());
     }
+    
+    public final int describeContents ()
+    {
+        return 0;
+    }
 
     public enum CardType
     {
         MifareClassic(0),
         MifareUltralight(1),
         MifareDesfire(2),
-        CEPAS(3);
+        CEPAS(3),
+        FeliCa(4);
 
         private int mValue;
 
@@ -142,6 +154,8 @@ public abstract class MifareCard implements Parcelable
                     return "MIFARE DESFire";
                 case 3:
                 	return "CEPAS";
+                case 4:
+                    return "FeliCa";
                 default:
                     return "Unknown";
             }
