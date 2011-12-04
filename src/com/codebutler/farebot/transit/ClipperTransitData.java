@@ -39,7 +39,7 @@ public class ClipperTransitData extends TransitData
 {
     private long            mSerialNumber;
     private short           mBalance;
-    private Trip[]          mTrips;
+    private ClipperTrip[]   mTrips;
     private ClipperRefill[] mRefills;
 
     private static final int  RECORD_LENGTH   = 32;
@@ -64,6 +64,7 @@ public class ClipperTransitData extends TransitData
             put(AGENCY_FERRY, "Golden Gate Ferry");
         }
     };
+    
     private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {
         {
             put(AGENCY_ACTRAN, "ACTransit");
@@ -115,12 +116,21 @@ public class ClipperTransitData extends TransitData
         }
     };
 
-
     public static boolean check (Card card)
     {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
     }
     
+    public static Creator<ClipperTransitData> CREATOR = new Creator<ClipperTransitData>() {
+        public ClipperTransitData createFromParcel(Parcel parcel) {
+            return new ClipperTransitData(parcel);
+        }
+
+        public ClipperTransitData[] newArray(int size) {
+            return new ClipperTransitData[size];
+        }
+    };
+        
     public static TransitIdentity parseTransitIdentity (Card card)
     {
         try {
@@ -131,6 +141,18 @@ public class ClipperTransitData extends TransitData
        }
     }
 
+
+    public ClipperTransitData(Parcel parcel) {
+        mSerialNumber = parcel.readLong();
+        mBalance      = (short) parcel.readLong();
+                
+        mTrips = new ClipperTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, ClipperTrip.CREATOR);
+        
+        mRefills = new ClipperRefill[parcel.readInt()];
+        parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
+    }
+    
     public ClipperTransitData (Card card)
     {
         DesfireCard desfireCard = (DesfireCard) card;
@@ -190,7 +212,7 @@ public class ClipperTransitData extends TransitData
         return mRefills;
     }
 
-    private Trip[] parseTrips (DesfireCard card)
+    private ClipperTrip[] parseTrips (DesfireCard card)
     {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x0e);
 
@@ -229,7 +251,7 @@ public class ClipperTransitData extends TransitData
             }
             pos -= RECORD_LENGTH;
         }
-        Trip[] useLog = new Trip[result.size()];
+        ClipperTrip[] useLog = new ClipperTrip[result.size()];
         result.toArray(useLog);
         return useLog;
     }
@@ -331,6 +353,17 @@ public class ClipperTransitData extends TransitData
             return sShortAgencies.get(agency);
         }
         return "UNK(0x" + Long.toString(agency, 16) + ")";
+    }
+
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeLong(mSerialNumber);
+        parcel.writeLong(mBalance);
+        
+        parcel.writeInt(mTrips.length);
+        parcel.writeTypedArray(mTrips,  flags);
+        
+        parcel.writeInt(mRefills.length);
+        parcel.writeTypedArray(mRefills, flags);
     }
 
     public static class ClipperTrip extends Trip
@@ -508,19 +541,35 @@ public class ClipperTransitData extends TransitData
         }
     }
 
-    public static class ClipperRefill extends Refill
-    {
+    public static class ClipperRefill extends Refill {
         private final long mTimestamp;
         private final long mAmount;
         private final long mMachineID;
         private final long mAgency;
 
+        public static Creator<ClipperRefill> CREATOR = new Creator<ClipperRefill>() {
+            public ClipperRefill createFromParcel(Parcel parcel) {
+                return new ClipperRefill(parcel);
+            }
+
+            public ClipperRefill[] newArray(int size) {
+                return new ClipperRefill[size];
+            }
+        };
+        
         public ClipperRefill (long timestamp, long amount, long agency, long machineid)
         {
             mTimestamp  = timestamp;
             mAmount     = amount;
             mMachineID  = machineid;
             mAgency     = agency;
+        }
+
+        public ClipperRefill(Parcel parcel) {
+            mTimestamp = parcel.readLong();
+            mAmount    = parcel.readLong();
+            mMachineID = parcel.readLong();
+            mAgency    = parcel.readLong();
         }
 
         @Override
@@ -550,6 +599,13 @@ public class ClipperTransitData extends TransitData
         @Override
         public String getShortAgencyName () {
             return ClipperTransitData.getShortAgencyName((int)mAgency);
+        }
+
+        public void writeToParcel(Parcel parcel, int flags) {
+            parcel.writeLong(mTimestamp);
+            parcel.writeLong(mAmount);
+            parcel.writeLong(mMachineID);
+            parcel.writeLong(mAgency);
         }
     }
 }

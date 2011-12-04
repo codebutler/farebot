@@ -22,8 +22,9 @@
 
 package com.codebutler.farebot.transit;
 
-public abstract class Refill
-{
+import android.os.Parcelable;
+
+public abstract class Refill implements Parcelable {
     public abstract long getTimestamp ();
     
     public abstract String getAgencyName ();
@@ -31,4 +32,8 @@ public abstract class Refill
 
     public abstract long getAmount ();
     public abstract String getAmountString ();
+
+    public final int describeContents() {
+        return 0;
+    }
 }

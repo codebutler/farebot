@@ -35,9 +35,9 @@ import java.util.TreeMap;
 
 public class EZLinkTransitData extends TransitData
 {
-    private String mSerialNumber;
-    private double mBalance;
-    private Trip[] mTrips;
+    private String       mSerialNumber;
+    private double       mBalance;
+    private EZLinkTrip[] mTrips;
 
     private static HashSet<String> sbsBuses = new HashSet<String> () {
             /**
@@ -430,6 +430,24 @@ public class EZLinkTransitData extends TransitData
         return new TransitIdentity("EZ-Link", Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>"));
     }
 
+    public Creator<EZLinkTransitData> CREATOR = new Creator<EZLinkTransitData>() {
+        public EZLinkTransitData createFromParcel(Parcel parcel) {
+            return new EZLinkTransitData(parcel);
+        }
+        
+        public EZLinkTransitData[] newArray(int size) {
+            return new EZLinkTransitData[size];
+        }
+    };
+    
+    public EZLinkTransitData(Parcel parcel) {
+        mSerialNumber = parcel.readString();
+        mBalance      = parcel.readDouble();
+        
+        mTrips = new EZLinkTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, EZLinkTrip.CREATOR);
+    }
+    
     public EZLinkTransitData (Card card)
     {
         CEPASCard cepasCard = (CEPASCard) card;
@@ -464,20 +482,23 @@ public class EZLinkTransitData extends TransitData
         return null;
     }
 
-    private Trip[] parseTrips (CEPASCard card)
+    private EZLinkTrip[] parseTrips (CEPASCard card)
     {
     	CEPASTransaction[] transactions = card.getHistory(3).getTransactions();
-    	Trip[] trips = new Trip[transactions.length];
+    	EZLinkTrip[] trips = new EZLinkTrip[transactions.length];
     	
     	for (int i = 0; i < trips.length; i++)
-    		trips[i] = createTrip(transactions[i]);
+    		trips[i] = new EZLinkTrip(transactions[i]);
         
     	return trips;
     }
 
-    private Trip createTrip (CEPASTransaction record)
-    {
-    	return new EZLinkTrip(record);
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mSerialNumber);
+        parcel.writeDouble(mBalance);
+        
+        parcel.writeInt(mTrips.length);
+        parcel.writeTypedArray(mTrips, flags);
     }
 
     public static class EZLinkTrip extends Trip

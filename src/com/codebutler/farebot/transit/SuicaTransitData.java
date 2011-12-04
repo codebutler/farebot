@@ -4,8 +4,7 @@
  * Copyright (C) 2011 Eric Butler
  *
  * Authors:
- *   Eric Butler <eric@codebutler.com>
- *   Kazzz
+ * Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,12 +44,27 @@ import static com.codebutler.farebot.felica.DBUtil.*;
 public class SuicaTransitData extends TransitData {
     private SuicaTrip[] mTrips;
 
+    public Creator<SuicaTransitData> CREATOR = new Creator<SuicaTransitData>() {
+        public SuicaTransitData createFromParcel(Parcel parcel) {
+            return new SuicaTransitData(parcel);
+        }
+
+        public SuicaTransitData[] newArray(int size) {
+            return new SuicaTransitData[size];
+        }
+    };
+
     public static boolean check(FelicaCard card) {
         return (card.getSystem(FeliCaLib.SYSTEMCODE_SUICA) != null);
     }
 
     public static TransitIdentity parseTransitIdentity (FelicaCard card) {
         return new TransitIdentity("Suica Card", null); // FIXME
+    }
+
+    public SuicaTransitData(Parcel parcel) {
+        mTrips = new SuicaTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, SuicaTrip.CREATOR);
     }
 
     public SuicaTransitData(FelicaCard card) {
@@ -110,6 +124,11 @@ public class SuicaTransitData extends TransitData {
     @Override
     public String getCardName() {
         return "Suica Card"; // FIXME: Could be ICOCA, etc.
+    }
+
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(mTrips.length);
+        parcel.writeTypedArray(mTrips, flags);
     }
 
     public static class SuicaTrip extends Trip {
@@ -188,15 +207,15 @@ public class SuicaTransitData extends TransitData {
                 if (mIsBus) {
                     mBusLineCode  = Util.toInt(data[6], data[7]);
                     mBusStopCode  = Util.toInt(data[8], data[9]);
-                    mStartStation = getBusStop(mBusLineCode, mBusStopCode);
+                    mStartStation = getBusStop(mRegionCode, mBusLineCode, mBusStopCode);
 
                 } else {
                     mRailEntranceLineCode    = data[6] & 0xFF;
                     mRailEntranceStationCode = data[7] & 0xFF;
                     mRailExitLineCode        = data[8] & 0xFF;
                     mRailExitStationCode     = data[9] & 0xFF;
-                    mStartStation = getRailStation(mRegionCode, getRailArea(), mRailEntranceLineCode, mRailEntranceStationCode);
-                    mEndStation   = getRailStation(mRegionCode, getRailArea(), mRailExitLineCode, mRailExitStationCode);
+                    mStartStation = getRailStation(mRegionCode, mRailEntranceLineCode, mRailEntranceStationCode);
+                    mEndStation   = getRailStation(mRegionCode, mRailExitLineCode, mRailExitStationCode);
                 }
             }
         }
@@ -362,21 +381,6 @@ public class SuicaTransitData extends TransitData {
    
         public String getProcessType() {
             return SuicaTransitData.getProcessTypeName(mProcessType);
-        }
-
-        // Based on code from http://handasse.blogspot.com/2008/04/python-pasorisuica.html
-        // This page has notes http://jennychan.web.fc2.com/format/suica.html#008B
-        private int getRailArea () {
-            if (mIsProductSale || mIsCharge || mIsBus)
-                return -1;
-            if (mRegionCode == 0) {
-                if (mRailEntranceLineCode < 0x80)
-                    return 0; // line JR.
-                else
-                    return 1; // Kanto public private railways
-            } else {
-                return 2; // Kansai Private Railways public
-            }
         }
 
         /*
@@ -574,7 +578,10 @@ public class SuicaTransitData extends TransitData {
      * @param stationCode 駅順コードをセット
      * @return 取得できた場合、序数0に会社名、1停留所名が戻ります
      */
-    private static Station getBusStop(int lineCode, int stationCode) {
+    private static Station getBusStop(int regionCode, int lineCode, int stationCode) {
+        // http://jennychan.web.fc2.com/format/suica.html
+        int areaCode = (regionCode >> 6);
+
         DBUtil util = new DBUtil(FareBotApplication.getInstance());
         try {
             SQLiteDatabase db = util.openDataBase();
@@ -613,8 +620,9 @@ public class SuicaTransitData extends TransitData {
      * @param stationCode 駅順コードをセット
      * @return 取得できた場合、序数0に会社名、1に路線名、2に駅名が戻ります
      */
-    private static Station getRailStation(int regionCode, int areaCode, int lineCode, int stationCode) {
-        areaCode = (regionCode >> 6);
+    private static Station getRailStation(int regionCode, int lineCode, int stationCode) {
+        // http://jennychan.web.fc2.com/format/suica.html
+        int areaCode = (regionCode >> 6);
 
         DBUtil util = new DBUtil(FareBotApplication.getInstance());
         try {

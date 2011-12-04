@@ -38,9 +38,9 @@ import java.util.*;
 
 public class OrcaTransitData extends TransitData
 {
-    private int      mSerialNumber;
-    private double   mBalance;
-    private Trip[]   mTrips;
+    private int        mSerialNumber;
+    private double     mBalance;
+    private OrcaTrip[] mTrips;
 
     public static boolean check (Card card)
     {
@@ -57,6 +57,14 @@ public class OrcaTransitData extends TransitData
         }
     }
 
+    public OrcaTransitData (Parcel parcel) {
+        mSerialNumber = parcel.readInt();
+        mBalance      = parcel.readDouble();
+        
+        mTrips = new OrcaTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, OrcaTrip.CREATOR);
+    }
+    
     public OrcaTransitData (Card card)
     {
         DesfireCard desfireCard = (DesfireCard) card;
@@ -109,7 +117,7 @@ public class OrcaTransitData extends TransitData
         return null;
     }
 
-    private Trip[] parseTrips (DesfireCard card)
+    private OrcaTrip[] parseTrips (DesfireCard card)
     {
         DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
 
@@ -118,7 +126,7 @@ public class OrcaTransitData extends TransitData
 
             List<Trip> result = new ArrayList<Trip>();
 
-            Trip[] useLog = new Trip[recordFile.getRecords().length];
+            OrcaTrip[] useLog = new OrcaTrip[recordFile.getRecords().length];
             for (int i = 0; i < useLog.length; i++) {
                 useLog[i] = new OrcaTrip(recordFile.getRecords()[i]);
             }
@@ -132,6 +140,14 @@ public class OrcaTransitData extends TransitData
             return useLog;
         }
         return null;
+    }
+
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(mSerialNumber);
+        parcel.writeDouble(mBalance);
+        
+        parcel.writeInt(mTrips.length);
+        parcel.writeTypedArray(mTrips, flags);
     }
 
     public static class OrcaTrip extends Trip

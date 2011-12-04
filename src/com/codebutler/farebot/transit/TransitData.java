@@ -22,11 +22,16 @@
 
 package com.codebutler.farebot.transit;
 
-public abstract class TransitData
-{
+import android.os.Parcelable;
+
+public abstract class TransitData implements Parcelable {
     public abstract String getBalanceString ();
     public abstract String getSerialNumber ();
     public abstract Trip[] getTrips ();
     public abstract Refill[] getRefills ();
     public abstract String getCardName ();
+
+    public final int describeContents() {
+        return 0;
+    }
 }
