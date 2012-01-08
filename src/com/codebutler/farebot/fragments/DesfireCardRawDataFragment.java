@@ -20,36 +20,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.activities;
+package com.codebutler.farebot.fragments;
 
 import android.app.AlertDialog;
-import android.app.ExpandableListActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import com.codebutler.farebot.ExpandableListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.mifare.DesfireApplication;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireFile;
 import com.codebutler.farebot.mifare.DesfireFileSettings.RecordDesfireFileSettings;
 import com.codebutler.farebot.mifare.DesfireFileSettings.StandardDesfireFileSettings;
 
-public class DesfireCardRawDataActivity extends ExpandableListActivity
+public class DesfireCardRawDataFragment extends ExpandableListFragment
 {
     private DesfireCard mCard;
 
-    public void onCreate (Bundle savedInstanceState)
-    {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_card_raw_data, null);
+    }
+
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_card_raw_data);
-
-        mCard = (DesfireCard) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
-
+        mCard = (DesfireCard) getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
         setListAdapter(new BaseExpandableListAdapter() {
             public int getGroupCount () {
                 return mCard.getApplications().length;
@@ -85,7 +88,7 @@ public class DesfireCardRawDataActivity extends ExpandableListActivity
 
             public View getGroupView (int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_1, null);
+                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_1, null);
 
                     // FIXME: WTF!!
                     convertView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.FILL_PARENT, 80));
@@ -102,7 +105,7 @@ public class DesfireCardRawDataActivity extends ExpandableListActivity
 
             public View getChildView (int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_2, null);
+                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_2, null);
                     convertView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.FILL_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
                 }
 
@@ -131,20 +134,18 @@ public class DesfireCardRawDataActivity extends ExpandableListActivity
                 return convertView;
             }
         });
+    }
 
-        getExpandableListView().setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            public boolean onChildClick (ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
 
-                String data = Utils.getHexString(file.getData(), "");
+        String data = Utils.getHexString(file.getData(), "");
 
-                new AlertDialog.Builder(DesfireCardRawDataActivity.this)
-                    .setTitle("File Content")
-                    .setMessage(data)
-                    .show();
+        new AlertDialog.Builder(getActivity())
+            .setTitle("File Content")
+            .setMessage(data)
+            .show();
 
-                return true;
-            }
-        });
+        return true;
     }
 }

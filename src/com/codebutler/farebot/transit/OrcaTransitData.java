@@ -51,7 +51,7 @@ public class OrcaTransitData extends TransitData
     {
         try {
             byte[] data = ((DesfireCard) card).getApplication(0xffffff).getFile(0x0f).getData();
-            return new TransitIdentity("ORCA Card", String.valueOf(Utils.byteArrayToInt(data, 5, 3)));
+            return new TransitIdentity("ORCA", String.valueOf(Utils.byteArrayToInt(data, 5, 3)));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA serial", ex);
         }
@@ -94,7 +94,7 @@ public class OrcaTransitData extends TransitData
 
     @Override
     public String getCardName () {
-        return "ORCA Card";
+        return "ORCA";
     }
 
     @Override
@@ -145,9 +145,13 @@ public class OrcaTransitData extends TransitData
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mSerialNumber);
         parcel.writeDouble(mBalance);
-        
-        parcel.writeInt(mTrips.length);
-        parcel.writeTypedArray(mTrips, flags);
+
+        if (mTrips != null) {
+            parcel.writeInt(mTrips.length);
+            parcel.writeTypedArray(mTrips, flags);
+        } else {
+            parcel.writeInt(0);
+        }
     }
 
     public static class OrcaTrip extends Trip

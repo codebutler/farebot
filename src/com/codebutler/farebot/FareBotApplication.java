@@ -23,6 +23,7 @@
 package com.codebutler.farebot;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 public class FareBotApplication extends Application {
     private static FareBotApplication sInstance;
@@ -33,5 +34,15 @@ public class FareBotApplication extends Application {
 
     public static FareBotApplication getInstance() {
         return sInstance;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .build());
     }
 }

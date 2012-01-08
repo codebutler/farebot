@@ -26,46 +26,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent">
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-            <TextView
-                    android:id="@+id/route_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/stations_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/datetime_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/fare_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:padding="6dip"
-            android:gravity="right|center_vertical"
-            android:textSize="17sp"
-            android:singleLine="true" />
-    </LinearLayout>
-
-
+    android:layout_height="match_parent">
     <com.google.android.maps.MapView
         android:id="@+id/map_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:clickable="true"
         android:enabled="true"
         android:apiKey="00QbXq3nuMZY8l7NaU_rZ95MV61SLwcqrBteSUw" />

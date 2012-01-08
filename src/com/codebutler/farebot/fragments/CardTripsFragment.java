@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.activities;
+package com.codebutler.farebot.fragments;
 
 import android.app.Activity;
-import android.app.ListActivity;
+import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,6 +36,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
+import com.codebutler.farebot.activities.CardInfoActivity;
+import com.codebutler.farebot.activities.TripMapActivity;
 import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
@@ -47,50 +50,49 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CardTripsActivity extends ListActivity
-{
-    private Card mCard;
+public class CardTripsFragment extends ListFragment {
+    private Card        mCard;
+    private TransitData mTransitData;
 
-    public void onCreate (Bundle savedInstanceState)
-    {
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_card_trips);
-        registerForContextMenu(findViewById(android.R.id.list));
-
-        mCard = (Card) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
-
-        TransitData transitData = mCard.parseTransitData();
-
-        if (transitData.getTrips() != null)
-            setListAdapter(new UseLogListAdapter(this, transitData.getTrips()));
-        else {
-            findViewById(android.R.id.list).setVisibility(View.GONE);
-            findViewById(R.id.error_text).setVisibility(View.VISIBLE);
-        }
+        mCard        = (Card)        getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        mTransitData = (TransitData) getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
-    
+
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_card_trips, null);
+
+        if (mTransitData.getTrips() != null)
+            setListAdapter(new UseLogListAdapter(getActivity(), mTransitData.getTrips()));
+        else {
+            view.findViewById(android.R.id.list).setVisibility(View.GONE);
+            view.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
+        }
+
+        return view;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
         Trip trip = (Trip) getListAdapter().getItem(position);
 
         if (!(Trip.hasLocation(trip.getStartStation())) && (!Trip.hasLocation(trip.getEndStation())))
             return;
         
-        Intent intent = new Intent(this, TripMapActivity.class);
+        Intent intent = new Intent(getActivity(), TripMapActivity.class);
         intent.putExtra(TripMapActivity.TRIP_EXTRA, trip);
         startActivity(intent);
     }
 
-    private static class UseLogListAdapter extends ArrayAdapter<Trip>
-    {
-        public UseLogListAdapter (Context context, Trip[] items)
-        {
+    private static class UseLogListAdapter extends ArrayAdapter<Trip> {
+        public UseLogListAdapter (Context context, Trip[] items) {
             super(context, 0, items);
         }
 
         @Override
-        public View getView (int position, View convertView, ViewGroup parent)
-        {
+        public View getView (int position, View convertView, ViewGroup parent) {
             Activity activity = (Activity) getContext();
             LayoutInflater inflater = activity.getLayoutInflater();
 
@@ -104,8 +106,17 @@ public class CardTripsActivity extends ListActivity
 
             Date date = new Date(trip.getTimestamp() * 1000);
 
+            View listHeader = convertView.findViewById(R.id.list_header);
+            if (isFirstInSection(position)) {
+                listHeader.setVisibility(View.VISIBLE);
+                ((TextView) listHeader.findViewById(android.R.id.text1)).setText(DateFormat.getDateInstance(DateFormat.LONG).format(date));
+            } else {
+                listHeader.setVisibility(View.GONE);
+            }
+            
+            convertView.findViewById(R.id.list_divider).setVisibility(isLastInSection(position) ? View.INVISIBLE : View.VISIBLE);
+
             ImageView iconImageView   = (ImageView) convertView.findViewById(R.id.icon_image_view);
-            TextView  dateTextView    = (TextView)  convertView.findViewById(R.id.date_text_view);
             TextView  timeTextView    = (TextView)  convertView.findViewById(R.id.time_text_view);
             TextView  routeTextView   = (TextView)  convertView.findViewById(R.id.route_text_view);
             TextView  fareTextView    = (TextView)  convertView.findViewById(R.id.fare_text_view);
@@ -116,22 +127,26 @@ public class CardTripsActivity extends ListActivity
             } else if (trip.getMode() == Trip.Mode.TRAIN) {
                 iconImageView.setImageResource(R.drawable.train);
             } else if (trip.getMode() == Trip.Mode.TRAM) {
-                iconImageView.setImageResource(R.drawable.tram);
+                iconImageView.setImageResource( R.drawable.tram);
             } else if (trip.getMode() == Trip.Mode.METRO) {
                 iconImageView.setImageResource(R.drawable.metro);
             } else if (trip.getMode() == Trip.Mode.FERRY) {
                 iconImageView.setImageResource(R.drawable.ferry);
+            } else if (trip.getMode() == Trip.Mode.TICKET_MACHINE) {
+                iconImageView.setImageResource(R.drawable.tvm);
+            } else if (trip.getMode() == Trip.Mode.VENDING_MACHINE) {
+                iconImageView.setImageResource(R.drawable.vending_machine);
+            } else if (trip.getMode() == Trip.Mode.POS) {
+                iconImageView.setImageResource(R.drawable.cashier);
             } else {
-                iconImageView.setImageDrawable(null); // FIXME
+                iconImageView.setImageDrawable(null); // FIXME: Need "Other" graphic
             }
 
-            dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
-            
             if (hasTime) {
                 timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
                 timeTextView.setVisibility(View.VISIBLE);
             } else {
-                timeTextView.setVisibility(View.GONE);
+                timeTextView.setVisibility(View.INVISIBLE);
             }
 
             List<String> routeText = new ArrayList<String>();
@@ -144,7 +159,7 @@ public class CardTripsActivity extends ListActivity
                 routeTextView.setText(Html.fromHtml(StringUtils.join(routeText, " ")));
                 routeTextView.setVisibility(View.VISIBLE);
             } else {
-                routeTextView.setVisibility(View.GONE);
+                routeTextView.setVisibility(View.INVISIBLE);
             }
 
             if (trip.getFare() != 0) {
@@ -162,6 +177,24 @@ public class CardTripsActivity extends ListActivity
             }
 
             return convertView;
+        }
+
+        private boolean isFirstInSection(int position) {
+            if (position == 0) return true;
+            
+            Date date1 = new Date(getItem(position).getTimestamp() * 1000);
+            Date date2 = new Date(getItem(position - 1).getTimestamp() * 1000);
+
+            return ((date1.getYear() != date2.getYear()) || (date1.getMonth() != date2.getMonth()) || (date1.getDay() != date2.getDay()));
+        }
+        
+        public boolean isLastInSection(int position) {
+            if (position == getCount() - 1) return true;
+
+            Date date1 = new Date(getItem(position).getTimestamp() * 1000);
+            Date date2 = new Date(getItem(position + 1).getTimestamp() * 1000);
+
+            return ((date1.getYear() != date2.getYear()) || (date1.getMonth() != date2.getMonth()) || (date1.getDay() != date2.getDay()));
         }
     }
 }

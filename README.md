@@ -1,6 +1,6 @@
 # FareBot
 
-Read data from MIFARE public transit cards using your NFC-equipped Android phone. 
+Read data from public transit cards using your NFC-equipped Android phone. 
 
 ## Written By
 
@@ -8,24 +8,30 @@ Read data from MIFARE public transit cards using your NFC-equipped Android phone
 
 ## Thanks To
 
-* [Karl Koscher][3] (ORCA Support)
-* [Sean Cross][4] (CEPES Support)
-* Anonymous Contributor (Clipper Support)
+* [Karl Koscher][3] (ORCA)
+* [Sean Cross][4] (CEPES/EZ-Link)
+* Anonymous Contributor (Clipper)
+* [nfc-felica project][13] (Suica)
 
 ## Supported Protocols
 
 * [MIFARE DESFire][6]
 * [CEPAS][2]
+* [FeliCa][8]
 
 ## Supported Cards
 
 * [ORCA][0] - Seattle, WA, USA
 * [Clipper][1] - San Francisco, CA, USA
 * [EZ-Link][7] - Singapore
+* [Suica][9], [ICOCA][10], [PASMO][11] - Japan
 
 ## Supported Phones
 
-* Google Nexus S
+FareBot uses the NFC hardware available in these phones:
+
+* Nexus S
+* Galaxy Nexus
 
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/
@@ -35,3 +41,8 @@ Read data from MIFARE public transit cards using your NFC-equipped Android phone
 [5]: https://twitter.com/#!/codebutler
 [6]: http://en.wikipedia.org/wiki/MIFARE#MIFARE_DESFire
 [7]: http://www.ezlink.com.sg/index.php
+[8]: http://en.wikipedia.org/wiki/FeliCa
+[9]: http://en.wikipedia.org/wiki/Suica
+[10]: http://en.wikipedia.org/wiki/ICOCA
+[11]: http://en.wikipedia.org/wiki/PASMO
+[13]: http://code.google.com/p/nfc-felica/

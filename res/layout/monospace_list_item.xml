@@ -29,7 +29,6 @@
     android:layout_height="wrap_content"
     android:padding="3dp"
     android:textSize="12sp"
-    android:textColor="#ff000000"
     android:typeface="monospace"
     android:singleLine="true"
     android:lineSpacingExtra="0dip" />

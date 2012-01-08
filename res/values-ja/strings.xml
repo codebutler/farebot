@@ -1,5 +1,4 @@
 <resources>
-    <!--
     <string name="felica_terminal_fare_adjustmnet">精算機</string>
     <string name="felica_terminal_portable">携帯型端末</string>
     <string name="felica_terminal_vehicle">等車載端末</string>
@@ -44,5 +43,4 @@
     <string name="felica_process_merchandise_admission_cash">入物 (入場現金併用物販)</string>
     <string name="felica_process_payment_thirdparty">精算 (他社精算)</string>
     <string name="felica_process_admission_thirdparty">精算 (他社入場精算)</string>
-    -->
 </resources>

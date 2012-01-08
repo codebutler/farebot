@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  activity_card_info.xml                                                 
+  supported_card.xml                                                 
                                                                        
   Copyright (C) 2011 Eric Butler                                       
                                                                        
@@ -24,16 +24,23 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <ProgressBar
-        android:id="@+id/loading"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:gravity="center" />
+    </LinearLayout>
 </RelativeLayout>

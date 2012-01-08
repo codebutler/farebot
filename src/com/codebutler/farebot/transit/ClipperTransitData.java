@@ -96,6 +96,7 @@ public class ClipperTransitData extends TransitData
             put((long)0x22, new Station("Hayward Station",                     "Hayward",              "37.670387", "-122.088002"));
             put((long)0x23, new Station("South Hayward Station",               "South Hayward",        "37.634800", "-122.057551"));
             put((long)0x24, new Station("Union City Station",                  "Union City",           "37.591203", "-122.017854"));
+            put((long)0x28, new Station("South San Francisco Station",         "South SF",             "37.6744",   "-122.442"));
             put((long)0x29, new Station("San Bruno Station",                   "San Bruno",            "37.63714",  "-122.415622"));
             put((long)0x2a, new Station("San Francisco Int'l Airport Station", "SFO",                  "37.61590",  "-122.39263"));
             put((long)0x2b, new Station("Milbrae Station",                     "Milbrae",              "37.599935", "-122.386478"));
@@ -135,7 +136,7 @@ public class ClipperTransitData extends TransitData
     {
         try {
            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
-           return new TransitIdentity("Clipper Card", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
+           return new TransitIdentity("Clipper", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
        } catch (Exception ex) {
            throw new RuntimeException("Error parsing Clipper serial", ex);
        }
@@ -190,7 +191,7 @@ public class ClipperTransitData extends TransitData
 
     @Override
     public String getCardName () {
-        return "Clipper Card";
+        return "Clipper";
     }
 
     @Override

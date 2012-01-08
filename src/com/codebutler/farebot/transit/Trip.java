@@ -67,7 +67,9 @@ public abstract class Trip implements Parcelable
         TRAM,
         METRO,
         FERRY,
-        PRODUCTS,
+        TICKET_MACHINE,
+        VENDING_MACHINE,
+        POS,
         OTHER
     }
 }

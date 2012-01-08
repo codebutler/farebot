@@ -22,18 +22,17 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
+import android.view.MenuItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.google.android.maps.*;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class TripMapActivity extends MapActivity {
     public static final String TRIP_EXTRA = "trip";
@@ -46,16 +45,16 @@ public class TripMapActivity extends MapActivity {
         mapView.setBuiltInZoomControls(true);
 
         Trip trip = (Trip) getIntent().getParcelableExtra(TRIP_EXTRA);
-        Date date = new Date(trip.getTimestamp() * 1000);
 
-
-        ((TextView) findViewById(R.id.route_text_view)).setText(trip.getAgencyName()); // FIXME + " " + trip.getRouteName());
-        ((TextView) findViewById(R.id.stations_text_view)).setText(Trip.formatStationNames(trip));
-        ((TextView) findViewById(R.id.datetime_text_view)).setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date));
-        ((TextView) findViewById(R.id.fare_text_view)).setText(trip.getFareString());
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(Trip.formatStationNames(trip));
+        actionBar.setSubtitle(trip.getAgencyName() + " " + trip.getRouteName());
 
         int startMarkerId = R.drawable.marker_start;
         int endMarkerId   = R.drawable.marker_end;
+
+        /* FIXME: Need icons...
 
         if (trip.getMode() == Trip.Mode.BUS) {
             startMarkerId = R.drawable.marker_bus_start;
@@ -77,6 +76,7 @@ public class TripMapActivity extends MapActivity {
             startMarkerId = R.drawable.marker_ferry_start;
             endMarkerId   = R.drawable.marker_ferry_end;
         }
+        */
 
         StationItemizedOverlay stationsOverlay = new StationItemizedOverlay(null);
         stationsOverlay.addStation(trip.getStartStation(), startMarkerId);
@@ -86,13 +86,21 @@ public class TripMapActivity extends MapActivity {
 
         if (stationsOverlay.getCenter() != null) {
             MapController controller = mapView.getController();
-            controller.setCenter(stationsOverlay.getCenter());
-            controller.zoomToSpan(stationsOverlay.getLatSpanE6(), stationsOverlay.getLatSpanE6());
+            centerAroundOverlayItems(controller, stationsOverlay);
         }
     }
 
     @Override
     protected boolean isRouteDisplayed() {
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
         return false;
     }
 
@@ -123,13 +131,49 @@ public class TripMapActivity extends MapActivity {
             Log.d("TripMapActivity", "Adding point: " + geoPoint.toString());
 
             OverlayItem item = new OverlayItem(geoPoint, station.getStationName(), station.getCompanyName());
-            Drawable drawable = getResources().getDrawable(markerId);
-            // drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-            drawable = boundCenterBottom(drawable);
-            item.setMarker(drawable);
+            item.setMarker(boundCenterBottom(getResources().getDrawable(markerId)));
 
             mMapOverlays.add(item);
             populate();
         }
+    }
+
+    // https://gist.github.com/1385260 
+    private static void centerAroundOverlayItems(MapController controller, StationItemizedOverlay itemizedOverlay) {
+    	if (itemizedOverlay.size() == 0) return;
+
+    	double hpadding = 0.1;
+    	double vpadding = 0.15;
+
+    	//start wide
+    	int minLatitude = (int)(90 * 1E6);
+    	int maxLatitude = (int)(-90 * 1E6);
+    	int minLongitude = (int)(180 * 1E6);
+    	int maxLongitude = (int)(-180 * 1E6);
+
+        for (int i = 0; i < itemizedOverlay.size(); i++) {
+            OverlayItem item = itemizedOverlay.getItem(i);
+
+    		int lat = item.getPoint().getLatitudeE6();
+    		int lon = item.getPoint().getLongitudeE6();
+    		//narrow down
+    		maxLatitude = Math.max(lat, maxLatitude);
+    		minLatitude = Math.min(lat, minLatitude);
+    		maxLongitude = Math.max(lon, maxLongitude);
+    		minLongitude = Math.min(lon, minLongitude);
+    	}
+
+    	maxLatitude = maxLatitude + (int)((maxLatitude - minLatitude) * hpadding);
+    	minLatitude = minLatitude - (int)((maxLatitude - minLatitude) * hpadding);
+
+    	maxLongitude = maxLongitude + (int)((maxLongitude - minLongitude) * vpadding);
+    	minLongitude = minLongitude - (int)((maxLongitude - minLongitude) * vpadding);
+
+    	controller.zoomToSpan(maxLatitude - minLatitude, maxLongitude - minLongitude); //this will zoom to nearest zoom level
+    	controller.animateTo( //go to the center of the span
+            new GeoPoint(
+                (maxLatitude + minLatitude) / 2,
+                (maxLongitude + minLongitude) / 2
+            ));
     }
 }

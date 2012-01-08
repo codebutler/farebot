@@ -8,3 +8,4 @@ classes/
 .idea
 local.properties
 *.iws
+projectFilesBackup/

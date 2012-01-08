@@ -22,31 +22,37 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.text.ClipboardManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.TabPagerAdapter;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.felica.FelicaCard;
-import com.codebutler.farebot.mifare.DesfireCard;
+import com.codebutler.farebot.fragments.CardHWDetailFragment;
+import com.codebutler.farebot.fragments.DesfireCardRawDataFragment;
+import com.codebutler.farebot.fragments.FelicaCardRawDataFragment;
 import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.mifare.DesfireCard;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class AdvancedCardInfoActivity extends TabActivity
+public class AdvancedCardInfoActivity extends Activity
 {
     public static String EXTRA_CARD    = "com.codebutler.farebot.EXTRA_CARD";
     public static String EXTRA_MESSAGE = "com.codebutler.farebot.EXTRA_MESSAGE";
 
+    private TabPagerAdapter mTabsAdapter;
     private Card mCard;
     
     @Override
@@ -54,52 +60,44 @@ public class AdvancedCardInfoActivity extends TabActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_card_info);
-
+        
         mCard = (Card) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
+        
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        mTabsAdapter = new TabPagerAdapter(this, viewPager);
+        
+        Bundle args = new Bundle();
+        args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
 
-        ((TextView) findViewById(R.id.card_type_text_view)).setText(mCard.getCardType().toString());
-        ((TextView) findViewById(R.id.card_serial_text_view)).setText(Utils.getHexString(mCard.getTagId(), "<error>"));
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(mCard.getCardType().toString() + " " + Utils.getHexString(mCard.getTagId(), "<error>"));
 
         if (mCard.getScannedAt().getTime() > 0) {
             String date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(mCard.getScannedAt());
             String time = new SimpleDateFormat("h:m a", Locale.US).format(mCard.getScannedAt());
-            ((TextView) findViewById(R.id.scanned_at)).setText(String.format("Scanned on %s at %s.", date, time));
-        } else
-            findViewById(R.id.scanned_at).setVisibility(View.GONE);
+            actionBar.setSubtitle(String.format("Scanned on %s at %s.", date, time));
+        }
+
+        mTabsAdapter.addTab(actionBar.newTab().setText(R.string.hw_detail), CardHWDetailFragment.class, args);
 
         if (getIntent().hasExtra(EXTRA_MESSAGE)) {
             String message = getIntent().getStringExtra(EXTRA_MESSAGE);
             ((TextView) findViewById(R.id.error_text_view)).setText(message);
             findViewById(R.id.error_text_view).setVisibility(View.VISIBLE);
+//            findViewById(R.id.pager).setVisibility(View.GONE);
         }
 
-        TabHost tabHost = getTabHost();
-
-        TabHost.TabSpec spec;
-        Intent intent;
-
-        intent = new Intent(this, CardHWDetailActivity.class);
-        intent.putExtras(getIntent().getExtras());
-
-        spec = tabHost.newTabSpec("hw_detail");
-        spec.setIndicator(getString(R.string.hw_detail));
-        spec.setContent(intent);
-        tabHost.addTab(spec);
-
-        Class rawDataActivityClass = null;
-
+        Class rawDataFragmentClass = null;
         if (mCard instanceof DesfireCard) {
-            rawDataActivityClass = DesfireCardRawDataActivity.class;
+            rawDataFragmentClass = DesfireCardRawDataFragment.class;
         } else if (mCard instanceof FelicaCard) {
-            rawDataActivityClass = FelicaCardRawDataActivity.class;
+            rawDataFragmentClass = FelicaCardRawDataFragment.class;
         }
 
-        if (rawDataActivityClass != null) {
-            intent = new Intent(this, rawDataActivityClass);
-            intent.putExtras(getIntent().getExtras());
-            spec.setIndicator(getString(R.string.data));
-            spec.setContent(intent);
-            tabHost.addTab(spec);
+        if (rawDataFragmentClass != null) {
+            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass, args);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         }
     }
 
@@ -120,11 +118,16 @@ public class AdvancedCardInfoActivity extends TabActivity
                 clipboard.setText(xml);
                 Toast.makeText(this, "Copied to clipboard.", 5).show();
                 return true;
+
             } else if (item.getItemId() == R.id.share_xml) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, xml);
                 startActivity(intent);
+                return true;
+
+            } else if (item.getItemId() == android.R.id.home) {
+                finish();
                 return true;
             }
         } catch (Exception ex) {

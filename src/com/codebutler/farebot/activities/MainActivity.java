@@ -22,11 +22,11 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
+import android.app.LoaderManager;
 import android.app.PendingIntent;
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.database.Cursor;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
@@ -59,12 +59,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends ListActivity
-{
+public class MainActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int SELECT_FILE = 1;
 
     private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
-    private NfcAdapter mAdapter;
+    private NfcAdapter mNfcAdapter;
     private PendingIntent mPendingIntent;
     private String[][] mTechLists;
 
@@ -76,59 +75,17 @@ public class MainActivity extends ListActivity
         super.onCreate(bundle);
         setContentView(R.layout.activity_main);
 
+        ActionBar actionBar = getActionBar();
+        actionBar.setHomeButtonEnabled(false);
+
         mDataCache = new HashMap<String, TransitIdentity>();
-
-        Cursor cursor = CardDBHelper.createCursor(this);
-        startManagingCursor(cursor);
-
-        setListAdapter(new ResourceCursorAdapter(this, android.R.layout.simple_list_item_2, cursor) {
-            @Override
-            public void bindView(View view, Context context, Cursor cursor) {
-                int    type      = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-                String serial    = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-                Date   scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
-
-                if (!mDataCache.containsKey(serial)) {
-                    String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
-                    try {
-                        mDataCache.put(serial, Card.fromXml(data).parseTransitIdentity());
-                    } catch (Exception ex) {
-                        mDataCache.put(serial, new TransitIdentity("Error: " + ex, null));
-                    }
-                }
-
-                TransitIdentity identity = mDataCache.get(serial);
-                
-                TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
-                TextView textView2 = (TextView) view.findViewById(android.R.id.text2);                  
-
-                if (identity != null) {
-                    if (identity.getSerialNumber() != null) {
-                        textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
-                    } else {
-                        textView1.setText(identity.getName());
-                    }
-                    textView2.setText(getString(R.string.scanned_at_format, SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(scannedAt), SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(scannedAt)));
-                } else {
-                    textView1.setText(getString(R.string.unknown_card));
-                    textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
-                }
-            }
-
-            @Override
-            protected void onContentChanged() {
-                super.onContentChanged();
-                mDataCache.clear();
-                updateUI();
-            }
-        });
 
         registerForContextMenu(getListView());
 
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         Intent intent = new Intent(this, ReadingTagActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
         mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         
         mTechLists = new String[][] {
@@ -137,12 +94,15 @@ public class MainActivity extends ListActivity
             new String[] { MifareUltralight.class.getName() },
             new String[] { NfcF.class.getName() }
         };
+
+        setListAdapter(new CardsAdapter());
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mAdapter.enableForegroundDispatch(this, mPendingIntent, null, mTechLists);
+        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, mTechLists);
         updateUI();
     }
 
@@ -163,6 +123,10 @@ public class MainActivity extends ListActivity
         }
         return false;
     }
+    
+    public void onSupportedCardsClick(View view) {
+        startActivity(new Intent(this, SupportedCardsActivity.class));
+    }
 
     @Override
     protected void onListItemClick (ListView l, View v, int position, long id)
@@ -182,7 +146,11 @@ public class MainActivity extends ListActivity
     public boolean onOptionsItemSelected (MenuItem item)
     {
         try {
-            if (item.getItemId() == R.id.about) {
+            if (item.getItemId() == R.id.supported_cards) {
+                startActivity(new Intent(this, SupportedCardsActivity.class));
+                return true;
+                    
+            } else if (item.getItemId() == R.id.about) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://codebutler.github.com/farebot")));
                 return true;
 
@@ -260,12 +228,85 @@ public class MainActivity extends ListActivity
 
     private void updateUI ()
     {
-        if (getListAdapter().getCount() == 0) {
+        if (((CursorAdapter) getListAdapter()).getCursor() == null) {
+            findViewById(android.R.id.list).setVisibility(View.GONE);
+            findViewById(R.id.no_cards).setVisibility(View.GONE);
+            findViewById(R.id.loading).setVisibility(View.VISIBLE);
+        } else if (getListAdapter().getCount() == 0) {
             findViewById(android.R.id.list).setVisibility(View.GONE);
             findViewById(R.id.no_cards).setVisibility(View.VISIBLE);
+            findViewById(R.id.loading).setVisibility(View.GONE);
         } else {
             findViewById(android.R.id.list).setVisibility(View.VISIBLE);
             findViewById(R.id.no_cards).setVisibility(View.GONE);
+            findViewById(R.id.loading).setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        return new CursorLoader(this, CardProvider.CONTENT_URI_CARD,
+            CardDBHelper.PROJECTION,
+            null,
+            null,
+            CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        ((CursorAdapter) getListAdapter()).swapCursor(cursor);
+        updateUI();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        ((CursorAdapter) getListAdapter()).swapCursor(null);
+    }
+
+    private class CardsAdapter extends ResourceCursorAdapter {
+        public CardsAdapter() {
+            super(MainActivity.this, android.R.layout.simple_list_item_2, null);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            int    type      = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
+            String serial    = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
+            Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+
+            if (!mDataCache.containsKey(serial)) {
+                String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
+                try {
+                    mDataCache.put(serial, Card.fromXml(data).parseTransitIdentity());
+                } catch (Exception ex) {
+                    mDataCache.put(serial, new TransitIdentity("Error: " + ex, null));
+                }
+            }
+
+            TransitIdentity identity = mDataCache.get(serial);
+
+            TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
+            TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
+
+            if (identity != null) {
+                if (identity.getSerialNumber() != null) {
+                    textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
+                } else {
+                    // textView1.setText(identity.getName());
+                    textView1.setText(String.format("%s: %s", identity.getName(), serial));
+                }
+                textView2.setText(getString(R.string.scanned_at_format, SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(scannedAt), SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(scannedAt)));
+            } else {
+                textView1.setText(getString(R.string.unknown_card));
+                textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
+            }
+        }
+
+        @Override
+        protected void onContentChanged() {
+            super.onContentChanged();
+            mDataCache.clear();
+            updateUI();
         }
     }
 }

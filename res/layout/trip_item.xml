@@ -23,66 +23,88 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:orientation="horizontal">
-
-    <ImageView
-        android:id="@+id/icon_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="80dp"
+        android:id="@+id/list_header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/date_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/time_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        android:clickable="false"
+        android:focusable="false">
+        <include layout="@layout/list_header" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:padding="6dip"
-        android:orientation="vertical">
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:duplicateParentState="true"
+        android:background="@drawable/list_selector_holo_dark">
 
-        <TextView
-            android:id="@+id/route_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:textSize="17sp"
-            android:gravity="left|center_vertical" />
-
-        <TextView
-            android:id="@+id/station_text_view"
+        <ImageView
+            android:id="@+id/icon_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:gravity="left|center_vertical" />
+            android:layout_gravity="center"
+            android:padding="5dip" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dip"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/route_text_view"
+                    android:text="Route Name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/station_text_view"
+                    android:text="Station"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical" />
+                </LinearLayout>
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dip"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/fare_text_view"
+                android:text="Fare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:gravity="right|center_vertical"
+                android:textSize="16sp"
+                android:singleLine="true" />
+            <TextView
+                android:id="@+id/time_text_view"
+                android:text="Time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:gravity="center_vertical|right" />
+        </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/fare_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right|center_vertical"
-        android:padding="6dip"
-        android:gravity="right|center_vertical"
-        android:textSize="17sp"
-        android:singleLine="true" />
+    <ImageView
+        android:id="@+id/list_divider"
+        android:src="@drawable/list_item_divider"
+        android:scaleType="fitXY"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.activities;
+package com.codebutler.farebot.fragments;
 
 import android.app.Activity;
-import android.app.ListActivity;
+import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,32 +32,21 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitData;
 
 import java.text.DateFormat;
 import java.util.Date;
 
-public class CardRefillsActivity extends ListActivity
+public class CardRefillsFragment extends ListFragment
 {
-    private Card mCard;
-
     public void onCreate (Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_card_refills);
 
-        mCard = (Card) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
-
-        TransitData transitData = mCard.parseTransitData();
-
-        if (transitData.getTrips() != null)
-            setListAdapter(new RefillsListAdapter(this, transitData.getRefills()));
-        else {
-            findViewById(android.R.id.list).setVisibility(View.GONE);
-            findViewById(R.id.error_text).setVisibility(View.VISIBLE);
-        }
+        TransitData transitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
+        setListAdapter(new RefillsListAdapter(getActivity(), transitData.getRefills()));
     }
 
     private static class RefillsListAdapter extends ArrayAdapter<Refill>

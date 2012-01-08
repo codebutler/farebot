@@ -24,6 +24,9 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/supported_cards"
+        android:title="@string/supported_cards" />
+    <item
         android:id="@+id/import_xml"
         android:title="@string/import_xml">
         <menu>

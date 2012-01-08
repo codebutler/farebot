@@ -33,17 +33,40 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:orientation="vertical">
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:drawableTop="@drawable/logo"
             android:text="@string/directions"
             android:textSize="45dp"
             android:gravity="center" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="Supported Cards"
+            android:onClick="onSupportedCardsClick" />
+        </LinearLayout>
     </RelativeLayout>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@android:id/list" />
+    <RelativeLayout
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
 </LinearLayout>

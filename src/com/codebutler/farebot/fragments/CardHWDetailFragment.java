@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.activities;
+package com.codebutler.farebot.fragments;
 
-import android.app.ListActivity;
+import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.cepas.CEPASCard;
 import com.codebutler.farebot.cepas.CEPASPurse;
 import com.codebutler.farebot.felica.FelicaCard;
@@ -46,22 +47,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CardHWDetailActivity extends ListActivity
+public class CardHWDetailFragment extends ListFragment
 {
     private Card mCard;
 
     @Override
-    protected void onCreate (Bundle savedInstanceState)
+    public void onCreate (Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_card_hw_detail);
 
-        mCard = getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
         
         List<ListItem> items = new ArrayList<ListItem>();
 
-        if(mCard.getCardType() == CardType.MifareDesfire)
-        {
+        if (mCard.getCardType() == CardType.MifareDesfire) {
 	        DesfireManufacturingData data = ((DesfireCard)mCard).getManufacturingData();
 	        items.add(new HeaderListItem("Hardware Information"));
 	        items.add(new ListItem("Vendor ID",     Integer.toString(data.hwVendorID)));
@@ -86,8 +85,8 @@ public class CardHWDetailActivity extends ListActivity
 	        items.add(new ListItem("Batch Number",       Integer.toString(data.batchNo)));
 	        items.add(new ListItem("Week of Production", Integer.toString(data.weekProd)));
 	        items.add(new ListItem("Year of Production", Integer.toString(data.yearProd)));
-        }
-        else if(mCard.getCardType() == CardType.CEPAS) { 
+
+        } else if (mCard.getCardType() == CardType.CEPAS) {
 	        CEPASCard card = (CEPASCard)mCard;
 
             // FIXME: What about other purses?
@@ -114,18 +113,17 @@ public class CardHWDetailActivity extends ListActivity
             items.add(new ListItem("Logfile Record Count", Byte.toString(purse.getLogfileRecordCount())));
             items.add(new ListItem("Issuer Data Length", Integer.toString(purse.getIssuerDataLength())));
             items.add(new ListItem("Issuer-specific Data", Utils.getHexString(purse.getIssuerSpecificData(), "<Error>")));
-        }
-        else if (mCard.getCardType() == CardType.FeliCa) {
+
+        } else if (mCard.getCardType() == CardType.FeliCa) {
             FelicaCard card = (FelicaCard) mCard;
             items.add(new ListItem("IDm", Utils.getHexString(card.getIDm().getBytes(), "err")));
             items.add(new ListItem("PMm", Utils.getHexString(card.getPMm().getBytes(), "err")));
         }
 
-        setListAdapter(new HWDetailListAdapter(this, items));
+        setListAdapter(new HWDetailListAdapter(getActivity(), items));
     }
 
-    private class HWDetailListAdapter extends ArrayAdapter<ListItem>
-    {
+    private class HWDetailListAdapter extends ArrayAdapter<ListItem> {
         private HWDetailListAdapter (Context context, List<ListItem> items)
         {
             super(context, 0, items);
@@ -136,15 +134,15 @@ public class CardHWDetailActivity extends ListActivity
         {
             ListItem item = (ListItem) getListAdapter().getItem(position);
             if (convertView != null) {
-                Log.i("CardHWDetailActivity", "ID: " + convertView.getId());
+                Log.i("CardHWDetailFragment", "ID: " + convertView.getId());
             }
             if (item instanceof HeaderListItem) {
                 if (convertView == null || convertView.getId() != android.R.id.text1)
-                    convertView = getLayoutInflater().inflate(R.layout.list_header, null);
+                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_header, null);
                 ((TextView) convertView.findViewById(android.R.id.text1)).setText(item.getText1());
             } else {
                 if (convertView == null || convertView.getId() == android.R.id.text1)
-                    convertView = getLayoutInflater().inflate(android.R.layout.simple_list_item_2, null);
+                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_list_item_2, null);
                 ((TextView) convertView.findViewById(android.R.id.text1)).setText(item.getText1());
                 ((TextView) convertView.findViewById(android.R.id.text2)).setText(item.getText2());
             }

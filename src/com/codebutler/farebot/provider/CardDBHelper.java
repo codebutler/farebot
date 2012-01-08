@@ -38,7 +38,7 @@ public class CardDBHelper extends SQLiteOpenHelper
     public static final String CARD_DIR_TYPE  = "vnd.android.cursor.dir/com.codebutler.farebot.card";
     public static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/com.codebutler.farebot.card";
 
-    private static final String[] PROJECTION = new String[] {
+    public static final String[] PROJECTION = new String[] {
         CardsTableColumns._ID,
         CardsTableColumns.TYPE,
         CardsTableColumns.TAG_SERIAL,
