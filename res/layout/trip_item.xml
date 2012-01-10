@@ -101,10 +101,9 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ImageView
+    <View
         android:id="@+id/list_divider"
-        android:src="@drawable/list_item_divider"
-        android:scaleType="fitXY"
+        android:background="@drawable/list_divider_holo_dark"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="1px" />
 </LinearLayout>

@@ -41,10 +41,12 @@ import android.view.View;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.TabPagerAdapter;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.fragments.CardBalanceFragment;
 import com.codebutler.farebot.fragments.CardRefillsFragment;
 import com.codebutler.farebot.fragments.CardTripsFragment;
 import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.provider.CardsTableColumns;
+import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 
 public class CardInfoActivity extends Activity {
@@ -125,16 +127,23 @@ public class CardInfoActivity extends Activity {
 
                 String titleSerial = (mTransitData.getSerialNumber() != null) ? mTransitData.getSerialNumber() : Utils.getHexString(mCard.getTagId(), "");
                 actionBar.setTitle(mTransitData.getCardName() + " " + titleSerial);
-                actionBar.setSubtitle(getString(R.string.balance_format, mTransitData.getBalanceString()));
 
                 Bundle args = new Bundle();
                 args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
                 args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
+                
+                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.balance), CardBalanceFragment.class, args);
 
-                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.recent_trips), CardTripsFragment.class, args);
+                if (mTransitData.getTrips() != null) {
+                    int textId = (mTransitData instanceof SuicaTransitData) ? R.string.history : R.string.trips;
+                    mTabsAdapter.addTab(actionBar.newTab().setText(textId), CardTripsFragment.class, args);
+                }
 
                 if (mTransitData.getRefills() != null) {
-                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.recent_refills), CardRefillsFragment.class, args);
+                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.refills), CardRefillsFragment.class, args);
+                }
+                
+                if (mTabsAdapter.getCount() > 1) {
                     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                 }
 

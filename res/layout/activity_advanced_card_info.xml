@@ -30,14 +30,14 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/unknown_card"
         android:id="@+id/error_text_view"
-        android:paddingTop="8dip"
-        android:paddingBottom="8dip"
+        android:padding="8dip"
         android:textColor="#FFFF0000"
         android:textStyle="bold"
         android:visibility="gone" />

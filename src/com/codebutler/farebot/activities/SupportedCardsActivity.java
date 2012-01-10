@@ -66,8 +66,8 @@ public class SupportedCardsActivity extends Activity {
             add(new CardInfo(R.drawable.clipper_card, "Clipper", "San Francisco, CA"));
             add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link", "Singapore"));
             add(new CardInfo(R.drawable.suica_card,   "Suica",   "Tokyo, Japan"));
-            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   "Kansai, Japan"));
             add(new CardInfo(R.drawable.pasmo_card,   "PASMO",   "Tokyo, Japan"));
+            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   "Kansai, Japan"));
         }
         
         @Override

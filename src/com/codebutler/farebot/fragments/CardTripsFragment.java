@@ -62,9 +62,9 @@ public class CardTripsFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_card_trips, null);
+        View view = inflater.inflate(R.layout.fragment_card_trips, null);
 
-        if (mTransitData.getTrips() != null)
+        if (mTransitData.getTrips() != null && mTransitData.getTrips().length > 0)
             setListAdapter(new UseLogListAdapter(getActivity(), mTransitData.getTrips()));
         else {
             view.findViewById(android.R.id.list).setVisibility(View.GONE);
@@ -139,7 +139,7 @@ public class CardTripsFragment extends ListFragment {
             } else if (trip.getMode() == Trip.Mode.POS) {
                 iconImageView.setImageResource(R.drawable.cashier);
             } else {
-                iconImageView.setImageDrawable(null); // FIXME: Need "Other" graphic
+                iconImageView.setImageResource(R.drawable.unknown);
             }
 
             if (hasTime) {

@@ -54,7 +54,7 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_card_raw_data, null);
+        return inflater.inflate(R.layout.fragment_card_raw_data, null);
     }
 
     @Override
@@ -67,7 +67,6 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
         }
 
         final ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(), R.layout.monospace_list_item, items);
-
         new AlertDialog.Builder(getActivity())
             .setTitle(String.format("Service 0x%s", Integer.toHexString(service.getServiceCode())))
             .setPositiveButton(android.R.string.ok, null)

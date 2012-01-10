@@ -34,8 +34,10 @@
     <string name="copy_xml">Copy</string>
     <string name="share_xml">Share</string>
     <string name="save_xml">Save to USB Storage</string>
-    <string name="recent_trips">Recent Trips</string>
-    <string name="recent_refills">Recent Refills</string>
+    <string name="trips">Trips</string>
+    <string name="history">History</string>
+    <string name="balance">Balance</string>
+    <string name="refills">Refills</string>
     <string name="no_trip_data">No trips found. Has this card been used?</string>
     <string name="no_refill_data">No refills found. Has this card only been used with a pass?</string>
     <string name="import_xml">Import</string>
@@ -49,7 +51,6 @@
     <string name="accessibility">Accessibility</string>
     <string name="speak_balance">Speak Balance</string>
     <string name="speak_balance_summary">Proof of concept</string>
-    <string name="balance_format">Balance: %s</string>
     <string name="balance_speech">Balance %s</string>
     <string name="loading">Loading...</string>
     <string name="scanned_at_format">Scanned at %1$s on %2$s</string>

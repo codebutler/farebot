@@ -47,7 +47,7 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_card_raw_data, null);
+        return inflater.inflate(R.layout.fragment_card_raw_data, null);
     }
 
     public void onCreate (Bundle savedInstanceState) {
@@ -136,13 +136,15 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment
         });
     }
 
-    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    @Override
+    public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
         DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
 
         String data = Utils.getHexString(file.getData(), "");
 
         new AlertDialog.Builder(getActivity())
             .setTitle("File Content")
+            .setPositiveButton(android.R.string.ok, null)
             .setMessage(data)
             .show();
 
