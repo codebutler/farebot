@@ -38,6 +38,10 @@ import java.util.*;
 
 public class OrcaTransitData extends TransitData
 {
+    private static final int AGENCY_KCM = 0x04;
+    private static final int AGENCY_PT  = 0x06;
+    private static final int AGENCY_ST  = 0x07;
+
     private int        mSerialNumber;
     private double     mBalance;
     private OrcaTrip[] mTrips;
@@ -79,7 +83,7 @@ public class OrcaTransitData extends TransitData
         }
 
         try {
-            data = desfireCard.getApplication(0x3010f2).getFile(0x04).getData();
+            data = desfireCard.getApplication(0x3010f2).getFile(AGENCY_KCM).getData();
             mBalance = Utils.byteArrayToInt(data, 41, 2);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA balance", ex);
@@ -139,7 +143,7 @@ public class OrcaTransitData extends TransitData
 
             return useLog;
         }
-        return null;
+        return new OrcaTrip[0];
     }
 
     public void writeToParcel(Parcel parcel, int flags) {
@@ -232,11 +236,11 @@ public class OrcaTransitData extends TransitData
             switch ((int) mAgency) {
                 case 0x02:
                     return "Community Transit";
-                case 0x04:
+                case AGENCY_KCM:
                     return "King County Metro Transit";
-                case 0x06:
+                case AGENCY_PT:
                     return "Pierce Transit";
-                case 0x07:
+                case OrcaTransitData.AGENCY_ST:
                     return "Sound Transit";
             }
             return "Unknown Agency";
@@ -247,11 +251,11 @@ public class OrcaTransitData extends TransitData
             switch ((int) mAgency) {
                 case 0x02:
                     return "CT";
-                case 0x04:
+                case AGENCY_KCM:
                     return "KCM";
-                case 0x06:
+                case AGENCY_PT:
                     return "PT";
-                case 0x07:
+                case AGENCY_ST:
                     return "ST";
             }
             return "Unknown";
@@ -263,7 +267,11 @@ public class OrcaTransitData extends TransitData
                 return "Link Light Rail";
             } else {
                 // FIXME: Need to find bus route #s
-                //return "(Unknown Route)";
+                if (mAgency == AGENCY_ST) {
+                    return "Express Bus";
+                } else if(mAgency == AGENCY_KCM) {
+                    return "Bus";
+                }
                 return null;
             }
         }
@@ -336,7 +344,7 @@ public class OrcaTransitData extends TransitData
         }
 
         private boolean isLink () {
-            return (mAgency == 0x07 && mCoachNum > 10000);
+            return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum > 10000);
         }
     }
 }
