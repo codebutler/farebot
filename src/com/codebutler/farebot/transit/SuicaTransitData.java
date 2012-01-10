@@ -39,7 +39,6 @@ import android.os.Parcel;
 import android.util.Log;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.felica.DBUtil;
 import com.codebutler.farebot.felica.FelicaBlock;
 import com.codebutler.farebot.felica.FelicaCard;
 import com.codebutler.farebot.felica.FelicaService;
@@ -328,8 +327,10 @@ public class SuicaTransitData extends TransitData {
             }
             if (mIsBus) {
                 return String.format("Bus Area 0x%s Line 0x%s Stop 0x%s", Integer.toHexString(mRegionCode), Integer.toHexString(mBusLineCode), Integer.toHexString(mBusStopCode));
-            } else {
+            } else if (!(mRailEntranceLineCode == 0 && mRailEntranceStationCode == 0)) {
                 return String.format("Line 0x%s Station 0x%s", Integer.toHexString(mRailEntranceLineCode), Integer.toHexString(mRailEntranceStationCode));
+            } else {
+                return null;
             }
         }
 
@@ -340,7 +341,7 @@ public class SuicaTransitData extends TransitData {
 
         @Override
         public String getEndStationName() {
-            if (mIsProductSale || mIsCharge)
+            if (mIsProductSale || mIsCharge || isTVM())
                 return null;
 
             if (mEndStation != null) {
@@ -359,9 +360,8 @@ public class SuicaTransitData extends TransitData {
 
         @Override
         public Mode getMode() {
-            int[] tvmConsoleTypes = { 0x03, 0x07, 0x08, 0x12, 0x13, 0x14, 0x15 };
             int consoleType = mConsoleType & 0xFF;
-            if (ArrayUtils.contains(tvmConsoleTypes, consoleType)) {
+            if (isTVM()) {
                 return Mode.TICKET_MACHINE;
             } else if (consoleType == 0xc8) {
                 return Mode.VENDING_MACHINE;
@@ -464,6 +464,12 @@ public class SuicaTransitData extends TransitData {
 
         public int describeContents() {
             return 0;
+        }
+
+        private boolean isTVM() {
+            int consoleType = mConsoleType & 0xFF;
+            int[] tvmConsoleTypes = { 0x03, 0x07, 0x08, 0x12, 0x13, 0x14, 0x15 };
+            return ArrayUtils.contains(tvmConsoleTypes, consoleType);
         }
     }
 
@@ -580,9 +586,8 @@ public class SuicaTransitData extends TransitData {
     private static Station getBusStop(int regionCode, int lineCode, int stationCode) {
         int areaCode = (regionCode >> 6);
 
-        DBUtil util = new DBUtil(FareBotApplication.getInstance());
         try {
-            SQLiteDatabase db = util.openDataBase();
+            SQLiteDatabase db = FareBotApplication.getInstance().getSuicaDBUtil().openDatabase();
             Cursor cursor = db.query(TABLE_IRUCA_STATIONCODE,
                 COLUMNS_IRUCA_STATIONCODE,
                 String.format("%s = ? AND %s = ?", COLUMN_LINECODE, COLUMN_STATIONCODE),
@@ -604,8 +609,6 @@ public class SuicaTransitData extends TransitData {
         } catch (Exception e) {
             Log.e("SuicaStationProvider", "getBusStop() error", e);
             return null;
-        } finally {
-            util.close();
         }
     }
 
@@ -621,9 +624,8 @@ public class SuicaTransitData extends TransitData {
     private static Station getRailStation(int regionCode, int lineCode, int stationCode) {
         int areaCode = (regionCode >> 6);
 
-        DBUtil util = new DBUtil(FareBotApplication.getInstance());
         try {
-            SQLiteDatabase db = util.openDataBase();
+            SQLiteDatabase db = FareBotApplication.getInstance().getSuicaDBUtil().openDatabase();
             Cursor cursor = db.query(
                  TABLE_STATIONCODE,
                  COLUMNS_STATIONCODE,
@@ -659,8 +661,6 @@ public class SuicaTransitData extends TransitData {
         } catch (Exception e) {
             Log.e("SuicaStationProvider", "Error in getRailStation", e);
             return null;
-        } finally {
-            util.close();
         }
     }
 }

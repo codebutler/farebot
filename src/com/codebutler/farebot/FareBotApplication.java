@@ -24,16 +24,25 @@ package com.codebutler.farebot;
 
 import android.app.Application;
 import android.os.StrictMode;
+import com.codebutler.farebot.felica.DBUtil;
 
 public class FareBotApplication extends Application {
     private static FareBotApplication sInstance;
 
+    private DBUtil mSuicaDBUtil;
+
     public FareBotApplication() {
         sInstance = this;
+
+        mSuicaDBUtil = new DBUtil(this);
     }
 
     public static FareBotApplication getInstance() {
         return sInstance;
+    }
+
+    public DBUtil getSuicaDBUtil() {
+        return mSuicaDBUtil;
     }
 
     @Override
