@@ -255,6 +255,9 @@ public class ClipperTransitData extends TransitData
         }
         ClipperTrip[] useLog = new ClipperTrip[result.size()];
         result.toArray(useLog);
+
+        Arrays.sort(useLog, new Trip.Comparator());
+
         return useLog;
     }
 
@@ -519,8 +522,16 @@ public class ClipperTransitData extends TransitData
 
         @Override
         public Mode getMode() {
+            if (mAgency == AGENCY_ACTRAN)
+                return Mode.BUS;
             if (mAgency == AGENCY_BART)
                 return Mode.METRO;
+            if (mAgency == AGENCY_CALTRAIN)
+                return Mode.TRAIN;
+            if (mAgency == AGENCY_GGT)
+                return Mode.BUS;
+            if (mAgency == AGENCY_VTA)
+                return Mode.BUS; // FIXME: or Mode.TRAM for light rail
             if (mAgency == AGENCY_MUNI) 
                 return Mode.BUS; // FIXME: or Mode.TRAM for "Muni Metro"
             if (mAgency == AGENCY_FERRY)

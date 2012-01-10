@@ -72,4 +72,11 @@ public abstract class Trip implements Parcelable
         POS,
         OTHER
     }
+
+    public static class Comparator implements java.util.Comparator<Trip> {
+        @Override
+        public int compare(Trip trip, Trip trip1) {
+            return Long.valueOf(trip1.getTimestamp()).compareTo(trip.getTimestamp());
+        }
+    }
 }

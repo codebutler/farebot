@@ -69,13 +69,11 @@ public class CardRefillsFragment extends ListFragment
             Refill refill = (Refill) getItem(position);
             Date date = new Date(refill.getTimestamp() * 1000);
 
-            TextView dateTextView    = (TextView) convertView.findViewById(R.id.date_text_view);
-            TextView timeTextView    = (TextView) convertView.findViewById(R.id.time_text_view);
+            TextView dateTimeTextView = (TextView) convertView.findViewById(R.id.datetime_text_view);
             TextView agencyTextView   = (TextView) convertView.findViewById(R.id.agency_text_view);
-            TextView amountTextView    = (TextView) convertView.findViewById(R.id.amount_text_view);
+            TextView amountTextView   = (TextView) convertView.findViewById(R.id.amount_text_view);
 
-            dateTextView.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(date));
-            timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
+            dateTimeTextView.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date));
             agencyTextView.setText(refill.getShortAgencyName());
             amountTextView.setText(refill.getAmountString());
 

@@ -135,11 +135,7 @@ public class OrcaTransitData extends TransitData
                 useLog[i] = new OrcaTrip(recordFile.getRecords()[i]);
             }
 
-            Arrays.sort(useLog, new Comparator<Trip>() {
-                public int compare(Trip trip, Trip trip1) {
-                    return Long.valueOf(trip1.getTimestamp()).compareTo(Long.valueOf(trip.getTimestamp()));
-                }
-            });
+            Arrays.sort(useLog, new Trip.Comparator());
 
             return useLog;
         }
