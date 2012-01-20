@@ -38,20 +38,20 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableTop="@drawable/logo"
-            android:text="@string/directions"
-            android:textSize="45dp"
-            android:gravity="center" />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center"
-            android:text="Supported Cards"
-            android:onClick="onSupportedCardsClick" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/logo"
+                android:text="@string/directions"
+                android:textSize="45dp"
+                android:gravity="center" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:text="Supported Cards"
+                android:onClick="onSupportedCardsClick" />
         </LinearLayout>
     </RelativeLayout>
     <ListView

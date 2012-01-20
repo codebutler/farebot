@@ -24,8 +24,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codebutler.farebot"
-    android:versionCode="9"
-    android:versionName="0.5.4">
+    android:versionCode="10"
+    android:versionName="2.0">
     <uses-sdk android:minSdkVersion="14" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -39,7 +39,8 @@
         <uses-library android:name="com.google.android.maps" />
         <activity
             android:name=".activities.MainActivity"
-            android:configChanges="keyboardHidden|orientation">
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -55,6 +56,7 @@
         <activity
             android:name=".activities.ReadingTagActivity"
             android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait"
             android:noHistory="true"
             android:launchMode="singleTop">
             <intent-filter>
@@ -87,7 +89,10 @@
         <activity
             android:name=".activities.TripMapActivity"
             android:configChanges="keyboardHidden|orientation"/>
-        <activity android:name=".activities.SupportedCardsActivity" android:label="Supported Cards"/>
+        <activity
+            android:name=".activities.SupportedCardsActivity"
+            android:label="@string/supported_cards"
+            android:screenOrientation="portrait" />
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"
             android:authorities="com.codebutler.farebot.cardprovider" />
