@@ -53,6 +53,8 @@ public class CardInfoActivity extends Activity {
     public static final String EXTRA_TRANSIT_DATA = "transit_data";
     public static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
 
+    private static final String KEY_SELECTED_TAB = "selected_tab";
+
     private Card            mCard;
     private TransitData     mTransitData;
     private TabPagerAdapter mTabsAdapter;
@@ -67,11 +69,11 @@ public class CardInfoActivity extends Activity {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_card_info);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
 
         final ActionBar actionBar = getActionBar();
@@ -151,8 +153,17 @@ public class CardInfoActivity extends Activity {
                 if (mSpeakBalanceEnabled && speakBalanceRequested) {
                     mTTS = new TextToSpeech(CardInfoActivity.this, mTTSInitListener);
                 }
+
+                if (savedInstanceState != null) {
+                    viewPager.setCurrentItem(savedInstanceState.getInt(KEY_SELECTED_TAB, 0));
+                }
             }
         }.execute();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        bundle.putInt(KEY_SELECTED_TAB, ((ViewPager) findViewById(R.id.pager)).getCurrentItem());
     }
 
     @Override
