@@ -22,13 +22,11 @@
 
 package com.codebutler.farebot.cepas;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 
 public class CEPASHistory implements Parcelable
 {
@@ -142,11 +140,11 @@ public class CEPASHistory implements Parcelable
         if (element.getAttribute("valid").equals("false"))
             return new CEPASHistory(id, element.getAttribute("error"));
 
-        NodeList historyElements = ((Element) element.getElementsByTagName("history").item(0)).getElementsByTagName("transaction");
+        NodeList transactionElements = element.getElementsByTagName("transaction");
 
-        CEPASTransaction[] transactions = new CEPASTransaction[historyElements.getLength()];
-        for (int i = 0; i < historyElements.getLength(); i++)
-            transactions[i] = CEPASTransaction.fromXML((Element)historyElements.item(i));
+        CEPASTransaction[] transactions = new CEPASTransaction[transactionElements.getLength()];
+        for (int i = 0; i < transactionElements.getLength(); i++)
+            transactions[i] = CEPASTransaction.fromXML((Element)transactionElements.item(i));
 
         return new CEPASHistory(id, transactions);
     }

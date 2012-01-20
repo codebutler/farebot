@@ -29,9 +29,7 @@ import com.codebutler.farebot.cepas.CEPASTransaction;
 import com.codebutler.farebot.mifare.Card;
 
 import java.text.NumberFormat;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.TreeMap;
+import java.util.*;
 
 public class EZLinkTransitData extends TransitData
 {
@@ -464,7 +462,9 @@ public class EZLinkTransitData extends TransitData
 
     @Override
     public String getBalanceString () {
-		return NumberFormat.getCurrencyInstance(new Locale("en", "SG")).format(mBalance / 100);
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+        numberFormat.setCurrency(Currency.getInstance("SGD"));
+        return numberFormat.format(mBalance / 100);
     }
 
     @Override
@@ -577,11 +577,14 @@ public class EZLinkTransitData extends TransitData
 
         @Override
         public String getFareString () {
+            NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+            numberFormat.setCurrency(Currency.getInstance("SGD"));
+
         	int balance = -mTransaction.getAmount();
         	if (balance < 0)
-        		return "Refund " + NumberFormat.getCurrencyInstance(new Locale("en", "SG")).format(-balance / 100.0);
+        		return "Refund " + numberFormat.format(-balance / 100.0);
         	else
-        		return NumberFormat.getCurrencyInstance(new Locale("en", "SG")).format(balance / 100.0);
+        		return numberFormat.format(balance / 100.0);
         }
 
         @Override

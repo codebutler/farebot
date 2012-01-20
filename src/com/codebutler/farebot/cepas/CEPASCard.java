@@ -83,7 +83,7 @@ public class CEPASCard extends Card
     @Override
     public TransitIdentity parseTransitIdentity() {
         if (EZLinkTransitData.check(this))
-            EZLinkTransitData.parseTransitIdentity(this);
+            return EZLinkTransitData.parseTransitIdentity(this);
         return null;
     }
 

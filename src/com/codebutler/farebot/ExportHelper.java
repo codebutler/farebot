@@ -76,7 +76,7 @@ public class ExportHelper
 
         Element rootElement = doc.getDocumentElement();
 
-        if (rootElement.getNodeName() == "card")
+        if (rootElement.getNodeName().equals("card"))
             return new Uri[] { importCard(context, rootElement) };
 
         NodeList cardNodes = rootElement.getElementsByTagName("card");
