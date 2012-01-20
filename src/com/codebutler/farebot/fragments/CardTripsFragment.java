@@ -40,6 +40,7 @@ import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.activities.TripMapActivity;
 import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
@@ -164,8 +165,8 @@ public class CardTripsFragment extends ListFragment {
 
             if (trip.getFare() != 0) {
                 fareTextView.setText(trip.getFareString());
-            } else {
-                fareTextView.setText("");
+            } else if (trip instanceof OrcaTransitData.OrcaTrip) {
+                fareTextView.setText(R.string.pass_or_transfer);
             }
 
             String stationText = Trip.formatStationNames(trip);

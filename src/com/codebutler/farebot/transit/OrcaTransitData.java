@@ -34,7 +34,10 @@ import com.codebutler.farebot.mifare.DesfireFile.RecordDesfireFile;
 import com.codebutler.farebot.mifare.DesfireRecord;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class OrcaTransitData extends TransitData
 {
@@ -195,11 +198,18 @@ public class OrcaTransitData extends TransitData
                 (usefulData[6] << 4)  |
                 (usefulData[7] >> 4);
     
-            mCoachNum   = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
-            mFare       = (usefulData[15] << 7) | (usefulData[16] >> 1);
+            mCoachNum = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
+
+            if (usefulData[15] == 0x00 || usefulData[15] == 0xFF) {
+                // FIXME: This appears to be some sort of special case for transfers and passes.
+                mFare = 0;
+            } else {
+                mFare = (usefulData[15] << 7) | (usefulData[16] >> 1);
+            }
+
             mNewBalance = (usefulData[34] << 8) | usefulData[35];
             mAgency     = usefulData[3] >> 4;
-            mTransType  = (usefulData[17]);            
+            mTransType  = (usefulData[17]);
         }
         
         public static Creator<OrcaTrip> CREATOR = new Creator<OrcaTrip>() {
@@ -274,7 +284,7 @@ public class OrcaTransitData extends TransitData
 
         @Override
         public String getFareString () {
-            return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100);
+            return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100.0);
         }
 
         @Override

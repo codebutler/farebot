@@ -1,6 +1,6 @@
 # FareBot
 
-Read data from public transit cards using your NFC-equipped Android phone. 
+View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC-equipped Android phone!
 
 ## Written By
 
@@ -11,7 +11,8 @@ Read data from public transit cards using your NFC-equipped Android phone.
 * [Karl Koscher][3] (ORCA)
 * [Sean Cross][4] (CEPES/EZ-Link)
 * Anonymous Contributor (Clipper)
-* [nfc-felica project][13] (Suica)
+* [nfc-felica][13] and [IC SFCard Fan][14] projects (Suica)
+* [The Noun Project][15] (Various icons)
 
 ## Supported Protocols
 
@@ -28,7 +29,7 @@ Read data from public transit cards using your NFC-equipped Android phone.
 
 ## Supported Phones
 
-FareBot uses the NFC hardware available in these phones:
+FareBot uses the NFC hardware available in these phones running Android 4.0 or later:
 
 * Nexus S
 * Galaxy Nexus
@@ -46,3 +47,5 @@ FareBot uses the NFC hardware available in these phones:
 [10]: http://en.wikipedia.org/wiki/ICOCA
 [11]: http://en.wikipedia.org/wiki/PASMO
 [13]: http://code.google.com/p/nfc-felica/
+[14]: http://www014.upp.so-net.ne.jp/SFCardFan/
+[15]: http://www.thenounproject.com/
