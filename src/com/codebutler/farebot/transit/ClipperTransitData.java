@@ -93,6 +93,7 @@ public class ClipperTransitData extends TransitData
             put((long)0x1a, new Station("El Cerrito Plaza Station",            "El Cerrito Plaza",     "37.903959", "-122.299271"));
             put((long)0x1b, new Station("El Cerrito Del Norte Station",        "El Cerrito Del Norte", "37.925651", "-122.317219"));
             put((long)0x1c, new Station("Richmond Station",                    "Richmond",             "37.93730",  "-122.35338"));
+            put((long)0x1d, new Station("Lake Merritt Station",                "Lake Merritt",         "37.79761",  "-122.26564"));
             put((long)0x22, new Station("Hayward Station",                     "Hayward",              "37.670387", "-122.088002"));
             put((long)0x23, new Station("South Hayward Station",               "South Hayward",        "37.634800", "-122.057551"));
             put((long)0x24, new Station("Union City Station",                  "Union City",           "37.591203", "-122.017854"));
