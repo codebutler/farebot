@@ -79,15 +79,15 @@ public class ClipperTransitData extends TransitData
 
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {
         {
-            put((long)0x4,  new Station("Glen Park Station",                   "Glen Park",            "37.733118", "-122.433808"));
-            put((long)0x3,  new Station("Balboa Park Station",                 "Balboa Park",          "37.721556", "-122.447503"));
-            put((long)0x5,  new Station("24th St. Mission Station",            "24th St.",             "37.75226",  "-122.41849"));
+            put((long)0x03, new Station("Balboa Park Station",                 "Balboa Park",          "37.721556", "-122.447503"));
+            put((long)0x04, new Station("Glen Park Station",                   "Glen Park",            "37.733118", "-122.433808"));
+            put((long)0x05, new Station("24th St. Mission Station",            "24th St.",             "37.75226",  "-122.41849"));
             put((long)0x06, new Station("16th St. Mission Station",            "16th St.",             "37.765228", "-122.419478"));
             put((long)0x07, new Station("Civic Center Station",                "Civic Center",         "37.779538", "-122.413788"));
             put((long)0x08, new Station("Powell Street Station",               "Powell St.",           "37.784970", "-122.40701"));
             put((long)0x09, new Station("Montgomery St. Station",              "Montgomery",           "37.789336", "-122.401486"));
             put((long)0x0a, new Station("Embarcadero Station",                 "Embarcadero",          "37.793086", "-122.396276"));
-            put((long)0xd,  new Station("19th Street Oakland Station",         "19th St.",             "37.80762",  "-122.26886"));
+            put((long)0x0d, new Station("19th Street Oakland Station",         "19th St.",             "37.80762",  "-122.26886"));
             put((long)0x18, new Station("Downtown Berkeley Station",           "Berkeley",             "37.869868", "-122.268051"));
             put((long)0x19, new Station("North Berkeley Station",              "North Berkeley",       "37.874026", "-122.283882"));
             put((long)0x1a, new Station("El Cerrito Plaza Station",            "El Cerrito Plaza",     "37.903959", "-122.299271"));
