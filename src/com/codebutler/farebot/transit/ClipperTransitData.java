@@ -88,6 +88,7 @@ public class ClipperTransitData extends TransitData
             put((long)0x09, new Station("Montgomery St. Station",              "Montgomery",           "37.789336", "-122.401486"));
             put((long)0x0a, new Station("Embarcadero Station",                 "Embarcadero",          "37.793086", "-122.396276"));
             put((long)0x0d, new Station("19th Street Oakland Station",         "19th St.",             "37.80762",  "-122.26886"));
+            put((long)0x15, new Station("Concord Station",                     "Concord",              "37.971606", "-122.02991"));
             put((long)0x18, new Station("Downtown Berkeley Station",           "Berkeley",             "37.869868", "-122.268051"));
             put((long)0x19, new Station("North Berkeley Station",              "North Berkeley",       "37.874026", "-122.283882"));
             put((long)0x1a, new Station("El Cerrito Plaza Station",            "El Cerrito Plaza",     "37.903959", "-122.299271"));
