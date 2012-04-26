@@ -100,6 +100,7 @@ public class ClipperTransitData extends TransitData
             put((long)0x22, new Station("Hayward Station",                     "Hayward",              "37.670387", "-122.088002"));
             put((long)0x23, new Station("South Hayward Station",               "South Hayward",        "37.634800", "-122.057551"));
             put((long)0x24, new Station("Union City Station",                  "Union City",           "37.591203", "-122.017854"));
+            put((long)0x25, new Station("Fremont Station",                     "Fremont",              "37.557727", "-121.976395"));
             put((long)0x26, new Station("Daly City Station",                   "Daly City",            "37.7066",   "-122.4696"));
             put((long)0x28, new Station("South San Francisco Station",         "South SF",             "37.6744",   "-122.442"));
             put((long)0x29, new Station("San Bruno Station",                   "San Bruno",            "37.63714",  "-122.415622"));
