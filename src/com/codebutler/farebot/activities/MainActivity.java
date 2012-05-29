@@ -23,6 +23,7 @@
 package com.codebutler.farebot.activities;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.app.PendingIntent;
@@ -36,6 +37,7 @@ import android.nfc.tech.MifareUltralight;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -83,6 +85,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         registerForContextMenu(getListView());
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        checkNfcEnabled();
 
         Intent intent = new Intent(this, ReadingTagActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -242,6 +246,31 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
             findViewById(R.id.loading).setVisibility(View.GONE);
         }
     }
+
+	private void checkNfcEnabled() {
+		if (!mNfcAdapter.isEnabled()) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					com.codebutler.farebot.activities.MainActivity.this);
+			builder.setTitle(R.string.nfc_off_error)
+					.setMessage(R.string.turn_on_nfc)
+					.setCancelable(true)
+					.setNegativeButton(R.string.cancel,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.dismiss();
+								}
+							})
+					.setNeutralButton(R.string.wireless_settings,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+								}
+							});
+			builder.show();
+		}
+	}
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
