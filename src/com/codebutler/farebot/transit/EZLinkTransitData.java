@@ -591,9 +591,10 @@ public class EZLinkTransitData extends TransitData
         	}
         	else if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND)
         		return "Bus Refund";
-        	else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT
-        			|| mTransaction.getType() == CEPASTransaction.TransactionType.OLD_MRT)
+        	else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
         		return "MRT";
+        	else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
+        		return "Top-up";
         	else if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
         		return "First use";
         	else
@@ -607,7 +608,7 @@ public class EZLinkTransitData extends TransitData
 
         	int balance = -mTransaction.getAmount();
         	if (balance < 0)
-        		return "Refund " + numberFormat.format(-balance / 100.0);
+        		return "Credit " + numberFormat.format(-balance / 100.0);
         	else
         		return numberFormat.format(balance / 100.0);
         }
@@ -672,6 +673,8 @@ public class EZLinkTransitData extends TransitData
                 return Mode.BUS;
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
                 return Mode.METRO;
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
+            	return Mode.TICKET_MACHINE;
             return Mode.OTHER;
         }
 

@@ -36,7 +36,7 @@ public class CEPASTransaction implements Parcelable
 
     public enum TransactionType {
         MRT,
-        OLD_MRT, /* Old MRT transit info is unhyphenated */
+        TOP_UP, /* Old MRT transit info is unhyphenated - renamed from OLD_MRT to TOP_UP, as it seems like the code has been repurposed. */
         BUS,
         BUS_REFUND,
         CREATION,
@@ -81,7 +81,7 @@ public class CEPASTransaction implements Parcelable
         if (mType == 48)
             return TransactionType.MRT;
         if (mType == 117)
-        	return TransactionType.OLD_MRT;
+        	return TransactionType.TOP_UP;
         if (mType == 49)
             return TransactionType.BUS;
         if (mType == 118)
