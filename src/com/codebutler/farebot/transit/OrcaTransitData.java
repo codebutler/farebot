@@ -44,6 +44,14 @@ public class OrcaTransitData extends TransitData
     private static final int AGENCY_KCM = 0x04;
     private static final int AGENCY_PT  = 0x06;
     private static final int AGENCY_ST  = 0x07;
+    private static final int AGENCY_CT  = 0x02;
+
+    // For future use.
+    private static final int TRANS_TYPE_PURSE_USE   = 0x0c;
+    private static final int TRANS_TYPE_CANCEL_TRIP = 0x01;
+    private static final int TRANS_TYPE_TAP_IN      = 0x03;
+    private static final int TRANS_TYPE_TAP_OUT     = 0x07;
+    private static final int TRANS_TYPE_PASS_USE    = 0x60;
 
     private int        mSerialNumber;
     private double     mBalance;
@@ -58,7 +66,7 @@ public class OrcaTransitData extends TransitData
     {
         try {
             byte[] data = ((DesfireCard) card).getApplication(0xffffff).getFile(0x0f).getData();
-            return new TransitIdentity("ORCA", String.valueOf(Utils.byteArrayToInt(data, 5, 3)));
+            return new TransitIdentity("ORCA", String.valueOf(Utils.byteArrayToInt(data, 4, 4)));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA serial", ex);
         }
@@ -86,7 +94,7 @@ public class OrcaTransitData extends TransitData
         }
 
         try {
-            data = desfireCard.getApplication(0x3010f2).getFile(AGENCY_KCM).getData();
+            data = desfireCard.getApplication(0x3010f2).getFile(0x04).getData();
             mBalance = Utils.byteArrayToInt(data, 41, 2);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA balance", ex);
@@ -240,13 +248,13 @@ public class OrcaTransitData extends TransitData
         @Override
         public String getAgencyName () {
             switch ((int) mAgency) {
-                case 0x02:
+                case AGENCY_CT:
                     return "Community Transit";
                 case AGENCY_KCM:
                     return "King County Metro Transit";
                 case AGENCY_PT:
                     return "Pierce Transit";
-                case OrcaTransitData.AGENCY_ST:
+                case AGENCY_ST:
                     return "Sound Transit";
             }
             return "Unknown Agency";
@@ -263,6 +271,8 @@ public class OrcaTransitData extends TransitData
                     return "PT";
                 case AGENCY_ST:
                     return "ST";
+                case AGENCY_CT:
+                    return "CT";
             }
             return "Unknown";
         }
