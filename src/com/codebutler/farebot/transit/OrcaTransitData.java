@@ -271,6 +271,8 @@ public class OrcaTransitData extends TransitData
                     return "PT";
                 case AGENCY_ST:
                     return "ST";
+                case AGENCY_CT:
+                    return "CT";
             }
             return "Unknown";
         }
