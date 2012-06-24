@@ -102,7 +102,7 @@
     <string name="felica_process_payment_thirdparty">Payment (3rd Party)</string>
     <string name="felica_process_admission_thirdparty">Admission Payment (3rd Party)</string>
     <string name="nfc_off_error">NFC is turned off</string>
-    <string name="turn_on_nfc">Please enable NFC to read card information</string>
+    <string name="turn_on_nfc">Please enable NFC to read card information.</string>
     <string name="cancel">Cancel</string>
     <string name="wireless_settings">Wireless Settings</string>
 </resources>

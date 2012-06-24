@@ -247,29 +247,26 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         }
     }
 
-	private void checkNfcEnabled() {
-		if (!mNfcAdapter.isEnabled()) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					com.codebutler.farebot.activities.MainActivity.this);
-			builder.setTitle(R.string.nfc_off_error)
-					.setMessage(R.string.turn_on_nfc)
-					.setCancelable(true)
-					.setNegativeButton(R.string.cancel,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.dismiss();
-								}
-							})
-					.setNeutralButton(R.string.wireless_settings,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-								}
-							});
-			builder.show();
-		}
+	private void checkNfcEnabled()
+    {
+		if (mNfcAdapter.isEnabled()) {
+            return;
+        }
+        new AlertDialog.Builder(MainActivity.this)
+            .setTitle(R.string.nfc_off_error)
+            .setMessage(R.string.turn_on_nfc)
+            .setCancelable(true)
+            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            })
+            .setNeutralButton(R.string.wireless_settings, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+                }
+            })
+            .show();
 	}
 
     @Override
@@ -301,7 +298,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         public void bindView(View view, Context context, Cursor cursor) {
             int    type      = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
             String serial    = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-            Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+            Date   scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
 
             if (!mDataCache.containsKey(serial)) {
                 String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
