@@ -256,7 +256,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
             .setTitle(R.string.nfc_off_error)
             .setMessage(R.string.turn_on_nfc)
             .setCancelable(true)
-            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.dismiss();
                 }

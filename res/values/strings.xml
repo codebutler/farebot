@@ -103,7 +103,6 @@
     <string name="felica_process_admission_thirdparty">Admission Payment (3rd Party)</string>
     <string name="nfc_off_error">NFC is turned off</string>
     <string name="turn_on_nfc">Please enable NFC to read card information.</string>
-    <string name="cancel">Cancel</string>
     <string name="wireless_settings">Wireless Settings</string>
     <string name="report_error">Report Error</string>
     <string name="unknown_card_description">This card is not yet supported by FareBot. Only raw data can be displayed.</string>
