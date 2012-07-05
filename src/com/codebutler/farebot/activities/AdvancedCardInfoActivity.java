@@ -169,8 +169,8 @@ public class AdvancedCardInfoActivity extends Activity
                 }
 
                 builder.append("\n\n");
-                builder.append("Comments:");
-                builder.append("\n\n");
+                builder.append(getString(R.string.comments));
+                builder.append(":\n\n");
 
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:eric+farebot@codebutler.com"));
                 intent.putExtra(Intent.EXTRA_SUBJECT, "FareBot Bug Report");
