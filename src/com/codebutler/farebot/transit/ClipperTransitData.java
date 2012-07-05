@@ -47,6 +47,7 @@ public class ClipperTransitData extends TransitData
     private static final int  AGENCY_BART     = 0x04;
     private static final int  AGENCY_CALTRAIN = 0x06;
     private static final int  AGENCY_GGT      = 0x0b;
+    private static final int  AGENCY_SAMTRANS = 0x0f;
     private static final int  AGENCY_VTA      = 0x11;
     private static final int  AGENCY_MUNI     = 0x12;
     private static final int  AGENCY_FERRY    = 0x19;
@@ -59,6 +60,7 @@ public class ClipperTransitData extends TransitData
             put(AGENCY_BART, "Bay Area Rapid Transit");
             put(AGENCY_CALTRAIN, "Caltrain");
             put(AGENCY_GGT, "Golden Gate Transit");
+            put(AGENCY_SAMTRANS, "San Mateo County Transit District");
             put(AGENCY_VTA, "Santa Clara Valley Transportation Authority");
             put(AGENCY_MUNI, "San Francisco Municipal");
             put(AGENCY_FERRY, "Golden Gate Ferry");
@@ -71,6 +73,7 @@ public class ClipperTransitData extends TransitData
             put(AGENCY_BART, "BART");
             put(AGENCY_CALTRAIN, "Caltrain");
             put(AGENCY_GGT, "GGT");
+            put(AGENCY_SAMTRANS, "SAMTRANS");
             put(AGENCY_VTA, "VTA");
             put(AGENCY_MUNI, "Muni");
             put(AGENCY_FERRY, "Ferry");
@@ -534,6 +537,8 @@ public class ClipperTransitData extends TransitData
             if (mAgency == AGENCY_CALTRAIN)
                 return Mode.TRAIN;
             if (mAgency == AGENCY_GGT)
+                return Mode.BUS;
+            if (mAgency == AGENCY_SAMTRANS)
                 return Mode.BUS;
             if (mAgency == AGENCY_VTA)
                 return Mode.BUS; // FIXME: or Mode.TRAM for light rail
