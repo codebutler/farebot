@@ -300,16 +300,18 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
             String serial    = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
             Date   scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
 
-            if (!mDataCache.containsKey(serial)) {
+            String cacheKey = serial + scannedAt.getTime();
+
+            if (!mDataCache.containsKey(cacheKey)) {
                 String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
                 try {
-                    mDataCache.put(serial, Card.fromXml(data).parseTransitIdentity());
+                    mDataCache.put(cacheKey, Card.fromXml(data).parseTransitIdentity());
                 } catch (Exception ex) {
-                    mDataCache.put(serial, new TransitIdentity("Error: " + ex, null));
+                    mDataCache.put(cacheKey, new TransitIdentity("Error: " + ex, null));
                 }
             }
 
-            TransitIdentity identity = mDataCache.get(serial);
+            TransitIdentity identity = mDataCache.get(cacheKey);
 
             TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
             TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
