@@ -40,6 +40,7 @@ import android.view.MenuItem;
 import android.view.View;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.TabPagerAdapter;
+import com.codebutler.farebot.UnsupportedCardException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.fragments.CardBalanceFragment;
 import com.codebutler.farebot.fragments.CardRefillsFragment;
@@ -115,14 +116,14 @@ public class CardInfoActivity extends Activity {
                         Utils.showErrorAndFinish(CardInfoActivity.this, mException);
                     } else {
                         Log.e("CardInfoActivity", "Error parsing transit data", mException);
-                        showAdvancedInfo(Utils.getErrorMessage(mException));
+                        showAdvancedInfo(mException);
                         finish();
                     }
                     return;
                 }
 
                 if (mTransitData == null) {
-                    showAdvancedInfo("Unsupported card data.");
+                    showAdvancedInfo(new UnsupportedCardException());
                     finish();
                     return;
                 }
@@ -186,11 +187,12 @@ public class CardInfoActivity extends Activity {
         return false;
     }
 
-    private void showAdvancedInfo (String message) {
+    private void showAdvancedInfo (Exception ex) {
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
         intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
-        if (message != null)
-            intent.putExtra(AdvancedCardInfoActivity.EXTRA_MESSAGE, message);
+        if (ex != null) {
+            intent.putExtra(AdvancedCardInfoActivity.EXTRA_ERROR, ex);
+        }
         startActivity(intent);
     }
 }

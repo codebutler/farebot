@@ -25,6 +25,9 @@ package com.codebutler.farebot;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import org.w3c.dom.Node;
 
@@ -173,5 +176,28 @@ public class Utils
         }
 
         return errorMessage;
+    }
+
+    public static String getDeviceInfoString() {
+        return String.format("Version: %s\nModel: %s (%s %s)\nOS: %s\n\n",
+            getVersionString(),
+            Build.MODEL,
+            Build.MANUFACTURER,
+            Build.BRAND,
+            Build.VERSION.RELEASE);
+    }
+
+    private static String getVersionString() {
+        PackageInfo info = getPackageInfo();
+        return String.format("%s (Build %s)", info.versionName, info.versionCode);
+    }
+
+    private static PackageInfo getPackageInfo() {
+        try {
+            FareBotApplication app = FareBotApplication.getInstance();
+            return app.getPackageManager().getPackageInfo(app.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

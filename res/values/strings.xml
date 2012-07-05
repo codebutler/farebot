@@ -105,4 +105,8 @@
     <string name="turn_on_nfc">Please enable NFC to read card information.</string>
     <string name="cancel">Cancel</string>
     <string name="wireless_settings">Wireless Settings</string>
+    <string name="report_error">Report Error</string>
+    <string name="unknown_card_description">This card is not yet supported by FareBot. Only raw data can be displayed.</string>
+    <string name="report_error_privacy_title">Privacy Notice</string>
+    <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
 </resources>

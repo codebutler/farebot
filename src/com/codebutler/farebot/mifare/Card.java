@@ -38,6 +38,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.StringReader;
 import java.util.Date;
 
@@ -101,16 +102,20 @@ public abstract class Card implements Parcelable
 
     public Element toXML () throws Exception
     {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = builder.newDocument();
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = builder.newDocument();
 
-        Element element = doc.createElement("card");
-        element.setAttribute("type", String.valueOf(getCardType().toInteger()));
-        element.setAttribute("id", Utils.getHexString(mTagId));
-        element.setAttribute("scanned_at", Long.toString(mScannedAt.getTime()));
-        doc.appendChild(element);
+            Element element = doc.createElement("card");
+            element.setAttribute("type", String.valueOf(getCardType().toInteger()));
+            element.setAttribute("id", Utils.getHexString(mTagId, null));
+            element.setAttribute("scanned_at", Long.toString(mScannedAt.getTime()));
+            doc.appendChild(element);
 
-        return doc.getDocumentElement();
+            return doc.getDocumentElement();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeToParcel (Parcel parcel, int flags)

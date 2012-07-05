@@ -23,6 +23,7 @@
 package com.codebutler.farebot.mifare;
 
 import android.nfc.Tag;
+import android.nfc.TagLostException;
 import android.nfc.tech.IsoDep;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -76,6 +77,8 @@ public class DesfireCard extends Card
                         else
                             data = desfireTag.readRecord(fileId);
                         files.add(DesfireFile.create(fileId, settings, data));
+                    } catch (TagLostException ex) {
+                        throw ex;
                     } catch (Exception ex) {
                         files.add(new DesfireFile.InvalidDesfireFile(fileId, ex.toString()));
                     }
