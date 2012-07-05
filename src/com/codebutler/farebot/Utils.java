@@ -35,6 +35,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.util.List;
 
 public class Utils
 {
@@ -199,5 +200,18 @@ public class Utils
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> T findInList(List<T> list, Matcher matcher) {
+        for (T item : list) {
+            if (matcher.matches(item)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public static interface Matcher<T> {
+        public boolean matches(T t);
     }
 }

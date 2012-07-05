@@ -233,29 +233,21 @@ public class ClipperTransitData extends TransitData
          */
         byte [] data = file.getData();
         int pos = data.length - RECORD_LENGTH;
-        List<Trip> result = new ArrayList<Trip>();
+        List<ClipperTrip> result = new ArrayList<ClipperTrip>();
         while (pos > 0) {
             byte[] slice = Utils.byteArraySlice(data, pos, RECORD_LENGTH);
-            Trip trip = createTrip(slice);
+            final ClipperTrip trip = createTrip(slice);
             if (trip != null) {
-//                int idx = Collections.binarySearch(result, trip,
-//                    new Comparator<Trip>() {
-//                        public int compare(Trip trip, Trip trip1) {
-//                            return Long.valueOf(trip1.getTimestamp()).compareTo(trip.getTimestamp());
-//                        }
-//                    });
-//                if (idx >= 0) {
-//                    /*
-//                     *  Some transaction types are temporary -- remove previous
-//                     *  instance if there is an an entry with the same start
-//                     *  timestamp.
-//                     */
-//                    result.remove(idx);
-//                } else {
-//                    /* Convert idx back into the insertion point */
-//                    idx = -(idx + 1);
-//                }
-//                result.add(idx, trip);
+                // Some transaction types are temporary -- remove previous trip with the same timestamp.
+                ClipperTrip oldTrip = Utils.findInList(result, new Utils.Matcher<ClipperTrip>() {
+                    @Override
+                    public boolean matches(ClipperTrip otherTrip) {
+                        return trip.getTimestamp() == otherTrip.getTimestamp();
+                    }
+                });
+                if (oldTrip != null) {
+                    result.remove(oldTrip);
+                }
 
                 result.add(trip);
             }
@@ -269,7 +261,7 @@ public class ClipperTransitData extends TransitData
         return useLog;
     }
 
-    private Trip createTrip (byte[] useData)
+    private ClipperTrip createTrip (byte[] useData)
     {
         long timestamp, fare, agency, from, to, route;
 
