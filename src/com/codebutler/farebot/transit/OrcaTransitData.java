@@ -308,7 +308,10 @@ public class OrcaTransitData extends TransitData
         @Override
         public Station getStartStation() {
             if (isLink()) {
-                return sLinkStations[(((int) mCoachNum) % 1000) - 193];
+                int stationNumber = (((int) mCoachNum) % 1000) - 193;
+                if (stationNumber < sLinkStations.length) {
+                    return sLinkStations[stationNumber];
+                }
             }
             return null;
         }
@@ -316,9 +319,14 @@ public class OrcaTransitData extends TransitData
         @Override
         public String getStartStationName () {
             if (isLink()) {
-                return sLinkStations[(((int) mCoachNum) % 1000) - 193].getStationName();
+                int stationNumber = (((int) mCoachNum) % 1000) - 193;
+                if (stationNumber < sLinkStations.length) {
+                    return sLinkStations[stationNumber].getStationName();
+                } else {
+                    return String.format("Unknown Station #%s", stationNumber);
+                }
             } else {
-                return "Coach #" + String.valueOf(mCoachNum);
+                return String.format("Coach #%s", String.valueOf(mCoachNum));
             }
         }
 
