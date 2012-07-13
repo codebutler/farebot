@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  cards_menu.xml
+
+  Copyright (C) 2012 Eric Butler
+
+  Authors:
+  Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/import_xml"
+        android:title="@string/import_xml">
+        <menu>
+            <item android:id="@+id/import_clipboard"
+                  android:title="@string/import_clipboard" />
+            <item android:id="@+id/import_file"
+                  android:title="@string/import_file"
+                  android:visible="false" />
+            <item android:id="@+id/import_sd"
+                  android:title="@string/import_sd" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/export_all"
+        android:title="@string/export_all">
+        <menu>
+            <item android:id="@+id/copy_xml"
+                  android:title="@string/copy_xml" />
+            <item android:id="@+id/share_xml"
+                  android:title="@string/share_xml" />
+            <item android:id="@+id/save_xml"
+                  android:title="@string/save_xml" />
+        </menu>
+    </item>
+</menu>

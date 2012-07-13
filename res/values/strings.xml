@@ -109,4 +109,6 @@
     <string name="report_error_privacy_title">Privacy Notice</string>
     <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
     <string name="comments">Comments</string>
+    <string name="scanned_cards">Scanned Cards</string>
+    <string name="no_scanned_cards">You have not scanned any cards.</string>
 </resources>

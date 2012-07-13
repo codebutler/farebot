@@ -96,6 +96,10 @@
             android:name=".activities.SupportedCardsActivity"
             android:label="@string/supported_cards"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.CardsActivity"
+            android:label="@string/scanned_cards"
+            android:screenOrientation="portrait" />
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"
             android:authorities="com.codebutler.farebot.cardprovider" />

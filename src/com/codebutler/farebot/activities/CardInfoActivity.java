@@ -176,7 +176,7 @@ public class CardInfoActivity extends SherlockFragmentActivity {
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, CardsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;

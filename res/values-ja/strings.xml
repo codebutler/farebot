@@ -85,4 +85,6 @@
     <string name="report_error_privacy_title">個人情報の取扱いについて</string>
     <string name="report_error_privacy_message">カードに含まれるの全てのデータ（履歴を含む）が送信されます</string>
     <string name="comments">コメント</string>
+    <string name="scanned_cards">スキャンしたカード</string>
+    <string name="no_scanned_cards">カードがまだスキャンされていません。</string>
 </resources>
