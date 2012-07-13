@@ -77,4 +77,12 @@
     <string name="felica_process_merchandise_admission_cash">入物 (入場現金併用物販)</string>
     <string name="felica_process_payment_thirdparty">精算 (他社精算)</string>
     <string name="felica_process_admission_thirdparty">精算 (他社入場精算)</string>
+    <string name="nfc_off_error">NFCは無効です</string>
+    <string name="turn_on_nfc">カードのデータを読み込むためにはNFCを有効してください</string>
+    <string name="wireless_settings">無線設定</string>
+    <string name="report_error">エラー情報を送信する</string>
+    <string name="unknown_card_description">読み込んだカードが対応していません。データだけが表示されます</string>
+    <string name="report_error_privacy_title">個人情報の取扱いについて</string>
+    <string name="report_error_privacy_message">カードに含まれるの全てのデータ（履歴を含む）が送信されます</string>
+    <string name="comments">コメント</string>
 </resources>
