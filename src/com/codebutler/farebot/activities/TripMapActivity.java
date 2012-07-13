@@ -22,19 +22,24 @@
 
 package com.codebutler.farebot.activities;
 
-import android.app.ActionBar;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockMapActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
-import com.google.android.maps.*;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
+import com.google.android.maps.OverlayItem;
 
 import java.util.ArrayList;
 
-public class TripMapActivity extends MapActivity {
+public class TripMapActivity extends SherlockMapActivity {
     public static final String TRIP_EXTRA = "trip";
 
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,7 @@ public class TripMapActivity extends MapActivity {
 
         Trip trip = (Trip) getIntent().getParcelableExtra(TRIP_EXTRA);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(Trip.formatStationNames(trip));
         actionBar.setSubtitle((trip.getRouteName() == null) ? trip.getAgencyName() : String.format("%s %s", trip.getAgencyName(), trip.getRouteName()));

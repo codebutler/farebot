@@ -22,8 +22,6 @@
 
 package com.codebutler.farebot.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,11 +29,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.text.ClipboardManager;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.TabPagerAdapter;
 import com.codebutler.farebot.UnsupportedCardException;
@@ -50,7 +50,7 @@ import com.codebutler.farebot.mifare.DesfireCard;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class AdvancedCardInfoActivity extends Activity
+public class AdvancedCardInfoActivity extends SherlockFragmentActivity
 {
     public static String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
     public static String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
@@ -80,7 +80,7 @@ public class AdvancedCardInfoActivity extends Activity
         Bundle args = new Bundle();
         args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mCard.getCardType().toString() + " " + Utils.getHexString(mCard.getTagId(), "<error>"));
 
@@ -118,7 +118,7 @@ public class AdvancedCardInfoActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu (Menu menu)
     {
-        getMenuInflater().inflate(R.menu.card_advanced_menu, menu);
+        getSupportMenuInflater().inflate(R.menu.card_advanced_menu, menu);
         return true;
     }
 

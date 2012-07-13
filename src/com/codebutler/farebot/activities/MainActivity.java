@@ -22,12 +22,12 @@
 
 package com.codebutler.farebot.activities;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.app.LoaderManager;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
@@ -38,12 +38,22 @@ import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.ResourceCursorAdapter;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.codebutler.farebot.ExportHelper;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -61,7 +71,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends SherlockFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int SELECT_FILE = 1;
 
     private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
@@ -77,12 +87,20 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         super.onCreate(bundle);
         setContentView(R.layout.activity_main);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(false);
 
         mDataCache = new HashMap<String, TransitIdentity>();
 
-        registerForContextMenu(getListView());
+        ListView listView = (ListView) findViewById(android.R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
+                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            }
+        });
+        registerForContextMenu(listView);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
@@ -99,8 +117,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
             new String[] { NfcF.class.getName() }
         };
 
-        setListAdapter(new CardsAdapter());
-        getLoaderManager().initLoader(0, null, this);
+        listView.setAdapter(new CardsAdapter());
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -117,8 +135,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     }
 
     @Override
-    public boolean onContextItemSelected (MenuItem item)
-    {
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         if (item.getItemId() == R.id.delete_card) {
             long id = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id;
             Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
@@ -133,16 +150,9 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     }
 
     @Override
-    protected void onListItemClick (ListView l, View v, int position, long id)
-    {
-        Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-    }
-
-    @Override
     public boolean onCreateOptionsMenu (Menu menu)
     {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        getSupportMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -221,7 +231,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
 
     private void onCardsImported (Uri[] uris)
     {
-        ((ResourceCursorAdapter) getListAdapter()).notifyDataSetChanged();
+        ((CursorAdapter) ((ListView) findViewById(android.R.id.list)).getAdapter()).notifyDataSetChanged();
         if (uris.length == 1) {
             Toast.makeText(this, "Card imported!", 5).show();
             startActivity(new Intent(Intent.ACTION_VIEW, uris[0]));
@@ -232,11 +242,12 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
 
     private void updateUI ()
     {
-        if (((CursorAdapter) getListAdapter()).getCursor() == null) {
+        CursorAdapter adapter = (CursorAdapter) ((ListView) findViewById(android.R.id.list)).getAdapter();
+        if (adapter.getCursor() == null) {
             findViewById(android.R.id.list).setVisibility(View.GONE);
             findViewById(R.id.no_cards).setVisibility(View.GONE);
             findViewById(R.id.loading).setVisibility(View.VISIBLE);
-        } else if (getListAdapter().getCount() == 0) {
+        } else if (adapter.getCount() == 0) {
             findViewById(android.R.id.list).setVisibility(View.GONE);
             findViewById(R.id.no_cards).setVisibility(View.VISIBLE);
             findViewById(R.id.loading).setVisibility(View.GONE);
@@ -280,13 +291,13 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        ((CursorAdapter) getListAdapter()).swapCursor(cursor);
+        ((CursorAdapter) ((ListView) findViewById(android.R.id.list)).getAdapter()).swapCursor(cursor);
         updateUI();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        ((CursorAdapter) getListAdapter()).swapCursor(null);
+        ((CursorAdapter) ((ListView) findViewById(android.R.id.list)).getAdapter()).swapCursor(null);
     }
 
     private class CardsAdapter extends ResourceCursorAdapter {

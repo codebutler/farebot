@@ -23,7 +23,6 @@
 package com.codebutler.farebot.fragments;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.transit.Refill;
@@ -39,7 +39,7 @@ import com.codebutler.farebot.transit.TransitData;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class CardRefillsFragment extends ListFragment
+public class CardRefillsFragment extends SherlockListFragment
 {
     public void onCreate (Bundle savedInstanceState)
     {

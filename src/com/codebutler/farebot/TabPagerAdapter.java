@@ -22,20 +22,20 @@
 
 package com.codebutler.farebot;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import java.util.ArrayList;
 
 public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
-    private final Activity mActivity;
+    private final SherlockFragmentActivity mActivity;
     private final ActionBar mActionBar;
     private final ViewPager mViewPager;
     private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
@@ -51,9 +51,9 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         }
     }
 
-    public TabPagerAdapter(Activity activity, ViewPager pager) {
+    public TabPagerAdapter(SherlockFragmentActivity activity, ViewPager pager) {
         mActivity = activity;
-        mActionBar = activity.getActionBar();
+        mActionBar = activity.getSupportActionBar();
         mViewPager = pager;
         mViewPager.setAdapter(this);
         mViewPager.setOnPageChangeListener(this);
@@ -82,7 +82,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         TabInfo info = mTabs.get(position);
 
         if (mCurTransaction == null) {
-            mCurTransaction = mActivity.getFragmentManager().beginTransaction();
+            mCurTransaction = mActivity.getSupportFragmentManager().beginTransaction();
         }
 
         Fragment fragment = Fragment.instantiate(mActivity, info.clss.getName(), info.args);
@@ -93,7 +93,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
     @Override
     public void destroyItem(View view, int i, Object object) {
         if (mCurTransaction == null) {
-            mCurTransaction = mActivity.getFragmentManager().beginTransaction();
+            mCurTransaction = mActivity.getSupportFragmentManager().beginTransaction();
         }
         mCurTransaction.hide((Fragment) object);
     }
@@ -103,7 +103,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         if (mCurTransaction != null) {
             mCurTransaction.commitAllowingStateLoss();
             mCurTransaction = null;
-            mActivity.getFragmentManager().executePendingTransactions();
+            mActivity.getSupportFragmentManager().executePendingTransactions();
         }
     }
 

@@ -23,7 +23,6 @@
 package com.codebutler.farebot.fragments;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CardTripsFragment extends ListFragment {
+public class CardTripsFragment extends SherlockListFragment {
     private Card        mCard;
     private TransitData mTransitData;
 
