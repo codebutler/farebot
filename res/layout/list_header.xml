@@ -30,4 +30,5 @@
     android:paddingTop="2dip"
     android:paddingBottom="2dip"
     android:paddingLeft="5dip"
+    android:textColor="@android:color/background_light"
     style="?android:attr/listSeparatorTextViewStyle" />
