@@ -260,7 +260,7 @@ public class CEPASPurse implements Parcelable
         return mLastTransactionDebitOptionsByte;
     }
 
-    public boolean isValidPurse () {
+    public boolean isValid () {
         return mIsValid;
     }
 

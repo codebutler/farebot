@@ -1,5 +1,5 @@
 /*
- * DesfireProtocol.java
+ * CEPASProtocol.java
  *
  * Copyright (C) 2011 Eric Butler
  *
@@ -26,12 +26,15 @@ import android.nfc.tech.IsoDep;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class CEPASProtocol
 {
+    private static final String TAG = "CEPASProtocol";
+
     /* Status codes */
-    static final byte OPERATION_OK      = (byte) 0x00;
-    static final byte PERMISSION_DENIED = (byte) 0x9D;
+    private static final byte OPERATION_OK      = (byte) 0x00;
+    private static final byte PERMISSION_DENIED = (byte) 0x9D;
 
     private IsoDep mTagTech;
 
@@ -40,65 +43,66 @@ public class CEPASProtocol
         mTagTech = tagTech;
     }
 
-    public CEPASPurse getPurse (int purseId) throws Exception
+    public CEPASPurse getPurse (int purseId) throws IOException
     {
-        byte[] purseBuff;
-        purseBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)0, null);
-        if (purseBuff != null)
-            return new CEPASPurse(purseId, purseBuff);
-        else
-            return new CEPASPurse(purseId, "No purse found");
+        try {
+            byte[] purseBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)0, null);
+            if (purseBuff != null) {
+                return new CEPASPurse(purseId, purseBuff);
+            } else {
+                return new CEPASPurse(purseId, "No purse found");
+            }
+        } catch (CEPASException ex) {
+            Log.w(TAG, "Error reading purse " + purseId, ex);
+            return new CEPASPurse(purseId, ex.getMessage());
+        }
     }
 
-    public CEPASHistory getHistory (int purseId) throws Exception
+    public CEPASHistory getHistory (int purseId) throws IOException
     {
-        byte[] historyBuff;
-        historyBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, null);
-        if (historyBuff != null)
-            return new CEPASHistory(purseId, historyBuff);
-        else
-            return new CEPASHistory(purseId, "No history found");
+        try {
+            byte[] historyBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, null);
+            if (historyBuff != null) {
+                return new CEPASHistory(purseId, historyBuff);
+            } else {
+                return new CEPASHistory(purseId, "No history found");
+            }
+        } catch (CEPASException ex) {
+            Log.w(TAG, "Error reading purse " + purseId, ex);
+            return new CEPASHistory(purseId, ex.getMessage());
+        }
     }
 
-    private byte[] sendRequest (byte command, byte p1, byte p2, byte Lc, byte[] parameters) throws Exception
+    private byte[] sendRequest (byte command, byte p1, byte p2, byte Lc, byte[] parameters) throws CEPASException, IOException
     {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, p1, p2, Lc, parameters));
 
-        while (true) {
-            if (recvBuffer[recvBuffer.length - 2] != (byte) 0x90) {
-                if (recvBuffer[recvBuffer.length-2] == 0x6b) {
-                    Log.d("CEPASProtocol", "File " + p1 + " was an invalid file.");
-                    p1++;
-                    return null;
-                }
-                else if (recvBuffer[recvBuffer.length-2] == 0x67) {
-                    recvBuffer = mTagTech.transceive(wrapMessage(command, p1, p2, Lc, parameters));
-                    Log.d("CEPASProtocol", "Got invalid file size response.");
-                    return null;
-                }
+        if (recvBuffer[recvBuffer.length - 2] != (byte) 0x90) {
+            if (recvBuffer[recvBuffer.length-2] == 0x6b) {
+                throw new CEPASException("File " + p1 + " was an invalid file.");
 
-                Log.d("CEPASProtocol", "Got generic invalid response: " + Integer.toHexString( ((int)recvBuffer[recvBuffer.length-2]) & 0xff));
-                throw new Exception("Invalid response");
+            } else if (recvBuffer[recvBuffer.length-2] == 0x67) {
+                throw new CEPASException("Got invalid file size response.");
             }
 
-            output.write(recvBuffer, 0, recvBuffer.length - 2);
-
-            byte status = recvBuffer[recvBuffer.length - 1];
-            if (status == OPERATION_OK) {
-                break;
-            } else if (status == PERMISSION_DENIED) {
-                throw new Exception("Permission denied");
-            } else {
-                throw new Exception("Unknown status code: " + Integer.toHexString(status & 0xFF));
-            }
+            throw new CEPASException("Got generic invalid response: " + Integer.toHexString( ((int)recvBuffer[recvBuffer.length-2]) & 0xff));
         }
 
-        return output.toByteArray();
+        output.write(recvBuffer, 0, recvBuffer.length - 2);
+
+        byte status = recvBuffer[recvBuffer.length - 1];
+        if (status == OPERATION_OK) {
+            return output.toByteArray();
+        } else if (status == PERMISSION_DENIED) {
+            throw new CEPASException("Permission denied");
+        } else {
+            throw new CEPASException("Unknown status code: " + Integer.toHexString(status & 0xFF));
+        }
     }
 
-    private byte[] wrapMessage (byte command, byte p1, byte p2, byte lc, byte[] parameters) throws Exception
+    private byte[] wrapMessage (byte command, byte p1, byte p2, byte lc, byte[] parameters) throws IOException
     {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
