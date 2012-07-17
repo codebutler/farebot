@@ -25,26 +25,26 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
     android:gravity="center_vertical|center_horizontal"> 
-    
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:indeterminate="true"
         style="?android:attr/progressBarStyleLarge" />
-    
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="40sp"
+        android:gravity="center"
         android:text="@string/reading_card"/>
-
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textSize="20sp"
         android:text="@string/dont_move" />
 </LinearLayout>

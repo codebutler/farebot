@@ -60,8 +60,6 @@ public class ReadingTagActivity extends SherlockActivity
 
     private void resolveIntent (Intent intent)
     {
-        final TextView textView = (TextView) findViewById(R.id.textView);
-        
         try {
             final Tag tag      = (Tag) intent.getParcelableExtra("android.nfc.extra.TAG");
             final byte[] tagId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
@@ -123,11 +121,6 @@ public class ReadingTagActivity extends SherlockActivity
                     } catch (Exception ex) {
                         Utils.showErrorAndFinish(ReadingTagActivity.this, ex);
                     }
-                }
-
-                @Override
-                protected void onProgressUpdate(String... values) {
-                    textView.setText(values[0]);
                 }
                 
             }.execute();
