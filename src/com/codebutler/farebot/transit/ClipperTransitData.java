@@ -239,16 +239,20 @@ public class ClipperTransitData extends TransitData
             final ClipperTrip trip = createTrip(slice);
             if (trip != null) {
                 // Some transaction types are temporary -- remove previous trip with the same timestamp.
-                ClipperTrip oldTrip = Utils.findInList(result, new Utils.Matcher<ClipperTrip>() {
+                ClipperTrip existingTrip = Utils.findInList(result, new Utils.Matcher<ClipperTrip>() {
                     @Override
                     public boolean matches(ClipperTrip otherTrip) {
                         return trip.getTimestamp() == otherTrip.getTimestamp();
                     }
                 });
-                if (oldTrip != null) {
-                    result.remove(oldTrip);
+                if (existingTrip != null) {
+                    if (existingTrip.getExitTimestamp() != 0) {
+                        // Old trip has exit timestamp, and is therefore better.
+                        continue;
+                    } else {
+                        result.remove(existingTrip);
+                    }
                 }
-
                 result.add(trip);
             }
             pos -= RECORD_LENGTH;
@@ -263,14 +267,15 @@ public class ClipperTransitData extends TransitData
 
     private ClipperTrip createTrip (byte[] useData)
     {
-        long timestamp, fare, agency, from, to, route;
+        long timestamp, exitTimestamp, fare, agency, from, to, route;
 
-        timestamp = Utils.byteArrayToLong(useData, 0xc, 4);
-        fare      = Utils.byteArrayToLong(useData, 0x6, 2);
-        agency    = Utils.byteArrayToLong(useData, 0x2, 2);
-        from      = Utils.byteArrayToLong(useData, 0x14, 2);
-        to        = Utils.byteArrayToLong(useData, 0x16, 2);
-        route     = Utils.byteArrayToLong(useData, 0x1c, 2);
+        timestamp     = Utils.byteArrayToLong(useData,  0xc, 4);
+        exitTimestamp = Utils.byteArrayToLong(useData, 0x10, 4);
+        fare          = Utils.byteArrayToLong(useData,  0x6, 2);
+        agency        = Utils.byteArrayToLong(useData,  0x2, 2);
+        from          = Utils.byteArrayToLong(useData, 0x14, 2);
+        to            = Utils.byteArrayToLong(useData, 0x16, 2);
+        route         = Utils.byteArrayToLong(useData, 0x1c, 2);
 
         if (agency == 0)
             return null;
@@ -278,7 +283,7 @@ public class ClipperTransitData extends TransitData
         // Use a magic number to offset the timestamp
         timestamp -= EPOCH_OFFSET;
 
-        return new ClipperTrip(timestamp, fare, agency, from, to, route);
+        return new ClipperTrip(timestamp, exitTimestamp, fare, agency, from, to, route);
     }
 
     private ClipperRefill[] parseRefills (DesfireCard card)
@@ -363,10 +368,10 @@ public class ClipperTransitData extends TransitData
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeLong(mSerialNumber);
         parcel.writeLong(mBalance);
-        
+
         parcel.writeInt(mTrips.length);
         parcel.writeTypedArray(mTrips,  flags);
-        
+
         parcel.writeInt(mRefills.length);
         parcel.writeTypedArray(mRefills, flags);
     }
@@ -374,6 +379,7 @@ public class ClipperTransitData extends TransitData
     public static class ClipperTrip extends Trip
     {
         private final long mTimestamp;
+        private final long mExitTimestamp;
         private final long mFare;
         private final long mAgency;
         private final long mFrom;
@@ -381,15 +387,16 @@ public class ClipperTransitData extends TransitData
         private final long mRoute;
         private long mBalance;
 
-        public ClipperTrip (long timestamp, long fare, long agency, long from, long to, long route)
+        public ClipperTrip (long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route)
         {
-            mTimestamp  = timestamp;
-            mFare       = fare;
-            mAgency     = agency;
-            mFrom       = from;
-            mTo         = to;
-            mRoute      = route;
-            mBalance    = 0;
+            mTimestamp      = timestamp;
+            mExitTimestamp  = exitTimestamp;
+            mFare           = fare;
+            mAgency         = agency;
+            mFrom           = from;
+            mTo             = to;
+            mRoute          = route;
+            mBalance        = 0;
         }
 
         public static Creator<ClipperTrip> CREATOR = new Creator<ClipperTrip>() {
@@ -404,18 +411,23 @@ public class ClipperTransitData extends TransitData
 
         private ClipperTrip (Parcel parcel)
         {
-            mTimestamp = parcel.readLong();
-            mFare      = parcel.readLong();
-            mAgency    = parcel.readLong();
-            mFrom      = parcel.readLong();
-            mTo        = parcel.readLong();
-            mRoute     = parcel.readLong();
-            mBalance   = parcel.readLong();
+            mTimestamp     = parcel.readLong();
+            mExitTimestamp = parcel.readLong();
+            mFare          = parcel.readLong();
+            mAgency        = parcel.readLong();
+            mFrom          = parcel.readLong();
+            mTo            = parcel.readLong();
+            mRoute         = parcel.readLong();
+            mBalance       = parcel.readLong();
         }
 
         @Override
         public long getTimestamp () {
             return mTimestamp;
+        }
+
+        public long getExitTimestamp () {
+            return mExitTimestamp;
         }
 
         @Override
@@ -534,7 +546,7 @@ public class ClipperTransitData extends TransitData
                 return Mode.BUS;
             if (mAgency == AGENCY_VTA)
                 return Mode.BUS; // FIXME: or Mode.TRAM for light rail
-            if (mAgency == AGENCY_MUNI) 
+            if (mAgency == AGENCY_MUNI)
                 return Mode.BUS; // FIXME: or Mode.TRAM for "Muni Metro"
             if (mAgency == AGENCY_FERRY)
                 return Mode.FERRY;
@@ -543,6 +555,7 @@ public class ClipperTransitData extends TransitData
 
         public void writeToParcel(Parcel parcel, int flags) {
             parcel.writeLong(mTimestamp);
+            parcel.writeLong(mExitTimestamp);
             parcel.writeLong(mFare);
             parcel.writeLong(mAgency);
             parcel.writeLong(mFrom);
@@ -571,7 +584,7 @@ public class ClipperTransitData extends TransitData
                 return new ClipperRefill[size];
             }
         };
-        
+
         public ClipperRefill (long timestamp, long amount, long agency, long machineid)
         {
             mTimestamp  = timestamp;
@@ -613,7 +626,7 @@ public class ClipperTransitData extends TransitData
 
         @Override
         public String getShortAgencyName () {
-            return ClipperTransitData.getShortAgencyName((int)mAgency);
+            return ClipperTransitData.getShortAgencyName((int) mAgency);
         }
 
         public void writeToParcel(Parcel parcel, int flags) {
