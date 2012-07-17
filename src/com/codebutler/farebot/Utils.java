@@ -29,9 +29,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+import android.view.WindowManager;
 import org.w3c.dom.Node;
 
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
@@ -49,18 +54,22 @@ public class Utils
 
     public static void showErrorAndFinish (final Activity activity, Exception ex)
     {
-        Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
-        ex.printStackTrace();
+        try {
+            Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
+            ex.printStackTrace();
 
-        new AlertDialog.Builder(activity)
-            .setMessage(Utils.getErrorMessage(ex))
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface arg0, int arg1) {
-                    activity.finish();
-                }
-            })
-            .show();
+            new AlertDialog.Builder(activity)
+                .setMessage(Utils.getErrorMessage(ex))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        activity.finish();
+                    }
+                })
+                .show();
+        } catch (WindowManager.BadTokenException unused) {
+            /* Ignore... happens if the activity was destroyed */
+        }
     }
 
     public static String getHexString (byte[] b) throws Exception
