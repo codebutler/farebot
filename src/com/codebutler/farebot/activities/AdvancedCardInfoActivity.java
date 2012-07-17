@@ -159,8 +159,18 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity
                 StringBuilder builder = new StringBuilder();
                 builder.append(Utils.getDeviceInfoString());
                 builder.append("\n\n");
+
+                builder.append(mError.toString());
+                builder.append("\n");
                 builder.append(Utils.getErrorMessage(mError));
+                builder.append("\n");
+                for (StackTraceElement elem : mError.getStackTrace()) {
+                    builder.append(elem.toString());
+                    builder.append("\n");
+                }
+
                 builder.append("\n\n");
+
                 try {
                     builder.append(Utils.xmlNodeToString(mCard.toXML().getOwnerDocument()));
                 } catch (Exception ex) {
