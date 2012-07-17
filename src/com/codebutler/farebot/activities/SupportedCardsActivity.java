@@ -62,12 +62,12 @@ public class SupportedCardsActivity extends SherlockActivity {
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
         public CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
-            add(new CardInfo(R.drawable.orca_card,    "ORCA",    "Seattle, WA"));
-            add(new CardInfo(R.drawable.clipper_card, "Clipper", "San Francisco, CA"));
-            add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link", "Singapore"));
-            add(new CardInfo(R.drawable.suica_card,   "Suica",   "Tokyo, Japan"));
-            add(new CardInfo(R.drawable.pasmo_card,   "PASMO",   "Tokyo, Japan"));
-            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   "Kansai, Japan"));
+            add(new CardInfo(R.drawable.orca_card,    "ORCA",    context.getString(R.string.location_seattle)));
+            add(new CardInfo(R.drawable.clipper_card, "Clipper", context.getString(R.string.location_san_francisco)));
+            add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link", context.getString(R.string.location_singapore)));
+            add(new CardInfo(R.drawable.suica_card,   "Suica",   context.getString(R.string.location_tokyo)));
+            add(new CardInfo(R.drawable.pasmo_card,   "PASMO",   context.getString(R.string.location_tokyo)));
+            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   context.getString(R.string.location_kansai)));
         }
         
         @Override

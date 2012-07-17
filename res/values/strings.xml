@@ -111,4 +111,10 @@
     <string name="comments">Comments</string>
     <string name="scanned_cards">Scanned Cards</string>
     <string name="no_scanned_cards">You have not scanned any cards.</string>
+
+    <string name="location_seattle">Seattle, WA</string>
+    <string name="location_san_francisco">San Francisco, CA</string>
+    <string name="location_singapore">Singapore</string>
+    <string name="location_tokyo">Tokyo, Japan</string>
+    <string name="location_kansai">Kansai, Japan</string>
 </resources>

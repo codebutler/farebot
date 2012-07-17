@@ -87,4 +87,7 @@
     <string name="comments">コメント</string>
     <string name="scanned_cards">スキャンしたカード</string>
     <string name="no_scanned_cards">カードがまだスキャンされていません。</string>
+
+    <string name="location_tokyo">東京</string>
+    <string name="location_kansai">関西</string>
 </resources>
