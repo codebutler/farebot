@@ -559,6 +559,11 @@ public class EZLinkTransitData extends TransitData
         }
 
         @Override
+        public long getExitTimestamp() {
+            return 0;
+        }
+
+        @Override
         public String getAgencyName () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");

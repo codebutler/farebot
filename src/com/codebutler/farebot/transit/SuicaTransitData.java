@@ -274,6 +274,11 @@ public class SuicaTransitData extends TransitData {
                 return 0;
         }
 
+        @Override
+        public long getExitTimestamp() {
+            return 0;
+        }
+
         public boolean hasTime() {
             return mIsProductSale;
         }

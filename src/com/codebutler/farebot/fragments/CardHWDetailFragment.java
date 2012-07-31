@@ -40,6 +40,8 @@ import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.mifare.Card.CardType;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireManufacturingData;
+import com.codebutler.farebot.ovchip.OVChipCard;
+import com.codebutler.farebot.transit.OVChipTransitData;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -118,6 +120,54 @@ public class CardHWDetailFragment extends SherlockListFragment
             FelicaCard card = (FelicaCard) mCard;
             items.add(new ListItem("IDm", Utils.getHexString(card.getIDm().getBytes(), "err")));
             items.add(new ListItem("PMm", Utils.getHexString(card.getPMm().getBytes(), "err")));
+        } else if (mCard.getCardType() == CardType.MifareClassic) {
+        	OVChipCard card = (OVChipCard)mCard;
+        	
+        	/*
+        	 * TODO: Get the following somewhere (they don't need access to the actual tag):
+        	 * Log.d("INFO", "Blocks: " + tech.getBlockCount());
+        	 * Log.d("INFO", "Sectors: " + tech.getSectorCount());
+        	 * Log.d("INFO", "Size: " + tech.getSize());
+        	 * Log.d("INFO", "Type: " + tech.getType());
+        	 */
+        	
+        	items.add(new HeaderListItem("Hardware Information"));
+        	items.add(new ListItem("Manufacturer ID",	card.getOVCPreamble().getManufacturer()));
+        	items.add(new ListItem("Publisher ID",      card.getOVCPreamble().getPublisher()));
+        	//items.add(new ListItem("Type",      .....));
+        	//items.add(new ListItem("Blocks",      .....));
+        	//items.add(new ListItem("Sectors",      .....));
+        	//items.add(new ListItem("Size",      .....));
+
+        	items.add(new HeaderListItem("General Information"));
+	        items.add(new ListItem("Serial Number",		card.getOVChipPreamble().getId()));
+	        items.add(new ListItem("Expiration Date",	DateFormat.getDateInstance(DateFormat.LONG).format(OVChipTransitData.convertDate(card.getOVChipPreamble().getExpdate()))));
+	        items.add(new ListItem("Card Type",			(card.getOVChipPreamble().getType() == 2 ? "Personal" : "Anonymous")));
+	        
+	        if (card.getComplete()) {
+		        items.add(new ListItem("Banned", ((card.getOVChipCredit().getBanbits() & (byte)0xC0) == (byte)0xC0) ? "Yes" : "No"));
+	        	
+	        	items.add(new HeaderListItem("Recent Slots"));
+	        	items.add(new ListItem("Transaction Slot",		"0x" + Integer.toHexString((char)card.getOVChipIndex().getRecentTransactionSlot())));
+	        	items.add(new ListItem("Info Slot",				"0x" + Integer.toHexString((char)card.getOVChipIndex().getRecentInfoSlot())));
+	        	items.add(new ListItem("Subscription Slot",		"0x" + Integer.toHexString((char)card.getOVChipIndex().getRecentSubscriptionSlot())));
+	        	items.add(new ListItem("Travelhistory Slot",	"0x" + Integer.toHexString((char)card.getOVChipIndex().getRecentTravelhistorySlot())));
+	        	items.add(new ListItem("Credit Slot",			"0x" + Integer.toHexString((char)card.getOVChipIndex().getRecentCreditSlot())));
+			    
+	        	if (card.getOVChipPreamble().getType() == 2)
+	        	{
+		        	items.add(new HeaderListItem("Personal Information"));
+		        	items.add(new ListItem("Birthdate",     DateFormat.getDateInstance(DateFormat.LONG).format(card.getOVChipInfo().getBirthdate())));
+		        }
+
+	        	items.add(new HeaderListItem("Credit Information"));
+	        	items.add(new ListItem("Credit Slot ID",	Integer.toString(card.getOVChipCredit().getId())));
+	        	items.add(new ListItem("Last Credit ID",	Integer.toString(card.getOVChipCredit().getCreditId())));
+	        	items.add(new ListItem("Credit",			OVChipTransitData.convertAmount(card.getOVChipCredit().getCredit())));
+	        	items.add(new ListItem("Autocharge",		(card.getOVChipInfo().getActive() == (byte)0x05 ? "Yes" : "No")));
+	        	items.add(new ListItem("Autocharge Limit",	OVChipTransitData.convertAmount(card.getOVChipInfo().getLimit())));
+	        	items.add(new ListItem("Autocharge Charge",	OVChipTransitData.convertAmount(card.getOVChipInfo().getCharge())));
+        	}
         }
 
         setListAdapter(new HWDetailListAdapter(getActivity(), items));

@@ -426,6 +426,7 @@ public class ClipperTransitData extends TransitData
             return mTimestamp;
         }
 
+        @Override
         public long getExitTimestamp () {
             return mExitTimestamp;
         }
