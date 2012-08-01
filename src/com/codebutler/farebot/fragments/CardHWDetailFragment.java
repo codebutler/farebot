@@ -132,8 +132,8 @@ public class CardHWDetailFragment extends SherlockListFragment
         	 */
         	
         	items.add(new HeaderListItem("Hardware Information"));
-        	items.add(new ListItem("Manufacturer ID",	card.getOVCPreamble().getManufacturer()));
-        	items.add(new ListItem("Publisher ID",      card.getOVCPreamble().getPublisher()));
+        	items.add(new ListItem("Manufacturer ID",	card.getOVChipPreamble().getManufacturer()));
+        	items.add(new ListItem("Publisher ID",      card.getOVChipPreamble().getPublisher()));
         	//items.add(new ListItem("Type",      .....));
         	//items.add(new ListItem("Blocks",      .....));
         	//items.add(new ListItem("Sectors",      .....));
