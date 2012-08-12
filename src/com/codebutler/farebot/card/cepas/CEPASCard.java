@@ -58,7 +58,11 @@ public class CEPASCard extends Card
             }
 
             for (int historyId = 0; historyId < cepasHistories.length; historyId++) {
-                cepasHistories[historyId] = cepasTag.getHistory(historyId);
+                if (cepasPurses[historyId].isValid()) {
+                    cepasHistories[historyId] = cepasTag.getHistory(historyId, Integer.parseInt(Byte.toString(cepasPurses[historyId].getLogfileRecordCount())));
+                } else {
+                    cepasHistories[historyId] = new CEPASHistory(historyId, (byte[]) null);
+                }
             }
         } finally {
             if (tech.isConnected())
