@@ -65,20 +65,20 @@ public class CEPASProtocol
         	byte[] historyBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, null);
 
         	if (historyBuff != null) {
-	        	byte[] historyBuff2 = null;
-	        	try {
-	        		historyBuff2 = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, new byte[]{(byte)(historyBuff.length/16+1)});
+	       	    byte[] historyBuff2 = null;
+	            try {
+	                historyBuff2 = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, new byte[]{(byte)(historyBuff.length/16+1)});
 	            } catch (CEPASException ex) {
 	                Log.w(TAG, "Error reading 2nd purse history " + purseId, ex);
 	            }
 	            fullHistoryBuff = new byte[historyBuff.length+(historyBuff2!=null?historyBuff2.length:0)];
 
-	        	System.arraycopy(historyBuff,0,fullHistoryBuff,0,historyBuff.length);
-	        	if (historyBuff2 != null)
-	        		System.arraycopy(historyBuff2,0,fullHistoryBuff,historyBuff.length,historyBuff2.length);
+	            System.arraycopy(historyBuff,0,fullHistoryBuff,0,historyBuff.length);
+	            if (historyBuff2 != null)
+	                System.arraycopy(historyBuff2,0,fullHistoryBuff,historyBuff.length,historyBuff2.length);
         	}
 	           
-	        if (fullHistoryBuff != null) {
+	    if (fullHistoryBuff != null) {
                 return new CEPASHistory(purseId, fullHistoryBuff);
             } else {
                 return new CEPASHistory(purseId, "No history found");
