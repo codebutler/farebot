@@ -67,7 +67,7 @@ public class CEPASProtocol
         	if (historyBuff != null) {
 	       	    byte[] historyBuff2 = null;
 	            try {
-	                historyBuff2 = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, new byte[]{(byte)(historyBuff.length/16+1)});
+	                historyBuff2 = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, new byte[]{(byte)(historyBuff.length/16)});
 	            } catch (CEPASException ex) {
 	                Log.w(TAG, "Error reading 2nd purse history " + purseId, ex);
 	            }
