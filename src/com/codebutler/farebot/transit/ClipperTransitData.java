@@ -82,33 +82,34 @@ public class ClipperTransitData extends TransitData
 
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {
         {
-            put((long)0x03, new Station("Balboa Park Station",                 "Balboa Park",          "37.721556", "-122.447503"));
-            put((long)0x04, new Station("Glen Park Station",                   "Glen Park",            "37.733118", "-122.433808"));
-            put((long)0x05, new Station("24th St. Mission Station",            "24th St.",             "37.75226",  "-122.41849"));
-            put((long)0x06, new Station("16th St. Mission Station",            "16th St.",             "37.765228", "-122.419478"));
-            put((long)0x07, new Station("Civic Center Station",                "Civic Center",         "37.779538", "-122.413788"));
-            put((long)0x08, new Station("Powell Street Station",               "Powell St.",           "37.784970", "-122.40701"));
-            put((long)0x09, new Station("Montgomery St. Station",              "Montgomery",           "37.789336", "-122.401486"));
-            put((long)0x0a, new Station("Embarcadero Station",                 "Embarcadero",          "37.793086", "-122.396276"));
-            put((long)0x0d, new Station("19th Street Oakland Station",         "19th St.",             "37.80762",  "-122.26886"));
-            put((long)0x15, new Station("Concord Station",                     "Concord",              "37.971606", "-122.02991"));
-            put((long)0x17, new Station("Pittsburg/Bay Point Station",         "Pittsburg/Bay Pt",     "38.01892",  "-121.94240"));
-            put((long)0x18, new Station("Downtown Berkeley Station",           "Berkeley",             "37.869868", "-122.268051"));
-            put((long)0x19, new Station("North Berkeley Station",              "North Berkeley",       "37.874026", "-122.283882"));
-            put((long)0x20, new Station("Coliseum/Oakland Airport BART",       "Coliseum/OAK",         "37.754270", "-122.197757"));
-            put((long)0x1a, new Station("El Cerrito Plaza Station",            "El Cerrito Plaza",     "37.903959", "-122.299271"));
-            put((long)0x1b, new Station("El Cerrito Del Norte Station",        "El Cerrito Del Norte", "37.925651", "-122.317219"));
-            put((long)0x1c, new Station("Richmond Station",                    "Richmond",             "37.93730",  "-122.35338"));
-            put((long)0x1d, new Station("Lake Merritt Station",                "Lake Merritt",         "37.79761",  "-122.26564"));
-            put((long)0x22, new Station("Hayward Station",                     "Hayward",              "37.670387", "-122.088002"));
-            put((long)0x23, new Station("South Hayward Station",               "South Hayward",        "37.634800", "-122.057551"));
-            put((long)0x24, new Station("Union City Station",                  "Union City",           "37.591203", "-122.017854"));
-            put((long)0x25, new Station("Fremont Station",                     "Fremont",              "37.557727", "-121.976395"));
-            put((long)0x26, new Station("Daly City Station",                   "Daly City",            "37.7066",   "-122.4696"));
-            put((long)0x28, new Station("South San Francisco Station",         "South SF",             "37.6744",   "-122.442"));
-            put((long)0x29, new Station("San Bruno Station",                   "San Bruno",            "37.63714",  "-122.415622"));
-            put((long)0x2a, new Station("San Francisco Int'l Airport Station", "SFO",                  "37.61590",  "-122.39263"));
-            put((long)0x2b, new Station("Milbrae Station",                     "Milbrae",              "37.599935", "-122.386478"));
+            put((long)0x03, new Station("Balboa Park Station",                       "Balboa Park",          "37.721556", "-122.447503"));
+            put((long)0x04, new Station("Glen Park Station",                         "Glen Park",            "37.733118", "-122.433808"));
+            put((long)0x05, new Station("24th St. Mission Station",                  "24th St.",             "37.75226",  "-122.41849"));
+            put((long)0x06, new Station("16th St. Mission Station",                  "16th St.",             "37.765228", "-122.419478"));
+            put((long)0x07, new Station("Civic Center Station",                      "Civic Center",         "37.779538", "-122.413788"));
+            put((long)0x08, new Station("Powell Street Station",                     "Powell St.",           "37.784970", "-122.40701"));
+            put((long)0x09, new Station("Montgomery St. Station",                    "Montgomery",           "37.789336", "-122.401486"));
+            put((long)0x0a, new Station("Embarcadero Station",                       "Embarcadero",          "37.793086", "-122.396276"));
+            put((long)0x0d, new Station("19th Street Oakland Station",               "19th St.",             "37.80762",  "-122.26886"));
+            put((long)0x13, new Station("Pleasant Hill/Contra Costa Centre Station", "Pleasant Hill",        "37.928409", "-122.056014"));
+            put((long)0x15, new Station("Concord Station",                           "Concord",              "37.971606", "-122.02991"));
+            put((long)0x17, new Station("Pittsburg/Bay Point Station",               "Pittsburg/Bay Pt",     "38.01892",  "-121.94240"));
+            put((long)0x18, new Station("Downtown Berkeley Station",                 "Berkeley",             "37.869868", "-122.268051"));
+            put((long)0x19, new Station("North Berkeley Station",                    "North Berkeley",       "37.874026", "-122.283882"));
+            put((long)0x20, new Station("Coliseum/Oakland Airport BART",             "Coliseum/OAK",         "37.754270", "-122.197757"));
+            put((long)0x1a, new Station("El Cerrito Plaza Station",                  "El Cerrito Plaza",     "37.903959", "-122.299271"));
+            put((long)0x1b, new Station("El Cerrito Del Norte Station",              "El Cerrito Del Norte", "37.925651", "-122.317219"));
+            put((long)0x1c, new Station("Richmond Station",                          "Richmond",             "37.93730",  "-122.35338"));
+            put((long)0x1d, new Station("Lake Merritt Station",                      "Lake Merritt",         "37.79761",  "-122.26564"));
+            put((long)0x22, new Station("Hayward Station",                           "Hayward",              "37.670387", "-122.088002"));
+            put((long)0x23, new Station("South Hayward Station",                     "South Hayward",        "37.634800", "-122.057551"));
+            put((long)0x24, new Station("Union City Station",                        "Union City",           "37.591203", "-122.017854"));
+            put((long)0x25, new Station("Fremont Station",                           "Fremont",              "37.557727", "-121.976395"));
+            put((long)0x26, new Station("Daly City Station",                         "Daly City",            "37.7066",   "-122.4696"));
+            put((long)0x28, new Station("South San Francisco Station",               "South SF",             "37.6744",   "-122.442"));
+            put((long)0x29, new Station("San Bruno Station",                         "San Bruno",            "37.63714",  "-122.415622"));
+            put((long)0x2a, new Station("San Francisco Int'l Airport Station",       "SFO",                  "37.61590",  "-122.39263"));
+            put((long)0x2b, new Station("Milbrae Station",                           "Milbrae",              "37.599935", "-122.386478"));
         }
     };
 
