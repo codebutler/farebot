@@ -53,12 +53,20 @@ public class CEPASCard extends Card
         try {
             CEPASProtocol cepasTag = new CEPASProtocol(tech);
 
+            // TODO: use only purseId=3 until we find usage of other purses
             for (int purseId = 0; purseId < cepasPurses.length; purseId++) {
-                cepasPurses[purseId] = cepasTag.getPurse(purseId);
+                if (purseId == 3)
+                    cepasPurses[purseId] = cepasTag.getPurse(purseId);
+                else
+                    cepasPurses[purseId] = new CEPASPurse(purseId, (byte[]) null);
             }
 
             for (int historyId = 0; historyId < cepasHistories.length; historyId++) {
-                cepasHistories[historyId] = cepasTag.getHistory(historyId);
+                if (cepasPurses[historyId].isValid()) {
+                    cepasHistories[historyId] = cepasTag.getHistory(historyId, Integer.parseInt(Byte.toString(cepasPurses[historyId].getLogfileRecordCount())));
+                } else {
+                    cepasHistories[historyId] = new CEPASHistory(historyId, (byte[]) null);
+                }
             }
         } finally {
             if (tech.isConnected())
