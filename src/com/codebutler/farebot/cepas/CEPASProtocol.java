@@ -43,10 +43,9 @@ public class CEPASProtocol
         mTagTech = tagTech;
     }
 
-    public CEPASPurse getPurse (int purseId) throws IOException
-    {
+    public CEPASPurse getPurse(int purseId) throws IOException {
         try {
-            byte[] purseBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)0, null);
+            byte[] purseBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 0, new byte[] { (byte) 0 });
             if (purseBuff != null) {
                 return new CEPASPurse(purseId, purseBuff);
             } else {
@@ -58,27 +57,30 @@ public class CEPASProtocol
         }
     }
 
-    public CEPASHistory getHistory (int purseId) throws IOException
-    {
+    public CEPASHistory getHistory(int purseId, int recordCount) throws IOException {
         try {
             byte[] fullHistoryBuff = null;
-        	byte[] historyBuff = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, null);
+            byte[] historyBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1, new byte[] { (byte) 0, (byte) (recordCount <= 15 ? recordCount * 16 : 15 * 16) });
 
-        	if (historyBuff != null) {
-	       	    byte[] historyBuff2 = null;
-	            try {
-	                historyBuff2 = sendRequest((byte)0x32, (byte) (purseId), (byte)0, (byte)1, new byte[]{(byte)(historyBuff.length/16)});
-	            } catch (CEPASException ex) {
-	                Log.w(TAG, "Error reading 2nd purse history " + purseId, ex);
-	            }
-	            fullHistoryBuff = new byte[historyBuff.length+(historyBuff2!=null?historyBuff2.length:0)];
+            if (historyBuff != null) {
+                if (recordCount > 15) {
+                    byte[] historyBuff2 = null;
+                    try {
+                        historyBuff2 = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1, new byte[] { (byte) 0x0F, (byte) ((recordCount - 15) * 16) });
+                    } catch (CEPASException ex) {
+                        Log.w(TAG, "Error reading 2nd purse history " + purseId, ex);
+                    }
+                    fullHistoryBuff = new byte[historyBuff.length + (historyBuff2 != null ? historyBuff2.length : 0)];
 
-	            System.arraycopy(historyBuff,0,fullHistoryBuff,0,historyBuff.length);
-	            if (historyBuff2 != null)
-	                System.arraycopy(historyBuff2,0,fullHistoryBuff,historyBuff.length,historyBuff2.length);
-        	}
-	           
-	    if (fullHistoryBuff != null) {
+                    System.arraycopy(historyBuff, 0, fullHistoryBuff, 0, historyBuff.length);
+                    if (historyBuff2 != null)
+                        System.arraycopy(historyBuff2, 0, fullHistoryBuff, historyBuff.length, historyBuff2.length);
+                } else {
+                    fullHistoryBuff = historyBuff;
+                }
+            }
+
+            if (fullHistoryBuff != null) {
                 return new CEPASHistory(purseId, fullHistoryBuff);
             } else {
                 return new CEPASHistory(purseId, "No history found");
@@ -131,9 +133,8 @@ public class CEPASProtocol
         // Write Lc and data fields
         if (parameters != null) {
             stream.write(parameters); // Data field
-        } else {
-            stream.write((byte) 0x00); // Lc = 0
         }
+        
         return stream.toByteArray();
     }
 }
