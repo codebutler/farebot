@@ -31,6 +31,7 @@ import java.util.List;
 public abstract class Trip implements Parcelable
 {
     public abstract long getTimestamp();
+    public abstract long getExitTimestamp();
     public abstract String getRouteName ();
     public abstract String getAgencyName ();
     public abstract String getShortAgencyName ();

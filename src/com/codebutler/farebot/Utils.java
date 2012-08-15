@@ -223,4 +223,35 @@ public class Utils
     public static interface Matcher<T> {
         public boolean matches(T t);
     }
+
+	public static int convertBCDtoInteger(byte data) {
+		return (((data & (char)0xF0) >> 4) * 10) + ((data & (char)0x0F));
+	}
+
+	public static int getBitsFromInteger(int buffer, int iStartBit, int iLength) {
+		return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
+	}
+
+	/* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
+	public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
+		int iEndBit = iStartBit + iLength - 1;
+		int iSByte = iStartBit / 8;
+		int iSBit = iStartBit % 8;
+		int iEByte = iEndBit / 8;
+		int iEBit = iEndBit % 8;
+
+		if (iSByte == iEByte) {
+			return (int)(((char)buffer[iEByte] >> (7 - iEBit)) & ((char)0xFF >> (8 - iLength)));
+		} else {
+			int uRet = (((char)buffer[iSByte] & (char)((char)0xFF >> iSBit)) << (((iEByte - iSByte - 1) * 8) + (iEBit + 1)));
+
+			for (int i = iSByte + 1; i < iEByte; i++) {
+				uRet |= (((char)buffer[i] & (char)0xFF) << (((iEByte - i - 1) * 8) + (iEBit + 1)));
+			}
+
+			uRet |= (((char)buffer[iEByte] & (char)0xFF)) >> (7 - iEBit);
+
+			return uRet;
+		}
+	}
 }

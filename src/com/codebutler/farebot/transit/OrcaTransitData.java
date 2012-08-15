@@ -246,6 +246,11 @@ public class OrcaTransitData extends TransitData
         }
 
         @Override
+        public long getExitTimestamp() {
+            return 0;
+        }
+
+        @Override
         public String getAgencyName () {
             switch ((int) mAgency) {
                 case AGENCY_CT:
