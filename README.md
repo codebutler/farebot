@@ -13,6 +13,7 @@ View your remaining balance, recent trips, and other information from contactles
 * Anonymous Contributor (Clipper)
 * [nfc-felica][13] and [IC SFCard Fan][14] projects (Suica)
 * [Wilbert Duijvenvoorde](https://github.com/wandcode) (MIFARE Classic/OV-chipkaart)
+* [tbonang](https://github.com/tbonang) (NETS FlashPay)
 * [The Noun Project][15] (Various icons)
 
 ## Supported Protocols
@@ -27,6 +28,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [ORCA][0] - Seattle, WA, USA
 * [Clipper][1] - San Francisco, CA, USA
 * [EZ-Link][7] - Singapore (Not compatible with all devices)
+* [NETS FlashPay](http://www.netsflashpay.com.sg/) - Singapore
 * [Suica][9], [ICOCA][10], [PASMO][11] - Japan
 * [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands (Requires encryption keys)
 
