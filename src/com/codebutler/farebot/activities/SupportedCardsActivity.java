@@ -65,6 +65,7 @@ public class SupportedCardsActivity extends SherlockActivity {
             add(new CardInfo(R.drawable.orca_card,    "ORCA",    context.getString(R.string.location_seattle)));
             add(new CardInfo(R.drawable.clipper_card, "Clipper", context.getString(R.string.location_san_francisco)));
             add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link", context.getString(R.string.location_singapore)));
+            add(new CardInfo(R.drawable.nets_card,  "NETS FlashPay", context.getString(R.string.location_singapore)));
             add(new CardInfo(R.drawable.suica_card,   "Suica",   context.getString(R.string.location_tokyo)));
             add(new CardInfo(R.drawable.pasmo_card,   "PASMO",   context.getString(R.string.location_tokyo)));
             add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   context.getString(R.string.location_kansai)));
