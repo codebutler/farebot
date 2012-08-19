@@ -315,7 +315,8 @@ public class EZLinkTransitData extends TransitData
             put("GTM", new MRTStation("GTM Manual Top-up", "GTM", "GTM", null, null));
 
             // North-East Line (NEL)
-            put("HBF", new MRTStation("HarbourFront", "NE1",              "HBF", "1.265297", "103.82225"));
+            put("HBF", new MRTStation("HarbourFront", "NE1 / CC29",         "HBF", "1.265297", "103.82225"));
+            put("HBC", new MRTStation("HarbourFront", "NE1 / CC29",         "HBC", "1.265297", "103.82225"));
             put("OTP", new MRTStation("Outram Park",  "NE3 / EW16",       "OTP", "1.280225", "103.839486"));
             put("CNT", new MRTStation("Chinatown",    "NE4 / DT19",       "CNT", "1.28485",  "103.844006"));
             put("CQY", new MRTStation("Clarke Quay",  "NE5",              "CQY", "1.288708", "103.846606"));
@@ -573,13 +574,13 @@ public class EZLinkTransitData extends TransitData
 
         @Override
         public String getAgencyName () {
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
                 if (sbsBuses.contains(routeString))
                     return "SBS";
                 return "SMRT";
             }
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION) {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION || mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
                 return mCardName;
             }
             if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL) {
@@ -590,13 +591,13 @@ public class EZLinkTransitData extends TransitData
 
         @Override
         public String getShortAgencyName () {
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
                 if (sbsBuses.contains(routeString))
                     return "SBS";
                 return "SMRT";
             }
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION || mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP) {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION || mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
                 if (mCardName.equals("EZ-Link")) return "EZ"; else return mCardName;
             }
             if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL) {
@@ -622,6 +623,8 @@ public class EZLinkTransitData extends TransitData
                 return "First use";
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL)
                 return "Retail Purchase";
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE)
+                return "Service Charge";
             return "(Unknown Route)";
         }
 
@@ -699,13 +702,13 @@ public class EZLinkTransitData extends TransitData
 
         @Override
         public Mode getMode() {
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS)
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND)
                 return Mode.BUS;
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
                 return Mode.METRO;
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
                 return Mode.TICKET_MACHINE;
-            else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL)
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE)
                 return Mode.POS;
             return Mode.OTHER;
         }
