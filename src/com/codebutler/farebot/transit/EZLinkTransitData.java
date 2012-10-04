@@ -315,7 +315,8 @@ public class EZLinkTransitData extends TransitData
             put("GTM", new MRTStation("GTM Manual Top-up", "GTM", "GTM", null, null));
 
             // North-East Line (NEL)
-            put("HBF", new MRTStation("HarbourFront", "NE1",              "HBF", "1.265297", "103.82225"));
+            put("HBF", new MRTStation("HarbourFront", "NE1 / CC29",         "HBF", "1.265297", "103.82225"));
+            put("HBC", new MRTStation("HarbourFront", "NE1 / CC29",         "HBC", "1.265297", "103.82225"));
             put("OTP", new MRTStation("Outram Park",  "NE3 / EW16",       "OTP", "1.280225", "103.839486"));
             put("CNT", new MRTStation("Chinatown",    "NE4 / DT19",       "CNT", "1.28485",  "103.844006"));
             put("CQY", new MRTStation("Clarke Quay",  "NE5",              "CQY", "1.288708", "103.846606"));
@@ -347,6 +348,7 @@ public class EZLinkTransitData extends TransitData
             put("TAS", new MRTStation("Tai Seng",        "CC11",             "TAS", "1.335833", "103.887942"));
             put("BLY", new MRTStation("Bartley",         "CC12",             "BLY", "1.342756", "103.879697"));
             put("SER", new MRTStation("Serangoon",       "CC13 / NE12",      "SER", "1.349944", "103.873092"));
+            put("SRC", new MRTStation("Serangoon",       "CC13 / NE12",      "SER", "1.349944", "103.873092"));
             put("LRC", new MRTStation("Lorong Chuan",    "CC14",             "LRC", "1.351636", "103.864064"));
             put("BSH", new MRTStation("Bishan",          "CC15 / NS17",      "BSH", "1.351236", "103.848456"));
             put("BSC", new MRTStation("Bishan",          "CC15 / NS17",      "BSC", "1.351236", "103.848456")); // Alternate name (Circle line entrance)
@@ -433,6 +435,15 @@ public class EZLinkTransitData extends TransitData
         }
     };
 
+    private static String getCardIssuer(String canNo) {
+        int issuerId = Integer.parseInt(canNo.substring(0,3));
+        switch (issuerId) {
+            case 100: return "EZ-Link";
+            case 111: return "NETS";
+            default: return "CEPAS";
+        }
+    }
+    
     public static MRTStation getStation (String code) {
         return mrtStations.get(code);
     }
@@ -451,7 +462,8 @@ public class EZLinkTransitData extends TransitData
 
     public static TransitIdentity parseTransitIdentity(Card card)
     {
-        return new TransitIdentity("EZ-Link", Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>"));
+        String canNo = Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>");
+        return new TransitIdentity(getCardIssuer(canNo), canNo);
     }
 
     public Creator<EZLinkTransitData> CREATOR = new Creator<EZLinkTransitData>() {
@@ -483,7 +495,7 @@ public class EZLinkTransitData extends TransitData
 
     @Override
     public String getCardName () {
-        return "EZ-Link";
+        return getCardIssuer(mSerialNumber);
     }
 
     @Override
@@ -515,7 +527,7 @@ public class EZLinkTransitData extends TransitData
             EZLinkTrip[] trips = new EZLinkTrip[transactions.length];
 
             for (int i = 0; i < trips.length; i++)
-                trips[i] = new EZLinkTrip(transactions[i]);
+                trips[i] = new EZLinkTrip(transactions[i], getCardName());
 
             return trips;
         }
@@ -533,15 +545,18 @@ public class EZLinkTransitData extends TransitData
     public static class EZLinkTrip extends Trip
     {
         private final CEPASTransaction mTransaction;
-
-        public EZLinkTrip (CEPASTransaction transaction)
+        private final String mCardName;
+        
+        public EZLinkTrip (CEPASTransaction transaction, String cardName)
         {
             mTransaction = transaction;
+            mCardName = cardName;
         }
 
         private EZLinkTrip (Parcel parcel)
         {
             mTransaction = parcel.readParcelable(CEPASTransaction.class.getClassLoader());
+            mCardName = parcel.readString();
         }
 
         public static Creator<EZLinkTrip> CREATOR = new Creator<EZLinkTrip>() {
@@ -560,28 +575,34 @@ public class EZLinkTransitData extends TransitData
 
         @Override
         public String getAgencyName () {
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
                 if (sbsBuses.contains(routeString))
                     return "SBS";
                 return "SMRT";
             }
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION) {
-                return "EZLink";
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION || mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
+                return mCardName;
+            }
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL) {
+                return "POS";
             }
             return "SMRT";
         }
 
         @Override
         public String getShortAgencyName () {
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
                 if (sbsBuses.contains(routeString))
                     return "SBS";
                 return "SMRT";
             }
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION) {
-                return "EZ";
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION || mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
+                if (mCardName.equals("EZ-Link")) return "EZ"; else return mCardName;
+            }
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL) {
+                return "POS";
             }
             return "SMRT";
         }
@@ -601,8 +622,11 @@ public class EZLinkTransitData extends TransitData
                 return "Top-up";
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
                 return "First use";
-            else
-                return "(Unknown Route)";
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL)
+                return "Retail Purchase";
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE)
+                return "Service Charge";
+            return "(Unknown Route)";
         }
 
         @Override
@@ -679,12 +703,14 @@ public class EZLinkTransitData extends TransitData
 
         @Override
         public Mode getMode() {
-            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS)
+            if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND)
                 return Mode.BUS;
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
                 return Mode.METRO;
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
                 return Mode.TICKET_MACHINE;
+            else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE)
+                return Mode.POS;
             return Mode.OTHER;
         }
 

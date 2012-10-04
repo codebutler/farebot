@@ -40,6 +40,8 @@ public class CEPASTransaction implements Parcelable
         BUS,
         BUS_REFUND,
         CREATION,
+        RETAIL,
+        SERVICE,
         UNKNOWN,
     }
 
@@ -80,14 +82,18 @@ public class CEPASTransaction implements Parcelable
     public TransactionType getType() {
         if (mType == 48)
             return TransactionType.MRT;
-        if (mType == 117)
+        if (mType == 117 || mType == 3)
         	return TransactionType.TOP_UP;
         if (mType == 49)
             return TransactionType.BUS;
         if (mType == 118)
             return TransactionType.BUS_REFUND;
-        if (mType == -16)
+        if (mType == -16 || mType == 5)
         	return TransactionType.CREATION;
+        if (mType == 4)
+            return TransactionType.SERVICE;
+        if (mType == 1)
+            return TransactionType.RETAIL;
         return TransactionType.UNKNOWN;
     }
 
