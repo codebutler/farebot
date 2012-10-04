@@ -348,6 +348,7 @@ public class EZLinkTransitData extends TransitData
             put("TAS", new MRTStation("Tai Seng",        "CC11",             "TAS", "1.335833", "103.887942"));
             put("BLY", new MRTStation("Bartley",         "CC12",             "BLY", "1.342756", "103.879697"));
             put("SER", new MRTStation("Serangoon",       "CC13 / NE12",      "SER", "1.349944", "103.873092"));
+            put("SRC", new MRTStation("Serangoon",       "CC13 / NE12",      "SER", "1.349944", "103.873092"));
             put("LRC", new MRTStation("Lorong Chuan",    "CC14",             "LRC", "1.351636", "103.864064"));
             put("BSH", new MRTStation("Bishan",          "CC15 / NS17",      "BSH", "1.351236", "103.848456"));
             put("BSC", new MRTStation("Bishan",          "CC15 / NS17",      "BSC", "1.351236", "103.848456")); // Alternate name (Circle line entrance)
