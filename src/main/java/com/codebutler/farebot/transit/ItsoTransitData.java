@@ -1,34 +1,42 @@
 /**
- * 
+ *
  */
 package com.codebutler.farebot.transit;
 
-import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.Card;
-import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.transit.ClipperTransitData.ClipperRefill;
-import com.codebutler.farebot.transit.ClipperTransitData.ClipperTrip;
-
 import android.os.Parcel;
+import com.codebutler.farebot.Utils;
+//import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.mifare.DesfireApplication;
+import com.codebutler.farebot.mifare.DesfireCard;
+import com.codebutler.farebot.mifare.DesfireFile;
 
-/**
- * @author rjmunro
- *
- */
-public class ITSOTransitData extends TransitData {
+import java.text.NumberFormat;
+import java.util.*;
 
-	
-	
-    public static boolean check (Card card)
-    {
-    	// Mifare Desfire
-        if ((card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x1602a0) != null))
-        	return true;
+public class ItsoTransitData extends TransitData {
+	private long mSerialNumber;
 
-        return false;
-    }
+	public static boolean check(Card card) {
+		// Mifare Desfire
+		if ((card instanceof DesfireCard)
+				&& (((DesfireCard) card).getApplication(0x1602a0) != null)) {
 
-	/* (non-Javadoc)
+			/* Need to check IIN is 633597
+			if (ItsoTransitData.bytesToHexString(data, 2, 3) != "633597") {
+			 */
+
+
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
 	 */
 	@Override
@@ -36,54 +44,98 @@ public class ITSOTransitData extends TransitData {
 		// TODO Auto-generated method stub
 
 	}
-	
-    public ITSOTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readLong();
-        mBalance      = (short) parcel.readLong();
-                
-        mTrips = new ClipperTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, ClipperTrip.CREATOR);
-        
-        mRefills = new ClipperRefill[parcel.readInt()];
-        parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
-    }
 
-	
-    public ITSOTransitData(Card card) {
-    	if (card instanceof DesfireCard) {
-            DesfireCard desfireCard = (DesfireCard) card;
+	public ItsoTransitData(Parcel parcel) {
+		/*
+		 * mSerialNumber = parcel.readLong(); mBalance = (short)
+		 * parcel.readLong();
+		 *
+		 * mTrips = new ClipperTrip[parcel.readInt()];
+		 * parcel.readTypedArray(mTrips, ClipperTrip.CREATOR);
+		 *
+		 * mRefills = new ClipperRefill[parcel.readInt()];
+		 * parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
+		 */
+	}
 
-            byte[] data;
+	/**
+	 * Turn bytes into hex string representation. Also useful for decoding BCD
+	 *
+	 * @param bytes
+	 *            The data to convert
+	 * @return The hex representation.
+	 */
+	public static String bytesToHexString(byte[] bytes) {
+		return bytesToHexString(bytes, 0, bytes.length);
+	}
 
-            try {
-                data = desfireCard.getApplication(0x1602a0).getFile(0x08).getData();
-                mSerialNumber = Utils.byteArrayToLong(data, 1, 4);
-            } catch (Exception ex) {
-                throw new RuntimeException("Error parsing Clipper serial", ex);
-            }
+	/**
+	 * Turn bytes into hex string representation. Also useful for decoding BCD
+	 *
+	 * @param b
+	 *            The data to convert
+	 * @param offset
+	 * @param length
+	 * @return
+	 */
+	public static String bytesToHexString(byte[] b, int offset, int length) {
+		if (b.length < length + offset)
+			throw new IllegalArgumentException(
+					"length must be less than or equal to b.length");
 
-            try {
-                data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
-                mBalance = (short) (((0xFF & data[18]) << 8) | (0xFF & data[19]));
-            } catch (Exception ex) {
-                throw new RuntimeException("Error parsing Clipper balance", ex);
-            }
+		StringBuilder sb = new StringBuilder(length * 2);
 
-            try {
-                mTrips = parseTrips(desfireCard);
-            } catch (Exception ex) {
-                throw new RuntimeException("Error parsing Clipper trips", ex);
-            }
+		Formatter formatter = new Formatter(sb);
+		for (int i = 0; i < length; i++) {
+			formatter.format("%02x", b[offset + i]);
+		}
 
-            try {
-                mRefills = parseRefills(desfireCard);
-            } catch (Exception ex) {
-                throw new RuntimeException("Error parsing Clipper refills", ex);
-            }
-    	}
-    }
+		formatter.close();
+		return sb.toString();
+	}
 
-	/* (non-Javadoc)
+	public ItsoTransitData(Card card) {
+		if (card instanceof DesfireCard) {
+			DesfireCard desfireCard = (DesfireCard) card;
+
+			DesfireApplication application = desfireCard
+					.getApplication(0x1602a0);
+
+			// See page 100 of
+			// http://www.itso.org.uk/content/Specification/Spec_v2.1.4/ITSO_TS_1000-10_V2_1_4_2010-02.pdf
+			byte[] directoryBytes = application.getFile(0x00).getData();
+			byte[] logBytes = application.getFile(0x01).getData();
+			byte[] shellBytes = application.getFile(0xf).getData();
+
+			// ISSN = Utils.byteArrayToLong(shellBytes,6,7);
+
+			byte[] data;
+			/*
+			 * try { data =
+			 * desfireCard.getApplication(0x1602a0).getFile(0x08).getData();
+			 * mSerialNumber = Utils.byteArrayToLong(data, 1, 4); } catch
+			 * (Exception ex) { throw new
+			 * RuntimeException("Error parsing Clipper serial", ex); }
+			 *
+			 * try { data =
+			 * desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
+			 * mBalance = (short) (((0xFF & data[18]) << 8) | (0xFF &
+			 * data[19])); } catch (Exception ex) { throw new
+			 * RuntimeException("Error parsing Clipper balance", ex); }
+			 *
+			 * try { mTrips = parseTrips(desfireCard); } catch (Exception ex) {
+			 * throw new RuntimeException("Error parsing Clipper trips", ex); }
+			 *
+			 * try { mRefills = parseRefills(desfireCard); } catch (Exception
+			 * ex) { throw new RuntimeException("Error parsing Clipper refills",
+			 * ex); }
+			 */
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see com.codebutler.farebot.transit.TransitData#getBalanceString()
 	 */
 	@Override
@@ -92,16 +144,19 @@ public class ITSOTransitData extends TransitData {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see com.codebutler.farebot.transit.TransitData#getSerialNumber()
 	 */
 	@Override
 	public String getSerialNumber() {
-		// TODO Auto-generated method stub
-		return null;
+		return Long.toString(mSerialNumber);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see com.codebutler.farebot.transit.TransitData#getTrips()
 	 */
 	@Override
@@ -110,7 +165,9 @@ public class ITSOTransitData extends TransitData {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see com.codebutler.farebot.transit.TransitData#getRefills()
 	 */
 	@Override
@@ -119,13 +176,32 @@ public class ITSOTransitData extends TransitData {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see com.codebutler.farebot.transit.TransitData#getCardName()
 	 */
 	@Override
 	public String getCardName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "ITSO";
+	}
+
+	public static TransitIdentity parseTransitIdentity(Card card) {
+		try {
+
+			byte[] data = ((DesfireCard) card).getApplication(0x1602a0)
+					.getFile(0x0f).getData();
+
+			return new TransitIdentity("ITSO",
+					ItsoTransitData.bytesToHexString(data, 5, 2)
+							+ " "
+							+ ItsoTransitData.bytesToHexString(data, 7, 2)
+							+ " "
+							+ ItsoTransitData.bytesToHexString(data, 9, 2));
+		} catch (Exception ex) {
+			throw new RuntimeException("Error parsing ITSO serial", ex);
+		}
 	}
 
 }

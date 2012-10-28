@@ -36,6 +36,7 @@ import com.codebutler.farebot.fragments.DesfireCardRawDataFragment;
 import com.codebutler.farebot.transit.ClipperTransitData;
 import com.codebutler.farebot.transit.HSLTransitData;
 import com.codebutler.farebot.transit.OrcaTransitData;
+import com.codebutler.farebot.transit.ItsoTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import org.w3c.dom.Document;
@@ -122,6 +123,8 @@ public class DesfireCard extends Card {
             return ClipperTransitData.parseTransitIdentity(this);
         if (HSLTransitData.check(this))
             return HSLTransitData.parseTransitIdentity(this);
+        if (ItsoTransitData.check(this))
+            return ItsoTransitData.parseTransitIdentity(this);
         return null;
     }
     
@@ -133,6 +136,8 @@ public class DesfireCard extends Card {
             return new ClipperTransitData(this);
         if (HSLTransitData.check(this))
             return new HSLTransitData(this);
+        if (ItsoTransitData.check(this))
+            return new ItsoTransitData(this);
         return null;
     }
 
