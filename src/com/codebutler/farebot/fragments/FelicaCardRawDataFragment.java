@@ -30,19 +30,26 @@ import android.text.ClipboardManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.codebutler.farebot.CardRawDataFragmentClass;
 import com.codebutler.farebot.ExpandableListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
-import com.codebutler.farebot.felica.FelicaBlock;
-import com.codebutler.farebot.felica.FelicaCard;
-import com.codebutler.farebot.felica.FelicaService;
-import com.codebutler.farebot.felica.FelicaSystem;
+import com.codebutler.farebot.card.felica.FelicaBlock;
+import com.codebutler.farebot.card.felica.FelicaCard;
+import com.codebutler.farebot.card.felica.FelicaService;
+import com.codebutler.farebot.card.felica.FelicaSystem;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@CardRawDataFragmentClass(FelicaCardRawDataFragment.class)
 public class FelicaCardRawDataFragment extends ExpandableListFragment {
     private FelicaCard mCard;
 
@@ -72,6 +79,7 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
             .setPositiveButton(android.R.string.ok, null)
             .setAdapter(adapter, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialogInterface, int position) {
+                    @SuppressWarnings("deprecation")
                     ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
                     clipboard.setText(adapter.getItem(position));
                     Toast.makeText(getActivity(), "Copied!" , 5).show();

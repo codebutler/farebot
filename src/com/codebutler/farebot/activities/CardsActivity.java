@@ -22,25 +22,12 @@
 
 package com.codebutler.farebot.activities;
 
-import android.content.Intent;
 import android.support.v4.app.Fragment;
-import com.actionbarsherlock.view.MenuItem;
 import com.codebutler.farebot.fragments.CardsFragment;
 
 public class CardsActivity extends FragmentWrapperActivity {
     @Override
     protected Fragment createFragment() {
         return new CardsFragment();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            return true;
-        }
-        return false;
     }
 }

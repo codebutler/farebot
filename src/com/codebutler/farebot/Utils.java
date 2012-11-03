@@ -25,9 +25,12 @@ package com.codebutler.farebot;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.WindowManager;
 import org.w3c.dom.Node;
@@ -42,8 +45,28 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import java.util.List;
 
-public class Utils
-{
+public class Utils {
+    public static void checkNfcEnabled(final Activity activity, NfcAdapter adapter) {
+        if (adapter.isEnabled()) {
+            return;
+        }
+        new AlertDialog.Builder(activity)
+            .setTitle(R.string.nfc_off_error)
+            .setMessage(R.string.turn_on_nfc)
+            .setCancelable(true)
+            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            })
+            .setNeutralButton(R.string.wireless_settings, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    activity.startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+                }
+            })
+            .show();
+    }
+
     public static void showError (final Activity activity, Exception ex)
     {
         Log.e(activity.getClass().getName(), ex.getMessage(), ex);
@@ -223,4 +246,35 @@ public class Utils
     public static interface Matcher<T> {
         public boolean matches(T t);
     }
+
+	public static int convertBCDtoInteger(byte data) {
+		return (((data & (char)0xF0) >> 4) * 10) + ((data & (char)0x0F));
+	}
+
+	public static int getBitsFromInteger(int buffer, int iStartBit, int iLength) {
+		return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
+	}
+
+	/* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
+	public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
+		int iEndBit = iStartBit + iLength - 1;
+		int iSByte = iStartBit / 8;
+		int iSBit = iStartBit % 8;
+		int iEByte = iEndBit / 8;
+		int iEBit = iEndBit % 8;
+
+		if (iSByte == iEByte) {
+			return (int)(((char)buffer[iEByte] >> (7 - iEBit)) & ((char)0xFF >> (8 - iLength)));
+		} else {
+			int uRet = (((char)buffer[iSByte] & (char)((char)0xFF >> iSBit)) << (((iEByte - iSByte - 1) * 8) + (iEBit + 1)));
+
+			for (int i = iSByte + 1; i < iEByte; i++) {
+				uRet |= (((char)buffer[i] & (char)0xFF) << (((iEByte - i - 1) * 8) + (iEBit + 1)));
+			}
+
+			uRet |= (((char)buffer[iEByte] & (char)0xFF)) >> (7 - iEBit);
+
+			return uRet;
+		}
+	}
 }

@@ -2,7 +2,7 @@
 <!--
   AndroidManifest.xml
 
-  Copyright (C) 2011 Eric Butler
+  Copyright (C) 2011-2012 Eric Butler
 
   Authors:
   Eric Butler <eric@codebutler.com>
@@ -24,8 +24,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codebutler.farebot"
-    android:versionCode="13"
-    android:versionName="2.2.1">
+    android:versionCode="14"
+    android:versionName="2.2.2">
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="14" />
@@ -100,8 +100,26 @@
             android:name=".activities.CardsActivity"
             android:label="@string/scanned_cards"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.KeysActivity"
+            android:label="@string/keys" />
+        <activity
+            android:name=".activities.AddKeyActivity"
+            android:label="@string/add_key"
+            android:theme="@style/Theme.Sherlock.Dialog">
+            <intent-filter android:priority="1">
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.VIEW"/>
+                <data android:scheme="file" android:pathPattern=".*\\.farebotkeys" android:mimeType="application/octet-stream"/>
+                <data android:scheme="content" android:pathPattern=".*\\.farebotkeys" android:mimeType="application/octet-stream"/>
+            </intent-filter>
+        </activity>
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"
             android:authorities="com.codebutler.farebot.cardprovider" />
+        <provider
+            android:name="com.codebutler.farebot.provider.CardKeyProvider"
+            android:authorities="com.codebutler.farebot.keyprovider" />
     </application>
 </manifest>

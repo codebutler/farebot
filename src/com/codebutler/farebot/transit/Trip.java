@@ -31,6 +31,7 @@ import java.util.List;
 public abstract class Trip implements Parcelable
 {
     public abstract long getTimestamp();
+    public abstract long getExitTimestamp();
     public abstract String getRouteName ();
     public abstract String getAgencyName ();
     public abstract String getShortAgencyName ();
@@ -42,6 +43,7 @@ public abstract class Trip implements Parcelable
     public abstract Station getEndStation ();
     public abstract double getFare ();
     public abstract Mode getMode();
+    public abstract boolean hasTime();
 
     public static boolean hasLocation(Station station) {
         return ((station != null) && ((station.getLatitude() != null) || station.getLongitude() != null));

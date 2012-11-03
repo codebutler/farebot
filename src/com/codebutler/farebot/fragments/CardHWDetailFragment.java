@@ -22,24 +22,19 @@
 
 package com.codebutler.farebot.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.codebutler.farebot.R;
+import com.codebutler.farebot.HeaderListItem;
+import com.codebutler.farebot.ListItem;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
-import com.codebutler.farebot.cepas.CEPASCard;
-import com.codebutler.farebot.cepas.CEPASPurse;
-import com.codebutler.farebot.felica.FelicaCard;
-import com.codebutler.farebot.mifare.Card;
-import com.codebutler.farebot.mifare.Card.CardType;
-import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.DesfireManufacturingData;
+import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.Card.CardType;
+import com.codebutler.farebot.card.cepas.CEPASCard;
+import com.codebutler.farebot.card.cepas.CEPASPurse;
+import com.codebutler.farebot.card.desfire.DesfireCard;
+import com.codebutler.farebot.card.desfire.DesfireManufacturingData;
+import com.codebutler.farebot.card.felica.FelicaCard;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -120,61 +115,6 @@ public class CardHWDetailFragment extends SherlockListFragment
             items.add(new ListItem("PMm", Utils.getHexString(card.getPMm().getBytes(), "err")));
         }
 
-        setListAdapter(new HWDetailListAdapter(getActivity(), items));
-    }
-
-    private class HWDetailListAdapter extends ArrayAdapter<ListItem> {
-        private HWDetailListAdapter (Context context, List<ListItem> items)
-        {
-            super(context, 0, items);
-        }
-
-        @Override
-        public View getView (int position, View convertView, ViewGroup parent)
-        {
-            ListItem item = (ListItem) getListAdapter().getItem(position);
-            if (convertView != null) {
-                Log.i("CardHWDetailFragment", "ID: " + convertView.getId());
-            }
-            if (item instanceof HeaderListItem) {
-                if (convertView == null || convertView.getId() != android.R.id.text1)
-                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_header, null);
-                ((TextView) convertView.findViewById(android.R.id.text1)).setText(item.getText1());
-            } else {
-                if (convertView == null || convertView.getId() == android.R.id.text1)
-                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_list_item_2, null);
-                ((TextView) convertView.findViewById(android.R.id.text1)).setText(item.getText1());
-                ((TextView) convertView.findViewById(android.R.id.text2)).setText(item.getText2());
-            }
-            return convertView;
-        }
-    }
-
-    private class ListItem
-    {
-        protected final String mText1;
-        protected final String mText2;
-
-        public ListItem (String name, String value)
-        {
-            mText1 = name;
-            mText2 = value;
-        }
-
-        public String getText1 () {
-            return mText1;
-        }
-
-        public String getText2 () {
-            return mText2;
-        }
-    }
-
-    private class HeaderListItem extends ListItem
-    {
-        public HeaderListItem (String title)
-        {
-            super(title, null);
-        }
+        setListAdapter(new ListItemAdapter(getActivity(), items));
     }
 }

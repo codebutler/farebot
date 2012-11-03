@@ -33,7 +33,6 @@ public class TransitIdentity {
     }
 
     public String getName() {
-
         return mName;
     }
 

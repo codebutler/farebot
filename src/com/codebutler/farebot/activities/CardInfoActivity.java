@@ -43,9 +43,11 @@ import com.codebutler.farebot.TabPagerAdapter;
 import com.codebutler.farebot.UnsupportedCardException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.fragments.CardBalanceFragment;
+import com.codebutler.farebot.fragments.CardInfoFragment;
 import com.codebutler.farebot.fragments.CardRefillsFragment;
+import com.codebutler.farebot.fragments.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragments.CardTripsFragment;
-import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
@@ -144,6 +146,14 @@ public class CardInfoActivity extends SherlockFragmentActivity {
 
                 if (mTransitData.getRefills() != null) {
                     mTabsAdapter.addTab(actionBar.newTab().setText(R.string.refills), CardRefillsFragment.class, args);
+                }
+
+                if (mTransitData.getSubscriptions() != null) {
+                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.subscriptions), CardSubscriptionsFragment.class, args);
+                }
+
+                if (mTransitData.getInfo() != null) {
+                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.info), CardInfoFragment.class, args);
                 }
                 
                 if (mTabsAdapter.getCount() > 1) {

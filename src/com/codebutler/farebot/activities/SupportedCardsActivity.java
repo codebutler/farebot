@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -62,12 +63,13 @@ public class SupportedCardsActivity extends SherlockActivity {
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
         public CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
-            add(new CardInfo(R.drawable.orca_card,    "ORCA",    context.getString(R.string.location_seattle)));
-            add(new CardInfo(R.drawable.clipper_card, "Clipper", context.getString(R.string.location_san_francisco)));
-            add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link", context.getString(R.string.location_singapore)));
-            add(new CardInfo(R.drawable.suica_card,   "Suica",   context.getString(R.string.location_tokyo)));
-            add(new CardInfo(R.drawable.pasmo_card,   "PASMO",   context.getString(R.string.location_tokyo)));
-            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   context.getString(R.string.location_kansai)));
+            add(new CardInfo(R.drawable.orca_card,    "ORCA",         R.string.location_seattle));
+            add(new CardInfo(R.drawable.clipper_card, "Clipper",      R.string.location_san_francisco));
+            add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link",      R.string.location_singapore, R.string.card_note_ezlink));
+            add(new CardInfo(R.drawable.suica_card,   "Suica",        R.string.location_tokyo));
+            add(new CardInfo(R.drawable.pasmo_card,   "PASMO",        R.string.location_tokyo));
+            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",        R.string.location_kansai));
+            add(new CardInfo(R.drawable.ovchip_card,  "OV-chipkaart", R.string.location_the_netherlands, R.string.card_note_ovchip));
         }
         
         @Override
@@ -77,85 +79,34 @@ public class SupportedCardsActivity extends SherlockActivity {
             }
 
             CardInfo info = getItem(position);
+            Spanned text = Html.fromHtml(String.format("<b>%s</b><br>%s", info.getName(), getString(info.getLocationId())));
+
             ((ImageView) convertView.findViewById(R.id.image)).setImageResource(info.getImageId());
-            ((TextView)  convertView.findViewById(R.id.text)).setText(Html.fromHtml(String.format("<b>%s</b><br>%s", info.getName(), info.getLocation())));
+            ((TextView)  convertView.findViewById(R.id.text)).setText(text);
+
+            if (info.getNoteId() >= 0) {
+                ((TextView) convertView.findViewById(R.id.note)).setText(info.getNoteId());
+            }
             
             return convertView;
         }
     }
 
-    /*
-        private class CardsAdapter extends PagerAdapter {
-        private List<CardInfo> mCards = new ArrayList<CardInfo>();
-
-        public CardsAdapter() {
-            super();
-            mCards.add(new CardInfo(R.drawable.orca_card,    "ORCA",    "Seattle, WA"));
-            mCards.add(new CardInfo(R.drawable.clipper_card, "Clipper", "San Francisco, CA"));
-            mCards.add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link", "Singapore"));
-            mCards.add(new CardInfo(R.drawable.suica_card,   "Suica",   "Tokyo, Japan"));
-            mCards.add(new CardInfo(R.drawable.icoca_card,   "ICOCA",   "Kansai, Japan"));
-            mCards.add(new CardInfo(R.drawable.pasmo_card,   "PASMO",   "Tokyo, Japan"));
-        }
-
-        @Override
-        public int getCount() {
-            return mCards.size();
-        }
-
-        @Override
-        public Object instantiateItem(View collection, int position) {
-            View view = getLayoutInflater().inflate(R.layout.supported_card, null);
-
-            CardInfo info = mCards.get(position);
-            ((ImageView) view.findViewById(R.id.image)).setImageResource(info.getImageId());
-            ((TextView)  view.findViewById(R.id.text)).setText(Html.fromHtml(String.format("<b>%s</b><br>%s", info.getName(), info.getLocation())));
-
-            view.setBackgroundColor(Color.BLUE);
-
-            ((ViewPager) collection).addView(view);
-
-            return view;
-        }
-
-        @Override
-        public void destroyItem(View collection, int position, Object view) {
-            ((ViewPager) collection).removeView((View) view);
-        }
-
-        @Override
-        public void startUpdate(View collection) {
-        }
-
-        @Override
-        public void finishUpdate(View collection) {
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return (view == object);
-        }
-
-        @Override
-        public Parcelable saveState() {
-            return null;
-        }
-
-        @Override
-        public void restoreState(Parcelable parcelable, ClassLoader classLoader) {
-        }
-    }
-     */
-
     private static class CardInfo {
         private final int mImageId;
         private final String mName;
-        private final String mLocation;
+        private final int mLocationId;
+        private final int mNoteId;
 
-        private CardInfo(int imageId, String name, String location) {
-            mImageId  = imageId;
-            mName     = name;
-            mLocation = location;
+        private CardInfo(int imageId, String name, int locationId) {
+            this(imageId, name, locationId, -1);
+        }
+
+        private CardInfo(int imageId, String name, int locationId, int noteId) {
+            mImageId    = imageId;
+            mName       = name;
+            mLocationId = locationId;
+            mNoteId     = noteId;
         }
 
         public int getImageId() {
@@ -166,8 +117,12 @@ public class SupportedCardsActivity extends SherlockActivity {
             return mName;
         }
 
-        public String getLocation() {
-            return mLocation;
+        public int getLocationId() {
+            return mLocationId;
+        }
+
+        public int getNoteId() {
+            return mNoteId;
         }
     }
 }

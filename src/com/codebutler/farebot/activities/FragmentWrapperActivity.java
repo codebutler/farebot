@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -49,6 +50,17 @@ public abstract class FragmentWrapperActivity extends SherlockFragmentActivity {
             transaction.add(R.id.content, createFragment(), "fragment");
             transaction.commit();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            return true;
+        }
+        return false;
     }
 
     protected abstract Fragment createFragment();

@@ -27,10 +27,13 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
+import com.codebutler.farebot.FareBotApplication;
+import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.Card;
-import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.DesfireFile;
+import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.desfire.DesfireCard;
+import com.codebutler.farebot.card.desfire.DesfireFile;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -104,6 +107,7 @@ public class ClipperTransitData extends TransitData
             put((long)0x1b, new Station("El Cerrito Del Norte Station",              "El Cerrito Del Norte", "37.925651", "-122.317219"));
             put((long)0x1c, new Station("Richmond Station",                          "Richmond",             "37.93730",  "-122.35338"));
             put((long)0x1d, new Station("Lake Merritt Station",                      "Lake Merritt",         "37.79761",  "-122.26564"));
+            // 0x1f". Oakland Coliseum Bart  --- https://twitter.com/mlroach/status/258253918134476800
             put((long)0x22, new Station("Hayward Station",                           "Hayward",              "37.670387", "-122.088002"));
             put((long)0x23, new Station("South Hayward Station",                     "South Hayward",        "37.634800", "-122.057551"));
             put((long)0x24, new Station("Union City Station",                        "Union City",           "37.591203", "-122.017854"));
@@ -224,6 +228,16 @@ public class ClipperTransitData extends TransitData
 
     public ClipperRefill[] getRefills () {
         return mRefills;
+    }
+
+    @Override
+    public Subscription[] getSubscriptions() {
+        return null;
+    }
+
+    @Override
+    public List<ListItem> getInfo() {
+        return null;
     }
 
     private ClipperTrip[] parseTrips (DesfireCard card)
@@ -354,19 +368,18 @@ public class ClipperTransitData extends TransitData
         }
     }
 
-    public static String getAgencyName(int agency)
-    {
+    public static String getAgencyName(int agency) {
         if (sAgencies.containsKey(agency)) {
             return sAgencies.get(agency);
         }
-        return "Unknown Agency (0x" + Long.toString(agency, 16) + ")";
+        return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
     public static String getShortAgencyName (int agency) {
         if (sShortAgencies.containsKey(agency)) {
             return sShortAgencies.get(agency);
         }
-        return "UNK(0x" + Long.toString(agency, 16) + ")";
+        return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
     public void writeToParcel(Parcel parcel, int flags) {
@@ -430,6 +443,7 @@ public class ClipperTransitData extends TransitData
             return mTimestamp;
         }
 
+        @Override
         public long getExitTimestamp () {
             return mExitTimestamp;
         }
@@ -555,6 +569,11 @@ public class ClipperTransitData extends TransitData
             if (mAgency == AGENCY_FERRY)
                 return Mode.FERRY;
             return Mode.OTHER;
+        }
+
+        @Override
+        public boolean hasTime() {
+            return true;
         }
 
         public void writeToParcel(Parcel parcel, int flags) {

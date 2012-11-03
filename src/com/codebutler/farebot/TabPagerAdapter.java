@@ -74,10 +74,12 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void startUpdate(View view) {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Object instantiateItem(View view, int position) {
         TabInfo info = mTabs.get(position);
 
@@ -91,6 +93,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void destroyItem(View view, int i, Object object) {
         if (mCurTransaction == null) {
             mCurTransaction = mActivity.getSupportFragmentManager().beginTransaction();
@@ -99,6 +102,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void finishUpdate(View view) {
         if (mCurTransaction != null) {
             mCurTransaction.commitAllowingStateLoss();

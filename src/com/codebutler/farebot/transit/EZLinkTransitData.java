@@ -23,10 +23,11 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
+import com.codebutler.farebot.ListItem;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.cepas.CEPASCard;
-import com.codebutler.farebot.cepas.CEPASTransaction;
-import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.card.cepas.CEPASCard;
+import com.codebutler.farebot.card.cepas.CEPASTransaction;
+import com.codebutler.farebot.card.Card;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -508,6 +509,16 @@ public class EZLinkTransitData extends TransitData
         return null;
     }
 
+    @Override
+    public Subscription[] getSubscriptions() {
+        return null;
+    }
+
+    @Override
+    public List<ListItem> getInfo() {
+        return null;
+    }
+
     private EZLinkTrip[] parseTrips (CEPASCard card)
     {
         CEPASTransaction[] transactions = card.getHistory(3).getTransactions();
@@ -556,6 +567,11 @@ public class EZLinkTransitData extends TransitData
         @Override
         public long getTimestamp() {
             return mTransaction.getTimestamp();
+        }
+
+        @Override
+        public long getExitTimestamp() {
+            return 0;
         }
 
         @Override
@@ -686,6 +702,11 @@ public class EZLinkTransitData extends TransitData
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
                 return Mode.TICKET_MACHINE;
             return Mode.OTHER;
+        }
+
+        @Override
+        public boolean hasTime() {
+            return true;
         }
 
         public void writeToParcel(Parcel parcel, int flags) {

@@ -49,7 +49,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.codebutler.farebot.ExportHelper;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
@@ -104,7 +104,7 @@ public class CardsFragment extends SherlockListFragment {
 
         registerForContextMenu(getListView());
 
-        getListView().setAdapter(new CardsAdapter());
+        setListAdapter(new CardsAdapter());
         getLoaderManager().initLoader(0, null, mLoaderCallbacks);
     }
 
@@ -140,6 +140,7 @@ public class CardsFragment extends SherlockListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
        try {
            if (item.getItemId() == R.id.import_clipboard) {
+               @SuppressWarnings("deprecation")
                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
                onCardsImported(ExportHelper.importCardsXml(getActivity(), clipboard.getText().toString()));
                return true;
@@ -158,6 +159,7 @@ public class CardsFragment extends SherlockListFragment {
                return true;
 
            } else if (item.getItemId() == R.id.copy_xml) {
+               @SuppressWarnings("deprecation")
                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
                clipboard.setText(ExportHelper.exportCardsXml(getActivity()));
                Toast.makeText(getActivity(), "Copied to clipboard.", 5).show();
@@ -208,7 +210,7 @@ public class CardsFragment extends SherlockListFragment {
 
     private class CardsAdapter extends ResourceCursorAdapter {
        public CardsAdapter() {
-           super(getActivity(), android.R.layout.simple_list_item_2, null);
+           super(getActivity(), android.R.layout.simple_list_item_2, null, false);
        }
 
        @Override

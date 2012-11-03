@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
@@ -35,11 +34,11 @@ import com.codebutler.farebot.ExpandableListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
-import com.codebutler.farebot.mifare.DesfireApplication;
-import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.DesfireFile;
-import com.codebutler.farebot.mifare.DesfireFileSettings.RecordDesfireFileSettings;
-import com.codebutler.farebot.mifare.DesfireFileSettings.StandardDesfireFileSettings;
+import com.codebutler.farebot.card.desfire.DesfireApplication;
+import com.codebutler.farebot.card.desfire.DesfireCard;
+import com.codebutler.farebot.card.desfire.DesfireFile;
+import com.codebutler.farebot.card.desfire.DesfireFileSettings.RecordDesfireFileSettings;
+import com.codebutler.farebot.card.desfire.DesfireFileSettings.StandardDesfireFileSettings;
 
 public class DesfireCardRawDataFragment extends ExpandableListFragment
 {
@@ -88,10 +87,7 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment
 
             public View getGroupView (int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_1, null);
-
-                    // FIXME: WTF!!
-                    convertView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.FILL_PARENT, 80));
+                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
                 }
 
                 TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
@@ -105,8 +101,7 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment
 
             public View getChildView (int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_2, null);
-                    convertView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.FILL_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
+                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
                 }
 
                 TextView textView1 = (TextView) convertView.findViewById(android.R.id.text1);

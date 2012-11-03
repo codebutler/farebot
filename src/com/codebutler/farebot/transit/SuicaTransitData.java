@@ -38,10 +38,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.util.Log;
 import com.codebutler.farebot.FareBotApplication;
+import com.codebutler.farebot.ListItem;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.felica.FelicaBlock;
-import com.codebutler.farebot.felica.FelicaCard;
-import com.codebutler.farebot.felica.FelicaService;
+import com.codebutler.farebot.card.felica.FelicaBlock;
+import com.codebutler.farebot.card.felica.FelicaCard;
+import com.codebutler.farebot.card.felica.FelicaService;
 import net.kazzz.felica.lib.FeliCaLib;
 import net.kazzz.felica.lib.Util;
 import org.apache.commons.lang.ArrayUtils;
@@ -49,7 +50,7 @@ import org.apache.commons.lang.ArrayUtils;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static com.codebutler.farebot.felica.DBUtil.*;
+import static com.codebutler.farebot.card.felica.DBUtil.*;
 
 public class SuicaTransitData extends TransitData {
     private SuicaTrip[] mTrips;
@@ -125,6 +126,16 @@ public class SuicaTransitData extends TransitData {
 
     @Override
     public Refill[] getRefills() {
+        return null;
+    }
+
+    @Override
+    public Subscription[] getSubscriptions() {
+        return null;
+    }
+
+    @Override
+    public List<ListItem> getInfo() {
         return null;
     }
 
@@ -272,6 +283,11 @@ public class SuicaTransitData extends TransitData {
                 return mTimestamp.getTime() / 1000;
             else
                 return 0;
+        }
+
+        @Override
+        public long getExitTimestamp() {
+            return 0;
         }
 
         public boolean hasTime() {

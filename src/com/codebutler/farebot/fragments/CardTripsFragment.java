@@ -39,9 +39,8 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.activities.TripMapActivity;
-import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.transit.OrcaTransitData;
-import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
 import org.apache.commons.lang.StringUtils;
@@ -98,12 +97,10 @@ public class CardTripsFragment extends SherlockListFragment {
             LayoutInflater inflater = activity.getLayoutInflater();
 
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.trip_item, null);
+                convertView = inflater.inflate(R.layout.trip_item, parent, false);
             }
 
             Trip trip = getItem(position);
-            
-            boolean hasTime = (!(trip instanceof SuicaTransitData.SuicaTrip) || ((SuicaTransitData.SuicaTrip)trip).hasTime());
 
             Date date = new Date(trip.getTimestamp() * 1000);
 
@@ -143,7 +140,7 @@ public class CardTripsFragment extends SherlockListFragment {
                 iconImageView.setImageResource(R.drawable.unknown);
             }
 
-            if (hasTime) {
+            if (trip.hasTime()) {
                 timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
                 timeTextView.setVisibility(View.VISIBLE);
             } else {
@@ -178,6 +175,12 @@ public class CardTripsFragment extends SherlockListFragment {
             }
 
             return convertView;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            Trip trip = getItem(position);
+            return Trip.hasLocation(trip.getStartStation()) || Trip.hasLocation(trip.getEndStation());
         }
 
         private boolean isFirstInSection(int position) {

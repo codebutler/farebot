@@ -117,4 +117,24 @@
     <string name="location_singapore">Singapore</string>
     <string name="location_tokyo">Tokyo, Japan</string>
     <string name="location_kansai">Kansai, Japan</string>
+    <string name="location_the_netherlands">The Netherlands</string>
+    <string name="block_title_format">Block: %s</string>
+    <string name="sector_title_format">Sector: 0x%s</string>
+    <string name="unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>
+
+    <string name="subscriptions">Subscriptions</string>
+    <string name="info">Info</string>
+    <string name="valid_format">Valid %1$s to %2$s</string>
+    <string name="card_note_ezlink">Not compatible with all devices.</string>
+    <string name="card_note_ovchip">Requires encryption keys.</string>
+    <string name="unknown_format">Unknown (%s)</string>
+    <string name="keys_required">Encryption keys are required to read this card.</string>
+    <string name="load_keys">Load Keys</string>
+    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
+    <string name="add_key">Add Key</string>
+    <string name="error">Error</string>
+    <string name="keys">Keys</string>
+    <string name="delete">Delete</string>
+    <string name="add_key_directions">Save your keys binary dump file with a .farebotkeys extension, email the dump file as an attachment to yourself, and open it on this device.</string>
+    <string name="no_keys">No keys.</string>
 </resources>

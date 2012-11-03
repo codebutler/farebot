@@ -1,3 +1,25 @@
+/*
+ * ExpandableListFragment.java
+ *
+ * Copyright (C) 2012 Eric Butler
+ *
+ * Authors:
+ * Eric Butler <eric@codebutler.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.codebutler.farebot;
 
 // From http://stackoverflow.com/questions/6051050/expandablelistfragment-with-loadermanager-for-compatibility-package
@@ -78,7 +100,7 @@ public class ExpandableListFragment extends SherlockFragment
         root.addView(tv, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
-        ListView lv = new ListView(getActivity());
+        ListView lv = new ExpandableListView(getActivity());
         lv.setId(android.R.id.list);
         lv.setDrawSelectorOnTop(false);
         root.addView(lv, new FrameLayout.LayoutParams(

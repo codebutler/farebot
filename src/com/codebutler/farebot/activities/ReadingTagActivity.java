@@ -32,12 +32,11 @@ import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.UnsupportedTagException;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.Card;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 
