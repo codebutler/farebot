@@ -36,8 +36,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 public class ExpandableListFragment extends SherlockFragment
     implements OnCreateContextMenuListener,
     ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener,
-    ExpandableListView.OnGroupExpandListener
-    {
+    ExpandableListView.OnGroupExpandListener {
 
     static final int INTERNAL_EMPTY_ID = 0x00ff0001;
 

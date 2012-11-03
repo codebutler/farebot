@@ -38,10 +38,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 
-public class ExportHelper
-{
-    public static String exportCardsXml (Context context) throws Exception
-    {
+public class ExportHelper {
+    public static String exportCardsXml (Context context) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
         // http://code.google.com/p/android/issues/detail?id=2735
@@ -69,8 +67,7 @@ public class ExportHelper
         return Utils.xmlNodeToString(exportDoc);
     }
 
-    public static Uri[] importCardsXml (Context context, String xml) throws Exception
-    {
+    public static Uri[] importCardsXml (Context context, String xml) throws Exception {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = builder.parse(new InputSource(new StringReader(xml)));
 
@@ -87,8 +84,7 @@ public class ExportHelper
         return results;
     }
 
-    private static Uri importCard (Context context, Element cardElement) throws Exception
-    {
+    private static Uri importCard (Context context, Element cardElement) throws Exception {
         String xml = Utils.xmlNodeToString(cardElement);
 
         ContentValues values = new ContentValues();

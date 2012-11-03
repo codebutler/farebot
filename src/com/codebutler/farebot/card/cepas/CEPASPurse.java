@@ -28,54 +28,51 @@ import com.codebutler.farebot.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class CEPASPurse implements Parcelable
-{
-    private final int     		    mId;
-    private final byte 				mCepasVersion;
-    private final byte 				mPurseStatus;
-    private final int 				mPurseBalance;
-    private final int 				mAutoLoadAmount;
-    private final byte[] 			mCAN;
-    private final byte[] 			mCSN;
-    private final int				mPurseExpiryDate;
-    private final int				mPurseCreationDate;
-    private final int 				mLastCreditTransactionTRP;
-    private final byte[] 			mLastCreditTransactionHeader;
-    private final byte 				mLogfileRecordCount;
-    private final int				mIssuerDataLength;
-    private final int 				mLastTransactionTRP;
-    private final CEPASTransaction 	mLastTransactionRecord;
-    private final byte[] 			mIssuerSpecificData;
-    private final byte 				mLastTransactionDebitOptionsByte;
+public class CEPASPurse implements Parcelable {
+    private final int              mId;
+    private final byte             mCepasVersion;
+    private final byte             mPurseStatus;
+    private final int              mPurseBalance;
+    private final int              mAutoLoadAmount;
+    private final byte[]           mCAN;
+    private final byte[]           mCSN;
+    private final int              mPurseExpiryDate;
+    private final int              mPurseCreationDate;
+    private final int              mLastCreditTransactionTRP;
+    private final byte[]           mLastCreditTransactionHeader;
+    private final byte             mLogfileRecordCount;
+    private final int              mIssuerDataLength;
+    private final int              mLastTransactionTRP;
+    private final CEPASTransaction mLastTransactionRecord;
+    private final byte[]           mIssuerSpecificData;
+    private final byte             mLastTransactionDebitOptionsByte;
 
-    private final boolean			mIsValid;
-    private final String			mErrorMessage;
+    private final boolean          mIsValid;
+    private final String           mErrorMessage;
 
-    public static CEPASPurse create (int purseId, byte[] purseData)
-    {
+    public static CEPASPurse create (int purseId, byte[] purseData) {
         return new CEPASPurse(purseId, purseData);
     }
 
     public CEPASPurse(
-        int     		 id,
-        byte 			 cepasVersion,
-        byte 			 purseStatus,
-        int 			 purseBalance,
-        int 			 autoLoadAmount,
-        byte[] 			 CAN,
-        byte[] 			 CSN,
-        int				 purseExpiryDate,
-        int				 purseCreationDate,
-        int 			 lastCreditTransactionTRP,
-        byte[] 			 lastCreditTransactionHeader,
-        byte 			 logfileRecordCount,
-        int				 issuerDataLength,
-        int 			 lastTransactionTRP,
+        int              id,
+        byte             cepasVersion,
+        byte             purseStatus,
+        int              purseBalance,
+        int              autoLoadAmount,
+        byte[]           CAN,
+        byte[]           CSN,
+        int              purseExpiryDate,
+        int              purseCreationDate,
+        int              lastCreditTransactionTRP,
+        byte[]           lastCreditTransactionHeader,
+        byte             logfileRecordCount,
+        int              issuerDataLength,
+        int              lastTransactionTRP,
         CEPASTransaction lastTransactionRecord,
-        byte[] 			 issuerSpecificData,
-        byte 			 lastTransactionDebitOptionsByte
-    )
-    {
+        byte[]           issuerSpecificData,
+        byte             lastTransactionDebitOptionsByte
+    ) {
         mId = id;
         mCepasVersion = cepasVersion;
         mPurseStatus = purseStatus;
@@ -97,8 +94,7 @@ public class CEPASPurse implements Parcelable
         mErrorMessage = "";
     }
 
-    public CEPASPurse (int purseId, String errorMessage)
-    {
+    public CEPASPurse (int purseId, String errorMessage) {
         mId = purseId;
         mCepasVersion = 0;
         mPurseStatus = 0;
@@ -120,8 +116,7 @@ public class CEPASPurse implements Parcelable
         mErrorMessage = errorMessage;
     }
 
-    public CEPASPurse (int purseId, byte[] purseData)
-    {
+    public CEPASPurse (int purseId, byte[] purseData) {
         int tmp;
         if (purseData == null) {
             purseData = new byte[128];
@@ -177,8 +172,7 @@ public class CEPASPurse implements Parcelable
         mLastTransactionTRP = ((0xff000000 & (purseData[42] << 24))
                              | (0x00ff0000 & (purseData[43] << 16))
                              | (0x0000ff00 & (purseData[44] << 8))
-                             | (0x000000ff & (purseData[45] << 0)));
-        {
+                             | (0x000000ff & (purseData[45] << 0))); {
             byte[] tmpTransaction = new byte[16];
             for (int i = 0; i < tmpTransaction.length; i++)
                 tmpTransaction[i] = purseData[46+i];
@@ -270,23 +264,23 @@ public class CEPASPurse implements Parcelable
 
     public static final Parcelable.Creator<CEPASPurse> CREATOR = new Parcelable.Creator<CEPASPurse>() {
         public CEPASPurse createFromParcel(Parcel source) {
-            int purseId = source.readInt();
-            byte 			 cepasVersion;
-            byte 			 purseStatus;
-            int 			 purseBalance;
-            int 			 autoLoadAmount;
-            byte[] 			 CAN;
-            byte[] 			 CSN;
-            int				 purseExpiryDate;
-            int				 purseCreationDate;
-            int 			 lastCreditTransactionTRP;
-            byte[] 			 lastCreditTransactionHeader;
-            byte 			 logfileRecordCount;
-            int				 issuerDataLength;
-            int 			 lastTransactionTRP;
+            int              purseId = source.readInt();
+            byte             cepasVersion;
+            byte             purseStatus;
+            int              purseBalance;
+            int              autoLoadAmount;
+            byte[]           CAN;
+            byte[]           CSN;
+            int              purseExpiryDate;
+            int              purseCreationDate;
+            int              lastCreditTransactionTRP;
+            byte[]           lastCreditTransactionHeader;
+            byte             logfileRecordCount;
+            int              issuerDataLength;
+            int              lastTransactionTRP;
             CEPASTransaction lastTransactionRecord;
-            byte[] 			 issuerSpecificData;
-            byte 			 lastTransactionDebitOptionsByte;
+            byte[]           issuerSpecificData;
+            byte             lastTransactionDebitOptionsByte;
 
             if (source.readInt() == 0) {
                 return new CEPASPurse(purseId, source.readString());
@@ -313,12 +307,12 @@ public class CEPASPurse implements Parcelable
             source.readByteArray(issuerSpecificData);
             lastTransactionDebitOptionsByte = source.readByte();
             return new CEPASPurse(purseId, cepasVersion, purseStatus, purseBalance,
-                  autoLoadAmount, CAN, CSN, purseExpiryDate,
-                  purseCreationDate,
-                  lastCreditTransactionTRP, lastCreditTransactionHeader,
-                  logfileRecordCount, issuerDataLength,
-                  lastTransactionTRP, lastTransactionRecord,
-                  issuerSpecificData, lastTransactionDebitOptionsByte);
+                autoLoadAmount, CAN, CSN, purseExpiryDate,
+                purseCreationDate,
+                lastCreditTransactionTRP, lastCreditTransactionHeader,
+                logfileRecordCount, issuerDataLength,
+                lastTransactionTRP, lastTransactionRecord,
+                issuerSpecificData, lastTransactionDebitOptionsByte);
         }
 
         public CEPASPurse[] newArray (int size) {
@@ -326,8 +320,7 @@ public class CEPASPurse implements Parcelable
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeInt(mId);
         if (!mIsValid) {
             parcel.writeInt(0);
@@ -357,30 +350,28 @@ public class CEPASPurse implements Parcelable
         }
     }
 
-    public int describeContents ()
-    {
+    public int describeContents () {
         return 0;
     }
 
-    public static CEPASPurse fromXML (Element element)
-    {
-        int     		 id;
-        byte 			 cepasVersion;
-        byte 			 purseStatus;
-        int 			 purseBalance;
-        int 			 autoLoadAmount;
-        byte[] 			 CAN;
-        byte[] 			 CSN;
-        int				 purseExpiryDate;
-        int				 purseCreationDate;
-        int 			 lastCreditTransactionTRP;
-        byte[] 			 lastCreditTransactionHeader;
-        byte 			 logfileRecordCount;
-        int				 issuerDataLength;
-        int 			 lastTransactionTRP;
+    public static CEPASPurse fromXML (Element element) {
+        int              id;
+        byte             cepasVersion;
+        byte             purseStatus;
+        int              purseBalance;
+        int              autoLoadAmount;
+        byte[]           CAN;
+        byte[]           CSN;
+        int              purseExpiryDate;
+        int              purseCreationDate;
+        int              lastCreditTransactionTRP;
+        byte[]           lastCreditTransactionHeader;
+        byte             logfileRecordCount;
+        int              issuerDataLength;
+        int              lastTransactionTRP;
         CEPASTransaction lastTransactionRecord;
-        byte[] 			 issuerSpecificData;
-        byte 			 lastTransactionDebitOptionsByte;
+        byte[]           issuerSpecificData;
+        byte             lastTransactionDebitOptionsByte;
 
         id = Integer.parseInt(element.getAttribute("id"));
         if (element.getAttribute("valid").equals("false"))
@@ -413,8 +404,7 @@ public class CEPASPurse implements Parcelable
                               issuerSpecificData, lastTransactionDebitOptionsByte);
     }
 
-    public Element toXML (Document doc) throws Exception
-    {
+    public Element toXML (Document doc) throws Exception {
         Element purse = doc.createElement("purse");
         if (!mIsValid) {
             purse.setAttribute("id", Integer.toString(mId));

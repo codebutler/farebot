@@ -32,130 +32,130 @@ import android.os.Parcelable;
 import com.codebutler.farebot.Utils;
 
 public class OVChipPreamble implements Parcelable {
-	private final String mId;
-	private final int mCheckbit;
-	private final String mManufacturer;
-	private final String mPublisher;
-	private final String mUnknownConstant1;
-	private final int mExpdate;
-	private final String mUnknownConstant2;
-	private final int mType;
+    private final String mId;
+    private final int mCheckbit;
+    private final String mManufacturer;
+    private final String mPublisher;
+    private final String mUnknownConstant1;
+    private final int mExpdate;
+    private final String mUnknownConstant2;
+    private final int mType;
 
     public OVChipPreamble (
-    		String id,
-    		int checkbit,
-    		String manufacturer,
-    		String publisher,
-    		String unknownConstant1,
-    		int expdate,
-    		String unknownConstant2,
-    		int type
+            String id,
+            int checkbit,
+            String manufacturer,
+            String publisher,
+            String unknownConstant1,
+            int expdate,
+            String unknownConstant2,
+            int type
     ) {
-    	mId = id;
-    	mCheckbit = checkbit;
-    	mManufacturer = manufacturer;
-    	mPublisher = publisher;
-    	mUnknownConstant1 = unknownConstant1;
-    	mExpdate = expdate;
-    	mUnknownConstant2 = unknownConstant2;
-    	mType = type;
+        mId = id;
+        mCheckbit = checkbit;
+        mManufacturer = manufacturer;
+        mPublisher = publisher;
+        mUnknownConstant1 = unknownConstant1;
+        mExpdate = expdate;
+        mUnknownConstant2 = unknownConstant2;
+        mType = type;
     }
 
     public OVChipPreamble (byte[] data) {
-    	if (data == null) {
-			data = new byte[48];
-		}
+        if (data == null) {
+            data = new byte[48];
+        }
 
-    	String id = "";
-		int checkbit = 0;
-		String manufacturer = "";
-		String publisher = "";
-		String unknownConstant1 = "";
-		int expdate = 0;
-		String unknownConstant2 = "";
-		int type = 0;
+        String id = "";
+        int checkbit = 0;
+        String manufacturer = "";
+        String publisher = "";
+        String unknownConstant1 = "";
+        int expdate = 0;
+        String unknownConstant2 = "";
+        int type = 0;
 
-		String hex = Utils.getHexString(data, null);
+        String hex = Utils.getHexString(data, null);
 
-		id = hex.substring(0, 8);
-		checkbit = Utils.getBitsFromBuffer(data, 32, 8);
-		manufacturer = hex.substring(10, 20);
-		publisher = hex.substring(20, 32);
-		unknownConstant1 = hex.substring(32, 54);
-		expdate = Utils.getBitsFromBuffer(data, 216, 20);
-		unknownConstant2 = hex.substring(59, 68);
-		type = Utils.getBitsFromBuffer(data, 276, 4);
+        id = hex.substring(0, 8);
+        checkbit = Utils.getBitsFromBuffer(data, 32, 8);
+        manufacturer = hex.substring(10, 20);
+        publisher = hex.substring(20, 32);
+        unknownConstant1 = hex.substring(32, 54);
+        expdate = Utils.getBitsFromBuffer(data, 216, 20);
+        unknownConstant2 = hex.substring(59, 68);
+        type = Utils.getBitsFromBuffer(data, 276, 4);
 
-		mId = id;
-    	mCheckbit = checkbit;
-    	mManufacturer = manufacturer;
-    	mPublisher = publisher;
-    	mUnknownConstant1 = unknownConstant1;
-    	mExpdate = expdate;
-    	mUnknownConstant2 = unknownConstant2;
-    	mType = type;
+        mId = id;
+        mCheckbit = checkbit;
+        mManufacturer = manufacturer;
+        mPublisher = publisher;
+        mUnknownConstant1 = unknownConstant1;
+        mExpdate = expdate;
+        mUnknownConstant2 = unknownConstant2;
+        mType = type;
     }
 
-	public String getId() {
-		return mId;
-	}
+    public String getId() {
+        return mId;
+    }
 
-	public int getCheckbit() {
-		return mCheckbit;
-	}
+    public int getCheckbit() {
+        return mCheckbit;
+    }
 
-	public String getManufacturer() {
-		return mManufacturer;
-	}
+    public String getManufacturer() {
+        return mManufacturer;
+    }
 
-	public String getPublisher() {
-		return mPublisher;
-	}
+    public String getPublisher() {
+        return mPublisher;
+    }
 
-	public String getUnknownConstant1() {
-		return mUnknownConstant1;
-	}
+    public String getUnknownConstant1() {
+        return mUnknownConstant1;
+    }
 
-	public int getExpdate() {
-		return mExpdate;
-	}
+    public int getExpdate() {
+        return mExpdate;
+    }
 
-	public String getUnknownConstant2() {
-		return mUnknownConstant2;
-	}
+    public String getUnknownConstant2() {
+        return mUnknownConstant2;
+    }
 
-	public int getType() {
-		return mType;
-	}
+    public int getType() {
+        return mType;
+    }
 
-	public int describeContents() {
-		return 0;
-	}
+    public int describeContents() {
+        return 0;
+    }
 
-	public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
+    public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
         public OVChipPreamble createFromParcel(Parcel source) {
-        	String id = "";
-    		int checkbit = 0;
-    		String manufacturer = "";
-    		String publisher = "";
-    		String unknownConstant1 = "";
-    		int expdate = 0;
-    		String unknownConstant2 = "";
-    		int type = 0;
+            String id = "";
+            int checkbit = 0;
+            String manufacturer = "";
+            String publisher = "";
+            String unknownConstant1 = "";
+            int expdate = 0;
+            String unknownConstant2 = "";
+            int type = 0;
 
-    		id = source.readString();
-    		checkbit = source.readInt();
-    		manufacturer = source.readString();
-    		publisher = source.readString();
-    		unknownConstant1 = source.readString();
-    		expdate = source.readInt();
-    		unknownConstant2 = source.readString();
-    		type = source.readInt();
+            id = source.readString();
+            checkbit = source.readInt();
+            manufacturer = source.readString();
+            publisher = source.readString();
+            unknownConstant1 = source.readString();
+            expdate = source.readInt();
+            unknownConstant2 = source.readString();
+            type = source.readInt();
 
             return new OVChipPreamble(id, checkbit,
-            		manufacturer, publisher,
-            		unknownConstant1, expdate,
-            		unknownConstant2, type);
+                    manufacturer, publisher,
+                    unknownConstant1, expdate,
+                    unknownConstant2, type);
         }
 
         public OVChipPreamble[] newArray (int size) {
@@ -163,53 +163,53 @@ public class OVChipPreamble implements Parcelable {
         }
     };
 
-	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeString(mId);
-		parcel.writeInt(mCheckbit);
-		parcel.writeString(mManufacturer);
-		parcel.writeString(mPublisher);
-		parcel.writeString(mUnknownConstant1);
-		parcel.writeInt(mExpdate);
-		parcel.writeString(mUnknownConstant2);
-		parcel.writeInt(mType);
-	}
-
-	public static OVChipPreamble fromXML (Element element) {
-		String id;
-		int checkbit;
-		String manufacturer;
-		String publisher;
-		String unknownConstant1;
-		int expdate;
-		String unknownConstant2;
-		int type;
-
-		id = element.getAttribute("id");
-		checkbit = Integer.parseInt(element.getAttribute("checkbit"));
-		manufacturer = element.getAttribute("manufacturer");
-		publisher = element.getAttribute("publisher");
-		unknownConstant1 = element.getAttribute("unknownconstant1");
-		expdate = Integer.parseInt(element.getAttribute("expdate"));
-		unknownConstant2 = element.getAttribute("unknownconstant2");
-		type = Integer.parseInt(element.getAttribute("type"));
-
-		return new OVChipPreamble(id, checkbit,
-        		manufacturer, publisher,
-        		unknownConstant1, expdate,
-        		unknownConstant2, type);
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mId);
+        parcel.writeInt(mCheckbit);
+        parcel.writeString(mManufacturer);
+        parcel.writeString(mPublisher);
+        parcel.writeString(mUnknownConstant1);
+        parcel.writeInt(mExpdate);
+        parcel.writeString(mUnknownConstant2);
+        parcel.writeInt(mType);
     }
 
-	public Element toXML (Document doc) throws Exception {
-		Element preamble = doc.createElement("preamble");
-		preamble.setAttribute("id", getId());
-		preamble.setAttribute("checkbit", Integer.toString(mCheckbit));
-		preamble.setAttribute("manufacturer", getManufacturer());
-		preamble.setAttribute("publisher", getPublisher());
-		preamble.setAttribute("unknownconstant1", getUnknownConstant1());
-		preamble.setAttribute("expdate", Integer.toString(mExpdate));
-		preamble.setAttribute("unknownconstant2", getUnknownConstant2());
-		preamble.setAttribute("type", Integer.toString(mType));
+    public static OVChipPreamble fromXML (Element element) {
+        String id;
+        int checkbit;
+        String manufacturer;
+        String publisher;
+        String unknownConstant1;
+        int expdate;
+        String unknownConstant2;
+        int type;
 
-		return preamble;
+        id = element.getAttribute("id");
+        checkbit = Integer.parseInt(element.getAttribute("checkbit"));
+        manufacturer = element.getAttribute("manufacturer");
+        publisher = element.getAttribute("publisher");
+        unknownConstant1 = element.getAttribute("unknownconstant1");
+        expdate = Integer.parseInt(element.getAttribute("expdate"));
+        unknownConstant2 = element.getAttribute("unknownconstant2");
+        type = Integer.parseInt(element.getAttribute("type"));
+
+        return new OVChipPreamble(id, checkbit,
+                manufacturer, publisher,
+                unknownConstant1, expdate,
+                unknownConstant2, type);
+    }
+
+    public Element toXML (Document doc) throws Exception {
+        Element preamble = doc.createElement("preamble");
+        preamble.setAttribute("id", getId());
+        preamble.setAttribute("checkbit", Integer.toString(mCheckbit));
+        preamble.setAttribute("manufacturer", getManufacturer());
+        preamble.setAttribute("publisher", getPublisher());
+        preamble.setAttribute("unknownconstant1", getUnknownConstant1());
+        preamble.setAttribute("expdate", Integer.toString(mExpdate));
+        preamble.setAttribute("unknownconstant2", getUnknownConstant2());
+        preamble.setAttribute("type", Integer.toString(mType));
+
+        return preamble;
     }
 }

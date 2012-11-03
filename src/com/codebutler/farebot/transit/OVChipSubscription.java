@@ -42,8 +42,7 @@ public class OVChipSubscription extends Subscription {
     private final int mRest;
 
     private static Map<Integer, String> sSubscriptions = new HashMap<Integer, String>() {
-        /* It seems that all the IDs are unique, so why bother with the companies? */
-        {
+        /* It seems that all the IDs are unique, so why bother with the companies? */ {
             /* NS */
             put(0x0005, "OV-jaarkaart");
             put(0x0007, "OV-Bijkaart 1e klas");
@@ -188,7 +187,7 @@ public class OVChipSubscription extends Subscription {
 
     @Override
     public String getAgencyName () {
-        return OVChipTransitData.getShortAgencyName((int)mAgency);	// Nobody uses most of the long names
+        return OVChipTransitData.getShortAgencyName((int)mAgency);    // Nobody uses most of the long names
     }
 
     @Override

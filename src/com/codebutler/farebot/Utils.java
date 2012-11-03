@@ -67,16 +67,14 @@ public class Utils {
             .show();
     }
 
-    public static void showError (final Activity activity, Exception ex)
-    {
+    public static void showError (final Activity activity, Exception ex) {
         Log.e(activity.getClass().getName(), ex.getMessage(), ex);
         new AlertDialog.Builder(activity)
             .setMessage(Utils.getErrorMessage(ex))
             .show();
     }
 
-    public static void showErrorAndFinish (final Activity activity, Exception ex)
-    {
+    public static void showErrorAndFinish (final Activity activity, Exception ex) {
         try {
             Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
             ex.printStackTrace();
@@ -95,8 +93,7 @@ public class Utils {
         }
     }
 
-    public static String getHexString (byte[] b) throws Exception
-    {
+    public static String getHexString (byte[] b) throws Exception {
         String result = "";
         for (int i=0; i < b.length; i++) {
             result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
@@ -104,8 +101,7 @@ public class Utils {
         return result;
     }
 
-    public static String getHexString (byte[] b, String defaultResult)
-    {
+    public static String getHexString (byte[] b, String defaultResult) {
         try {
             return getHexString(b);
         } catch (Exception ex) {
@@ -113,8 +109,7 @@ public class Utils {
         }
     }
 
-    public static byte[] hexStringToByteArray (String s)
-    {
+    public static byte[] hexStringToByteArray (String s) {
         if ((s.length() % 2) != 0) {
             throw new IllegalArgumentException("Bad input string: " + s);
         }
@@ -129,8 +124,7 @@ public class Utils {
     }
 
     /*
-    public static byte[] intToByteArray(int value)
-    {
+    public static byte[] intToByteArray(int value) {
         return new byte[] {
                 (byte)(value >>> 24),
                 (byte)(value >>> 16),
@@ -139,23 +133,19 @@ public class Utils {
     }
     */
     
-    public static int byteArrayToInt(byte[] b)
-    {
+    public static int byteArrayToInt(byte[] b) {
         return byteArrayToInt(b, 0);
     }
     
-    public static int byteArrayToInt(byte[] b, int offset)
-    {
+    public static int byteArrayToInt(byte[] b, int offset) {
         return byteArrayToInt(b, offset, b.length);
     }
     
-    public static int byteArrayToInt(byte[] b, int offset, int length)
-    {
-    	return (int) byteArrayToLong(b, offset, length);
+    public static int byteArrayToInt(byte[] b, int offset, int length) {
+        return (int) byteArrayToLong(b, offset, length);
     }
 
-    public static long byteArrayToLong(byte[] b, int offset, int length)
-    {
+    public static long byteArrayToLong(byte[] b, int offset, int length) {
         if (b.length < length)
             throw new IllegalArgumentException("length must be less than or equal to b.length");
 
@@ -167,16 +157,14 @@ public class Utils {
         return value;
     }
 
-    public static byte[] byteArraySlice(byte[] b, int offset, int length)
-    {
+    public static byte[] byteArraySlice(byte[] b, int offset, int length) {
         byte[] ret = new byte[length];
         for (int i = 0; i < length; i++)
-        	ret[i] = b[offset+i];
+            ret[i] = b[offset+i];
         return ret;
     }
 
-    public static String xmlNodeToString (Node node) throws Exception
-    {
+    public static String xmlNodeToString (Node node) throws Exception {
         // The amount of code required to do simple things in Java is incredible.
         Source source = new DOMSource(node);
         StringWriter stringWriter = new StringWriter();
@@ -185,12 +173,12 @@ public class Utils {
         Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        transformer.setURIResolver(null);
         transformer.transform(source, result);
         return stringWriter.getBuffer().toString();
     }
 
-    public static String getErrorMessage (Throwable ex)
-    {
+    public static String getErrorMessage (Throwable ex) {
         String errorMessage = ex.getLocalizedMessage();
         if (errorMessage == null)
             errorMessage = ex.getMessage();
@@ -247,34 +235,34 @@ public class Utils {
         public boolean matches(T t);
     }
 
-	public static int convertBCDtoInteger(byte data) {
-		return (((data & (char)0xF0) >> 4) * 10) + ((data & (char)0x0F));
-	}
+    public static int convertBCDtoInteger(byte data) {
+        return (((data & (char)0xF0) >> 4) * 10) + ((data & (char)0x0F));
+    }
 
-	public static int getBitsFromInteger(int buffer, int iStartBit, int iLength) {
-		return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
-	}
+    public static int getBitsFromInteger(int buffer, int iStartBit, int iLength) {
+        return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
+    }
 
-	/* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
-	public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
-		int iEndBit = iStartBit + iLength - 1;
-		int iSByte = iStartBit / 8;
-		int iSBit = iStartBit % 8;
-		int iEByte = iEndBit / 8;
-		int iEBit = iEndBit % 8;
+    /* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
+    public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
+        int iEndBit = iStartBit + iLength - 1;
+        int iSByte = iStartBit / 8;
+        int iSBit = iStartBit % 8;
+        int iEByte = iEndBit / 8;
+        int iEBit = iEndBit % 8;
 
-		if (iSByte == iEByte) {
-			return (int)(((char)buffer[iEByte] >> (7 - iEBit)) & ((char)0xFF >> (8 - iLength)));
-		} else {
-			int uRet = (((char)buffer[iSByte] & (char)((char)0xFF >> iSBit)) << (((iEByte - iSByte - 1) * 8) + (iEBit + 1)));
+        if (iSByte == iEByte) {
+            return (int)(((char)buffer[iEByte] >> (7 - iEBit)) & ((char)0xFF >> (8 - iLength)));
+        } else {
+            int uRet = (((char)buffer[iSByte] & (char)((char)0xFF >> iSBit)) << (((iEByte - iSByte - 1) * 8) + (iEBit + 1)));
 
-			for (int i = iSByte + 1; i < iEByte; i++) {
-				uRet |= (((char)buffer[i] & (char)0xFF) << (((iEByte - i - 1) * 8) + (iEBit + 1)));
-			}
+            for (int i = iSByte + 1; i < iEByte; i++) {
+                uRet |= (((char)buffer[i] & (char)0xFF) << (((iEByte - i - 1) * 8) + (iEBit + 1)));
+            }
 
-			uRet |= (((char)buffer[iEByte] & (char)0xFF)) >> (7 - iEBit);
+            uRet |= (((char)buffer[iEByte] & (char)0xFF)) >> (7 - iEBit);
 
-			return uRet;
-		}
-	}
+            return uRet;
+        }
+    }
 }

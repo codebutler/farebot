@@ -72,8 +72,7 @@ public class FelicaCard extends Card {
 
     // https://github.com/tmurakam/felicalib/blob/master/src/dump/dump.c
     // https://github.com/tmurakam/felica2money/blob/master/src/card/Suica.cs
-    public static FelicaCard dumpTag(byte[] tagId, Tag tag) throws Exception
-    {
+    public static FelicaCard dumpTag(byte[] tagId, Tag tag) throws Exception {
         FeliCaTag ft = new FeliCaTag(tag);
 
         FeliCaLib.IDm idm = ft.pollingAndGetIDm(FeliCaLib.SYSTEMCODE_ANY);

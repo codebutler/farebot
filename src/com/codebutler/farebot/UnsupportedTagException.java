@@ -22,13 +22,11 @@
 
 package com.codebutler.farebot;
 
-public class UnsupportedTagException extends Exception
-{
+public class UnsupportedTagException extends Exception {
     private String[] mTechList;
     private String   mTagId;
 
-    public UnsupportedTagException (String[] techList, String tagId)
-    {
+    public UnsupportedTagException (String[] techList, String tagId) {
         mTechList = techList;
         mTagId = tagId;
     }
@@ -42,8 +40,7 @@ public class UnsupportedTagException extends Exception
     }
 
     @Override
-    public String getMessage ()
-    {
+    public String getMessage () {
         StringBuilder builder = new StringBuilder();
         for (String tech : mTechList) {
             builder.append("\n  ");

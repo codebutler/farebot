@@ -25,13 +25,11 @@ package com.codebutler.farebot.card.desfire;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class DesfireApplication implements Parcelable
-{
+public class DesfireApplication implements Parcelable {
     private int           mId;
     private DesfireFile[] mFiles;
 
-    public DesfireApplication (int id, DesfireFile[] files)
-    {
+    public DesfireApplication (int id, DesfireFile[] files) {
         mId    = id;
         mFiles = files;
     }
@@ -44,8 +42,7 @@ public class DesfireApplication implements Parcelable
         return mFiles;
     }
 
-    public DesfireFile getFile (int fileId)
-    {
+    public DesfireFile getFile (int fileId) {
         for (DesfireFile file : mFiles) {
             if (file.getId() == fileId)
                 return file;
@@ -68,15 +65,13 @@ public class DesfireApplication implements Parcelable
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeInt(mId);
         parcel.writeInt(mFiles.length);
         parcel.writeTypedArray(mFiles, flags);
     }
 
-    public int describeContents ()
-    {
+    public int describeContents () {
         return 0;
     }    
 }

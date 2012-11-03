@@ -27,22 +27,19 @@ import android.os.Parcelable;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings.RecordDesfireFileSettings;
 import org.apache.commons.lang.ArrayUtils;
 
-public class DesfireFile implements Parcelable
-{
+public class DesfireFile implements Parcelable {
     private int                 mId;
     private DesfireFileSettings mSettings;
     private byte[]              mData;
 
-    public static DesfireFile create (int fileId, DesfireFileSettings fileSettings, byte[] fileData)
-    {
+    public static DesfireFile create (int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
         if (fileSettings instanceof RecordDesfireFileSettings)
             return new RecordDesfireFile(fileId, fileSettings, fileData);
         else
             return new DesfireFile(fileId, fileSettings, fileData);
     }
 
-    private DesfireFile (int fileId, DesfireFileSettings fileSettings, byte[] fileData)
-    {
+    private DesfireFile (int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
         mId       = fileId;
         mSettings = fileSettings;
         mData     = fileData;
@@ -83,8 +80,7 @@ public class DesfireFile implements Parcelable
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeInt(mId);
         if (this instanceof InvalidDesfireFile) {
             parcel.writeInt(1);
@@ -97,17 +93,14 @@ public class DesfireFile implements Parcelable
         }
     }
 
-    public int describeContents ()
-    {
+    public int describeContents () {
         return 0;
     }
 
-    public static class RecordDesfireFile extends DesfireFile
-    {
+    public static class RecordDesfireFile extends DesfireFile {
         private DesfireRecord[] mRecords;
 
-        private RecordDesfireFile (int fileId, DesfireFileSettings fileSettings, byte[] fileData)
-        {
+        private RecordDesfireFile (int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
             super(fileId, fileSettings, fileData);
 
             RecordDesfireFileSettings settings = (RecordDesfireFileSettings) fileSettings;
@@ -125,12 +118,10 @@ public class DesfireFile implements Parcelable
         }
     }
 
-    public static class InvalidDesfireFile extends DesfireFile
-    {
+    public static class InvalidDesfireFile extends DesfireFile {
         private String mErrorMessage;
 
-        public InvalidDesfireFile (int fileId, String errorMessage)
-        {
+        public InvalidDesfireFile (int fileId, String errorMessage) {
             super(fileId, null, new byte[0]);
             mErrorMessage = errorMessage;
         }

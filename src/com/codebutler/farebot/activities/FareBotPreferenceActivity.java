@@ -29,10 +29,8 @@ import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.codebutler.farebot.R;
 
-public class FareBotPreferenceActivity extends SherlockPreferenceActivity
-{
-    public void onCreate (Bundle savedInstanceState)
-    {
+public class FareBotPreferenceActivity extends SherlockPreferenceActivity {
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.prefs);
 
@@ -41,8 +39,7 @@ public class FareBotPreferenceActivity extends SherlockPreferenceActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

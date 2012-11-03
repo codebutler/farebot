@@ -28,7 +28,7 @@ package com.codebutler.farebot.transit;
 import android.os.Parcelable;
 
 public abstract class Subscription implements Parcelable {
-	public abstract int getId();
+    public abstract int getId();
 
     public abstract long getValidFrom ();
     public abstract long getValidTo();

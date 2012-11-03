@@ -42,13 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CardHWDetailFragment extends SherlockListFragment
-{
+public class CardHWDetailFragment extends SherlockListFragment {
     private Card mCard;
 
     @Override
-    public void onCreate (Bundle savedInstanceState)
-    {
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
@@ -56,36 +54,36 @@ public class CardHWDetailFragment extends SherlockListFragment
         List<ListItem> items = new ArrayList<ListItem>();
 
         if (mCard.getCardType() == CardType.MifareDesfire) {
-	        DesfireManufacturingData data = ((DesfireCard)mCard).getManufacturingData();
-	        items.add(new HeaderListItem("Hardware Information"));
-	        items.add(new ListItem("Vendor ID",     Integer.toString(data.hwVendorID)));
-	        items.add(new ListItem("Type",          Integer.toString(data.hwType)));
-	        items.add(new ListItem("Subtype",       Integer.toString(data.hwSubType)));
-	        items.add(new ListItem("Major Version", Integer.toString(data.hwMajorVersion)));
-	        items.add(new ListItem("Minor Version", Integer.toString(data.hwMinorVersion)));
-	        items.add(new ListItem("Storage Size",  Integer.toString(data.hwStorageSize)));
-	        items.add(new ListItem("Protocol",      Integer.toString(data.hwProtocol)));
-	
-	        items.add(new HeaderListItem("Software Information"));
-	        items.add(new ListItem("Vendor ID",     Integer.toString(data.swVendorID)));
-	        items.add(new ListItem("Type",          Integer.toString(data.swType)));
-	        items.add(new ListItem("Subtype",       Integer.toString(data.swSubType)));
-	        items.add(new ListItem("Major Version", Integer.toString(data.swMajorVersion)));
-	        items.add(new ListItem("Minor Version", Integer.toString(data.swMinorVersion)));
-	        items.add(new ListItem("Storage Size",  Integer.toString(data.swStorageSize)));
-	        items.add(new ListItem("Protocol",      Integer.toString(data.swProtocol)));
-	
-	        items.add(new HeaderListItem("General Information"));
-	        items.add(new ListItem("Serial Number",      Integer.toString(data.uid)));
-	        items.add(new ListItem("Batch Number",       Integer.toString(data.batchNo)));
-	        items.add(new ListItem("Week of Production", Integer.toString(data.weekProd)));
-	        items.add(new ListItem("Year of Production", Integer.toString(data.yearProd)));
+            DesfireManufacturingData data = ((DesfireCard)mCard).getManufacturingData();
+            items.add(new HeaderListItem("Hardware Information"));
+            items.add(new ListItem("Vendor ID",     Integer.toString(data.hwVendorID)));
+            items.add(new ListItem("Type",          Integer.toString(data.hwType)));
+            items.add(new ListItem("Subtype",       Integer.toString(data.hwSubType)));
+            items.add(new ListItem("Major Version", Integer.toString(data.hwMajorVersion)));
+            items.add(new ListItem("Minor Version", Integer.toString(data.hwMinorVersion)));
+            items.add(new ListItem("Storage Size",  Integer.toString(data.hwStorageSize)));
+            items.add(new ListItem("Protocol",      Integer.toString(data.hwProtocol)));
+
+            items.add(new HeaderListItem("Software Information"));
+            items.add(new ListItem("Vendor ID",     Integer.toString(data.swVendorID)));
+            items.add(new ListItem("Type",          Integer.toString(data.swType)));
+            items.add(new ListItem("Subtype",       Integer.toString(data.swSubType)));
+            items.add(new ListItem("Major Version", Integer.toString(data.swMajorVersion)));
+            items.add(new ListItem("Minor Version", Integer.toString(data.swMinorVersion)));
+            items.add(new ListItem("Storage Size",  Integer.toString(data.swStorageSize)));
+            items.add(new ListItem("Protocol",      Integer.toString(data.swProtocol)));
+
+            items.add(new HeaderListItem("General Information"));
+            items.add(new ListItem("Serial Number",      Integer.toString(data.uid)));
+            items.add(new ListItem("Batch Number",       Integer.toString(data.batchNo)));
+            items.add(new ListItem("Week of Production", Integer.toString(data.weekProd)));
+            items.add(new ListItem("Year of Production", Integer.toString(data.yearProd)));
 
         } else if (mCard.getCardType() == CardType.CEPAS) {
-	        CEPASCard card = (CEPASCard)mCard;
+            CEPASCard card = (CEPASCard)mCard;
 
             // FIXME: What about other purses?
-	        CEPASPurse purse = card.getPurse(3);
+            CEPASPurse purse = card.getPurse(3);
             items.add(new HeaderListItem("Purse Information"));
             items.add(new ListItem("CEPAS Version", Byte.toString(purse.getCepasVersion())));
             items.add(new ListItem("Purse ID",     Integer.toString(purse.getId())));

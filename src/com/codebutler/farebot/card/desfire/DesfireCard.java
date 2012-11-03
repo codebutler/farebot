@@ -46,13 +46,11 @@ import java.util.Date;
 import java.util.List;
 
 @CardRawDataFragmentClass(DesfireCardRawDataFragment.class)
-public class DesfireCard extends Card
-{
+public class DesfireCard extends Card {
     private DesfireManufacturingData mManfData;
     private DesfireApplication[]     mApplications;
 
-    public static DesfireCard dumpTag (Tag tag) throws Exception
-    {
+    public static DesfireCard dumpTag (Tag tag) throws Exception {
         List<DesfireApplication> apps = new ArrayList<DesfireApplication>();
 
         IsoDep tech = IsoDep.get(tag);
@@ -104,8 +102,7 @@ public class DesfireCard extends Card
         return new DesfireCard(tag.getId(), new Date(), manufData, appsArray);
     }
 
-    DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication apps[])
-    {
+    DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication apps[]) {
         super(tagId, scannedAt);
         mManfData     = manfData;
         mApplications = apps;
@@ -138,8 +135,7 @@ public class DesfireCard extends Card
         return mApplications;
     }
 
-    public DesfireApplication getApplication (int appId)
-    {
+    public DesfireApplication getApplication (int appId) {
         for (DesfireApplication app : mApplications) {
             if (app.getId() == appId)
                 return app;
@@ -172,8 +168,7 @@ public class DesfireCard extends Card
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         super.writeToParcel(parcel, flags);
         parcel.writeParcelable(mManfData, flags);
         parcel.writeInt(mApplications.length);
@@ -182,8 +177,7 @@ public class DesfireCard extends Card
     
     // FIXME: This is such a mess!
     
-    public static DesfireCard fromXml (byte[] cardId, Date scannedAt, Element element)
-    {
+    public static DesfireCard fromXml (byte[] cardId, Date scannedAt, Element element) {
         Element appsElement = (Element) element.getElementsByTagName("applications").item(0);
 
         NodeList appElements = appsElement.getElementsByTagName("application");
@@ -263,8 +257,7 @@ public class DesfireCard extends Card
         return new DesfireCard(cardId, scannedAt, manfData, apps);
     }
 
-    public Element toXML() throws Exception
-    {
+    public Element toXML() throws Exception {
         Element root = super.toXML();
 
         Document doc = root.getOwnerDocument();

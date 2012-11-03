@@ -44,13 +44,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.StringReader;
 import java.util.Date;
 
-public abstract class Card implements Parcelable
-{
+public abstract class Card implements Parcelable {
     private byte[] mTagId;
     private Date   mScannedAt;
 
-    protected Card(byte[] tagId, Date scannedAt)
-    {
+    protected Card(byte[] tagId, Date scannedAt) {
         mTagId     = tagId;
         mScannedAt = scannedAt;
     }
@@ -69,8 +67,7 @@ public abstract class Card implements Parcelable
             throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
     }
 
-    public static Card fromXml (String xml) throws Exception
-    {
+    public static Card fromXml (String xml) throws Exception {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = builder.parse(new InputSource(new StringReader(xml)));
 
@@ -83,7 +80,7 @@ public abstract class Card implements Parcelable
             case MifareDesfire:
                 return DesfireCard.fromXml(id, scannedAt, rootElement);
             case CEPAS:
-            	return CEPASCard.fromXML(id, scannedAt, rootElement);
+                return CEPASCard.fromXML(id, scannedAt, rootElement);
             case FeliCa:
                 return FelicaCard.fromXml(id, scannedAt, rootElement);
             case MifareClassic:
@@ -106,8 +103,7 @@ public abstract class Card implements Parcelable
     public abstract TransitIdentity parseTransitIdentity();
     public abstract TransitData parseTransitData ();
 
-    public Element toXML () throws Exception
-    {
+    public Element toXML () throws Exception {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.newDocument();
@@ -124,20 +120,17 @@ public abstract class Card implements Parcelable
         }
     }
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeInt(mTagId.length);
         parcel.writeByteArray(mTagId);
         parcel.writeLong(mScannedAt.getTime());
     }
     
-    public final int describeContents ()
-    {
+    public final int describeContents () {
         return 0;
     }
 
-    public enum CardType
-    {
+    public enum CardType {
         MifareClassic(0),
         MifareUltralight(1),
         MifareDesfire(2),
@@ -146,18 +139,15 @@ public abstract class Card implements Parcelable
 
         private int mValue;
 
-        CardType (int value)
-        {
+        CardType (int value) {
             mValue = value;
         }
 
-        public int toInteger ()
-        {
+        public int toInteger () {
             return mValue;
         }
 
-        public String toString ()
-        {
+        public String toString () {
             switch (mValue) {
                 case 0:
                     return "MIFARE Classic";
@@ -166,7 +156,7 @@ public abstract class Card implements Parcelable
                 case 2:
                     return "MIFARE DESFire";
                 case 3:
-                	return "CEPAS";
+                    return "CEPAS";
                 case 4:
                     return "FeliCa";
                 default:

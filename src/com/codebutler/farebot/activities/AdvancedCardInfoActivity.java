@@ -49,8 +49,7 @@ import com.codebutler.farebot.fragments.CardHWDetailFragment;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class AdvancedCardInfoActivity extends SherlockFragmentActivity
-{
+public class AdvancedCardInfoActivity extends SherlockFragmentActivity {
     public static String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
     public static String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
 
@@ -59,8 +58,7 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity
     private Exception mError;
 
     @Override
-    protected void onCreate (Bundle savedInstanceState)
-    {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_card_info);
 
@@ -124,15 +122,13 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu (Menu menu)
-    {
+    public boolean onCreateOptionsMenu (Menu menu) {
         getSupportMenuInflater().inflate(R.menu.card_advanced_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected (MenuItem item)
-    {
+    public boolean onOptionsItemSelected (MenuItem item) {
         try {
             String xml = Utils.xmlNodeToString(mCard.toXML().getOwnerDocument());
             if (item.getItemId() == R.id.copy_xml) {

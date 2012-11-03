@@ -29,8 +29,7 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.io.ByteArrayInputStream;
 
-public abstract class DesfireFileSettings implements Parcelable
-{
+public abstract class DesfireFileSettings implements Parcelable {
     public final byte   fileType;
     public final byte   commSetting;
     public final byte[] accessRights;
@@ -42,8 +41,7 @@ public abstract class DesfireFileSettings implements Parcelable
     static final byte LINEAR_RECORD_FILE = (byte) 0x03;
     static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
     
-    public static DesfireFileSettings Create (byte[] data) throws Exception
-    {
+    public static DesfireFileSettings Create (byte[] data) throws Exception {
         byte fileType = (byte) data[0];
 
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
@@ -58,8 +56,7 @@ public abstract class DesfireFileSettings implements Parcelable
             throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
     }
 
-    private DesfireFileSettings (ByteArrayInputStream stream)
-    {
+    private DesfireFileSettings (ByteArrayInputStream stream) {
         fileType    = (byte) stream.read();
         commSetting = (byte) stream.read();
 
@@ -67,8 +64,7 @@ public abstract class DesfireFileSettings implements Parcelable
         stream.read(accessRights, 0, accessRights.length);
     }
 
-    private DesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights)
-    {
+    private DesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights) {
         this.fileType     = fileType;
         this.commSetting  = commSetting;
         this.accessRights = accessRights;
@@ -116,25 +112,21 @@ public abstract class DesfireFileSettings implements Parcelable
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeByte(fileType);
         parcel.writeByte(commSetting);
         parcel.writeInt(accessRights.length);
         parcel.writeByteArray(accessRights);
     }
 
-    public int describeContents ()
-    {
+    public int describeContents () {
         return 0;
     }
 
-    public static class StandardDesfireFileSettings extends DesfireFileSettings
-    {
+    public static class StandardDesfireFileSettings extends DesfireFileSettings {
         public final int fileSize;
 
-        private StandardDesfireFileSettings (ByteArrayInputStream stream)
-        {
+        private StandardDesfireFileSettings (ByteArrayInputStream stream) {
             super(stream);
             byte[] buf = new byte[3];
             stream.read(buf, 0, buf.length);
@@ -142,28 +134,24 @@ public abstract class DesfireFileSettings implements Parcelable
             fileSize = Utils.byteArrayToInt(buf);
         }
 
-        StandardDesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights, int fileSize)
-        {
+        StandardDesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights, int fileSize) {
             super(fileType, commSetting, accessRights);
             this.fileSize = fileSize;
         }
 
         @Override
-        public void writeToParcel (Parcel parcel, int flags)
-        {
+        public void writeToParcel (Parcel parcel, int flags) {
             super.writeToParcel(parcel, flags);
             parcel.writeInt(fileSize);
         }
     }
 
-    public static class RecordDesfireFileSettings extends DesfireFileSettings
-    {
+    public static class RecordDesfireFileSettings extends DesfireFileSettings {
         public final int recordSize;
         public final int maxRecords;
         public final int curRecords;
 
-        public RecordDesfireFileSettings(ByteArrayInputStream stream)
-        {
+        public RecordDesfireFileSettings(ByteArrayInputStream stream) {
             super(stream);
 
             byte[] buf = new byte[3];
@@ -182,8 +170,7 @@ public abstract class DesfireFileSettings implements Parcelable
             curRecords = Utils.byteArrayToInt(buf);
         }
 
-        RecordDesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights, int recordSize, int maxRecords, int curRecords)
-        {
+        RecordDesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights, int recordSize, int maxRecords, int curRecords) {
             super(fileType, commSetting, accessRights);
             this.recordSize = recordSize;
             this.maxRecords = maxRecords;
@@ -191,8 +178,7 @@ public abstract class DesfireFileSettings implements Parcelable
         }
 
         @Override
-        public void writeToParcel (Parcel parcel, int flags)
-        {
+        public void writeToParcel (Parcel parcel, int flags) {
             super.writeToParcel(parcel, flags);
             parcel.writeInt(recordSize);
             parcel.writeInt(maxRecords);
@@ -200,10 +186,8 @@ public abstract class DesfireFileSettings implements Parcelable
         }
     }
 
-    public static class UnsupportedDesfireFileSettings extends DesfireFileSettings
-    {
-        public UnsupportedDesfireFileSettings(byte fileType)
-        {
+    public static class UnsupportedDesfireFileSettings extends DesfireFileSettings {
+        public UnsupportedDesfireFileSettings(byte fileType) {
             super(fileType, Byte.MIN_VALUE, new byte[0]);
         }
     }

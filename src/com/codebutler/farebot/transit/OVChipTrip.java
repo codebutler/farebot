@@ -87,9 +87,9 @@ public class OVChipTrip extends Trip {
         }
 
         mIsTrain = mAgency == OVChipTransitData.AGENCY_NS || (mAgency == OVChipTransitData.AGENCY_ARRIVA && mStartStationId < 800);
-        mIsMetro = (mAgency == OVChipTransitData.AGENCY_GVB && mStartStationId < 3000) || (mAgency == OVChipTransitData.AGENCY_RET && mStartStationId < 3000);	// TODO: Needs verification!
+        mIsMetro = (mAgency == OVChipTransitData.AGENCY_GVB && mStartStationId < 3000) || (mAgency == OVChipTransitData.AGENCY_RET && mStartStationId < 3000);    // TODO: Needs verification!
         mIsOther = mAgency == OVChipTransitData.AGENCY_TLS || mAgency == OVChipTransitData.AGENCY_DUO || mAgency == OVChipTransitData.AGENCY_STORE;
-        mIsFerry = mAgency == OVChipTransitData.AGENCY_ARRIVA && (mStartStationId > 4600 && mStartStationId < 4700);	// TODO: Needs verification!
+        mIsFerry = mAgency == OVChipTransitData.AGENCY_ARRIVA && (mStartStationId > 4600 && mStartStationId < 4700);    // TODO: Needs verification!
 
         // FIXME: Clean this up
         //mIsBusOrTram = (mAgency == AGENCY_GVB || mAgency == AGENCY_HTM || mAgency == AGENCY_RET && (!mIsMetro));
@@ -217,7 +217,7 @@ public class OVChipTrip extends Trip {
 
     @Override
     public String getAgencyName() {
-        return OVChipTransitData.getShortAgencyName((int)mAgency);	// Nobody uses most of the long names
+        return OVChipTransitData.getShortAgencyName((int)mAgency);    // Nobody uses most of the long names
     }
 
     @Override

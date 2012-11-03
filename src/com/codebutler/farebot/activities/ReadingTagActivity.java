@@ -40,11 +40,9 @@ import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 
-public class ReadingTagActivity extends SherlockActivity
-{
+public class ReadingTagActivity extends SherlockActivity {
     @Override
-    public void onCreate (Bundle icicle)
-    {
+    public void onCreate (Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_reading_tag);
 
@@ -52,13 +50,11 @@ public class ReadingTagActivity extends SherlockActivity
     }
 
     @Override
-    public void onNewIntent (Intent intent)
-    {
+    public void onNewIntent (Intent intent) {
         resolveIntent(intent);
     }
 
-    private void resolveIntent (Intent intent)
-    {
+    private void resolveIntent (Intent intent) {
         try {
             final Tag tag      = (Tag) intent.getParcelableExtra("android.nfc.extra.TAG");
             final byte[] tagId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);

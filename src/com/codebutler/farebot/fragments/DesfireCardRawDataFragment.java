@@ -40,8 +40,7 @@ import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings.RecordDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings.StandardDesfireFileSettings;
 
-public class DesfireCardRawDataFragment extends ExpandableListFragment
-{
+public class DesfireCardRawDataFragment extends ExpandableListFragment {
     private DesfireCard mCard;
 
     @Override

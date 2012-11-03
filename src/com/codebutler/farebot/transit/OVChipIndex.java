@@ -30,11 +30,11 @@ import com.codebutler.farebot.Utils;
 import java.util.Arrays;
 
 public class OVChipIndex implements Parcelable {
-    private int mRecentTransactionSlot;		// Most recent transaction slot (0xFB0 or 0xFD0)
-    private int mRecentInfoSlot;			// Most recent card information index slot (0x5C0 or 0x580)
-    private int mRecentSubscriptionSlot;	// Most recent subscription index slot (0xF10 or 0xF30)
-    private int mRecentTravelhistorySlot;	// Most recent travel history index slot (0xF50 or 0xF70)
-    private int mRecentCreditSlot;			// Most recent credit index slot (0xF90 or 0xFA0)
+    private int mRecentTransactionSlot;        // Most recent transaction slot (0xFB0 or 0xFD0)
+    private int mRecentInfoSlot;            // Most recent card information index slot (0x5C0 or 0x580)
+    private int mRecentSubscriptionSlot;    // Most recent subscription index slot (0xF10 or 0xF30)
+    private int mRecentTravelhistorySlot;    // Most recent travel history index slot (0xF50 or 0xF70)
+    private int mRecentCreditSlot;            // Most recent credit index slot (0xF90 or 0xFA0)
     private int[] mSubscriptionIndex;
 
     public OVChipIndex (

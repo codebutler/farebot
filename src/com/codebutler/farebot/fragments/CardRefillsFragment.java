@@ -39,26 +39,21 @@ import com.codebutler.farebot.transit.TransitData;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class CardRefillsFragment extends SherlockListFragment
-{
-    public void onCreate (Bundle savedInstanceState)
-    {
+public class CardRefillsFragment extends SherlockListFragment {
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TransitData transitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
         setListAdapter(new RefillsListAdapter(getActivity(), transitData.getRefills()));
     }
 
-    private static class RefillsListAdapter extends ArrayAdapter<Refill>
-    {
-        public RefillsListAdapter (Context context, Refill[] refills)
-        {
+    private static class RefillsListAdapter extends ArrayAdapter<Refill> {
+        public RefillsListAdapter (Context context, Refill[] refills) {
             super(context, 0, refills);
         }
 
         @Override
-        public View getView (int position, View convertView, ViewGroup parent)
-        {
+        public View getView (int position, View convertView, ViewGroup parent) {
             Activity activity = (Activity) getContext();
             LayoutInflater inflater = activity.getLayoutInflater();
 

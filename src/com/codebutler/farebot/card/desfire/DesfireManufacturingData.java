@@ -29,8 +29,7 @@ import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
 
-public class DesfireManufacturingData implements Parcelable
-{
+public class DesfireManufacturingData implements Parcelable {
     public final int hwVendorID;
     public final int hwType;
     public final int hwSubType;
@@ -52,8 +51,7 @@ public class DesfireManufacturingData implements Parcelable
     public final int weekProd;
     public final int yearProd;
 
-    public DesfireManufacturingData (byte[] data)
-    {
+    public DesfireManufacturingData (byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
         hwVendorID     = stream.read();
         hwType         = stream.read();
@@ -86,13 +84,11 @@ public class DesfireManufacturingData implements Parcelable
         yearProd = stream.read();
     }
 
-    public static DesfireManufacturingData fromXml (Element element)
-    {
+    public static DesfireManufacturingData fromXml (Element element) {
         return new DesfireManufacturingData(element);
     }
 
-    private DesfireManufacturingData (Element element)
-    {
+    private DesfireManufacturingData (Element element) {
         hwVendorID     = Integer.parseInt(element.getElementsByTagName("hw-vendor-id").item(0).getTextContent());
         hwType         = Integer.parseInt(element.getElementsByTagName("hw-type").item(0).getTextContent());
         hwSubType      = Integer.parseInt(element.getElementsByTagName("hw-sub-type").item(0).getTextContent());
@@ -115,8 +111,7 @@ public class DesfireManufacturingData implements Parcelable
         yearProd = Integer.parseInt(element.getElementsByTagName("year-prod").item(0).getTextContent());
     }
 
-    private DesfireManufacturingData (Parcel parcel)
-    {
+    private DesfireManufacturingData (Parcel parcel) {
         hwVendorID     = parcel.readInt();
         hwType         = parcel.readInt();
         hwSubType      = parcel.readInt();
@@ -139,8 +134,7 @@ public class DesfireManufacturingData implements Parcelable
         yearProd = parcel.readInt();
     }
 
-    public void writeToParcel(Parcel parcel, int flags)
-    {
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(hwVendorID);
         parcel.writeInt(hwType);
         parcel.writeInt(hwSubType);
@@ -163,8 +157,7 @@ public class DesfireManufacturingData implements Parcelable
         parcel.writeInt(yearProd);
     }
 
-    public int describeContents()
-    {
+    public int describeContents() {
         return 0;
     }
 

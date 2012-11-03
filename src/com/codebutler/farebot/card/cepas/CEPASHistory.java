@@ -28,8 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class CEPASHistory implements Parcelable
-{
+public class CEPASHistory implements Parcelable {
     private static CEPASTransaction[] sEmptyTransaction = new CEPASTransaction[0];
 
     private int                 mId;
@@ -37,13 +36,11 @@ public class CEPASHistory implements Parcelable
     private final boolean       mIsValid;
     private final String        mErrorMessage;
 
-    public static CEPASHistory create (int purseId, byte[] purseData)
-    {
+    public static CEPASHistory create (int purseId, byte[] purseData) {
         return new CEPASHistory(purseId, purseData);
     }
 
-    public CEPASHistory (int purseId, byte[] purseData)
-    {
+    public CEPASHistory (int purseId, byte[] purseData) {
         mId = purseId;
 
         if (purseData != null) {
@@ -115,8 +112,7 @@ public class CEPASHistory implements Parcelable
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeInt(mId);
         if (mIsValid) {
             parcel.writeInt(1);
@@ -129,13 +125,11 @@ public class CEPASHistory implements Parcelable
         }
     }
 
-    public int describeContents ()
-    {
+    public int describeContents () {
         return 0;
     }
 
-    public static CEPASHistory fromXML (Element element)
-    {
+    public static CEPASHistory fromXML (Element element) {
         int id = Integer.parseInt(element.getAttribute("id"));
         if (element.getAttribute("valid").equals("false"))
             return new CEPASHistory(id, element.getAttribute("error"));
@@ -149,8 +143,7 @@ public class CEPASHistory implements Parcelable
         return new CEPASHistory(id, transactions);
     }
 
-    public Element toXML(Document doc) throws Exception
-    {
+    public Element toXML(Document doc) throws Exception {
         Element history = doc.createElement("history");
         history.setAttribute("id", Integer.toString(mId));
         if (!mIsValid) {

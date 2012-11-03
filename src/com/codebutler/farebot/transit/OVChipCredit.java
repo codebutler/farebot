@@ -53,9 +53,9 @@ public class OVChipCredit implements Parcelable {
         banbits = Utils.getBitsFromBuffer(data, 0, 9);
         id = Utils.getBitsFromBuffer(data, 9, 12);
         creditId = Utils.getBitsFromBuffer(data, 56, 12);
-        credit = Utils.getBitsFromBuffer(data, 78, 15);	// Skipping the first bit (77)...
+        credit = Utils.getBitsFromBuffer(data, 78, 15);    // Skipping the first bit (77)...
 
-        if ((data[9] & (byte)0x04) != 4) {	// ...as the first bit is used to see if the credit is negative or not
+        if ((data[9] & (byte)0x04) != 4) {    // ...as the first bit is used to see if the credit is negative or not
             credit ^= (char)0x7FFF;
             credit = credit * -1;
         }

@@ -36,13 +36,11 @@ import org.w3c.dom.NodeList;
 
 import java.util.Date;
 
-public class CEPASCard extends Card
-{
+public class CEPASCard extends Card {
     private CEPASPurse[]   mPurses;
     private CEPASHistory[] mHistories;
 
-    public static CEPASCard dumpTag (Tag tag) throws Exception
-    {
+    public static CEPASCard dumpTag (Tag tag) throws Exception {
         IsoDep tech = IsoDep.get(tag);
 
         tech.connect();
@@ -72,8 +70,7 @@ public class CEPASCard extends Card
         return new CEPASCard(tag.getId(), new Date(), cepasPurses, cepasHistories);
     }
 
-    private CEPASCard (byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories)
-    {
+    private CEPASCard (byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
         super(tagId, scannedAt);
         mPurses = purses;
         mHistories = histories;
@@ -98,13 +95,11 @@ public class CEPASCard extends Card
         return null;
     }
 
-    public CEPASPurse getPurse (int purse)
-    {
+    public CEPASPurse getPurse (int purse) {
         return mPurses[purse];
     }
 
-    public CEPASHistory getHistory (int purse)
-    {
+    public CEPASHistory getHistory (int purse) {
         return mHistories[purse];
     }
 
@@ -133,8 +128,7 @@ public class CEPASCard extends Card
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         super.writeToParcel(parcel, flags);
 
         parcel.writeInt(mPurses.length);
@@ -146,8 +140,7 @@ public class CEPASCard extends Card
             parcel.writeParcelable(mHistories[i], flags);
     }
 
-    public static CEPASCard fromXML (byte[] cardId, Date scannedAt, Element rootElement)
-    {
+    public static CEPASCard fromXML (byte[] cardId, Date scannedAt, Element rootElement) {
         NodeList purseElements = ((Element) rootElement.getElementsByTagName("purses").item(0)).getElementsByTagName("purse");
         CEPASPurse[] purses = new CEPASPurse[purseElements.getLength()];
         for(int i = 0; i < purseElements.getLength(); i++)
@@ -161,8 +154,7 @@ public class CEPASCard extends Card
         return new CEPASCard(cardId, scannedAt, purses, histories);
     }
 
-    public Element toXML () throws Exception
-    {
+    public Element toXML () throws Exception {
         Element root = super.toXML();
 
         Document doc = root.getOwnerDocument();

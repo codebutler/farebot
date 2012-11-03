@@ -145,37 +145,37 @@ public class TripMapActivity extends SherlockMapActivity {
 
     // https://gist.github.com/1385260 
     private static void centerAroundOverlayItems(MapController controller, StationItemizedOverlay itemizedOverlay) {
-    	if (itemizedOverlay.size() == 0) return;
+        if (itemizedOverlay.size() == 0) return;
 
-    	double hpadding = 0.1;
-    	double vpadding = 0.15;
+        double hpadding = 0.1;
+        double vpadding = 0.15;
 
-    	//start wide
-    	int minLatitude = (int)(90 * 1E6);
-    	int maxLatitude = (int)(-90 * 1E6);
-    	int minLongitude = (int)(180 * 1E6);
-    	int maxLongitude = (int)(-180 * 1E6);
+        //start wide
+        int minLatitude = (int)(90 * 1E6);
+        int maxLatitude = (int)(-90 * 1E6);
+        int minLongitude = (int)(180 * 1E6);
+        int maxLongitude = (int)(-180 * 1E6);
 
         for (int i = 0; i < itemizedOverlay.size(); i++) {
             OverlayItem item = itemizedOverlay.getItem(i);
 
-    		int lat = item.getPoint().getLatitudeE6();
-    		int lon = item.getPoint().getLongitudeE6();
-    		//narrow down
-    		maxLatitude = Math.max(lat, maxLatitude);
-    		minLatitude = Math.min(lat, minLatitude);
-    		maxLongitude = Math.max(lon, maxLongitude);
-    		minLongitude = Math.min(lon, minLongitude);
-    	}
+            int lat = item.getPoint().getLatitudeE6();
+            int lon = item.getPoint().getLongitudeE6();
+            //narrow down
+            maxLatitude = Math.max(lat, maxLatitude);
+            minLatitude = Math.min(lat, minLatitude);
+            maxLongitude = Math.max(lon, maxLongitude);
+            minLongitude = Math.min(lon, minLongitude);
+        }
 
-    	maxLatitude = maxLatitude + (int)((maxLatitude - minLatitude) * hpadding);
-    	minLatitude = minLatitude - (int)((maxLatitude - minLatitude) * hpadding);
+        maxLatitude = maxLatitude + (int)((maxLatitude - minLatitude) * hpadding);
+        minLatitude = minLatitude - (int)((maxLatitude - minLatitude) * hpadding);
 
-    	maxLongitude = maxLongitude + (int)((maxLongitude - minLongitude) * vpadding);
-    	minLongitude = minLongitude - (int)((maxLongitude - minLongitude) * vpadding);
+        maxLongitude = maxLongitude + (int)((maxLongitude - minLongitude) * vpadding);
+        minLongitude = minLongitude - (int)((maxLongitude - minLongitude) * vpadding);
 
-    	controller.zoomToSpan(maxLatitude - minLatitude, maxLongitude - minLongitude); //this will zoom to nearest zoom level
-    	controller.animateTo( //go to the center of the span
+        controller.zoomToSpan(maxLatitude - minLatitude, maxLongitude - minLongitude); //this will zoom to nearest zoom level
+        controller.animateTo( //go to the center of the span
             new GeoPoint(
                 (maxLatitude + minLatitude) / 2,
                 (maxLongitude + minLongitude) / 2

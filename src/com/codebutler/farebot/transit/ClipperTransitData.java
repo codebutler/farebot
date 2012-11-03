@@ -38,8 +38,7 @@ import com.codebutler.farebot.card.desfire.DesfireFile;
 import java.text.NumberFormat;
 import java.util.*;
 
-public class ClipperTransitData extends TransitData
-{
+public class ClipperTransitData extends TransitData {
     private long            mSerialNumber;
     private short           mBalance;
     private ClipperTrip[]   mTrips;
@@ -57,8 +56,7 @@ public class ClipperTransitData extends TransitData
 
     private static final long EPOCH_OFFSET    = 0x83aa7f18;
 
-    private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() {
-        {
+    private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() { {
             put(AGENCY_ACTRAN, "Alameda-Contra Costa Transit District");
             put(AGENCY_BART, "Bay Area Rapid Transit");
             put(AGENCY_CALTRAIN, "Caltrain");
@@ -70,8 +68,7 @@ public class ClipperTransitData extends TransitData
         }
     };
     
-    private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {
-        {
+    private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() { {
             put(AGENCY_ACTRAN, "ACTransit");
             put(AGENCY_BART, "BART");
             put(AGENCY_CALTRAIN, "Caltrain");
@@ -83,8 +80,7 @@ public class ClipperTransitData extends TransitData
         }
     };
 
-    private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {
-        {
+    private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() { {
             put((long)0x01, new Station("Colma Station",                             "Colma",                "37.68468",  "-122.46626"));
             put((long)0x02, new Station("Daly City Station",                         "Daly City",            "37.70608",  "-122.46908"));
             put((long)0x03, new Station("Balboa Park Station",                       "Balboa Park",          "37.721556", "-122.447503"));
@@ -121,22 +117,19 @@ public class ClipperTransitData extends TransitData
         }
     };
 
-    private static Map<Long, String> sFerryRoutes = new HashMap<Long, String>() {
-        {
+    private static Map<Long, String> sFerryRoutes = new HashMap<Long, String>() { {
             put((long)0x03, "Larkspur");
             put((long)0x04, "San Francisco");
         }
     };
 
-    private static Map<Long, Station> sFerryTerminals = new HashMap<Long, Station>() {
-        {
+    private static Map<Long, Station> sFerryTerminals = new HashMap<Long, Station>() { {
             put((long)0x01, new Station("San Francisco Ferry Building", "San Francisco", "37.795873", "-122.391987"));
             put((long)0x03, new Station("Larkspur Ferry Terminal", "Larkspur", "37.945509", "-122.50916"));
         }
     };
 
-    public static boolean check (Card card)
-    {
+    public static boolean check (Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
     }
     
@@ -150,8 +143,7 @@ public class ClipperTransitData extends TransitData
         }
     };
         
-    public static TransitIdentity parseTransitIdentity (Card card)
-    {
+    public static TransitIdentity parseTransitIdentity (Card card) {
         try {
            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
            return new TransitIdentity("Clipper", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
@@ -172,8 +164,7 @@ public class ClipperTransitData extends TransitData
         parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
     }
     
-    public ClipperTransitData (Card card)
-    {
+    public ClipperTransitData (Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
 
         byte[] data;
@@ -241,8 +232,7 @@ public class ClipperTransitData extends TransitData
         return null;
     }
 
-    private ClipperTrip[] parseTrips (DesfireCard card)
-    {
+    private ClipperTrip[] parseTrips (DesfireCard card) {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x0e);
 
         /*
@@ -285,8 +275,7 @@ public class ClipperTransitData extends TransitData
         return useLog;
     }
 
-    private ClipperTrip createTrip (byte[] useData)
-    {
+    private ClipperTrip createTrip (byte[] useData) {
         long timestamp, exitTimestamp, fare, agency, from, to, route;
 
         timestamp     = Utils.byteArrayToLong(useData,  0xc, 4);
@@ -306,8 +295,7 @@ public class ClipperTransitData extends TransitData
         return new ClipperTrip(timestamp, exitTimestamp, fare, agency, from, to, route);
     }
 
-    private ClipperRefill[] parseRefills (DesfireCard card)
-    {
+    private ClipperRefill[] parseRefills (DesfireCard card) {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x04);
 
         /*
@@ -335,8 +323,7 @@ public class ClipperTransitData extends TransitData
         return useLog;
     }
 
-    private ClipperRefill createRefill (byte[] useData)
-    {
+    private ClipperRefill createRefill (byte[] useData) {
         long timestamp, amount, agency, machineid;
 
         timestamp = Utils.byteArrayToLong(useData, 0x4, 4);
@@ -351,8 +338,7 @@ public class ClipperTransitData extends TransitData
         return new ClipperRefill(timestamp, amount, agency, machineid);
     }
 
-    private void setBalances()
-    {
+    private void setBalances() {
         int trip_idx = 0;
         int refill_idx = 0;
         long balance = (long) mBalance;
@@ -395,8 +381,7 @@ public class ClipperTransitData extends TransitData
         parcel.writeTypedArray(mRefills, flags);
     }
 
-    public static class ClipperTrip extends Trip
-    {
+    public static class ClipperTrip extends Trip {
         private final long mTimestamp;
         private final long mExitTimestamp;
         private final long mFare;
@@ -406,8 +391,7 @@ public class ClipperTransitData extends TransitData
         private final long mRoute;
         private long mBalance;
 
-        public ClipperTrip (long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route)
-        {
+        public ClipperTrip (long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route) {
             mTimestamp      = timestamp;
             mExitTimestamp  = exitTimestamp;
             mFare           = fare;
@@ -428,8 +412,7 @@ public class ClipperTransitData extends TransitData
             }
         };
 
-        private ClipperTrip (Parcel parcel)
-        {
+        private ClipperTrip (Parcel parcel) {
             mTimestamp     = parcel.readLong();
             mExitTimestamp = parcel.readLong();
             mFare          = parcel.readLong();
@@ -610,8 +593,7 @@ public class ClipperTransitData extends TransitData
             }
         };
 
-        public ClipperRefill (long timestamp, long amount, long agency, long machineid)
-        {
+        public ClipperRefill (long timestamp, long amount, long agency, long machineid) {
             mTimestamp  = timestamp;
             mAmount     = amount;
             mMachineID  = machineid;

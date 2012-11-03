@@ -27,8 +27,8 @@ import android.provider.BaseColumns;
 public class KeysTableColumns implements BaseColumns {
     public static final String TABLE_NAME = "keys";
 
-   	public static final String CARD_ID    = "card_id";
-   	public static final String CARD_TYPE  = "card_type";
-   	public static final String KEY_DATA   = "key_data";
+    public static final String CARD_ID    = "card_id";
+    public static final String CARD_TYPE  = "card_type";
+    public static final String KEY_DATA   = "key_data";
     public static final String CREATED_AT = "created_at";
 }

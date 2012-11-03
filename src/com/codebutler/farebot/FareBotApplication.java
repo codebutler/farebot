@@ -23,6 +23,7 @@
 package com.codebutler.farebot;
 
 import android.app.Application;
+import android.os.StrictMode;
 import com.codebutler.farebot.card.felica.DBUtil;
 import com.codebutler.farebot.transit.OVChipDBUtil;
 
@@ -55,9 +56,9 @@ public class FareBotApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-//        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//            .detectAll()
-//            .penaltyLog()
-//            .build());
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .build());
     }
 }

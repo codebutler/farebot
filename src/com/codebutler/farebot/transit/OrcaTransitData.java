@@ -40,8 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class OrcaTransitData extends TransitData
-{
+public class OrcaTransitData extends TransitData {
     private static final int AGENCY_KCM = 0x04;
     private static final int AGENCY_PT  = 0x06;
     private static final int AGENCY_ST  = 0x07;
@@ -58,13 +57,11 @@ public class OrcaTransitData extends TransitData
     private double     mBalance;
     private OrcaTrip[] mTrips;
 
-    public static boolean check (Card card)
-    {
+    public static boolean check (Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity(Card card)
-    {
+    public static TransitIdentity parseTransitIdentity(Card card) {
         try {
             byte[] data = ((DesfireCard) card).getApplication(0xffffff).getFile(0x0f).getData();
             return new TransitIdentity("ORCA", String.valueOf(Utils.byteArrayToInt(data, 4, 4)));
@@ -81,8 +78,7 @@ public class OrcaTransitData extends TransitData
         parcel.readTypedArray(mTrips, OrcaTrip.CREATOR);
     }
     
-    public OrcaTransitData (Card card)
-    {
+    public OrcaTransitData (Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
 
         byte[] data;
@@ -143,8 +139,7 @@ public class OrcaTransitData extends TransitData
         return null;
     }
 
-    private OrcaTrip[] parseTrips (DesfireCard card)
-    {
+    private OrcaTrip[] parseTrips (DesfireCard card) {
         DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
 
         if (file instanceof RecordDesfireFile) {
@@ -176,8 +171,7 @@ public class OrcaTransitData extends TransitData
         }
     }
 
-    public static class OrcaTrip extends Trip
-    {
+    public static class OrcaTrip extends Trip {
         private final long mTimestamp;
         private final long mCoachNum;
         private final long mFare;
@@ -201,8 +195,7 @@ public class OrcaTransitData extends TransitData
             new Station("Seatac Airport Station",             "Sea-Tac",       "47.4445305", "-122.297012")
         };
         
-        public OrcaTrip (DesfireRecord record)
-        {
+        public OrcaTrip (DesfireRecord record) {
             byte[] useData = record.getData();
             long[] usefulData = new long[useData.length];
     
@@ -241,8 +234,7 @@ public class OrcaTransitData extends TransitData
             }
         };
 
-        private OrcaTrip (Parcel parcel)
-        {
+        private OrcaTrip (Parcel parcel) {
             mTimestamp  = parcel.readLong();
             mCoachNum   = parcel.readLong();
             mFare       = parcel.readLong();
@@ -372,8 +364,7 @@ public class OrcaTransitData extends TransitData
             return mCoachNum;
         }
 
-        public void writeToParcel(Parcel parcel, int flags)
-        {
+        public void writeToParcel(Parcel parcel, int flags) {
             parcel.writeLong(mTimestamp);
             parcel.writeLong(mCoachNum);
             parcel.writeLong(mFare);

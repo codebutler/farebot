@@ -27,8 +27,7 @@ import org.w3c.dom.Element;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class CEPASTransaction implements Parcelable
-{
+public class CEPASTransaction implements Parcelable {
     private final byte   mType;
     private final int    mAmount;
     private final int    mDate;
@@ -45,8 +44,7 @@ public class CEPASTransaction implements Parcelable
         UNKNOWN,
     }
 
-    public CEPASTransaction (byte[] rawData)
-    {
+    public CEPASTransaction (byte[] rawData) {
         int tmp;
 
         mType = rawData[0];
@@ -71,8 +69,7 @@ public class CEPASTransaction implements Parcelable
         mUserData = new String(userData);
     }
 
-    public CEPASTransaction (byte type, int amount, int date, String userData)
-    {
+    public CEPASTransaction (byte type, int amount, int date, String userData) {
         mType = type;
         mAmount = amount;
         mDate = date;
@@ -83,13 +80,13 @@ public class CEPASTransaction implements Parcelable
         if (mType == 48)
             return TransactionType.MRT;
         if (mType == 117 || mType == 3)
-        	return TransactionType.TOP_UP;
+            return TransactionType.TOP_UP;
         if (mType == 49)
             return TransactionType.BUS;
         if (mType == 118)
             return TransactionType.BUS_REFUND;
         if (mType == -16 || mType == 5)
-        	return TransactionType.CREATION;
+            return TransactionType.CREATION;
         if (mType == 4)
             return TransactionType.SERVICE;
         if (mType == 1)
@@ -123,8 +120,7 @@ public class CEPASTransaction implements Parcelable
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags)
-    {
+    public void writeToParcel (Parcel parcel, int flags) {
         parcel.writeByte(mType);
         parcel.writeInt(mAmount);
         parcel.writeInt(mDate);
@@ -135,8 +131,7 @@ public class CEPASTransaction implements Parcelable
         return 0;
     }
 
-    public static CEPASTransaction fromXML (Element element)
-    {
+    public static CEPASTransaction fromXML (Element element) {
         return new CEPASTransaction(
             Byte.parseByte(element.getAttribute("type")),
             Integer.parseInt(element.getAttribute("amount")),
@@ -145,8 +140,7 @@ public class CEPASTransaction implements Parcelable
         );
     }
 
-    public Element toXML (Document doc) throws Exception
-    {
+    public Element toXML (Document doc) throws Exception {
         Element transaction = doc.createElement("transaction");
         transaction.setAttribute("type", Byte.toString(mType));
         transaction.setAttribute("amount", Integer.toString(mAmount));

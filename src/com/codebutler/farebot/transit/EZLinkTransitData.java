@@ -32,16 +32,13 @@ import com.codebutler.farebot.card.Card;
 import java.text.NumberFormat;
 import java.util.*;
 
-public class EZLinkTransitData extends TransitData
-{
+public class EZLinkTransitData extends TransitData {
     private String       mSerialNumber;
     private double       mBalance;
     private EZLinkTrip[] mTrips;
 
     private static HashSet<String> sbsBuses = new HashSet<String> () {
-        private static final long serialVersionUID = 1L;
-
-        {
+        private static final long serialVersionUID = 1L; {
             add("CT18");
             add("CT8");
             add("CT18");
@@ -309,9 +306,7 @@ public class EZLinkTransitData extends TransitData
     // Data snagged from http://www.sgwiki.com/wiki/North_East_Line
     // Coordinates taken from respective Wikipedia MRT pages
     private static TreeMap<String, MRTStation> mrtStations = new TreeMap<String, MRTStation> () {
-        private static final long serialVersionUID = 1L;
-
-        {
+        private static final long serialVersionUID = 1L; {
             // Transaction Codes
             put("GTM", new MRTStation("GTM Manual Top-up", "GTM", "GTM", null, null));
 
@@ -461,8 +456,7 @@ public class EZLinkTransitData extends TransitData
         return false;
     }
 
-    public static TransitIdentity parseTransitIdentity(Card card)
-    {
+    public static TransitIdentity parseTransitIdentity(Card card) {
         String canNo = Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>");
         return new TransitIdentity(getCardIssuer(canNo), canNo);
     }
@@ -485,8 +479,7 @@ public class EZLinkTransitData extends TransitData
         parcel.readTypedArray(mTrips, EZLinkTrip.CREATOR);
     }
 
-    public EZLinkTransitData (Card card)
-    {
+    public EZLinkTransitData (Card card) {
         CEPASCard cepasCard = (CEPASCard) card;
 
         mSerialNumber = Utils.getHexString(cepasCard.getPurse(3).getCAN(), "<Error>");
@@ -531,8 +524,7 @@ public class EZLinkTransitData extends TransitData
         return null;
     }
 
-    private EZLinkTrip[] parseTrips (CEPASCard card)
-    {
+    private EZLinkTrip[] parseTrips (CEPASCard card) {
         CEPASTransaction[] transactions = card.getHistory(3).getTransactions();
         if (transactions != null) {
             EZLinkTrip[] trips = new EZLinkTrip[transactions.length];
@@ -553,19 +545,16 @@ public class EZLinkTransitData extends TransitData
         parcel.writeTypedArray(mTrips, flags);
     }
 
-    public static class EZLinkTrip extends Trip
-    {
+    public static class EZLinkTrip extends Trip {
         private final CEPASTransaction mTransaction;
         private final String mCardName;
         
-        public EZLinkTrip (CEPASTransaction transaction, String cardName)
-        {
+        public EZLinkTrip (CEPASTransaction transaction, String cardName) {
             mTransaction = transaction;
             mCardName = cardName;
         }
 
-        private EZLinkTrip (Parcel parcel)
-        {
+        private EZLinkTrip (Parcel parcel) {
             mTransaction = parcel.readParcelable(CEPASTransaction.class.getClassLoader());
             mCardName = parcel.readString();
         }

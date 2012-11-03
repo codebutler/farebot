@@ -73,21 +73,21 @@ public class OVChipTransaction implements Parcelable {
     }
 
     public OVChipTransaction (
-            int		transactionSlot,
-            int		date,
-            int		time,
-            int		transfer,
-            int		company,
-            int		id,
-            int		station,
-            int		machineId,
-            int		vehicleId,
-            int		productId,
-            int		amount,
-            int		subscriptionId,
-            int		valid,
-            int		unknownConstant,
-            int		unknownConstant2
+            int        transactionSlot,
+            int        date,
+            int        time,
+            int        transfer,
+            int        company,
+            int        id,
+            int        station,
+            int        machineId,
+            int        vehicleId,
+            int        productId,
+            int        amount,
+            int        subscriptionId,
+            int        valid,
+            int        unknownConstant,
+            int        unknownConstant2
     ) {
         mTransactionSlot = transactionSlot;
         mErrorMessage = "";
@@ -297,20 +297,20 @@ public class OVChipTransaction implements Parcelable {
     public static final Parcelable.Creator<OVChipTransaction> CREATOR = new Parcelable.Creator<OVChipTransaction>() {
         public OVChipTransaction createFromParcel(Parcel source) {
             int transactionSlot;
-            int	date;
-            int	time;
-            int	transfer;
-            int	company;
-            int	id;
-            int	station;
-            int	machineId;
-            int	vehicleId;
-            int	productId;
-            int	amount;
-            int	subscriptionId;
-            int	valid;
-            int	unknownConstant;
-            int	unknownConstant2;
+            int    date;
+            int    time;
+            int    transfer;
+            int    company;
+            int    id;
+            int    station;
+            int    machineId;
+            int    vehicleId;
+            int    productId;
+            int    amount;
+            int    subscriptionId;
+            int    valid;
+            int    unknownConstant;
+            int    unknownConstant2;
 
             transactionSlot = source.readInt();
             valid = source.readInt();

@@ -115,7 +115,7 @@ public class OVChipParser {
         * English: http://ov-chipkaart.pc-active.nl/Indexes
         */
         int count = Utils.getBitsFromBuffer(data, 0, 4);
-        OVChipSubscription[] subscriptions = new OVChipSubscription[count];	// Might be *dangerous* to rely on this
+        OVChipSubscription[] subscriptions = new OVChipSubscription[count];    // Might be *dangerous* to rely on this
         int offset = 4;
 
         for (int i = 0; i < count; i++) {

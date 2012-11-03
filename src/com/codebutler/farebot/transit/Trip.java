@@ -28,8 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Trip implements Parcelable
-{
+public abstract class Trip implements Parcelable {
     public abstract long getTimestamp();
     public abstract long getExitTimestamp();
     public abstract String getRouteName ();

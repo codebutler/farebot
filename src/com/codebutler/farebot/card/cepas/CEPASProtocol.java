@@ -28,8 +28,7 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class CEPASProtocol
-{
+public class CEPASProtocol {
     private static final String TAG = "CEPASProtocol";
 
     /* Status codes */
@@ -38,8 +37,7 @@ public class CEPASProtocol
 
     private IsoDep mTagTech;
 
-    public CEPASProtocol (IsoDep tagTech)
-    {
+    public CEPASProtocol (IsoDep tagTech) {
         mTagTech = tagTech;
     }
 
@@ -91,8 +89,7 @@ public class CEPASProtocol
         }
     }
 
-    private byte[] sendRequest (byte command, byte p1, byte p2, byte Lc, byte[] parameters) throws CEPASException, IOException
-    {
+    private byte[] sendRequest (byte command, byte p1, byte p2, byte Lc, byte[] parameters) throws CEPASException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, p1, p2, Lc, parameters));
@@ -120,8 +117,7 @@ public class CEPASProtocol
         }
     }
 
-    private byte[] wrapMessage (byte command, byte p1, byte p2, byte lc, byte[] parameters) throws IOException
-    {
+    private byte[] wrapMessage (byte command, byte p1, byte p2, byte lc, byte[] parameters) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         stream.write((byte) 0x90); // CLA
