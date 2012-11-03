@@ -31,7 +31,6 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.classic.ClassicCard;
-import com.codebutler.farebot.card.classic.ClassicSector;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -69,6 +68,16 @@ public class OVChipTransitData extends TransitData {
     public static final int  AGENCY_STORE      = 0x19;
 
     private static final byte[] OVC_MANUFACTURER = { (byte) 0x98, (byte) 0x02, (byte) 0x00 /*, (byte) 0x64, (byte) 0x8E */ };
+    private static final byte[] OVC_HEADER = new byte[11];
+    static {
+        OVC_HEADER[0] = -124;
+        OVC_HEADER[4] = 6;
+        OVC_HEADER[5] = 3;
+        OVC_HEADER[6] = -96;
+        OVC_HEADER[8] = 19;
+        OVC_HEADER[9] = -82;
+        OVC_HEADER[10] = -28;
+    }
 
     private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() { {
             put(AGENCY_TLS,        "Trans Link Systems");
@@ -123,18 +132,15 @@ public class OVChipTransitData extends TransitData {
         if (!(card instanceof ClassicCard))
             return false;
 
-        ClassicSector preamble = ((ClassicCard) card).getSector(0);
-        if (preamble == null) {
-            return false;
-        }
+        ClassicCard classicCard = (ClassicCard) card;
 
-        byte[] data = preamble.readBlocks(0, 1);
-        if (data == null) {
+        if (classicCard.getSectors().length != 40)
             return false;
-        }
 
-        byte[] manufacturer = Arrays.copyOfRange(data, 5, 5 + OVC_MANUFACTURER.length);
-        return Arrays.equals(manufacturer, OVC_MANUFACTURER);
+        // Starting at 0×010, 8400 0000 0603 a000 13ae e401 xxxx 0e80 80e8 seems to exist on all OVC's (with xxxx different).
+        // http://www.ov-chipkaart.de/back-up/3-8-11/www.ov-chipkaart.me/blog/index7e09.html?page_id=132
+        byte[] blockData = classicCard.getSector(0).readBlocks(1, 1);
+        return Arrays.equals(Arrays.copyOfRange(blockData, 0, 11), OVC_HEADER);
     }
 
     public static TransitIdentity parseTransitIdentity (Card card) {
