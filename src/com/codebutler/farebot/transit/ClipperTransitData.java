@@ -267,6 +267,7 @@ public class ClipperTransitData extends TransitData
                 if (existingTrip != null) {
                     if (existingTrip.getExitTimestamp() != 0) {
                         // Old trip has exit timestamp, and is therefore better.
+                        pos -= RECORD_LENGTH;
                         continue;
                     } else {
                         result.remove(existingTrip);
