@@ -28,6 +28,9 @@ import com.codebutler.farebot.card.felica.DBUtil;
 import com.codebutler.farebot.transit.OVChipDBUtil;
 
 public class FareBotApplication extends Application {
+    public static final String PREF_LAST_READ_ID = "last_read_id";
+    public static final String PREF_LAST_READ_AT = "last_read_at";
+
     private static FareBotApplication sInstance;
 
     private DBUtil mSuicaDBUtil;
