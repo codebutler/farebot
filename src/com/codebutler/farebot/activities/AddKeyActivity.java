@@ -114,7 +114,7 @@ public class AddKeyActivity extends SherlockActivity {
 
         Utils.checkNfcEnabled(this, mNfcAdapter);
 
-        Intent intent = new Intent(this, AddKeyActivity.class);
+        Intent intent = getIntent();
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 

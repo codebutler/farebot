@@ -81,8 +81,13 @@ public class CardsFragment extends SherlockListFragment {
 
         @Override
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-           ((CursorAdapter) getListView().getAdapter()).swapCursor(cursor);
-            setListShown(true);
+            if (getListAdapter() == null) {
+                setListAdapter(new CardsAdapter());
+                setListShown(true);
+                setEmptyText(getString(R.string.no_scanned_cards));
+            }
+
+            ((CursorAdapter) getListAdapter()).swapCursor(cursor);
         }
 
         @Override
@@ -100,11 +105,9 @@ public class CardsFragment extends SherlockListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setEmptyText(getString(R.string.no_scanned_cards));
 
         registerForContextMenu(getListView());
 
-        setListAdapter(new CardsAdapter());
         getLoaderManager().initLoader(0, null, mLoaderCallbacks);
     }
 
