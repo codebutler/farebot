@@ -26,7 +26,6 @@ package com.codebutler.farebot.card.classic;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Parcel;
-import android.util.Base64;
 import com.codebutler.farebot.CardHasManufacturingInfo;
 import com.codebutler.farebot.CardRawDataFragmentClass;
 import com.codebutler.farebot.Utils;
@@ -40,9 +39,9 @@ import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,37 +70,41 @@ public class ClassicCard extends Card {
             List<ClassicSector> sectors = new ArrayList<ClassicSector>();
 
             for (int sectorIndex = 0; sectorIndex < tech.getSectorCount(); sectorIndex++) {
-                boolean authSuccess;
-                ClassicSectorKey sectorKey;
-                if (sectorIndex == 0) {
-                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
-                    if (!authSuccess) {
-                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
-                    }
-                } else {
-                    if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
-                        if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
-                        } else {
-                            authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
+                try {
+                    boolean authSuccess;
+                    ClassicSectorKey sectorKey;
+                    if (sectorIndex == 0) {
+                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
+                        if (!authSuccess) {
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
                         }
                     } else {
-                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
+                        if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
+                            if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
+                            } else {
+                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
+                            }
+                        } else {
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
+                        }
                     }
-                }
 
-                if (authSuccess) {
-                    List<ClassicBlock> blocks = new ArrayList<ClassicBlock>();
-                    // FIXME: First read trailer block to get type of other blocks.
-                    int firstBlockIndex = tech.sectorToBlock(sectorIndex);
-                    for (int blockIndex = 0; blockIndex < tech.getBlockCountInSector(sectorIndex); blockIndex++) {
-                        byte[] data = tech.readBlock(firstBlockIndex + blockIndex);
-                        String type = ClassicBlock.TYPE_DATA; // FIXME
-                        blocks.add(ClassicBlock.create(type, blockIndex, data));
+                    if (authSuccess) {
+                        List<ClassicBlock> blocks = new ArrayList<ClassicBlock>();
+                        // FIXME: First read trailer block to get type of other blocks.
+                        int firstBlockIndex = tech.sectorToBlock(sectorIndex);
+                        for (int blockIndex = 0; blockIndex < tech.getBlockCountInSector(sectorIndex); blockIndex++) {
+                            byte[] data = tech.readBlock(firstBlockIndex + blockIndex);
+                            String type = ClassicBlock.TYPE_DATA; // FIXME
+                            blocks.add(ClassicBlock.create(type, blockIndex, data));
+                        }
+                        sectors.add(new ClassicSector(sectorIndex, blocks.toArray(new ClassicBlock[blocks.size()])));
+                    } else {
+                        sectors.add(new UnauthorizedClassicSector(sectorIndex));
                     }
-                    sectors.add(new ClassicSector(sectorIndex, blocks.toArray(new ClassicBlock[blocks.size()])));
-                } else {
-                    sectors.add(new UnauthorizedClassicSector(sectorIndex));
+                } catch (IOException ex) {
+                    sectors.add(new InvalidClassicSector(sectorIndex, Utils.getErrorMessage(ex)));
                 }
             }
 
@@ -121,23 +124,7 @@ public class ClassicCard extends Card {
         ClassicSector[] sectors = new ClassicSector[sectorElements.getLength()];
         for (int i = 0; i < sectorElements.getLength(); i++) {
             Element sectorElement = (Element) sectorElements.item(i);
-            int sectorIndex = Integer.parseInt(sectorElement.getAttribute("index"));
-            if (sectorElement.hasAttribute("unauthorized") && sectorElement.getAttribute("unauthorized").equals("true")) {
-                sectors[i] = new UnauthorizedClassicSector(sectorIndex);
-            } else {
-                Element blocksElement = (Element) sectorElement.getElementsByTagName("blocks").item(0);
-                NodeList blockElements = blocksElement.getElementsByTagName("block");
-                ClassicBlock[] blocks = new ClassicBlock[blockElements.getLength()];
-                for (int j = 0; j < blockElements.getLength(); j++) {
-                    Element blockElement = (Element) blockElements.item(j);
-                    String type  = blockElement.getAttribute("type");
-                    int blockIndex = Integer.parseInt(blockElement.getAttribute("index"));
-                    Node dataElement = blockElement.getElementsByTagName("data").item(0);
-                    byte[] data = Base64.decode(dataElement.getTextContent().trim(), Base64.DEFAULT);
-                    blocks[j] = ClassicBlock.create(type, blockIndex, data);
-                }
-                sectors[i] = new ClassicSector(sectorIndex, blocks);
-            }
+            sectors[i] = ClassicSector.fromXml(sectorElement);
         }
 
         return new ClassicCard(tagId, new Date(), sectors);

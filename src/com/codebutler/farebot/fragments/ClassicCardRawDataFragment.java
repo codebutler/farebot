@@ -37,6 +37,7 @@ import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicSector;
+import com.codebutler.farebot.card.classic.InvalidClassicSector;
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector;
 
 public class ClassicCardRawDataFragment extends ExpandableListFragment {
@@ -117,12 +118,15 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
             }
 
             ClassicSector sector = (ClassicSector) getGroup(groupPosition);
+            String sectorIndexString = Integer.toHexString(sector.getIndex());
 
             TextView textView = (TextView) view.findViewById(android.R.id.text1);
             if (sector instanceof UnauthorizedClassicSector) {
-                textView.setText(mActivity.getString(R.string.unauthorized_sector_title_format, Integer.toHexString(sector.getIndex())));
+                textView.setText(mActivity.getString(R.string.unauthorized_sector_title_format, sectorIndexString));
+            } else if (sector instanceof InvalidClassicSector) {
+                textView.setText(mActivity.getString(R.string.invalid_sector_title_format, sectorIndexString, ((InvalidClassicSector) sector).getError()));
             } else {
-                textView.setText(mActivity.getString(R.string.sector_title_format, Integer.toHexString(sector.getIndex())));
+                textView.setText(mActivity.getString(R.string.sector_title_format, sectorIndexString));
             }
 
             return view;

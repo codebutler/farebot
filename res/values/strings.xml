@@ -121,6 +121,7 @@
     <string name="block_title_format">Block: %s</string>
     <string name="sector_title_format">Sector: 0x%s</string>
     <string name="unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>
+    <string name="invalid_sector_title_format">Sector: 0x%1$s (Invalid: %2$s)</string>
 
     <string name="subscriptions">Subscriptions</string>
     <string name="info">Info</string>

@@ -23,12 +23,37 @@
 
 package com.codebutler.farebot.card.classic;
 
+import android.util.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class ClassicSector {
     private int mIndex;
     private ClassicBlock[] mBlocks;
+
+    public static ClassicSector fromXml(Element sectorElement) {
+        int sectorIndex = Integer.parseInt(sectorElement.getAttribute("index"));
+        if (sectorElement.hasAttribute("unauthorized") && sectorElement.getAttribute("unauthorized").equals("true")) {
+            return new UnauthorizedClassicSector(sectorIndex);
+        } else if (sectorElement.hasAttribute("invalid") && sectorElement.getAttribute("invalid").equals("true")) {
+            return new InvalidClassicSector(sectorIndex, sectorElement.getAttribute("error"));
+        } else {
+            Element blocksElement = (Element) sectorElement.getElementsByTagName("blocks").item(0);
+            NodeList blockElements = blocksElement.getElementsByTagName("block");
+            ClassicBlock[] blocks = new ClassicBlock[blockElements.getLength()];
+            for (int j = 0; j < blockElements.getLength(); j++) {
+                Element blockElement = (Element) blockElements.item(j);
+                String type  = blockElement.getAttribute("type");
+                int blockIndex = Integer.parseInt(blockElement.getAttribute("index"));
+                Node dataElement = blockElement.getElementsByTagName("data").item(0);
+                byte[] data = Base64.decode(dataElement.getTextContent().trim(), Base64.DEFAULT);
+                blocks[j] = ClassicBlock.create(type, blockIndex, data);
+            }
+            return new ClassicSector(sectorIndex, blocks);
+        }
+    }
 
     public ClassicSector(int index, ClassicBlock[] blocks) {
         mIndex  = index;
