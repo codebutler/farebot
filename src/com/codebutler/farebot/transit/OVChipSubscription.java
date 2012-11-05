@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -166,13 +167,13 @@ public class OVChipSubscription extends Subscription {
     }
 
     @Override
-    public long getValidFrom() {
-        return mValidFrom;
+    public Date getValidFrom() {
+        return OVChipTransitData.convertDate((int) mValidFrom);
     }
 
     @Override
-    public long getValidTo() {
-        return mValidTo;
+    public Date getValidTo() {
+        return OVChipTransitData.convertDate((int) mValidTo);
     }
 
     @Override

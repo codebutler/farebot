@@ -37,7 +37,6 @@ import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 public class CardSubscriptionsFragment extends SherlockListFragment {
@@ -70,14 +69,13 @@ public class CardSubscriptionsFragment extends SherlockListFragment {
 
             Subscription subscription = getItem(position);
 
-            Date validFrom = new Date(subscription.getValidFrom());
-            Date validTo   = new Date(subscription.getValidTo());
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            String validFrom = dateFormat.format(subscription.getValidFrom());
+            String validTo   = dateFormat.format(subscription.getValidTo());
 
             ((TextView) view.findViewById(R.id.company)).setText(subscription.getShortAgencyName());
             ((TextView) view.findViewById(R.id.name)).setText(subscription.getSubscriptionName());
-            ((TextView) view.findViewById(R.id.valid)).setText(getString(R.string.valid_format, dateFormat.format(validFrom), dateFormat.format(validTo)));
+            ((TextView) view.findViewById(R.id.valid)).setText(getString(R.string.valid_format, validFrom, validTo));
 
             return view;
         }

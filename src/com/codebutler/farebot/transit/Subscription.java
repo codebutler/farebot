@@ -27,11 +27,13 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcelable;
 
+import java.util.Date;
+
 public abstract class Subscription implements Parcelable {
     public abstract int getId();
 
-    public abstract long getValidFrom ();
-    public abstract long getValidTo();
+    public abstract Date getValidFrom ();
+    public abstract Date getValidTo();
 
     public abstract String getAgencyName();
     public abstract String getShortAgencyName();
