@@ -79,37 +79,35 @@ public class OVChipTransitData extends TransitData {
         OVC_HEADER[10] = -28;
     }
 
-    private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() { {
-            put(AGENCY_TLS,        "Trans Link Systems");
-            put(AGENCY_CONNEXXION, "Connexxion");
-            put(AGENCY_GVB,        "Gemeentelijk Vervoersbedrijf");
-            put(AGENCY_HTM,        "Haagsche Tramweg-Maatschappij");
-            put(AGENCY_NS,         "Nederlandse Spoorwegen");
-            put(AGENCY_RET,        "Rotterdamse Elektrische Tram");
-            put(AGENCY_VEOLIA,     "Veolia");
-            put(AGENCY_ARRIVA,     "Arriva");
-            put(AGENCY_SYNTUS,     "Syntus");
-            put(AGENCY_QBUZZ,      "Qbuzz");
-            put(AGENCY_DUO,        "Dienst Uitvoering Onderwijs");
-            put(AGENCY_STORE,      "Reseller");
-        }
-    };
+    private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() {{
+        put(AGENCY_TLS,        "Trans Link Systems");
+        put(AGENCY_CONNEXXION, "Connexxion");
+        put(AGENCY_GVB,        "Gemeentelijk Vervoersbedrijf");
+        put(AGENCY_HTM,        "Haagsche Tramweg-Maatschappij");
+        put(AGENCY_NS,         "Nederlandse Spoorwegen");
+        put(AGENCY_RET,        "Rotterdamse Elektrische Tram");
+        put(AGENCY_VEOLIA,     "Veolia");
+        put(AGENCY_ARRIVA,     "Arriva");
+        put(AGENCY_SYNTUS,     "Syntus");
+        put(AGENCY_QBUZZ,      "Qbuzz");
+        put(AGENCY_DUO,        "Dienst Uitvoering Onderwijs");
+        put(AGENCY_STORE,      "Reseller");
+    }};
 
-    private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() { {
-            put(AGENCY_TLS,        "TLS");
-            put(AGENCY_CONNEXXION, "Connexxion"); /* or Breng, Hermes, GVU */
-            put(AGENCY_GVB,        "GVB");
-            put(AGENCY_HTM,        "HTM");
-            put(AGENCY_NS,         "NS");
-            put(AGENCY_RET,        "RET");
-            put(AGENCY_VEOLIA,     "Veolia");
-            put(AGENCY_ARRIVA,     "Arriva");     /* or Aquabus */
-            put(AGENCY_SYNTUS,     "Syntus");
-            put(AGENCY_QBUZZ,      "Qbuzz");
-            put(AGENCY_DUO,        "DUO");
-            put(AGENCY_STORE,      "Reseller");   /* used by Albert Heijn, Primera and Hermes busses and maybe even more */
-        }
-    };
+    private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {{
+        put(AGENCY_TLS,        "TLS");
+        put(AGENCY_CONNEXXION, "Connexxion"); /* or Breng, Hermes, GVU */
+        put(AGENCY_GVB,        "GVB");
+        put(AGENCY_HTM,        "HTM");
+        put(AGENCY_NS,         "NS");
+        put(AGENCY_RET,        "RET");
+        put(AGENCY_VEOLIA,     "Veolia");
+        put(AGENCY_ARRIVA,     "Arriva");     /* or Aquabus */
+        put(AGENCY_SYNTUS,     "Syntus");
+        put(AGENCY_QBUZZ,      "Qbuzz");
+        put(AGENCY_DUO,        "DUO");
+        put(AGENCY_STORE,      "Reseller");   /* used by Albert Heijn, Primera and Hermes busses and maybe even more */
+    }};
 
     private final OVChipIndex          mIndex;
     private final OVChipPreamble       mPreamble;
