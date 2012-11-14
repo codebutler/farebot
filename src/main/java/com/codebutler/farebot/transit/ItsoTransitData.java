@@ -70,6 +70,7 @@ public class ItsoTransitData extends TransitData {
 
 			// We go via hex strings because these are binary coded decimal.
 			ISSN = Long.parseLong(Utils.getHexString(shellBytes, 5, 2));
+			mSerialNumber = Long.parseLong(Utils.getHexString(shellBytes, 7, 4));
 
 			byte[] data;
 			/*
