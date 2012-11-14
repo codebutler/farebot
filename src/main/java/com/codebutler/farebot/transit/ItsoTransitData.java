@@ -5,14 +5,10 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import com.codebutler.farebot.Utils;
-//import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.mifare.Card;
 import com.codebutler.farebot.mifare.DesfireApplication;
 import com.codebutler.farebot.mifare.DesfireCard;
 import com.codebutler.farebot.mifare.DesfireFile;
-
-import java.text.NumberFormat;
-import java.util.*;
 
 public class ItsoTransitData extends TransitData {
 	private long mSerialNumber;
@@ -23,7 +19,7 @@ public class ItsoTransitData extends TransitData {
 				&& (((DesfireCard) card).getApplication(0x1602a0) != null)) {
 
 			/* Need to check IIN is 633597
-			if (ItsoTransitData.bytesToHexString(data, 2, 3) != "633597") {
+			if (Utils.getHexString(data, 2, 3) != "633597") {
 			 */
 
 
@@ -56,42 +52,6 @@ public class ItsoTransitData extends TransitData {
 		 * mRefills = new ClipperRefill[parcel.readInt()];
 		 * parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
 		 */
-	}
-
-	/**
-	 * Turn bytes into hex string representation. Also useful for decoding BCD
-	 *
-	 * @param bytes
-	 *            The data to convert
-	 * @return The hex representation.
-	 */
-	public static String bytesToHexString(byte[] bytes) {
-		return bytesToHexString(bytes, 0, bytes.length);
-	}
-
-	/**
-	 * Turn bytes into hex string representation. Also useful for decoding BCD
-	 *
-	 * @param b
-	 *            The data to convert
-	 * @param offset
-	 * @param length
-	 * @return
-	 */
-	public static String bytesToHexString(byte[] b, int offset, int length) {
-		if (b.length < length + offset)
-			throw new IllegalArgumentException(
-					"length must be less than or equal to b.length");
-
-		StringBuilder sb = new StringBuilder(length * 2);
-
-		Formatter formatter = new Formatter(sb);
-		for (int i = 0; i < length; i++) {
-			formatter.format("%02x", b[offset + i]);
-		}
-
-		formatter.close();
-		return sb.toString();
 	}
 
 	public ItsoTransitData(Card card) {
@@ -194,11 +154,11 @@ public class ItsoTransitData extends TransitData {
 					.getFile(0x0f).getData();
 
 			return new TransitIdentity("ITSO",
-					ItsoTransitData.bytesToHexString(data, 5, 2)
+					Utils.getHexString(data, 5, 2)
 							+ " "
-							+ ItsoTransitData.bytesToHexString(data, 7, 2)
+							+ Utils.getHexString(data, 7, 2)
 							+ " "
-							+ ItsoTransitData.bytesToHexString(data, 9, 2));
+							+ Utils.getHexString(data, 9, 2));
 		} catch (Exception ex) {
 			throw new RuntimeException("Error parsing ITSO serial", ex);
 		}
