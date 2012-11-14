@@ -28,6 +28,8 @@ public class ItsoTransitData extends TransitData {
 			return true;
 		}
 
+		// TODO: Support Mifare classic etc. here
+
 		return false;
 	}
 
