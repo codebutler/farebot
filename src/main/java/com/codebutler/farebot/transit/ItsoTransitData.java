@@ -3,12 +3,15 @@
  */
 package com.codebutler.farebot.transit;
 
+import java.util.List;
+
 import android.os.Parcel;
+
+import com.codebutler.farebot.ListItem;
 import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.mifare.Card;
-import com.codebutler.farebot.mifare.DesfireApplication;
-import com.codebutler.farebot.mifare.DesfireCard;
-import com.codebutler.farebot.mifare.DesfireFile;
+import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.desfire.DesfireApplication;
+import com.codebutler.farebot.card.desfire.DesfireCard;
 
 public class ItsoTransitData extends TransitData {
 	private long mSerialNumber;
@@ -167,6 +170,18 @@ public class ItsoTransitData extends TransitData {
 		} catch (Exception ex) {
 			throw new RuntimeException("Error parsing ITSO serial", ex);
 		}
+	}
+
+	@Override
+	public Subscription[] getSubscriptions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ListItem> getInfo() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
