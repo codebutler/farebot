@@ -34,6 +34,7 @@ import com.codebutler.farebot.fragments.ClassicCardRawDataFragment;
 import com.codebutler.farebot.keys.CardKeys;
 import com.codebutler.farebot.keys.ClassicCardKeys;
 import com.codebutler.farebot.keys.ClassicSectorKey;
+import com.codebutler.farebot.transit.BilheteUnicoSPTransitData;
 import com.codebutler.farebot.transit.OVChipTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -170,6 +171,8 @@ public class ClassicCard extends Card {
     public TransitData parseTransitData() {
         if (OVChipTransitData.check(this))
             return new OVChipTransitData(this);
+        else if(BilheteUnicoSPTransitData.check(this))
+        	return new BilheteUnicoSPTransitData(this);
         return null;
     }
 
