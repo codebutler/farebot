@@ -9,3 +9,5 @@ classes/
 local.properties
 *.iws
 projectFilesBackup/
+
+project.properties
