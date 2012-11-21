@@ -71,23 +71,23 @@ public class ClassicCard extends Card {
 
             for (int sectorIndex = 0; sectorIndex < tech.getSectorCount(); sectorIndex++) {
                 try {
-                    boolean authSuccess;
+                    boolean authSuccess = false;
+
                     ClassicSectorKey sectorKey;
-                    if (sectorIndex == 0) {
-                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
-                        if (!authSuccess) {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
-                        }
-                    } else {
-                        if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
-                            if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
-                            } else {
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
-                            }
+                    if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
+                        if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
                         } else {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
+                            authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
                         }
+                    }
+                    
+                    if (!authSuccess && sectorIndex == 0) {
+                    	authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
+                    }
+                    
+                    if (!authSuccess) {
+                    	authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
                     }
 
                     if (authSuccess) {
