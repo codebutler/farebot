@@ -71,6 +71,7 @@ public class SupportedCardsActivity extends SherlockActivity {
             add(new CardInfo(R.drawable.pasmo_card,   "PASMO",         R.string.location_tokyo));
             add(new CardInfo(R.drawable.icoca_card,   "ICOCA",         R.string.location_kansai));
             add(new CardInfo(R.drawable.ovchip_card,  "OV-chipkaart",  R.string.location_the_netherlands, R.string.card_note_ovchip));
+            add(new CardInfo(R.drawable.bilheteunicosp_card,  "Bilhete Único",  R.string.location_sao_paulo, R.string.card_note_bilheteunicosp));
         }
         
         @Override

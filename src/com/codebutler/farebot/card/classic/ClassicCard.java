@@ -34,6 +34,7 @@ import com.codebutler.farebot.fragments.ClassicCardRawDataFragment;
 import com.codebutler.farebot.keys.CardKeys;
 import com.codebutler.farebot.keys.ClassicCardKeys;
 import com.codebutler.farebot.keys.ClassicSectorKey;
+import com.codebutler.farebot.transit.BilheteUnicoSPTransitData;
 import com.codebutler.farebot.transit.OVChipTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -71,23 +72,23 @@ public class ClassicCard extends Card {
 
             for (int sectorIndex = 0; sectorIndex < tech.getSectorCount(); sectorIndex++) {
                 try {
-                    boolean authSuccess;
+                    boolean authSuccess = false;
                     ClassicSectorKey sectorKey;
-                    if (sectorIndex == 0) {
-                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
-                        if (!authSuccess) {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
-                        }
-                    } else {
-                        if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
-                            if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
-                            } else {
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
-                            }
+                    
+                    if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
+                        if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
                         } else {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
+                            authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
                         }
+                    }
+                    
+                    if(!authSuccess && sectorIndex == 0) {
+                    	authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
+                    }
+                    
+                    if(!authSuccess) {
+                    	authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
                     }
 
                     if (authSuccess) {
@@ -170,6 +171,8 @@ public class ClassicCard extends Card {
     public TransitData parseTransitData() {
         if (OVChipTransitData.check(this))
             return new OVChipTransitData(this);
+        else if(BilheteUnicoSPTransitData.check(this))
+        	return new BilheteUnicoSPTransitData(this);
         return null;
     }
 
