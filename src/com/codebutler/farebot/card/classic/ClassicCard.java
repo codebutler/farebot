@@ -74,10 +74,14 @@ public class ClassicCard extends Card {
                     boolean authSuccess = false;
                     ClassicSectorKey sectorKey;
                     
+                    if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
                         if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
                         } else {
+                            authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
                         }
                     }
+                    
                     if(!authSuccess && sectorIndex == 0) {
                     	authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
                     }
