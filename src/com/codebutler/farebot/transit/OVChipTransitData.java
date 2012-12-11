@@ -225,8 +225,11 @@ public class OVChipTransitData extends TransitData {
     }
 
     public static String convertAmount(int amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        DecimalFormat formatter = (DecimalFormat)NumberFormat.getCurrencyInstance();
         formatter.setCurrency(Currency.getInstance("EUR"));
+        String symbol = formatter.getCurrency().getSymbol();
+        formatter.setNegativePrefix(symbol + "-");
+        formatter.setNegativeSuffix("");
 
         return formatter.format((double)amount / 100.0);
     }
