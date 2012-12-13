@@ -182,9 +182,17 @@ public class OVChipTransitData extends TransitData {
 
             if (i < (transactions.size() - 1)) {
                 OVChipTransaction nextTransaction = transactions.get(i + 1);
-                if (transaction.isSameTrip(nextTransaction)) {
+                if (transaction.getId() == nextTransaction.getId()) { // handle two consecutive (duplicate) logins, skip the first one
+                    continue;
+                } else if (transaction.isSameTrip(nextTransaction)) {
                     trips.add(new OVChipTrip(transaction, nextTransaction));
                     i++;
+                    if (i < (transactions.size() - 2)) { // check for two consecutive (duplicate) logouts, skip the second one
+                        OVChipTransaction followingTransaction = transactions.get(i + 1);
+                        if (nextTransaction.getId() == followingTransaction.getId()) {
+                            i++;
+                        }
+                    }
                     continue;
                 }
             }
