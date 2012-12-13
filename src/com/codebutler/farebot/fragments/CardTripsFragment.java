@@ -136,7 +136,9 @@ public class CardTripsFragment extends SherlockListFragment {
                 iconImageView.setImageResource(R.drawable.vending_machine);
             } else if (trip.getMode() == Trip.Mode.POS) {
                 iconImageView.setImageResource(R.drawable.cashier);
-            } else {
+            } else if (trip.getMode() == Trip.Mode.BANNED) {
+                iconImageView.setImageResource(R.drawable.banned);
+        	} else {
                 iconImageView.setImageResource(R.drawable.unknown);
             }
 
