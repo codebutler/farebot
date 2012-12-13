@@ -75,8 +75,12 @@ public class OVChipTrip extends Trip {
         mStartStation = getStation(mAgency, mStartStationId);
 
         if (outTransaction != null) {
-            mEndStation    = getStation(mAgency, outTransaction.getStation());
             mEndStationId  = outTransaction.getStation();
+            if (getStation(mAgency, outTransaction.getStation()) != null) {
+                mEndStation = getStation(mAgency, outTransaction.getStation());
+            } else {
+                mEndStation = new Station(String.format("Unknown (%s)", mEndStationId), null, null);
+            }
             mExitTimestamp = OVChipTransitData.convertDate(outTransaction.getDate(), outTransaction.getTime());
             mFare          = outTransaction.getAmount();
         } else {
