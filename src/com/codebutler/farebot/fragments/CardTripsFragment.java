@@ -40,6 +40,7 @@ import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.activities.TripMapActivity;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.transit.OVChipTrip;
 import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
