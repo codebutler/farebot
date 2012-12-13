@@ -166,6 +166,8 @@ public class CardTripsFragment extends SherlockListFragment {
                 fareTextView.setText(trip.getFareString());
             } else if (trip instanceof OrcaTransitData.OrcaTrip) {
                 fareTextView.setText(R.string.pass_or_transfer);
+            } else if (trip instanceof OVChipTrip) {
+                fareTextView.setText(trip.getFareString());
             }
 
             String stationText = Trip.formatStationNames(trip);
