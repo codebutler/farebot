@@ -71,7 +71,8 @@ public abstract class Trip implements Parcelable {
         TICKET_MACHINE,
         VENDING_MACHINE,
         POS,
-        OTHER
+        OTHER,
+        BANNED
     }
 
     public static class Comparator implements java.util.Comparator<Trip> {
