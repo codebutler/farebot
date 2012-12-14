@@ -182,6 +182,14 @@ public class OVChipSubscription extends Subscription {
     }
 
     @Override
+    public String getActivation() {
+        if (mType1 != 0) {
+            return mUsed != 0 ? "Activated and used" : "Activated but not used";
+        }
+        return "Deactivated";
+    }
+
+    @Override
     public int getMachineId () {
         return mMachineId;
     }
