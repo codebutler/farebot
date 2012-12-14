@@ -40,6 +40,7 @@ public abstract class Subscription implements Parcelable {
 
     public abstract int getMachineId();
     public abstract String getSubscriptionName();
+    public abstract String getActivation();
 
     public final int describeContents() {
         return 0;

@@ -76,6 +76,7 @@ public class CardSubscriptionsFragment extends SherlockListFragment {
             ((TextView) view.findViewById(R.id.company)).setText(subscription.getShortAgencyName());
             ((TextView) view.findViewById(R.id.name)).setText(subscription.getSubscriptionName());
             ((TextView) view.findViewById(R.id.valid)).setText(getString(R.string.valid_format, validFrom, validTo));
+            ((TextView) view.findViewById(R.id.used)).setText(subscription.getActivation());
 
             return view;
         }
