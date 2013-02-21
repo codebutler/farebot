@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.codebutler.farebot.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +34,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class OVChipInfo implements Parcelable {
+    private final int  mCompany;
+    private final int  mExpdate;
     private final Date mBirthdate;
     private final int  mActive;
     private final int  mLimit;
@@ -40,12 +43,16 @@ public class OVChipInfo implements Parcelable {
     private final int  mUnknown;
 
     public OVChipInfo (
+    		int company,
+    		int expdate,
             Date birthdate,
             int  active,
             int  limit,
             int  charge,
             int  unknown
     ) {
+    	mCompany = company;
+    	mExpdate = expdate;
         mBirthdate = birthdate;
         mActive = active;
         mLimit = limit;
@@ -58,34 +65,49 @@ public class OVChipInfo implements Parcelable {
             data = new byte[48];
         }
 
+        int company = 0;
+        int expdate = 0;
         Date birthdate = new Date();
         int active = 0;
         int limit = 0;
-         int charge = 0;
-         int unknown = 0;
+        int charge = 0;
+        int unknown = 0;
 
-            if ((data[13] & (byte)0x02) == (byte)0x02) {    // Has date of birth, so it's a personal card (no autocharge on anonymous cards)
-                int year = (Utils.convertBCDtoInteger(data[14]) * 100) + Utils.convertBCDtoInteger(data[15]);
-                int month = Utils.convertBCDtoInteger(data[16]);
-                int day = Utils.convertBCDtoInteger(data[17]);
+        company = ((char)data[6] >> 3) & (char)0x1F; // Could be 4 bits though
+        expdate = (((char)data[6] & (char)0x07) << 11) | (((char)data[7] & (char)0xFF) << 3) | (((char)data[8] >> 5) & (char)0x07);
 
-                Calendar calendar = Calendar.getInstance();
+        if ((data[13] & (byte)0x02) == (byte)0x02) {    // Has date of birth, so it's a personal card (no autocharge on anonymous cards)
+            int year = (Utils.convertBCDtoInteger(data[14]) * 100) + Utils.convertBCDtoInteger(data[15]);
+            int month = Utils.convertBCDtoInteger(data[16]);
+            int day = Utils.convertBCDtoInteger(data[17]);
+
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month - 1);
             calendar.set(Calendar.DAY_OF_MONTH, day);
             birthdate = calendar.getTime();
 
-             active = (data[22] >> 4) & (byte)0x0F;
-             limit = (((char)data[22] & (char)0x0F) << 12) | (((char)data[23] & (char)0xFF) << 4) | (((char)data[24] >> 4) & (char)0x0F);
-             charge = (((char)data[24] & (char)0x0F) << 12) | (((char)data[25] & (char)0xFF) << 4) | (((char)data[26] >> 4) & (char)0x0F);
-             unknown = (((char)data[26] & (char)0x0F) << 12) | (((char)data[27] & (char)0xFF) << 4) | (((char)data[28] >> 4) & (char)0x0F);
-            }
+            active = (data[22] >> 4) & (byte)0x0F;
+            limit = (((char)data[22] & (char)0x0F) << 12) | (((char)data[23] & (char)0xFF) << 4) | (((char)data[24] >> 4) & (char)0x0F);
+            charge = (((char)data[24] & (char)0x0F) << 12) | (((char)data[25] & (char)0xFF) << 4) | (((char)data[26] >> 4) & (char)0x0F);
+            unknown = (((char)data[26] & (char)0x0F) << 12) | (((char)data[27] & (char)0xFF) << 4) | (((char)data[28] >> 4) & (char)0x0F);
+        }
 
-            mBirthdate = birthdate;
-            mActive = active;
+        mCompany = company;
+        mExpdate = expdate;
+        mBirthdate = birthdate;
+        mActive = active;
         mLimit = limit;
         mCharge = charge;
         mUnknown = unknown;
+    }
+
+    public int getCompany() {
+        return mCompany;
+    }
+
+    public int getExpdate() {
+        return mExpdate;
     }
 
     public Date getBirthdate() {
@@ -114,20 +136,24 @@ public class OVChipInfo implements Parcelable {
 
     public static final Parcelable.Creator<OVChipInfo> CREATOR = new Parcelable.Creator<OVChipInfo>() {
         public OVChipInfo createFromParcel(Parcel source) {
-            Date birthdate = null;
-            int active = 0;
-            int limit = 0;
-             int charge = 0;
-             int unknown = 0;
+        int company = 0;
+        int expdate = 0;
+        Date birthdate = null;
+        int active = 0;
+        int limit = 0;
+        int charge = 0;
+        int unknown = 0;
 
-             birthdate = new Date(source.readLong());
-             active = source.readInt();
-             limit = source.readInt();
-             charge = source.readInt();
-             unknown = source.readInt();
+        company = source.readInt();
+        expdate = source.readInt();
+        birthdate = new Date(source.readLong());
+        active = source.readInt();
+        limit = source.readInt();
+        charge = source.readInt();
+        unknown = source.readInt();
 
-            return new OVChipInfo(birthdate, active,
-                    limit, charge, unknown);
+        return new OVChipInfo(company, expdate, birthdate,
+                    active, limit, charge, unknown);
         }
 
         public OVChipInfo[] newArray (int size) {
@@ -136,6 +162,8 @@ public class OVChipInfo implements Parcelable {
     };
 
     public void writeToParcel(Parcel parcel, int flags) {
+    	parcel.writeInt(mCompany);
+        parcel.writeInt(mExpdate);
         parcel.writeLong(mBirthdate.getTime());
         parcel.writeInt(mActive);
         parcel.writeInt(mLimit);
@@ -144,24 +172,30 @@ public class OVChipInfo implements Parcelable {
     }
 
     public static OVChipInfo fromXML (Element element) {
+        int company;
+        int expdate;
         Date birthdate;
         int active;
         int limit;
-         int charge;
-         int unknown;
+        int charge;
+        int unknown;
 
-         birthdate = new Date(Long.valueOf(element.getAttribute("birthdate")));
-         active = Integer.parseInt(element.getAttribute("active"));
-         limit = Integer.parseInt(element.getAttribute("limit"));
-         charge = Integer.parseInt(element.getAttribute("charge"));
-         unknown = Integer.parseInt(element.getAttribute("unknown"));
+        company = Integer.parseInt(element.getAttribute("company"));
+        expdate = Integer.parseInt(element.getAttribute("expdate"));
+        birthdate = new Date(Long.valueOf(element.getAttribute("birthdate")));
+        active = Integer.parseInt(element.getAttribute("active"));
+        limit = Integer.parseInt(element.getAttribute("limit"));
+        charge = Integer.parseInt(element.getAttribute("charge"));
+        unknown = Integer.parseInt(element.getAttribute("unknown"));
 
-        return new OVChipInfo(birthdate, active,
-                limit, charge, unknown);
+        return new OVChipInfo(company, expdate, birthdate,
+                active, limit, charge, unknown);
     }
 
     public Element toXML (Document doc) throws Exception {
         Element info = doc.createElement("info");
+        info.setAttribute("company", Integer.toString(mCompany));
+        info.setAttribute("expdate", Integer.toString(mExpdate));
         info.setAttribute("birthdate", Long.toString(mBirthdate.getTime()));
         info.setAttribute("active", Integer.toString(mActive));
         info.setAttribute("limit", Integer.toString(mLimit));

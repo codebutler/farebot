@@ -310,28 +310,29 @@ public class OVChipTransitData extends TransitData {
         items.add(new ListItem("Serial Number",   mPreamble.getId()));
         items.add(new ListItem("Expiration Date", DateFormat.getDateInstance(DateFormat.LONG).format(OVChipTransitData.convertDate(mPreamble.getExpdate()))));
         items.add(new ListItem("Card Type",       (mPreamble.getType() == 2 ? "Personal" : "Anonymous")));
+        items.add(new ListItem("Issuer",          OVChipTransitData.getShortAgencyName(mInfo.getCompany())));
 
-        items.add(new ListItem("Banned", ((mCredit.getBanbits() & (byte)0xC0) == (byte)0xC0) ? "Yes" : "No"));
+        items.add(new ListItem("Banned",          ((mCredit.getBanbits() & (char)0xC0) == (char)0xC0) ? "Yes" : "No"));
 
          if (mPreamble.getType() == 2) {
               items.add(new HeaderListItem("Personal Information"));
-              items.add(new ListItem("Birthdate",     DateFormat.getDateInstance(DateFormat.LONG).format(mInfo.getBirthdate())));
+              items.add(new ListItem("Birthdate", DateFormat.getDateInstance(DateFormat.LONG).format(mInfo.getBirthdate())));
         }
 
-         items.add(new HeaderListItem("Credit Information"));
-         items.add(new ListItem("Credit Slot ID",    Integer.toString(mCredit.getId())));
-         items.add(new ListItem("Last Credit ID",    Integer.toString(mCredit.getCreditId())));
-         items.add(new ListItem("Credit",            OVChipTransitData.convertAmount(mCredit.getCredit())));
-         items.add(new ListItem("Autocharge",        (mInfo.getActive() == (byte)0x05 ? "Yes" : "No")));
-         items.add(new ListItem("Autocharge Limit",    OVChipTransitData.convertAmount(mInfo.getLimit())));
-         items.add(new ListItem("Autocharge Charge",    OVChipTransitData.convertAmount(mInfo.getCharge())));
+        items.add(new HeaderListItem("Credit Information"));
+        items.add(new ListItem("Credit Slot ID",    Integer.toString(mCredit.getId())));
+        items.add(new ListItem("Last Credit ID",    Integer.toString(mCredit.getCreditId())));
+        items.add(new ListItem("Credit",            OVChipTransitData.convertAmount(mCredit.getCredit())));
+        items.add(new ListItem("Autocharge",        (mInfo.getActive() == (byte)0x05 ? "Yes" : "No")));
+        items.add(new ListItem("Autocharge Limit",  OVChipTransitData.convertAmount(mInfo.getLimit())));
+        items.add(new ListItem("Autocharge Charge", OVChipTransitData.convertAmount(mInfo.getCharge())));
 
         items.add(new HeaderListItem("Recent Slots"));
-        items.add(new ListItem("Transaction Slot",        "0x" + Integer.toHexString((char)mIndex.getRecentTransactionSlot())));
-        items.add(new ListItem("Info Slot",                "0x" + Integer.toHexString((char)mIndex.getRecentInfoSlot())));
-        items.add(new ListItem("Subscription Slot",        "0x" + Integer.toHexString((char)mIndex.getRecentSubscriptionSlot())));
-        items.add(new ListItem("Travelhistory Slot",    "0x" + Integer.toHexString((char)mIndex.getRecentTravelhistorySlot())));
-        items.add(new ListItem("Credit Slot",            "0x" + Integer.toHexString((char)mIndex.getRecentCreditSlot())));
+        items.add(new ListItem("Transaction Slot",   "0x" + Integer.toHexString((char)mIndex.getRecentTransactionSlot())));
+        items.add(new ListItem("Info Slot",          "0x" + Integer.toHexString((char)mIndex.getRecentInfoSlot())));
+        items.add(new ListItem("Subscription Slot",  "0x" + Integer.toHexString((char)mIndex.getRecentSubscriptionSlot())));
+        items.add(new ListItem("Travelhistory Slot", "0x" + Integer.toHexString((char)mIndex.getRecentTravelhistorySlot())));
+        items.add(new ListItem("Credit Slot",        "0x" + Integer.toHexString((char)mIndex.getRecentCreditSlot())));
 
         return items;
     }
