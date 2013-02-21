@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.codebutler.farebot.Utils;
 import org.w3c.dom.Document;
