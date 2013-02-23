@@ -315,7 +315,7 @@ public class OVChipTransitData extends TransitData {
         items.add(new ListItem("Card Type",       (mPreamble.getType() == 2 ? "Personal" : "Anonymous")));
         items.add(new ListItem("Issuer",          OVChipTransitData.getShortAgencyName(mInfo.getCompany())));
 
-        items.add(new ListItem("Banned",          ((mCredit.getBanbits() & (byte)0xC0) == (byte)0xC0) ? "Yes" : "No"));
+        items.add(new ListItem("Banned",          ((mCredit.getBanbits() & (char)0xC0) == (char)0xC0) ? "Yes" : "No"));
 
          if (mPreamble.getType() == 2) {
               items.add(new HeaderListItem("Personal Information"));
