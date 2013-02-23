@@ -67,6 +67,7 @@ public class OVChipTransitData extends TransitData {
     public static final int  AGENCY_QBUZZ      = 0x0A;
     public static final int  AGENCY_DUO        = 0x0C;    // Could also be 2C though... ( http://www.ov-chipkaart.me/forum/viewtopic.php?f=10&t=299 )
     public static final int  AGENCY_STORE      = 0x19;
+    public static final int  AGENCY_DUO_ALT    = 0x2C;
 
     private static final byte[] OVC_MANUFACTURER = { (byte) 0x98, (byte) 0x02, (byte) 0x00 /*, (byte) 0x64, (byte) 0x8E */ };
     private static final byte[] OVC_HEADER = new byte[11];
@@ -93,6 +94,7 @@ public class OVChipTransitData extends TransitData {
         put(AGENCY_QBUZZ,      "Qbuzz");
         put(AGENCY_DUO,        "Dienst Uitvoering Onderwijs");
         put(AGENCY_STORE,      "Reseller");
+        put(AGENCY_DUO_ALT,    "Dienst Uitvoering Onderwijs");
     }};
 
     private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {{
@@ -108,6 +110,7 @@ public class OVChipTransitData extends TransitData {
         put(AGENCY_QBUZZ,      "Qbuzz");
         put(AGENCY_DUO,        "DUO");
         put(AGENCY_STORE,      "Reseller");   /* used by Albert Heijn, Primera and Hermes busses and maybe even more */
+        put(AGENCY_DUO_ALT,    "DUO");
     }};
 
     private final OVChipIndex          mIndex;

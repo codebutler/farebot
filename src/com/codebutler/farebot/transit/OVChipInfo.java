@@ -87,10 +87,10 @@ public class OVChipInfo implements Parcelable {
             calendar.set(Calendar.DAY_OF_MONTH, day);
             birthdate = calendar.getTime();
 
-            active = (data[22] >> 4) & (byte)0x0F;
-            limit = (((char)data[22] & (char)0x0F) << 12) | (((char)data[23] & (char)0xFF) << 4) | (((char)data[24] >> 4) & (char)0x0F);
-            charge = (((char)data[24] & (char)0x0F) << 12) | (((char)data[25] & (char)0xFF) << 4) | (((char)data[26] >> 4) & (char)0x0F);
-            unknown = (((char)data[26] & (char)0x0F) << 12) | (((char)data[27] & (char)0xFF) << 4) | (((char)data[28] >> 4) & (char)0x0F);
+            active = (data[22] >> 5) & (byte)0x07;
+            limit = (((char)data[22] & (char)0x1F) << 11) | (((char)data[23] & (char)0xFF) << 3) | (((char)data[24] >> 5) & (char)0x07);
+            charge = (((char)data[24] & (char)0x1F) << 11) | (((char)data[25] & (char)0xFF) << 3) | (((char)data[26] >> 5) & (char)0x07);
+            unknown = (((char)data[26] & (char)0x1F) << 11) | (((char)data[27] & (char)0xFF) << 3) | (((char)data[28] >> 5) & (char)0x07);
         }
 
         mCompany = company;
