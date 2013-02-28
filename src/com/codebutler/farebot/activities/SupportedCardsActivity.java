@@ -63,14 +63,15 @@ public class SupportedCardsActivity extends SherlockActivity {
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
         public CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
-            add(new CardInfo(R.drawable.orca_card,    "ORCA",          R.string.location_seattle));
-            add(new CardInfo(R.drawable.clipper_card, "Clipper",       R.string.location_san_francisco));
-            add(new CardInfo(R.drawable.ezlink_card,  "EZ-Link",       R.string.location_singapore, R.string.card_note_ezlink));
-            add(new CardInfo(R.drawable.nets_card,    "NETS FlashPay", R.string.location_singapore));
-            add(new CardInfo(R.drawable.suica_card,   "Suica",         R.string.location_tokyo));
-            add(new CardInfo(R.drawable.pasmo_card,   "PASMO",         R.string.location_tokyo));
-            add(new CardInfo(R.drawable.icoca_card,   "ICOCA",         R.string.location_kansai));
-            add(new CardInfo(R.drawable.ovchip_card,  "OV-chipkaart",  R.string.location_the_netherlands, R.string.card_note_ovchip));
+            add(new CardInfo(R.drawable.orca_card,           "ORCA",          R.string.location_seattle));
+            add(new CardInfo(R.drawable.clipper_card,        "Clipper",       R.string.location_san_francisco));
+            add(new CardInfo(R.drawable.ezlink_card,         "EZ-Link",       R.string.location_singapore,       R.string.card_note_ezlink));
+            add(new CardInfo(R.drawable.nets_card,           "NETS FlashPay", R.string.location_singapore));
+            add(new CardInfo(R.drawable.suica_card,          "Suica",         R.string.location_tokyo));
+            add(new CardInfo(R.drawable.pasmo_card,          "PASMO",         R.string.location_tokyo));
+            add(new CardInfo(R.drawable.icoca_card,          "ICOCA",         R.string.location_kansai));
+            add(new CardInfo(R.drawable.ovchip_card,         "OV-chipkaart",  R.string.location_the_netherlands, R.string.card_note_ovchip));
+            add(new CardInfo(R.drawable.bilheteunicosp_card, "Bilhete Único", R.string.location_sao_paulo,       R.string.card_note_bilheteunicosp));
         }
         
         @Override
