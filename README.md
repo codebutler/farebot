@@ -14,6 +14,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [nfc-felica][13] and [IC SFCard Fan][14] projects (Suica)
 * [Wilbert Duijvenvoorde](https://github.com/wandcode) (MIFARE Classic/OV-chipkaart)
 * [tbonang](https://github.com/tbonang) (NETS FlashPay)
+* [Marcelo Liberato](https://github.com/mliberato) (Bilhete Único)
 * [The Noun Project][15] (Various icons)
 
 ## Supported Protocols
@@ -31,13 +32,11 @@ View your remaining balance, recent trips, and other information from contactles
 * [NETS FlashPay](http://www.netsflashpay.com.sg/) - Singapore
 * [Suica][9], [ICOCA][10], [PASMO][11] - Japan
 * [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands (Requires encryption keys)
+* [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil (Requires encryption keys)
 
 ## Supported Phones
 
-FareBot uses the NFC hardware available in these phones running Android 4.0 or later:
-
-* Nexus S
-* Galaxy Nexus
+FareBot requires an NFC Android phone running 2.3 or later.
 
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/
