@@ -24,15 +24,20 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.codebutler.farebot.Utils;
+
 public class OVChipSubscription extends Subscription {
     private final int mId;
-    private final long mValidFrom;
-    private final long mValidTo;
+    private final int mUnknown1;
+    private final long mValidFromDate;
+    private final long mValidFromTime;
+    private final long mValidToDate;
+    private final long mValidToTime;
+    private final int mUnknown2;
     private final int mAgency;
     private final int mMachineId;
     private final int mSubscription;
@@ -100,52 +105,103 @@ public class OVChipSubscription extends Subscription {
         int id = 0;
         int company = 0;
         int subscription = 0;
-        int validFrom = 0;
-        int validTo = 0;
+        int unknown1 = 0;
+        int validFromDate = 0;
+        int validFromTime = 0;
+        int validToDate = 0;
+        int validToTime = 0;
+        int unknown2 = 0;
         int machineId = 0;
 
-        if (data[0] == (byte)0x0A && data[1] == (byte)0x00 && data[2] == (byte)0xE0 && ((data[3] & (byte)0xF0) == (byte)0x00)) {
-            id           = ((data[9] & (byte)0xFF) << 4) | ((data[10] >> 4) & (byte)0x0F);
-            company      = ((data[4] >> 4) & (byte) 0x0F);
-            subscription = (((char)data[4] & (char)0x0F) << 12) | (((char)data[5] & (char)0xFF) << 4) | (((char)data[6] >> 4) & (char)0x0F);
-            validFrom    = (((char)data[11] & (char)0x07) << 11) | (((char)data[12] & (char)0xFF) << 3) | (((char)data[13] >> 5) & (char)0x07);
-            validTo      = (((char)data[13] & (char)0x1F) << 9) | (((char)data[14] & (char)0xFF) << 1) | (((char)data[15] >> 7) & (char)0x01);
-            machineId    = (((char)data[21] & (char)0x03) << 22) | (((char)data[22] & (char)0xFF) << 14) | (((char)data[23] & (char)0xFF) << 6) | (((char)data[24] >> 2) & (char)0x3F);
-        } else if (data[0] == (byte)0x0A && data[1] == (byte)0x02 && data[2] == (byte)0xE0 && ((data[3] & (byte)0xF0) == (byte)0x00)) {
-            id           = ((data[9] & (byte)0xFF) << 4) | ((data[10] >> 4) & (byte)0x0F);
-            company      = ((data[4] >> 4) & (byte) 0x0F);
-            subscription = (((char)data[4] & (char)0x0F) << 12) | (((char)data[5] & (char)0xFF) << 4) | (((char)data[6] >> 4) & (char)0x0F);
-            validFrom    = ((char)(data[12] & (char)0x01) << 13) | (((char)data[13] & (char)0xFF) << 5) | (((char)data[14] >> 3) & (char)0x1F);
+        int iBitOffset = 0;
+        int fieldbits = Utils.getBitsFromBuffer(data, 0, 28);
+        iBitOffset += 28;
+        int subfieldbits = 0;
 
-            if ((((data[11] & (byte)0x1F) << 7) | ((data[12] >> 1) & (byte)0x7F)) == 31) {
-                validTo   = (((char)data[16] & (char)0xFF) << 6) | (((char)data[17] >> 2) & (char)0x3F);
-                machineId = (((char)data[25] & (char)0x03) << 22) | (((char)data[26] & (char)0xFF) << 14) | (((char)data[27] & (char)0xFF) << 6) | (((char)data[28] >> 2) & (char)0x3F);
+        if (fieldbits != 0x00) {
+            if ((fieldbits & 0x0000200) != 0x00) {
+                company = Utils.getBitsFromBuffer(data, iBitOffset, 8);
+                iBitOffset += 8;
             }
 
-            if ((((data[11] & (byte)0x1F) << 7) | ((data[12] >> 1) & (byte)0x7F)) == 21) {
-                validTo   = (((char)data[14] & (char)0x07) << 11) | (((char)data[15] & (char)0xFF) << 3) | (((char)data[16] >> 5) & (char)0x07);
-                machineId = (((char)data[23] & (char)0xFF) << 16) | (((char)data[24] & (char)0xFF) << 8) | (((char)data[25] & (char)0xFF));
+            if ((fieldbits & 0x0000400) != 0x00) {
+                subscription = Utils.getBitsFromBuffer(data, iBitOffset, 16);
+                iBitOffset += 24;	/* skipping the first 8 bits, as they are not used OR don't belong to subscriptiontype at all */
+            }
+
+            if ((fieldbits & 0x0000800) != 0x00) {
+                id = Utils.getBitsFromBuffer(data, iBitOffset, 24);
+                iBitOffset += 24;
+            }
+
+            if ((fieldbits & 0x0002000) != 0x00) {
+                unknown1 = Utils.getBitsFromBuffer(data, iBitOffset, 10);
+                iBitOffset += 10;
+            }
+
+            if ((fieldbits & 0x0200000) != 0x00) {
+                subfieldbits = Utils.getBitsFromBuffer(data, iBitOffset, 9);
+                iBitOffset += 9;
+            }
+
+            if (subfieldbits != 0x00) {
+                if ((subfieldbits & 0x0000001) != 0x00) {
+                    validFromDate = Utils.getBitsFromBuffer(data, iBitOffset, 14);
+                    iBitOffset += 14;
+                }
+
+                if ((subfieldbits & 0x0000002) != 0x00) {
+                    validFromTime = Utils.getBitsFromBuffer(data, iBitOffset, 11);
+                    iBitOffset += 11;
+                }
+
+                if ((subfieldbits & 0x0000004) != 0x00) {
+                    validToDate = Utils.getBitsFromBuffer(data, iBitOffset, 14);
+                    iBitOffset += 14;
+                }
+
+                if ((subfieldbits & 0x0000008) != 0x00) {
+                    validToTime = Utils.getBitsFromBuffer(data, iBitOffset, 11);
+                    iBitOffset += 11;
+                }
+
+                if ((subfieldbits & 0x0000010) != 0x00) {
+                    unknown2 = Utils.getBitsFromBuffer(data, iBitOffset, 53);
+                    iBitOffset += 53;
+                }
+            }
+
+            if ((fieldbits & 0x0800000) != 0x00) {
+                machineId = Utils.getBitsFromBuffer(data, iBitOffset, 24);
+                iBitOffset += 24;
             }
         } else {
             throw new IllegalArgumentException("Not valid");
         }
 
-        mId           = id;
-        mAgency       = company;
-        mSubscription = subscription;
-        mValidFrom    = validFrom;
-        mValidTo      = validTo;
-        mMachineId    = machineId;
+        mId            = id;
+        mAgency        = company;
+        mSubscription  = subscription;
+        mUnknown1      = unknown1;
+        mValidFromDate = validFromDate;
+        mValidFromTime = validFromTime;
+        mValidToDate   = validToDate;
+        mValidToTime   = validToTime;
+        mUnknown2      = unknown2;
+        mMachineId     = machineId;
     }
 
-
     public OVChipSubscription(Parcel parcel) {
-        mId           = parcel.readInt();
-        mValidFrom    = parcel.readLong();
-        mValidTo      = parcel.readLong();
-        mAgency       = parcel.readInt();
-        mMachineId    = parcel.readInt();
-        mSubscription = parcel.readInt();
+        mId            = parcel.readInt();
+        mUnknown1      = parcel.readInt();
+        mValidFromDate = parcel.readLong();
+        mValidFromTime = parcel.readLong();
+        mValidToDate   = parcel.readLong();
+        mValidToTime   = parcel.readLong();
+        mUnknown2      = parcel.readInt();
+        mAgency        = parcel.readInt();
+        mMachineId     = parcel.readInt();
+        mSubscription  = parcel.readInt();
 
         mSubscriptionAddress = parcel.readInt();
         mType1               = parcel.readInt();
@@ -168,17 +224,31 @@ public class OVChipSubscription extends Subscription {
 
     @Override
     public Date getValidFrom() {
-        return OVChipTransitData.convertDate((int) mValidFrom);
+        if (mValidFromTime != 0)
+            return OVChipTransitData.convertDate((int) mValidFromDate, (int) mValidFromTime);
+        else
+        	return OVChipTransitData.convertDate((int) mValidFromDate);
     }
 
     @Override
     public Date getValidTo() {
-        return OVChipTransitData.convertDate((int) mValidTo);
+    	if (mValidToTime != 0)
+            return OVChipTransitData.convertDate((int) mValidToDate, (int) mValidToTime);
+        else
+        	return OVChipTransitData.convertDate((int) mValidToDate);
     }
 
     @Override
     public String getSubscriptionName() {
         return getSubscriptionName(mSubscription);
+    }
+
+    @Override
+    public String getActivation() {
+        if (mType1 != 0) {
+            return mUsed != 0 ? "Activated and used" : "Activated but not used";
+        }
+        return "Deactivated";
     }
 
     @Override
@@ -196,10 +266,22 @@ public class OVChipSubscription extends Subscription {
         return OVChipTransitData.getShortAgencyName((int)mAgency);
     }
 
+    public int getUnknown1 () {
+        return mUnknown1;
+    }
+
+    public int getUnknown2 () {
+        return mUnknown2;
+    }
+
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mId);
-        parcel.writeLong(mValidFrom);
-        parcel.writeLong(mValidTo);
+        parcel.writeInt(mUnknown1);
+        parcel.writeLong(mValidFromDate);
+        parcel.writeLong(mValidFromTime);
+        parcel.writeLong(mValidToDate);
+        parcel.writeLong(mValidToTime);
+        parcel.writeInt(mUnknown2);
         parcel.writeInt(mAgency);
         parcel.writeInt(mMachineId);
         parcel.writeInt(mSubscription);

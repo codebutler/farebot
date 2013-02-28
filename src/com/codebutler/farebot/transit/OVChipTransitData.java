@@ -33,6 +33,7 @@ import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.classic.ClassicCard;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +67,7 @@ public class OVChipTransitData extends TransitData {
     public static final int  AGENCY_QBUZZ      = 0x0A;
     public static final int  AGENCY_DUO        = 0x0C;    // Could also be 2C though... ( http://www.ov-chipkaart.me/forum/viewtopic.php?f=10&t=299 )
     public static final int  AGENCY_STORE      = 0x19;
+    public static final int  AGENCY_DUO_ALT    = 0x2C;
 
     private static final byte[] OVC_MANUFACTURER = { (byte) 0x98, (byte) 0x02, (byte) 0x00 /*, (byte) 0x64, (byte) 0x8E */ };
     private static final byte[] OVC_HEADER = new byte[11];
@@ -92,6 +94,7 @@ public class OVChipTransitData extends TransitData {
         put(AGENCY_QBUZZ,      "Qbuzz");
         put(AGENCY_DUO,        "Dienst Uitvoering Onderwijs");
         put(AGENCY_STORE,      "Reseller");
+        put(AGENCY_DUO_ALT,    "Dienst Uitvoering Onderwijs");
     }};
 
     private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {{
@@ -107,6 +110,7 @@ public class OVChipTransitData extends TransitData {
         put(AGENCY_QBUZZ,      "Qbuzz");
         put(AGENCY_DUO,        "DUO");
         put(AGENCY_STORE,      "Reseller");   /* used by Albert Heijn, Primera and Hermes busses and maybe even more */
+        put(AGENCY_DUO_ALT,    "DUO");
     }};
 
     private final OVChipIndex          mIndex;
@@ -182,9 +186,17 @@ public class OVChipTransitData extends TransitData {
 
             if (i < (transactions.size() - 1)) {
                 OVChipTransaction nextTransaction = transactions.get(i + 1);
-                if (transaction.isSameTrip(nextTransaction)) {
+                if (transaction.getId() == nextTransaction.getId()) { // handle two consecutive (duplicate) logins, skip the first one
+                    continue;
+                } else if (transaction.isSameTrip(nextTransaction)) {
                     trips.add(new OVChipTrip(transaction, nextTransaction));
                     i++;
+                    if (i < (transactions.size() - 2)) { // check for two consecutive (duplicate) logouts, skip the second one
+                        OVChipTransaction followingTransaction = transactions.get(i + 1);
+                        if (nextTransaction.getId() == followingTransaction.getId()) {
+                            i++;
+                        }
+                    }
                     continue;
                 }
             }
@@ -225,8 +237,11 @@ public class OVChipTransitData extends TransitData {
     }
 
     public static String convertAmount(int amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        DecimalFormat formatter = (DecimalFormat)NumberFormat.getCurrencyInstance();
         formatter.setCurrency(Currency.getInstance("EUR"));
+        String symbol = formatter.getCurrency().getSymbol();
+        formatter.setNegativePrefix(symbol + "-");
+        formatter.setNegativeSuffix("");
 
         return formatter.format((double)amount / 100.0);
     }
@@ -298,28 +313,29 @@ public class OVChipTransitData extends TransitData {
         items.add(new ListItem("Serial Number",   mPreamble.getId()));
         items.add(new ListItem("Expiration Date", DateFormat.getDateInstance(DateFormat.LONG).format(OVChipTransitData.convertDate(mPreamble.getExpdate()))));
         items.add(new ListItem("Card Type",       (mPreamble.getType() == 2 ? "Personal" : "Anonymous")));
+        items.add(new ListItem("Issuer",          OVChipTransitData.getShortAgencyName(mInfo.getCompany())));
 
-        items.add(new ListItem("Banned", ((mCredit.getBanbits() & (byte)0xC0) == (byte)0xC0) ? "Yes" : "No"));
+        items.add(new ListItem("Banned",          ((mCredit.getBanbits() & (char)0xC0) == (char)0xC0) ? "Yes" : "No"));
 
          if (mPreamble.getType() == 2) {
               items.add(new HeaderListItem("Personal Information"));
-              items.add(new ListItem("Birthdate",     DateFormat.getDateInstance(DateFormat.LONG).format(mInfo.getBirthdate())));
+              items.add(new ListItem("Birthdate", DateFormat.getDateInstance(DateFormat.LONG).format(mInfo.getBirthdate())));
         }
 
-         items.add(new HeaderListItem("Credit Information"));
-         items.add(new ListItem("Credit Slot ID",    Integer.toString(mCredit.getId())));
-         items.add(new ListItem("Last Credit ID",    Integer.toString(mCredit.getCreditId())));
-         items.add(new ListItem("Credit",            OVChipTransitData.convertAmount(mCredit.getCredit())));
-         items.add(new ListItem("Autocharge",        (mInfo.getActive() == (byte)0x05 ? "Yes" : "No")));
-         items.add(new ListItem("Autocharge Limit",    OVChipTransitData.convertAmount(mInfo.getLimit())));
-         items.add(new ListItem("Autocharge Charge",    OVChipTransitData.convertAmount(mInfo.getCharge())));
+        items.add(new HeaderListItem("Credit Information"));
+        items.add(new ListItem("Credit Slot ID",    Integer.toString(mCredit.getId())));
+        items.add(new ListItem("Last Credit ID",    Integer.toString(mCredit.getCreditId())));
+        items.add(new ListItem("Credit",            OVChipTransitData.convertAmount(mCredit.getCredit())));
+        items.add(new ListItem("Autocharge",        (mInfo.getActive() == (byte)0x05 ? "Yes" : "No")));
+        items.add(new ListItem("Autocharge Limit",  OVChipTransitData.convertAmount(mInfo.getLimit())));
+        items.add(new ListItem("Autocharge Charge", OVChipTransitData.convertAmount(mInfo.getCharge())));
 
         items.add(new HeaderListItem("Recent Slots"));
-        items.add(new ListItem("Transaction Slot",        "0x" + Integer.toHexString((char)mIndex.getRecentTransactionSlot())));
-        items.add(new ListItem("Info Slot",                "0x" + Integer.toHexString((char)mIndex.getRecentInfoSlot())));
-        items.add(new ListItem("Subscription Slot",        "0x" + Integer.toHexString((char)mIndex.getRecentSubscriptionSlot())));
-        items.add(new ListItem("Travelhistory Slot",    "0x" + Integer.toHexString((char)mIndex.getRecentTravelhistorySlot())));
-        items.add(new ListItem("Credit Slot",            "0x" + Integer.toHexString((char)mIndex.getRecentCreditSlot())));
+        items.add(new ListItem("Transaction Slot",   "0x" + Integer.toHexString((char)mIndex.getRecentTransactionSlot())));
+        items.add(new ListItem("Info Slot",          "0x" + Integer.toHexString((char)mIndex.getRecentInfoSlot())));
+        items.add(new ListItem("Subscription Slot",  "0x" + Integer.toHexString((char)mIndex.getRecentSubscriptionSlot())));
+        items.add(new ListItem("Travelhistory Slot", "0x" + Integer.toHexString((char)mIndex.getRecentTravelhistorySlot())));
+        items.add(new ListItem("Credit Slot",        "0x" + Integer.toHexString((char)mIndex.getRecentCreditSlot())));
 
         return items;
     }

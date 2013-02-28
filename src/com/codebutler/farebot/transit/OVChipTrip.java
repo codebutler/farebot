@@ -75,8 +75,12 @@ public class OVChipTrip extends Trip {
         mStartStation = getStation(mAgency, mStartStationId);
 
         if (outTransaction != null) {
-            mEndStation    = getStation(mAgency, outTransaction.getStation());
             mEndStationId  = outTransaction.getStation();
+            if (getStation(mAgency, outTransaction.getStation()) != null) {
+                mEndStation = getStation(mAgency, outTransaction.getStation());
+            } else {
+                mEndStation = new Station(String.format("Unknown (%s)", mEndStationId), null, null);
+            }
             mExitTimestamp = OVChipTransitData.convertDate(outTransaction.getDate(), outTransaction.getTime());
             mFare          = outTransaction.getAmount();
         } else {
@@ -100,9 +104,9 @@ public class OVChipTrip extends Trip {
         mIsBus = (!mIsTrain && !mIsMetro && !mIsOther && !mIsFerry);
 
         mIsCharge = mProcessType == OVChipTransitData.PROCESS_CREDIT || mProcessType == OVChipTransitData.PROCESS_TRANSFER;
-        mIsPurchase = mProcessType == OVChipTransitData.PROCESS_PURCHASE;
+        mIsPurchase = mProcessType == OVChipTransitData.PROCESS_PURCHASE || mProcessType == OVChipTransitData.PROCESS_NODATA; // Not 100% sure about what NODATA is, but looks alright so far
 
-        mIsBanned = mProcessType == OVChipTransitData.PROCESS_BANNED; // TODO: Needs icon, could use: http://thenounproject.com/noun/no-entry/#icon-No42
+        mIsBanned = mProcessType == OVChipTransitData.PROCESS_BANNED;
     }
 
     public static Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
@@ -259,7 +263,13 @@ public class OVChipTrip extends Trip {
 
     @Override
     public Mode getMode() {
-        if (mIsTrain) {
+        if (mIsBanned) {
+            return Mode.BANNED;
+        } else if (mIsCharge) {
+            return Mode.TICKET_MACHINE;
+        } else if (mIsPurchase) {
+            return Mode.VENDING_MACHINE;
+    	} else if (mIsTrain) {
             return Mode.TRAIN;
         } else if (mIsBus) {
             return Mode.BUS;
@@ -267,8 +277,6 @@ public class OVChipTrip extends Trip {
             return Mode.METRO;
         } else if (mIsFerry) {
             return Mode.FERRY;
-        } else if (mIsPurchase) {
-            return Mode.VENDING_MACHINE;
         } else if (mIsOther) {
             return Mode.OTHER;
         } else {

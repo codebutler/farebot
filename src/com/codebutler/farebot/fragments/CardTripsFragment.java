@@ -40,6 +40,7 @@ import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.activities.TripMapActivity;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.transit.OVChipTrip;
 import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
@@ -136,7 +137,9 @@ public class CardTripsFragment extends SherlockListFragment {
                 iconImageView.setImageResource(R.drawable.vending_machine);
             } else if (trip.getMode() == Trip.Mode.POS) {
                 iconImageView.setImageResource(R.drawable.cashier);
-            } else {
+            } else if (trip.getMode() == Trip.Mode.BANNED) {
+                iconImageView.setImageResource(R.drawable.banned);
+        	} else {
                 iconImageView.setImageResource(R.drawable.unknown);
             }
 
@@ -164,6 +167,8 @@ public class CardTripsFragment extends SherlockListFragment {
                 fareTextView.setText(trip.getFareString());
             } else if (trip instanceof OrcaTransitData.OrcaTrip) {
                 fareTextView.setText(R.string.pass_or_transfer);
+            } else if (trip instanceof OVChipTrip) {
+                fareTextView.setText(trip.getFareString());
             }
 
             String stationText = Trip.formatStationNames(trip);

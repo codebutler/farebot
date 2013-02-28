@@ -48,4 +48,8 @@
         android:id="@+id/valid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/used"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>
