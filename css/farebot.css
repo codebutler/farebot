@@ -1,0 +1,75 @@
+body {
+  font-family: 'Droid Sans', sans-serif;
+  font-size: 16px;
+}
+h2 {
+  font-size: 20px;
+  margin-top: 0;
+}
+.container {
+  margin-top: 3em;
+}
+.tagline, .download {
+  text-align: center;
+}
+.header {
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+.tagline {
+  margin: 0;
+  padding-bottom: 30px;
+  max-width: 500px;
+  font-size: 18px;
+  line-height: 1.4em;
+}
+.download {
+  margin: 0;
+  padding-bottom: 30px;
+}
+.main-column {
+  padding-left: 20px;
+}
+.footer {
+  margin-top: 3em;
+  font-size: 10px;
+  text-align: center;
+}
+.footer a {
+  color: inherit;
+}
+a {
+  color: #069;
+}
+.supported-cards {
+  max-width: 400px;
+  margin-bottom: 1.5em;
+  text-align: left;
+}
+.supported-cards ul {
+  list-style-position: inside;
+  padding: 0;
+  margin: 0 0 0.5em 0;
+}
+.supported-cards ul li {
+  padding-bottom: 0.25em;
+}
+.supported-cards ul li:last-child {
+  padding-bottom: 0 !important;
+}
+.supported-cards ul sup {
+  font-size: 10px;
+}
+.supported-cards .footnote {
+  font-size: 10px;
+  margin: 0;
+}
+.screenshots img {
+  width: 100px;
+  margin-bottom: 0.5em;
+}
+
+#screenshotModal {
+  width: 300px;
+  margin-left: -150px;
+}

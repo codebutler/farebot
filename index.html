@@ -4,55 +4,19 @@
     <title>FareBot</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
     <link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
-    <style type="text/css">
-      #header {
-        text-align: center;
-        padding: 3em;
-      }
-      #content {
-        text-align: center;
-        font-family: 'Droid Sans Mono'
-      }
-      #tagline {
-        margin: 0 auto;
-        max-width: 500px;
-      }
-      #download {
-        padding: 1em 0;
-      }
-      #info {
-        font-size: 10px;
-      }
-      #info a {
-        color: inherit;
-      }
-      a {
-        color: #069;
-      }
-      .supported-cards {
-        max-width: 400px;
-        margin: 0 auto;
-        margin-bottom: 3em;
-        text-align: left;
-      }
-      .supported-cards h2 {
-        font-size: 20px;
-      }
-      .supported-cards ul {
-        list-style-position: inside;
-        padding: 0;
-      }
-      .supported-cards ul sup {
-        font-size: 10px;
-      }
-      .supported-cards .footnote {
-        font-size: 10px;
-        margin: 0;
-      }
-
-    </style>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="css/farebot.css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
-
+      $(function() {
+          $('.screenshots a').click(function() {
+            $('#screenshotModal img').attr('src', $('img', this).attr('src'));
+          });
+      });
+    </script>
+    <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-21232426-1']);
       _gaq.push(['_trackPageview']);
@@ -62,43 +26,64 @@
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
-
     </script>
   </head>
   <body>
-    <div id="header">
-      <img src="farebot_card.png" alt="FareBot" />
-      <a href="https://github.com/codebutler/farebot"><img style="position: absolute; top: 0; right: 0; border: 0; opacity: 0.2;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-    </div>
-    <div id="content">
-      <p id="tagline">View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!</p>
-      
-      <p id="download">
-        <a href="https://play.google.com/store/apps/details?id=com.codebutler.farebot"><img alt="Get it on Google Play" style="width: 172px; height: 60px" src="https://developer.android.com/images/brand/en_generic_rgb_wo_60.png" /></a>
-      </p>
+    <a href="https://github.com/codebutler/farebot"><img style="position: absolute; top: 0; right: 0; border: 0; opacity: 0.2;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
-      <div class="supported-cards">
-        <h2>Supported Cards:</h2>
-        <ul>
-          <li><a href="http://www.orcacard.com/">ORCA</a> - Seattle, WA, USA</li>
-          <li><a href="https://www.clippercard.com/">Clipper</a> - San Francisco, CA, USA</li>
-          <li><a href="http://www.ezlink.com.sg/index.php">EZ-Link</a> - Singapore<sup>1</sup></li>
-          <li><a href="http://www.netsflashpay.com.sg/">NETS FlashPay</a> - Singapore</li>
-          <li><a href="http://en.wikipedia.org/wiki/Suica">Suica</a>, <a href="http://en.wikipedia.org/wiki/ICOCA">ICOCA</a>, <a href="http://en.wikipedia.org/wiki/PASMO">PASMO</a> - Japan</li>
-          <li><a href="http://www.ov-chipkaart.nl/">OV-chipkaart</a> - Netherlands<sup>2</sup></li>
-          <li><a href="http://www.sptrans.com.br/bilhete_unico/">Bilhete Único</a> - São Paulo, Brazil<sup>2</sup></li>
-        </ul>
-        <p class="footnote"><sup>1</sup> Not compatible with all devices.</p>
-        <p class="footnote"><sup>2</sup> Requires encryption keys.</p>
+    <div class="container">
+      <div class="row">
+        <div class="span5">
+          <div class="header">
+            <img src="img/farebot_card.png" alt="FareBot" />
+          </div>
+          <p class="tagline">View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!</p>
+          <p class="download">
+            <a href="https://play.google.com/store/apps/details?id=com.codebutler.farebot"><img alt="Get it on Google Play" style="width: 172px; height: 60px" src="https://developer.android.com/images/brand/en_generic_rgb_wo_60.png" /></a>
+          </p>
+        </div>
+        <div class="span7">
+          <div class="main-column">
+            <div class="supported-cards">
+              <h2>Supported Cards</h2>
+              <ul>
+                <li><a href="http://www.orcacard.com/">ORCA</a> - Seattle, WA, USA</li>
+                <li><a href="https://www.clippercard.com/">Clipper</a> - San Francisco, CA, USA</li>
+                <li><a href="http://www.ezlink.com.sg/index.php">EZ-Link</a> - Singapore<sup>1</sup></li>
+                <li><a href="http://www.netsflashpay.com.sg/">NETS FlashPay</a> - Singapore</li>
+                <li><a href="http://en.wikipedia.org/wiki/Suica">Suica</a>, <a href="http://en.wikipedia.org/wiki/ICOCA">ICOCA</a>, <a href="http://en.wikipedia.org/wiki/PASMO">PASMO</a> - Japan</li>
+                <li><a href="http://www.ov-chipkaart.nl/">OV-chipkaart</a> - Netherlands<sup>2</sup></li>
+                <li><a href="http://www.sptrans.com.br/bilhete_unico/">Bilhete Único</a> - São Paulo, Brazil<sup>2</sup></li>
+              </ul>
+              <p class="footnote"><sup>1</sup> Not compatible with all devices.</p>
+              <p class="footnote"><sup>2</sup> Requires encryption keys.</p>
+            </div>
+            <h2>Screenshots</h2>
+            <div class="screenshots">
+              <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0000_en_home.png"></a>
+              <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0001_en_supported_cards.png"></a>
+              <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0002_en_card_balance.png"></a>
+              <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0003_en_card_history.png"></a>
+              <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0004_en_trip_map.png"></a>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <p id="info">
-        Created by <a href="http://codebutler.com">Eric Butler</a> – Released under the <a href="http://www.fsf.org/licensing/licenses/gpl.html">GPLv3</a>
-        <br/>
-        <a href="mailto:eric+farebot@codebutler.com">mail</a> – 
-        <a href="http://twitter.com/codebutler">twitter</a> –
-        <a href="https://github.com/codebutler/farebot/issues">bug tracker</a> – 
-        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=GSFRW42WFGUTE&lc=US&item_name=FareBot&item_number=farebot&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">donate</a>
+      <div class="row">
+        <div class="span12">
+          <p class="footer">
+            Created by <a href="http://codebutler.com">Eric Butler</a> – Released under the <a href="http://www.fsf.org/licensing/licenses/gpl.html">GPLv3</a>
+            <br/>
+            <a href="mailto:eric+farebot@codebutler.com">mail</a> – 
+            <a href="http://twitter.com/codebutler">twitter</a> –
+            <a href="https://plus.google.com/107450974842126761402/posts">G+</a> –
+            <a href="https://github.com/codebutler/farebot/issues">issue tracker</a> – 
+            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=GSFRW42WFGUTE&lc=US&item_name=FareBot&item_number=farebot&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">donate</a>
+        </div>
+      </div>
+    </div>
+    <div id="screenshotModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <img>
     </div>
   </body>
 </html>
