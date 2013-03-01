@@ -16,11 +16,12 @@
         <option name="APK_PATH" value="" />
         <option name="LIBRARY_PROJECT" value="true" />
         <option name="RUN_PROCESS_RESOURCES_MAVEN_TASK" value="true" />
-        <option name="GENERATE_UNSIGNED_APK" value="false" />
         <option name="CUSTOM_DEBUG_KEYSTORE_PATH" value="" />
         <option name="PACK_TEST_CODE" value="false" />
         <option name="RUN_PROGUARD" value="false" />
         <option name="PROGUARD_CFG_PATH" value="/proguard.cfg" />
+        <option name="USE_CUSTOM_MANIFEST_PACKAGE" value="false" />
+        <option name="CUSTOM_MANIFEST_PACKAGE" value="" />
         <resOverlayFolders>
           <path>/res-overlay</path>
         </resOverlayFolders>
