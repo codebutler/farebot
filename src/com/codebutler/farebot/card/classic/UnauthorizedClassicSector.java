@@ -40,4 +40,14 @@ public class UnauthorizedClassicSector extends ClassicSector {
     public byte[] readBlocks(int startBlock, int blockCount) {
         throw new UnauthorizedException();
     }
+
+    @Override
+    public ClassicBlock[] getBlocks() {
+        throw new UnauthorizedException();
+    }
+
+    @Override
+    public ClassicBlock getBlock(int index) {
+        throw new UnauthorizedException();
+    }
 }
