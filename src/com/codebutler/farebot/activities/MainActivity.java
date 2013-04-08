@@ -32,6 +32,7 @@ import android.nfc.tech.MifareUltralight;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -58,24 +59,31 @@ public class MainActivity extends SherlockFragmentActivity {
         actionBar.setHomeButtonEnabled(false);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter != null) {
+            Utils.checkNfcEnabled(this, mNfcAdapter);
 
-        Utils.checkNfcEnabled(this, mNfcAdapter);
-
-        Intent intent = new Intent(this, ReadingTagActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-        mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            Intent intent = new Intent(this, ReadingTagActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else {
+            ((TextView) findViewById(R.id.directions)).setText(R.string.nfc_unavailable);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, mTechLists);
+        if (mNfcAdapter != null) {
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, mTechLists);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mNfcAdapter.disableForegroundDispatch(this);
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundDispatch(this);
+        }
     }
 
     public void onSupportedCardsClick(View view) {

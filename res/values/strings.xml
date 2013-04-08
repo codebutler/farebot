@@ -140,4 +140,5 @@
     <string name="delete">Delete</string>
     <string name="add_key_directions">Save your keys binary dump file with a .farebotkeys extension, email the dump file as an attachment to yourself, and open it on this device.</string>
     <string name="no_keys">No keys.</string>
+    <string name="nfc_unavailable">NFC Unavailable</string>
 </resources>
