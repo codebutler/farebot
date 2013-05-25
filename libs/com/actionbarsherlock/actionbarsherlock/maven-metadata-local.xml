@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.actionbarsherlock</groupId>
+  <artifactId>actionbarsherlock</artifactId>
+  <versioning>
+    <versions>
+      <version>4.3.2-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20130524221054</lastUpdated>
+  </versioning>
+</metadata>

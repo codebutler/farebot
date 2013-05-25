@@ -1,0 +1,42 @@
+buildscript {
+    repositories { 
+      maven { url 'http://repo1.maven.org/maven2' } 
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.4.1'
+    }
+}
+
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+    maven { url 'libs' }
+}
+
+dependencies {
+    compile 'com.google.android:support-v4:r7'
+    compile 'com.google.android.gms:google-play-services:7'
+    compile 'com.actionbarsherlock:actionbarsherlock:4.3.2-SNAPSHOT'
+    compile 'commons-io:commons-io:2.4'
+    compile 'commons-lang:commons-lang:2.6'
+    compile files('libs/nfc-felica.jar')
+}
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "17.0.0"
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 17
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+        }
+    }
+}
+
+

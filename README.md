@@ -1,6 +1,6 @@
 # FareBot
 
-View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC-equipped Android phone!
+View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!
 
 ## Written By
 
