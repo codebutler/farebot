@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  strings.xml
+
+  Copyright (C) 2013 Eric Butler
+
+  Authors:
+  Lauri Andler <lauri.andler@gmail.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="app_name">FareBot</string>
+    <string name="directions">Napauta korttia.</string>
+    <string name="reading_card">Luetaan korttia</string>
+    <string name="dont_move">Älä liikuta korttia</string>
+    <string name="advanced_info">Tarkat tiedot</string>
+    <string name="delete_card">Poista kortti</string>
+    <string name="unknown_card">Tuntematon kortti</string>
+    <string name="hw_detail">Valmistajan tiedot</string>
+    <string name="data">Raakadata</string>
+    <string name="copy_xml">Kopioi</string>
+    <string name="share_xml">Jaa</string>
+    <string name="save_xml">Tallenna USB-muistille</string>
+    <string name="trips">Matkat</string>
+    <string name="history">Historia</string>
+    <string name="balance">Saldo</string>
+    <string name="refills">Lataukset</string>
+    <string name="no_trip_data">Ei löytynyt matkoja. Onko korttia käytetty?</string>
+    <string name="no_refill_data">Ei löytynyt latauksia. Onko kortille ladattu arvoa?</string>
+    <string name="import_xml">Import</string>
+    <string name="import_clipboard">Importtaa leikepöydältä</string>
+    <string name="import_file">Importtaa tiedostosta</string>
+    <string name="import_sd">Importtaa USB-muistilta</string>
+    <string name="export">Export</string>
+    <string name="export_all">Exporttaa kaikki</string>
+    <string name="about">Tietoja</string>
+    <string name="preferences">Asetukset</string>
+    <string name="accessibility">Helppokäyttöisyys</string>
+    <string name="speak_balance">Sano saldo</string>
+    <string name="speak_balance_summary">Proof of concept</string>
+    <string name="balance_speech">Saldo %s</string>
+    <string name="loading">Lataa...</string>
+    <string name="scanned_at_format">Scannattu %1$s klo %2$s</string>
+    <string name="supported_cards">Tuetut kortit</string>
+    <string name="pass_or_transfer">Pass/Xfer</string>
+
+    <string name="felica_terminal_fare_adjustment">Fare Adjustment Machine</string>
+    <string name="felica_terminal_portable">Portable Terminal</string>
+    <string name="felica_terminal_vehicle">Vehicle Terminal (on bus)</string>
+    <string name="felica_terminal_ticket">Ticket Machine</string>
+    <string name="felica_terminal_deposit_quick_charge">Quick Charge Machine</string>
+    <string name="felica_terminal_tvm_tokyo_monorail">Tokyo Monorail Ticket Machine</string>
+    <string name="felica_terminal_tvm_etc">Ticket Machine, etc.</string>
+    <string name="felica_terminal_ticket_gate">Ticket Gate</string>
+    <string name="felica_terminal_simple_ticket_gate">Simple Ticket Gate</string>
+    <string name="felica_terminal_booth">Booth</string>
+    <string name="felica_terminal_booth_green">Booth (Green)</string>
+    <string name="felica_terminal_ticket_gate_terminal">Ticket Gate Terminal</string>
+    <string name="felica_terminal_mobile_phone">Mobile Phone</string>
+    <string name="felica_terminal_connection_adjustment">Connection Adjustment Machine</string>
+    <string name="felica_terminal_transfer_adjustment">Transfer Adjustment Machine</string>
+    <string name="felica_terminal_simple_deposit">Simple Deposit Machine</string>
+    <string name="felica_terminal_pos">Point of Sale Terminal</string>
+    <string name="felica_terminal_vending">Vending Machine</string>
+
+    <string name="felica_process_fare_exit_gate">Fare Gate</string>
+    <string name="felica_process_charge">Charge</string>
+    <string name="felica_process_purchase_magnetic">Magnetic Ticket</string>
+    <string name="felica_process_fare_adjustment">Fare Adjustment</string>
+    <string name="felica_process_admission_payment">Admission Payment</string>
+    <string name="felica_process_booth_exit">Station Master Booth Exit</string>
+    <string name="felica_process_issue_new">New Issue</string>
+    <string name="felica_process_booth_deduction">Booth Deduction</string>
+    <string name="felica_process_bus_pitapa">Bus (PiTaPa)</string>
+    <string name="felica_process_bus_iruca">Bus (IruCa)</string>
+    <string name="felica_process_reissue">Re-issue</string>
+    <string name="felica_process_payment_shinkansen">Shinkansen Payment</string>
+    <string name="felica_process_entry_a_autocharge">Entry A (Autocharge)</string>
+    <string name="felica_process_exit_a_autocharge">Exit A (Autocharge)</string>
+    <string name="felica_process_deposit_bus">Bus Deposit</string>
+    <string name="felica_process_purchase_special_ticket">Ticket (Special Bus/Streetcar)</string>
+    <string name="felica_process_merchandise_purchase">Merchandise</string>
+    <string name="felica_process_bonus_charge">Bonus Charge</string>
+    <string name="felica_process_register_deposit">Register Deposit</string>
+    <string name="felica_process_merchandise_cancel">Cancel Merchandise</string>
+    <string name="felica_process_merchandise_admission">Merchandise/Admission</string>
+    <string name="felica_process_merchandise_purchase_cash">Merchandise (partially with cash)</string>
+    <string name="felica_process_merchandise_admission_cash">Merchandise/Admission (partially with cash)</string>
+    <string name="felica_process_payment_thirdparty">Payment (3rd Party)</string>
+    <string name="felica_process_admission_thirdparty">Admission Payment (3rd Party)</string>
+    <string name="nfc_off_error">NFC on pois päältä</string>
+    <string name="turn_on_nfc">Salli NFC:n käyttö jotta voin lukea kortin tiedot.</string>
+    <string name="wireless_settings">Tiedonsiirtoasetukset</string>
+    <string name="report_error">Raportoi virheestä</string>
+    <string name="unknown_card_description">Farebot ei vielä tue tätä korttia. Vain raakadata voidaan näyttää.</string>
+    <string name="report_error_privacy_title">Yksityisyydensuoja</string>
+    <string name="report_error_privacy_message">Kaikki tällä kortilla löytyvä tieto liitetään lähettämääsi virheraporttiin.</string>
+    <string name="comments">Kommentit</string>
+
+    <string name="hsl_pass_is_valid">Kausi voimassa</string>
+    <string name="hsl_1zone_ticket">Sisäinen lippu</string>
+    <string name="hsl_2zone_ticket">Seutulippu</string>
+    <string name="hsl_balance_refill">Arvon lataus</string>
+    <string name="hsl_balance_ticket">Arvolippu</string>
+    <string name="hsl_value_ticket_is_valid">Arvolippu voimassa</string>
+    <string name="hsl_pass_ticket">Kausilippu</string>
+    <string name="hsl_season_ticket_starts">Kausi alkaa</string>
+    <string name="hsl_season_ticket_ends">Kausi loppuu</string>
+    <string name="hsl_season_ticket_bought_on">Kausilippu ostettu</string>
+    <string name="hsl_previous_season_ticket">Viime kausilippu</string>
+    <string name="hsl_season_ticket_price_was">Kausilipun hinta oli</string>
+    <string name="hsl_you_last_used_this_ticket">Viimeksi käytit tätä kausilippua</string>
+    <string name="hsl_person_format">%s henkilö</string>
+
+    <string name="hsl_value_ticket">Arvolippu</string>
+    <string name="hsl_value_ticket_bought_on">Arvolippu ostettu</string>
+    <string name="hsl_value_ticket_expires_on">Lippu vanhenee</string>
+    <string name="hsl_value_ticket_last_transfer">Viime vaihto</string>
+    <string name="hsl_value_ticket_last_sign">Viimeinen merkki</string>
+    <string name="hsl_value_ticket_price">Arvolipun hinta</string>
+    <string name="hsl_value_ticket_disco_group">Alennusryhmä</string>
+    <string name="hsl_value_ticket_pax">Ryhmän koko</string>
+    <string name="hsl_value_ticket_duration">Vaihtoaika</string>
+    <string name="hsl_value_ticket_vehicle_number">Kulkuneuvon numero</string>
+    <string name="hsl_value_ticket_vehicle_type">Liikenneväline</string>
+    <string name="hsl_value_ticket_line_number">Reittinumero</string>
+
+    <string name="hsl_season_ticket">Kausikortti</string>
+</resources>
