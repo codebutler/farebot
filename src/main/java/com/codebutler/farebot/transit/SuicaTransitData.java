@@ -502,7 +502,7 @@ public class SuicaTransitData extends TransitData {
         c.set(Calendar.DAY_OF_MONTH, dd);
 
         // Product sales have time, too.
-        // 物販だったら時間もセット
+        // 物販だったら時s間もセット
         if (isProductSale) {
             int time = Util.toInt(data[6], data[7]);
             int hh = time >> 11;
