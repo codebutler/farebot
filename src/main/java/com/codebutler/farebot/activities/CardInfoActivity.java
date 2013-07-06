@@ -50,6 +50,7 @@ import com.codebutler.farebot.fragments.CardTripsFragment;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.SuicaTransitData;
+import com.codebutler.farebot.transit.EdyTransitData;
 import com.codebutler.farebot.transit.TransitData;
 
 public class CardInfoActivity extends SherlockFragmentActivity {
@@ -140,7 +141,7 @@ public class CardInfoActivity extends SherlockFragmentActivity {
                 mTabsAdapter.addTab(actionBar.newTab().setText(R.string.balance), CardBalanceFragment.class, args);
 
                 if (mTransitData.getTrips() != null) {
-                    int textId = (mTransitData instanceof SuicaTransitData) ? R.string.history : R.string.trips;
+                    int textId = (mTransitData instanceof SuicaTransitData) || (mTransitData instanceof EdyTransitData) ? R.string.history : R.string.trips;
                     mTabsAdapter.addTab(actionBar.newTab().setText(textId), CardTripsFragment.class, args);
                 }
 
