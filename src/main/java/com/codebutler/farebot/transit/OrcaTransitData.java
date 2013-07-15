@@ -37,14 +37,17 @@ import com.codebutler.farebot.card.desfire.DesfireRecord;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class OrcaTransitData extends TransitData {
     private static final int AGENCY_KCM = 0x04;
     private static final int AGENCY_PT  = 0x06;
     private static final int AGENCY_ST  = 0x07;
     private static final int AGENCY_CT  = 0x02;
+    private static final int AGENCY_WSF = 0x08;
 
     // For future use.
     private static final int TRANS_TYPE_PURSE_USE   = 0x0c;
@@ -194,7 +197,12 @@ public class OrcaTransitData extends TransitData {
             new Station("Tukwila International Blvd Station", "Tukwila",       "47.4642754", "-122.288391"),
             new Station("Seatac Airport Station",             "Sea-Tac",       "47.4445305", "-122.297012")
         };
-        
+
+        private static Map<Integer, Station> sWSFTerminals = new HashMap<Integer, Station>() {{
+            put(10101, new Station("Seattle Terminal",           "Seattle",    "47.602722", "-122.338512"));
+            put(10103, new Station("Bainbridge Island Terminal", "Bainbridge", "47.62362",  "-122.51082" ));
+        }};
+
         public OrcaTrip (DesfireRecord record) {
             byte[] useData = record.getData();
             long[] usefulData = new long[useData.length];
@@ -264,8 +272,10 @@ public class OrcaTransitData extends TransitData {
                     return "Pierce Transit";
                 case AGENCY_ST:
                     return "Sound Transit";
+                case AGENCY_WSF:
+                    return "Washington State Ferries";
             }
-            return "Unknown Agency";
+            return String.format("Unknown Agency: %s", mAgency);
         }
 
         @Override
@@ -279,8 +289,10 @@ public class OrcaTransitData extends TransitData {
                     return "PT";
                 case AGENCY_ST:
                     return "ST";
+                case AGENCY_WSF:
+                    return "WSF";
             }
-            return "Unknown";
+            return String.format("Unknown Agency: %s", mAgency);
         }
 
         @Override
@@ -320,6 +332,8 @@ public class OrcaTransitData extends TransitData {
                 if (stationNumber < sLinkStations.length) {
                     return sLinkStations[stationNumber];
                 }
+            } else if (mAgency == AGENCY_WSF) {
+                return sWSFTerminals.get((int)mAgency);
             }
             return null;
         }
@@ -332,6 +346,13 @@ public class OrcaTransitData extends TransitData {
                     return sLinkStations[stationNumber].getStationName();
                 } else {
                     return String.format("Unknown Station #%s", stationNumber);
+                }
+            } else if (mAgency == AGENCY_WSF) {
+                int terminalNumber = (int) mCoachNum;
+                if (sWSFTerminals.containsKey(terminalNumber)) {
+                    return sWSFTerminals.get(terminalNumber).getStationName();
+                } else {
+                    return String.format("Unknown Terminal #%s", terminalNumber);
                 }
             } else {
                 return String.format("Coach #%s", String.valueOf(mCoachNum));
@@ -352,7 +373,13 @@ public class OrcaTransitData extends TransitData {
 
         @Override
         public Mode getMode() {
-            return (isLink()) ? Mode.METRO : Mode.BUS;
+            if (isLink()) {
+                return Mode.METRO;
+            } else if (mAgency == AGENCY_WSF) {
+                return Mode.FERRY;
+            } else {
+                return Mode.BUS;
+            }
         }
 
         @Override
