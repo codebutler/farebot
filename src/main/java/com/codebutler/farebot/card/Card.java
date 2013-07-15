@@ -33,7 +33,7 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;

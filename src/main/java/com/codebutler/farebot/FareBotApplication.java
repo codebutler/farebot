@@ -26,6 +26,7 @@ import android.app.Application;
 import android.os.StrictMode;
 import com.codebutler.farebot.card.felica.DBUtil;
 import com.codebutler.farebot.transit.OVChipDBUtil;
+import com.crashlytics.android.Crashlytics;
 
 public class FareBotApplication extends Application {
     public static final String PREF_LAST_READ_ID = "last_read_id";
@@ -63,5 +64,7 @@ public class FareBotApplication extends Application {
             .detectAll()
             .penaltyLog()
             .build());
+
+        Crashlytics.start(this);
     }
 }

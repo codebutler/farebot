@@ -44,7 +44,7 @@ import com.codebutler.farebot.transit.OVChipTrip;
 import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.DateFormat;
 import java.util.ArrayList;

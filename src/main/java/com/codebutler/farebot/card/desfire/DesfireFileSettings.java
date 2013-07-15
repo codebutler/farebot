@@ -25,7 +25,7 @@ package com.codebutler.farebot.card.desfire;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.codebutler.farebot.Utils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.ByteArrayInputStream;
 

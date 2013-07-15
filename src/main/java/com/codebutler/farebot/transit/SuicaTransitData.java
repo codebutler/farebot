@@ -45,12 +45,32 @@ import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
 import net.kazzz.felica.lib.FeliCaLib;
 import net.kazzz.felica.lib.Util;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
-import static com.codebutler.farebot.card.felica.DBUtil.*;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMNS_IRUCA_STATIONCODE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMNS_STATIONCODE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_AREACODE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_COMPANYNAME;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_COMPANYNAME_EN;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_ID;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LATITUDE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LINECODE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LINENAME;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LINENAME_EN;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LONGITUDE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_STATIONCODE;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_STATIONNAME;
+import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_STATIONNAME_EN;
+import static com.codebutler.farebot.card.felica.DBUtil.TABLE_IRUCA_STATIONCODE;
+import static com.codebutler.farebot.card.felica.DBUtil.TABLE_STATIONCODE;
 
 public class SuicaTransitData extends TransitData {
     private SuicaTrip[] mTrips;

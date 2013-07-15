@@ -34,7 +34,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import net.kazzz.felica.FeliCaTag;
 import net.kazzz.felica.command.ReadResponse;
 import net.kazzz.felica.lib.FeliCaLib;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

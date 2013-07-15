@@ -137,5 +137,8 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBUUm1_1cyaCLkIvcE60gF4xO3pyb6SyP4"/>
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="77d8c3509e581fb753f705c476fe3b022dda0287" />
     </application>
 </manifest>

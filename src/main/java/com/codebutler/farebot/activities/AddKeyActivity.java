@@ -46,7 +46,7 @@ import com.codebutler.farebot.keys.ClassicSectorKey;
 import com.codebutler.farebot.provider.CardKeyProvider;
 import com.codebutler.farebot.provider.KeysTableColumns;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
