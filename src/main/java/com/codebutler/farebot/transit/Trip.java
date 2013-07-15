@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit;
 
+import android.os.Parcel;
 import android.os.Parcelable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,18 +30,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Trip implements Parcelable {
+    public static final Creator<Trip> CREATOR = new Creator<Trip>() {
+        @Override
+        public Trip createFromParcel(Parcel parcel) {
+            return null;
+        }
+
+        @Override
+        public Trip[] newArray(int size) {
+            return new Trip[size];
+        }
+    };
+
     public abstract long getTimestamp();
     public abstract long getExitTimestamp();
-    public abstract String getRouteName ();
-    public abstract String getAgencyName ();
-    public abstract String getShortAgencyName ();
-    public abstract String getFareString ();
-    public abstract String getBalanceString ();
-    public abstract String getStartStationName ();
-    public abstract Station getStartStation ();
-    public abstract String getEndStationName ();
-    public abstract Station getEndStation ();
-    public abstract double getFare ();
+    public abstract String getRouteName();
+    public abstract String getAgencyName();
+    public abstract String getShortAgencyName();
+    public abstract String getFareString();
+    public abstract String getBalanceString();
+    public abstract String getStartStationName();
+    public abstract Station getStartStation();
+    public abstract String getEndStationName();
+    public abstract Station getEndStation();
+    public abstract double getFare();
     public abstract Mode getMode();
     public abstract boolean hasTime();
 

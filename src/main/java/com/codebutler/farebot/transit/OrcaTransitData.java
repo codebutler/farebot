@@ -26,17 +26,21 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireFile.RecordDesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireRecord;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -56,9 +60,9 @@ public class OrcaTransitData extends TransitData {
     private static final int TRANS_TYPE_TAP_OUT     = 0x07;
     private static final int TRANS_TYPE_PASS_USE    = 0x60;
 
-    private int        mSerialNumber;
-    private double     mBalance;
-    private OrcaTrip[] mTrips;
+    private int    mSerialNumber;
+    private double mBalance;
+    private Trip[] mTrips;
 
     public static boolean check (Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
@@ -76,9 +80,9 @@ public class OrcaTransitData extends TransitData {
     public OrcaTransitData (Parcel parcel) {
         mSerialNumber = parcel.readInt();
         mBalance      = parcel.readDouble();
-        
-        mTrips = new OrcaTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, OrcaTrip.CREATOR);
+
+        parcel.readInt();
+        mTrips = (Trip[]) parcel.readParcelableArray(null);
     }
     
     public OrcaTransitData (Card card) {
@@ -142,24 +146,42 @@ public class OrcaTransitData extends TransitData {
         return null;
     }
 
-    private OrcaTrip[] parseTrips (DesfireCard card) {
-        DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
+    private Trip[] parseTrips(DesfireCard card) {
+        List<Trip> trips = new ArrayList<Trip>();
 
+        DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
         if (file instanceof RecordDesfireFile) {
             RecordDesfireFile recordFile = (RecordDesfireFile) card.getApplication(0x3010f2).getFile(0x02);
-
-            List<Trip> result = new ArrayList<Trip>();
 
             OrcaTrip[] useLog = new OrcaTrip[recordFile.getRecords().length];
             for (int i = 0; i < useLog.length; i++) {
                 useLog[i] = new OrcaTrip(recordFile.getRecords()[i]);
             }
-
             Arrays.sort(useLog, new Trip.Comparator());
+            ArrayUtils.reverse(useLog);
 
-            return useLog;
+            for (int i = 0; i < useLog.length; i++) {
+                OrcaTrip trip = useLog[i];
+                OrcaTrip nextTrip = (i+1 < useLog.length) ? useLog[i+1] : null;
+
+                if (isSameTrip(trip, nextTrip)) {
+                    trips.add(new MergedOrcaTrip(trip, nextTrip));
+                    i++;
+                    continue;
+                }
+
+                trips.add(trip);
+            }
         }
-        return new OrcaTrip[0];
+        Collections.sort(trips, new Trip.Comparator());
+        return trips.toArray(new Trip[trips.size()]);
+    }
+
+    private boolean isSameTrip(OrcaTrip firstTrip, OrcaTrip secondTrip) {
+        return firstTrip != null && secondTrip != null &&
+            firstTrip.mTransType == TRANS_TYPE_TAP_IN &&
+            (secondTrip.mTransType ==TRANS_TYPE_TAP_OUT || secondTrip.mTransType == TRANS_TYPE_CANCEL_TRIP) &&
+            firstTrip.mAgency == secondTrip.mAgency;
     }
 
     public void writeToParcel(Parcel parcel, int flags) {
@@ -168,7 +190,7 @@ public class OrcaTransitData extends TransitData {
 
         if (mTrips != null) {
             parcel.writeInt(mTrips.length);
-            parcel.writeTypedArray(mTrips, flags);
+            parcel.writeParcelableArray(mTrips, flags);
         } else {
             parcel.writeInt(0);
         }
@@ -333,7 +355,7 @@ public class OrcaTransitData extends TransitData {
                     return sLinkStations[stationNumber];
                 }
             } else if (mAgency == AGENCY_WSF) {
-                return sWSFTerminals.get((int)mAgency);
+                return sWSFTerminals.get((int)mCoachNum);
             }
             return null;
         }
@@ -391,6 +413,10 @@ public class OrcaTransitData extends TransitData {
             return mCoachNum;
         }
 
+        public long getTransType() {
+            return mTransType;
+        }
+
         public void writeToParcel(Parcel parcel, int flags) {
             parcel.writeLong(mTimestamp);
             parcel.writeLong(mCoachNum);
@@ -406,6 +432,113 @@ public class OrcaTransitData extends TransitData {
 
         private boolean isLink () {
             return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum > 10000);
+        }
+    }
+
+    public static class MergedOrcaTrip extends Trip {
+        private final OrcaTrip mStartTrip;
+        private final OrcaTrip mEndTrip;
+
+        public static Creator<MergedOrcaTrip> CREATOR = new Creator<MergedOrcaTrip>() {
+            public MergedOrcaTrip createFromParcel(Parcel parcel) {
+                return new MergedOrcaTrip(
+                    (OrcaTrip) parcel.readParcelable(OrcaTrip.class.getClassLoader()),
+                    (OrcaTrip) parcel.readParcelable(OrcaTrip.class.getClassLoader())
+                );
+            }
+
+            public MergedOrcaTrip[] newArray(int size) {
+                return new MergedOrcaTrip[size];
+            }
+        };
+
+        public MergedOrcaTrip(OrcaTrip startTrip, OrcaTrip endTrip) {
+            mStartTrip = startTrip;
+            mEndTrip = endTrip;
+        }
+
+        @Override
+        public long getTimestamp() {
+            return mStartTrip.getTimestamp();
+        }
+
+        @Override
+        public long getExitTimestamp() {
+            return mEndTrip.getTimestamp();
+        }
+
+        @Override
+        public String getRouteName() {
+            return mStartTrip.getRouteName();
+        }
+
+        @Override
+        public String getAgencyName() {
+            return mStartTrip.getAgencyName();
+        }
+
+        @Override
+        public String getShortAgencyName() {
+            return mStartTrip.getShortAgencyName();
+        }
+
+        @Override
+        public String getFareString() {
+            if (mEndTrip.mTransType == TRANS_TYPE_CANCEL_TRIP) {
+                return FareBotApplication.getInstance().getString(R.string.fare_cancelled_format, mStartTrip.getFareString());
+            }
+            return mStartTrip.getFareString();
+        }
+
+        @Override
+        public String getBalanceString() {
+            return mEndTrip.getBalanceString();
+        }
+
+        @Override
+        public String getStartStationName() {
+            return mStartTrip.getStartStationName();
+        }
+
+        @Override
+        public Station getStartStation() {
+            return mStartTrip.getStartStation();
+        }
+
+        @Override
+        public String getEndStationName() {
+            return mEndTrip.getStartStationName();
+        }
+
+        @Override
+        public Station getEndStation() {
+            return mEndTrip.getStartStation();
+        }
+
+        @Override
+        public double getFare() {
+            return mStartTrip.getFare();
+        }
+
+        @Override
+        public Mode getMode() {
+            return mStartTrip.getMode();
+        }
+
+        @Override
+        public boolean hasTime() {
+            return mStartTrip.hasTime();
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int flags) {
+            mStartTrip.writeToParcel(parcel, flags);
+            mEndTrip.writeToParcel(parcel, flags);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
         }
     }
 }
