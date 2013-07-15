@@ -37,6 +37,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TripMapActivity extends SherlockFragmentActivity {
     public static final String TRIP_EXTRA = "trip";
 
@@ -88,21 +91,31 @@ public class TripMapActivity extends SherlockFragmentActivity {
         }
         */
 
+        final List<LatLng> points = new ArrayList<LatLng>();
         LatLngBounds.Builder builder = LatLngBounds.builder();
+
         if (trip.getStartStation() != null) {
-            builder.include(addStationMarker(trip.getStartStation(), startMarkerId));
+            LatLng startStationLatLng = addStationMarker(trip.getStartStation(), startMarkerId);
+            builder.include(startStationLatLng);
+            points.add(startStationLatLng);
         }
+
         if (trip.getEndStation() != null) {
-            builder.include(addStationMarker(trip.getEndStation(), endMarkerId));
+            LatLng endStationLatLng = addStationMarker(trip.getEndStation(), endMarkerId);
+            builder.include(endStationLatLng);
+            points.add(endStationLatLng);
         }
 
         final LatLngBounds bounds = builder.build();
-
         findViewById(R.id.map).post(new Runnable() {
             @Override
             public void run() {
-                int padding = getResources().getDimensionPixelSize(R.dimen.map_padding);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                if (points.size() == 1) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(points.get(0), 17));
+                } else {
+                    int padding = getResources().getDimensionPixelSize(R.dimen.map_padding);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                }
             }
         });
     }
