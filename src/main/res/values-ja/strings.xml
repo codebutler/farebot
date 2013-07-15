@@ -32,7 +32,8 @@
     <string name="scanned_at_format">%2$sに%1$sにスキャンされました</string>
     <string name="supported_cards">利用できるカード</string>
     <string name="pass_or_transfer">パス／乗り換え</string>
-    
+    <string name="transaction_sequence">順序</string>
+
     <string name="felica_terminal_fare_adjustment">精算機</string>
     <string name="felica_terminal_portable">携帯型端末</string>
     <string name="felica_terminal_vehicle">等車載端末</string>

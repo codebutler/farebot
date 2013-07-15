@@ -114,10 +114,12 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity {
         }
 
         CardRawDataFragmentClass annotation = mCard.getClass().getAnnotation(CardRawDataFragmentClass.class);
-        Class rawDataFragmentClass = annotation.value();
-        if (rawDataFragmentClass != null) {
-            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass, args);
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        if (annotation != null) {
+            Class rawDataFragmentClass = annotation.value();
+            if (rawDataFragmentClass != null) {
+                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass, args);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            }
         }
     }
 

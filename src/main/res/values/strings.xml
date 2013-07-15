@@ -56,6 +56,7 @@
     <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
     <string name="supported_cards">Supported Cards</string>
     <string name="pass_or_transfer">Pass/Xfer</string>
+    <string name="transaction_sequence">#</string>
 
     <string name="felica_terminal_fare_adjustment">Fare Adjustment Machine</string>
     <string name="felica_terminal_portable">Portable Terminal</string>

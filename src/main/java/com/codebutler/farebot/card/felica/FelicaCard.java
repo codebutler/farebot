@@ -29,6 +29,7 @@ import android.util.Log;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.transit.SuicaTransitData;
+import com.codebutler.farebot.transit.EdyTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import net.kazzz.felica.FeliCaTag;
@@ -246,6 +247,8 @@ public class FelicaCard extends Card {
     public TransitIdentity parseTransitIdentity() {
         if (SuicaTransitData.check(this))
             return SuicaTransitData.parseTransitIdentity(this);
+        else if (EdyTransitData.check(this))
+            return EdyTransitData.parseTransitIdentity(this);
         return null;
     }
 
@@ -254,6 +257,8 @@ public class FelicaCard extends Card {
         Log.d("FelicaCard", "parseTransitData() called!!");
         if (SuicaTransitData.check(this))
             return new SuicaTransitData(this);
+        else if (EdyTransitData.check(this))
+            return new EdyTransitData(this);
         return null;
     }
 

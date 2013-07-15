@@ -48,29 +48,9 @@ import net.kazzz.felica.lib.Util;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMNS_IRUCA_STATIONCODE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMNS_STATIONCODE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_AREACODE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_COMPANYNAME;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_COMPANYNAME_EN;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_ID;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LATITUDE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LINECODE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LINENAME;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LINENAME_EN;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_LONGITUDE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_STATIONCODE;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_STATIONNAME;
-import static com.codebutler.farebot.card.felica.DBUtil.COLUMN_STATIONNAME_EN;
-import static com.codebutler.farebot.card.felica.DBUtil.TABLE_IRUCA_STATIONCODE;
-import static com.codebutler.farebot.card.felica.DBUtil.TABLE_STATIONCODE;
+import static com.codebutler.farebot.card.felica.DBUtil.*;
 
 public class SuicaTransitData extends TransitData {
     private SuicaTrip[] mTrips;
@@ -522,7 +502,7 @@ public class SuicaTransitData extends TransitData {
         c.set(Calendar.DAY_OF_MONTH, dd);
 
         // Product sales have time, too.
-        // 物販だったら時間もセット
+        // 物販だったら時s間もセット
         if (isProductSale) {
             int time = Util.toInt(data[6], data[7]);
             int hh = time >> 11;
