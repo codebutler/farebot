@@ -15,7 +15,7 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 
 public class ItsoTransitData extends TransitData {
 	private long mSerialNumber;
-	private long ISSN;
+	private long issn;
 
 	public static boolean check(Card card) {
 		// Mifare Desfire
@@ -25,8 +25,6 @@ public class ItsoTransitData extends TransitData {
 			/* Need to check IIN is 633597
 			if (Utils.getHexString(data, 2, 3) != "633597") {
 			 */
-
-
 
 			return true;
 		}
@@ -74,7 +72,7 @@ public class ItsoTransitData extends TransitData {
 			byte[] shellBytes = application.getFile(0xf).getData();
 
 			// We go via hex strings because these are binary coded decimal.
-			ISSN = Long.parseLong(Utils.getHexString(shellBytes, 5, 2));
+			issn = Long.parseLong(Utils.getHexString(shellBytes, 5, 2));
 			mSerialNumber = Long.parseLong(Utils.getHexString(shellBytes, 7, 4));
 
 			byte[] data;
@@ -119,7 +117,8 @@ public class ItsoTransitData extends TransitData {
 	 */
 	@Override
 	public String getSerialNumber() {
-		return Long.toString(mSerialNumber);
+		String stringSerialNo = String.format("%08d", mSerialNumber);
+		return String.format("%04d", issn) + " " + stringSerialNo.substring(0, 4) + " " + stringSerialNo.substring(4);
 	}
 
 	/*
