@@ -3,6 +3,7 @@
  */
 package com.codebutler.farebot.transit;
 
+import java.util.Arrays;
 import java.util.List;
 
 import android.os.Parcel;
@@ -16,6 +17,9 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 public class ItsoTransitData extends TransitData {
 	private long mSerialNumber;
 	private long issn;
+	private byte[] directoryBytes;
+	private byte[][] logs;
+	private byte[] shellBytes;
 
 	public static boolean check(Card card) {
 		// Mifare Desfire
@@ -67,9 +71,9 @@ public class ItsoTransitData extends TransitData {
 
 			// See page 100 of
 			// http://www.itso.org.uk/content/Specification/Spec_v2.1.4/ITSO_TS_1000-10_V2_1_4_2010-02.pdf
-			byte[] directoryBytes = application.getFile(0x00).getData();
-			byte[] logBytes = application.getFile(0x01).getData();
-			byte[] shellBytes = application.getFile(0xf).getData();
+			directoryBytes = application.getFile(0x00).getData();
+			logs = divideArray(application.getFile(0x01).getData(), 48);
+			shellBytes = application.getFile(0xf).getData();
 
 			// We go via hex strings because these are binary coded decimal.
 			issn = Long.parseLong(Utils.getHexString(shellBytes, 5, 2));
@@ -181,6 +185,30 @@ public class ItsoTransitData extends TransitData {
 	public List<ListItem> getInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Divide an array of bytes into equal sized chunks
+	 *
+	 * Taken from: http://stackoverflow.com/a/3405233/3408
+	 *
+	 * @param source The array to divide
+	 * @param chunksize Number of bytes to put in each chunk
+	 * @return
+	 */
+	public static byte[][] divideArray(byte[] source, int chunksize) {
+
+		byte[][] ret = new byte[(int) Math.ceil(source.length
+				/ (double) chunksize)][chunksize];
+
+		int start = 0;
+
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = Arrays.copyOfRange(source, start, start + chunksize);
+			start += chunksize;
+		}
+
+		return ret;
 	}
 
 }
