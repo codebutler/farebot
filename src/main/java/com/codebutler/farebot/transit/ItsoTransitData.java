@@ -133,7 +133,22 @@ public class ItsoTransitData extends TransitData {
 	@Override
 	public Trip[] getTrips() {
 		// TODO Auto-generated method stub
-		return null;
+		Trip[] trips = new Trip[logs.length];
+
+		int tripCount = 0;
+
+		for(byte[] logEntry : logs) {
+			//Util.logEntry;
+			long minutes = (0xFF & logEntry[4]) * 65536 + (0xFF & logEntry[5]) * 256 + (0xFF & logEntry[6]);
+			if (minutes > 0) {
+				trips[tripCount] = new ItsoTrip(minutes * 60 + 852076800L); // 852076800L is the timestamp of 1st Jan 1997
+				tripCount++;
+			}
+			// .setRoute()
+			// .setAgency()
+			// .setMode() etc.
+		}
+		return Arrays.copyOfRange(trips, 0, tripCount);
 	}
 
 	/*
@@ -210,5 +225,108 @@ public class ItsoTransitData extends TransitData {
 
 		return ret;
 	}
+
+    public static class ItsoTrip extends Trip {
+
+        private final long mTimestamp;
+
+        public ItsoTrip (Long startTime) {
+        	mTimestamp = startTime;
+        }
+
+		@Override
+		public int describeContents() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public long getTimestamp() {
+			return mTimestamp;
+		}
+
+		@Override
+		public long getExitTimestamp() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public String getRouteName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getAgencyName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getShortAgencyName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getFareString() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getBalanceString() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getStartStationName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Station getStartStation() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getEndStationName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Station getEndStation() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public double getFare() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public Mode getMode() {
+			return Mode.BUS;
+		}
+
+		@Override
+		public boolean hasTime() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+    }
 
 }
