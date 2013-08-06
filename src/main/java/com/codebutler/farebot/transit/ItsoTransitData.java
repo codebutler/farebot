@@ -4,13 +4,12 @@
 package com.codebutler.farebot.transit;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.kazzz.felica.lib.Util;
 
 import android.os.Parcel;
+import android.util.SparseArray;
 
 import com.codebutler.farebot.ListItem;
 import com.codebutler.farebot.Utils;
@@ -267,7 +266,7 @@ public class ItsoTransitData extends TransitData {
 			return this;
 		}
 
-		private static Map<Integer, String> routes = new HashMap<Integer, String>() {{
+		private static SparseArray<String> routes = new SparseArray<String>() {{
 			put(0x1fff,   "3");
 			put(0x27ff,   "4");
 			put(0x22bf,   "4A");
@@ -282,13 +281,10 @@ public class ItsoTransitData extends TransitData {
 
 		@Override
 		public String getRouteName() {
-			if (routes.containsKey(route)) {
-				return routes.get(route);
-			}
-			return "Unknown Route: " + Util.getHexString(Util.toBytes(route));
+			return routes.get(route,  "Unknown Route: " + Util.getHexString(Util.toBytes(route)));
 		}
 
-		private static Map<Integer, String> agencys = new HashMap<Integer, String>() {{
+		private static SparseArray<String> agencys = new SparseArray<String>() {{
 			put(0x0000, "Stagecoach");
 			put(0x206c, "Oxford Bus company");
 		}};
@@ -300,10 +296,7 @@ public class ItsoTransitData extends TransitData {
 
 		@Override
 		public String getAgencyName() {
-			if (agencys.containsKey(agency)) {
-				return agencys.get(agency);
-			}
-			return "Unknown operator: " + Util.getHexString(Util.toBytes(agency));
+			return agencys.get(agency, "Unknown operator: " + Util.getHexString(Util.toBytes(agency)));
 		}
 
 		@Override
