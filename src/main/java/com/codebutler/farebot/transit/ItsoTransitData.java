@@ -4,7 +4,11 @@
 package com.codebutler.farebot.transit;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import net.kazzz.felica.lib.Util;
 
 import android.os.Parcel;
 
@@ -133,7 +137,7 @@ public class ItsoTransitData extends TransitData {
 	@Override
 	public Trip[] getTrips() {
 		// TODO Auto-generated method stub
-		Trip[] trips = new Trip[logs.length];
+		ItsoTrip[] trips = new ItsoTrip[logs.length];
 
 		int tripCount = 0;
 
@@ -142,11 +146,10 @@ public class ItsoTransitData extends TransitData {
 			long minutes = (0xFF & logEntry[4]) * 65536 + (0xFF & logEntry[5]) * 256 + (0xFF & logEntry[6]);
 			if (minutes > 0) {
 				trips[tripCount] = new ItsoTrip(minutes * 60 + 852076800L); // 852076800L is the timestamp of 1st Jan 1997
+				trips[tripCount].setAgency((0xFF & logEntry[21]) * 256 + (0xFF & logEntry[22]));
+				trips[tripCount].setRoute((0xFF & logEntry[23]) * 256 + (0xFF & logEntry[24]));
 				tripCount++;
 			}
-			// .setRoute()
-			// .setAgency()
-			// .setMode() etc.
 		}
 		return Arrays.copyOfRange(trips, 0, tripCount);
 	}
@@ -226,13 +229,15 @@ public class ItsoTransitData extends TransitData {
 		return ret;
 	}
 
-    public static class ItsoTrip extends Trip {
+	public static class ItsoTrip extends Trip {
 
-        private final long mTimestamp;
+		private final long mTimestamp;
+		private int route;
+		private int agency;
 
-        public ItsoTrip (Long startTime) {
-        	mTimestamp = startTime;
-        }
+		public ItsoTrip (Long startTime) {
+			mTimestamp = startTime;
+		}
 
 		@Override
 		public int describeContents() {
@@ -257,22 +262,53 @@ public class ItsoTransitData extends TransitData {
 			return 0;
 		}
 
+		public ItsoTrip setRoute(int routeID) {
+			this.route = routeID;
+			return this;
+		}
+
+		private static Map<Integer, String> routes = new HashMap<Integer, String>() {{
+			put(0x1fff,   "3");
+			put(0x27ff,   "4");
+			put(0x22bf,   "4A");
+			put(0x233f,   "4C");
+			put(0x2fff,   "5");
+			put(0x087f,  "11");
+			put(0x08ff,  "13");
+			put(0x28ff,  "U1");
+			put(0xC07f,  "S1");
+			put(0xe047, "X13");
+		}};
+
 		@Override
 		public String getRouteName() {
-			// TODO Auto-generated method stub
-			return null;
+			if (routes.containsKey(route)) {
+				return routes.get(route);
+			}
+			return "Unknown Route: " + Util.getHexString(Util.toBytes(route));
+		}
+
+		private static Map<Integer, String> agencys = new HashMap<Integer, String>() {{
+			put(0x0000, "Stagecoach");
+			put(0x206c, "Oxford Bus company");
+		}};
+
+		public ItsoTrip setAgency(int agencyID) {
+			this.agency = agencyID;
+			return this;
 		}
 
 		@Override
 		public String getAgencyName() {
-			// TODO Auto-generated method stub
-			return null;
+			if (agencys.containsKey(agency)) {
+				return agencys.get(agency);
+			}
+			return "Unknown operator: " + Util.getHexString(Util.toBytes(agency));
 		}
 
 		@Override
 		public String getShortAgencyName() {
-			// TODO Auto-generated method stub
-			return null;
+			return getAgencyName();
 		}
 
 		@Override
