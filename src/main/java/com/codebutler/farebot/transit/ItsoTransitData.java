@@ -150,7 +150,9 @@ public class ItsoTransitData extends TransitData {
 				tripCount++;
 			}
 		}
-		return Arrays.copyOfRange(trips, 0, tripCount);
+		trips = Arrays.copyOfRange(trips, 0, tripCount);
+		Arrays.sort(trips);
+		return trips;
 	}
 
 	/*
@@ -228,7 +230,7 @@ public class ItsoTransitData extends TransitData {
 		return ret;
 	}
 
-	public static class ItsoTrip extends Trip {
+	public static class ItsoTrip extends Trip implements Comparable<ItsoTrip> {
 
 		private final long mTimestamp;
 		private int route;
@@ -355,6 +357,17 @@ public class ItsoTransitData extends TransitData {
 		public boolean hasTime() {
 			// TODO Auto-generated method stub
 			return false;
+		}
+
+		@Override
+		public int compareTo(ItsoTrip another) {
+			if (this.mTimestamp > another.mTimestamp) {
+				return -1;
+			} else if (this.mTimestamp < another.mTimestamp) {
+				return 1;
+			} else {
+				return 0;
+			}
 		}
     }
 
