@@ -9,6 +9,7 @@ import java.util.List;
 import net.kazzz.felica.lib.Util;
 
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.SparseArray;
 
 import com.codebutler.farebot.ListItem;
@@ -248,8 +249,9 @@ public class ItsoTransitData extends TransitData {
 
 		@Override
 		public void writeToParcel(Parcel dest, int flags) {
-			// TODO Auto-generated method stub
-
+			dest.writeLong(mTimestamp);
+			dest.writeInt(route);
+			dest.writeInt(agency);
 		}
 
 		@Override
@@ -369,6 +371,21 @@ public class ItsoTransitData extends TransitData {
 				return 0;
 			}
 		}
-    }
 
+		protected ItsoTrip(Parcel in) {
+			mTimestamp = in.readLong();
+			route = in.readInt();
+			agency = in.readInt();
+		}
+
+		public static final Parcelable.Creator<ItsoTrip> CREATOR = new Parcelable.Creator<ItsoTrip>() {
+			public ItsoTrip createFromParcel(Parcel in) {
+				return new ItsoTrip(in);
+			}
+
+			public ItsoTrip[] newArray(int size) {
+				return new ItsoTrip[size];
+			}
+		};
+	}
 }
