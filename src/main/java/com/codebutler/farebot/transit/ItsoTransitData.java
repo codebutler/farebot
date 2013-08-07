@@ -271,15 +271,24 @@ public class ItsoTransitData extends TransitData {
 		}
 
 		private static SparseArray<String> routes = new SparseArray<String>() {{
+			put(0x0fff,   "1");
 			put(0x1fff,   "3");
 			put(0x27ff,   "4");
 			put(0x22bf,   "4A");
 			put(0x233f,   "4C");
 			put(0x2fff,   "5");
+			put(0x47ff,   "8");
+			put(0x083f,  "10");
 			put(0x087f,  "11");
 			put(0x08ff,  "13");
-			put(0x28ff,  "U1");
+			put(0xc18d,  "66");
+			put(0x1801, "300");
+			put(0x2001, "400");
 			put(0xC07f,  "S1");
+			put(0xc87f,  "T1");
+			put(0xc8ff,  "T3");
+			put(0x28ff,  "U1");
+			put(0x29bf,  "U5");
 			put(0xe047, "X13");
 		}};
 
@@ -291,6 +300,7 @@ public class ItsoTransitData extends TransitData {
 		private static SparseArray<String> agencys = new SparseArray<String>() {{
 			put(0x0000, "Stagecoach");
 			put(0x206c, "Oxford Bus company");
+			put(0x207f, "Thames Travel");
 		}};
 
 		public ItsoTrip setAgency(int agencyID) {
