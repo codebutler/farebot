@@ -54,16 +54,6 @@ public class ItsoTransitData extends TransitData {
 	}
 
 	public ItsoTransitData(Parcel parcel) {
-		/*
-		 * mSerialNumber = parcel.readLong(); mBalance = (short)
-		 * parcel.readLong();
-		 *
-		 * mTrips = new ClipperTrip[parcel.readInt()];
-		 * parcel.readTypedArray(mTrips, ClipperTrip.CREATOR);
-		 *
-		 * mRefills = new ClipperRefill[parcel.readInt()];
-		 * parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
-		 */
 	}
 
 	public ItsoTransitData(Card card) {
@@ -83,27 +73,6 @@ public class ItsoTransitData extends TransitData {
 			issn = Long.parseLong(Utils.getHexString(shellBytes, 5, 2));
 			mSerialNumber = Long.parseLong(Utils.getHexString(shellBytes, 7, 4));
 
-			byte[] data;
-			/*
-			 * try { data =
-			 * desfireCard.getApplication(0x1602a0).getFile(0x08).getData();
-			 * mSerialNumber = Utils.byteArrayToLong(data, 1, 4); } catch
-			 * (Exception ex) { throw new
-			 * RuntimeException("Error parsing Clipper serial", ex); }
-			 *
-			 * try { data =
-			 * desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
-			 * mBalance = (short) (((0xFF & data[18]) << 8) | (0xFF &
-			 * data[19])); } catch (Exception ex) { throw new
-			 * RuntimeException("Error parsing Clipper balance", ex); }
-			 *
-			 * try { mTrips = parseTrips(desfireCard); } catch (Exception ex) {
-			 * throw new RuntimeException("Error parsing Clipper trips", ex); }
-			 *
-			 * try { mRefills = parseRefills(desfireCard); } catch (Exception
-			 * ex) { throw new RuntimeException("Error parsing Clipper refills",
-			 * ex); }
-			 */
 		}
 	}
 
