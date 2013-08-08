@@ -10,6 +10,7 @@ import net.kazzz.felica.lib.Util;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.codebutler.farebot.ListItem;
@@ -25,6 +26,8 @@ public class ItsoTransitData extends TransitData {
 	private byte[][] logs;
 	private byte[] shellBytes;
 	private byte[][] sectorData;
+	private String firstName;
+	private String lastName;
 
 	public static boolean check(Card card) {
 		// Mifare Desfire
@@ -77,6 +80,15 @@ public class ItsoTransitData extends TransitData {
 			sectorData = new byte[14][];
 			for (int sector=0; sector<13; sector++) {
 				sectorData[sector] = application.getFile(14-sector).getData();
+
+				byte[] thisSector = sectorData[sector];
+				if (Utils.getHexString(thisSector, 1, 3).equals("41ff00")) {
+					byte firstNameLength = thisSector[29];
+					firstName = new String (thisSector, 30, (int) firstNameLength);
+					byte lastNameLength = thisSector[30 + firstNameLength];
+					lastName = new String (thisSector, 31 + firstNameLength, lastNameLength);
+					Log.i("CardholderName",firstName + " / " + lastName);
+				}
 			}
 		}
 	}
