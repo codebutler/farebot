@@ -24,6 +24,7 @@ public class ItsoTransitData extends TransitData {
 	private byte[] directoryBytes;
 	private byte[][] logs;
 	private byte[] shellBytes;
+	private byte[][] sectorData;
 
 	public static boolean check(Card card) {
 		// Mifare Desfire
@@ -73,6 +74,10 @@ public class ItsoTransitData extends TransitData {
 			issn = Long.parseLong(Utils.getHexString(shellBytes, 5, 2));
 			mSerialNumber = Long.parseLong(Utils.getHexString(shellBytes, 7, 4));
 
+			sectorData = new byte[14][];
+			for (int sector=0; sector<13; sector++) {
+				sectorData[sector] = application.getFile(14-sector).getData();
+			}
 		}
 	}
 
