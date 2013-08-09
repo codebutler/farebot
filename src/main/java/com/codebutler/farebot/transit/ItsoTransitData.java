@@ -28,6 +28,7 @@ public class ItsoTransitData extends TransitData {
 	private byte[][] sectorData;
 	private String firstName;
 	private String lastName;
+	private String dob;
 
 	public static boolean check(Card card) {
 		// Mifare Desfire
@@ -88,6 +89,10 @@ public class ItsoTransitData extends TransitData {
 					byte lastNameLength = thisSector[30 + firstNameLength];
 					lastName = new String (thisSector, 31 + firstNameLength, lastNameLength);
 					Log.i("CardholderName",firstName + " / " + lastName);
+					dob = Util.getHexString(thisSector, 7, 2) + "-"
+					+ Util.getHexString(thisSector, 9, 1) + "-"
+					+ Util.getHexString(thisSector, 10, 1);
+					Log.i("CardholderDOB",dob);
 				}
 			}
 		}
