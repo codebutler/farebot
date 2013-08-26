@@ -220,6 +220,12 @@ public class OrcaTransitData extends TransitData {
             new Station("Seatac Airport Station",             "Sea-Tac",       "47.4445305", "-122.297012")
         };
 
+        // TODO: Find and add remaining Sounder station data.
+        private static Map<Integer, Station> sSounderStations = new HashMap<Integer, Station>() {{
+            put(3, new Station("King Street Station",         "King Street",   "47.598445", "-122.330161"));
+            put(5, new Station("Kent Station",                "Kent",          "47.384257", "-122.233151"));
+        }};
+
         private static Map<Integer, Station> sWSFTerminals = new HashMap<Integer, Station>() {{
             put(10101, new Station("Seattle Terminal",           "Seattle",    "47.602722", "-122.338512"));
             put(10103, new Station("Bainbridge Island Terminal", "Bainbridge", "47.62362",  "-122.51082" ));
@@ -321,6 +327,8 @@ public class OrcaTransitData extends TransitData {
         public String getRouteName () {
             if (isLink()) {
                 return "Link Light Rail";
+            } else if (isSounder()) {
+                return "Sounder Train";
             } else {
                 // FIXME: Need to find bus route #s
                 if (mAgency == AGENCY_ST) {
@@ -354,6 +362,8 @@ public class OrcaTransitData extends TransitData {
                 if (stationNumber < sLinkStations.length) {
                     return sLinkStations[stationNumber];
                 }
+            } else if (isSounder()) {
+                return sSounderStations.get((int) mCoachNum);
             } else if (mAgency == AGENCY_WSF) {
                 return sWSFTerminals.get((int)mCoachNum);
             }
@@ -366,6 +376,13 @@ public class OrcaTransitData extends TransitData {
                 int stationNumber = (((int) mCoachNum) % 1000) - 193;
                 if (stationNumber < sLinkStations.length) {
                     return sLinkStations[stationNumber].getStationName();
+                } else {
+                    return String.format("Unknown Station #%s", stationNumber);
+                }
+            } else if (isSounder()) {
+                int stationNumber = (int) mCoachNum;
+                if (sSounderStations.containsKey(stationNumber)) {
+                    return sSounderStations.get(stationNumber).getStationName();
                 } else {
                     return String.format("Unknown Station #%s", stationNumber);
                 }
@@ -397,6 +414,8 @@ public class OrcaTransitData extends TransitData {
         public Mode getMode() {
             if (isLink()) {
                 return Mode.METRO;
+            } else if (isSounder()) {
+                return Mode.TRAIN;
             } else if (mAgency == AGENCY_WSF) {
                 return Mode.FERRY;
             } else {
@@ -432,6 +451,11 @@ public class OrcaTransitData extends TransitData {
 
         private boolean isLink () {
             return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum > 10000);
+        }
+
+        private boolean isSounder() {
+            // FIXME: This should check if sSounderStations contains mCoachNum as a key once incomplete data is found and added.
+            return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum < 20);
         }
     }
 
@@ -487,6 +511,11 @@ public class OrcaTransitData extends TransitData {
             if (mEndTrip.mTransType == TRANS_TYPE_CANCEL_TRIP) {
                 return FareBotApplication.getInstance().getString(R.string.fare_cancelled_format, mStartTrip.getFareString());
             }
+
+            if (mStartTrip.isSounder()) {
+                return NumberFormat.getCurrencyInstance(Locale.US).format(getFare() / 100.0);
+            }
+
             return mStartTrip.getFareString();
         }
 
@@ -517,7 +546,14 @@ public class OrcaTransitData extends TransitData {
 
         @Override
         public double getFare() {
-            return mStartTrip.getFare();
+            if (mStartTrip.isSounder()) {
+                // Unlike Link Light Rail, a rebate is given on tap out with the Sounder train.
+                // Since the rebate fare comes up as zero, we use the new balance values to
+                // determine the rebate fare.
+                return mStartTrip.getFare() + (mStartTrip.mNewBalance - mEndTrip.mNewBalance);
+            } else {
+                return mStartTrip.getFare();
+            }
         }
 
         @Override
