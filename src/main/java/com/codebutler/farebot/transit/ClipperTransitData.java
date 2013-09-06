@@ -53,6 +53,7 @@ public class ClipperTransitData extends TransitData {
     private static final int  AGENCY_VTA      = 0x11;
     private static final int  AGENCY_MUNI     = 0x12;
     private static final int  AGENCY_FERRY    = 0x19;
+    private static final int  AGENCY_WALGREENS= 0x1af;
 
     private static final long EPOCH_OFFSET    = 0x83aa7f18;
 
@@ -65,6 +66,7 @@ public class ClipperTransitData extends TransitData {
         put(AGENCY_VTA,      "Santa Clara Valley Transportation Authority");
         put(AGENCY_MUNI,     "San Francisco Municipal");
         put(AGENCY_FERRY,    "Golden Gate Ferry");
+        put(AGENCY_WALGREENS,"Walgreens");
     }};
     
     private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {{
@@ -76,6 +78,7 @@ public class ClipperTransitData extends TransitData {
         put(AGENCY_VTA,      "VTA");
         put(AGENCY_MUNI,     "Muni");
         put(AGENCY_FERRY,    "Ferry");
+        put(AGENCY_WALGREENS,"Walgreens");
     }};
 
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {{
