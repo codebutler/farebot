@@ -89,13 +89,15 @@ public class ClipperTransitData extends TransitData {
         put((long)0x08, new Station("Powell Street Station",                     "Powell St.",           "37.784970", "-122.40701"));
         put((long)0x09, new Station("Montgomery St. Station",                    "Montgomery",           "37.789336", "-122.401486"));
         put((long)0x0a, new Station("Embarcadero Station",                       "Embarcadero",          "37.793086", "-122.396276"));
+        put((long)0x0b, new Station("West Oakland Station",                      "West Oakland",         "37.805296", "-122.294938"));
         put((long)0x0c, new Station("12th Street Oakland City Center",           "12th St.",             "37.802956", "-122.2720367"));
         put((long)0x0d, new Station("19th Street Oakland Station",               "19th St.",             "37.80762",  "-122.26886"));
+        put((long)0x0e, new Station("MacArthur Station",                         "MacArthur",            "37.82928",  "-122.26661"));
         put((long)0x0f, new Station("Rockridge Station",                         "Rockridge",            "37.84463",  "-122.251825"));
         put((long)0x13, new Station("Walnut Creek Station",                      "Walnut Creek",         "37.90563",  "-122.06744"));
         put((long)0x14, new Station("Concord Station",                           "Concord",              "37.97376",  "-122.02903"));
         put((long)0x15, new Station("North Concord/Martinez Station",            "N. Concord/Martinez",  "38.00318",  "-122.02463"));
-        put((long)0x17, new Station("Pittsburg/Bay Point Station",               "Pittsburg/Bay Pt",     "38.01892",  "-121.94240"));
+        put((long)0x17, new Station("Ashby Station",                             "Ashby",                "37.85303",  "-122.269965"));
         put((long)0x18, new Station("Downtown Berkeley Station",                 "Berkeley",             "37.869868", "-122.268051"));
         put((long)0x19, new Station("North Berkeley Station",                    "North Berkeley",       "37.874026", "-122.283882"));
         put((long)0x20, new Station("Coliseum/Oakland Airport BART",             "Coliseum/OAK",         "37.754270", "-122.197757"));
