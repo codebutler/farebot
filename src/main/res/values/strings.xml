@@ -121,6 +121,7 @@
     <string name="location_the_netherlands">The Netherlands</string>
     <string name="location_sao_paulo">São Paulo, Brazil</string>
     <string name="location_helsinki_finland">Helsinki, Finland</string>
+    <string name="location_united_kingdom">UK</string>
     <string name="block_title_format">Block: %s</string>
     <string name="sector_title_format">Sector: 0x%s</string>
     <string name="unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>

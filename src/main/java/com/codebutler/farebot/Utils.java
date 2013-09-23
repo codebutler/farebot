@@ -43,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.util.Formatter;
 import java.util.List;
 
 public class Utils {
@@ -107,6 +108,30 @@ public class Utils {
         } catch (Exception ex) {
             return defaultResult;
         }
+    }
+
+    /**
+     * Turn bytes into hex string representation. Also useful for decoding BCD
+     *
+     * @param b The data to convert
+     * @param offset
+     * @param length
+     * @return
+     */
+    public static String getHexString(byte[] b, int offset, int length) {
+        if (b.length < length + offset)
+            throw new IllegalArgumentException(
+                    "length must be less than or equal to b.length");
+
+        StringBuilder sb = new StringBuilder(length * 2);
+
+        Formatter formatter = new Formatter(sb);
+        for (int i = 0; i < length; i++) {
+            formatter.format("%02x", b[offset + i]);
+        }
+
+        formatter.close();
+        return sb.toString();
     }
 
     public static byte[] hexStringToByteArray (String s) {
