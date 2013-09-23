@@ -269,8 +269,10 @@ public class ItsoTransitData extends TransitData {
 			put(0x233f,   "4C");
 			put(0x2fff,   "5");
 			put(0x47ff,   "8");
+			put(0x4fff,   "9");
 			put(0x083f,  "10");
 			put(0x087f,  "11");
+			put(0x0899,  "12C");
 			put(0x08ff,  "13");
 			put(0xc18d,  "66");
 			put(0x1801, "300");
@@ -280,7 +282,9 @@ public class ItsoTransitData extends TransitData {
 			put(0xc8ff,  "T3");
 			put(0x28ff,  "U1");
 			put(0x29bf,  "U5");
+			put(0xe0ff,  "X3");
 			put(0xe047, "X13");
+			put(0xe0c1, "X30");
 		}};
 
 		@Override
