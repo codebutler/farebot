@@ -113,6 +113,7 @@ public class ClipperTransitData extends TransitData {
         put((long)0x29, new Station("San Bruno Station",                         "San Bruno",            "37.63714",  "-122.415622"));
         put((long)0x2a, new Station("San Francisco Int'l Airport Station",       "SFO",                  "37.61590",  "-122.39263"));
         put((long)0x2b, new Station("Millbrae Station",                          "Millbrae",             "37.599935", "-122.386478"));
+        put((long)0x2c, new Station("West Dublin/Pleasanton Station",            "W. Dublin/Pleasanton", "37.699764", "-121.928118"));
     }};
 
     private static Map<Long, String> sFerryRoutes = new HashMap<Long, String>() {{
