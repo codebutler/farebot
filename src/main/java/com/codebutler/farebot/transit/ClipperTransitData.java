@@ -91,6 +91,7 @@ public class ClipperTransitData extends TransitData {
         put((long)0x0a, new Station("Embarcadero Station",                       "Embarcadero",          "37.793086", "-122.396276"));
         put((long)0x0c, new Station("12th Street Oakland City Center",           "12th St.",             "37.802956", "-122.2720367"));
         put((long)0x0d, new Station("19th Street Oakland Station",               "19th St.",             "37.80762",  "-122.26886"));
+        put((long)0x0e, new Station("MacArthur Station",                         "MacArthur",            "37.82840",  "-122.267083"));
         put((long)0x0f, new Station("Rockridge Station",                         "Rockridge",            "37.84463",  "-122.251825"));
         put((long)0x13, new Station("Walnut Creek Station",                      "Walnut Creek",         "37.90563",  "-122.06744"));
         put((long)0x14, new Station("Concord Station",                           "Concord",              "37.97376",  "-122.02903"));
@@ -103,6 +104,7 @@ public class ClipperTransitData extends TransitData {
         put((long)0x1b, new Station("El Cerrito Del Norte Station",              "El Cerrito Del Norte", "37.925651", "-122.317219"));
         put((long)0x1c, new Station("Richmond Station",                          "Richmond",             "37.93730",  "-122.35338"));
         put((long)0x1d, new Station("Lake Merritt Station",                      "Lake Merritt",         "37.79761",  "-122.26564"));
+        put((long)0x1e, new Station("Fruitvale Station",                         "Fruitvale",            "37.77495",  "-122.22425"));
         put((long)0x1f, new Station("Coliseum/Oakland Airport Station",          "Coliseum/OAK",         "37.75256",  "-122.19806"));
         put((long)0x22, new Station("Hayward Station",                           "Hayward",              "37.670387", "-122.088002"));
         put((long)0x23, new Station("South Hayward Station",                     "South Hayward",        "37.634800", "-122.057551"));
