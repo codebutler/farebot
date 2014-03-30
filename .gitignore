@@ -14,3 +14,4 @@ project.properties
 .gradle
 release.keystore
 com_crashlytics_export_strings.xml
+.project
