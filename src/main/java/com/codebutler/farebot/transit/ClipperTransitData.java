@@ -531,19 +531,18 @@ public class ClipperTransitData extends TransitData {
 
         @Override
         public String getEndStationName () {
-            if (mAgency == AGENCY_BART) {
+            if (mAgency == AGENCY_BART || mAgency == AGENCY_GG_FERRY || mAgency == AGENCY_SF_BAY_FERRY) {
                 Station station = getEndStation();
-                if (station != null)
-                    return sBartStations.get(mTo).getShortStationName();
-                else
-                    return "Station #0x" + Long.toString(mTo, 16);
+                if (station != null) {
+                    return station.getShortStationName();
+                }
+                return "Station #0x" + Long.toString(mTo, 16);
             } else if (mAgency == AGENCY_MUNI) {
                 return null; // Coach number is not collected
-            } else if (mAgency == AGENCY_GGT || mAgency == AGENCY_CALTRAIN ||
-                       mAgency == AGENCY_GG_FERRY || mAgency == AGENCY_SF_BAY_FERRY) {
+            } else if (mAgency == AGENCY_GGT || mAgency == AGENCY_CALTRAIN) {
                 if (mTo == 0xffff)
                     return "(End of line)";
-                return "Zone #" + mTo;
+                return "Zone #0x" + Long.toString(mTo, 16);
             } else {
                 return "(Unknown Station)";
             }
