@@ -44,38 +44,41 @@ public class ClipperTransitData extends TransitData {
     private ClipperTrip[]   mTrips;
     private ClipperRefill[] mRefills;
 
-    private static final int  RECORD_LENGTH   = 32;
-    private static final int  AGENCY_ACTRAN   = 0x01;
-    private static final int  AGENCY_BART     = 0x04;
-    private static final int  AGENCY_CALTRAIN = 0x06;
-    private static final int  AGENCY_GGT      = 0x0b;
-    private static final int  AGENCY_SAMTRANS = 0x0f;
-    private static final int  AGENCY_VTA      = 0x11;
-    private static final int  AGENCY_MUNI     = 0x12;
-    private static final int  AGENCY_FERRY    = 0x19;
+    private static final int  RECORD_LENGTH         = 32;
+    private static final int  AGENCY_ACTRAN         = 0x01;
+    private static final int  AGENCY_BART           = 0x04;
+    private static final int  AGENCY_CALTRAIN       = 0x06;
+    private static final int  AGENCY_GGT            = 0x0b;
+    private static final int  AGENCY_SAMTRANS       = 0x0f;
+    private static final int  AGENCY_VTA            = 0x11;
+    private static final int  AGENCY_MUNI           = 0x12;
+    private static final int  AGENCY_GG_FERRY       = 0x19;
+    private static final int  AGENCY_SF_BAY_FERRY   = 0x1b;
 
     private static final long EPOCH_OFFSET    = 0x83aa7f18;
 
     private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() {{
-        put(AGENCY_ACTRAN,   "Alameda-Contra Costa Transit District");
-        put(AGENCY_BART,     "Bay Area Rapid Transit");
-        put(AGENCY_CALTRAIN, "Caltrain");
-        put(AGENCY_GGT,      "Golden Gate Transit");
-        put(AGENCY_SAMTRANS, "San Mateo County Transit District");
-        put(AGENCY_VTA,      "Santa Clara Valley Transportation Authority");
-        put(AGENCY_MUNI,     "San Francisco Municipal");
-        put(AGENCY_FERRY,    "Golden Gate Ferry");
+        put(AGENCY_ACTRAN,          "Alameda-Contra Costa Transit District");
+        put(AGENCY_BART,            "Bay Area Rapid Transit");
+        put(AGENCY_CALTRAIN,        "Caltrain");
+        put(AGENCY_GGT,             "Golden Gate Transit");
+        put(AGENCY_SAMTRANS,        "San Mateo County Transit District");
+        put(AGENCY_VTA,             "Santa Clara Valley Transportation Authority");
+        put(AGENCY_MUNI,            "San Francisco Municipal");
+        put(AGENCY_GG_FERRY,        "Golden Gate Ferry");
+        put(AGENCY_SF_BAY_FERRY,    "San Francisco Bay Ferry");
     }};
     
     private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {{
-        put(AGENCY_ACTRAN,   "ACTransit");
-        put(AGENCY_BART,     "BART");
-        put(AGENCY_CALTRAIN, "Caltrain");
-        put(AGENCY_GGT,      "GGT");
-        put(AGENCY_SAMTRANS, "SAMTRANS");
-        put(AGENCY_VTA,      "VTA");
-        put(AGENCY_MUNI,     "Muni");
-        put(AGENCY_FERRY,    "Ferry");
+        put(AGENCY_ACTRAN,          "ACTransit");
+        put(AGENCY_BART,            "BART");
+        put(AGENCY_CALTRAIN,        "Caltrain");
+        put(AGENCY_GGT,             "GGT");
+        put(AGENCY_SAMTRANS,        "SAMTRANS");
+        put(AGENCY_VTA,             "VTA");
+        put(AGENCY_MUNI,            "Muni");
+        put(AGENCY_GG_FERRY,        "GG Ferry");
+        put(AGENCY_SF_BAY_FERRY,    "SF Bay Ferry");
     }};
 
     private static Map<Long, Station> sBartStations = new HashMap<Long, Station>() {{
@@ -89,13 +92,15 @@ public class ClipperTransitData extends TransitData {
         put((long)0x08, new Station("Powell Street Station",                     "Powell St.",           "37.784970", "-122.40701"));
         put((long)0x09, new Station("Montgomery St. Station",                    "Montgomery",           "37.789336", "-122.401486"));
         put((long)0x0a, new Station("Embarcadero Station",                       "Embarcadero",          "37.793086", "-122.396276"));
+        put((long)0x0b, new Station("West Oakland Station",                      "West Oakland",         "37.805296", "-122.294938"));
         put((long)0x0c, new Station("12th Street Oakland City Center",           "12th St.",             "37.802956", "-122.2720367"));
         put((long)0x0d, new Station("19th Street Oakland Station",               "19th St.",             "37.80762",  "-122.26886"));
+        put((long)0x0e, new Station("MacArthur Station",                         "MacArthur",            "37.82928",  "-122.26661"));
         put((long)0x0f, new Station("Rockridge Station",                         "Rockridge",            "37.84463",  "-122.251825"));
         put((long)0x13, new Station("Walnut Creek Station",                      "Walnut Creek",         "37.90563",  "-122.06744"));
         put((long)0x14, new Station("Concord Station",                           "Concord",              "37.97376",  "-122.02903"));
         put((long)0x15, new Station("North Concord/Martinez Station",            "N. Concord/Martinez",  "38.00318",  "-122.02463"));
-        put((long)0x17, new Station("Pittsburg/Bay Point Station",               "Pittsburg/Bay Pt",     "38.01892",  "-121.94240"));
+        put((long)0x17, new Station("Ashby Station",                             "Ashby",                "37.85303",  "-122.269965"));
         put((long)0x18, new Station("Downtown Berkeley Station",                 "Berkeley",             "37.869868", "-122.268051"));
         put((long)0x19, new Station("North Berkeley Station",                    "North Berkeley",       "37.874026", "-122.283882"));
         put((long)0x20, new Station("Coliseum/Oakland Airport BART",             "Coliseum/OAK",         "37.754270", "-122.197757"));
@@ -115,14 +120,19 @@ public class ClipperTransitData extends TransitData {
         put((long)0x2b, new Station("Millbrae Station",                          "Millbrae",             "37.599935", "-122.386478"));
     }};
 
-    private static Map<Long, String> sFerryRoutes = new HashMap<Long, String>() {{
+    private static Map<Long, String> sGgFerryRoutes = new HashMap<Long, String>() {{
         put((long)0x03, "Larkspur");
         put((long)0x04, "San Francisco");
     }};
 
-    private static Map<Long, Station> sFerryTerminals = new HashMap<Long, Station>() {{
+    private static Map<Long, Station> sGgFerryTerminals = new HashMap<Long, Station>() {{
         put((long)0x01, new Station("San Francisco Ferry Building", "San Francisco", "37.795873", "-122.391987"));
         put((long)0x03, new Station("Larkspur Ferry Terminal", "Larkspur", "37.945509", "-122.50916"));
+    }};
+
+    private static Map<Long, Station> sSfBayFerryTerminals = new HashMap<Long, Station>() {{
+        put((long)0x01, new Station("Alameda Main Street Terminal", "Alameda Main St.", "37.790668", "-122.294036"));
+        put((long)0x08, new Station("San Francisco Ferry Building", "Ferry Building", "37.795873", "-122.391987"));
     }};
 
     public static boolean check (Card card) {
@@ -441,9 +451,9 @@ public class ClipperTransitData extends TransitData {
 
         @Override
         public String getRouteName () {
-            if (mAgency == AGENCY_FERRY &&
-                sFerryRoutes.containsKey(mRoute)) {
-                return sFerryRoutes.get(mRoute);
+            if (mAgency == AGENCY_GG_FERRY &&
+                sGgFerryRoutes.containsKey(mRoute)) {
+                return sGgFerryRoutes.get(mRoute);
             } else {
                 // FIXME: Need to find bus route #s
                 // return "(Route 0x" + Long.toString(mRoute, 16) + ")";
@@ -472,9 +482,13 @@ public class ClipperTransitData extends TransitData {
                 if (sBartStations.containsKey(mFrom)) {
                     return sBartStations.get(mFrom);
                 }
-            } else if (mAgency == AGENCY_FERRY) {
-                if (sFerryTerminals.containsKey(mFrom)) {
-                    return sFerryTerminals.get(mFrom);
+            } else if (mAgency == AGENCY_GG_FERRY) {
+                if (sGgFerryTerminals.containsKey(mFrom)) {
+                    return sGgFerryTerminals.get(mFrom);
+                }
+            } else if (mAgency == AGENCY_SF_BAY_FERRY) {
+                if (sSfBayFerryTerminals.containsKey(mFrom)) {
+                    return sSfBayFerryTerminals.get(mFrom);
                 }
             }
             return null;
@@ -486,9 +500,13 @@ public class ClipperTransitData extends TransitData {
                 if (sBartStations.containsKey(mTo)) {
                     return sBartStations.get(mTo);
                 }
-            } else if (mAgency == AGENCY_FERRY) {
-                if (sFerryTerminals.containsKey(mTo)) {
-                    return sFerryTerminals.get(mTo);
+            } else if (mAgency == AGENCY_GG_FERRY) {
+                if (sGgFerryTerminals.containsKey(mTo)) {
+                    return sGgFerryTerminals.get(mTo);
+                }
+            } else if (mAgency == AGENCY_SF_BAY_FERRY) {
+                if (sSfBayFerryTerminals.containsKey(mTo)) {
+                    return sSfBayFerryTerminals.get(mTo);
                 }
             }
             return null;
@@ -496,7 +514,7 @@ public class ClipperTransitData extends TransitData {
 
         @Override
         public String getStartStationName () {
-            if (mAgency == AGENCY_BART || mAgency == AGENCY_FERRY) {
+            if (mAgency == AGENCY_BART || mAgency == AGENCY_GG_FERRY || mAgency == AGENCY_SF_BAY_FERRY) {
                 Station station = getStartStation();
                 if (station != null)
                     return station.getShortStationName();
@@ -513,19 +531,18 @@ public class ClipperTransitData extends TransitData {
 
         @Override
         public String getEndStationName () {
-            if (mAgency == AGENCY_BART) {
+            if (mAgency == AGENCY_BART || mAgency == AGENCY_GG_FERRY || mAgency == AGENCY_SF_BAY_FERRY) {
                 Station station = getEndStation();
-                if (station != null)
-                    return sBartStations.get(mTo).getShortStationName();
-                else
-                    return "Station #0x" + Long.toString(mTo, 16);
+                if (station != null) {
+                    return station.getShortStationName();
+                }
+                return "Station #0x" + Long.toString(mTo, 16);
             } else if (mAgency == AGENCY_MUNI) {
                 return null; // Coach number is not collected
-            } else if (mAgency == AGENCY_GGT || mAgency == AGENCY_CALTRAIN ||
-                       mAgency == AGENCY_FERRY) {
+            } else if (mAgency == AGENCY_GGT || mAgency == AGENCY_CALTRAIN) {
                 if (mTo == 0xffff)
                     return "(End of line)";
-                return "Zone #" + mTo;
+                return "Zone #0x" + Long.toString(mTo, 16);
             } else {
                 return "(Unknown Station)";
             }
@@ -547,7 +564,9 @@ public class ClipperTransitData extends TransitData {
                 return Mode.BUS; // FIXME: or Mode.TRAM for light rail
             if (mAgency == AGENCY_MUNI)
                 return Mode.BUS; // FIXME: or Mode.TRAM for "Muni Metro"
-            if (mAgency == AGENCY_FERRY)
+            if (mAgency == AGENCY_GG_FERRY)
+                return Mode.FERRY;
+            if (mAgency == AGENCY_SF_BAY_FERRY)
                 return Mode.FERRY;
             return Mode.OTHER;
         }
