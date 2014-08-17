@@ -17,6 +17,9 @@ h2 {
   text-align: center;
   margin-bottom: 1.5em;
 }
+.header img {
+  max-width: 100%;
+}
 .tagline {
   margin: 0;
   padding-bottom: 30px;
@@ -31,13 +34,13 @@ h2 {
 .main-column {
   padding-left: 20px;
 }
-.footer {
-  margin-top: 3em;
-  font-size: 13px;
+footer {
+  margin-top: 48px;
+  padding: 24px 0;
+  line-height: 0.75em;
+  border-top: 1px solid #ccc;
   text-align: center;
-}
-.footer a {
-  color: inherit;
+  opacity: 0.7;
 }
 a {
   color: #069;
@@ -47,15 +50,15 @@ a {
   margin-bottom: 1.5em;
   text-align: left;
 }
-.supported-cards ul {
+ul {
   list-style-position: inside;
   padding: 0;
   margin: 0 0 0.5em 0;
 }
-.supported-cards ul li {
+ul li {
   padding-bottom: 0.25em;
 }
-.supported-cards ul li:last-child {
+ul li:last-child {
   padding-bottom: 0 !important;
 }
 .supported-cards ul sup {
@@ -65,12 +68,24 @@ a {
   font-size: 10px;
   margin: 0;
 }
+.screenshots, .support {
+  margin-bottom: 1.5em;
+}
 .screenshots img {
   width: 100px;
   margin-bottom: 0.5em;
 }
-
-#screenshotModal {
+.modal-screenshot .modal-dialog {
   width: 300px;
-  margin-left: -150px;
+}
+.modal-screenshot .modal-body {
+  text-align: center;
+  padding: 0;
+}
+.modal-screenshot .modal-content {
+  border-radius: 0;
+  border: 0;
+}
+code {
+  color: #3069ac;
 }

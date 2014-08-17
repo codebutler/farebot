@@ -2,21 +2,11 @@
 <html>
   <head>
     <title>FareBot</title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link href="css/farebot.css" rel="stylesheet">
-    <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-      $(function() {
-          $('.screenshots a').click(function() {
-            $('#screenshotModal img').attr('src', $('img', this).attr('src'));
-          });
-      });
-    </script>
     <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-21232426-1']);
@@ -30,20 +20,20 @@
     </script>
   </head>
   <body>
-    <a href="https://github.com/codebutler/farebot"><img style="position: absolute; top: 0; right: 0; border: 0; opacity: 0.2;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+    <a href="https://github.com/codebutler/farebot"><img style="position: absolute; top: 0; right: 0; border: 0; opacity: 0.2" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
     <div class="container">
       <div class="row">
-        <div class="span5">
+        <div class="col-sm-5">
           <div class="header">
-            <img src="img/farebot_card.png" alt="FareBot" />
+            <img src="img/farebot_card.png" alt="FareBot">
           </div>
           <p class="tagline">View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!</p>
           <p class="download">
             <a href="https://play.google.com/store/apps/details?id=com.codebutler.farebot"><img alt="Get it on Google Play" style="width: 172px; height: 60px" src="https://developer.android.com/images/brand/en_generic_rgb_wo_60.png" /></a>
           </p>
         </div>
-        <div class="span7">
+        <div class="col-sm-7">
           <div class="main-column">
             <div class="supported-cards">
               <h2>Supported Cards</h2>
@@ -67,24 +57,46 @@
               <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0003_en_card_history.png"></a>
               <a href="#screenshotModal" data-toggle="modal"><img src="img/screenshot_0004_en_trip_map.png"></a>
             </div>
+            <h2>Support</h2>
+            <ul class="support">
+              <li>Join <code>#farebot</code> on <code>irc.freenode.net</code>.</li>
+              <li><a href="https://github.com/codebutler/farebot/issues">Issue Tracker</a></li>
+              <li><a href="https://plus.google.com/107450974842126761402/posts">Google+ Community</a></li>
+            </ul>
+            <h2>Contribute</h2>
+            <p>You can find FareBot's source code on <a href="https://github.com/codebutler/farebot">GitHub</a>.</p>
+            <p>FareBot is set up with BitHub, so you can make money for contributing code! The current BitHub price for an accepted pull request is:</p>
+            <p><a href="https://codebutler-bithub.herokuapp.com/"><img src="https://codebutler-bithub.herokuapp.com/v1/status/payment/commit" style="width: 189px"></a></p>
+            <p>If you've enjoyed using FareBot, please consider contributing to the development fund:</p>
+            <p><a class="coinbase-button" data-code="0d31ab1497aadba3abc15a4944fe57b8" data-button-style="donation_large" href="https://coinbase.com/checkouts/0d31ab1497aadba3abc15a4944fe57b8">Donate Bitcoins</a><script src="https://coinbase.com/assets/button.js" type="text/javascript"></script></p>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="span12">
-          <p class="footer">
-            Created by <a href="http://codebutler.com">Eric Butler</a> – Released under the <a href="http://www.fsf.org/licensing/licenses/gpl.html">GPLv3</a>
-            <br/>
-            <a href="mailto:eric+farebot@codebutler.com">mail</a> – 
-            <a href="http://twitter.com/codebutler">twitter</a> –
-            <a href="https://plus.google.com/107450974842126761402/posts">g+</a> –
-            <a href="https://github.com/codebutler/farebot/issues">issue tracker</a> – 
-            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=GSFRW42WFGUTE&lc=US&item_name=FareBot&item_number=farebot&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">donate</a>
+        <div class="col-sm-12">
+          <footer>
+            <p>by <a href="https://twitter.com/codebutler">@codebutler</a></p>
+          </footer>
         </div>
       </div>
     </div>
-    <div id="screenshotModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <img>
+    <div id="screenshotModal" class="modal-screenshot modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+         <div class="modal-content">
+           <div class="modal-body">
+             <img>
+           </div>
+         </div>
+       </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $(function() {
+          $('.screenshots a').click(function() {
+            $('#screenshotModal img').attr('src', $('img', this).attr('src'));
+          });
+      });
+    </script>
   </body>
 </html>
