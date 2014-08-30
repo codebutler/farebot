@@ -109,7 +109,6 @@
     <string name="unknown_card_description">This card is not yet supported by FareBot. Only raw data can be displayed.</string>
     <string name="report_error_privacy_title">Privacy Notice</string>
     <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
-    <string name="comments">Comments</string>
     <string name="scanned_cards">Scanned Cards</string>
     <string name="no_scanned_cards">You have not scanned any cards.</string>
 
@@ -174,4 +173,5 @@
     <string name="fare_cancelled_format">%s (Cancelled)</string>
     <string name="general">General</string>
     <string name="launch_from_background">Launch from background</string>
+    <string name="error_report_sent">Error report sent!</string>
 </resources>

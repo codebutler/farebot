@@ -23,29 +23,30 @@
 package com.codebutler.farebot.fragments;
 
 import android.app.Activity;
+import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.widget.CursorAdapter;
-import android.widget.ResourceCursorAdapter;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.app.ListFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.ResourceCursorAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.codebutler.farebot.ExportHelper;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -54,6 +55,7 @@ import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitIdentity;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -229,7 +231,8 @@ public class CardsFragment extends ListFragment {
                try {
                    mDataCache.put(cacheKey, Card.fromXml(data).parseTransitIdentity());
                } catch (Exception ex) {
-                   mDataCache.put(cacheKey, new TransitIdentity("Error: " + ex, null));
+                   String error = String.format("Error: %s", Utils.getErrorMessage(ex));
+                   mDataCache.put(cacheKey, new TransitIdentity(error, null));
                }
            }
 

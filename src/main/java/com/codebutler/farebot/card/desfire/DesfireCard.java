@@ -23,11 +23,11 @@
 package com.codebutler.farebot.card.desfire;
 
 import android.nfc.Tag;
-import android.nfc.TagLostException;
 import android.nfc.tech.IsoDep;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
+
 import com.codebutler.farebot.CardRawDataFragmentClass;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
@@ -38,10 +38,12 @@ import com.codebutler.farebot.transit.HSLTransitData;
 import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,7 +82,7 @@ public class DesfireCard extends Card {
                         else
                             data = desfireTag.readRecord(fileId);
                         files.add(DesfireFile.create(fileId, settings, data));
-                    } catch (TagLostException ex) {
+                    } catch (IOException ex) {
                         throw ex;
                     } catch (Exception ex) {
                         files.add(new DesfireFile.InvalidDesfireFile(fileId, ex.toString()));

@@ -33,7 +33,11 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.WindowManager;
+
 import org.w3c.dom.Node;
+
+import java.io.StringWriter;
+import java.util.List;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -42,12 +46,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
-import java.util.List;
 
 public class Utils {
     public static void checkNfcEnabled(final Activity activity, NfcAdapter adapter) {
-        if (adapter.isEnabled()) {
+        if (adapter != null && adapter.isEnabled()) {
             return;
         }
         new AlertDialog.Builder(activity)

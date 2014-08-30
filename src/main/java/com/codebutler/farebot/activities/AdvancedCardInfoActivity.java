@@ -27,7 +27,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.text.ClipboardManager;
@@ -46,6 +45,7 @@ import com.codebutler.farebot.UnsupportedCardException;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.fragments.CardHWDetailFragment;
+import com.crashlytics.android.Crashlytics;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -70,7 +70,7 @@ public class AdvancedCardInfoActivity extends Activity {
             }
         });
         
-        mCard = (Card) getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
         
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
@@ -124,14 +124,12 @@ public class AdvancedCardInfoActivity extends Activity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu (Menu menu) {
+    @Override public boolean onCreateOptionsMenu (Menu menu) {
         getMenuInflater().inflate(R.menu.card_advanced_menu, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected (MenuItem item) {
+    @Override public boolean onOptionsItemSelected (MenuItem item) {
         try {
             String xml = Utils.xmlNodeToString(mCard.toXML().getOwnerDocument());
             if (item.getItemId() == R.id.copy_xml) {
@@ -162,39 +160,14 @@ public class AdvancedCardInfoActivity extends Activity {
 
     private void reportError() {
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(Utils.getDeviceInfoString());
-                builder.append("\n\n");
-
-                builder.append(mError.toString());
-                builder.append("\n");
-                builder.append(Utils.getErrorMessage(mError));
-                builder.append("\n");
-                for (StackTraceElement elem : mError.getStackTrace()) {
-                    builder.append(elem.toString());
-                    builder.append("\n");
-                }
-
-                builder.append("\n\n");
-
+            @Override public void onClick(DialogInterface dialog, int which) {
                 try {
-                    builder.append(Utils.xmlNodeToString(mCard.toXML().getOwnerDocument()));
+                    Crashlytics.log(Utils.xmlNodeToString(mCard.toXML().getOwnerDocument()));
                 } catch (Exception ex) {
-                    builder.append("Failed to generate XML: ");
-                    builder.append(ex);
+                    Crashlytics.logException(ex);
                 }
-
-                builder.append("\n\n");
-                builder.append(getString(R.string.comments));
-                builder.append(":\n\n");
-
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:eric+farebot@codebutler.com"));
-                intent.putExtra(Intent.EXTRA_SUBJECT, "FareBot Bug Report");
-                intent.putExtra(Intent.EXTRA_TEXT, builder.toString());
-                startActivity(intent);
-
+                Crashlytics.logException(mError);
+                Toast.makeText(AdvancedCardInfoActivity.this, R.string.error_report_sent, Toast.LENGTH_SHORT).show();
             }
         };
         new AlertDialog.Builder(this)

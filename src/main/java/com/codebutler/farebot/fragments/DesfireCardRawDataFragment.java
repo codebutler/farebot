@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+
 import com.codebutler.farebot.ExpandableListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -111,18 +112,22 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
 
                 textView1.setText("File: 0x" + Integer.toHexString(file.getId()));
 
-                if (file.getFileSettings() instanceof StandardDesfireFileSettings) {
-                    StandardDesfireFileSettings fileSettings = (StandardDesfireFileSettings) file.getFileSettings();
-                    textView2.setText(String.format("Type: %s, Size: %s", fileSettings.getFileTypeName(), String.valueOf(fileSettings.fileSize)));
-                } else if (file.getFileSettings() instanceof RecordDesfireFileSettings) {
-                    RecordDesfireFileSettings fileSettings = (RecordDesfireFileSettings) file.getFileSettings();
-                    textView2.setText(String.format("Type: %s, Cur Records: %s, Max Records: %s, Record Size: %s",
-                            fileSettings.getFileTypeName(),
-                            String.valueOf(fileSettings.curRecords),
-                            String.valueOf(fileSettings.maxRecords),
-                            String.valueOf(fileSettings.recordSize)));
+                if (file instanceof DesfireFile.InvalidDesfireFile) {
+                    textView2.setText(((DesfireFile.InvalidDesfireFile) file).getErrorMessage());
                 } else {
-                    textView2.setText("Unknown file type");
+                    if (file.getFileSettings() instanceof StandardDesfireFileSettings) {
+                        StandardDesfireFileSettings fileSettings = (StandardDesfireFileSettings) file.getFileSettings();
+                        textView2.setText(String.format("Type: %s, Size: %s", fileSettings.getFileTypeName(), String.valueOf(fileSettings.fileSize)));
+                    } else if (file.getFileSettings() instanceof RecordDesfireFileSettings) {
+                        RecordDesfireFileSettings fileSettings = (RecordDesfireFileSettings) file.getFileSettings();
+                        textView2.setText(String.format("Type: %s, Cur Records: %s, Max Records: %s, Record Size: %s",
+                                fileSettings.getFileTypeName(),
+                                String.valueOf(fileSettings.curRecords),
+                                String.valueOf(fileSettings.maxRecords),
+                                String.valueOf(fileSettings.recordSize)));
+                    } else {
+                        textView2.setText("Unknown file type");
+                    }
                 }
 
                 return convertView;
@@ -133,6 +138,10 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
     @Override
     public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
         DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
+
+        if (file instanceof DesfireFile.InvalidDesfireFile) {
+            return false;
+        }
 
         String data = Utils.getHexString(file.getData(), "");
 

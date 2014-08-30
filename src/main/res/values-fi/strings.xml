@@ -108,7 +108,6 @@
     <string name="unknown_card_description">Farebot ei vielä tue tätä korttia. Vain raakadata voidaan näyttää.</string>
     <string name="report_error_privacy_title">Yksityisyydensuoja</string>
     <string name="report_error_privacy_message">Kaikki tällä kortilla löytyvä tieto liitetään lähettämääsi virheraporttiin.</string>
-    <string name="comments">Kommentit</string>
 
     <string name="hsl_pass_is_valid">Kausi voimassa</string>
     <string name="hsl_1zone_ticket">Sisäinen lippu</string>

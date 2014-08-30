@@ -24,7 +24,9 @@ package com.codebutler.farebot.card.desfire;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.codebutler.farebot.card.desfire.DesfireFileSettings.RecordDesfireFileSettings;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 public class DesfireFile implements Parcelable {
@@ -128,6 +130,10 @@ public class DesfireFile implements Parcelable {
 
         public String getErrorMessage () {
             return mErrorMessage;
+        }
+
+        @Override public byte[] getData() {
+            throw new IllegalStateException(String.format("Invalid file: %s", mErrorMessage));
         }
     }
 }

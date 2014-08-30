@@ -65,6 +65,8 @@ public class FareBotApplication extends Application {
             .penaltyLog()
             .build());
 
-        Crashlytics.start(this);
+        if (!BuildConfig.DEBUG) {
+            Crashlytics.start(this);
+        }
     }
 }
