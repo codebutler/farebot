@@ -24,21 +24,21 @@ package com.codebutler.farebot.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.app.Activity;
+import android.view.MenuItem;
 import com.codebutler.farebot.R;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
-public abstract class FragmentWrapperActivity extends SherlockFragmentActivity {
+public abstract class FragmentWrapperActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         FrameLayout container = new FrameLayout(this);
         container.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
@@ -46,7 +46,7 @@ public abstract class FragmentWrapperActivity extends SherlockFragmentActivity {
         setContentView(container);
 
         if (getFragment() == null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.add(R.id.content, createFragment(), "fragment");
             transaction.commit();
         }
@@ -66,6 +66,6 @@ public abstract class FragmentWrapperActivity extends SherlockFragmentActivity {
     protected abstract Fragment createFragment();
 
     protected Fragment getFragment() {
-        return getSupportFragmentManager().findFragmentByTag("fragment");
+        return getFragmentManager().findFragmentByTag("fragment");
     }
 }

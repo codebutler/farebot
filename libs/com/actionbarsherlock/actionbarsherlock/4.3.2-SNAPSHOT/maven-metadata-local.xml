@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata modelVersion="1.1.0">
-  <groupId>com.actionbarsherlock</groupId>
+  <groupId>android</groupId>
   <artifactId>actionbarsherlock</artifactId>
   <version>4.3.2-SNAPSHOT</version>
   <versioning>

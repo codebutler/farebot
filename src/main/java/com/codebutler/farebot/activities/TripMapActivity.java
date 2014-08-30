@@ -22,16 +22,17 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.MenuItem;
+
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -40,7 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TripMapActivity extends SherlockFragmentActivity {
+public class TripMapActivity extends Activity {
     public static final String TRIP_EXTRA = "trip";
 
     private GoogleMap mMap;
@@ -56,10 +57,10 @@ public class TripMapActivity extends SherlockFragmentActivity {
 
         setContentView(R.layout.activity_trip_map);
 
-        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         mMap.getUiSettings().setZoomControlsEnabled(false);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(Trip.formatStationNames(trip));
         actionBar.setSubtitle((trip.getRouteName() == null) ? trip.getAgencyName() : String.format("%s %s", trip.getAgencyName(), trip.getRouteName()));

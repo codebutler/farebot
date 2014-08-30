@@ -33,18 +33,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.app.Activity;
+import android.view.MenuItem;
 import com.codebutler.farebot.R;
 
 import java.util.ArrayList;
 
-public class SupportedCardsActivity extends SherlockActivity {
+public class SupportedCardsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_supported_cards);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         
         ((Gallery) findViewById(R.id.gallery)).setAdapter(new CardsAdapter(this));
     }

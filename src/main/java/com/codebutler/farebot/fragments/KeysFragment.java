@@ -28,30 +28,30 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.ResourceCursorAdapter;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.widget.CursorAdapter;
+import android.widget.ResourceCursorAdapter;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.app.Activity;
+import android.app.ListFragment;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import com.codebutler.farebot.BetterAsyncTask;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.provider.CardKeyProvider;
 import com.codebutler.farebot.provider.KeysTableColumns;
 
-public class KeysFragment extends SherlockListFragment implements AdapterView.OnItemLongClickListener {
+public class KeysFragment extends ListFragment implements AdapterView.OnItemLongClickListener {
     private ActionMode mActionMode;
     private int mActionKeyId;
 
-    private com.actionbarsherlock.view.ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+    private android.view.ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
@@ -134,7 +134,7 @@ public class KeysFragment extends SherlockListFragment implements AdapterView.On
         Cursor cursor = (Cursor) getListAdapter().getItem(position);
 
         mActionKeyId = cursor.getInt(cursor.getColumnIndex(KeysTableColumns._ID));
-        mActionMode  = ((SherlockFragmentActivity)getActivity()).startActionMode(mActionModeCallback);
+        mActionMode  = ((Activity)getActivity()).startActionMode(mActionModeCallback);
 
         return true;
     }

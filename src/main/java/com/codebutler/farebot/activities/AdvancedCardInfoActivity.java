@@ -22,6 +22,8 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,13 +31,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.text.ClipboardManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+
 import com.codebutler.farebot.CardHasManufacturingInfo;
 import com.codebutler.farebot.CardRawDataFragmentClass;
 import com.codebutler.farebot.R;
@@ -49,7 +50,7 @@ import com.codebutler.farebot.fragments.CardHWDetailFragment;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class AdvancedCardInfoActivity extends SherlockFragmentActivity {
+public class AdvancedCardInfoActivity extends Activity {
     public static String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
     public static String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
 
@@ -77,7 +78,7 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity {
         Bundle args = new Bundle();
         args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mCard.getCardType().toString() + " " + Utils.getHexString(mCard.getTagId(), "<error>"));
 
@@ -125,7 +126,7 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.card_advanced_menu, menu);
+        getMenuInflater().inflate(R.menu.card_advanced_menu, menu);
         return true;
     }
 
@@ -137,7 +138,7 @@ public class AdvancedCardInfoActivity extends SherlockFragmentActivity {
                 @SuppressWarnings("deprecation")
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(xml);
-                Toast.makeText(this, "Copied to clipboard.", 5).show();
+                Toast.makeText(this, "Copied to clipboard.", Toast.LENGTH_SHORT).show();
                 return true;
 
             } else if (item.getItemId() == R.id.share_xml) {

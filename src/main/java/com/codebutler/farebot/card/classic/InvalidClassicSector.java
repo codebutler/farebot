@@ -44,4 +44,19 @@ public class InvalidClassicSector extends ClassicSector {
     public String getError() {
         return mError;
     }
+
+    @Override
+    public byte[] readBlocks(int startBlock, int blockCount) {
+        throw new IllegalStateException(mError);
+    }
+
+    @Override
+    public ClassicBlock[] getBlocks() {
+        throw new IllegalStateException(mError);
+    }
+
+    @Override
+    public ClassicBlock getBlock(int index) {
+        throw new IllegalStateException(mError);
+    }
 }

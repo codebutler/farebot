@@ -33,14 +33,14 @@ import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.view.Menu;
+import android.view.MenuItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends Activity {
     private NfcAdapter mNfcAdapter;
     private PendingIntent mPendingIntent;
     private String[][] mTechLists = new String[][] {
@@ -55,7 +55,7 @@ public class MainActivity extends SherlockFragmentActivity {
         super.onCreate(bundle);
         setContentView(R.layout.activity_main);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setHomeButtonEnabled(false);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -96,7 +96,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 

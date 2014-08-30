@@ -22,19 +22,20 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.preference.PreferenceActivity;
+import android.view.MenuItem;
+
 import com.codebutler.farebot.R;
 
-public class FareBotPreferenceActivity extends SherlockPreferenceActivity {
+public class FareBotPreferenceActivity extends PreferenceActivity {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.prefs);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 

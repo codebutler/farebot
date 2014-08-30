@@ -33,7 +33,7 @@ import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import com.actionbarsherlock.app.SherlockActivity;
+import android.app.Activity;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.UnsupportedTagException;
@@ -44,7 +44,7 @@ import com.codebutler.farebot.provider.CardsTableColumns;
 
 import java.util.Date;
 
-public class ReadingTagActivity extends SherlockActivity {
+public class ReadingTagActivity extends Activity {
     @Override
     public void onCreate (Bundle icicle) {
         super.onCreate(icicle);

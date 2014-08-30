@@ -37,7 +37,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockActivity;
+import android.app.Activity;
 import com.codebutler.farebot.BetterAsyncTask;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -51,7 +51,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class AddKeyActivity extends SherlockActivity {
+public class AddKeyActivity extends Activity {
     private NfcAdapter mNfcAdapter;
     private PendingIntent mPendingIntent;
     private String[][] mTechLists = new String[][] {

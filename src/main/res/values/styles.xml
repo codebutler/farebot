@@ -22,7 +22,8 @@
   -->
 
 <resources>
-    <style name="ButtonBar"></style>
+    <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog"></style>
+    <style name="BorderlessButton" parent="@android:style/Widget.Holo.Button.Borderless.Small"></style>
+    <style name="FareBotDialog" parent="@android:style/Theme.Holo.Dialog"></style>
     <style name="ButtonBarButton" parent="@style/BorderlessButton"></style>
-    <style name="FareBotDialog" parent="android:Theme.Dialog"></style>
 </resources>

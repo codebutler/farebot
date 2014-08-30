@@ -22,6 +22,8 @@
 
 package com.codebutler.farebot.activities;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -33,27 +35,26 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.TabPagerAdapter;
 import com.codebutler.farebot.UnsupportedCardException;
 import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.fragments.CardBalanceFragment;
 import com.codebutler.farebot.fragments.CardInfoFragment;
 import com.codebutler.farebot.fragments.CardRefillsFragment;
 import com.codebutler.farebot.fragments.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragments.CardTripsFragment;
-import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.provider.CardsTableColumns;
-import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.EdyTransitData;
+import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 
-public class CardInfoActivity extends SherlockFragmentActivity {
+public class CardInfoActivity extends Activity {
     public static final String EXTRA_TRANSIT_DATA = "transit_data";
     public static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
 
@@ -80,7 +81,7 @@ public class CardInfoActivity extends SherlockFragmentActivity {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
 
-        final ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(R.string.loading);
         
@@ -180,7 +181,7 @@ public class CardInfoActivity extends SherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.card_info_menu, menu);
+        getMenuInflater().inflate(R.menu.card_info_menu, menu);
         return true;
     }
 

@@ -24,13 +24,13 @@ package com.codebutler.farebot.fragments;
 
 import android.os.Bundle;
 import android.view.View;
-import com.actionbarsherlock.app.SherlockListFragment;
+import android.app.ListFragment;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.transit.TransitData;
 
-public class CardInfoFragment extends SherlockListFragment {
+public class CardInfoFragment extends ListFragment {
     private Card mCard;
     private TransitData mTransitData;
 

@@ -24,16 +24,26 @@ package com.codebutler.farebot;
 
 // From http://stackoverflow.com/questions/6051050/expandablelistfragment-with-loadermanager-for-compatibility-package
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.*;
+import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.*;
-import com.actionbarsherlock.app.SherlockFragment;
+import android.widget.AdapterView;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class ExpandableListFragment extends SherlockFragment
+public class ExpandableListFragment extends Fragment
     implements OnCreateContextMenuListener,
     ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener,
     ExpandableListView.OnGroupExpandListener {

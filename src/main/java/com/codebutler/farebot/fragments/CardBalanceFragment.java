@@ -27,14 +27,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockFragment;
+import android.app.Fragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.transit.TransitData;
 
-public class CardBalanceFragment extends SherlockFragment {
+public class CardBalanceFragment extends Fragment {
     private Card mCard;
     private TransitData mTransitData;
 

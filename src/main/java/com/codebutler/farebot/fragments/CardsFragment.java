@@ -30,11 +30,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.ResourceCursorAdapter;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.widget.CursorAdapter;
+import android.widget.ResourceCursorAdapter;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.View;
@@ -42,10 +42,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.app.ListFragment;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import com.codebutler.farebot.ExportHelper;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
@@ -63,7 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CardsFragment extends SherlockListFragment {
+public class CardsFragment extends ListFragment {
     private static final int REQUEST_SELECT_FILE = 1;
     private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
 

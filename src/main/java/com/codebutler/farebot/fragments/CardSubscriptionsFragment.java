@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockListFragment;
+import android.app.ListFragment;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activities.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activities.CardInfoActivity;
@@ -39,7 +39,7 @@ import com.codebutler.farebot.transit.TransitData;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class CardSubscriptionsFragment extends SherlockListFragment {
+public class CardSubscriptionsFragment extends ListFragment {
     private Card mCard;
     private TransitData mTransitData;
 

@@ -23,7 +23,7 @@
 package com.codebutler.farebot.fragments;
 
 import android.os.Bundle;
-import com.actionbarsherlock.app.SherlockListFragment;
+import android.app.ListFragment;
 import com.codebutler.farebot.HeaderListItem;
 import com.codebutler.farebot.ListItem;
 import com.codebutler.farebot.Utils;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CardHWDetailFragment extends SherlockListFragment {
+public class CardHWDetailFragment extends ListFragment {
     private Card mCard;
 
     @Override
