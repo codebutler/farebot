@@ -172,4 +172,6 @@
     <string name="hsl_value_ticket_line_number">Line number</string>
     <string name="hsl_season_ticket">Season ticket</string>
     <string name="fare_cancelled_format">%s (Cancelled)</string>
+    <string name="general">General</string>
+    <string name="launch_from_background">Launch from background</string>
 </resources>

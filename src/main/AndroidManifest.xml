@@ -26,9 +26,7 @@
     package="com.codebutler.farebot"
     android:versionCode="20"
     android:versionName="2.5.0">
-    <uses-sdk
-        android:minSdkVersion="10"
-        android:targetSdkVersion="14" />
+
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -49,7 +47,8 @@
     <application
         android:label="@string/app_name"
         android:icon="@drawable/launcher_icon"
-        android:name=".FareBotApplication">
+        android:name=".FareBotApplication"
+        android:allowBackup="true">
 
         <activity
             android:name=".activities.MainActivity"
@@ -67,11 +66,19 @@
                 <data android:mimeType="vnd.android.cursor.dir/com.codebutler.farebot.card" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.ReadingTagActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait"
             android:noHistory="true"
+            android:launchMode="singleTop"/>
+
+        <activity
+            android:name=".activities.BackgroundTagActivity"
+            android:enabled="false"
+            android:noHistory="true"
+            android:configChanges="keyboardHidden|orientation"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED"/>
@@ -84,6 +91,7 @@
                 android:name="android.nfc.action.TECH_DISCOVERED"
                 android:resource="@xml/filter_nfc" />
         </activity>
+
         <activity
             android:name=".activities.CardInfoActivity"
             android:configChanges="keyboardHidden|orientation">
@@ -94,26 +102,33 @@
                 <data android:mimeType="vnd.android.cursor.item/com.codebutler.farebot.card" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.AdvancedCardInfoActivity"
             android:configChanges="keyboardHidden|orientation" />
+
         <activity
             android:name=".activities.FareBotPreferenceActivity"
             android:label="@string/preferences" />
+
         <activity
             android:name=".activities.TripMapActivity"
             android:configChanges="keyboardHidden|orientation"/>
+
         <activity
             android:name=".activities.SupportedCardsActivity"
             android:label="@string/supported_cards"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".activities.CardsActivity"
             android:label="@string/scanned_cards"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".activities.KeysActivity"
             android:label="@string/keys" />
+
         <activity
             android:name=".activities.AddKeyActivity"
             android:label="@string/add_key"
@@ -126,15 +141,21 @@
                 <data android:scheme="content" android:pathPattern=".*\\.farebotkeys" android:mimeType="application/octet-stream"/>
             </intent-filter>
         </activity>
+
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"
-            android:authorities="com.codebutler.farebot.cardprovider" />
+            android:authorities="com.codebutler.farebot.cardprovider"
+            android:exported="false"/>
+
         <provider
             android:name="com.codebutler.farebot.provider.CardKeyProvider"
-            android:authorities="com.codebutler.farebot.keyprovider" />
+            android:authorities="com.codebutler.farebot.keyprovider"
+            android:exported="false"/>
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBUUm1_1cyaCLkIvcE60gF4xO3pyb6SyP4"/>
+
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="77d8c3509e581fb753f705c476fe3b022dda0287" />

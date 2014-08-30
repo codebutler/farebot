@@ -23,24 +23,38 @@
 package com.codebutler.farebot.activities;
 
 import android.app.ActionBar;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 
 import com.codebutler.farebot.R;
 
-public class FareBotPreferenceActivity extends PreferenceActivity {
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+
+public class FareBotPreferenceActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
+
+    private CheckBoxPreference mPreferenceLaunchFromBackground;
+
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.prefs);
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mPreferenceLaunchFromBackground
+                = (CheckBoxPreference) getPreferenceManager().findPreference("pref_launch_from_background");
+        mPreferenceLaunchFromBackground.setChecked(isLaunchFromBgEnabled());
+        mPreferenceLaunchFromBackground.setOnPreferenceChangeListener(this);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -49,5 +63,27 @@ public class FareBotPreferenceActivity extends PreferenceActivity {
         }
 
         return false;
+    }
+
+    @Override public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (preference == mPreferenceLaunchFromBackground) {
+            setLaunchFromBgEnabled((Boolean) newValue);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isLaunchFromBgEnabled() {
+        ComponentName componentName = new ComponentName(this, BackgroundTagActivity.class);
+        PackageManager packageManager = getPackageManager();
+        int componentEnabledSetting = packageManager.getComponentEnabledSetting(componentName);
+        return componentEnabledSetting == COMPONENT_ENABLED_STATE_ENABLED;
+    }
+
+    private void setLaunchFromBgEnabled(boolean enabled) {
+        ComponentName componentName = new ComponentName(this, BackgroundTagActivity.class);
+        PackageManager packageManager = getPackageManager();
+        int newState = enabled ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED;
+        packageManager.setComponentEnabledSetting(componentName, newState, PackageManager.DONT_KILL_APP);
     }
 }

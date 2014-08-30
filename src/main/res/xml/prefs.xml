@@ -23,6 +23,13 @@
   -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/general">
+        <CheckBoxPreference
+            android:title="@string/launch_from_background"
+            android:persistent="false"
+            android:key="pref_launch_from_background"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/accessibility">
         <CheckBoxPreference
             android:title="@string/speak_balance"
