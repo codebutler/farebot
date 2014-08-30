@@ -76,20 +76,17 @@ public class CEPASCard extends Card {
         mHistories = histories;
     }
 
-    @Override
-    public CardType getCardType () {
+    @Override public CardType getCardType () {
         return CardType.CEPAS;
     }
 
-    @Override
-    public TransitIdentity parseTransitIdentity() {
+    @Override public TransitIdentity parseTransitIdentity() {
         if (EZLinkTransitData.check(this))
             return EZLinkTransitData.parseTransitIdentity(this);
         return null;
     }
 
-    @Override
-    public TransitData parseTransitData() {
+    @Override public TransitData parseTransitData() {
         if (EZLinkTransitData.check(this))
            return new EZLinkTransitData(this);
         return null;
@@ -113,11 +110,11 @@ public class CEPASCard extends Card {
 
             CEPASPurse[] purses = new CEPASPurse[source.readInt()];
             for(int i=0; i<purses.length; i++)
-                purses[i] = (CEPASPurse) source.readParcelable(CEPASPurse.class.getClassLoader());
+                purses[i] = source.readParcelable(CEPASPurse.class.getClassLoader());
 
             CEPASHistory[] histories = new CEPASHistory[source.readInt()];
             for(int i=0; i<histories.length; i++)
-                histories[i] = (CEPASHistory) source.readParcelable(CEPASHistory.class.getClassLoader());
+                histories[i] = source.readParcelable(CEPASHistory.class.getClassLoader());
 
 
             return new CEPASCard(tagId, scannedAt, purses, histories);
@@ -154,7 +151,7 @@ public class CEPASCard extends Card {
         return new CEPASCard(cardId, scannedAt, purses, histories);
     }
 
-    public Element toXML () throws Exception {
+    public Element toXML() throws Exception {
         Element root = super.toXML();
 
         Document doc = root.getOwnerDocument();

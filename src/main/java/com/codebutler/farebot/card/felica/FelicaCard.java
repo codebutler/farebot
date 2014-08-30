@@ -82,7 +82,7 @@ public class FelicaCard extends Card {
         if (idm == null)
             throw new Exception("Failed to read IDm");
 
-        List<FelicaSystem> systems = new ArrayList<FelicaSystem>();
+        List<FelicaSystem> systems = new ArrayList<>();
 
         // FIXME: Enumerate "areas" inside of systems ???
                 
@@ -102,7 +102,7 @@ public class FelicaCard extends Card {
             
             Log.d("FelicaCard", " - Got PMm: " + Utils.getHexString(ft.getPMm().getBytes()) + "  compare: " + Utils.getHexString(pmm.getBytes()));
 
-            List<FelicaService> services = new ArrayList<FelicaService>();
+            List<FelicaService> services = new ArrayList<>();
 
             for (FeliCaLib.ServiceCode serviceCode : ft.getServiceCodeList()) {
                 // There appears to be some disagreement over byte order.
@@ -111,7 +111,7 @@ public class FelicaCard extends Card {
                 int serviceCodeInt = Utils.byteArrayToInt(bytes);
                 serviceCode = new FeliCaLib.ServiceCode(serviceCodeInt);
 
-                List<FelicaBlock> blocks = new ArrayList<FelicaBlock>();
+                List<FelicaBlock> blocks = new ArrayList<>();
 
                 ft.polling(systemCode);
 
@@ -238,13 +238,11 @@ public class FelicaCard extends Card {
         return new FelicaCard(tagId, scannedAt, idm, pmm, systems);
     }
 
-    @Override
-    public CardType getCardType() {
+    @Override public CardType getCardType() {
         return CardType.FeliCa;
     }
 
-    @Override
-    public TransitIdentity parseTransitIdentity() {
+    @Override public TransitIdentity parseTransitIdentity() {
         if (SuicaTransitData.check(this))
             return SuicaTransitData.parseTransitIdentity(this);
         else if (EdyTransitData.check(this))
@@ -252,8 +250,7 @@ public class FelicaCard extends Card {
         return null;
     }
 
-    @Override
-    public TransitData parseTransitData() {
+    @Override public TransitData parseTransitData() {
         Log.d("FelicaCard", "parseTransitData() called!!");
         if (SuicaTransitData.check(this))
             return new SuicaTransitData(this);
@@ -262,8 +259,7 @@ public class FelicaCard extends Card {
         return null;
     }
 
-    @Override
-    public Element toXML() throws Exception {
+    @Override public Element toXML() throws Exception {
         Element root = super.toXML();
 
         Document doc = root.getOwnerDocument();
@@ -311,8 +307,7 @@ public class FelicaCard extends Card {
         return root;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
+    @Override public void writeToParcel(Parcel parcel, int flags) {
         super.writeToParcel(parcel, flags);
         parcel.writeParcelable(mIDm, flags);
         parcel.writeParcelable(mPMm, flags);

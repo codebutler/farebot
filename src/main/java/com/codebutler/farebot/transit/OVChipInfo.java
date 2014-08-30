@@ -65,8 +65,8 @@ public class OVChipInfo implements Parcelable {
             data = new byte[48];
         }
 
-        int company = 0;
-        int expdate = 0;
+        int company;
+        int expdate;
         Date birthdate = new Date();
         int active = 0;
         int limit = 0;
@@ -136,13 +136,13 @@ public class OVChipInfo implements Parcelable {
 
     public static final Parcelable.Creator<OVChipInfo> CREATOR = new Parcelable.Creator<OVChipInfo>() {
         public OVChipInfo createFromParcel(Parcel source) {
-        int company = 0;
-        int expdate = 0;
-        Date birthdate = null;
-        int active = 0;
-        int limit = 0;
-        int charge = 0;
-        int unknown = 0;
+        int company;
+        int expdate;
+        Date birthdate;
+        int active;
+        int limit;
+        int charge;
+        int unknown;
 
         company = source.readInt();
         expdate = source.readInt();

@@ -23,7 +23,7 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.cepas.CEPASTransaction;
@@ -487,40 +487,33 @@ public class EZLinkTransitData extends TransitData {
         mTrips        = parseTrips(cepasCard);
     }
 
-    @Override
-    public String getCardName () {
+    @Override public String getCardName () {
         return getCardIssuer(mSerialNumber);
     }
 
-    @Override
-    public String getBalanceString () {
+    @Override public String getBalanceString () {
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
         numberFormat.setCurrency(Currency.getInstance("SGD"));
         return numberFormat.format(mBalance / 100);
     }
 
-    @Override
-    public String getSerialNumber () {
+    @Override public String getSerialNumber () {
         return mSerialNumber;
     }
 
-    @Override
-    public Trip[] getTrips () {
+    @Override public Trip[] getTrips () {
         return mTrips;
     }
 
-    @Override
-    public Refill[] getRefills () {
+    @Override public Refill[] getRefills () {
         return null;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
@@ -568,18 +561,15 @@ public class EZLinkTransitData extends TransitData {
             }
         };
 
-        @Override
-        public long getTimestamp() {
+        @Override public long getTimestamp() {
             return mTransaction.getTimestamp();
         }
 
-        @Override
-        public long getExitTimestamp() {
+        @Override public long getExitTimestamp() {
             return 0;
         }
 
-        @Override
-        public String getAgencyName () {
+        @Override public String getAgencyName () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
                 if (sbsBuses.contains(routeString))
@@ -595,8 +585,7 @@ public class EZLinkTransitData extends TransitData {
             return "SMRT";
         }
 
-        @Override
-        public String getShortAgencyName () {
+        @Override public String getShortAgencyName () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
                 String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
                 if (sbsBuses.contains(routeString))
@@ -612,8 +601,7 @@ public class EZLinkTransitData extends TransitData {
             return "SMRT";
         }
 
-        @Override
-        public String getRouteName () {
+        @Override public String getRouteName () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
                 if (mTransaction.getUserData().startsWith("SVC"))
                     return "Bus #" + mTransaction.getUserData().substring(3, 7).replace(" ", "");
@@ -634,8 +622,7 @@ public class EZLinkTransitData extends TransitData {
             return "(Unknown Route)";
         }
 
-        @Override
-        public String getFareString () {
+        @Override public String getFareString () {
             NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
             numberFormat.setCurrency(Currency.getInstance("SGD"));
 
@@ -646,20 +633,17 @@ public class EZLinkTransitData extends TransitData {
                 return numberFormat.format(balance / 100.0);
         }
 
-        @Override
-        public double getFare () {
+        @Override public double getFare () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
                 return 0.0;
             return mTransaction.getAmount() / 100.0;
         }
 
-        @Override
-        public String getBalanceString () {
+        @Override public String getBalanceString () {
             return "(???)";
         }
 
-        @Override
-        public Station getStartStation () {
+        @Override public Station getStartStation () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
                 return null;
             if (mTransaction.getUserData().charAt(3) == '-'
@@ -670,8 +654,7 @@ public class EZLinkTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public Station getEndStation () {
+        @Override public Station getEndStation () {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
                 return null;
             if (mTransaction.getUserData().charAt(3) == '-'
@@ -682,8 +665,7 @@ public class EZLinkTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public String getStartStationName() {
+        @Override public String getStartStationName() {
             Station startStation = getStartStation();
             if (startStation != null)
                 return startStation.getStationName();
@@ -694,8 +676,7 @@ public class EZLinkTransitData extends TransitData {
             return mTransaction.getUserData();
         }
 
-        @Override
-        public String getEndStationName () {
+        @Override public String getEndStationName () {
             Station endStation = getEndStation();
             if (endStation != null)
                 return endStation.getStationName();
@@ -706,8 +687,7 @@ public class EZLinkTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public Mode getMode() {
+        @Override public Mode getMode() {
             if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND)
                 return Mode.BUS;
             else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
@@ -719,8 +699,7 @@ public class EZLinkTransitData extends TransitData {
             return Mode.OTHER;
         }
 
-        @Override
-        public boolean hasTime() {
+        @Override public boolean hasTime() {
             return true;
         }
 

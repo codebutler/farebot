@@ -34,8 +34,7 @@ import java.util.Date;
 
 public class OVChipTrip extends Trip {
     public static final java.util.Comparator<? super OVChipTrip> ID_ORDER =  new java.util.Comparator<OVChipTrip>() {
-        @Override
-        public int compare(OVChipTrip t1, OVChipTrip t2) {
+        @Override public int compare(OVChipTrip t1, OVChipTrip t2) {
             return Integer.valueOf(t1.getId()).compareTo(t2.getId());
         }
     };
@@ -160,13 +159,11 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    @Override
-    public int describeContents() {
+    @Override public int describeContents() {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
+    @Override public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mId);
 
 //        parcel.writeInt(mSame ? 1 : 0);
@@ -214,28 +211,23 @@ public class OVChipTrip extends Trip {
         return mId;
     }
 
-    @Override
-    public String getRouteName() {
+    @Override public String getRouteName() {
         return null;
     }
 
-    @Override
-    public String getAgencyName() {
-        return OVChipTransitData.getShortAgencyName((int)mAgency);    // Nobody uses most of the long names
+    @Override public String getAgencyName() {
+        return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
     }
 
-    @Override
-    public String getShortAgencyName() {
-        return OVChipTransitData.getShortAgencyName((int)mAgency);
+    @Override public String getShortAgencyName() {
+        return OVChipTransitData.getShortAgencyName(mAgency);
     }
 
-    @Override
-    public String getBalanceString() {
+    @Override public String getBalanceString() {
         return null;
     }
 
-    @Override
-    public String getStartStationName() {
+    @Override public String getStartStationName() {
         if (mStartStation != null && !TextUtils.isEmpty(mStartStation.getStationName())) {
             return mStartStation.getStationName();
         } else {
@@ -243,26 +235,22 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    @Override
-    public Station getStartStation() {
+    @Override public Station getStartStation() {
         return mStartStation;
     }
 
-    @Override
-    public String getEndStationName() {
+    @Override public String getEndStationName() {
         if (mEndStation != null && !TextUtils.isEmpty(mEndStation.getStationName())) {
             return mEndStation.getStationName();
         }
         return null;
     }
 
-    @Override
-    public Station getEndStation() {
+    @Override public Station getEndStation() {
         return mEndStation;
     }
 
-    @Override
-    public Mode getMode() {
+    @Override public Mode getMode() {
         if (mIsBanned) {
             return Mode.BANNED;
         } else if (mIsCharge) {
@@ -284,8 +272,7 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    @Override
-    public long getTimestamp() {
+    @Override public long getTimestamp() {
         if (mTimestamp != null)
             return mTimestamp.getTime() / 1000;
         else
@@ -303,13 +290,11 @@ public class OVChipTrip extends Trip {
         return (mTimestamp != null);
     }
 
-    @Override
-    public double getFare() {
+    @Override public double getFare() {
         return mFare;
     }
 
-    @Override
-    public String getFareString() {
+    @Override public String getFareString() {
         return OVChipTransitData.convertAmount((int)mFare);
     }
 

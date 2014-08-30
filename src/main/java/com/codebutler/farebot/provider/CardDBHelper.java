@@ -57,8 +57,7 @@ public class CardDBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override
-    public void onCreate (SQLiteDatabase db) {
+    @Override public void onCreate (SQLiteDatabase db) {
         db.execSQL("CREATE TABLE cards ("
         + "_id        INTEGER PRIMARY KEY, "
         + "type       TEXT NOT NULL, "
@@ -68,8 +67,7 @@ public class CardDBHelper extends SQLiteOpenHelper {
         + ");");
     }
 
-    @Override
-    public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion == 2) {
             db.beginTransaction();
             try {

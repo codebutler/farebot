@@ -27,7 +27,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
@@ -111,43 +111,36 @@ public class OrcaTransitData extends TransitData {
         }
     }
 
-    @Override
-    public String getCardName () {
+    @Override public String getCardName () {
         return "ORCA";
     }
 
-    @Override
-    public String getBalanceString () {
+    @Override public String getBalanceString () {
         return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100);
     }
 
-    @Override
-    public String getSerialNumber () {
+    @Override public String getSerialNumber () {
         return Integer.toString(mSerialNumber);
     }
 
-    @Override
-    public Trip[] getTrips () {
+    @Override public Trip[] getTrips () {
         return mTrips;
     }
 
-    @Override
-    public Refill[] getRefills () {
+    @Override public Refill[] getRefills () {
         return null;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
     private Trip[] parseTrips(DesfireCard card) {
-        List<Trip> trips = new ArrayList<Trip>();
+        List<Trip> trips = new ArrayList<>();
 
         DesfireFile file = card.getApplication(0x3010f2).getFile(0x02);
         if (file instanceof RecordDesfireFile) {
@@ -273,18 +266,15 @@ public class OrcaTransitData extends TransitData {
             mTransType  = parcel.readLong();
         }
 
-        @Override
-        public long getTimestamp() {
+        @Override public long getTimestamp() {
             return mTimestamp;
         }
 
-        @Override
-        public long getExitTimestamp() {
+        @Override public long getExitTimestamp() {
             return 0;
         }
 
-        @Override
-        public String getAgencyName () {
+        @Override public String getAgencyName () {
             switch ((int) mAgency) {
                 case AGENCY_CT:
                     return "Community Transit";
@@ -300,8 +290,7 @@ public class OrcaTransitData extends TransitData {
             return String.format("Unknown Agency: %s", mAgency);
         }
 
-        @Override
-        public String getShortAgencyName () {
+        @Override public String getShortAgencyName () {
             switch ((int) mAgency) {
                 case AGENCY_CT:
                     return "CT";
@@ -317,8 +306,7 @@ public class OrcaTransitData extends TransitData {
             return String.format("Unknown Agency: %s", mAgency);
         }
 
-        @Override
-        public String getRouteName () {
+        @Override public String getRouteName () {
             if (isLink()) {
                 return "Link Light Rail";
             } else {
@@ -332,23 +320,19 @@ public class OrcaTransitData extends TransitData {
             }
         }
 
-        @Override
-        public String getFareString () {
+        @Override public String getFareString () {
             return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100.0);
         }
 
-        @Override
-        public double getFare () {
+        @Override public double getFare () {
             return mFare;
         }
 
-        @Override
-        public String getBalanceString () {
+        @Override public String getBalanceString () {
             return NumberFormat.getCurrencyInstance(Locale.US).format(mNewBalance / 100);
         }
 
-        @Override
-        public Station getStartStation() {
+        @Override public Station getStartStation() {
             if (isLink()) {
                 int stationNumber = (((int) mCoachNum) % 1000) - 193;
                 if (stationNumber < sLinkStations.length) {
@@ -360,8 +344,7 @@ public class OrcaTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public String getStartStationName () {
+        @Override public String getStartStationName () {
             if (isLink()) {
                 int stationNumber = (((int) mCoachNum) % 1000) - 193;
                 if (stationNumber < sLinkStations.length) {
@@ -381,20 +364,17 @@ public class OrcaTransitData extends TransitData {
             }
         }
 
-        @Override
-        public String getEndStationName () {
+        @Override public String getEndStationName () {
             // ORCA tracks destination in a separate record
             return null;
         }
 
-        @Override
-        public Station getEndStation () {
+        @Override public Station getEndStation () {
             // ORCA tracks destination in a separate record
             return null;
         }
 
-        @Override
-        public Mode getMode() {
+        @Override public Mode getMode() {
             if (isLink()) {
                 return Mode.METRO;
             } else if (mAgency == AGENCY_WSF) {
@@ -404,8 +384,7 @@ public class OrcaTransitData extends TransitData {
             }
         }
 
-        @Override
-        public boolean hasTime() {
+        @Override public boolean hasTime() {
             return true;
         }
 
@@ -457,87 +436,71 @@ public class OrcaTransitData extends TransitData {
             mEndTrip = endTrip;
         }
 
-        @Override
-        public long getTimestamp() {
+        @Override public long getTimestamp() {
             return mStartTrip.getTimestamp();
         }
 
-        @Override
-        public long getExitTimestamp() {
+        @Override public long getExitTimestamp() {
             return mEndTrip.getTimestamp();
         }
 
-        @Override
-        public String getRouteName() {
+        @Override public String getRouteName() {
             return mStartTrip.getRouteName();
         }
 
-        @Override
-        public String getAgencyName() {
+        @Override public String getAgencyName() {
             return mStartTrip.getAgencyName();
         }
 
-        @Override
-        public String getShortAgencyName() {
+        @Override public String getShortAgencyName() {
             return mStartTrip.getShortAgencyName();
         }
 
-        @Override
-        public String getFareString() {
+        @Override public String getFareString() {
             if (mEndTrip.mTransType == TRANS_TYPE_CANCEL_TRIP) {
                 return FareBotApplication.getInstance().getString(R.string.fare_cancelled_format, mStartTrip.getFareString());
             }
             return mStartTrip.getFareString();
         }
 
-        @Override
-        public String getBalanceString() {
+        @Override public String getBalanceString() {
             return mEndTrip.getBalanceString();
         }
 
-        @Override
-        public String getStartStationName() {
+        @Override public String getStartStationName() {
             return mStartTrip.getStartStationName();
         }
 
-        @Override
-        public Station getStartStation() {
+        @Override public Station getStartStation() {
             return mStartTrip.getStartStation();
         }
 
-        @Override
-        public String getEndStationName() {
+        @Override public String getEndStationName() {
             return mEndTrip.getStartStationName();
         }
 
-        @Override
-        public Station getEndStation() {
+        @Override public Station getEndStation() {
             return mEndTrip.getStartStation();
         }
 
-        @Override
-        public double getFare() {
+        @Override public double getFare() {
             return mStartTrip.getFare();
         }
 
-        @Override
-        public Mode getMode() {
+        @Override public Mode getMode() {
             return mStartTrip.getMode();
         }
 
-        @Override
-        public boolean hasTime() {
+        @Override public boolean hasTime() {
             return mStartTrip.hasTime();
         }
 
-        @Override
-        public void writeToParcel(Parcel parcel, int flags) {
+        @Override public void writeToParcel(Parcel parcel, int flags) {
             mStartTrip.writeToParcel(parcel, flags);
             mEndTrip.writeToParcel(parcel, flags);
         }
 
-        @Override
-        public int describeContents() {
+        @Override public int describeContents() {
             return 0;
         }
     }

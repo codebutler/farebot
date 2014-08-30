@@ -43,23 +43,20 @@ public class CardKeyProvider extends BetterContentProvider {
         );
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    @Override public Uri insert(Uri uri, ContentValues values) {
         long now = new Date().getTime();
         values.put(KeysTableColumns.CREATED_AT, now);
         return super.insert(uri, values);
     }
 
-    @Override
-    protected UriMatcher createUriMatcher(Uri contentUri, String basePath) {
+    @Override protected UriMatcher createUriMatcher(Uri contentUri, String basePath) {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(contentUri.getAuthority(), basePath,        CODE_COLLECTION);
         matcher.addURI(contentUri.getAuthority(), basePath + "/*", CODE_SINGLE);
         return matcher;
     }
 
-    @Override
-    protected void appendWheres(SQLiteQueryBuilder builder, UriMatcher matcher, Uri uri) {
+    @Override protected void appendWheres(SQLiteQueryBuilder builder, UriMatcher matcher, Uri uri) {
         switch (matcher.match(uri)) {
             case CODE_COLLECTION:
                 // Nothing needed here

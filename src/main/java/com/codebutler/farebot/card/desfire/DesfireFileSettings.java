@@ -42,7 +42,7 @@ public abstract class DesfireFileSettings implements Parcelable {
     static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
     
     public static DesfireFileSettings Create (byte[] data) throws Exception {
-        byte fileType = (byte) data[0];
+        byte fileType = data[0];
 
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
 
@@ -56,7 +56,7 @@ public abstract class DesfireFileSettings implements Parcelable {
             throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
     }
 
-    private DesfireFileSettings (ByteArrayInputStream stream) {
+    private DesfireFileSettings(ByteArrayInputStream stream) {
         fileType    = (byte) stream.read();
         commSetting = (byte) stream.read();
 
@@ -139,8 +139,7 @@ public abstract class DesfireFileSettings implements Parcelable {
             this.fileSize = fileSize;
         }
 
-        @Override
-        public void writeToParcel (Parcel parcel, int flags) {
+        @Override public void writeToParcel (Parcel parcel, int flags) {
             super.writeToParcel(parcel, flags);
             parcel.writeInt(fileSize);
         }
@@ -177,8 +176,7 @@ public abstract class DesfireFileSettings implements Parcelable {
             this.curRecords = curRecords;
         }
 
-        @Override
-        public void writeToParcel (Parcel parcel, int flags) {
+        @Override public void writeToParcel (Parcel parcel, int flags) {
             super.writeToParcel(parcel, flags);
             parcel.writeInt(recordSize);
             parcel.writeInt(maxRecords);

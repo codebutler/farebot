@@ -25,7 +25,7 @@ package com.codebutler.farebot.card;
 import android.nfc.Tag;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.codebutler.farebot.UnsupportedTagException;
+
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.classic.ClassicCard;

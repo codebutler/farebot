@@ -38,7 +38,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.util.Log;
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
@@ -83,7 +83,7 @@ public class SuicaTransitData extends TransitData {
 
         long previousBalance = -1;
 
-        List<SuicaTrip> trips = new ArrayList<SuicaTrip>();
+        List<SuicaTrip> trips = new ArrayList<>();
 
         // Read blocks oldest-to-newest to calculate fare.
         FelicaBlock[] blocks = service.getBlocks();
@@ -106,41 +106,34 @@ public class SuicaTransitData extends TransitData {
         mTrips = trips.toArray(new SuicaTrip[trips.size()]);
     }
 
-    @Override
-    public String getBalanceString() {
+    @Override public String getBalanceString() {
         if (mTrips.length > 0)
             return mTrips[0].getBalanceString();
         return null;
     }
 
-    @Override
-    public String getSerialNumber() {
+    @Override public String getSerialNumber() {
         // FIXME: Find where this is on the card.
         return null;
     }
 
-    @Override
-    public Trip[] getTrips() {
+    @Override public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override
-    public Refill[] getRefills() {
+    @Override public Refill[] getRefills() {
         return null;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
-    @Override
-    public String getCardName() {
+    @Override public String getCardName() {
         return "Suica"; // FIXME: Could be ICOCA, etc.
     }
 
@@ -277,16 +270,14 @@ public class SuicaTransitData extends TransitData {
                 mEndStation = parcel.readParcelable(Station.class.getClassLoader());
         }
 
-        @Override
-        public long getTimestamp() {
+        @Override public long getTimestamp() {
             if (mTimestamp != null)
                 return mTimestamp.getTime() / 1000;
             else
                 return 0;
         }
 
-        @Override
-        public long getExitTimestamp() {
+        @Override public long getExitTimestamp() {
             return 0;
         }
 
@@ -294,28 +285,23 @@ public class SuicaTransitData extends TransitData {
             return mIsProductSale;
         }
 
-        @Override
-        public String getRouteName() {
+        @Override public String getRouteName() {
             return (mStartStation != null) ?  mStartStation.getLineName() : (getConsoleType() + " " + getProcessType());
         }
 
-        @Override
-        public String getAgencyName() {
+        @Override public String getAgencyName() {
             return (mStartStation != null) ? mStartStation.getCompanyName() : null;
         }
 
-        @Override
-        public String getShortAgencyName() {
+        @Override public String getShortAgencyName() {
             return getAgencyName();
         }
 
-        @Override
-        public double getFare() {
+        @Override public double getFare() {
             return mFare;
         }
 
-        @Override
-        public String getFareString() {
+        @Override public String getFareString() {
             NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
             format.setMaximumFractionDigits(0);
             if (mFare < 0) return "+" + format.format(-mFare);
@@ -326,15 +312,13 @@ public class SuicaTransitData extends TransitData {
             return mBalance;
         }
 
-        @Override
-        public String getBalanceString() {
+        @Override public String getBalanceString() {
             NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
             format.setMaximumFractionDigits(0);
             return format.format(mBalance);
         }
 
-        @Override
-        public String getStartStationName() {
+        @Override public String getStartStationName() {
             if (mIsProductSale || mIsCharge)
                 return null;
 
@@ -350,13 +334,11 @@ public class SuicaTransitData extends TransitData {
             }
         }
 
-        @Override
-        public Station getStartStation() {
+        @Override public Station getStartStation() {
             return mStartStation;
         }
 
-        @Override
-        public String getEndStationName() {
+        @Override public String getEndStationName() {
             if (mIsProductSale || mIsCharge || isTVM())
                 return null;
 
@@ -369,13 +351,11 @@ public class SuicaTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public Station getEndStation() {
+        @Override public Station getEndStation() {
             return mEndStation;
         }
 
-        @Override
-        public Mode getMode() {
+        @Override public Mode getMode() {
             int consoleType = mConsoleType & 0xFF;
             if (isTVM()) {
                 return Mode.TICKET_MACHINE;

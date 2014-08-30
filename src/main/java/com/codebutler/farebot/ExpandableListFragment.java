@@ -43,6 +43,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+
 public class ExpandableListFragment extends Fragment
     implements OnCreateContextMenuListener,
     ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener,
@@ -98,26 +100,21 @@ public class ExpandableListFragment extends Fragment
      * behavior of ListFragment.  In particular, this is currently the only
      * way to have the built-in indeterminant progress state be shown.
      */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         FrameLayout root = new FrameLayout(getActivity());
 
         TextView tv = new TextView(getActivity());
         tv.setId(INTERNAL_EMPTY_ID);
         tv.setGravity(Gravity.CENTER);
-        root.addView(tv, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+        root.addView(tv, new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
         ListView lv = new ExpandableListView(getActivity());
         lv.setId(android.R.id.list);
         lv.setDrawSelectorOnTop(false);
-        root.addView(lv, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+        root.addView(lv, new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
-        ListView.LayoutParams lp = new ListView.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
-        root.setLayoutParams(lp);
+        root.setLayoutParams(new ListView.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
         return root;
     }
@@ -125,8 +122,7 @@ public class ExpandableListFragment extends Fragment
     /**
      * Attach to list view once Fragment is ready to run.
      */
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    @Override public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ensureList();
     }
@@ -134,8 +130,7 @@ public class ExpandableListFragment extends Fragment
     /**
      * Detach from list view.
      */
-    @Override
-    public void onDestroyView() {
+    @Override public void onDestroyView() {
         mHandler.removeCallbacks(mRequestFocus);
         mList = null;
         super.onDestroyView();
@@ -327,27 +322,23 @@ public class ExpandableListFragment extends Fragment
         mHandler.post(mRequestFocus);
     }
 
-    @Override
-    public void onGroupExpand(int arg0) {
+    @Override public void onGroupExpand(int arg0) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
-    public void onGroupCollapse(int arg0) {
+    @Override public void onGroupCollapse(int arg0) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
-    public boolean onChildClick(ExpandableListView arg0, View arg1, int arg2,
+    @Override public boolean onChildClick(ExpandableListView arg0, View arg1, int arg2,
             int arg3, long arg4) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     }
 
     public void onContentChanged() {

@@ -54,12 +54,12 @@ public class OVChipIndex implements Parcelable {
     }
 
     public OVChipIndex (byte[] data) {
-        int recentTransactionSlot = 0;
-        int recentInfoSlot = 0;
-        int recentSubscriptionSlot = 0;
-        int recentTravelhistorySlot = 0;
-        int recentCreditSlot = 0;
-        int[] subscriptionIndex = null;
+        int recentTransactionSlot;
+        int recentInfoSlot;
+        int recentSubscriptionSlot;
+        int recentTravelhistorySlot;
+        int recentCreditSlot;
+        int[] subscriptionIndex;
 
         byte[] first_slot = Arrays.copyOfRange(data, 0, data.length / 2);
         byte[] second_slot = Arrays.copyOfRange(data, data.length / 2, data.length);
@@ -124,12 +124,12 @@ public class OVChipIndex implements Parcelable {
 
     public static final Parcelable.Creator<OVChipIndex> CREATOR = new Parcelable.Creator<OVChipIndex>() {
         public OVChipIndex createFromParcel(Parcel source) {
-            int recentTransactionSlot = 0;
-            int recentInfoSlot = 0;
-            int recentSubscriptionSlot = 0;
-            int recentTravelhistorySlot = 0;
-            int recentCreditSlot = 0;
-            int[] subscriptionIndex = null;
+            int recentTransactionSlot;
+            int recentInfoSlot;
+            int recentSubscriptionSlot;
+            int recentTravelhistorySlot;
+            int recentCreditSlot;
+            int[] subscriptionIndex;
 
             recentTransactionSlot = source.readInt();
             recentInfoSlot = source.readInt();

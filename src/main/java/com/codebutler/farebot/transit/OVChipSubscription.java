@@ -217,53 +217,45 @@ public class OVChipSubscription extends Subscription {
         return "Unknown Subscription (0x" + Long.toString(subscription, 16) + ")";
     }
 
-    @Override
-    public int getId() {
+    @Override public int getId() {
         return mId;
     }
 
-    @Override
-    public Date getValidFrom() {
+    @Override public Date getValidFrom() {
         if (mValidFromTime != 0)
             return OVChipTransitData.convertDate((int) mValidFromDate, (int) mValidFromTime);
         else
         	return OVChipTransitData.convertDate((int) mValidFromDate);
     }
 
-    @Override
-    public Date getValidTo() {
+    @Override public Date getValidTo() {
     	if (mValidToTime != 0)
             return OVChipTransitData.convertDate((int) mValidToDate, (int) mValidToTime);
         else
         	return OVChipTransitData.convertDate((int) mValidToDate);
     }
 
-    @Override
-    public String getSubscriptionName() {
+    @Override public String getSubscriptionName() {
         return getSubscriptionName(mSubscription);
     }
 
-    @Override
-    public String getActivation() {
+    @Override public String getActivation() {
         if (mType1 != 0) {
             return mUsed != 0 ? "Activated and used" : "Activated but not used";
         }
         return "Deactivated";
     }
 
-    @Override
-    public int getMachineId () {
+    @Override public int getMachineId () {
         return mMachineId;
     }
 
-    @Override
-    public String getAgencyName () {
-        return OVChipTransitData.getShortAgencyName((int)mAgency);    // Nobody uses most of the long names
+    @Override public String getAgencyName () {
+        return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
     }
 
-    @Override
-    public String getShortAgencyName () {
-        return OVChipTransitData.getShortAgencyName((int)mAgency);
+    @Override public String getShortAgencyName () {
+        return OVChipTransitData.getShortAgencyName(mAgency);
     }
 
     public int getUnknown1 () {

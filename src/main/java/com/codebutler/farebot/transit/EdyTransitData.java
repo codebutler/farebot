@@ -27,7 +27,7 @@ package com.codebutler.farebot.transit;
 import android.app.Application;
 import android.os.Parcel;
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
@@ -102,7 +102,7 @@ public class EdyTransitData extends TransitData {
 
         // now read the transaction history
         FelicaService serviceHistory = card.getSystem(FeliCaLib.SYSTEMCODE_EDY).getService(FELICA_SERVICE_EDY_HISTORY);
-        List<EdyTrip> trips = new ArrayList<EdyTrip>();
+        List<EdyTrip> trips = new ArrayList<>();
 
         // Read blocks in order
         FelicaBlock[] blocks = serviceHistory.getBlocks();
@@ -115,16 +115,14 @@ public class EdyTransitData extends TransitData {
         mTrips = trips.toArray(new EdyTrip[trips.size()]);
     }
 
-    @Override
-    public String getBalanceString() {
+    @Override public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
         return format.format(mCurrentBalance);
     }
 
-    @Override
-    public String getSerialNumber() {
-        StringBuffer str = new StringBuffer(20);
+    @Override public String getSerialNumber() {
+        StringBuilder str = new StringBuilder(20);
         for (int i=0; i<8; i+=2) {
             str.append(String.format("%02X", mSerialNumber[i]));
             str.append(String.format("%02X", mSerialNumber[i+1]));
@@ -134,28 +132,23 @@ public class EdyTransitData extends TransitData {
         return str.toString();
     }
 
-    @Override
-    public Trip[] getTrips() {
+    @Override public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override
-    public Refill[] getRefills() {
+    @Override public Refill[] getRefills() {
         return null;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
-    @Override
-    public String getCardName() {
+    @Override public String getCardName() {
         return "Edy";
     }
 

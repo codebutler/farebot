@@ -88,25 +88,22 @@ public abstract class BetterAsyncTask<Result> extends AsyncTask<Void, ProgressBa
         mProgressDialog.setMessage(TextUtils.isEmpty(text) ? mActivity.getString(R.string.loading) : text);
     }
 
-    @Override
-    protected final TaskResult<Result> doInBackground(Void... unused) {
+    @Override protected final TaskResult<Result> doInBackground(Void... unused) {
         try {
-            return new TaskResult<Result>(doInBackground());
+            return new TaskResult<>(doInBackground());
         } catch (Exception e) {
             Log.e(TAG, "Error in task:", e);
-            return new TaskResult<Result>(e);
+            return new TaskResult<>(e);
         }
     }
 
-    @Override
-    protected void onPreExecute() {
+    @Override protected void onPreExecute() {
         super.onPreExecute();
         if (mProgressDialog != null)
             mProgressDialog.show();
     }
 
-    @Override
-    protected final void onPostExecute(TaskResult<Result> result) {
+    @Override protected final void onPostExecute(TaskResult<Result> result) {
         if (mProgressDialog != null)
             mProgressDialog.dismiss();
         if (!result.success()) {
@@ -125,8 +122,7 @@ public abstract class BetterAsyncTask<Result> extends AsyncTask<Void, ProgressBa
             .create();
         if (mFinishOnError) {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialogInterface) {
+                @Override public void onDismiss(DialogInterface dialogInterface) {
                     mActivity.finish();
                 }
             });

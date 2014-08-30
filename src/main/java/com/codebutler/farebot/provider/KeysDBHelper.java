@@ -37,8 +37,7 @@ public class KeysDBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
+    @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + KeysTableColumns.TABLE_NAME + " ("
             + KeysTableColumns._ID        + " INTEGER PRIMARY KEY, "
             + KeysTableColumns.CARD_ID    + " TEXT NOT NULL, "
@@ -47,8 +46,7 @@ public class KeysDBHelper extends SQLiteOpenHelper {
             + KeysTableColumns.CREATED_AT + " LONG NOT NULL)");
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Not Implemented...
     }
 }

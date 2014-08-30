@@ -33,7 +33,7 @@ import android.text.TextUtils;
 
 public abstract class BetterContentProvider extends ContentProvider {
     private SQLiteOpenHelper        mHelper;
-    private Class<SQLiteOpenHelper> mHelperClass;
+    private Class<? extends SQLiteOpenHelper> mHelperClass;
     private String                  mItemType;
     private Uri                     mContentUri;
     private String                  mDirType;
@@ -43,7 +43,8 @@ public abstract class BetterContentProvider extends ContentProvider {
     protected static final int CODE_COLLECTION = 100;
     protected static final int CODE_SINGLE     = 101;
 
-    public BetterContentProvider(Class helperClass, String dirType, String itemType, String tableName, Uri contentUri) {
+    public BetterContentProvider(Class<? extends SQLiteOpenHelper> helperClass, String dirType, String itemType,
+            String tableName, Uri contentUri) {
         mHelperClass = helperClass;
         mDirType     = dirType;
         mItemType    = itemType;
@@ -55,8 +56,7 @@ public abstract class BetterContentProvider extends ContentProvider {
         mUriMatcher = createUriMatcher(contentUri, basePath);
     }
 
-    @Override
-    public boolean onCreate() {
+    @Override public boolean onCreate() {
         try {
             mHelper = mHelperClass.getConstructor(Context.class).newInstance(getContext());
         } catch (Exception e) {
@@ -65,8 +65,8 @@ public abstract class BetterContentProvider extends ContentProvider {
         return true;
     }
 
-    @Override
-    public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    @Override public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs,
+            String sortOrder) {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(mTableName);
         appendWheres(builder, mUriMatcher, uri);
@@ -78,8 +78,7 @@ public abstract class BetterContentProvider extends ContentProvider {
         return cursor;
     }
 
-    @Override
-    public String getType(Uri uri) {
+    @Override public String getType(Uri uri) {
         switch (mUriMatcher.match(uri)) {
             case CODE_COLLECTION:
                 return mDirType;
@@ -90,8 +89,7 @@ public abstract class BetterContentProvider extends ContentProvider {
         }
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    @Override public Uri insert(Uri uri, ContentValues values) {
         if (mUriMatcher.match(uri) != CODE_COLLECTION) {
             throw new IllegalArgumentException("Incorrect URI: " + uri);
         }
@@ -105,8 +103,7 @@ public abstract class BetterContentProvider extends ContentProvider {
         return itemUri;
     }
 
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    @Override public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         int count = 0;
         switch (mUriMatcher.match(uri)) {
@@ -128,10 +125,9 @@ public abstract class BetterContentProvider extends ContentProvider {
         return count;
     }
 
-    @Override
-    public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    @Override public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
-        int count = 0;
+        int count;
         switch (mUriMatcher.match(uri)) {
             case CODE_COLLECTION:
                 count = db.update(mTableName, values, selection,  selectionArgs);

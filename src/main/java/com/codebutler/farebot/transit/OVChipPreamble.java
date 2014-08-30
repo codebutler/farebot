@@ -66,14 +66,14 @@ public class OVChipPreamble implements Parcelable {
             data = new byte[48];
         }
 
-        String id = "";
-        int checkbit = 0;
-        String manufacturer = "";
-        String publisher = "";
-        String unknownConstant1 = "";
-        int expdate = 0;
-        String unknownConstant2 = "";
-        int type = 0;
+        String id;
+        int checkbit;
+        String manufacturer;
+        String publisher;
+        String unknownConstant1;
+        int expdate;
+        String unknownConstant2;
+        int type;
 
         String hex = Utils.getHexString(data, null);
 
@@ -134,14 +134,14 @@ public class OVChipPreamble implements Parcelable {
 
     public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
         public OVChipPreamble createFromParcel(Parcel source) {
-            String id = "";
-            int checkbit = 0;
-            String manufacturer = "";
-            String publisher = "";
-            String unknownConstant1 = "";
-            int expdate = 0;
-            String unknownConstant2 = "";
-            int type = 0;
+            String id;
+            int checkbit;
+            String manufacturer;
+            String publisher;
+            String unknownConstant1;
+            int expdate;
+            String unknownConstant2;
+            int type;
 
             id = source.readString();
             checkbit = source.readInt();

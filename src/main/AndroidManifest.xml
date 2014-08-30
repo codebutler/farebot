@@ -51,7 +51,7 @@
         android:allowBackup="true">
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activity.MainActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -68,14 +68,14 @@
         </activity>
 
         <activity
-            android:name=".activities.ReadingTagActivity"
+            android:name=".activity.ReadingTagActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait"
             android:noHistory="true"
             android:launchMode="singleTop"/>
 
         <activity
-            android:name=".activities.BackgroundTagActivity"
+            android:name=".activity.BackgroundTagActivity"
             android:enabled="false"
             android:noHistory="true"
             android:configChanges="keyboardHidden|orientation"
@@ -93,7 +93,7 @@
         </activity>
 
         <activity
-            android:name=".activities.CardInfoActivity"
+            android:name=".activity.CardInfoActivity"
             android:configChanges="keyboardHidden|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -104,33 +104,33 @@
         </activity>
 
         <activity
-            android:name=".activities.AdvancedCardInfoActivity"
+            android:name=".activity.AdvancedCardInfoActivity"
             android:configChanges="keyboardHidden|orientation" />
 
         <activity
-            android:name=".activities.FareBotPreferenceActivity"
+            android:name=".activity.FareBotPreferenceActivity"
             android:label="@string/preferences" />
 
         <activity
-            android:name=".activities.TripMapActivity"
+            android:name=".activity.TripMapActivity"
             android:configChanges="keyboardHidden|orientation"/>
 
         <activity
-            android:name=".activities.SupportedCardsActivity"
+            android:name=".activity.SupportedCardsActivity"
             android:label="@string/supported_cards"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activities.CardsActivity"
+            android:name=".activity.CardsActivity"
             android:label="@string/scanned_cards"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activities.KeysActivity"
+            android:name=".activity.KeysActivity"
             android:label="@string/keys" />
 
         <activity
-            android:name=".activities.AddKeyActivity"
+            android:name=".activity.AddKeyActivity"
             android:label="@string/add_key"
             android:theme="@style/FareBotDialog">
             <intent-filter android:priority="1">

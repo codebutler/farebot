@@ -28,7 +28,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
@@ -148,7 +148,6 @@ public class ClipperTransitData extends TransitData {
        }
     }
 
-
     public ClipperTransitData(Parcel parcel) {
         mSerialNumber = parcel.readLong();
         mBalance      = (short) parcel.readLong();
@@ -160,7 +159,7 @@ public class ClipperTransitData extends TransitData {
         parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
     }
     
-    public ClipperTransitData (Card card) {
+    public ClipperTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
 
         byte[] data;
@@ -194,23 +193,19 @@ public class ClipperTransitData extends TransitData {
         setBalances();
     }
 
-    @Override
-    public String getCardName () {
+    @Override public String getCardName () {
         return "Clipper";
     }
 
-    @Override
-    public String getBalanceString () {
+    @Override public String getBalanceString () {
         return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100.0);
     }
 
-    @Override
-    public String getSerialNumber () {
+    @Override public String getSerialNumber () {
         return Long.toString(mSerialNumber);
     }
 
-    @Override
-    public Trip[] getTrips () {
+    @Override public Trip[] getTrips () {
         return mTrips;
     }
 
@@ -218,13 +213,11 @@ public class ClipperTransitData extends TransitData {
         return mRefills;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
@@ -238,15 +231,14 @@ public class ClipperTransitData extends TransitData {
          */
         byte [] data = file.getData();
         int pos = data.length - RECORD_LENGTH;
-        List<ClipperTrip> result = new ArrayList<ClipperTrip>();
+        List<ClipperTrip> result = new ArrayList<>();
         while (pos > 0) {
             byte[] slice = Utils.byteArraySlice(data, pos, RECORD_LENGTH);
             final ClipperTrip trip = createTrip(slice);
             if (trip != null) {
                 // Some transaction types are temporary -- remove previous trip with the same timestamp.
                 ClipperTrip existingTrip = Utils.findInList(result, new Utils.Matcher<ClipperTrip>() {
-                    @Override
-                    public boolean matches(ClipperTrip otherTrip) {
+                    @Override public boolean matches(ClipperTrip otherTrip) {
                         return trip.getTimestamp() == otherTrip.getTimestamp();
                     }
                 });
@@ -301,7 +293,7 @@ public class ClipperTransitData extends TransitData {
          */
         byte [] data = file.getData();
         int pos = data.length - RECORD_LENGTH;
-        List<ClipperRefill> result = new ArrayList<ClipperRefill>();
+        List<ClipperRefill> result = new ArrayList<>();
         while (pos > 0) {
             byte[] slice = Utils.byteArraySlice(data, pos, RECORD_LENGTH);
             ClipperRefill refill = createRefill(slice);
@@ -313,7 +305,7 @@ public class ClipperTransitData extends TransitData {
         useLog = result.toArray(useLog);
         Arrays.sort(useLog, new Comparator<ClipperRefill>() {
             public int compare(ClipperRefill r, ClipperRefill r1) {
-                return Long.valueOf(r1.getTimestamp()).compareTo(Long.valueOf(r.getTimestamp()));
+                return Long.valueOf(r1.getTimestamp()).compareTo(r.getTimestamp());
             }
         });
         return useLog;
@@ -346,8 +338,8 @@ public class ClipperTransitData extends TransitData {
                 balance -= mRefills[refill_idx].mAmount;
                 refill_idx++;
             }
-            ((ClipperTrip)mTrips[trip_idx]).mBalance = balance;
-            balance += ((ClipperTrip)mTrips[trip_idx]).mFare;
+            mTrips[trip_idx].mBalance = balance;
+            balance += mTrips[trip_idx].mFare;
             trip_idx++;
         }
     }
@@ -419,28 +411,23 @@ public class ClipperTransitData extends TransitData {
             mBalance       = parcel.readLong();
         }
 
-        @Override
-        public long getTimestamp () {
+        @Override public long getTimestamp () {
             return mTimestamp;
         }
 
-        @Override
-        public long getExitTimestamp () {
+        @Override public long getExitTimestamp () {
             return mExitTimestamp;
         }
 
-        @Override
-        public String getAgencyName () {
+        @Override public String getAgencyName () {
             return ClipperTransitData.getAgencyName((int)mAgency);
         }
 
-        @Override
-        public String getShortAgencyName () {
+        @Override public String getShortAgencyName () {
             return ClipperTransitData.getShortAgencyName((int)mAgency);
         }
 
-        @Override
-        public String getRouteName () {
+        @Override public String getRouteName () {
             if (mAgency == AGENCY_FERRY &&
                 sFerryRoutes.containsKey(mRoute)) {
                 return sFerryRoutes.get(mRoute);
@@ -451,23 +438,19 @@ public class ClipperTransitData extends TransitData {
             }
         }
 
-        @Override
-        public String getFareString () {
+        @Override public String getFareString () {
             return NumberFormat.getCurrencyInstance(Locale.US).format((double)mFare / 100.0);
         }
 
-        @Override
-        public double getFare () {
+        @Override public double getFare () {
             return mFare;
         }
 
-        @Override
-        public String getBalanceString () {
+        @Override public String getBalanceString () {
             return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.0);
         }
 
-        @Override
-        public Station getStartStation() {
+        @Override public Station getStartStation() {
             if (mAgency == AGENCY_BART) {
                 if (sBartStations.containsKey(mFrom)) {
                     return sBartStations.get(mFrom);
@@ -480,8 +463,7 @@ public class ClipperTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public Station getEndStation() {
+        @Override public Station getEndStation() {
             if (mAgency == AGENCY_BART) {
                 if (sBartStations.containsKey(mTo)) {
                     return sBartStations.get(mTo);
@@ -494,8 +476,7 @@ public class ClipperTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public String getStartStationName () {
+        @Override public String getStartStationName () {
             if (mAgency == AGENCY_BART || mAgency == AGENCY_FERRY) {
                 Station station = getStartStation();
                 if (station != null)
@@ -511,8 +492,7 @@ public class ClipperTransitData extends TransitData {
             }
         }
 
-        @Override
-        public String getEndStationName () {
+        @Override public String getEndStationName () {
             if (mAgency == AGENCY_BART) {
                 Station station = getEndStation();
                 if (station != null)
@@ -531,8 +511,7 @@ public class ClipperTransitData extends TransitData {
             }
         }
 
-        @Override
-        public Mode getMode() {
+        @Override public Mode getMode() {
             if (mAgency == AGENCY_ACTRAN)
                 return Mode.BUS;
             if (mAgency == AGENCY_BART)
@@ -552,8 +531,7 @@ public class ClipperTransitData extends TransitData {
             return Mode.OTHER;
         }
 
-        @Override
-        public boolean hasTime() {
+        @Override public boolean hasTime() {
             return true;
         }
 
@@ -603,18 +581,15 @@ public class ClipperTransitData extends TransitData {
             mAgency    = parcel.readLong();
         }
 
-        @Override
-        public long getTimestamp () {
+        @Override public long getTimestamp () {
             return mTimestamp;
         }
 
-        @Override
-        public long getAmount () {
+        @Override public long getAmount () {
             return mAmount;
         }
 
-        @Override
-        public String getAmountString () {
+        @Override public String getAmountString () {
             return NumberFormat.getCurrencyInstance(Locale.US).format((double)mAmount / 100.0);
         }
 
@@ -622,13 +597,11 @@ public class ClipperTransitData extends TransitData {
             return mMachineID;
         }
 
-        @Override
-        public String getAgencyName () {
+        @Override public String getAgencyName () {
             return ClipperTransitData.getAgencyName((int)mAgency);
         }
 
-        @Override
-        public String getShortAgencyName () {
+        @Override public String getShortAgencyName () {
             return ClipperTransitData.getShortAgencyName((int) mAgency);
         }
 

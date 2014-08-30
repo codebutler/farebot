@@ -66,7 +66,7 @@ public class DesfireFile implements Parcelable {
             boolean isError = (source.readInt() == 1);
 
             if (!isError) {
-                DesfireFileSettings fileSettings = (DesfireFileSettings) source.readParcelable(DesfireFileSettings.class.getClassLoader());
+                DesfireFileSettings fileSettings = source.readParcelable(DesfireFileSettings.class.getClassLoader());
                 int    dataLength = source.readInt();
                 byte[] fileData   = new byte[dataLength];
                 source.readByteArray(fileData);

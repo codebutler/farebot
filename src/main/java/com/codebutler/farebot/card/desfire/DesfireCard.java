@@ -28,11 +28,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
 
-import com.codebutler.farebot.CardRawDataFragmentClass;
+import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireFile.InvalidDesfireFile;
-import com.codebutler.farebot.fragments.DesfireCardRawDataFragment;
+import com.codebutler.farebot.fragment.DesfireCardRawDataFragment;
 import com.codebutler.farebot.transit.ClipperTransitData;
 import com.codebutler.farebot.transit.HSLTransitData;
 import com.codebutler.farebot.transit.OrcaTransitData;
@@ -54,7 +54,7 @@ public class DesfireCard extends Card {
     private DesfireApplication[]     mApplications;
 
     public static DesfireCard dumpTag (Tag tag) throws Exception {
-        List<DesfireApplication> apps = new ArrayList<DesfireApplication>();
+        List<DesfireApplication> apps = new ArrayList<>();
 
         IsoDep tech = IsoDep.get(tag);
 
@@ -71,12 +71,12 @@ public class DesfireCard extends Card {
             for (int appId : desfireTag.getAppList()) {
                 desfireTag.selectApp(appId);
 
-                List<DesfireFile> files = new ArrayList<DesfireFile>();
+                List<DesfireFile> files = new ArrayList<>();
 
                 for (int fileId : desfireTag.getFileList()) {
                     try {
                         DesfireFileSettings settings = desfireTag.getFileSettings(fileId);
-                        byte[] data = null;
+                        byte[] data;
                         if (settings instanceof DesfireFileSettings.StandardDesfireFileSettings)
                             data = desfireTag.readFile(fileId);
                         else
@@ -111,13 +111,11 @@ public class DesfireCard extends Card {
         mApplications = apps;
     }
 
-    @Override
-    public CardType getCardType () {
+    @Override public CardType getCardType () {
         return CardType.MifareDesfire;
     }
 
-    @Override
-    public TransitIdentity parseTransitIdentity() {
+    @Override public TransitIdentity parseTransitIdentity() {
         if (OrcaTransitData.check(this))
             return OrcaTransitData.parseTransitIdentity(this);
         if (ClipperTransitData.check(this))
@@ -127,8 +125,7 @@ public class DesfireCard extends Card {
         return null;
     }
     
-    @Override
-    public TransitData parseTransitData() {
+    @Override public TransitData parseTransitData() {
         if (OrcaTransitData.check(this))
             return new OrcaTransitData(this);
         if (ClipperTransitData.check(this))
@@ -206,7 +203,7 @@ public class DesfireCard extends Card {
                 Element fileElement = (Element) fileElements.item(y);
                 int fileId = Integer.parseInt(fileElement.getAttribute("id"));
 
-                DesfireFileSettings fileSettings = null;
+                DesfireFileSettings fileSettings;
 
                 Element settingsElement = (Element) fileElement.getElementsByTagName("settings").item(0);
 

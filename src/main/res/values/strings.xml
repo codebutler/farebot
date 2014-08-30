@@ -52,7 +52,7 @@
     <string name="speak_balance">Speak Balance</string>
     <string name="speak_balance_summary">Proof of concept</string>
     <string name="balance_speech">Balance %s</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
     <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
     <string name="supported_cards">Supported Cards</string>
     <string name="pass_or_transfer">Pass/Xfer</string>

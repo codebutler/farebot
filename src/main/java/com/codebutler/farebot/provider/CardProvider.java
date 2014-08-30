@@ -47,14 +47,12 @@ public class CardProvider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, "cards/#", CardDBHelper.SINGLE_CARD_URI_INDICATOR);
     }
 
-    @Override
-    public boolean onCreate () {
+    @Override public boolean onCreate () {
         mDbHelper = new CardDBHelper(getContext());
         return true;
     }
 
-    @Override
-    public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    @Override public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         switch (sUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
@@ -76,8 +74,7 @@ public class CardProvider extends ContentProvider {
         return cursor;
     }
 
-    @Override
-    public String getType (Uri uri) {
+    @Override public String getType (Uri uri) {
         switch (sUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
                 return CardDBHelper.CARD_DIR_TYPE;
@@ -88,13 +85,10 @@ public class CardProvider extends ContentProvider {
         }
     }
 
-    @Override
-    public Uri insert (Uri uri, ContentValues values) {
+    @Override public Uri insert (Uri uri, ContentValues values) {
         if (sUriMatcher.match(uri) != CardDBHelper.CARD_COLLECTION_URI_INDICATOR) {
             throw new IllegalArgumentException("Incorrect URI: " + uri);
         }
-
-        Long now = Long.valueOf(System.currentTimeMillis());
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long rowId = db.insertOrThrow(CardsTableColumns.TABLE_NAME, null, values);
@@ -105,8 +99,7 @@ public class CardProvider extends ContentProvider {
         return cardUri;
     }
 
-    @Override
-    public int delete (Uri uri, String selection, String[] selectionArgs) {
+    @Override public int delete (Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int count = 0;
         switch (sUriMatcher.match(uri)) {
@@ -125,10 +118,9 @@ public class CardProvider extends ContentProvider {
         return count;
     }
 
-    @Override
-    public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    @Override public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        int count = 0;
+        int count;
         switch (sUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
                 count = db.update(CardsTableColumns.TABLE_NAME, values, selection, selectionArgs);

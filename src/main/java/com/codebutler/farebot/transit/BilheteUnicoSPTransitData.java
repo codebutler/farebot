@@ -23,7 +23,7 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.classic.ClassicCard;
 
@@ -85,43 +85,35 @@ public class BilheteUnicoSPTransitData extends TransitData {
         return formatter.format((double)amount / 100.0);
     }
 
-    @Override
-    public String getCardName () {
+    @Override public String getCardName () {
         return "Bilhete Único";
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
+    @Override public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeParcelable(mCredit, flags);
     }
 
-    @Override
-    public String getBalanceString() {
+    @Override public String getBalanceString() {
         return BilheteUnicoSPTransitData.convertAmount(mCredit.getCredit());
     }
 
-    @Override
-    public String getSerialNumber() {
+    @Override public String getSerialNumber() {
         return null;
     }
 
-    @Override
-    public Trip[] getTrips() {
+    @Override public Trip[] getTrips() {
         return null;
     }
 
-    @Override
-    public Refill[] getRefills() {
+    @Override public Refill[] getRefills() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 }

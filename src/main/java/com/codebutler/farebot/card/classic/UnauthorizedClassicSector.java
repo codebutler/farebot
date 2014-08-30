@@ -20,7 +20,7 @@
 
 package com.codebutler.farebot.card.classic;
 
-import com.codebutler.farebot.UnauthorizedException;
+import com.codebutler.farebot.card.UnauthorizedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -36,18 +36,15 @@ public class UnauthorizedClassicSector extends ClassicSector {
         return sectorElement;
     }
 
-    @Override
-    public byte[] readBlocks(int startBlock, int blockCount) {
+    @Override public byte[] readBlocks(int startBlock, int blockCount) {
         throw new UnauthorizedException();
     }
 
-    @Override
-    public ClassicBlock[] getBlocks() {
+    @Override public ClassicBlock[] getBlocks() {
         throw new UnauthorizedException();
     }
 
-    @Override
-    public ClassicBlock getBlock(int index) {
+    @Override public ClassicBlock getBlock(int index) {
         throw new UnauthorizedException();
     }
 }

@@ -161,8 +161,7 @@ public class Utils {
 
     public static byte[] byteArraySlice(byte[] b, int offset, int length) {
         byte[] ret = new byte[length];
-        for (int i = 0; i < length; i++)
-            ret[i] = b[offset+i];
+        System.arraycopy(b, offset, ret, 0, length);
         return ret;
     }
 
@@ -254,7 +253,7 @@ public class Utils {
         int iEBit = iEndBit % 8;
 
         if (iSByte == iEByte) {
-            return (int)(((char)buffer[iEByte] >> (7 - iEBit)) & ((char)0xFF >> (8 - iLength)));
+            return ((char)buffer[iEByte] >> (7 - iEBit)) & ((char)0xFF >> (8 - iLength));
         } else {
             int uRet = (((char)buffer[iSByte] & (char)((char)0xFF >> iSBit)) << (((iEByte - iSByte - 1) * 8) + (iEBit + 1)));
 

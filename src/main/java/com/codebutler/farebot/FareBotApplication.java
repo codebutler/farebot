@@ -56,8 +56,7 @@ public class FareBotApplication extends Application {
         return mOVChipDBUtil;
     }
 
-    @Override
-    public void onCreate() {
+    @Override public void onCreate() {
         super.onCreate();
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()

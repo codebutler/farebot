@@ -24,7 +24,7 @@ package com.codebutler.farebot.card.classic;
 
 public class ClassicUtils {
     public static int convertBytePointerToBlock(int index) {
-        int block = 0;
+        int block;
 
         if (index >= 2048) { // Sector 32 (0x800)
             block = 128;

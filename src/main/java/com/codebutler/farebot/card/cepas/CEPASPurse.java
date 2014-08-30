@@ -302,7 +302,7 @@ public class CEPASPurse implements Parcelable {
             logfileRecordCount = source.readByte();
             issuerDataLength = source.readInt();
             lastTransactionTRP = source.readInt();
-            lastTransactionRecord = (CEPASTransaction) source.readParcelable(CEPASTransaction.class.getClassLoader());
+            lastTransactionRecord = source.readParcelable(CEPASTransaction.class.getClassLoader());
             issuerSpecificData = new byte[source.readInt()];
             source.readByteArray(issuerSpecificData);
             lastTransactionDebitOptionsByte = source.readByte();

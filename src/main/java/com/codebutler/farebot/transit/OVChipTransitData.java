@@ -25,8 +25,8 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.HeaderListItem;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.HeaderListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
@@ -172,10 +172,10 @@ public class OVChipTransitData extends TransitData {
         mPreamble = parser.getPreamble();
         mInfo     = parser.getInfo();
 
-        List<OVChipTransaction> transactions = new ArrayList<OVChipTransaction>(Arrays.asList(parser.getTransactions()));
+        List<OVChipTransaction> transactions = new ArrayList<>(Arrays.asList(parser.getTransactions()));
         Collections.sort(transactions, OVChipTransaction.ID_ORDER);
 
-        List<OVChipTrip> trips = new ArrayList<OVChipTrip>();
+        List<OVChipTrip> trips = new ArrayList<>();
 
         for (int i = 0; i < transactions.size(); i++) {
             OVChipTransaction transaction = transactions.get(i);
@@ -207,11 +207,10 @@ public class OVChipTransitData extends TransitData {
         Collections.sort(trips, OVChipTrip.ID_ORDER);
         mTrips = trips.toArray(new OVChipTrip[trips.size()]);
 
-        List<OVChipSubscription> subs = new ArrayList<OVChipSubscription>();
+        List<OVChipSubscription> subs = new ArrayList<>();
         subs.addAll(Arrays.asList(parser.getSubscriptions()));
         Collections.sort(subs, new Comparator<OVChipSubscription>() {
-            @Override
-            public int compare(OVChipSubscription s1, OVChipSubscription s2) {
+            @Override public int compare(OVChipSubscription s1, OVChipSubscription s2) {
                 return Integer.valueOf(s1.getId()).compareTo(s2.getId());
             }
         });
@@ -246,8 +245,7 @@ public class OVChipTransitData extends TransitData {
         return formatter.format((double)amount / 100.0);
     }
 
-    @Override
-    public String getCardName () {
+    @Override public String getCardName () {
         return "OV-Chipkaart";
     }
 
@@ -265,8 +263,7 @@ public class OVChipTransitData extends TransitData {
         return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
+    @Override public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mTrips.length);
         parcel.writeTypedArray(mTrips, flags);
         parcel.writeInt(mSubscriptions.length);
@@ -277,23 +274,19 @@ public class OVChipTransitData extends TransitData {
         parcel.writeParcelable(mCredit, flags);
     }
 
-    @Override
-    public String getBalanceString() {
+    @Override public String getBalanceString() {
         return OVChipTransitData.convertAmount(mCredit.getCredit());
     }
 
-    @Override
-    public String getSerialNumber() {
+    @Override public String getSerialNumber() {
         return null;
     }
 
-    @Override
-    public Trip[] getTrips() {
+    @Override public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override
-    public Refill[] getRefills() {
+    @Override public Refill[] getRefills() {
         return null;
     }
 
@@ -301,9 +294,8 @@ public class OVChipTransitData extends TransitData {
         return mSubscriptions;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
-        ArrayList<ListItem> items = new ArrayList<ListItem>();
+    @Override public List<ListItem> getInfo() {
+        ArrayList<ListItem> items = new ArrayList<>();
 
         items.add(new HeaderListItem("Hardware Information"));
         items.add(new ListItem("Manufacturer ID", mPreamble.getManufacturer()));

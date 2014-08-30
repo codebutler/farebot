@@ -31,13 +31,11 @@ import java.util.List;
 
 public abstract class Trip implements Parcelable {
     public static final Creator<Trip> CREATOR = new Creator<Trip>() {
-        @Override
-        public Trip createFromParcel(Parcel parcel) {
+        @Override public Trip createFromParcel(Parcel parcel) {
             return null;
         }
 
-        @Override
-        public Trip[] newArray(int size) {
+        @Override public Trip[] newArray(int size) {
             return new Trip[size];
         }
     };
@@ -62,7 +60,7 @@ public abstract class Trip implements Parcelable {
     }
 
     public static String formatStationNames(Trip trip) {
-        List<String> stationText = new ArrayList<String>();
+        List<String> stationText = new ArrayList<>();
         if (trip.getStartStationName() != null)
             stationText.add(trip.getStartStationName());
         if (trip.getEndStationName() != null && (!trip.getEndStationName().equals(trip.getStartStationName())))
@@ -89,8 +87,7 @@ public abstract class Trip implements Parcelable {
     }
 
     public static class Comparator implements java.util.Comparator<Trip> {
-        @Override
-        public int compare(Trip trip, Trip trip1) {
+        @Override public int compare(Trip trip, Trip trip1) {
             return Long.valueOf(trip1.getTimestamp()).compareTo(trip.getTimestamp());
         }
     }

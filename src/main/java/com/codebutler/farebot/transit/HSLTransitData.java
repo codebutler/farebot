@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.ListItem;
+import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
@@ -123,7 +123,7 @@ public class HSLTransitData extends TransitData {
         mKausiJOREExt       = parcel.readLong();
         mKausiDirection     = parcel.readLong();
 
-        mTrips = new ArrayList<HSLTrip>();
+        mTrips = new ArrayList<>();
         parcel.readTypedList(mTrips, HSLTrip.CREATOR);
     }
 
@@ -288,13 +288,11 @@ public class HSLTransitData extends TransitData {
         return (EPOCH) + day * (60 * 60 * 24) + minute * 60;
     }
 
-    @Override
-    public String getCardName() {
+    @Override public String getCardName() {
         return "HSL";
     }
 
-    @Override
-    public String getBalanceString() {
+    @Override public String getBalanceString() {
         FareBotApplication app = FareBotApplication.getInstance();
         String ret = NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mBalance / 100);
         if (mHasKausi)
@@ -352,29 +350,24 @@ public class HSLTransitData extends TransitData {
     }
     */
 
-    @Override
-    public String getSerialNumber() {
+    @Override public String getSerialNumber() {
         return mSerialNumber;
     }
 
-    @Override
-    public Trip[] getTrips() {
-        return (HSLTrip[]) mTrips.toArray(new HSLTrip[mTrips.size()]);
+    @Override public Trip[] getTrips() {
+        return mTrips.toArray(new HSLTrip[mTrips.size()]);
     }
 
-    @Override
-    public Refill[] getRefills() {
+    @Override public Refill[] getRefills() {
         Refill[] ret = {mLastRefill};
         return ret;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
+    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override
-    public List<ListItem> getInfo() {
+    @Override public List<ListItem> getInfo() {
         return null;
     }
 
@@ -385,14 +378,14 @@ public class HSLTransitData extends TransitData {
             RecordDesfireFile recordFile = (RecordDesfireFile) card.getApplication(0x1120ef).getFile(0x04);
 
 
-            List<HSLTrip> useLog = new ArrayList<HSLTrip>();
+            List<HSLTrip> useLog = new ArrayList<>();
             for (int i = 0; i < recordFile.getRecords().length; i++) {
                 useLog.add(new HSLTrip(recordFile.getRecords()[i]));
             }
             Collections.sort(useLog, new Trip.Comparator());
             return useLog;
         }
-        return new ArrayList<HSLTrip>();
+        return new ArrayList<>();
     }
 
     public void writeToParcel(Parcel parcel, int flags) {
@@ -446,28 +439,23 @@ public class HSLTransitData extends TransitData {
             dest.writeLong(mRefillAmount);
         }
 
-        @Override
-        public long getTimestamp() {
+        @Override public long getTimestamp() {
             return mRefillTime;
         }
 
-        @Override
-        public String getAgencyName() {
+        @Override public String getAgencyName() {
             return FareBotApplication.getInstance().getString(R.string.hsl_balance_refill);
         }
 
-        @Override
-        public String getShortAgencyName() {
+        @Override public String getShortAgencyName() {
             return FareBotApplication.getInstance().getString(R.string.hsl_balance_refill);
         }
 
-        @Override
-        public long getAmount() {
+        @Override public long getAmount() {
             return mRefillAmount;
         }
 
-        @Override
-        public String getAmountString() {
+        @Override public String getAmountString() {
             return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mRefillAmount / 100.0);
         }
     }
@@ -536,18 +524,15 @@ public class HSLTransitData extends TransitData {
             mLine = null;
         }
 
-        @Override
-        public long getTimestamp() {
+        @Override public long getTimestamp() {
             return mTimestamp;
         }
 
-        @Override
-        public long getExitTimestamp() {
+        @Override public long getExitTimestamp() {
             return 0;
         }
 
-        @Override
-        public String getAgencyName() {
+        @Override public String getAgencyName() {
             FareBotApplication app = FareBotApplication.getInstance();
             String pax = app.getString(R.string.hsl_person_format, mPax);
             if (mArvo == 1) {
@@ -560,13 +545,11 @@ public class HSLTransitData extends TransitData {
             }
         }
 
-        @Override
-        public String getShortAgencyName() {
+        @Override public String getShortAgencyName() {
             return getAgencyName();
         }
 
-        @Override
-        public String getRouteName() {
+        @Override public String getRouteName() {
             if (mLine != null) {
                  // FIXME: i18n
                 return String.format("Line %s, Vehicle %s", mLine.substring(1), mVehicleNumber);
@@ -574,33 +557,27 @@ public class HSLTransitData extends TransitData {
             return null;
         }
 
-        @Override
-        public String getFareString() {
+        @Override public String getFareString() {
             return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mFare / 100.0);
         }
 
-        @Override
-        public double getFare() {
+        @Override public double getFare() {
             return mFare;
         }
 
-        @Override
-        public String getBalanceString() {
+        @Override public String getBalanceString() {
             return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mNewBalance / 100);
         }
 
-        @Override
-        public String getEndStationName() {
+        @Override public String getEndStationName() {
             return null;
         }
 
-        @Override
-        public Station getEndStation() {
+        @Override public Station getEndStation() {
             return null;
         }
 
-        @Override
-        public Mode getMode() {
+        @Override public Mode getMode() {
             if (mLine != null) {
                 if (mLine.equals("1300"))
                     return Mode.METRO;
@@ -616,8 +593,7 @@ public class HSLTransitData extends TransitData {
             }
         }
 
-        @Override
-        public boolean hasTime() {
+        @Override public boolean hasTime() {
             return false;
         }
 
@@ -627,13 +603,11 @@ public class HSLTransitData extends TransitData {
             return mPax;
         }
 
-        @Override
-        public String getStartStationName() {
+        @Override public String getStartStationName() {
             return null;
         }
 
-        @Override
-        public Station getStartStation() {
+        @Override public Station getStartStation() {
             return null;
         }
 

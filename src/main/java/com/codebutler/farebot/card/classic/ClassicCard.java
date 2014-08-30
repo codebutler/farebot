@@ -26,14 +26,14 @@ package com.codebutler.farebot.card.classic;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Parcel;
-import com.codebutler.farebot.CardHasManufacturingInfo;
-import com.codebutler.farebot.CardRawDataFragmentClass;
+import com.codebutler.farebot.card.CardHasManufacturingInfo;
+import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.fragments.ClassicCardRawDataFragment;
-import com.codebutler.farebot.keys.CardKeys;
-import com.codebutler.farebot.keys.ClassicCardKeys;
-import com.codebutler.farebot.keys.ClassicSectorKey;
+import com.codebutler.farebot.fragment.ClassicCardRawDataFragment;
+import com.codebutler.farebot.key.CardKeys;
+import com.codebutler.farebot.key.ClassicCardKeys;
+import com.codebutler.farebot.key.ClassicSectorKey;
 import com.codebutler.farebot.transit.BilheteUnicoSPTransitData;
 import com.codebutler.farebot.transit.OVChipTransitData;
 import com.codebutler.farebot.transit.TransitData;
@@ -68,7 +68,7 @@ public class ClassicCard extends Card {
 
             ClassicCardKeys keys = (ClassicCardKeys) CardKeys.forTagId(tagId);
 
-            List<ClassicSector> sectors = new ArrayList<ClassicSector>();
+            List<ClassicSector> sectors = new ArrayList<>();
 
             for (int sectorIndex = 0; sectorIndex < tech.getSectorCount(); sectorIndex++) {
                 try {
@@ -92,7 +92,7 @@ public class ClassicCard extends Card {
                     }
 
                     if (authSuccess) {
-                        List<ClassicBlock> blocks = new ArrayList<ClassicBlock>();
+                        List<ClassicBlock> blocks = new ArrayList<>();
                         // FIXME: First read trailer block to get type of other blocks.
                         int firstBlockIndex = tech.sectorToBlock(sectorIndex);
                         for (int blockIndex = 0; blockIndex < tech.getBlockCountInSector(sectorIndex); blockIndex++) {
@@ -132,8 +132,7 @@ public class ClassicCard extends Card {
     }
 
     public static final Creator<ClassicCard> CREATOR = new Creator<ClassicCard>() {
-        @Override
-        public ClassicCard createFromParcel(Parcel source) {
+        @Override public ClassicCard createFromParcel(Parcel source) {
             try {
                 return (ClassicCard) ClassicCard.fromXml(source.readString());
             } catch (Exception e) {
@@ -141,8 +140,7 @@ public class ClassicCard extends Card {
             }
         }
 
-        @Override
-        public ClassicCard[] newArray(int size) {
+        @Override public ClassicCard[] newArray(int size) {
             return new ClassicCard[size];
         }
     };
@@ -160,15 +158,13 @@ public class ClassicCard extends Card {
         return root;
     }
 
-    @Override
-    public TransitIdentity parseTransitIdentity() {
+    @Override public TransitIdentity parseTransitIdentity() {
         if (OVChipTransitData.check(this))
             return OVChipTransitData.parseTransitIdentity(this);
         return null;
     }
 
-    @Override
-    public TransitData parseTransitData() {
+    @Override public TransitData parseTransitData() {
         if (OVChipTransitData.check(this))
             return new OVChipTransitData(this);
         else if (BilheteUnicoSPTransitData.check(this))
@@ -176,8 +172,7 @@ public class ClassicCard extends Card {
         return null;
     }
 
-    @Override
-    public CardType getCardType() {
+    @Override public CardType getCardType() {
         return CardType.MifareClassic;
     }
 
