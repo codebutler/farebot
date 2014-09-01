@@ -23,6 +23,7 @@
 package com.codebutler.farebot.activity;
 
 import android.app.Fragment;
+
 import com.codebutler.farebot.fragment.CardsFragment;
 
 public class CardsActivity extends FragmentWrapperActivity {

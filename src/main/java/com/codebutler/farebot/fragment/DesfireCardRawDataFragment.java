@@ -31,15 +31,19 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
-import com.codebutler.farebot.ExpandableListFragment;
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireApplication;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
-import com.codebutler.farebot.card.desfire.DesfireFileSettings.RecordDesfireFileSettings;
-import com.codebutler.farebot.card.desfire.DesfireFileSettings.StandardDesfireFileSettings;
+import com.codebutler.farebot.card.desfire.InvalidDesfireFile;
+import com.codebutler.farebot.card.desfire.RecordDesfireFileSettings;
+import com.codebutler.farebot.card.desfire.StandardDesfireFileSettings;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.Serializer;
 
 public class DesfireCardRawDataFragment extends ExpandableListFragment {
     private DesfireCard mCard;
@@ -48,32 +52,33 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
         return inflater.inflate(R.layout.fragment_card_raw_data, null);
     }
 
-    public void onCreate (Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard = (DesfireCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         setListAdapter(new BaseExpandableListAdapter() {
-            public int getGroupCount () {
-                return mCard.getApplications().length;
+            public int getGroupCount() {
+                return mCard.getApplications().size();
             }
 
             public int getChildrenCount (int groupPosition) {
-                return mCard.getApplications()[groupPosition].getFiles().length;
+                return mCard.getApplications().get(groupPosition).getFiles().size();
             }
 
             public Object getGroup (int groupPosition) {
-                return mCard.getApplications()[groupPosition];
+                return mCard.getApplications().get(groupPosition);
             }
 
             public Object getChild (int groupPosition, int childPosition) {
-                return mCard.getApplications()[groupPosition].getFiles()[childPosition];
+                return mCard.getApplications().get(groupPosition).getFiles().get(childPosition);
             }
 
             public long getGroupId (int groupPosition) {
-                return mCard.getApplications()[groupPosition].getId();
+                return mCard.getApplications().get(groupPosition).getId();
             }
 
             public long getChildId (int groupPosition, int childPosition) {
-                return mCard.getApplications()[groupPosition].getFiles()[childPosition].getId();
+                return mCard.getApplications().get(groupPosition).getFiles().get(childPosition).getId();
             }
 
             public boolean hasStableIds () {
@@ -91,7 +96,7 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
 
                 TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
 
-                DesfireApplication app = mCard.getApplications()[groupPosition];
+                DesfireApplication app = mCard.getApplications().get(groupPosition);
 
                 textView.setText("Application: 0x" + Integer.toHexString(app.getId()));
 
@@ -106,24 +111,24 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
                 TextView textView1 = (TextView) convertView.findViewById(android.R.id.text1);
                 TextView textView2 = (TextView) convertView.findViewById(android.R.id.text2);
 
-                DesfireApplication app = mCard.getApplications()[groupPosition];
-                DesfireFile file = app.getFiles()[childPosition];
+                DesfireApplication app = mCard.getApplications().get(groupPosition);
+                DesfireFile file = app.getFiles().get(childPosition);
 
                 textView1.setText("File: 0x" + Integer.toHexString(file.getId()));
 
-                if (file instanceof DesfireFile.InvalidDesfireFile) {
-                    textView2.setText(((DesfireFile.InvalidDesfireFile) file).getErrorMessage());
+                if (file instanceof InvalidDesfireFile) {
+                    textView2.setText(((InvalidDesfireFile) file).getErrorMessage());
                 } else {
                     if (file.getFileSettings() instanceof StandardDesfireFileSettings) {
                         StandardDesfireFileSettings fileSettings = (StandardDesfireFileSettings) file.getFileSettings();
-                        textView2.setText(String.format("Type: %s, Size: %s", fileSettings.getFileTypeName(), String.valueOf(fileSettings.fileSize)));
+                        textView2.setText(String.format("Type: %s, Size: %s", fileSettings.getFileTypeName(), String.valueOf(fileSettings.getFileSize())));
                     } else if (file.getFileSettings() instanceof RecordDesfireFileSettings) {
                         RecordDesfireFileSettings fileSettings = (RecordDesfireFileSettings) file.getFileSettings();
                         textView2.setText(String.format("Type: %s, Cur Records: %s, Max Records: %s, Record Size: %s",
                                 fileSettings.getFileTypeName(),
-                                String.valueOf(fileSettings.curRecords),
-                                String.valueOf(fileSettings.maxRecords),
-                                String.valueOf(fileSettings.recordSize)));
+                                String.valueOf(fileSettings.getCurRecords()),
+                                String.valueOf(fileSettings.getMaxRecords()),
+                                String.valueOf(fileSettings.getRecordSize())));
                     } else {
                         textView2.setText("Unknown file type");
                     }
@@ -137,7 +142,7 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
     @Override public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
         DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
 
-        if (file instanceof DesfireFile.InvalidDesfireFile) {
+        if (file instanceof InvalidDesfireFile) {
             return false;
         }
 

@@ -22,32 +22,22 @@
 
 package com.codebutler.farebot.card.felica;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.codebutler.farebot.xml.Base64String;
 
-public class FelicaBlock implements Parcelable {
-    private byte   mAddr;
-    private byte[] mData;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Text;
 
-    public static Creator<FelicaBlock> CREATOR = new Creator<FelicaBlock>() {
-        public FelicaBlock createFromParcel(Parcel parcel) {
-            byte addr       = parcel.readByte();
-            int  dataLenght = parcel.readInt();
+@Root(name="block")
+public class FelicaBlock {
+    @Attribute(name="address") private byte mAddr;
+    @Text private Base64String mData;
 
-            byte[] data = new byte[dataLenght];
-            parcel.readByteArray(data);
-
-            return new FelicaBlock(addr, data);
-        }
-
-        public FelicaBlock[] newArray(int size) {
-            return new FelicaBlock[size];
-        }
-    };
+    FelicaBlock() { }
 
     public FelicaBlock(byte addr, byte[] data) {
         mAddr = addr;
-        mData = data;
+        mData = new Base64String(data);
     }
 
     public byte getAddress() {
@@ -55,16 +45,6 @@ public class FelicaBlock implements Parcelable {
     }
 
     public byte[] getData() {
-        return mData;
-    }
-
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeByte(mAddr);
-        parcel.writeInt(mData.length);
-        parcel.writeByteArray(mData);
-    }
-
-    public int describeContents() {
-        return 0;
+        return mData.getData();
     }
 }

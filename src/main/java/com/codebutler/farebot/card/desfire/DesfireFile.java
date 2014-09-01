@@ -22,118 +22,43 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.codebutler.farebot.xml.Base64String;
 
-import com.codebutler.farebot.card.desfire.DesfireFileSettings.RecordDesfireFileSettings;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-import org.apache.commons.lang3.ArrayUtils;
+@Root(name="file")
+public class DesfireFile {
+    @Attribute(name="id") private int mId;
+    @Element(name="settings", required=false) private DesfireFileSettings mSettings;
+    @Element(name="data", required=false) private Base64String mData;
 
-public class DesfireFile implements Parcelable {
-    private int                 mId;
-    private DesfireFileSettings mSettings;
-    private byte[]              mData;
-
-    public static DesfireFile create (int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        if (fileSettings instanceof RecordDesfireFileSettings)
+    public static DesfireFile create(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
+        if (fileSettings instanceof RecordDesfireFileSettings) {
             return new RecordDesfireFile(fileId, fileSettings, fileData);
-        else
+        } else {
             return new DesfireFile(fileId, fileSettings, fileData);
+        }
     }
 
-    private DesfireFile (int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        mId       = fileId;
+    DesfireFile() { /* For XML Serializer */ }
+
+    DesfireFile(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
+        mId = fileId;
         mSettings = fileSettings;
-        mData     = fileData;
+        mData = new Base64String(fileData);
     }
 
-    public DesfireFileSettings getFileSettings () {
+    public DesfireFileSettings getFileSettings() {
         return mSettings;
     }
 
-    public int getId () {
+    public int getId() {
         return mId;
     }
 
-    public byte[] getData () {
-        return mData;
-    }
-
-    public static final Parcelable.Creator<DesfireFile> CREATOR = new Parcelable.Creator<DesfireFile>() {
-        public DesfireFile createFromParcel(Parcel source) {
-            int fileId = source.readInt();
-
-            boolean isError = (source.readInt() == 1);
-
-            if (!isError) {
-                DesfireFileSettings fileSettings = source.readParcelable(DesfireFileSettings.class.getClassLoader());
-                int    dataLength = source.readInt();
-                byte[] fileData   = new byte[dataLength];
-                source.readByteArray(fileData);
-
-                return DesfireFile.create(fileId, fileSettings, fileData);
-            } else {
-                return new InvalidDesfireFile(fileId, source.readString());
-            }
-        }
-
-        public DesfireFile[] newArray (int size) {
-            return new DesfireFile[size];
-        }
-    };
-
-    public void writeToParcel (Parcel parcel, int flags) {
-        parcel.writeInt(mId);
-        if (this instanceof InvalidDesfireFile) {
-            parcel.writeInt(1);
-            parcel.writeString(((InvalidDesfireFile)this).getErrorMessage());
-        } else {
-            parcel.writeInt(0);
-            parcel.writeParcelable(mSettings, 0);
-            parcel.writeInt(mData.length);
-            parcel.writeByteArray(mData);
-        }
-    }
-
-    public int describeContents () {
-        return 0;
-    }
-
-    public static class RecordDesfireFile extends DesfireFile {
-        private DesfireRecord[] mRecords;
-
-        private RecordDesfireFile (int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-            super(fileId, fileSettings, fileData);
-
-            RecordDesfireFileSettings settings = (RecordDesfireFileSettings) fileSettings;
-
-            DesfireRecord[] records = new DesfireRecord[settings.curRecords];
-            for (int i = 0; i < settings.curRecords; i++) {
-                int offset = settings.recordSize * i;
-                records[i] = new DesfireRecord(ArrayUtils.subarray(getData(), offset, offset + settings.recordSize));
-            }
-            mRecords = records;
-        }
-
-        public DesfireRecord[] getRecords () {
-            return mRecords;
-        }
-    }
-
-    public static class InvalidDesfireFile extends DesfireFile {
-        private String mErrorMessage;
-
-        public InvalidDesfireFile (int fileId, String errorMessage) {
-            super(fileId, null, new byte[0]);
-            mErrorMessage = errorMessage;
-        }
-
-        public String getErrorMessage () {
-            return mErrorMessage;
-        }
-
-        @Override public byte[] getData() {
-            throw new IllegalStateException(String.format("Invalid file: %s", mErrorMessage));
-        }
+    public byte[] getData() {
+        return mData.getData();
     }
 }

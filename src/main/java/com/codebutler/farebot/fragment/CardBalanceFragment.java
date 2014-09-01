@@ -22,17 +22,21 @@
 
 package com.codebutler.farebot.fragment;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.app.Fragment;
+
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.transit.TransitData;
+
+import org.simpleframework.xml.Serializer;
 
 public class CardBalanceFragment extends Fragment {
     private Card mCard;
@@ -40,7 +44,8 @@ public class CardBalanceFragment extends Fragment {
 
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCard        = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard        = Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 

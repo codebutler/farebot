@@ -22,38 +22,31 @@
 
 package com.codebutler.farebot.card.felica;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.codebutler.farebot.util.Utils;
 
-public class FelicaSystem implements Parcelable {
-    private int mCode;
-    private FelicaService[] mServices;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
-    public static Creator<FelicaSystem> CREATOR = new Creator<FelicaSystem>() {
-        public FelicaSystem createFromParcel(Parcel parcel) {
-            int systemCode = parcel.readInt();
+import java.util.List;
 
-            FelicaService[] services = new FelicaService[parcel.readInt()];
-            parcel.readTypedArray(services, FelicaService.CREATOR);
+@Root(name="system")
+public class FelicaSystem {
+    @Attribute(name="code") private int mCode;
+    @ElementList(name="services") private List<FelicaService> mServices;
 
-            return new FelicaSystem(systemCode, services);
-        }
-
-        public FelicaSystem[] newArray(int size) {
-            return new FelicaSystem[size];
-        }
-    };
+    private FelicaSystem() { /* For XML Serializer */ }
 
     public FelicaSystem(int code, FelicaService[] services) {
         mCode = code;
-        mServices = services;
+        mServices = Utils.arrayAsList(services);
     }
 
     public int getCode() {
         return mCode;
     }
 
-    public FelicaService[] getServices() {
+    public List<FelicaService> getServices() {
         return mServices;
     }
 
@@ -64,15 +57,5 @@ public class FelicaSystem implements Parcelable {
             }
         }
         return null;
-    }
-
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mCode);
-        parcel.writeInt(mServices.length);
-        parcel.writeTypedArray(mServices, flags);
-    }
-
-    public int describeContents() {
-        return 0;
     }
 }

@@ -22,26 +22,25 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import com.codebutler.farebot.Utils;
-import org.apache.commons.lang3.ArrayUtils;
+import com.codebutler.farebot.xml.HexString;
+
+import org.simpleframework.xml.Element;
 
 import java.io.ByteArrayInputStream;
 
-public abstract class DesfireFileSettings implements Parcelable {
-    public final byte   fileType;
-    public final byte   commSetting;
-    public final byte[] accessRights;
+public abstract class DesfireFileSettings {
+    @Element(name="filetype") private byte mFileType;
+    @Element(name="commsettings") private byte mCommSetting;
+    @Element(name="accessrights") private HexString mAccessRights;
 
     /* DesfireFile Types */
-    static final byte STANDARD_DATA_FILE = (byte) 0x00;
-    static final byte BACKUP_DATA_FILE   = (byte) 0x01;
-    static final byte VALUE_FILE         = (byte) 0x02;
-    static final byte LINEAR_RECORD_FILE = (byte) 0x03;
-    static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
+    public static final byte STANDARD_DATA_FILE = (byte) 0x00;
+    public static final byte BACKUP_DATA_FILE   = (byte) 0x01;
+    public static final byte VALUE_FILE         = (byte) 0x02;
+    public static final byte LINEAR_RECORD_FILE = (byte) 0x03;
+    public static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
     
-    public static DesfireFileSettings Create (byte[] data) throws Exception {
+    public static DesfireFileSettings create(byte[] data) throws Exception {
         byte fileType = data[0];
 
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
@@ -56,22 +55,37 @@ public abstract class DesfireFileSettings implements Parcelable {
             throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
     }
 
-    private DesfireFileSettings(ByteArrayInputStream stream) {
-        fileType    = (byte) stream.read();
-        commSetting = (byte) stream.read();
+    DesfireFileSettings() { /* For XML Serializer */ }
 
-        accessRights = new byte[2];
+    DesfireFileSettings(ByteArrayInputStream stream) {
+        mFileType = (byte) stream.read();
+        mCommSetting = (byte) stream.read();
+
+        byte[] accessRights = new byte[2];
         stream.read(accessRights, 0, accessRights.length);
+        this.mAccessRights = new HexString(accessRights);
     }
 
-    private DesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights) {
-        this.fileType     = fileType;
-        this.commSetting  = commSetting;
-        this.accessRights = accessRights;
+    DesfireFileSettings(byte fileType, byte commSetting, byte[] accessRights) {
+        this.mFileType = fileType;
+        this.mCommSetting = commSetting;
+        this.mAccessRights = new HexString(accessRights);
+    }
+
+    public byte getFileType() {
+        return mFileType;
+    }
+
+    public byte getCommSetting() {
+        return mCommSetting;
+    }
+
+    public HexString getAccessRights() {
+        return mAccessRights;
     }
 
     public String getFileTypeName () {
-        switch (fileType) {
+        switch (mFileType) {
             case STANDARD_DATA_FILE:
                 return "Standard";
             case BACKUP_DATA_FILE:
@@ -86,108 +100,4 @@ public abstract class DesfireFileSettings implements Parcelable {
                 return "Unknown";
         }
     }
-
-    public static final Parcelable.Creator<DesfireFileSettings> CREATOR = new Parcelable.Creator<DesfireFileSettings>() {
-        public DesfireFileSettings createFromParcel(Parcel source) {
-            byte fileType       = source.readByte();
-            byte commSetting    = source.readByte();
-            byte[] accessRights = new byte[source.readInt()];
-            source.readByteArray(accessRights);
-
-            if (fileType == STANDARD_DATA_FILE || fileType == BACKUP_DATA_FILE) {
-                int fileSize = source.readInt();
-                return new StandardDesfireFileSettings(fileType, commSetting, accessRights, fileSize);
-            } else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE) {
-                int recordSize = source.readInt();
-                int maxRecords = source.readInt();
-                int curRecords = source.readInt();
-                return new RecordDesfireFileSettings(fileType, commSetting, accessRights, recordSize, maxRecords, curRecords);
-            } else {
-                return new UnsupportedDesfireFileSettings(fileType);
-            }
-        }
-
-        public DesfireFileSettings[] newArray(int size) {
-            return new DesfireFileSettings[size];
-        }
-    };
-
-    public void writeToParcel (Parcel parcel, int flags) {
-        parcel.writeByte(fileType);
-        parcel.writeByte(commSetting);
-        parcel.writeInt(accessRights.length);
-        parcel.writeByteArray(accessRights);
-    }
-
-    public int describeContents () {
-        return 0;
-    }
-
-    public static class StandardDesfireFileSettings extends DesfireFileSettings {
-        public final int fileSize;
-
-        private StandardDesfireFileSettings (ByteArrayInputStream stream) {
-            super(stream);
-            byte[] buf = new byte[3];
-            stream.read(buf, 0, buf.length);
-            ArrayUtils.reverse(buf);
-            fileSize = Utils.byteArrayToInt(buf);
-        }
-
-        StandardDesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights, int fileSize) {
-            super(fileType, commSetting, accessRights);
-            this.fileSize = fileSize;
-        }
-
-        @Override public void writeToParcel (Parcel parcel, int flags) {
-            super.writeToParcel(parcel, flags);
-            parcel.writeInt(fileSize);
-        }
-    }
-
-    public static class RecordDesfireFileSettings extends DesfireFileSettings {
-        public final int recordSize;
-        public final int maxRecords;
-        public final int curRecords;
-
-        public RecordDesfireFileSettings(ByteArrayInputStream stream) {
-            super(stream);
-
-            byte[] buf = new byte[3];
-            stream.read(buf, 0, buf.length);
-            ArrayUtils.reverse(buf);
-            recordSize = Utils.byteArrayToInt(buf);
-
-            buf = new byte[3];
-            stream.read(buf, 0, buf.length);
-            ArrayUtils.reverse(buf);
-            maxRecords = Utils.byteArrayToInt(buf);
-
-            buf = new byte[3];
-            stream.read(buf, 0, buf.length);
-            ArrayUtils.reverse(buf);
-            curRecords = Utils.byteArrayToInt(buf);
-        }
-
-        RecordDesfireFileSettings (byte fileType, byte commSetting, byte[] accessRights, int recordSize, int maxRecords, int curRecords) {
-            super(fileType, commSetting, accessRights);
-            this.recordSize = recordSize;
-            this.maxRecords = maxRecords;
-            this.curRecords = curRecords;
-        }
-
-        @Override public void writeToParcel (Parcel parcel, int flags) {
-            super.writeToParcel(parcel, flags);
-            parcel.writeInt(recordSize);
-            parcel.writeInt(maxRecords);
-            parcel.writeInt(curRecords);
-        }
-    }
-
-    public static class UnsupportedDesfireFileSettings extends DesfireFileSettings {
-        public UnsupportedDesfireFileSettings(byte fileType) {
-            super(fileType, Byte.MIN_VALUE, new byte[0]);
-        }
-    }
 }
-

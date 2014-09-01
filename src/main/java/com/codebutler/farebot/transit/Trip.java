@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

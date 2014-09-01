@@ -22,19 +22,21 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import com.codebutler.farebot.util.Utils;
 
-public class CEPASHistory implements Parcelable {
-    private static CEPASTransaction[] sEmptyTransaction = new CEPASTransaction[0];
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
-    private int                 mId;
-    private CEPASTransaction[]  mTransactions;
-    private final boolean       mIsValid;
-    private final String        mErrorMessage;
+import java.util.ArrayList;
+import java.util.List;
+
+@Root(name="history")
+public class CEPASHistory {
+    @Attribute(name="id") private int mId;
+    @ElementList(name="transaction", inline=true, required=false) private List<CEPASTransaction> mTransactions;
+    @Attribute(name="valid") private boolean mIsValid;
+    @Attribute(name="error", required=false) private String mErrorMessage;
 
     public static CEPASHistory create (int purseId, byte[] purseData) {
         return new CEPASHistory(purseId, purseData);
@@ -48,19 +50,19 @@ public class CEPASHistory implements Parcelable {
             mErrorMessage = "";
             int recordSize = 16;
             int purseCount = purseData.length / recordSize;
-            mTransactions = new CEPASTransaction[purseCount];
-
+            CEPASTransaction[] transactions = new CEPASTransaction[purseCount];
             for (int i = 0; i < purseData.length; i += recordSize) {
                 byte[] tempData = new byte[recordSize];
                 for (int j = 0; j < tempData.length; j++)
                     tempData[j] = purseData[i+j];
-                mTransactions[i/tempData.length] = new CEPASTransaction(tempData);
+                transactions[i/tempData.length] = new CEPASTransaction(tempData);
             }
+            mTransactions = Utils.arrayAsList(transactions);
         }
         else {
             mIsValid      = false;
             mErrorMessage = "";
-            mTransactions = sEmptyTransaction;
+            mTransactions = new ArrayList<>();
         }
     }
 
@@ -71,17 +73,19 @@ public class CEPASHistory implements Parcelable {
     }
 
     public CEPASHistory (int purseId, CEPASTransaction[] transactions) {
-        mTransactions = transactions;
+        mTransactions = Utils.arrayAsList(transactions);
         mId           = purseId;
         mIsValid      = true;
         mErrorMessage = "";
     }
 
+    private CEPASHistory() { /* For XML Serializer */ }
+
     public int getId () {
         return mId;
     }
 
-    public CEPASTransaction[] getTransactions () {
+    public List<CEPASTransaction> getTransactions () {
         return mTransactions;
     }
 
@@ -91,69 +95,5 @@ public class CEPASHistory implements Parcelable {
 
     public String getErrorMessage () {
         return mErrorMessage;
-    }
-
-    public static final Parcelable.Creator<CEPASHistory> CREATOR = new Parcelable.Creator<CEPASHistory>() {
-        public CEPASHistory createFromParcel(Parcel source) {
-            int purseId = source.readInt();
-
-            if(source.readInt() == 1) {
-                CEPASTransaction[] transactions = new CEPASTransaction[source.readInt()];
-                for(int i=0; i<transactions.length; i++)
-                    transactions[i] = source.readParcelable(CEPASTransaction.class.getClassLoader());
-                return new CEPASHistory(purseId, transactions);
-            }
-            else
-                return new CEPASHistory(purseId, source.readString());
-        }
-
-        public CEPASHistory[] newArray (int size) {
-            return new CEPASHistory[size];
-        }
-    };
-
-    public void writeToParcel (Parcel parcel, int flags) {
-        parcel.writeInt(mId);
-        if (mIsValid) {
-            parcel.writeInt(1);
-            parcel.writeInt(mTransactions.length);
-            for (int i = 0; i < mTransactions.length; i++)
-                parcel.writeParcelable(mTransactions[i], flags);
-        } else {
-            parcel.writeInt(0);
-            parcel.writeString(mErrorMessage);
-        }
-    }
-
-    public int describeContents () {
-        return 0;
-    }
-
-    public static CEPASHistory fromXML (Element element) {
-        int id = Integer.parseInt(element.getAttribute("id"));
-        if (element.getAttribute("valid").equals("false"))
-            return new CEPASHistory(id, element.getAttribute("error"));
-
-        NodeList transactionElements = element.getElementsByTagName("transaction");
-
-        CEPASTransaction[] transactions = new CEPASTransaction[transactionElements.getLength()];
-        for (int i = 0; i < transactionElements.getLength(); i++)
-            transactions[i] = CEPASTransaction.fromXML((Element)transactionElements.item(i));
-
-        return new CEPASHistory(id, transactions);
-    }
-
-    public Element toXML(Document doc) throws Exception {
-        Element history = doc.createElement("history");
-        history.setAttribute("id", Integer.toString(mId));
-        if (!mIsValid) {
-            history.setAttribute("valid", "false");
-            history.setAttribute("error", getErrorMessage());
-        } else {
-            history.setAttribute("valid", "true");
-            for(CEPASTransaction transaction : mTransactions)
-                history.appendChild(transaction.toXML(doc));
-        }
-        return history;
     }
 }

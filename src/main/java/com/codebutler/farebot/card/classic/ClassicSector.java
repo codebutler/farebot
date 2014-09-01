@@ -23,66 +23,36 @@
 
 package com.codebutler.farebot.card.classic;
 
-import android.util.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import com.codebutler.farebot.util.Utils;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+
+import java.util.List;
+
+@Root(name="sector")
 public class ClassicSector {
-    private int mIndex;
-    private ClassicBlock[] mBlocks;
+    @Attribute(name="index") private int mIndex;
+    @ElementList(name="blocks") private List<ClassicBlock> mBlocks;
 
-    public static ClassicSector fromXml(Element sectorElement) {
-        int sectorIndex = Integer.parseInt(sectorElement.getAttribute("index"));
-        if (sectorElement.hasAttribute("unauthorized") && sectorElement.getAttribute("unauthorized").equals("true")) {
-            return new UnauthorizedClassicSector(sectorIndex);
-        } else if (sectorElement.hasAttribute("invalid") && sectorElement.getAttribute("invalid").equals("true")) {
-            return new InvalidClassicSector(sectorIndex, sectorElement.getAttribute("error"));
-        } else {
-            Element blocksElement = (Element) sectorElement.getElementsByTagName("blocks").item(0);
-            NodeList blockElements = blocksElement.getElementsByTagName("block");
-            ClassicBlock[] blocks = new ClassicBlock[blockElements.getLength()];
-            for (int j = 0; j < blockElements.getLength(); j++) {
-                Element blockElement = (Element) blockElements.item(j);
-                String type  = blockElement.getAttribute("type");
-                int blockIndex = Integer.parseInt(blockElement.getAttribute("index"));
-                Node dataElement = blockElement.getElementsByTagName("data").item(0);
-                byte[] data = Base64.decode(dataElement.getTextContent().trim(), Base64.DEFAULT);
-                blocks[j] = ClassicBlock.create(type, blockIndex, data);
-            }
-            return new ClassicSector(sectorIndex, blocks);
-        }
-    }
+    protected ClassicSector() { }
 
     public ClassicSector(int index, ClassicBlock[] blocks) {
         mIndex  = index;
-        mBlocks = blocks;
+        mBlocks = Utils.arrayAsList(blocks);
     }
 
     public int getIndex() {
         return mIndex;
     }
 
-    public ClassicBlock[] getBlocks() {
+    public List<ClassicBlock> getBlocks() {
         return mBlocks;
     }
 
     public ClassicBlock getBlock(int index) {
-        return mBlocks[index];
-    }
-
-    public Element toXML(Document doc) {
-        Element sectorElement = doc.createElement("sector");
-        sectorElement.setAttribute("index", String.valueOf(getIndex()));
-
-        Element blocksElement = doc.createElement("blocks");
-        for (ClassicBlock block : getBlocks()) {
-            blocksElement.appendChild(block.toXML(doc));
-        }
-        sectorElement.appendChild(blocksElement);
-
-        return sectorElement;
+        return mBlocks.get(index);
     }
 
     public byte[] readBlocks(int startBlock, int blockCount) {

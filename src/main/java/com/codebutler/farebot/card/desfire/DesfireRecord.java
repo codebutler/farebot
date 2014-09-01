@@ -22,14 +22,18 @@
 
 package com.codebutler.farebot.card.desfire;
 
-public class DesfireRecord {
-    private byte[] mData;
+import com.codebutler.farebot.xml.Base64String;
 
-    public DesfireRecord (byte[] data) {
-        mData = data;
+public class DesfireRecord {
+    private Base64String mData;
+
+    private DesfireRecord() { /* For XML Serializer */ }
+
+    public DesfireRecord(byte[] data) {
+        mData = new Base64String(data);
     }
 
-    public byte[] getData () {
-        return mData;
+    public byte[] getData() {
+        return mData.getData();
     }
 }

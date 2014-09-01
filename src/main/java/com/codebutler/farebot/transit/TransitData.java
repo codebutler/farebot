@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit;
 
 import android.os.Parcelable;
+
 import com.codebutler.farebot.ui.ListItem;
 
 import java.util.List;

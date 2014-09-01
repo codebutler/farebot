@@ -34,14 +34,16 @@ import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.codebutler.farebot.BuildConfig;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.card.UnsupportedTagException;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.UnsupportedTagException;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
+import com.codebutler.farebot.util.Utils;
 
 import java.util.Date;
 
@@ -80,14 +82,14 @@ public class ReadingTagActivity extends Activity {
                     try {
                         Card card = Card.dumpTag(tagId, tag);
 
-                        String cardXml = Utils.xmlNodeToString(card.toXML().getOwnerDocument());
+                        String cardXml = card.toXml(FareBotApplication.getInstance().getSerializer());
 
-                        /*
-                        Log.d("ReadingTagActivity", "Got Card XML");
-                        for (String line : cardXml.split("\n")) {
-                            Log.d("ReadingTagActivity", "Got Card XML: " + line);
+                        if (BuildConfig.DEBUG) {
+                            Log.d("ReadingTagActivity", "Got Card XML");
+                            for (String line : cardXml.split("\n")) {
+                                Log.d("ReadingTagActivity", "Got Card XML: " + line);
+                            }
                         }
-                        */
 
                         String tagIdString = Utils.getHexString(card.getTagId());
 

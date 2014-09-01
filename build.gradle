@@ -11,7 +11,7 @@ buildscript {
 
 apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
-2
+
 repositories {
     mavenCentral()
     maven { url 'http://download.crashlytics.com/maven' }
@@ -20,10 +20,15 @@ repositories {
 
 dependencies {
     compile 'com.android.support:support-v4:20.0.0'
-    compile 'com.google.android.gms:play-services:5.0.77'
+    compile 'com.google.android.gms:play-services:5.2.08'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile 'org.apache.commons:commons-io:1.3.2'
     compile 'org.apache.commons:commons-lang3:3.1'
+    compile('org.simpleframework:simple-xml:2.7.1') {
+        exclude module: 'stax'
+        exclude module: 'stax-api'
+        exclude module: 'xpp3'
+    }
     compile files('libs/nfc-felica.jar')
 }
 

@@ -22,58 +22,41 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.codebutler.farebot.util.Utils;
 
-public class DesfireApplication implements Parcelable {
-    private int           mId;
-    private DesfireFile[] mFiles;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
-    public DesfireApplication (int id, DesfireFile[] files) {
-        mId    = id;
-        mFiles = files;
+import java.util.List;
+
+@Root(name="application")
+public class DesfireApplication {
+    @Attribute(name="id") private String mId;
+    @ElementList(name="files") private List<DesfireFile> mFiles;
+
+    private DesfireApplication() { /* For XML Serializer */ }
+
+    public DesfireApplication(int id, DesfireFile[] files) {
+        mId = String.valueOf(id);
+        mFiles = Utils.arrayAsList(files);
     }
 
-    public int getId () {
-        return mId;
+    public int getId() {
+        return Integer.parseInt(mId);
     }
 
-    public DesfireFile[] getFiles () {
+    public List<DesfireFile> getFiles() {
         return mFiles;
     }
 
-    public DesfireFile getFile (int fileId) {
+    public DesfireFile getFile(int fileId) {
         for (DesfireFile file : mFiles) {
             if (file.getId() == fileId)
                 return file;
         }
         return null;
     }
-
-    public static final Parcelable.Creator<DesfireApplication> CREATOR = new Parcelable.Creator<DesfireApplication>() {
-        public DesfireApplication createFromParcel(Parcel source) {
-            int id = source.readInt();
-
-            DesfireFile[] files = new DesfireFile[source.readInt()];
-            source.readTypedArray(files, DesfireFile.CREATOR);
-
-            return new DesfireApplication(id, files);
-        }
-
-        public DesfireApplication[] newArray (int size) {
-            return new DesfireApplication[size];
-        }
-    };
-
-    public void writeToParcel (Parcel parcel, int flags) {
-        parcel.writeInt(mId);
-        parcel.writeInt(mFiles.length);
-        parcel.writeTypedArray(mFiles, flags);
-    }
-
-    public int describeContents () {
-        return 0;
-    }    
 }
 
 

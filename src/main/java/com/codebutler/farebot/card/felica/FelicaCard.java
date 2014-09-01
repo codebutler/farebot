@@ -23,53 +23,36 @@
 package com.codebutler.farebot.card.felica;
 
 import android.nfc.Tag;
-import android.os.Parcel;
-import android.util.Base64;
 import android.util.Log;
-import com.codebutler.farebot.Utils;
+
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.transit.SuicaTransitData;
-import com.codebutler.farebot.transit.EdyTransitData;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
+import com.codebutler.farebot.transit.edy.EdyTransitData;
+import com.codebutler.farebot.transit.suica.SuicaTransitData;
+import com.codebutler.farebot.util.Utils;
+
 import net.kazzz.felica.FeliCaTag;
 import net.kazzz.felica.command.ReadResponse;
 import net.kazzz.felica.lib.FeliCaLib;
+
 import org.apache.commons.lang3.ArrayUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Root(name="card")
 public class FelicaCard extends Card {
-    private FeliCaLib.IDm  mIDm;
-    private FeliCaLib.PMm  mPMm;
-    private FelicaSystem[] mSystems;
+    @Element(name="idm") private FeliCaLib.IDm mIDm;
+    @Element(name="pmm") private FeliCaLib.PMm mPMm;
+    @ElementList(name="systems") private List<FelicaSystem> mSystems;
 
-    public static Creator<FelicaCard> CREATOR = new Creator<FelicaCard>() {
-        public FelicaCard createFromParcel(Parcel source) {
-            int tagIdLength = source.readInt();
-            byte[] tagId = new byte[tagIdLength];
-            source.readByteArray(tagId);
-
-            Date scannedAt = new Date(source.readLong());
-
-            FeliCaLib.IDm idm = source.readParcelable(FeliCaLib.IDm.class.getClassLoader());
-            FeliCaLib.PMm pmm = source.readParcelable(FeliCaLib.PMm.class.getClassLoader());
-
-            FelicaSystem[] systems = new FelicaSystem[source.readInt()];
-            source.readTypedArray(systems, FelicaSystem.CREATOR);
-            
-            return new FelicaCard(tagId, scannedAt, idm, pmm, systems);
-        }
-
-        public FelicaCard[] newArray(int size) {
-            return new FelicaCard[size];
-        }
-    };
+    private FelicaCard() { /* For XML Serializer */ }
 
     // https://github.com/tmurakam/felicalib/blob/master/src/dump/dump.c
     // https://github.com/tmurakam/felica2money/blob/master/src/card/Suica.cs
@@ -141,7 +124,7 @@ public class FelicaCard extends Card {
         super(tagId, scannedAt);
         mIDm     = idm;
         mPMm     = pmm;
-        mSystems = systems;
+        mSystems = Utils.arrayAsList(systems);
     }
 
     public FeliCaLib.IDm getIDm() {
@@ -177,7 +160,7 @@ public class FelicaCard extends Card {
     }
     */
 
-    public FelicaSystem[] getSystems() {
+    public List<FelicaSystem> getSystems() {
         return mSystems;
     }
 
@@ -188,54 +171,6 @@ public class FelicaCard extends Card {
             }
         }
         return null;
-    }
-
-    public static FelicaCard fromXml(byte[] tagId, Date scannedAt, Element element) {
-        Element systemsElement = (Element) element.getElementsByTagName("systems").item(0);
-
-        NodeList systemElements = systemsElement.getElementsByTagName("system");
-
-        FeliCaLib.IDm idm = new FeliCaLib.IDm(Base64.decode(element.getElementsByTagName("idm").item(0).getTextContent(), Base64.DEFAULT));
-        FeliCaLib.PMm pmm = new FeliCaLib.PMm(Base64.decode(element.getElementsByTagName("pmm").item(0).getTextContent(), Base64.DEFAULT));
-
-        FelicaSystem[] systems = new FelicaSystem[systemElements.getLength()];
-
-        for (int x = 0; x < systemElements.getLength(); x++) {
-            Element systemElement = (Element) systemElements.item(x);
-
-            int systemCode = Integer.parseInt(systemElement.getAttribute("code"));
-
-            Element servicesElement = (Element) systemElement.getElementsByTagName("services").item(0);
-
-            NodeList serviceElements = servicesElement.getElementsByTagName("service");
-
-            FelicaService[] services = new FelicaService[serviceElements.getLength()];
-
-            for (int y = 0; y < serviceElements.getLength(); y++) {
-                Element serviceElement = (Element) serviceElements.item(y);
-                int serviceCode = Integer.parseInt(serviceElement.getAttribute("code"));
-
-                Element blocksElement = (Element) serviceElement.getElementsByTagName("blocks").item(0);
-
-                NodeList blockElements = blocksElement.getElementsByTagName("block");
-
-                FelicaBlock[] blocks = new FelicaBlock[blockElements.getLength()];
-
-                for (int z = 0; z < blockElements.getLength(); z++) {
-                    Element blockElement = (Element) blockElements.item(z);
-                    byte address = Byte.parseByte(blockElement.getAttribute("address"));
-                    byte[] data = Base64.decode(blockElement.getTextContent(), Base64.DEFAULT);
-
-                    blocks[z] = new FelicaBlock(address, data);
-                }
-
-                services[y] = new FelicaService(serviceCode, blocks);
-            }
-
-            systems[x] = new FelicaSystem(systemCode, services);
-        }
-
-        return new FelicaCard(tagId, scannedAt, idm, pmm, systems);
     }
 
     @Override public CardType getCardType() {
@@ -257,61 +192,5 @@ public class FelicaCard extends Card {
         else if (EdyTransitData.check(this))
             return new EdyTransitData(this);
         return null;
-    }
-
-    @Override public Element toXML() throws Exception {
-        Element root = super.toXML();
-
-        Document doc = root.getOwnerDocument();
-
-        Element idmElement = doc.createElement("idm");
-        idmElement.setTextContent(Base64.encodeToString(mIDm.getBytes(), Base64.DEFAULT));
-        root.appendChild(idmElement);
-
-        Element pmmElement = doc.createElement("pmm");
-        pmmElement.setTextContent(Base64.encodeToString(mPMm.getBytes(), Base64.DEFAULT));
-        root.appendChild(pmmElement);
-
-        Element systemsElement = doc.createElement("systems");
-
-        for (FelicaSystem system : mSystems) {
-            Element systemElement = doc.createElement("system");
-            systemElement.setAttribute("code", String.valueOf(system.getCode()));
-
-            Element servicesElement = doc.createElement("services");
-            for (FelicaService service : system.getServices()) {
-                Element serviceElement = doc.createElement("service");
-                serviceElement.setAttribute("code", String.valueOf(service.getServiceCode()));
-
-                Element blocksElement = doc.createElement("blocks");
-                for (FelicaBlock block : service.getBlocks()) {
-                    Element blockElement = doc.createElement("block");
-                    blockElement.setAttribute("address", String.valueOf(block.getAddress()));
-                    blockElement.setTextContent(Base64.encodeToString(block.getData(), Base64.DEFAULT));
-
-                    blocksElement.appendChild(blockElement);
-                }
-
-                serviceElement.appendChild(blocksElement);
-
-                servicesElement.appendChild(serviceElement);
-            }
-
-            systemElement.appendChild(servicesElement);
-
-            systemsElement.appendChild(systemElement);
-        }
-
-        root.appendChild(systemsElement);
-
-        return root;
-    }
-
-    @Override public void writeToParcel(Parcel parcel, int flags) {
-        super.writeToParcel(parcel, flags);
-        parcel.writeParcelable(mIDm, flags);
-        parcel.writeParcelable(mPMm, flags);
-        parcel.writeInt(mSystems.length);
-        parcel.writeTypedArray(mSystems, flags);
     }
 }

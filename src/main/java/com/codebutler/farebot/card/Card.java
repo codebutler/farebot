@@ -23,33 +23,33 @@
 package com.codebutler.farebot.card;
 
 import android.nfc.Tag;
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.util.Log;
 
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
-import org.apache.commons.lang3.ArrayUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
+import com.codebutler.farebot.util.Utils;
+import com.codebutler.farebot.xml.HexString;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.StringReader;
+import org.apache.commons.lang3.ArrayUtils;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Serializer;
+
+import java.io.StringWriter;
 import java.util.Date;
 
-public abstract class Card implements Parcelable {
-    private byte[] mTagId;
-    private Date   mScannedAt;
+public abstract class Card {
+    @Attribute(name="type") private String mType;
+    @Attribute(name="id") private HexString mTagId;
+    @Attribute(name="scanned_at") private Date mScannedAt;
+
+    protected Card() { }
 
     protected Card(byte[] tagId, Date scannedAt) {
-        mTagId     = tagId;
+        mTagId = new HexString(tagId);
         mScannedAt = scannedAt;
     }
 
@@ -67,101 +67,40 @@ public abstract class Card implements Parcelable {
             throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
     }
 
-    public static Card fromXml (String xml) throws Exception {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = builder.parse(new InputSource(new StringReader(xml)));
+    public static Card fromXml(Serializer serializer, String xml) {
+        try {
+            return serializer.read(Card.class, xml);
+        } catch (Exception ex) {
+            Log.e("Card", "Failed to deserialize", ex);
+            throw new RuntimeException(ex);
+        }
+    }
 
-        Element rootElement = doc.getDocumentElement();
-
-        CardType type      = CardType.class.getEnumConstants()[Integer.parseInt(rootElement.getAttribute("type"))];
-        byte[]   id        = Utils.hexStringToByteArray(rootElement.getAttribute("id"));
-        Date     scannedAt = rootElement.hasAttribute("scanned_at") ? new Date(Long.valueOf(rootElement.getAttribute("scanned_at"))) : new Date(0);
-        switch (type) {
-            case MifareDesfire:
-                return DesfireCard.fromXml(id, scannedAt, rootElement);
-            case CEPAS:
-                return CEPASCard.fromXML(id, scannedAt, rootElement);
-            case FeliCa:
-                return FelicaCard.fromXml(id, scannedAt, rootElement);
-            case MifareClassic:
-                return ClassicCard.fromXml(id, scannedAt, rootElement);
-            default:
-                throw new UnsupportedOperationException("Unsupported card type: " + type);
+    public String toXml(Serializer serializer) {
+        try {
+            StringWriter writer = new StringWriter();
+            serializer.write(this, writer);
+            return writer.toString();
+        } catch (Exception ex) {
+            Log.e("Card", "Failed to serialize", ex);
+            throw new RuntimeException(ex);
         }
     }
 
     public abstract CardType getCardType();
 
-    public byte[] getTagId () {
-        return mTagId;
+    public byte[] getTagId() {
+        return mTagId.getData();
     }
 
-    public Date getScannedAt () {
+    public String getType() {
+        return mType;
+    }
+
+    public Date getScannedAt() {
         return mScannedAt;
     }
 
     public abstract TransitIdentity parseTransitIdentity();
-    public abstract TransitData parseTransitData ();
-
-    public Element toXML () throws Exception {
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = builder.newDocument();
-
-            Element element = doc.createElement("card");
-            element.setAttribute("type", String.valueOf(getCardType().toInteger()));
-            element.setAttribute("id", Utils.getHexString(mTagId, null));
-            element.setAttribute("scanned_at", Long.toString(mScannedAt.getTime()));
-            doc.appendChild(element);
-
-            return doc.getDocumentElement();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void writeToParcel (Parcel parcel, int flags) {
-        parcel.writeInt(mTagId.length);
-        parcel.writeByteArray(mTagId);
-        parcel.writeLong(mScannedAt.getTime());
-    }
-    
-    public final int describeContents () {
-        return 0;
-    }
-
-    public enum CardType {
-        MifareClassic(0),
-        MifareUltralight(1),
-        MifareDesfire(2),
-        CEPAS(3),
-        FeliCa(4);
-
-        private int mValue;
-
-        CardType (int value) {
-            mValue = value;
-        }
-
-        public int toInteger () {
-            return mValue;
-        }
-
-        public String toString () {
-            switch (mValue) {
-                case 0:
-                    return "MIFARE Classic";
-                case 1:
-                    return "MIFARE Ultralight";
-                case 2:
-                    return "MIFARE DESFire";
-                case 3:
-                    return "CEPAS";
-                case 4:
-                    return "FeliCa";
-                default:
-                    return "Unknown";
-            }
-        }
-    }
+    public abstract TransitData parseTransitData();
 }

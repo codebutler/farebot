@@ -23,7 +23,8 @@
 package com.codebutler.farebot.key;
 
 
-import com.codebutler.farebot.Utils;
+import com.codebutler.farebot.util.Utils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -23,19 +23,22 @@
 
 package com.codebutler.farebot.card.classic;
 
-import android.util.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import com.codebutler.farebot.xml.Base64String;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
+
+@Root(name="block")
 public class ClassicBlock {
     public static final String TYPE_DATA         = "data";
     public static final String TYPE_VALUE        = "value";
     public static final String TYPE_TRAILER      = "trailer";
     public static final String TYPE_MANUFACTURER = "manufacturer";
 
-    private final int    mIndex;
-    private final String mType;
-    private final byte[] mData;
+    @Attribute(name="index") private int mIndex;
+    @Attribute(name="type") private String mType;
+    @Element(name="data") private Base64String mData;
 
     public static ClassicBlock create(String type, int index, byte[] data) {
         if (type.equals(TYPE_DATA) || type.equals(TYPE_VALUE)) {
@@ -44,10 +47,12 @@ public class ClassicBlock {
         return null;
     }
 
+    public ClassicBlock() { }
+
     public ClassicBlock(int index, String type, byte[] data) {
         mIndex = index;
-        mType  = type;
-        mData  = data;
+        mType = type;
+        mData = new Base64String(data);
     }
 
     public int getIndex() {
@@ -59,18 +64,6 @@ public class ClassicBlock {
     }
 
     public byte[] getData() {
-        return mData;
-    }
-
-    public Element toXML(Document doc) {
-        Element blockElement = doc.createElement("block");
-        blockElement.setAttribute("index", String.valueOf(getIndex()));
-        blockElement.setAttribute("type", getType());
-
-        Element dataElement = doc.createElement("data");
-        dataElement.setTextContent(Base64.encodeToString(getData(), Base64.DEFAULT));
-        blockElement.appendChild(dataElement);
-
-        return blockElement;
+        return mData.getData();
     }
 }

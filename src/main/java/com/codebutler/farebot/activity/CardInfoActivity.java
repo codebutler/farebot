@@ -39,20 +39,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.ui.TabPagerAdapter;
-import com.codebutler.farebot.card.UnsupportedCardException;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.UnsupportedCardException;
 import com.codebutler.farebot.fragment.CardBalanceFragment;
 import com.codebutler.farebot.fragment.CardInfoFragment;
 import com.codebutler.farebot.fragment.CardRefillsFragment;
 import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragment.CardTripsFragment;
 import com.codebutler.farebot.provider.CardsTableColumns;
-import com.codebutler.farebot.transit.EdyTransitData;
-import com.codebutler.farebot.transit.SuicaTransitData;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.edy.EdyTransitData;
+import com.codebutler.farebot.transit.suica.SuicaTransitData;
+import com.codebutler.farebot.ui.TabPagerAdapter;
+import com.codebutler.farebot.util.Utils;
 
 public class CardInfoActivity extends Activity {
     public static final String EXTRA_TRANSIT_DATA = "transit_data";
@@ -97,7 +98,7 @@ public class CardInfoActivity extends Activity {
 
                     String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
 
-                    mCard        = Card.fromXml(data);
+                    mCard = Card.fromXml(FareBotApplication.getInstance().getSerializer(), data);
                     mTransitData = mCard.parseTransitData();
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CardInfoActivity.this);
@@ -133,7 +134,7 @@ public class CardInfoActivity extends Activity {
                 actionBar.setTitle(mTransitData.getCardName() + " " + titleSerial);
 
                 Bundle args = new Bundle();
-                args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
+                args.putString(AdvancedCardInfoActivity.EXTRA_CARD, mCard.toXml(FareBotApplication.getInstance().getSerializer()));
                 args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
                 
                 mTabsAdapter.addTab(actionBar.newTab().setText(R.string.balance), CardBalanceFragment.class, args);
@@ -195,7 +196,7 @@ public class CardInfoActivity extends Activity {
 
     private void showAdvancedInfo (Exception ex) {
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
-        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
+        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard.toXml(FareBotApplication.getInstance().getSerializer()));
         if (ex != null) {
             intent.putExtra(AdvancedCardInfoActivity.EXTRA_ERROR, ex);
         }

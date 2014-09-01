@@ -47,16 +47,19 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codebutler.farebot.ExportHelper;
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitIdentity;
+import com.codebutler.farebot.util.ExportHelper;
+import com.codebutler.farebot.util.Utils;
 
 import org.apache.commons.io.FileUtils;
+import org.simpleframework.xml.Serializer;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -110,8 +113,9 @@ public class CardsFragment extends ListFragment {
 
     @Override public void onListItemClick(ListView l, View v, int position, long id) {
         Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        //FIXME: Bind to current package !!
+        startActivity(intent);
     }
 
     @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -207,9 +211,9 @@ public class CardsFragment extends ListFragment {
            super(getActivity(), android.R.layout.simple_list_item_2, null, false);
        }
 
-       @Override    public void bindView(View view, Context context, Cursor cursor) {
-           int    type      = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-           String serial    = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
+       @Override public void bindView(View view, Context context, Cursor cursor) {
+           int type = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
+           String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
            Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
 
            String cacheKey = serial + scannedAt.getTime();
@@ -217,7 +221,8 @@ public class CardsFragment extends ListFragment {
            if (!mDataCache.containsKey(cacheKey)) {
                String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
                try {
-                   mDataCache.put(cacheKey, Card.fromXml(data).parseTransitIdentity());
+                   Serializer serializer = FareBotApplication.getInstance().getSerializer();
+                   mDataCache.put(cacheKey, Card.fromXml(serializer, data).parseTransitIdentity());
                } catch (Exception ex) {
                    String error = String.format("Error: %s", Utils.getErrorMessage(ex));
                    mDataCache.put(cacheKey, new TransitIdentity(error, null));
@@ -239,11 +244,11 @@ public class CardsFragment extends ListFragment {
                textView2.setText(getString(R.string.scanned_at_format, SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(scannedAt), SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(scannedAt)));
            } else {
                textView1.setText(getString(R.string.unknown_card));
-               textView2.setText(String.format("%s - %s", Card.CardType.values()[type].toString(), serial));
+               textView2.setText(String.format("%s - %s", CardType.values()[type].toString(), serial));
            }
        }
 
-       @Override    protected void onContentChanged() {
+       @Override protected void onContentChanged() {
            super.onContentChanged();
            mDataCache.clear();
        }

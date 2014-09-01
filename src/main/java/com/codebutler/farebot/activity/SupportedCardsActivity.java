@@ -22,19 +22,20 @@
 
 package com.codebutler.farebot.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.app.Activity;
-import android.view.MenuItem;
+
 import com.codebutler.farebot.R;
 
 import java.util.ArrayList;

@@ -24,28 +24,31 @@ package com.codebutler.farebot.card.cepas;
 
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
-import android.os.Parcel;
-import android.os.Parcelable;
+
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.transit.EZLinkTransitData;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import com.codebutler.farebot.transit.ezlink.EZLinkTransitData;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 import java.util.Date;
+import java.util.List;
 
+@Root(name="card")
 public class CEPASCard extends Card {
-    private CEPASPurse[]   mPurses;
-    private CEPASHistory[] mHistories;
+    @ElementList(name="purses") private List<CEPASPurse> mPurses;
+    @ElementList(name="histories") private List<CEPASHistory> mHistories;
 
-    public static CEPASCard dumpTag (Tag tag) throws Exception {
+    public static CEPASCard dumpTag(Tag tag) throws Exception {
         IsoDep tech = IsoDep.get(tag);
 
         tech.connect();
 
-        CEPASPurse[]   cepasPurses    = new CEPASPurse[16];
+        CEPASPurse[] cepasPurses = new CEPASPurse[16];
         CEPASHistory[] cepasHistories = new CEPASHistory[16];
 
         try {
@@ -57,7 +60,8 @@ public class CEPASCard extends Card {
 
             for (int historyId = 0; historyId < cepasHistories.length; historyId++) {
                 if (cepasPurses[historyId].isValid()) {
-                    cepasHistories[historyId] = cepasTag.getHistory(historyId, Integer.parseInt(Byte.toString(cepasPurses[historyId].getLogfileRecordCount())));
+                    int recordCount = Integer.parseInt(Byte.toString(cepasPurses[historyId].getLogfileRecordCount()));
+                    cepasHistories[historyId] = cepasTag.getHistory(historyId, recordCount);
                 } else {
                     cepasHistories[historyId] = new CEPASHistory(historyId, (byte[]) null);
                 }
@@ -70,13 +74,15 @@ public class CEPASCard extends Card {
         return new CEPASCard(tag.getId(), new Date(), cepasPurses, cepasHistories);
     }
 
-    private CEPASCard (byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
+    private CEPASCard(byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
         super(tagId, scannedAt);
-        mPurses = purses;
-        mHistories = histories;
+        mPurses = Utils.arrayAsList(purses);
+        mHistories = Utils.arrayAsList(histories);
     }
 
-    @Override public CardType getCardType () {
+    private CEPASCard() { /* For XML Serializer */ }
+
+    @Override public CardType getCardType() {
         return CardType.CEPAS;
     }
 
@@ -92,81 +98,11 @@ public class CEPASCard extends Card {
         return null;
     }
 
-    public CEPASPurse getPurse (int purse) {
-        return mPurses[purse];
+    public CEPASPurse getPurse(int purse) {
+        return mPurses.get(purse);
     }
 
-    public CEPASHistory getHistory (int purse) {
-        return mHistories[purse];
-    }
-
-    public static final Parcelable.Creator<CEPASCard> CREATOR = new Parcelable.Creator<CEPASCard>() {
-        public CEPASCard createFromParcel(Parcel source) {
-            int tagIdLength = source.readInt();
-            byte[] tagId = new byte[tagIdLength];
-            source.readByteArray(tagId);
-
-            Date scannedAt = new Date(source.readLong());
-
-            CEPASPurse[] purses = new CEPASPurse[source.readInt()];
-            for(int i=0; i<purses.length; i++)
-                purses[i] = source.readParcelable(CEPASPurse.class.getClassLoader());
-
-            CEPASHistory[] histories = new CEPASHistory[source.readInt()];
-            for(int i=0; i<histories.length; i++)
-                histories[i] = source.readParcelable(CEPASHistory.class.getClassLoader());
-
-
-            return new CEPASCard(tagId, scannedAt, purses, histories);
-        }
-
-        public CEPASCard[] newArray (int size) {
-            return new CEPASCard[size];
-        }
-    };
-
-    public void writeToParcel (Parcel parcel, int flags) {
-        super.writeToParcel(parcel, flags);
-
-        parcel.writeInt(mPurses.length);
-        for (int i = 0; i < mPurses.length; i++)
-            parcel.writeParcelable(mPurses[i], flags);
-
-        parcel.writeInt(mHistories.length);
-        for (int i = 0; i < mHistories.length; i++)
-            parcel.writeParcelable(mHistories[i], flags);
-    }
-
-    public static CEPASCard fromXML (byte[] cardId, Date scannedAt, Element rootElement) {
-        NodeList purseElements = ((Element) rootElement.getElementsByTagName("purses").item(0)).getElementsByTagName("purse");
-        CEPASPurse[] purses = new CEPASPurse[purseElements.getLength()];
-        for(int i = 0; i < purseElements.getLength(); i++)
-            purses[i] = CEPASPurse.fromXML((Element)purseElements.item(i));
-
-        NodeList historyElements = ((Element) rootElement.getElementsByTagName("histories").item(0)).getElementsByTagName("history");
-        CEPASHistory[] histories = new CEPASHistory[historyElements.getLength()];
-        for(int i = 0; i < historyElements.getLength(); i++)
-            histories[i] = CEPASHistory.fromXML((Element)historyElements.item(i));
-
-        return new CEPASCard(cardId, scannedAt, purses, histories);
-    }
-
-    public Element toXML() throws Exception {
-        Element root = super.toXML();
-
-        Document doc = root.getOwnerDocument();
-
-        Element pursesElement    = doc.createElement("purses");
-        Element historiesElement = doc.createElement("histories");
-
-        for (CEPASPurse purse : mPurses)
-            pursesElement.appendChild(purse.toXML(doc));
-        root.appendChild(pursesElement);
-
-        for (CEPASHistory history : mHistories)
-            historiesElement.appendChild(history.toXML(doc));
-        root.appendChild(historiesElement);
-
-        return root;
+    public CEPASHistory getHistory(int purse) {
+        return mHistories.get(purse);
     }
 }

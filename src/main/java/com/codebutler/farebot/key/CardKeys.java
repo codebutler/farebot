@@ -24,10 +24,12 @@ package com.codebutler.farebot.key;
 
 import android.database.Cursor;
 import android.net.Uri;
+
 import com.codebutler.farebot.FareBotApplication;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.provider.CardKeyProvider;
 import com.codebutler.farebot.provider.KeysTableColumns;
+import com.codebutler.farebot.util.Utils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -22,14 +22,15 @@
 
 package com.codebutler.farebot.activity;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.app.Activity;
-import android.view.MenuItem;
+
 import com.codebutler.farebot.R;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;

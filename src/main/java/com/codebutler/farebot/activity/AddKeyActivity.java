@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ContentValues;
@@ -36,14 +37,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.app.Activity;
-import com.codebutler.farebot.BetterAsyncTask;
+
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.key.ClassicCardKeys;
 import com.codebutler.farebot.key.ClassicSectorKey;
 import com.codebutler.farebot.provider.CardKeyProvider;
 import com.codebutler.farebot.provider.KeysTableColumns;
+import com.codebutler.farebot.util.BetterAsyncTask;
+import com.codebutler.farebot.util.Utils;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 

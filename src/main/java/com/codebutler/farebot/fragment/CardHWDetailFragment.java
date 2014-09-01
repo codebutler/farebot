@@ -22,19 +22,23 @@
 
 package com.codebutler.farebot.fragment;
 
-import android.os.Bundle;
 import android.app.ListFragment;
-import com.codebutler.farebot.ui.HeaderListItem;
-import com.codebutler.farebot.ui.ListItem;
-import com.codebutler.farebot.Utils;
+import android.os.Bundle;
+
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.Card.CardType;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.cepas.CEPASPurse;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireManufacturingData;
 import com.codebutler.farebot.card.felica.FelicaCard;
+import com.codebutler.farebot.ui.HeaderListItem;
+import com.codebutler.farebot.ui.ListItem;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.Serializer;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -48,7 +52,8 @@ public class CardHWDetailFragment extends ListFragment {
     @Override public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard = Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         
         List<ListItem> items = new ArrayList<>();
 

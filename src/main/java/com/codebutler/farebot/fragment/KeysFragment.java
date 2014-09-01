@@ -42,10 +42,10 @@ import android.widget.CursorAdapter;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
-import com.codebutler.farebot.BetterAsyncTask;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.provider.CardKeyProvider;
 import com.codebutler.farebot.provider.KeysTableColumns;
+import com.codebutler.farebot.util.BetterAsyncTask;
 
 public class KeysFragment extends ListFragment implements AdapterView.OnItemLongClickListener {
     private ActionMode mActionMode;

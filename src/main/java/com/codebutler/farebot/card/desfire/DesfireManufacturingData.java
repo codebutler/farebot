@@ -22,34 +22,37 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import com.codebutler.farebot.Utils;
-import org.w3c.dom.Element;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
 import java.io.ByteArrayInputStream;
 
-public class DesfireManufacturingData implements Parcelable {
-    public final int hwVendorID;
-    public final int hwType;
-    public final int hwSubType;
-    public final int hwMajorVersion;
-    public final int hwMinorVersion;
-    public final int hwStorageSize;
-    public final int hwProtocol;
+@Root(name="manufacturing-data")
+public class DesfireManufacturingData {
+    @Element(name="hw-vendor-id") public int hwVendorID;
+    @Element(name="hw-type") public int hwType;
+    @Element(name="hw-sub-type") public int hwSubType;
+    @Element(name="hw-major-version") public int hwMajorVersion;
+    @Element(name="hw-minor-version") public int hwMinorVersion;
+    @Element(name="hw-storage-size") public int hwStorageSize;
+    @Element(name="hw-protocol") public int hwProtocol;
 
-    public final int swVendorID;
-    public final int swType;
-    public final int swSubType;
-    public final int swMajorVersion;
-    public final int swMinorVersion;
-    public final int swStorageSize;
-    public final int swProtocol;
+    @Element(name="sw-vendor-id") public int swVendorID;
+    @Element(name="sw-type") public int swType;
+    @Element(name="sw-sub-type") public int swSubType;
+    @Element(name="sw-major-version") public int swMajorVersion;
+    @Element(name="sw-minor-version") public int swMinorVersion;
+    @Element(name="sw-storage-size") public int swStorageSize;
+    @Element(name="sw-protocol") public int swProtocol;
 
-    public final int uid;
-    public final int batchNo;
-    public final int weekProd;
-    public final int yearProd;
+    @Element(name="uid") public int uid;
+    @Element(name="batch-no") public int batchNo;
+    @Element(name="week-prod") public int weekProd;
+    @Element(name="year-prod") public int yearProd;
+
+    private DesfireManufacturingData() { /* For XML Serializer */ }
 
     public DesfireManufacturingData (byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
@@ -83,91 +86,4 @@ public class DesfireManufacturingData implements Parcelable {
         weekProd = stream.read();
         yearProd = stream.read();
     }
-
-    public static DesfireManufacturingData fromXml (Element element) {
-        return new DesfireManufacturingData(element);
-    }
-
-    private DesfireManufacturingData (Element element) {
-        hwVendorID     = Integer.parseInt(element.getElementsByTagName("hw-vendor-id").item(0).getTextContent());
-        hwType         = Integer.parseInt(element.getElementsByTagName("hw-type").item(0).getTextContent());
-        hwSubType      = Integer.parseInt(element.getElementsByTagName("hw-sub-type").item(0).getTextContent());
-        hwMajorVersion = Integer.parseInt(element.getElementsByTagName("hw-major-version").item(0).getTextContent());
-        hwMinorVersion = Integer.parseInt(element.getElementsByTagName("hw-minor-version").item(0).getTextContent());
-        hwStorageSize  = Integer.parseInt(element.getElementsByTagName("hw-storage-size").item(0).getTextContent());
-        hwProtocol     = Integer.parseInt(element.getElementsByTagName("hw-protocol").item(0).getTextContent());
-
-        swVendorID     = Integer.parseInt(element.getElementsByTagName("sw-vendor-id").item(0).getTextContent());
-        swType         = Integer.parseInt(element.getElementsByTagName("sw-type").item(0).getTextContent());
-        swSubType      = Integer.parseInt(element.getElementsByTagName("sw-sub-type").item(0).getTextContent());
-        swMajorVersion = Integer.parseInt(element.getElementsByTagName("sw-major-version").item(0).getTextContent());
-        swMinorVersion = Integer.parseInt(element.getElementsByTagName("sw-minor-version").item(0).getTextContent());
-        swStorageSize  = Integer.parseInt(element.getElementsByTagName("sw-storage-size").item(0).getTextContent());
-        swProtocol     = Integer.parseInt(element.getElementsByTagName("sw-protocol").item(0).getTextContent());
-
-        uid      = Integer.parseInt(element.getElementsByTagName("uid").item(0).getTextContent());
-        batchNo  = Integer.parseInt(element.getElementsByTagName("batch-no").item(0).getTextContent());
-        weekProd = Integer.parseInt(element.getElementsByTagName("week-prod").item(0).getTextContent());
-        yearProd = Integer.parseInt(element.getElementsByTagName("year-prod").item(0).getTextContent());
-    }
-
-    private DesfireManufacturingData (Parcel parcel) {
-        hwVendorID     = parcel.readInt();
-        hwType         = parcel.readInt();
-        hwSubType      = parcel.readInt();
-        hwMajorVersion = parcel.readInt();
-        hwMinorVersion = parcel.readInt();
-        hwStorageSize  = parcel.readInt();
-        hwProtocol     = parcel.readInt();
-
-        swVendorID     = parcel.readInt();
-        swType         = parcel.readInt();
-        swSubType      = parcel.readInt();
-        swMajorVersion = parcel.readInt();
-        swMinorVersion = parcel.readInt();
-        swStorageSize  = parcel.readInt();
-        swProtocol     = parcel.readInt();
-
-        uid      = parcel.readInt();
-        batchNo  = parcel.readInt();
-        weekProd = parcel.readInt();
-        yearProd = parcel.readInt();
-    }
-
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(hwVendorID);
-        parcel.writeInt(hwType);
-        parcel.writeInt(hwSubType);
-        parcel.writeInt(hwMajorVersion);
-        parcel.writeInt(hwMinorVersion);
-        parcel.writeInt(hwStorageSize);
-        parcel.writeInt(hwProtocol);
-
-        parcel.writeInt(swVendorID);
-        parcel.writeInt(swType);
-        parcel.writeInt(swSubType);
-        parcel.writeInt(swMajorVersion);
-        parcel.writeInt(swMinorVersion);
-        parcel.writeInt(swStorageSize);
-        parcel.writeInt(swProtocol);
-
-        parcel.writeInt(uid);
-        parcel.writeInt(batchNo);
-        parcel.writeInt(weekProd);
-        parcel.writeInt(yearProd);
-    }
-
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Parcelable.Creator<DesfireManufacturingData> CREATOR = new Parcelable.Creator<DesfireManufacturingData>() {
-        public DesfireManufacturingData createFromParcel(Parcel source) {
-            return new DesfireManufacturingData(source);
-        }
-
-        public DesfireManufacturingData[] newArray(int size) {
-            return new DesfireManufacturingData[size];
-        }
-    };
 }

@@ -31,22 +31,28 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
-import com.codebutler.farebot.ExpandableListFragment;
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicSector;
 import com.codebutler.farebot.card.classic.InvalidClassicSector;
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.Serializer;
+
+import java.util.List;
 
 public class ClassicCardRawDataFragment extends ExpandableListFragment {
     private ClassicCard mCard;
 
     public void onCreate (Bundle bundle) {
         super.onCreate(bundle);
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard = (ClassicCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         setListAdapter(new ClassicRawDataAdapter(getActivity(), mCard));
     }
 
@@ -77,14 +83,14 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
         }
 
         @Override public int getGroupCount() {
-            return mCard.getSectors().length;
+            return mCard.getSectors().size();
         }
 
         @Override public int getChildrenCount(int groupPosition) {
             ClassicSector sector = mCard.getSector(groupPosition);
             if (!(sector instanceof UnauthorizedClassicSector)) {
-                ClassicBlock[] blocks = sector.getBlocks();
-                return (blocks == null) ? 0 : blocks.length;
+                List<ClassicBlock> blocks = sector.getBlocks();
+                return (blocks == null) ? 0 : blocks.size();
             } else {
                 return 0;
             }
@@ -95,7 +101,7 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
         }
 
         @Override public Object getChild(int groupPosition, int childPosition) {
-            return mCard.getSector(groupPosition).getBlocks()[childPosition];
+            return mCard.getSector(groupPosition).getBlocks().get(childPosition);
         }
 
         @Override public long getGroupId(int groupPosition) {

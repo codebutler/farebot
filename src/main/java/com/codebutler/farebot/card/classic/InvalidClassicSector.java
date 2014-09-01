@@ -22,23 +22,17 @@
 
 package com.codebutler.farebot.card.classic;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
 
+@Root(name="sector")
 public class InvalidClassicSector extends ClassicSector {
-    private String mError;
+    @Attribute(name="error") private String mError;
+    @Attribute(name="invalid") public static final boolean mInvalid = true;
 
     public InvalidClassicSector(int index, String error) {
         super(index, null);
         mError = error;
-    }
-
-    public Element toXML(Document doc) {
-        Element sectorElement = doc.createElement("sector");
-        sectorElement.setAttribute("index", String.valueOf(getIndex()));
-        sectorElement.setAttribute("invalid", "true");
-        sectorElement.setAttribute("error", mError);
-        return sectorElement;
     }
 
     public String getError() {
@@ -49,7 +43,7 @@ public class InvalidClassicSector extends ClassicSector {
         throw new IllegalStateException(mError);
     }
 
-    @Override public ClassicBlock[] getBlocks() {
+    @Override public java.util.List<ClassicBlock> getBlocks() {
         throw new IllegalStateException(mError);
     }
 

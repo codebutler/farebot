@@ -23,7 +23,8 @@
 package com.codebutler.farebot.card.desfire;
 
 import android.nfc.tech.IsoDep;
-import com.codebutler.farebot.Utils;
+
+import com.codebutler.farebot.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 
@@ -93,7 +94,7 @@ public class DesfireProtocol {
 
     public DesfireFileSettings getFileSettings (int fileNo) throws Exception {
         byte[] data = sendRequest(GET_FILE_SETTINGS, new byte[] { (byte) fileNo });
-        return DesfireFileSettings.Create(data);
+        return DesfireFileSettings.create(data);
     }
 
     public byte[] readFile (int fileNo) throws Exception {

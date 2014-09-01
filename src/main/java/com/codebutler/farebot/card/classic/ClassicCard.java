@@ -25,38 +25,42 @@ package com.codebutler.farebot.card.classic;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
-import android.os.Parcel;
+
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardHasManufacturingInfo;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
-import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.fragment.ClassicCardRawDataFragment;
 import com.codebutler.farebot.key.CardKeys;
 import com.codebutler.farebot.key.ClassicCardKeys;
 import com.codebutler.farebot.key.ClassicSectorKey;
-import com.codebutler.farebot.transit.BilheteUnicoSPTransitData;
-import com.codebutler.farebot.transit.OVChipTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitData;
+import com.codebutler.farebot.transit.ovc.OVChipTransitData;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Root(name="card")
 @CardRawDataFragmentClass(ClassicCardRawDataFragment.class)
 @CardHasManufacturingInfo(false)
 public class ClassicCard extends Card {
     public static final byte[] PREAMBLE_KEY = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
 
-    private ClassicSector[] mSectors;
+    @ElementList(name="sectors") private List<ClassicSector> mSectors;
+
+    private ClassicCard() { /* For XML Serializer */ }
 
     protected ClassicCard(byte[] tagId, Date scannedAt, ClassicSector[] sectors) {
         super(tagId, scannedAt);
-        mSectors = sectors;
+        mSectors = Utils.arrayAsList(sectors);
     }
 
     public static ClassicCard dumpTag(byte[] tagId, Tag tag) throws Exception {
@@ -118,57 +122,21 @@ public class ClassicCard extends Card {
         }
     }
 
-    public static Card fromXml(byte[] tagId, Date scannedAt, Element rootElement) {
-        Element sectorsElement = (Element) rootElement.getElementsByTagName("sectors").item(0);
-        NodeList sectorElements = sectorsElement.getElementsByTagName("sector");
-
-        ClassicSector[] sectors = new ClassicSector[sectorElements.getLength()];
-        for (int i = 0; i < sectorElements.getLength(); i++) {
-            Element sectorElement = (Element) sectorElements.item(i);
-            sectors[i] = ClassicSector.fromXml(sectorElement);
-        }
-
-        return new ClassicCard(tagId, new Date(), sectors);
-    }
-
-    public static final Creator<ClassicCard> CREATOR = new Creator<ClassicCard>() {
-        @Override public ClassicCard createFromParcel(Parcel source) {
-            try {
-                return (ClassicCard) ClassicCard.fromXml(source.readString());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override public ClassicCard[] newArray(int size) {
-            return new ClassicCard[size];
-        }
-    };
-
-    public Element toXML() throws Exception {
-        Element root = super.toXML();
-        Document doc = root.getOwnerDocument();
-
-        Element sectorsElement = doc.createElement("sectors");
-        for (ClassicSector sector : mSectors) {
-            sectorsElement.appendChild(sector.toXML(doc));
-        }
-        root.appendChild(sectorsElement);
-
-        return root;
-    }
-
     @Override public TransitIdentity parseTransitIdentity() {
-        if (OVChipTransitData.check(this))
+        if (OVChipTransitData.check(this)) {
             return OVChipTransitData.parseTransitIdentity(this);
+        } else if (BilheteUnicoSPTransitData.check(this)) {
+            return BilheteUnicoSPTransitData.parseTransitIdentity(this);
+        }
         return null;
     }
 
     @Override public TransitData parseTransitData() {
-        if (OVChipTransitData.check(this))
+        if (OVChipTransitData.check(this)) {
             return new OVChipTransitData(this);
-        else if (BilheteUnicoSPTransitData.check(this))
+        } else if (BilheteUnicoSPTransitData.check(this)) {
             return new BilheteUnicoSPTransitData(this);
+        }
         return null;
     }
 
@@ -176,19 +144,11 @@ public class ClassicCard extends Card {
         return CardType.MifareClassic;
     }
 
-    public ClassicSector[] getSectors() {
+    public List<ClassicSector> getSectors() {
         return mSectors;
     }
 
     public ClassicSector getSector(int index) {
-        return mSectors[index];
-    }
-
-    public void writeToParcel(Parcel parcel, int flags) {
-        try {
-            parcel.writeString(Utils.xmlNodeToString(toXML().getOwnerDocument()));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return mSectors.get(index);
     }
 }

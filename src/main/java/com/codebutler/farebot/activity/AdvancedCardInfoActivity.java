@@ -36,16 +36,19 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codebutler.farebot.FareBotApplication;
+import com.codebutler.farebot.R;
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardHasManufacturingInfo;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
-import com.codebutler.farebot.R;
-import com.codebutler.farebot.ui.TabPagerAdapter;
 import com.codebutler.farebot.card.UnauthorizedException;
 import com.codebutler.farebot.card.UnsupportedCardException;
-import com.codebutler.farebot.Utils;
-import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.fragment.CardHWDetailFragment;
+import com.codebutler.farebot.ui.TabPagerAdapter;
+import com.codebutler.farebot.util.Utils;
 import com.crashlytics.android.Crashlytics;
+
+import org.simpleframework.xml.Serializer;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -67,14 +70,12 @@ public class AdvancedCardInfoActivity extends Activity {
                 reportError();
             }
         });
-        
-        mCard = getIntent().getParcelableExtra(AdvancedCardInfoActivity.EXTRA_CARD);
+
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard = Card.fromXml(serializer, getIntent().getStringExtra(AdvancedCardInfoActivity.EXTRA_CARD));
         
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
-        
-        Bundle args = new Bundle();
-        args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -108,14 +109,14 @@ public class AdvancedCardInfoActivity extends Activity {
 
         CardHasManufacturingInfo infoAnnotation = mCard.getClass().getAnnotation(CardHasManufacturingInfo.class);
         if (infoAnnotation == null || infoAnnotation.value()) {
-            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.hw_detail), CardHWDetailFragment.class, args);
+            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.hw_detail), CardHWDetailFragment.class, getIntent().getExtras());
         }
 
         CardRawDataFragmentClass annotation = mCard.getClass().getAnnotation(CardRawDataFragmentClass.class);
         if (annotation != null) {
             Class rawDataFragmentClass = annotation.value();
             if (rawDataFragmentClass != null) {
-                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass, args);
+                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass, getIntent().getExtras());
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             }
         }
@@ -128,8 +129,8 @@ public class AdvancedCardInfoActivity extends Activity {
 
     @Override public boolean onOptionsItemSelected (MenuItem item) {
         try {
-            String xml = Utils.xmlNodeToString(mCard.toXML().getOwnerDocument());
             if (item.getItemId() == R.id.copy_xml) {
+                String xml = mCard.toXml(FareBotApplication.getInstance().getSerializer());
                 @SuppressWarnings("deprecation")
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(xml);
@@ -137,6 +138,7 @@ public class AdvancedCardInfoActivity extends Activity {
                 return true;
 
             } else if (item.getItemId() == R.id.share_xml) {
+                String xml = mCard.toXml(FareBotApplication.getInstance().getSerializer());
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, xml);
@@ -159,7 +161,7 @@ public class AdvancedCardInfoActivity extends Activity {
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
             @Override public void onClick(DialogInterface dialog, int which) {
                 try {
-                    Crashlytics.log(Utils.xmlNodeToString(mCard.toXML().getOwnerDocument()));
+                    Crashlytics.log(mCard.toXml(FareBotApplication.getInstance().getSerializer()));
                 } catch (Exception ex) {
                     Crashlytics.logException(ex);
                 }

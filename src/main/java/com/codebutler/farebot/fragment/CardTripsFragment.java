@@ -23,6 +23,7 @@
 package com.codebutler.farebot.fragment;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,17 +35,20 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.app.ListFragment;
+
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.activity.TripMapActivity;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.transit.OVChipTrip;
-import com.codebutler.farebot.transit.OrcaTransitData;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.orca.OrcaTrip;
+import com.codebutler.farebot.transit.ovc.OVChipTrip;
+
 import org.apache.commons.lang3.StringUtils;
+import org.simpleframework.xml.Serializer;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -57,7 +61,8 @@ public class CardTripsFragment extends ListFragment {
 
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCard        = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard = Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 
@@ -162,7 +167,7 @@ public class CardTripsFragment extends ListFragment {
 
             if (trip.getFare() != 0) {
                 fareTextView.setText(trip.getFareString());
-            } else if (trip instanceof OrcaTransitData.OrcaTrip) {
+            } else if (trip instanceof OrcaTrip) {
                 fareTextView.setText(R.string.pass_or_transfer);
             } else if (trip instanceof OVChipTrip) {
                 fareTextView.setText(trip.getFareString());

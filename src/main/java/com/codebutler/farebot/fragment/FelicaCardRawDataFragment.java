@@ -37,15 +37,18 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codebutler.farebot.card.CardRawDataFragmentClass;
-import com.codebutler.farebot.ExpandableListFragment;
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.Utils;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
+import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.card.felica.FelicaSystem;
+import com.codebutler.farebot.util.Utils;
+
+import org.simpleframework.xml.Serializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +62,8 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
 
     public void onCreate (Bundle bundle) {
         super.onCreate(bundle);
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        Serializer serializer = FareBotApplication.getInstance().getSerializer();
+        mCard = (FelicaCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         setListAdapter(new FelicaRawDataAdapter(getActivity(), mCard));
     }
 
@@ -102,27 +106,27 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
         }
 
         public int getGroupCount() {
-            return mCard.getSystems().length;
+            return mCard.getSystems().size();
         }
 
         public Object getGroup(int groupPosition) {
-            return mCard.getSystems()[groupPosition];
+            return mCard.getSystems().get(groupPosition);
         }
 
         public long getGroupId(int groupPosition) {
-            return mCard.getSystems()[groupPosition].getCode();
+            return mCard.getSystems().get(groupPosition).getCode();
         }
 
         public int getChildrenCount(int groupPosition) {
-            return mCard.getSystems()[groupPosition].getServices().length;
+            return mCard.getSystems().get(groupPosition).getServices().size();
         }
 
         public Object getChild(int groupPosition, int childPosition) {
-            return mCard.getSystems()[groupPosition].getServices()[childPosition];
+            return mCard.getSystems().get(groupPosition).getServices().get(childPosition);
         }
 
         public long getChildId(int groupPosition, int childPosition) {
-            return mCard.getSystems()[groupPosition].getServices()[childPosition].getServiceCode();
+            return mCard.getSystems().get(groupPosition).getServices().get(childPosition).getServiceCode();
         }
 
         public boolean hasStableIds() {
@@ -140,7 +144,7 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
                 view.setLayoutParams(new AbsListView.LayoutParams(MATCH_PARENT, 80));
             }
 
-            FelicaSystem system = mCard.getSystems()[groupPosition];
+            FelicaSystem system = mCard.getSystems().get(groupPosition);
 
             TextView textView = (TextView) view.findViewById(android.R.id.text1);
             textView.setText(String.format("System: 0x%s", Integer.toHexString(system.getCode())));
@@ -158,11 +162,11 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
             TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
             TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
 
-            FelicaSystem system = mCard.getSystems()[groupPosition];
-            FelicaService service = system.getServices()[childPosition];
+            FelicaSystem system = mCard.getSystems().get(groupPosition);
+            FelicaService service = system.getServices().get(childPosition);
 
             textView1.setText(String.format("Service: 0x%s", Integer.toHexString(service.getServiceCode())));
-            textView2.setText(String.format("%s block(s)", service.getBlocks().length));
+            textView2.setText(String.format("%s block(s)", service.getBlocks().size()));
 
             return view;
         }

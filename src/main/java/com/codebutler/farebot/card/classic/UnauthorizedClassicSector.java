@@ -21,26 +21,25 @@
 package com.codebutler.farebot.card.classic;
 
 import com.codebutler.farebot.card.UnauthorizedException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
+
+@Root(name="sector")
 public class UnauthorizedClassicSector extends ClassicSector {
+    @Attribute(name="unauthorized") public static final boolean mUnauthorized = true;
+
+    private UnauthorizedClassicSector() { /** For XML serializer **/ }
+
     public UnauthorizedClassicSector(int sectorIndex) {
         super(sectorIndex, null);
-    }
-
-    public Element toXML(Document doc) {
-        Element sectorElement = doc.createElement("sector");
-        sectorElement.setAttribute("index", String.valueOf(getIndex()));
-        sectorElement.setAttribute("unauthorized", "true");
-        return sectorElement;
     }
 
     @Override public byte[] readBlocks(int startBlock, int blockCount) {
         throw new UnauthorizedException();
     }
 
-    @Override public ClassicBlock[] getBlocks() {
+    @Override public java.util.List<ClassicBlock> getBlocks() {
         throw new UnauthorizedException();
     }
 
