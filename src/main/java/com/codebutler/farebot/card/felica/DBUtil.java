@@ -79,7 +79,6 @@ public class DBUtil {
 
     private static final String TAG = "SuicaDBUtil";
 
-    private static final String DB_PATH = "/data/data/com.codebutler.farebot/databases/";
     private static final String DB_NAME = "StationCode.db";
 
     private static final int VERSION = 2;
@@ -99,7 +98,7 @@ public class DBUtil {
         if (!this.hasDatabase()) {
             this.copyDatabase();
         }
-        mDatabase = SQLiteDatabase.openDatabase(new File(DB_PATH, DB_NAME).getPath(), null, SQLiteDatabase.OPEN_READONLY);
+        mDatabase = SQLiteDatabase.openDatabase(getDBFile().getPath(), null, SQLiteDatabase.OPEN_READONLY);
         return mDatabase;
 
     }
@@ -112,7 +111,7 @@ public class DBUtil {
     private boolean hasDatabase() {
         SQLiteDatabase tempDatabase = null;
 
-        File file = new File(DB_PATH, DB_NAME);
+        File file = getDBFile();
         if (!file.exists()) {
             return false;
         }
@@ -140,7 +139,7 @@ public class DBUtil {
         OutputStream out = null;
         try {
             in  = this.mContext.getAssets().open(DB_NAME);
-            out = new FileOutputStream(new File(DB_PATH, DB_NAME));
+            out = new FileOutputStream(getDBFile());
             IOUtils.copy(in, out);
         } catch (IOException e) {
             throw new RuntimeException("Error copying database", e);
@@ -148,5 +147,9 @@ public class DBUtil {
             IOUtils.closeQuietly(out);
             IOUtils.closeQuietly(in);
         }
+    }
+
+    private File getDBFile() {
+        return mContext.getDatabasePath(DB_NAME);
     }
 }

@@ -32,8 +32,11 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.codebutler.farebot.BuildConfig;
+
 public class CardProvider extends ContentProvider {
-    public static final String AUTHORITY = "com.codebutler.farebot.cardprovider";
+    public static final String AUTHORITY = BuildConfig.BUILD_TYPE.equals("dev") ?
+            "com.codebutler.farebot.dev.cardprovider" : "com.codebutler.farebot.cardprovider";
 
     public static final Uri CONTENT_URI_CARD = Uri.parse("content://" + AUTHORITY + "/cards");
 

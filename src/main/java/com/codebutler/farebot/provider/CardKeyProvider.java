@@ -27,11 +27,15 @@ import android.content.UriMatcher;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.codebutler.farebot.BuildConfig;
+
 import java.util.Date;
 
 public class CardKeyProvider extends BetterContentProvider {
-    public static final String AUTHORITY   = "com.codebutler.farebot.keyprovider";
-    public static final Uri    CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/keys");
+    public static final String AUTHORITY = BuildConfig.BUILD_TYPE.equals("dev") ?
+            "com.codebutler.farebot.dev.keyprovider" : "com.codebutler.farebot.keyprovider";
+
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/keys");
 
     public CardKeyProvider() {
         super(

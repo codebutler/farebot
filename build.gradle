@@ -68,6 +68,13 @@ android {
     }
 
     buildTypes {
+        debug {
+
+        }
+        dev.initWith(buildTypes.debug)
+        dev {
+            applicationIdSuffix '.dev'
+        }
         release {
             signingConfig signingConfigs.release
         }
