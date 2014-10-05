@@ -67,9 +67,8 @@ public class ClipperTrip extends Trip {
     }
 
     @Override public String getRouteName () {
-        if (mAgency == ClipperData.AGENCY_FERRY &&
-            ClipperData.FERRY_ROUTES.containsKey(mRoute)) {
-            return ClipperData.FERRY_ROUTES.get(mRoute);
+        if (mAgency == ClipperData.AGENCY_GG_FERRY) {
+            return ClipperData.GG_FERRY_ROUTES.get(mRoute);
         } else {
             // FIXME: Need to find bus route #s
             // return "(Route 0x" + Long.toString(mRoute, 16) + ")";
@@ -94,9 +93,13 @@ public class ClipperTrip extends Trip {
             if (ClipperData.BART_STATIONS.containsKey(mFrom)) {
                 return ClipperData.BART_STATIONS.get(mFrom);
             }
-        } else if (mAgency == ClipperData.AGENCY_FERRY) {
-            if (ClipperData.FERRY_TERMINALS.containsKey(mFrom)) {
-                return ClipperData.FERRY_TERMINALS.get(mFrom);
+        } else if (mAgency == ClipperData.AGENCY_GG_FERRY) {
+            if (ClipperData.GG_FERRY_TERIMINALS.containsKey(mFrom)) {
+                return ClipperData.GG_FERRY_TERIMINALS.get(mFrom);
+            }
+        } else if (mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
+            if (ClipperData.SF_BAY_FERRY_TERMINALS.containsKey(mFrom)) {
+                return ClipperData.SF_BAY_FERRY_TERMINALS.get(mFrom);
             }
         }
         return null;
@@ -107,16 +110,19 @@ public class ClipperTrip extends Trip {
             if (ClipperData.BART_STATIONS.containsKey(mTo)) {
                 return ClipperData.BART_STATIONS.get(mTo);
             }
-        } else if (mAgency == ClipperData.AGENCY_FERRY) {
-            if (ClipperData.FERRY_TERMINALS.containsKey(mTo)) {
-                return ClipperData.FERRY_TERMINALS.get(mTo);
+        } else if (mAgency == ClipperData.AGENCY_GG_FERRY) {
+            if (ClipperData.GG_FERRY_TERIMINALS.containsKey(mTo)) {
+                return ClipperData.GG_FERRY_TERIMINALS.get(mTo);
+            }
+        } else if (mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
+            if (ClipperData.SF_BAY_FERRY_TERMINALS.containsKey(mTo)) {
+                return ClipperData.SF_BAY_FERRY_TERMINALS.get(mTo);
             }
         }
         return null;
     }
-
     @Override public String getStartStationName () {
-        if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_FERRY) {
+        if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_GG_FERRY || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             Station station = getStartStation();
             if (station != null)
                 return station.getShortStationName();
@@ -132,19 +138,19 @@ public class ClipperTrip extends Trip {
     }
 
     @Override public String getEndStationName () {
-        if (mAgency == ClipperData.AGENCY_BART) {
+        if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_GG_FERRY || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             Station station = getEndStation();
-            if (station != null)
-                return ClipperData.BART_STATIONS.get(mTo).getShortStationName();
-            else
+            if (station != null) {
+                return station.getShortStationName();
+            } else {
                 return "Station #0x" + Long.toString(mTo, 16);
+            }
         } else if (mAgency == ClipperData.AGENCY_MUNI) {
             return null; // Coach number is not collected
-        } else if (mAgency == ClipperData.AGENCY_GGT || mAgency == ClipperData.AGENCY_CALTRAIN ||
-                   mAgency == ClipperData.AGENCY_FERRY) {
+        } else if (mAgency == ClipperData.AGENCY_GGT || mAgency == ClipperData.AGENCY_CALTRAIN) {
             if (mTo == 0xffff)
                 return "(End of line)";
-            return "Zone #" + mTo;
+            return "Zone #0x" + Long.toString(mTo, 16);
         } else {
             return "(Unknown Station)";
         }
@@ -165,7 +171,9 @@ public class ClipperTrip extends Trip {
             return Mode.BUS; // FIXME: or Mode.TRAM for light rail
         if (mAgency == ClipperData.AGENCY_MUNI)
             return Mode.BUS; // FIXME: or Mode.TRAM for "Muni Metro"
-        if (mAgency == ClipperData.AGENCY_FERRY)
+        if (mAgency == ClipperData.AGENCY_GG_FERRY)
+            return Mode.FERRY;
+        if (mAgency == ClipperData.AGENCY_SF_BAY_FERRY)
             return Mode.FERRY;
         return Mode.OTHER;
     }
