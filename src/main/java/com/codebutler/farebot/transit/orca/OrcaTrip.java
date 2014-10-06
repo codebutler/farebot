@@ -35,6 +35,11 @@ public class OrcaTrip extends Trip {
         new Station("Seatac Airport Station",             "Sea-Tac",       "47.4445305", "-122.297012")
     };
 
+    private static Map<Integer, Station> sSounderStations = new HashMap<Integer, Station>() {{
+        put(3, new Station("King Street Station", "King Street",   "47.598445", "-122.330161"));
+        put(5, new Station("Kent Station",        "Kent",          "47.384257", "-122.233151"));
+    }};
+
     private static Map<Integer, Station> sWSFTerminals = new HashMap<Integer, Station>() {{
         put(10101, new Station("Seattle Terminal",           "Seattle",    "47.602722", "-122.338512"));
         put(10103, new Station("Bainbridge Island Terminal", "Bainbridge", "47.62362",  "-122.51082" ));
@@ -131,6 +136,8 @@ public class OrcaTrip extends Trip {
     @Override public String getRouteName () {
         if (isLink()) {
             return "Link Light Rail";
+        } else if (isSounder()) {
+            return "Sounder Train";
         } else {
             // FIXME: Need to find bus route #s
             if (mAgency == OrcaTransitData.AGENCY_ST) {
@@ -160,6 +167,8 @@ public class OrcaTrip extends Trip {
             if (stationNumber < sLinkStations.length) {
                 return sLinkStations[stationNumber];
             }
+        } else if (isSounder()) {
+            return sSounderStations.get((int) mCoachNum);
         } else if (mAgency == OrcaTransitData.AGENCY_WSF) {
             return sWSFTerminals.get((int)mCoachNum);
         }
@@ -171,6 +180,13 @@ public class OrcaTrip extends Trip {
             int stationNumber = (((int) mCoachNum) % 1000) - 193;
             if (stationNumber < sLinkStations.length) {
                 return sLinkStations[stationNumber].getStationName();
+            } else {
+                return String.format("Unknown Station #%s", stationNumber);
+            }
+        } else if (isSounder()) {
+            int stationNumber = (int) mCoachNum;
+            if (sSounderStations.containsKey(stationNumber)) {
+                return sSounderStations.get(stationNumber).getStationName();
             } else {
                 return String.format("Unknown Station #%s", stationNumber);
             }
@@ -199,6 +215,8 @@ public class OrcaTrip extends Trip {
     @Override public Mode getMode() {
         if (isLink()) {
             return Mode.METRO;
+        } else if (isSounder()) {
+            return Mode.TRAIN;
         } else if (mAgency == OrcaTransitData.AGENCY_WSF) {
             return Mode.FERRY;
         } else {
@@ -233,5 +251,9 @@ public class OrcaTrip extends Trip {
 
     private boolean isLink () {
         return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum > 10000);
+    }
+
+    private boolean isSounder() {
+        return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum < 20);
     }
 }
