@@ -1,10 +1,10 @@
 buildscript {
-    repositories { 
-      maven { url 'http://repo1.maven.org/maven2' } 
-      maven { url 'http://download.crashlytics.com/maven' }
+    repositories {
+        jcenter()
+        maven { url 'http://download.crashlytics.com/maven' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.2'
+        classpath 'com.android.tools.build:gradle:0.13.2'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
     }
 }
@@ -13,9 +13,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven { url 'http://download.crashlytics.com/maven' }
-    maven { url 'libs' }
 }
 
 dependencies {
@@ -29,13 +28,13 @@ dependencies {
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
-    compile files('libs/nfc-felica.jar')
+    compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 def password = null
 
 def askPassword() {
-  return 'security -q find-generic-password -g -l farebot-release'.execute().err.text.split('"')[1]
+    return 'security -q find-generic-password -g -l farebot-release'.execute().err.text.split('"')[1]
 }
 
 afterEvaluate {
@@ -68,9 +67,6 @@ android {
     }
 
     buildTypes {
-        debug {
-
-        }
         dev.initWith(buildTypes.debug)
         dev {
             applicationIdSuffix '.dev'
@@ -89,8 +85,4 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
-}
-
-tasks.withType(Compile) {
-    options.encoding = "UTF-8"
 }
