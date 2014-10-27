@@ -42,13 +42,14 @@ import java.io.StringWriter;
 import java.util.Date;
 
 public abstract class Card {
-    @Attribute(name="type") private String mType;
+    @Attribute(name="type") private CardType mType;
     @Attribute(name="id") private HexString mTagId;
     @Attribute(name="scanned_at") private Date mScannedAt;
 
     protected Card() { }
 
-    protected Card(byte[] tagId, Date scannedAt) {
+    protected Card(CardType type, byte[] tagId, Date scannedAt) {
+        mType = type;
         mTagId = new HexString(tagId);
         mScannedAt = scannedAt;
     }
@@ -87,14 +88,12 @@ public abstract class Card {
         }
     }
 
-    public abstract CardType getCardType();
+    public CardType getCardType() {
+        return mType;
+    }
 
     public byte[] getTagId() {
         return mTagId.getData();
-    }
-
-    public String getType() {
-        return mType;
     }
 
     public Date getScannedAt() {

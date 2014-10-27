@@ -106,13 +106,9 @@ public class DesfireCard extends Card {
     private DesfireCard() { /* For XML Serializer */ }
 
     DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication apps[]) {
-        super(tagId, scannedAt);
+        super(CardType.MifareDesfire, tagId, scannedAt);
         mManfData = manfData;
         mApplications = Utils.arrayAsList(apps);
-    }
-
-    @Override public CardType getCardType() {
-        return CardType.MifareDesfire;
     }
 
     @Override public TransitIdentity parseTransitIdentity() {

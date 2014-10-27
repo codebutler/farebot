@@ -75,16 +75,12 @@ public class CEPASCard extends Card {
     }
 
     private CEPASCard(byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
-        super(tagId, scannedAt);
+        super(CardType.CEPAS, tagId, scannedAt);
         mPurses = Utils.arrayAsList(purses);
         mHistories = Utils.arrayAsList(histories);
     }
 
     private CEPASCard() { /* For XML Serializer */ }
-
-    @Override public CardType getCardType() {
-        return CardType.CEPAS;
-    }
 
     @Override public TransitIdentity parseTransitIdentity() {
         if (EZLinkTransitData.check(this))

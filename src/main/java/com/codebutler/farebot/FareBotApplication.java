@@ -26,6 +26,7 @@ import android.app.Application;
 import android.os.StrictMode;
 
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.classic.ClassicSector;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings;
@@ -35,6 +36,7 @@ import com.codebutler.farebot.card.felica.DBUtil;
 import com.codebutler.farebot.transit.ovc.OVChipDBUtil;
 import com.codebutler.farebot.xml.Base64String;
 import com.codebutler.farebot.xml.CardConverter;
+import com.codebutler.farebot.xml.CardTypeTransform;
 import com.codebutler.farebot.xml.ClassicSectorConverter;
 import com.codebutler.farebot.xml.DesfireFileConverter;
 import com.codebutler.farebot.xml.DesfireFileSettingsConverter;
@@ -101,6 +103,7 @@ public class FareBotApplication extends Application {
             matcher.bind(Date.class, EpochDateTransform.class);
             matcher.bind(FeliCaLib.IDm.class, FelicaIDmTransform.class);
             matcher.bind(FeliCaLib.PMm.class, FelicaPMmTransform.class);
+            matcher.bind(CardType.class, CardTypeTransform.class);
 
         } catch (Exception ex) {
             throw new RuntimeException(ex);

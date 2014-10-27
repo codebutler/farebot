@@ -121,7 +121,7 @@ public class FelicaCard extends Card {
     }
 
     public FelicaCard(byte[] tagId, Date scannedAt, FeliCaLib.IDm idm, FeliCaLib.PMm pmm, FelicaSystem[] systems) {
-        super(tagId, scannedAt);
+        super(CardType.FeliCa, tagId, scannedAt);
         mIDm     = idm;
         mPMm     = pmm;
         mSystems = Utils.arrayAsList(systems);
@@ -171,10 +171,6 @@ public class FelicaCard extends Card {
             }
         }
         return null;
-    }
-
-    @Override public CardType getCardType() {
-        return CardType.FeliCa;
     }
 
     @Override public TransitIdentity parseTransitIdentity() {

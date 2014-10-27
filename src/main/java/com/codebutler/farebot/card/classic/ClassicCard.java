@@ -59,7 +59,7 @@ public class ClassicCard extends Card {
     private ClassicCard() { /* For XML Serializer */ }
 
     protected ClassicCard(byte[] tagId, Date scannedAt, ClassicSector[] sectors) {
-        super(tagId, scannedAt);
+        super(CardType.MifareClassic, tagId, scannedAt);
         mSectors = Utils.arrayAsList(sectors);
     }
 
@@ -138,10 +138,6 @@ public class ClassicCard extends Card {
             return new BilheteUnicoSPTransitData(this);
         }
         return null;
-    }
-
-    @Override public CardType getCardType() {
-        return CardType.MifareClassic;
     }
 
     public List<ClassicSector> getSectors() {
