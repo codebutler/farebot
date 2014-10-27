@@ -49,6 +49,7 @@ import android.widget.Toast;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.provider.CardDBHelper;
@@ -113,8 +114,9 @@ public class CardsFragment extends ListFragment {
 
     @Override public void onListItemClick(ListView l, View v, int position, long id) {
         Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        //FIXME: Bind to current package !!
+        Intent intent = new Intent(getActivity(), CardInfoActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(uri);
         startActivity(intent);
     }
 
