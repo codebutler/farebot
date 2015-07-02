@@ -225,6 +225,15 @@ public class Utils {
         return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
     }
 
+    public static byte[] reverseBuffer(byte[] buffer, int iStartByte, int iLength) {
+        byte[] reversed = new byte[iLength];
+        int iEndByte = iStartByte + iLength;
+        for (int x=0; x<iLength; x++) {
+            reversed[x] = buffer[iEndByte - x - 1];
+        }
+        return reversed;
+    }
+
     /* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
     public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
         int iEndBit = iStartBit + iLength - 1;
