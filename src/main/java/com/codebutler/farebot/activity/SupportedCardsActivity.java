@@ -74,6 +74,7 @@ public class SupportedCardsActivity extends Activity {
             add(new CardInfo(R.drawable.ovchip_card,         "OV-chipkaart",  R.string.location_the_netherlands, R.string.card_note_ovchip));
             add(new CardInfo(R.drawable.bilheteunicosp_card, "Bilhete Único", R.string.location_sao_paulo,       R.string.card_note_bilheteunicosp));
             add(new CardInfo(R.drawable.hsl_card,            "HSL",           R.string.location_helsinki_finland));
+            add(new CardInfo(R.drawable.opal_card,           "Opal",          R.string.location_sydney_australia));
         }
 
         @Override public View getView(int position, View convertView, ViewGroup group) {

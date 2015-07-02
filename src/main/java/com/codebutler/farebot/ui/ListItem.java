@@ -22,9 +22,19 @@
 
 package com.codebutler.farebot.ui;
 
+import com.codebutler.farebot.util.Utils;
+
 public class ListItem {
     protected final String mText1;
     protected final String mText2;
+
+    public ListItem(int nameResource, int valueResource) {
+        this(nameResource, Utils.localizeString(valueResource));
+    }
+
+    public ListItem(int nameResource, String value) {
+        this(Utils.localizeString(nameResource), value);
+    }
 
     public ListItem(String name, String value) {
         mText1 = name;

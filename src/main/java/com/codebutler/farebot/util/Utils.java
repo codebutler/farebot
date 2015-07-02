@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.provider.Settings;
@@ -228,8 +229,43 @@ public class Utils {
         return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
     }
 
+    /**
+     * Reverses a byte array, such that the last byte is first, and the first byte is last.
+     *
+     * @param buffer Source buffer to reverse
+     * @param iStartByte Start position in the buffer to read from
+     * @param iLength Number of bytes to read
+     * @return A new byte array, of length iLength, with the bytes reversed
+     */
+    public static byte[] reverseBuffer(byte[] buffer, int iStartByte, int iLength) {
+        byte[] reversed = new byte[iLength];
+        int iEndByte = iStartByte + iLength;
+        for (int x=0; x<iLength; x++) {
+            reversed[x] = buffer[iEndByte - x - 1];
+        }
+        return reversed;
+    }
+
+    /**
+     * Given an unsigned integer value, calculate the two's complement of the value if it is
+     * actually a negative value
+     * @param input Input value to convert
+     * @param highestBit The position of the highest bit in the number, 0-indexed.
+     * @return A signed integer containing it's converted value.
+     */
+    public static int unsignedToTwoComplement(int input, int highestBit) {
+        if (getBitsFromInteger(input, highestBit, 1) == 1) {
+            // inverse all bits
+            input ^= (2 << highestBit) - 1;
+            return -(1 + input);
+        }
+
+        return input;
+    }
+
     /* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
     public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
+        // Note: Assumes big-endian
         int iEndBit = iStartBit + iLength - 1;
         int iSByte = iStartBit / 8;
         int iSBit = iStartBit % 8;
@@ -250,4 +286,17 @@ public class Utils {
             return uRet;
         }
     }
+
+    /**
+     * Given a string resource (R.string), localize the string according to the language preferences
+     * on the device.
+     * @param stringResource R.string to localize.
+     * @param formatArgs Formatting arguments to pass
+     * @return Localized string
+     */
+    public static String localizeString(int stringResource, Object... formatArgs) {
+        Resources res = FareBotApplication.getInstance().getResources();
+        return res.getString(stringResource, formatArgs);
+    }
+
 }

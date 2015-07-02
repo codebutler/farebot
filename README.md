@@ -16,6 +16,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [tbonang](https://github.com/tbonang) (NETS FlashPay)
 * [Marcelo Liberato](https://github.com/mliberato) (Bilhete Único)
 * [Lauri Andler](https://github.com/landler/) (HSL)
+* [Michael](https://github.com/micolous/) (Opal)
 * [The Noun Project][15] (Various icons)
 
 ## Supported Protocols
@@ -35,6 +36,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands (Requires encryption keys)
 * [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil (Requires encryption keys)
 * [Matkakortti][16], [HSL][17] - Finland
+* [Opal][18] - Sydney, Australia
 
 ## Supported Phones
 
@@ -58,3 +60,4 @@ FareBot requires an NFC Android phone running 4.0.1 or later.
 [15]: http://www.thenounproject.com/
 [16]: http://www.hsl.fi/EN/passengersguide/travelcard/Pages/default.aspx
 [17]: http://www.hsl.fi/EN/
+[18]: http://www.opal.com.au/
