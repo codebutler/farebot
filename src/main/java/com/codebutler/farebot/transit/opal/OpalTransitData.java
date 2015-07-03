@@ -1,14 +1,12 @@
 package com.codebutler.farebot.transit.opal;
 
 import android.os.Parcel;
-import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
@@ -31,7 +29,7 @@ import java.util.Locale;
  *
  * Documentation of format: https://github.com/codebutler/farebot/wiki/Opal
  */
-public class OpalTransitData  extends TransitData {
+public class OpalTransitData extends TransitData {
     private int    mSerialNumber;
     private double mBalance; // cents
     private int    mChecksum;
