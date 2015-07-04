@@ -2,9 +2,9 @@ package com.codebutler.farebot.transit.opal;
 
 import android.os.Parcel;
 import android.text.format.DateFormat;
-import android.util.Log;
 
 import com.codebutler.farebot.FareBotApplication;
+import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.Refill;
@@ -34,15 +34,16 @@ public class OpalTransitData extends TransitData {
     private double mBalance; // cents
     private int    mChecksum;
     private int    mWeeklyTrips;
-    private boolean mAutoRecharge;
+    private boolean mAutoTopup;
     private int    mActionType;
-    private int    mTransitMode;
+    private int mVehicleType;
     private int    mMinute;
     private int    mDay;
     private int    mTransactionNumber;
     private int    mLastDigit;
 
     private static GregorianCalendar OPAL_EPOCH = new GregorianCalendar(1980, Calendar.JANUARY, 1);
+    private static OpalSubscription OPAL_AUTOMATIC_TOP_UP = new OpalSubscription();
 
     public static boolean check (Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x314553) != null);
@@ -53,9 +54,9 @@ public class OpalTransitData extends TransitData {
         mBalance      = parcel.readDouble();
         mChecksum     = parcel.readInt();
         mWeeklyTrips  = parcel.readInt();
-        mAutoRecharge = parcel.readByte() == 0x01;
+        mAutoTopup = parcel.readByte() == 0x01;
         mActionType   = parcel.readInt();
-        mTransitMode  = parcel.readInt();
+        mVehicleType = parcel.readInt();
         mMinute       = parcel.readInt();
         mDay          = parcel.readInt();
         mTransactionNumber = parcel.readInt();
@@ -66,18 +67,15 @@ public class OpalTransitData extends TransitData {
         DesfireCard desfireCard = (DesfireCard) card;
         byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData();
         int iRawBalance;
-        //Log.d("OpalRaw", Utils.getHexString(data));
 
-        // All data on the card is actually reversed
         data = Utils.reverseBuffer(data, 0, 16);
-        //Log.d("OpalRev", Utils.getHexString(data));
 
         try {
             mChecksum = Utils.getBitsFromBuffer(data, 0, 16);
             mWeeklyTrips = Utils.getBitsFromBuffer(data, 16, 4);
-            mAutoRecharge = Utils.getBitsFromBuffer(data, 20, 1) == 0x01;
+            mAutoTopup = Utils.getBitsFromBuffer(data, 20, 1) == 0x01;
             mActionType = Utils.getBitsFromBuffer(data, 21, 4);
-            mTransitMode = Utils.getBitsFromBuffer(data, 25, 3);
+            mVehicleType = Utils.getBitsFromBuffer(data, 25, 3);
             mMinute = Utils.getBitsFromBuffer(data, 28, 11);
             mDay = Utils.getBitsFromBuffer(data, 39, 15);
             iRawBalance = Utils.getBitsFromBuffer(data, 54, 21);
@@ -103,9 +101,13 @@ public class OpalTransitData extends TransitData {
     }
 
     @Override public String getSerialNumber () {
-        return String.format("308522%09d%01d", new Object[] { mSerialNumber, mLastDigit });
+        return formatSerialNumber(mSerialNumber, mLastDigit);
     }
 
+    private static String formatSerialNumber(int serialNumber, int lastDigit) {
+        return String.format("308522%09d%01d", new Object[] { serialNumber, lastDigit });
+
+    }
     public Calendar getLastTransactionTime() {
         Calendar cLastTransaction = GregorianCalendar.getInstance();
         cLastTransaction.setTimeInMillis(OPAL_EPOCH.getTimeInMillis());
@@ -117,28 +119,29 @@ public class OpalTransitData extends TransitData {
     @Override public List<ListItem> getInfo() {
         ArrayList<ListItem> items = new ArrayList<>();
 
-        items.add(new HeaderListItem("Card Information"));
-        items.add(new ListItem("Card Number", getSerialNumber()));
-        items.add(new ListItem("Balance", getBalanceString()));
-        items.add(new ListItem("Weekly Trips", Integer.toString(mWeeklyTrips)));
-        items.add(new ListItem("Automatic Recharge", mAutoRecharge ? "Enabled" : "Disabled"));
-        items.add(new ListItem("Data Checksum", Integer.toString(mChecksum)));
+        items.add(new HeaderListItem(R.string.general));
+        items.add(new ListItem(R.string.opal_weekly_trips, Integer.toString(mWeeklyTrips)));
+        items.add(new ListItem(R.string.checksum, Integer.toString(mChecksum)));
 
-        items.add(new HeaderListItem("Last Transaction"));
-        items.add(new ListItem("Number", Integer.toString(mTransactionNumber)));
+        items.add(new HeaderListItem(R.string.last_transaction));
+        items.add(new ListItem(R.string.transaction_sequence, Integer.toString(mTransactionNumber)));
         Date cLastTransactionTime = getLastTransactionTime().getTime();
-        items.add(new ListItem("Date", DateFormat.getLongDateFormat(FareBotApplication.getInstance()).format(cLastTransactionTime)));
-        items.add(new ListItem("Time", DateFormat.getTimeFormat(FareBotApplication.getInstance()).format(cLastTransactionTime)));
-        items.add(new ListItem("Mode", Integer.toString(mTransitMode)));
-        items.add(new ListItem("Action Type", Integer.toString(mActionType)));
+        items.add(new ListItem(R.string.date, DateFormat.getLongDateFormat(FareBotApplication.getInstance()).format(cLastTransactionTime)));
+        items.add(new ListItem(R.string.time, DateFormat.getTimeFormat(FareBotApplication.getInstance()).format(cLastTransactionTime)));
+        items.add(new ListItem(R.string.vehicle_type, getVehicleType(mVehicleType)));
+        items.add(new ListItem(R.string.transaction_type, getActionType(mActionType)));
 
         return items;
     }
 
     public static TransitIdentity parseTransitIdentity (Card card) {
-        // TODO: Make this not parse the whole card first.
-        OpalTransitData data = new OpalTransitData(card);
-        return new TransitIdentity("Opal", data.getSerialNumber());
+        DesfireCard desfireCard = (DesfireCard) card;
+        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData();
+        data = Utils.reverseBuffer(data, 0, 5);
+
+        int lastDigit = Utils.getBitsFromBuffer(data, 4, 4);
+        int serialNumber = Utils.getBitsFromBuffer(data, 8, 32);
+        return new TransitIdentity("Opal", formatSerialNumber(serialNumber, lastDigit));
     }
 
     public void writeToParcel(Parcel parcel, int flags) {
@@ -146,21 +149,41 @@ public class OpalTransitData extends TransitData {
         parcel.writeDouble(mBalance);
         parcel.writeInt(mChecksum);
         parcel.writeInt(mWeeklyTrips);
-        parcel.writeByte((byte) (mAutoRecharge ? 0x01 : 0x00));
+        parcel.writeByte((byte) (mAutoTopup ? 0x01 : 0x00));
         parcel.writeInt(mActionType);
-        parcel.writeInt(mTransitMode);
+        parcel.writeInt(mVehicleType);
         parcel.writeInt(mMinute);
         parcel.writeInt(mDay);
         parcel.writeInt(mTransactionNumber);
         parcel.writeInt(mLastDigit);
     }
 
+    @Override public Subscription[] getSubscriptions() {
+        // Opal has no concept of "subscriptions" (travel pass), only automatic top up.
+        if (mAutoTopup) {
+            return new Subscription[] {OPAL_AUTOMATIC_TOP_UP};
+        }
+        return new Subscription[] {};
+    }
+
+    public static String getVehicleType(int vehicleType) {
+        if (OpalData.VEHICLES.containsKey(vehicleType)) {
+            return Utils.localizeString(OpalData.VEHICLES.get(vehicleType));
+        }
+        return Utils.localizeString(R.string.unknown_format, "0x" + Long.toString(vehicleType, 16));
+    }
+
+    public static String getActionType(int actionType) {
+        if (OpalData.ACTIONS.containsKey(actionType)) {
+            return Utils.localizeString(OpalData.ACTIONS.get(actionType));
+        }
+
+        return Utils.localizeString(R.string.unknown_format, "0x" + Long.toString(actionType, 16));
+    }
+
     // Unsupported elements
     @Override public Refill[] getRefills () { return null; }
     @Override public Trip[] getTrips () {
-        return null;
-    }
-    @Override public Subscription[] getSubscriptions() {
         return null;
     }
 

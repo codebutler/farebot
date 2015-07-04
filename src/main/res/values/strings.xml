@@ -175,4 +175,25 @@
     <string name="general">General</string>
     <string name="launch_from_background">Launch from background</string>
     <string name="error_report_sent">Error report sent!</string>
+
+    <string name="checksum">Checksum</string>
+    <string name="last_transaction">Last transaction</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="vehicle_type">Vehicle type</string>
+    <string name="transaction_type">Transaction type</string>
+
+    <!--
+        Opal (Sydney, AU).
+        These are deliberately separated strings in order to match the terminology of the agency.
+    -->
+    <string name="opal_automatic_top_up">Automatic top up</string>
+    <string name="opal_weekly_trips">Weekly trips</string>
+    <string name="opal_vehicle_bus">Bus</string>
+    <string name="opal_vehicle_ferry">Ferry or Light Rail</string>
+    <string name="opal_vehicle_rail">Rail</string>
+    <string name="opal_action_new_journey_in_progress">New journey in progress</string>
+    <string name="opal_action_manly_ferry_journey">Manly Ferry journey</string>
+    <string name="opal_action_journey_completed">Journey completed</string>
+    <string name="opal_action_tap_on_reversal">Tap on reversal</string>
 </resources>
