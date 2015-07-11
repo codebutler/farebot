@@ -243,6 +243,23 @@ public class Utils {
         return reversed;
     }
 
+    /**
+     * Given an unsigned integer value, calculate the two's complement of the value if it is
+     * actually a negative value
+     * @param input Input value to convert
+     * @param highestBit The position of the highest bit in the number, 0-indexed.
+     * @return A signed integer containing it's converted value.
+     */
+    public static int unsignedToTwoComplement(int input, int highestBit) {
+        if (getBitsFromInteger(input, highestBit, 1) == 1) {
+            // inverse all bits
+            input ^= (2 << highestBit) - 1;
+            return -(1 + input);
+        }
+
+        return input;
+    }
+
     /* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
     public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
         // Note: Assumes big-endian

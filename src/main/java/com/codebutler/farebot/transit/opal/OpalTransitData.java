@@ -31,12 +31,12 @@ import java.util.Locale;
  */
 public class OpalTransitData extends TransitData {
     private int    mSerialNumber;
-    private double mBalance; // cents
+    private int    mBalance; // cents
     private int    mChecksum;
     private int    mWeeklyTrips;
     private boolean mAutoTopup;
     private int    mActionType;
-    private int mVehicleType;
+    private int    mVehicleType;
     private int    mMinute;
     private int    mDay;
     private int    mTransactionNumber;
@@ -51,7 +51,7 @@ public class OpalTransitData extends TransitData {
 
     public OpalTransitData (Parcel parcel) {
         mSerialNumber = parcel.readInt();
-        mBalance      = parcel.readDouble();
+        mBalance      = parcel.readInt();
         mChecksum     = parcel.readInt();
         mWeeklyTrips  = parcel.readInt();
         mAutoTopup = parcel.readByte() == 0x01;
@@ -87,8 +87,7 @@ public class OpalTransitData extends TransitData {
             throw new RuntimeException("Error parsing Opal data", ex);
         }
 
-        // TODO: handle negative
-        mBalance = iRawBalance;
+        mBalance = Utils.unsignedToTwoComplement(iRawBalance, 21);
     }
 
     @Override public String getCardName () {
@@ -97,7 +96,7 @@ public class OpalTransitData extends TransitData {
 
 
     @Override public String getBalanceString () {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.);
     }
 
     @Override public String getSerialNumber () {
@@ -146,7 +145,7 @@ public class OpalTransitData extends TransitData {
 
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mSerialNumber);
-        parcel.writeDouble(mBalance);
+        parcel.writeInt(mBalance);
         parcel.writeInt(mChecksum);
         parcel.writeInt(mWeeklyTrips);
         parcel.writeByte((byte) (mAutoTopup ? 0x01 : 0x00));
