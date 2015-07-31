@@ -87,7 +87,7 @@ public class OpalTransitData extends TransitData {
             throw new RuntimeException("Error parsing Opal data", ex);
         }
 
-        mBalance = Utils.unsignedToTwoComplement(iRawBalance, 21);
+        mBalance = Utils.unsignedToTwoComplement(iRawBalance, 20);
     }
 
     @Override public String getCardName () {
