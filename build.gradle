@@ -4,18 +4,20 @@ buildscript {
         maven { url 'http://download.crashlytics.com/maven' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.2'
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.14.2'
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.14.3'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url 'http://download.crashlytics.com/maven' }
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
-
-repositories {
-    mavenCentral()
-    maven { url 'http://download.crashlytics.com/maven' }
-}
 
 dependencies {
     compile 'com.android.support:support-v4:20.0.0'
