@@ -38,6 +38,7 @@ import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitData;
 import com.codebutler.farebot.transit.ovc.OVChipTransitData;
+import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitData;
 import com.codebutler.farebot.util.Utils;
 
 import org.simpleframework.xml.ElementList;
@@ -124,11 +125,20 @@ public class ClassicCard extends Card {
     }
 
     @Override public TransitIdentity parseTransitIdentity() {
+        // All .check() methods should work without a key, and throw an UnauthorizedException
+        // Otherwise UnauthorizedClassicTransitData will not trigger
         if (OVChipTransitData.check(this)) {
             return OVChipTransitData.parseTransitIdentity(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
             return BilheteUnicoSPTransitData.parseTransitIdentity(this);
+        } else if (UnauthorizedClassicTransitData.check(this)) {
+            // This check must be LAST.
+            //
+            // This is to throw up a warning whenever there is a card with all locked sectors
+            return UnauthorizedClassicTransitData.parseTransitIdentity(this);
         }
+
+        // This point is where the card has some open sectors, but cannot be identified.
         return null;
     }
 
@@ -137,6 +147,8 @@ public class ClassicCard extends Card {
             return new OVChipTransitData(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
             return new BilheteUnicoSPTransitData(this);
+        } else if (UnauthorizedClassicTransitData.check(this)) {
+            return new UnauthorizedClassicTransitData();
         }
         return null;
     }

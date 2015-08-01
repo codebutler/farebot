@@ -29,6 +29,7 @@
     <string name="advanced_info">Advanced Info</string>
     <string name="delete_card">Delete Card</string>
     <string name="unknown_card">Unknown Card</string>
+    <string name="locked_card">Locked Card</string>
     <string name="hw_detail">Manufacturing Info</string>
     <string name="data">Raw Data</string>
     <string name="copy_xml">Copy</string>
