@@ -1,0 +1,16 @@
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <provider
+            android:name="com.codebutler.farebot.provider.CardProvider"
+            android:authorities="com.codebutler.farebot.dev.cardprovider"
+            android:exported="false"
+            tools:replace="android:authorities"/>
+        <provider
+            android:name="com.codebutler.farebot.provider.CardKeyProvider"
+            android:authorities="com.codebutler.farebot.dev.keyprovider"
+            android:exported="false"
+            tools:replace="android:authorities"/>
+    </application>
+</manifest>

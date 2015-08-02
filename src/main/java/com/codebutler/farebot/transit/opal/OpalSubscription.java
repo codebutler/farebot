@@ -8,7 +8,6 @@ import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Class describing auto-topup on Opal.

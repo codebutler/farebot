@@ -1,23 +1,16 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.14.3'
-    }
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-        maven { url 'http://download.crashlytics.com/maven' }
+        classpath 'io.fabric.tools:gradle:1.19.2'
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
+apply plugin: 'io.fabric'
 apply plugin: 'checkstyle'
 
 check.dependsOn 'checkstyle'
@@ -29,10 +22,17 @@ task checkstyle(type: Checkstyle) {
     classpath = files()
 }
 
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
 dependencies {
-    compile 'com.android.support:support-v4:23.1.0'
-    compile 'com.google.android.gms:play-services:8.1.0'
-    compile 'com.crashlytics.android:crashlytics:1.1.13'
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.google.android.gms:play-services:6.5.87'
     compile 'org.apache.commons:commons-io:1.3.2'
     compile 'org.apache.commons:commons-lang3:3.1'
     compile('org.simpleframework:simple-xml:2.7.1') {
@@ -41,19 +41,8 @@ dependencies {
         exclude module: 'xpp3'
     }
     compile fileTree(dir: 'libs', include: '*.jar')
-}
-
-def password = null
-
-def askPassword() {
-    return 'security -q find-generic-password -g -l farebot-release'.execute().err.text.split('"')[1]
-}
-
-afterEvaluate {
-    validateReleaseSigning.doFirst {
-        password = askPassword()
-        signingConfig.storePassword = password
-        signingConfig.keyPassword = password
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
+        transitive = true;
     }
 }
 
@@ -64,8 +53,10 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 23
+        versionCode getVersionCode()
+        versionName getVersionName()
     }
-
+/*
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -77,14 +68,11 @@ android {
             keyPassword ''
         }
     }
-
+*/
     buildTypes {
         dev.initWith(buildTypes.debug)
         dev {
             applicationIdSuffix '.dev'
-        }
-        release {
-            signingConfig signingConfigs.release
         }
     }
 

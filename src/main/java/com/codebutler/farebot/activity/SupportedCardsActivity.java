@@ -25,6 +25,7 @@ package com.codebutler.farebot.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -89,8 +90,35 @@ public class SupportedCardsActivity extends Activity {
             ((ImageView) convertView.findViewById(R.id.image)).setImageResource(info.getImageId());
             ((TextView)  convertView.findViewById(R.id.text)).setText(text);
 
-            if (info.getNoteId() >= 0) {
-                ((TextView) convertView.findViewById(R.id.note)).setText(info.getNoteId());
+            String notes = "";
+
+            FareBotApplication app = FareBotApplication.getInstance();
+            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(app);
+            boolean nfcAvailable = nfcAdapter != null;
+
+            if (nfcAvailable) {
+                if (info.getCardType() == CardType.MifareClassic && !app.getMifareClassicSupport()) {
+                    // Mifare Classic is not supported by this device.
+                    notes += Utils.localizeString(R.string.card_not_supported_on_device) + " ";
+                }
+
+                if (info.getCardType() == CardType.CEPAS) {
+                    // TODO: Implement feature detection for CEPAS like Mifare Classic.
+                    // TODO: It is probably exposed in hasSystemFeature().
+                    notes += Utils.localizeString(R.string.card_note_cepas) + " ";
+                }
+            } else {
+                // This device does not support NFC, so all cards are not supported.
+                notes += Utils.localizeString(R.string.card_not_supported_on_device) + " ";
+            }
+
+            // Keys being required is secondary to the card not being supported.
+            if (info.getKeysRequired()) {
+                notes += Utils.localizeString(R.string.keys_required) + " ";
+            }
+
+            if (!notes.equals("")) {
+                ((TextView) convertView.findViewById(R.id.note)).setText(notes);
             }
 
             return convertView;
