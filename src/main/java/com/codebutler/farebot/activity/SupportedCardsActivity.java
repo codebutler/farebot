@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitData;
 
 import java.util.ArrayList;
 
@@ -64,18 +65,19 @@ public class SupportedCardsActivity extends Activity {
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
         public CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
-            add(new CardInfo(R.drawable.orca_card,           "ORCA",          R.string.location_seattle));
-            add(new CardInfo(R.drawable.clipper_card,        "Clipper",       R.string.location_san_francisco));
-            add(new CardInfo(R.drawable.ezlink_card,         "EZ-Link",       R.string.location_singapore,       R.string.card_note_ezlink));
-            add(new CardInfo(R.drawable.nets_card,           "NETS FlashPay", R.string.location_singapore));
-            add(new CardInfo(R.drawable.suica_card,          "Suica",         R.string.location_tokyo));
-            add(new CardInfo(R.drawable.pasmo_card,          "PASMO",         R.string.location_tokyo));
-            add(new CardInfo(R.drawable.edy_card,            "Edy",           R.string.location_tokyo));
-            add(new CardInfo(R.drawable.icoca_card,          "ICOCA",         R.string.location_kansai));
-            add(new CardInfo(R.drawable.ovchip_card,         "OV-chipkaart",  R.string.location_the_netherlands, R.string.card_note_ovchip));
-            add(new CardInfo(R.drawable.bilheteunicosp_card, "Bilhete Único", R.string.location_sao_paulo,       R.string.card_note_bilheteunicosp));
-            add(new CardInfo(R.drawable.hsl_card,            "HSL",           R.string.location_helsinki_finland));
-            add(new CardInfo(R.drawable.opal_card,           "Opal",          R.string.location_sydney_australia));
+            add(new CardInfo(R.drawable.orca_card, "ORCA", R.string.location_seattle));
+            add(new CardInfo(R.drawable.clipper_card,          "Clipper",       R.string.location_san_francisco));
+            add(new CardInfo(R.drawable.ezlink_card,           "EZ-Link",       R.string.location_singapore,       R.string.card_note_ezlink));
+            add(new CardInfo(R.drawable.nets_card,             "NETS FlashPay", R.string.location_singapore));
+            add(new CardInfo(R.drawable.suica_card,            "Suica",         R.string.location_tokyo));
+            add(new CardInfo(R.drawable.pasmo_card,            "PASMO",         R.string.location_tokyo));
+            add(new CardInfo(R.drawable.edy_card,              "Edy",           R.string.location_tokyo));
+            add(new CardInfo(R.drawable.icoca_card,            "ICOCA",         R.string.location_kansai));
+            add(new CardInfo(R.drawable.ovchip_card,           "OV-chipkaart",  R.string.location_the_netherlands, R.string.card_note_ovchip));
+            add(new CardInfo(R.drawable.bilheteunicosp_card,   "Bilhete Único", R.string.location_sao_paulo,       R.string.card_note_bilheteunicosp));
+            add(new CardInfo(R.drawable.hsl_card,              "HSL",           R.string.location_helsinki_finland));
+            add(new CardInfo(R.drawable.opal_card,             "Opal",          R.string.location_sydney_australia));
+            add(new CardInfo(R.drawable.manly_fast_ferry_card, ManlyFastFerryTransitData.NAME, R.string.location_sydney_australia, R.string.card_note_manly_fast_ferry));
         }
 
         @Override public View getView(int position, View convertView, ViewGroup group) {

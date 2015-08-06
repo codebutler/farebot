@@ -22,7 +22,8 @@ See [the Project Status page on the wiki][19].
 * [tbonang](https://github.com/tbonang) (NETS FlashPay)
 * [Marcelo Liberato](https://github.com/mliberato) (Bilhete Único)
 * [Lauri Andler](https://github.com/landler/) (HSL)
-* [Michael](https://github.com/micolous/) (Opal)
+* [Michael](https://github.com/micolous/) (Opal, Manly Fast Ferry)
+* [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
 * [The Noun Project][15] (Various icons)
 
 ## Supported Protocols
@@ -37,6 +38,7 @@ See [the Project Status page on the wiki][19].
 * [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil (Requires encryption keys, not compatible with all devices)
 * [Clipper][1] - San Francisco, CA, USA
 * [EZ-Link][7] - Singapore (Not compatible with all devices)
+* [Manly Fast Ferry][20] - Sydney, Australia (new in M, requires encryption keys, not compatible with all devices)
 * [Matkakortti][16], [HSL][17] - Finland
 * [NETS FlashPay](http://www.netsflashpay.com.sg/) - Singapore
 * [Opal][18] - Sydney, Australia (new in M)
@@ -70,3 +72,5 @@ Some newer devices do not support MIFARE Classic.  MIFARE Classic is not an NFC-
 [17]: http://www.hsl.fi/EN/
 [18]: http://www.opal.com.au/
 [19]: https://github.com/micolous/farebot/wiki/Project-Status
+[20]: http://www.manlyfastferry.com.au/
+

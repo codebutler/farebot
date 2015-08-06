@@ -37,6 +37,7 @@ import com.codebutler.farebot.key.ClassicSectorKey;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitData;
+import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitData;
 import com.codebutler.farebot.transit.ovc.OVChipTransitData;
 import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitData;
 import com.codebutler.farebot.util.Utils;
@@ -163,6 +164,8 @@ public class ClassicCard extends Card {
             return OVChipTransitData.parseTransitIdentity(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
             return BilheteUnicoSPTransitData.parseTransitIdentity(this);
+        } else if (ManlyFastFerryTransitData.check(this)) {
+            return ManlyFastFerryTransitData.parseTransitIdentity(this);
         } else if (UnauthorizedClassicTransitData.check(this)) {
             // This check must be LAST.
             //
@@ -170,7 +173,7 @@ public class ClassicCard extends Card {
             return UnauthorizedClassicTransitData.parseTransitIdentity(this);
         }
 
-        // This point is where the card has some open sectors, but cannot be identified.
+        // The card could not be identified, but has some open sectors.
         return null;
     }
 
@@ -179,9 +182,16 @@ public class ClassicCard extends Card {
             return new OVChipTransitData(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
             return new BilheteUnicoSPTransitData(this);
+        } else if (ManlyFastFerryTransitData.check(this)) {
+            return new ManlyFastFerryTransitData(this);
         } else if (UnauthorizedClassicTransitData.check(this)) {
+            // This check must be LAST.
+            //
+            // This is to throw up a warning whenever there is a card with all locked sectors
             return new UnauthorizedClassicTransitData();
         }
+
+        // The card could not be identified, but has some open sectors.
         return null;
     }
 
