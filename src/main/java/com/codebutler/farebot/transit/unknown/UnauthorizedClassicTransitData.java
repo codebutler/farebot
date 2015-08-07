@@ -21,14 +21,9 @@ import java.util.List;
  * Handle MiFare Classic with no open sectors
  */
 public class UnauthorizedClassicTransitData  extends TransitData {
-    public static boolean check (Card card) {
-        if (!(card instanceof ClassicCard)) {
-            return false;
-        }
-
-        ClassicCard classic = (ClassicCard)card;
+    public static boolean check (ClassicCard card) {
         // check to see if all sectors are blocked
-        for (ClassicSector s : classic.getSectors()) {
+        for (ClassicSector s : card.getSectors()) {
             if (!(s instanceof UnauthorizedClassicSector)) {
                 // At least one sector is "open", this is not for us
                 return false;
