@@ -1,4 +1,4 @@
-# FareBot M
+# Farebot M
 
 View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!
 
@@ -29,7 +29,7 @@ See [the Project Status page on the wiki][19].
 ## Supported Protocols
 
 * [MIFARE DESFire][6]
-* [CEPAS][2]
+* [CEPAS][2] (Not compatible with all devices)
 * [FeliCa][8]
 * [MIFARE Classic](http://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic) (Not compatible with all devices)
 

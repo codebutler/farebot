@@ -46,14 +46,15 @@ import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.orca.OrcaTrip;
 import com.codebutler.farebot.transit.ovc.OVChipTrip;
+import com.codebutler.farebot.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.simpleframework.xml.Serializer;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 public class CardTripsFragment extends ListFragment {
     private Card        mCard;
@@ -110,8 +111,7 @@ public class CardTripsFragment extends ListFragment {
             View listHeader = convertView.findViewById(R.id.list_header);
             if (isFirstInSection(position)) {
                 listHeader.setVisibility(View.VISIBLE);
-                DateFormat dateInstance = DateFormat.getDateInstance(DateFormat.LONG);
-                ((TextView) listHeader.findViewById(android.R.id.text1)).setText(dateInstance.format(date));
+                ((TextView) listHeader.findViewById(android.R.id.text1)).setText(Utils.longDateFormat(date));
             } else {
                 listHeader.setVisibility(View.GONE);
             }
@@ -148,7 +148,7 @@ public class CardTripsFragment extends ListFragment {
             }
 
             if (trip.hasTime()) {
-                timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
+                timeTextView.setText(Utils.timeFormat(date));
                 timeTextView.setVisibility(View.VISIBLE);
             } else {
                 timeTextView.setVisibility(View.INVISIBLE);

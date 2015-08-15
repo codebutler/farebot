@@ -46,6 +46,7 @@ import com.codebutler.farebot.xml.FelicaPMmTransform;
 import com.codebutler.farebot.xml.HexString;
 import com.codebutler.farebot.xml.SkippableRegistryStrategy;
 
+import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 import net.kazzz.felica.lib.FeliCaLib;
 
@@ -141,7 +142,7 @@ public class FareBotApplication extends Application {
             .build());
 
         if (!BuildConfig.DEBUG) {
-            Fabric.with(this);
+            Fabric.with(this, new Crashlytics());
         }
     }
 }

@@ -63,8 +63,6 @@ import org.apache.commons.io.FileUtils;
 import org.simpleframework.xml.Serializer;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -243,10 +241,9 @@ public class CardsFragment extends ListFragment {
                    // textView1.setText(identity.getName());
                    textView1.setText(String.format("%s: %s", identity.getName(), serial));
                }
-               DateFormat timeInstance = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
-               DateFormat dateInstance = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
-               textView2.setText(getString(R.string.scanned_at_format, timeInstance.format(scannedAt),
-                       dateInstance.format(scannedAt)));
+               textView2.setText(getString(R.string.scanned_at_format, Utils.timeFormat(scannedAt),
+                       Utils.dateFormat(scannedAt)));
+
            } else {
                textView1.setText(getString(R.string.unknown_card));
                textView2.setText(String.format("%s - %s", CardType.values()[type].toString(), serial));

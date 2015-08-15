@@ -36,9 +36,10 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.util.Utils;
 
-import java.text.DateFormat;
 import java.util.Date;
+
 
 public class CardRefillsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
@@ -68,7 +69,7 @@ public class CardRefillsFragment extends ListFragment {
             TextView agencyTextView   = (TextView) convertView.findViewById(R.id.agency_text_view);
             TextView amountTextView   = (TextView) convertView.findViewById(R.id.amount_text_view);
 
-            dateTimeTextView.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date));
+            dateTimeTextView.setText(Utils.dateTimeFormat(date));
             agencyTextView.setText(refill.getShortAgencyName());
             amountTextView.setText(refill.getAmountString());
 

@@ -51,7 +51,7 @@
         <activity
             android:name="com.codebutler.farebot.activity.MainActivity"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="sensorPortrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -71,7 +71,7 @@
             android:configChanges="keyboardHidden|orientation"
             android:launchMode="singleTop"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name="com.codebutler.farebot.activity.BackgroundTagActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -114,11 +114,11 @@
         <activity
             android:name="com.codebutler.farebot.activity.SupportedCardsActivity"
             android:label="@string/supported_cards"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name="com.codebutler.farebot.activity.CardsActivity"
             android:label="@string/scanned_cards"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name="com.codebutler.farebot.activity.KeysActivity"
             android:label="@string/keys" />

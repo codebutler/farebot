@@ -100,20 +100,8 @@ public class MainActivity extends Activity {
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.about:
-                Uri.Builder b = Uri.parse("https://micolous.github.io/farebot/").buildUpon();
-                int version = -1;
-                try {
-                    version = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-                } catch (PackageManager.NameNotFoundException ex) {
-                    // Shouldn't hit this...
-                }
-
-                // Pass the version number to the website.
-                // This allows the website to have a hook showing if the user's version is out of date
-                // and flag specifically which cards *won't* be supported (or have problems).
-                b.appendQueryParameter("ver", Integer.toString(version));
-                startActivity(new Intent(Intent.ACTION_VIEW, b.build()));
-                return true;
+                startActivity(new Intent(this, AboutActivity.class));
+                break;
             case R.id.prefs:
                 startActivity(new Intent(this, FareBotPreferenceActivity.class));
                 break;

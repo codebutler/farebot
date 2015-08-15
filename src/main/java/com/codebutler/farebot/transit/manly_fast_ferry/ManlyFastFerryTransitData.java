@@ -1,9 +1,7 @@
 package com.codebutler.farebot.transit.manly_fast_ferry;
 
 import android.os.Parcel;
-import android.text.format.DateFormat;
 
-import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.UnauthorizedException;
 import com.codebutler.farebot.card.classic.ClassicBlock;
@@ -26,7 +24,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -206,7 +203,7 @@ public class ManlyFastFerryTransitData extends TransitData {
         ArrayList<ListItem> items = new ArrayList<>();
         items.add(new HeaderListItem(R.string.general));
         Date cLastTransactionTime = mEpochDate.getTime();
-        items.add(new ListItem(R.string.card_epoch, DateFormat.getLongDateFormat(FareBotApplication.getInstance()).format(cLastTransactionTime)));
+        items.add(new ListItem(R.string.card_epoch, Utils.longDateFormat(cLastTransactionTime)));
 
         return items;
     }

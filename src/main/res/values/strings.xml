@@ -66,7 +66,7 @@
     <string name="turn_on_nfc">Please enable NFC to read card information.</string>
     <string name="wireless_settings">Wireless Settings</string>
     <string name="report_error">Report Error</string>
-    <string name="unknown_card_description">This card is not yet supported by FareBot. Only raw data can be displayed.</string>
+    <string name="unknown_card_description">This card is not yet supported by Farebot. Only raw data can be displayed.</string>
     <string name="report_error_privacy_title">Privacy Notice</string>
     <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
     <string name="scanned_cards">Scanned Cards</string>
@@ -81,7 +81,7 @@
     <string name="unknown_format">Unknown (%s)</string>
     <string name="keys_required">Encryption keys are required to read this card.</string>
     <string name="load_keys">Load Keys</string>
-    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
+    <string name="card_keys_not_supported">Farebot does not support keys for this type of card.</string>
     <string name="add_key">Add Key</string>
     <string name="error">Error</string>
     <string name="keys">Keys</string>
@@ -102,6 +102,9 @@
     <string name="card_epoch">Card Epoch</string>
     <string name="card_not_supported_on_device">This card is not supported by your device.</string>
     <string name="card_note_cepas">Not compatible with all devices.</string>
+    <string name="visit_website">Visit Website</string>
+    <string name="title_activity_about">About Farebot M</string>
+
 
     <!-- Locations -->
     <string name="location_seattle">Seattle, WA</string>

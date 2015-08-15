@@ -39,7 +39,6 @@ import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.util.ImmutableMapBuilder;
 import com.codebutler.farebot.util.Utils;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 
 public class OVChipTransitData extends TransitData {
     public static final int  PROCESS_PURCHASE  =  0x00;
@@ -309,7 +309,7 @@ public class OVChipTransitData extends TransitData {
 
         items.add(new HeaderListItem("General Information"));
         items.add(new ListItem("Serial Number",   mPreamble.getId()));
-        items.add(new ListItem("Expiration Date", DateFormat.getDateInstance(DateFormat.LONG).format(OVChipTransitData.convertDate(mPreamble.getExpdate()))));
+        items.add(new ListItem("Expiration Date", Utils.longDateFormat(OVChipTransitData.convertDate(mPreamble.getExpdate()))));
         items.add(new ListItem("Card Type",       (mPreamble.getType() == 2 ? "Personal" : "Anonymous")));
         items.add(new ListItem("Issuer",          OVChipTransitData.getShortAgencyName(mInfo.getCompany())));
 
@@ -317,7 +317,7 @@ public class OVChipTransitData extends TransitData {
 
          if (mPreamble.getType() == 2) {
               items.add(new HeaderListItem("Personal Information"));
-              items.add(new ListItem("Birthdate", DateFormat.getDateInstance(DateFormat.LONG).format(mInfo.getBirthdate())));
+              items.add(new ListItem("Birthdate", Utils.longDateFormat(mInfo.getBirthdate())));
         }
 
         items.add(new HeaderListItem("Credit Information"));

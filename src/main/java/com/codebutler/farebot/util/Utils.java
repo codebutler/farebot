@@ -33,6 +33,7 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -41,6 +42,7 @@ import com.codebutler.farebot.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class Utils {
@@ -186,12 +188,31 @@ public class Utils {
     }
 
     public static String getDeviceInfoString() {
-        return String.format("Version: %s\nModel: %s (%s %s)\nOS: %s\n\n",
-            getVersionString(),
-            Build.MODEL,
-            Build.MANUFACTURER,
-            Build.BRAND,
-            Build.VERSION.RELEASE);
+        FareBotApplication app = FareBotApplication.getInstance();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(app);
+        boolean nfcAvailable = nfcAdapter != null;
+        boolean nfcEnabled = false;
+        if (nfcAvailable) {
+            nfcEnabled = nfcAdapter.isEnabled();
+        }
+
+        return String.format("Version: %s\nModel: %s (%s)\nManufacturer: %s (%s)\nAndroid OS: %s (%s)\n\nNFC available: %s\nNFC enabled: %s\nMifare Classic support: %s\n\n",
+                // Version:
+                getVersionString(),
+                // Model
+                Build.MODEL,
+                Build.DEVICE,
+                // Manufacturer / brand:
+                Build.MANUFACTURER,
+                Build.BRAND,
+                // OS:
+                Build.VERSION.RELEASE,
+                Build.ID,
+                // NFC:
+                nfcAvailable,
+                nfcEnabled,
+                app.getMifareClassicSupport()
+        );
     }
 
     private static String getVersionString() {
@@ -299,4 +320,31 @@ public class Utils {
         return res.getString(stringResource, formatArgs);
     }
 
+    public static String longDateFormat(Date date) {
+        return DateFormat.getLongDateFormat(FareBotApplication.getInstance()).format(date);
+    }
+
+    public static String longDateFormat(long milliseconds) {
+        return longDateFormat(new Date(milliseconds));
+    }
+
+    public static String dateFormat(Date date) {
+        return DateFormat.getDateFormat(FareBotApplication.getInstance()).format(date);
+    }
+
+    public static String dateFormat(long milliseconds) {
+        return dateFormat(new Date(milliseconds));
+    }
+
+    public static String timeFormat(Date date) {
+        return DateFormat.getTimeFormat(FareBotApplication.getInstance()).format(date);
+    }
+
+    public static String timeFormat(long milliseconds) {
+        return timeFormat(new Date(milliseconds));
+    }
+
+    public static String dateTimeFormat(Date date) {
+        return dateFormat(date) + " " + timeFormat(date);
+    }
 }
