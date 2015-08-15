@@ -5,7 +5,8 @@ public enum CardType {
     MifareUltralight(1),
     MifareDesfire(2),
     CEPAS(3),
-    FeliCa(4);
+    FeliCa(4),
+    Unknown(65535);
 
     public static CardType parseValue(String value) {
         return CardType.class.getEnumConstants()[Integer.parseInt(value)];
@@ -33,6 +34,7 @@ public enum CardType {
                 return "CEPAS";
             case 4:
                 return "FeliCa";
+            case 65535:
             default:
                 return "Unknown";
         }

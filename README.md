@@ -50,7 +50,7 @@ See [the Project Status page on the wiki][19].
 
 FareBot requires an NFC Android phone running 4.0.3 or later.
 
-Some newer devices do not support MIFARE Classic.  MIFARE Classic is not an NFC-compliant card format, so can only be read with older phones with non-Broadcom chipsets.
+Some newer devices do not support MIFARE Classic.  MIFARE Classic is not an NFC-compliant card format, so can only be read with phones with NXP chipsets.
 
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/

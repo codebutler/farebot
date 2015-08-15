@@ -100,11 +100,8 @@
     <string name="vehicle_type">Vehicle type</string>
     <string name="transaction_type">Transaction type</string>
     <string name="card_epoch">Card Epoch</string>
-
-    <string name="card_note_bilheteunicosp">Requires encryption keys.</string>
-    <string name="card_note_ezlink">Not compatible with all devices.</string>
-    <string name="card_note_manly_fast_ferry">Not compatible with all devices. Requires encryption keys.</string>
-    <string name="card_note_ovchip">Requires encryption keys.</string>
+    <string name="card_not_supported_on_device">This card is not supported by your device.</string>
+    <string name="card_note_cepas">Not compatible with all devices.</string>
 
     <!-- Locations -->
     <string name="location_seattle">Seattle, WA</string>

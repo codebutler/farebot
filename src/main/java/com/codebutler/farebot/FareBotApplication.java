@@ -71,6 +71,7 @@ public class FareBotApplication extends Application {
     private DBUtil mSuicaDBUtil;
     private OVChipDBUtil mOVChipDBUtil;
     private final Serializer mSerializer;
+    private boolean mMifareClassicSupport;
 
     public FareBotApplication() {
         sInstance = this;
@@ -126,8 +127,13 @@ public class FareBotApplication extends Application {
         return mSerializer;
     }
 
+    public boolean getMifareClassicSupport() { return mMifareClassicSupport; }
+
     @Override public void onCreate() {
         super.onCreate();
+
+        // Check for Mifare Classic support
+        mMifareClassicSupport = this.getPackageManager().hasSystemFeature("com.nxp.mifare");
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
             .detectAll()

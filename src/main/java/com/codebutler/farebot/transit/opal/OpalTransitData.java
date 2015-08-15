@@ -44,7 +44,7 @@ public class OpalTransitData extends TransitData {
 
     private static GregorianCalendar OPAL_EPOCH = new GregorianCalendar(1980, Calendar.JANUARY, 1);
     private static OpalSubscription OPAL_AUTOMATIC_TOP_UP = new OpalSubscription();
-    private static final String NAME = "Opal";
+    public static final String NAME = "Opal";
 
 
     public static boolean check (Card card) {
