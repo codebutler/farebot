@@ -4,6 +4,8 @@ View your remaining balance, recent trips, and other information from contactles
 
 This fork is maintained by Michael, which contains some support for additional cards.
 
+**Version**: 2.9.22
+
 ## Principally Written By
 
 * [Eric Butler][5] <eric@codebutler.com>
