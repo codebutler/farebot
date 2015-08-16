@@ -20,3 +20,5 @@ crashlytics.properties
 fabric.properties
 *.apk
 manifest-merger-release-report.txt
+*.zip
+*scan_*/

@@ -105,7 +105,7 @@ public class OpalTransitData extends TransitData {
     }
 
     private static String formatSerialNumber(int serialNumber, int lastDigit) {
-        return String.format("308522%09d%01d", new Object[] { serialNumber, lastDigit });
+        return String.format("308522%09d%01d", serialNumber, lastDigit);
 
     }
     public Calendar getLastTransactionTime() {
