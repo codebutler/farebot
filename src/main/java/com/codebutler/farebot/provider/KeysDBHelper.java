@@ -26,12 +26,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.codebutler.farebot.BuildConfig;
+
 public class KeysDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "keys.db";
     private static final int DATABASE_VERSION = 3;
 
-    public static final String KEY_DIR_TYPE  = "vnd.android.cursor.dir/com.codebutler.farebot.key";
-    public static final String KEY_ITEM_TYPE = "vnd.android.cursor.item/com.codebutler.farebot.key";
+    public static final String KEY_DIR_TYPE  = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".key";
+    public static final String KEY_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".key";
 
     public KeysDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

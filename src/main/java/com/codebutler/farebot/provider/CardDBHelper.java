@@ -27,6 +27,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.codebutler.farebot.BuildConfig;
+
 public class CardDBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "cards.db";
     public static final int DATABASE_VERSION = 2;
@@ -34,8 +36,8 @@ public class CardDBHelper extends SQLiteOpenHelper {
     public static final int CARD_COLLECTION_URI_INDICATOR = 1;
     public static final int SINGLE_CARD_URI_INDICATOR = 2;
 
-    public static final String CARD_DIR_TYPE  = "vnd.android.cursor.dir/com.codebutler.farebot.card";
-    public static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/com.codebutler.farebot.card";
+    public static final String CARD_DIR_TYPE  = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".card";
+    public static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".card";
 
     public static final String[] PROJECTION = new String[] {
         CardsTableColumns._ID,
