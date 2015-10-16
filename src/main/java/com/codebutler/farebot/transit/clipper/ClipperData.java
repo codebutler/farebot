@@ -62,13 +62,13 @@ final class ClipperData {
         put((long)0x17, new Station("Ashby Station",                             "Ashby",                "37.85303",  "-122.269965"));
         put((long)0x18, new Station("Downtown Berkeley Station",                 "Berkeley",             "37.869868", "-122.268051"));
         put((long)0x19, new Station("North Berkeley Station",                    "North Berkeley",       "37.874026", "-122.283882"));
-        put((long)0x20, new Station("Coliseum/Oakland Airport BART",             "Coliseum/OAK",         "37.754270", "-122.197757"));
+        put((long)0x20, new Station("Coliseum Station",                          "Coliseum",             "37.754270", "-122.197757"));
         put((long)0x1a, new Station("El Cerrito Plaza Station",                  "El Cerrito Plaza",     "37.903959", "-122.299271"));
         put((long)0x1b, new Station("El Cerrito Del Norte Station",              "El Cerrito Del Norte", "37.925651", "-122.317219"));
         put((long)0x1c, new Station("Richmond Station",                          "Richmond",             "37.93730",  "-122.35338"));
         put((long)0x1d, new Station("Lake Merritt Station",                      "Lake Merritt",         "37.79761",  "-122.26564"));
         put((long)0x1e, new Station("Fruitvale Station",                         "Fruitvale",            "37.77495",  "-122.22425"));
-        put((long)0x1f, new Station("Coliseum/Oakland Airport Station",          "Coliseum/OAK",         "37.75256",  "-122.19806"));
+        put((long)0x1f, new Station("Coliseum Station",                          "Coliseum",             "37.75256",  "-122.19806"));
         put((long)0x22, new Station("Hayward Station",                           "Hayward",              "37.670387", "-122.088002"));
         put((long)0x23, new Station("South Hayward Station",                     "South Hayward",        "37.634800", "-122.057551"));
         put((long)0x24, new Station("Union City Station",                        "Union City",           "37.591203", "-122.017854"));
@@ -79,6 +79,7 @@ final class ClipperData {
         put((long)0x2a, new Station("San Francisco Int'l Airport Station",       "SFO",                  "37.61590",  "-122.39263"));
         put((long)0x2b, new Station("Millbrae Station",                          "Millbrae",             "37.599935", "-122.386478"));
         put((long)0x2c, new Station("West Dublin/Pleasanton Station",            "W. Dublin/Pleasanton", "37.699764", "-121.928118"));
+        put((long)0x2d, new Station("Oakland Airport Station",                   "OAK Airport",          "37.75256",  "-122.19806"));
     }};
 
     static Map<Long, String> GG_FERRY_ROUTES = new HashMap<Long, String>() {{
