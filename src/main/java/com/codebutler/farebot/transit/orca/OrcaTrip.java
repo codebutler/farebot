@@ -113,6 +113,8 @@ public class OrcaTrip extends Trip {
                 return "Sound Transit";
             case OrcaTransitData.AGENCY_WSF:
                 return "Washington State Ferries";
+            case OrcaTransitData.AGENCY_ET:
+                return "Everett Transit";
         }
         return String.format("Unknown Agency: %s", mAgency);
     }
@@ -129,6 +131,8 @@ public class OrcaTrip extends Trip {
                 return "ST";
             case OrcaTransitData.AGENCY_WSF:
                 return "WSF";
+            case OrcaTransitData.AGENCY_ET:
+                return "ET";
         }
         return String.format("Unknown Agency: %s", mAgency);
     }
