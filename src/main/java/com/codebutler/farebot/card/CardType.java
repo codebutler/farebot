@@ -17,11 +17,11 @@ public enum CardType {
         mValue = value;
     }
 
-    public int toInteger () {
+    public int toInteger() {
         return mValue;
     }
 
-    public String toString () {
+    public String toString() {
         switch (mValue) {
             case 0:
                 return "MIFARE Classic";

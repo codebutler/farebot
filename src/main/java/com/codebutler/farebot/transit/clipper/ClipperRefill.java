@@ -13,7 +13,7 @@ public class ClipperRefill extends Refill {
     final long mMachineID;
     final long mAgency;
 
-    public static Creator<ClipperRefill> CREATOR = new Creator<ClipperRefill>() {
+    public static final Creator<ClipperRefill> CREATOR = new Creator<ClipperRefill>() {
         public ClipperRefill createFromParcel(Parcel parcel) {
             return new ClipperRefill(parcel);
         }
@@ -37,27 +37,27 @@ public class ClipperRefill extends Refill {
         mAgency    = parcel.readLong();
     }
 
-    @Override public long getTimestamp () {
+    @Override public long getTimestamp() {
         return mTimestamp;
     }
 
-    @Override public long getAmount () {
+    @Override public long getAmount() {
         return mAmount;
     }
 
-    @Override public String getAmountString () {
+    @Override public String getAmountString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format((double)mAmount / 100.0);
     }
 
-    public long getMachineID () {
+    public long getMachineID() {
         return mMachineID;
     }
 
-    @Override public String getAgencyName () {
+    @Override public String getAgencyName() {
         return ClipperTransitData.getAgencyName((int)mAgency);
     }
 
-    @Override public String getShortAgencyName () {
+    @Override public String getShortAgencyName() {
         return ClipperTransitData.getShortAgencyName((int) mAgency);
     }
 

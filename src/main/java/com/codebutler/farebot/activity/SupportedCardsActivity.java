@@ -46,7 +46,7 @@ public class SupportedCardsActivity extends Activity {
         setContentView(R.layout.activity_supported_cards);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        
+
         ((Gallery) findViewById(R.id.gallery)).setAdapter(new CardsAdapter(this));
     }
 
@@ -59,7 +59,7 @@ public class SupportedCardsActivity extends Activity {
         }
         return false;
     }
-    
+
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
         public CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
@@ -75,14 +75,15 @@ public class SupportedCardsActivity extends Activity {
             add(new CardInfo(R.drawable.bilheteunicosp_card, "Bilhete Único", R.string.location_sao_paulo,       R.string.card_note_bilheteunicosp));
             add(new CardInfo(R.drawable.hsl_card,            "HSL",           R.string.location_helsinki_finland));
         }
-        
+
         @Override public View getView(int position, View convertView, ViewGroup group) {
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.supported_card, null);
             }
 
             CardInfo info = getItem(position);
-            Spanned text = Html.fromHtml(String.format("<b>%s</b><br>%s", info.getName(), getString(info.getLocationId())));
+            Spanned text = Html.fromHtml(String.format("<b>%s</b><br>%s", info.getName(),
+                    getString(info.getLocationId())));
 
             ((ImageView) convertView.findViewById(R.id.image)).setImageResource(info.getImageId());
             ((TextView)  convertView.findViewById(R.id.text)).setText(text);
@@ -90,7 +91,7 @@ public class SupportedCardsActivity extends Activity {
             if (info.getNoteId() >= 0) {
                 ((TextView) convertView.findViewById(R.id.note)).setText(info.getNoteId());
             }
-            
+
             return convertView;
         }
     }

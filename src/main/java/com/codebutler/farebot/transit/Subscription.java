@@ -8,7 +8,7 @@
  *
  * Based on code from http://http://www.huuf.info/OV/
  * by Huuf. See project URL for complete author information.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@ import java.util.Date;
 public abstract class Subscription implements Parcelable {
     public abstract int getId();
 
-    public abstract Date getValidFrom ();
+    public abstract Date getValidFrom();
     public abstract Date getValidTo();
 
     public abstract String getAgencyName();

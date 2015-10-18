@@ -84,7 +84,8 @@ public class OVChipDBUtil {
             this.copyDatabase();
         }
 
-        mDatabase = SQLiteDatabase.openDatabase(new File(DB_PATH, DB_NAME).getPath(), null, SQLiteDatabase.OPEN_READONLY);
+        mDatabase = SQLiteDatabase.openDatabase(new File(DB_PATH, DB_NAME).getPath(), null,
+                SQLiteDatabase.OPEN_READONLY);
         return mDatabase;
     }
 

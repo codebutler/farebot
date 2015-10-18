@@ -39,7 +39,7 @@ public class UnsupportedTagException extends Exception {
         return mTagId;
     }
 
-    @Override public String getMessage () {
+    @Override public String getMessage() {
         StringBuilder builder = new StringBuilder();
         for (String tech : mTechList) {
             builder.append("\n  ");

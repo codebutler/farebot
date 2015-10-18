@@ -75,7 +75,7 @@ public class CardsFragment extends ListFragment {
 
     private Map<String, TransitIdentity> mDataCache;
 
-    private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<android.database.Cursor>() {
+    private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
             return new CursorLoader(getActivity(), CardProvider.CONTENT_URI_CARD,
                 CardDBHelper.PROJECTION,
@@ -124,7 +124,7 @@ public class CardsFragment extends ListFragment {
         inflater.inflate(R.menu.cards_menu, menu);
     }
 
-    @Override public void onCreateContextMenu (ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+    @Override public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         getActivity().getMenuInflater().inflate(R.menu.card_context_menu, menu);
     }
 
@@ -186,7 +186,7 @@ public class CardsFragment extends ListFragment {
        return false;
     }
 
-    @Override public void onActivityResult (int requestCode, int resultCode, Intent data) {
+    @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_SELECT_FILE) {
                 Uri uri = data.getData();
@@ -198,7 +198,7 @@ public class CardsFragment extends ListFragment {
         }
     }
 
-    private void onCardsImported (Uri[] uris) {
+    private void onCardsImported(Uri[] uris) {
         ((CursorAdapter) ((ListView) getView().findViewById(android.R.id.list)).getAdapter()).notifyDataSetChanged();
         if (uris.length == 1) {
             Toast.makeText(getActivity(), "Card imported!", Toast.LENGTH_SHORT).show();
@@ -243,7 +243,10 @@ public class CardsFragment extends ListFragment {
                    // textView1.setText(identity.getName());
                    textView1.setText(String.format("%s: %s", identity.getName(), serial));
                }
-               textView2.setText(getString(R.string.scanned_at_format, SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(scannedAt), SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(scannedAt)));
+               DateFormat timeInstance = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
+               DateFormat dateInstance = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+               textView2.setText(getString(R.string.scanned_at_format, timeInstance.format(scannedAt),
+                       dateInstance.format(scannedAt)));
            } else {
                textView1.setText(getString(R.string.unknown_card));
                textView2.setText(String.format("%s - %s", CardType.values()[type].toString(), serial));

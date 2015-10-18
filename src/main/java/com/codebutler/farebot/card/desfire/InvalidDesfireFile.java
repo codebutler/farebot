@@ -14,7 +14,7 @@ public class InvalidDesfireFile extends DesfireFile {
         mErrorMessage = errorMessage;
     }
 
-    public String getErrorMessage () {
+    public String getErrorMessage() {
         return mErrorMessage;
     }
 

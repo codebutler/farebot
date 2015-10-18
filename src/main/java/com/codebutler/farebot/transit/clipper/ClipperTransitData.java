@@ -55,13 +55,13 @@ public class ClipperTransitData extends TransitData {
     private ClipperTrip[]   mTrips;
     private ClipperRefill[] mRefills;
 
-    private static final long EPOCH_OFFSET    = 0x83aa7f18;
+    private static final long EPOCH_OFFSET = 0x83aa7f18;
 
-    public static boolean check (Card card) {
+    public static boolean check(Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
     }
-    
-    public static Creator<ClipperTransitData> CREATOR = new Creator<ClipperTransitData>() {
+
+    public static final Creator<ClipperTransitData> CREATOR = new Creator<ClipperTransitData>() {
         public ClipperTransitData createFromParcel(Parcel parcel) {
             return new ClipperTransitData(parcel);
         }
@@ -70,8 +70,8 @@ public class ClipperTransitData extends TransitData {
             return new ClipperTransitData[size];
         }
     };
-        
-    public static TransitIdentity parseTransitIdentity (Card card) {
+
+    public static TransitIdentity parseTransitIdentity(Card card) {
         try {
            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
            return new TransitIdentity("Clipper", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
@@ -83,14 +83,14 @@ public class ClipperTransitData extends TransitData {
     public ClipperTransitData(Parcel parcel) {
         mSerialNumber = parcel.readLong();
         mBalance      = (short) parcel.readLong();
-                
+
         mTrips = new ClipperTrip[parcel.readInt()];
         parcel.readTypedArray(mTrips, ClipperTrip.CREATOR);
-        
+
         mRefills = new ClipperRefill[parcel.readInt()];
         parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
     }
-    
+
     public ClipperTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
 
@@ -125,23 +125,23 @@ public class ClipperTransitData extends TransitData {
         setBalances();
     }
 
-    @Override public String getCardName () {
+    @Override public String getCardName() {
         return "Clipper";
     }
 
-    @Override public String getBalanceString () {
+    @Override public String getBalanceString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100.0);
     }
 
-    @Override public String getSerialNumber () {
+    @Override public String getSerialNumber() {
         return Long.toString(mSerialNumber);
     }
 
-    @Override public Trip[] getTrips () {
+    @Override public Trip[] getTrips() {
         return mTrips;
     }
 
-    public ClipperRefill[] getRefills () {
+    public ClipperRefill[] getRefills() {
         return mRefills;
     }
 
@@ -153,7 +153,7 @@ public class ClipperTransitData extends TransitData {
         return null;
     }
 
-    private ClipperTrip[] parseTrips (DesfireCard card) {
+    private ClipperTrip[] parseTrips(DesfireCard card) {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x0e);
 
         /*
@@ -195,7 +195,7 @@ public class ClipperTransitData extends TransitData {
         return useLog;
     }
 
-    private ClipperTrip createTrip (byte[] useData) {
+    private ClipperTrip createTrip(byte[] useData) {
         long timestamp, exitTimestamp, fare, agency, from, to, route;
 
         timestamp     = Utils.byteArrayToLong(useData,  0xc, 4);
@@ -215,7 +215,7 @@ public class ClipperTransitData extends TransitData {
         return new ClipperTrip(timestamp, exitTimestamp, fare, agency, from, to, route);
     }
 
-    private ClipperRefill[] parseRefills (DesfireCard card) {
+    private ClipperRefill[] parseRefills(DesfireCard card) {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x04);
 
         /*
@@ -223,7 +223,7 @@ public class ClipperTransitData extends TransitData {
          *  be only a regular file.  As such, we'll need to extract the records
          *  manually.
          */
-        byte [] data = file.getData();
+        byte[] data = file.getData();
         int pos = data.length - RECORD_LENGTH;
         List<ClipperRefill> result = new ArrayList<>();
         while (pos > 0) {
@@ -243,7 +243,7 @@ public class ClipperTransitData extends TransitData {
         return useLog;
     }
 
-    private ClipperRefill createRefill (byte[] useData) {
+    private ClipperRefill createRefill(byte[] useData) {
         long timestamp, amount, agency, machineid;
 
         timestamp = Utils.byteArrayToLong(useData, 0x4, 4);
@@ -259,20 +259,18 @@ public class ClipperTransitData extends TransitData {
     }
 
     private void setBalances() {
-        int trip_idx = 0;
-        int refill_idx = 0;
+        int tripIdx = 0;
+        int refillIdx = 0;
         long balance = (long) mBalance;
 
-        while (trip_idx < mTrips.length) {
-            while (refill_idx < mRefills.length &&
-                    mRefills[refill_idx].getTimestamp() >
-                        mTrips[trip_idx].getTimestamp()) {
-                balance -= mRefills[refill_idx].mAmount;
-                refill_idx++;
+        while (tripIdx < mTrips.length) {
+            while (refillIdx < mRefills.length && mRefills[refillIdx].getTimestamp() > mTrips[tripIdx].getTimestamp()) {
+                balance -= mRefills[refillIdx].mAmount;
+                refillIdx++;
             }
-            mTrips[trip_idx].mBalance = balance;
-            balance += mTrips[trip_idx].mFare;
-            trip_idx++;
+            mTrips[tripIdx].mBalance = balance;
+            balance += mTrips[tripIdx].mFare;
+            tripIdx++;
         }
     }
 
@@ -283,7 +281,7 @@ public class ClipperTransitData extends TransitData {
         return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
-    public static String getShortAgencyName (int agency) {
+    public static String getShortAgencyName(int agency) {
         if (ClipperData.SHORT_AGENCIES.containsKey(agency)) {
             return ClipperData.SHORT_AGENCIES.get(agency);
         }
@@ -300,5 +298,4 @@ public class ClipperTransitData extends TransitData {
         parcel.writeInt(mRefills.length);
         parcel.writeTypedArray(mRefills, flags);
     }
-
 }

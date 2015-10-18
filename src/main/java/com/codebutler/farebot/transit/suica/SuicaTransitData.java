@@ -53,7 +53,7 @@ import java.util.List;
 public class SuicaTransitData extends TransitData {
     private SuicaTrip[] mTrips;
 
-    public Creator<SuicaTransitData> CREATOR = new Creator<SuicaTransitData>() {
+    public static final Creator<SuicaTransitData> CREATOR = new Creator<SuicaTransitData>() {
         public SuicaTransitData createFromParcel(Parcel parcel) {
             return new SuicaTransitData(parcel);
         }
@@ -67,7 +67,7 @@ public class SuicaTransitData extends TransitData {
         return (card.getSystem(FeliCaLib.SYSTEMCODE_SUICA) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity (FelicaCard card) {
+    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
         return new TransitIdentity("Suica", null); // FIXME: Could be ICOCA, etc.
     }
 
@@ -100,7 +100,7 @@ public class SuicaTransitData extends TransitData {
 
         // Return trips in descending order.
         Collections.reverse(trips);
-        
+
         mTrips = trips.toArray(new SuicaTrip[trips.size()]);
     }
 

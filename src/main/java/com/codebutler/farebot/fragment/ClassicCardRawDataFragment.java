@@ -49,7 +49,7 @@ import java.util.List;
 public class ClassicCardRawDataFragment extends ExpandableListFragment {
     private ClassicCard mCard;
 
-    public void onCreate (Bundle bundle) {
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
         mCard = (ClassicCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));

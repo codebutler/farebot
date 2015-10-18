@@ -67,7 +67,7 @@ public class CardInfoActivity extends Activity {
     private TextToSpeech    mTTS;
 
     private OnInitListener mTTSInitListener = new OnInitListener() {
-        public void onInit (int status) {
+        public void onInit(int status) {
             if (status == TextToSpeech.SUCCESS) {
                 mTTS.speak(getString(R.string.balance_speech, mTransitData.getBalanceString()), TextToSpeech.QUEUE_FLUSH, null);
             }
@@ -84,11 +84,11 @@ public class CardInfoActivity extends Activity {
         final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(R.string.loading);
-        
+
         new AsyncTask<Void, Void, Void>() {
             private Exception mException;
             public boolean mSpeakBalanceEnabled;
-            
+
             @Override protected Void doInBackground(Void... voids) {
                 try {
                     Uri uri = getIntent().getData();
@@ -130,17 +130,20 @@ public class CardInfoActivity extends Activity {
                     return;
                 }
 
-                String titleSerial = (mTransitData.getSerialNumber() != null) ? mTransitData.getSerialNumber() : Utils.getHexString(mCard.getTagId(), "");
+                String titleSerial = (mTransitData.getSerialNumber() != null) ? mTransitData.getSerialNumber()
+                        : Utils.getHexString(mCard.getTagId(), "");
                 actionBar.setTitle(mTransitData.getCardName() + " " + titleSerial);
 
                 Bundle args = new Bundle();
-                args.putString(AdvancedCardInfoActivity.EXTRA_CARD, mCard.toXml(FareBotApplication.getInstance().getSerializer()));
+                args.putString(AdvancedCardInfoActivity.EXTRA_CARD,
+                        mCard.toXml(FareBotApplication.getInstance().getSerializer()));
                 args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
-                
+
                 mTabsAdapter.addTab(actionBar.newTab().setText(R.string.balance), CardBalanceFragment.class, args);
 
                 if (mTransitData.getTrips() != null) {
-                    int textId = (mTransitData instanceof SuicaTransitData) || (mTransitData instanceof EdyTransitData) ? R.string.history : R.string.trips;
+                    int textId = (mTransitData instanceof SuicaTransitData) || (mTransitData instanceof EdyTransitData)
+                            ? R.string.history : R.string.trips;
                     mTabsAdapter.addTab(actionBar.newTab().setText(textId), CardTripsFragment.class, args);
                 }
 
@@ -149,13 +152,14 @@ public class CardInfoActivity extends Activity {
                 }
 
                 if (mTransitData.getSubscriptions() != null) {
-                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.subscriptions), CardSubscriptionsFragment.class, args);
+                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.subscriptions), CardSubscriptionsFragment.class,
+                            args);
                 }
 
                 if (mTransitData.getInfo() != null) {
                     mTabsAdapter.addTab(actionBar.newTab().setText(R.string.info), CardInfoFragment.class, args);
                 }
-                
+
                 if (mTabsAdapter.getCount() > 1) {
                     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                 }
@@ -176,12 +180,12 @@ public class CardInfoActivity extends Activity {
         bundle.putInt(KEY_SELECTED_TAB, ((ViewPager) findViewById(R.id.pager)).getCurrentItem());
     }
 
-    @Override public boolean onCreateOptionsMenu (Menu menu) {
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.card_info_menu, menu);
         return true;
     }
 
-    @Override public boolean onOptionsItemSelected (MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, CardsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -194,9 +198,10 @@ public class CardInfoActivity extends Activity {
         return false;
     }
 
-    private void showAdvancedInfo (Exception ex) {
+    private void showAdvancedInfo(Exception ex) {
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
-        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard.toXml(FareBotApplication.getInstance().getSerializer()));
+        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD,
+                mCard.toXml(FareBotApplication.getInstance().getSerializer()));
         if (ex != null) {
             intent.putExtra(AdvancedCardInfoActivity.EXTRA_ERROR, ex);
         }

@@ -40,17 +40,17 @@ public class OVChipInfo implements Parcelable {
     private final int  mCharge;
     private final int  mUnknown;
 
-    public OVChipInfo (
-    		int company,
-    		int expdate,
+    public OVChipInfo(
+            int company,
+            int expdate,
             Date birthdate,
             int  active,
             int  limit,
             int  charge,
             int  unknown
     ) {
-    	mCompany = company;
-    	mExpdate = expdate;
+        mCompany = company;
+        mExpdate = expdate;
         mBirthdate = birthdate;
         mActive = active;
         mLimit = limit;
@@ -58,7 +58,7 @@ public class OVChipInfo implements Parcelable {
         mUnknown = unknown;
     }
 
-    public OVChipInfo (byte[] data) {
+    public OVChipInfo(byte[] data) {
         if (data == null) {
             data = new byte[48];
         }
@@ -154,13 +154,13 @@ public class OVChipInfo implements Parcelable {
                     active, limit, charge, unknown);
         }
 
-        public OVChipInfo[] newArray (int size) {
+        public OVChipInfo[] newArray(int size) {
             return new OVChipInfo[size];
         }
     };
 
     public void writeToParcel(Parcel parcel, int flags) {
-    	parcel.writeInt(mCompany);
+        parcel.writeInt(mCompany);
         parcel.writeInt(mExpdate);
         parcel.writeLong(mBirthdate.getTime());
         parcel.writeInt(mActive);

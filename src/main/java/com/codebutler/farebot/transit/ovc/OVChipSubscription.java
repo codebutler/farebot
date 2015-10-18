@@ -26,10 +26,10 @@ package com.codebutler.farebot.transit.ovc;
 import android.os.Parcel;
 
 import com.codebutler.farebot.transit.Subscription;
+import com.codebutler.farebot.util.ImmutableMapBuilder;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class OVChipSubscription extends Subscription {
@@ -49,41 +49,40 @@ public class OVChipSubscription extends Subscription {
     private final int mUsed;
     private final int mRest;
 
-    private static Map<Integer, String> sSubscriptions = new HashMap<Integer, String>() {
-        /* It seems that all the IDs are unique, so why bother with the companies? */ {
+    private static final Map<Integer, String> SUBSCRIPTIONS = new ImmutableMapBuilder<Integer, String>()
+            /* It seems that all the IDs are unique, so why bother with the companies? */
             /* NS */
-            put(0x0005, "OV-jaarkaart");
-            put(0x0007, "OV-Bijkaart 1e klas");
-            put(0x0011, "NS Businesscard");
-            put(0x0019, "Voordeelurenabonnement (twee jaar)");
-            put(0x00AF, "Studenten OV-chipkaart week (2009)");
-            put(0x00B0, "Studenten OV-chipkaart weekend (2009)");
-            put(0x00B1, "Studentenkaart korting week (2009)");
-            put(0x00B2, "Studentenkaart korting weekend (2009)");
-            put(0x00C9, "Reizen op saldo bij NS, 1e klasse");
-            put(0x00CA, "Reizen op saldo bij NS, 2de klasse");
-            put(0x00CE, "Voordeelurenabonnement reizen op saldo");
-            put(0x00E5, "Reizen op saldo (tijdelijk eerste klas)");
-            put(0x00E6, "Reizen op saldo (tijdelijk tweede klas)");
-            put(0x00E7, "Reizen op saldo (tijdelijk eerste klas korting)");
+            .put(0x0005, "OV-jaarkaart")
+            .put(0x0007, "OV-Bijkaart 1e klas")
+            .put(0x0011, "NS Businesscard")
+            .put(0x0019, "Voordeelurenabonnement (twee jaar)")
+            .put(0x00AF, "Studenten OV-chipkaart week (2009)")
+            .put(0x00B0, "Studenten OV-chipkaart weekend (2009)")
+            .put(0x00B1, "Studentenkaart korting week (2009)")
+            .put(0x00B2, "Studentenkaart korting weekend (2009)")
+            .put(0x00C9, "Reizen op saldo bij NS, 1e klasse")
+            .put(0x00CA, "Reizen op saldo bij NS, 2de klasse")
+            .put(0x00CE, "Voordeelurenabonnement reizen op saldo")
+            .put(0x00E5, "Reizen op saldo (tijdelijk eerste klas)")
+            .put(0x00E6, "Reizen op saldo (tijdelijk tweede klas)")
+            .put(0x00E7, "Reizen op saldo (tijdelijk eerste klas korting)")
             /* Arriva */
-            put(0x059A, "Dalkorting");
+            .put(0x059A, "Dalkorting")
             /* Veolia */
-            put(0x0626, "DALU Dalkorting");
+            .put(0x0626, "DALU Dalkorting")
             /* Connexxion */
-            put(0x0692, "Daluren Oost-Nederland");
-            put(0x069C, "Daluren Oost-Nederland");
+            .put(0x0692, "Daluren Oost-Nederland")
+            .put(0x069C, "Daluren Oost-Nederland")
             /* DUO */
-            put(0x09C6, "Student weekend-vrij");
-            put(0x09C7, "Student week-korting");
-            put(0x09C9, "Student week-vrij");
-            put(0x09CA, "Student weekend-korting");
+            .put(0x09C6, "Student weekend-vrij")
+            .put(0x09C7, "Student week-korting")
+            .put(0x09C9, "Student week-vrij")
+            .put(0x09CA, "Student weekend-korting")
             /* GVB */
-            put(0x0BBD, "Fietssupplement");
-        }
-    };
+            .put(0x0BBD, "Fietssupplement")
+            .build();
 
-    public static Creator<OVChipSubscription> CREATOR = new Creator<OVChipSubscription>() {
+    public static final Creator<OVChipSubscription> CREATOR = new Creator<OVChipSubscription>() {
         public OVChipSubscription createFromParcel(Parcel parcel) {
             return new OVChipSubscription(parcel);
         }
@@ -128,7 +127,7 @@ public class OVChipSubscription extends Subscription {
 
             if ((fieldbits & 0x0000400) != 0x00) {
                 subscription = Utils.getBitsFromBuffer(data, iBitOffset, 16);
-                iBitOffset += 24;	/* skipping the first 8 bits, as they are not used OR don't belong to subscriptiontype at all */
+                iBitOffset += 24; /* skipping the first 8 bits, as they are not used OR don't belong to subscriptiontype at all */
             }
 
             if ((fieldbits & 0x0000800) != 0x00) {
@@ -213,8 +212,8 @@ public class OVChipSubscription extends Subscription {
     }
 
     public static String getSubscriptionName(int subscription) {
-        if (sSubscriptions.containsKey(subscription)) {
-            return sSubscriptions.get(subscription);
+        if (SUBSCRIPTIONS.containsKey(subscription)) {
+            return SUBSCRIPTIONS.get(subscription);
         }
         return "Unknown Subscription (0x" + Long.toString(subscription, 16) + ")";
     }
@@ -227,14 +226,14 @@ public class OVChipSubscription extends Subscription {
         if (mValidFromTime != 0)
             return OVChipTransitData.convertDate((int) mValidFromDate, (int) mValidFromTime);
         else
-        	return OVChipTransitData.convertDate((int) mValidFromDate);
+            return OVChipTransitData.convertDate((int) mValidFromDate);
     }
 
     @Override public Date getValidTo() {
-    	if (mValidToTime != 0)
+        if (mValidToTime != 0)
             return OVChipTransitData.convertDate((int) mValidToDate, (int) mValidToTime);
         else
-        	return OVChipTransitData.convertDate((int) mValidToDate);
+            return OVChipTransitData.convertDate((int) mValidToDate);
     }
 
     @Override public String getSubscriptionName() {
@@ -248,23 +247,23 @@ public class OVChipSubscription extends Subscription {
         return "Deactivated";
     }
 
-    @Override public int getMachineId () {
+    @Override public int getMachineId() {
         return mMachineId;
     }
 
-    @Override public String getAgencyName () {
+    @Override public String getAgencyName() {
         return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
     }
 
-    @Override public String getShortAgencyName () {
+    @Override public String getShortAgencyName() {
         return OVChipTransitData.getShortAgencyName(mAgency);
     }
 
-    public int getUnknown1 () {
+    public int getUnknown1() {
         return mUnknown1;
     }
 
-    public int getUnknown2 () {
+    public int getUnknown2() {
         return mUnknown2;
     }
 

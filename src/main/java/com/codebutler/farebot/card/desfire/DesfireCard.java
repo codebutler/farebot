@@ -60,7 +60,7 @@ public class DesfireCard extends Card {
 
         DesfireManufacturingData manufData;
         DesfireApplication[]     appsArray;
-        
+
         try {
             DesfireProtocol desfireTag = new DesfireProtocol(tech);
 
@@ -105,7 +105,7 @@ public class DesfireCard extends Card {
 
     private DesfireCard() { /* For XML Serializer */ }
 
-    DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication apps[]) {
+    DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication[] apps) {
         super(CardType.MifareDesfire, tagId, scannedAt);
         mManfData = manfData;
         mApplications = Utils.arrayAsList(apps);
@@ -120,7 +120,7 @@ public class DesfireCard extends Card {
             return HSLTransitData.parseTransitIdentity(this);
         return null;
     }
-    
+
     @Override public TransitData parseTransitData() {
         if (OrcaTransitData.check(this))
             return new OrcaTransitData(this);
@@ -135,7 +135,7 @@ public class DesfireCard extends Card {
         return mApplications;
     }
 
-    public DesfireApplication getApplication (int appId) {
+    public DesfireApplication getApplication(int appId) {
         for (DesfireApplication app : mApplications) {
             if (app.getId() == appId)
                 return app;
@@ -143,7 +143,7 @@ public class DesfireCard extends Card {
         return null;
     }
 
-    public DesfireManufacturingData getManufacturingData () {
+    public DesfireManufacturingData getManufacturingData() {
         return mManfData;
     }
 }

@@ -66,7 +66,7 @@ public class OrcaTransitData extends TransitData {
     private double mBalance;
     private Trip[] mTrips;
 
-    public static boolean check (Card card) {
+    public static boolean check(Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
     }
 
@@ -79,15 +79,15 @@ public class OrcaTransitData extends TransitData {
         }
     }
 
-    public OrcaTransitData (Parcel parcel) {
+    public OrcaTransitData(Parcel parcel) {
         mSerialNumber = parcel.readInt();
         mBalance      = parcel.readDouble();
 
         parcel.readInt();
         mTrips = (Trip[]) parcel.readParcelableArray(null);
     }
-    
-    public OrcaTransitData (Card card) {
+
+    public OrcaTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
 
         byte[] data;
@@ -113,23 +113,23 @@ public class OrcaTransitData extends TransitData {
         }
     }
 
-    @Override public String getCardName () {
+    @Override public String getCardName() {
         return "ORCA";
     }
 
-    @Override public String getBalanceString () {
+    @Override public String getBalanceString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100);
     }
 
-    @Override public String getSerialNumber () {
+    @Override public String getSerialNumber() {
         return Integer.toString(mSerialNumber);
     }
 
-    @Override public Trip[] getTrips () {
+    @Override public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override public Refill[] getRefills () {
+    @Override public Refill[] getRefills() {
         return null;
     }
 
@@ -173,10 +173,11 @@ public class OrcaTransitData extends TransitData {
     }
 
     private boolean isSameTrip(OrcaTrip firstTrip, OrcaTrip secondTrip) {
-        return firstTrip != null && secondTrip != null &&
-            firstTrip.mTransType == TRANS_TYPE_TAP_IN &&
-            (secondTrip.mTransType ==TRANS_TYPE_TAP_OUT || secondTrip.mTransType == TRANS_TYPE_CANCEL_TRIP) &&
-            firstTrip.mAgency == secondTrip.mAgency;
+        return firstTrip != null
+                && secondTrip != null
+                && firstTrip.mTransType == TRANS_TYPE_TAP_IN
+                && (secondTrip.mTransType ==TRANS_TYPE_TAP_OUT || secondTrip.mTransType == TRANS_TYPE_CANCEL_TRIP)
+                && firstTrip.mAgency == secondTrip.mAgency;
     }
 
     public void writeToParcel(Parcel parcel, int flags) {

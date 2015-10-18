@@ -27,7 +27,7 @@ import org.simpleframework.xml.Root;
 
 @Root(name="sector")
 public class UnauthorizedClassicSector extends ClassicSector {
-    @Attribute(name="unauthorized") public static final boolean mUnauthorized = true;
+    @Attribute(name="unauthorized") public static final boolean UNAUTHORIZED = true;
 
     private UnauthorizedClassicSector() { /** For XML serializer **/ }
 

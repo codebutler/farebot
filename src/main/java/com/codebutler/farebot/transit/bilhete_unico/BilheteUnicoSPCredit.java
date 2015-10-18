@@ -23,11 +23,11 @@ import java.nio.ByteOrder;
 public class BilheteUnicoSPCredit implements Parcelable {
     private final int mCredit;
 
-    public BilheteUnicoSPCredit (int credit) {
+    public BilheteUnicoSPCredit(int credit) {
         mCredit   = credit;
     }
 
-    public BilheteUnicoSPCredit (byte[] data) {
+    public BilheteUnicoSPCredit(byte[] data) {
         if (data == null) {
             data = new byte[16];
         }
@@ -43,13 +43,14 @@ public class BilheteUnicoSPCredit implements Parcelable {
         return 0;
     }
 
-    public static final Parcelable.Creator<BilheteUnicoSPCredit> CREATOR = new Parcelable.Creator<BilheteUnicoSPCredit>() {
+    public static final Parcelable.Creator<BilheteUnicoSPCredit> CREATOR
+            = new Parcelable.Creator<BilheteUnicoSPCredit>() {
         public BilheteUnicoSPCredit createFromParcel(Parcel source) {
             int credit   = source.readInt();
             return new BilheteUnicoSPCredit(credit);
         }
 
-        public BilheteUnicoSPCredit[] newArray (int size) {
+        public BilheteUnicoSPCredit[] newArray(int size) {
             return new BilheteUnicoSPCredit[size];
         }
     };

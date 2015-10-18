@@ -39,7 +39,7 @@ public abstract class DesfireFileSettings {
     public static final byte VALUE_FILE         = (byte) 0x02;
     public static final byte LINEAR_RECORD_FILE = (byte) 0x03;
     public static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
-    
+
     public static DesfireFileSettings create(byte[] data) throws Exception {
         byte fileType = data[0];
 
@@ -84,7 +84,7 @@ public abstract class DesfireFileSettings {
         return mAccessRights;
     }
 
-    public String getFileTypeName () {
+    public String getFileTypeName() {
         switch (mFileType) {
             case STANDARD_DATA_FILE:
                 return "Standard";

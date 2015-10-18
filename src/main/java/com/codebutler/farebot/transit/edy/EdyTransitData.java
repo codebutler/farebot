@@ -57,11 +57,10 @@ public class EdyTransitData extends TransitData {
     public static final int FELICA_MODE_EDY_GIFT        = 0x04;
 
     // private data
-    private byte[]          mSerialNumber = new byte[8];
-    private int             mCurrentBalance;
+    private byte[] mSerialNumber = new byte[8];
+    private int    mCurrentBalance;
 
-
-    public Creator<EdyTransitData> CREATOR = new Creator<EdyTransitData>() {
+    public static final Creator<EdyTransitData> CREATOR = new Creator<EdyTransitData>() {
         public EdyTransitData createFromParcel(Parcel parcel) {
             return new EdyTransitData(parcel);
         }
@@ -75,7 +74,7 @@ public class EdyTransitData extends TransitData {
         return (card.getSystem(FeliCaLib.SYSTEMCODE_EDY) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity (FelicaCard card) {
+    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
         return new TransitIdentity("Edy", null);
     }
 
@@ -90,8 +89,7 @@ public class EdyTransitData extends TransitData {
         List<FelicaBlock> blocksID = serviceID.getBlocks();
         FelicaBlock blockID = blocksID.get(0);
         byte[] dataID = blockID.getData();
-        for (int i=2; i<10; i++)
-        {
+        for (int i=2; i<10; i++) {
             mSerialNumber[i-2] = dataID[i];
         }
 

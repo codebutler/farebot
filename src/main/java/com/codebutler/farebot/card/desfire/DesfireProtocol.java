@@ -52,7 +52,7 @@ public class DesfireProtocol {
 
     public DesfireManufacturingData getManufacturingData() throws Exception {
         byte[] respBuffer = sendRequest(GET_MANUFACTURING_DATA);
-        
+
         if (respBuffer.length != 28)
             throw new Exception("Invalid response");
 
@@ -74,7 +74,7 @@ public class DesfireProtocol {
         return appIds;
     }
 
-    public void selectApp (int appId) throws Exception {
+    public void selectApp(int appId) throws Exception {
         byte[] appIdBuff = new byte[3];
         appIdBuff[0] = (byte) ((appId & 0xFF0000) >> 16);
         appIdBuff[1] = (byte) ((appId & 0xFF00) >> 8);
@@ -92,12 +92,12 @@ public class DesfireProtocol {
         return fileIds;
     }
 
-    public DesfireFileSettings getFileSettings (int fileNo) throws Exception {
+    public DesfireFileSettings getFileSettings(int fileNo) throws Exception {
         byte[] data = sendRequest(GET_FILE_SETTINGS, new byte[] { (byte) fileNo });
         return DesfireFileSettings.create(data);
     }
 
-    public byte[] readFile (int fileNo) throws Exception {
+    public byte[] readFile(int fileNo) throws Exception {
         return sendRequest(READ_DATA, new byte[] {
             (byte) fileNo,
             (byte) 0x0, (byte) 0x0, (byte) 0x0,
@@ -105,7 +105,7 @@ public class DesfireProtocol {
         });
     }
 
-    public byte[] readRecord (int fileNum) throws Exception {
+    public byte[] readRecord(int fileNum) throws Exception {
         return sendRequest(READ_RECORD, new byte[]{
                 (byte) fileNum,
                 (byte) 0x0, (byte) 0x0, (byte) 0x0,
@@ -113,11 +113,11 @@ public class DesfireProtocol {
         });
     }
 
-    private byte[] sendRequest (byte command) throws Exception {
+    private byte[] sendRequest(byte command) throws Exception {
         return sendRequest(command, null);
     }
 
-    private byte[] sendRequest (byte command, byte[] parameters) throws Exception {
+    private byte[] sendRequest(byte command, byte[] parameters) throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, parameters));
@@ -139,11 +139,11 @@ public class DesfireProtocol {
                 throw new Exception("Unknown status code: " + Integer.toHexString(status & 0xFF));
             }
         }
-        
+
         return output.toByteArray();
     }
 
-    private byte[] wrapMessage (byte command, byte[] parameters) throws Exception {
+    private byte[] wrapMessage(byte command, byte[] parameters) throws Exception {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         stream.write((byte) 0x90);

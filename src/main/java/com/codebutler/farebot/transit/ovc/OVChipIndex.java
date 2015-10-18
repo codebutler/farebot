@@ -31,14 +31,14 @@ import com.codebutler.farebot.util.Utils;
 import java.util.Arrays;
 
 public class OVChipIndex implements Parcelable {
-    private int mRecentTransactionSlot;        // Most recent transaction slot (0xFB0 or 0xFD0)
+    private int mRecentTransactionSlot;     // Most recent transaction slot (0xFB0 or 0xFD0)
     private int mRecentInfoSlot;            // Most recent card information index slot (0x5C0 or 0x580)
     private int mRecentSubscriptionSlot;    // Most recent subscription index slot (0xF10 or 0xF30)
-    private int mRecentTravelhistorySlot;    // Most recent travel history index slot (0xF50 or 0xF70)
-    private int mRecentCreditSlot;            // Most recent credit index slot (0xF90 or 0xFA0)
+    private int mRecentTravelhistorySlot;   // Most recent travel history index slot (0xF50 or 0xF70)
+    private int mRecentCreditSlot;          // Most recent credit index slot (0xF90 or 0xFA0)
     private int[] mSubscriptionIndex;
 
-    public OVChipIndex (
+    public OVChipIndex(
             int recentTransactionSlot,
             int recentInfoSlot,
             int recentSubscriptionSlot,
@@ -54,7 +54,7 @@ public class OVChipIndex implements Parcelable {
         mSubscriptionIndex = subscriptionIndex;
     }
 
-    public OVChipIndex (byte[] data) {
+    public OVChipIndex(byte[] data) {
         int recentTransactionSlot;
         int recentInfoSlot;
         int recentSubscriptionSlot;
@@ -62,14 +62,16 @@ public class OVChipIndex implements Parcelable {
         int recentCreditSlot;
         int[] subscriptionIndex;
 
-        byte[] first_slot = Arrays.copyOfRange(data, 0, data.length / 2);
-        byte[] second_slot = Arrays.copyOfRange(data, data.length / 2, data.length);
+        byte[] firstSlot = Arrays.copyOfRange(data, 0, data.length / 2);
+        byte[] secondSlot = Arrays.copyOfRange(data, data.length / 2, data.length);
 
-        int iIDa3 = ((first_slot[1] & (char)0x3F) << 10) | ((first_slot[2] & (char)0xFF) << 2) | ((first_slot[3] >> 6) & (char)0x03);
-        int iIDb3 = ((second_slot[1] & (char)0x3F) << 10) | ((second_slot[2] & (char)0xFF) << 2) | ((second_slot[3] >> 6) & (char)0x03);
+        int iIDa3 = ((firstSlot[1] & (char)0x3F) << 10) | ((firstSlot[2] & (char)0xFF) << 2)
+                | ((firstSlot[3] >> 6) & (char)0x03);
+        int iIDb3 = ((secondSlot[1] & (char)0x3F) << 10) | ((secondSlot[2] & (char)0xFF) << 2)
+                | ((secondSlot[3] >> 6) & (char)0x03);
 
         recentTransactionSlot = (iIDb3 > iIDa3 ? (char)(0xFB0) : (char)(0xFD0));
-        byte[] buffer = (iIDb3 > iIDa3 ? second_slot : first_slot);
+        byte[] buffer = (iIDb3 > iIDa3 ? secondSlot : firstSlot);
 
         int cardindex = ((buffer[3] >> 5) & (char)0x01);
         recentInfoSlot = (cardindex == 1 ? (char)0x5C0 : (char)0x580);
@@ -84,7 +86,8 @@ public class OVChipIndex implements Parcelable {
 
         for (int i = 0; i < 12; i++) {
             int bits = Utils.getBitsFromBuffer(buffer, offset + (i * 4), 4);
-            subscriptionIndex[i] = (bits < 5 ? ((char)0x800 + bits * (byte)0x30) : bits > 9 ? ((char)0xA00 + (bits - 10) * (byte)0x30) : ((char)0x900 + (bits - 5) * (byte)0x30));
+            subscriptionIndex[i] = (bits < 5 ? ((char)0x800 + bits * (byte)0x30) : bits > 9
+                    ? ((char)0xA00 + (bits - 10) * (byte)0x30) : ((char)0x900 + (bits - 5) * (byte)0x30));
         }
 
         mRecentTransactionSlot = recentTransactionSlot;
@@ -147,7 +150,7 @@ public class OVChipIndex implements Parcelable {
                     subscriptionIndex);
         }
 
-        public OVChipIndex[] newArray (int size) {
+        public OVChipIndex[] newArray(int size) {
             return new OVChipIndex[size];
         }
     };

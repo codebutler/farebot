@@ -25,6 +25,9 @@ package com.codebutler.farebot.provider;
 import android.provider.BaseColumns;
 
 public class CardsTableColumns implements BaseColumns {
+
+    private CardsTableColumns() { }
+
     public static final String TABLE_NAME = "cards";
 
     public static final String TYPE       = "type";

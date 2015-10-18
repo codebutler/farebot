@@ -103,7 +103,7 @@ public class SuicaTrip extends Trip {
         }
     }
 
-    public static Creator<SuicaTrip> CREATOR = new Creator<SuicaTrip>() {
+    public static final Creator<SuicaTrip> CREATOR = new Creator<SuicaTrip>() {
         public SuicaTrip createFromParcel(Parcel parcel) {
             return new SuicaTrip(parcel);
         }
@@ -198,9 +198,11 @@ public class SuicaTrip extends Trip {
             return mStartStation.getShortStationName();
         }
         if (mIsBus) {
-            return String.format("Bus Area 0x%s Line 0x%s Stop 0x%s", Integer.toHexString(mRegionCode), Integer.toHexString(mBusLineCode), Integer.toHexString(mBusStopCode));
+            return String.format("Bus Area 0x%s Line 0x%s Stop 0x%s", Integer.toHexString(mRegionCode),
+                    Integer.toHexString(mBusLineCode), Integer.toHexString(mBusStopCode));
         } else if (!(mRailEntranceLineCode == 0 && mRailEntranceStationCode == 0)) {
-            return String.format("Line 0x%s Station 0x%s", Integer.toHexString(mRailEntranceLineCode), Integer.toHexString(mRailEntranceStationCode));
+            return String.format("Line 0x%s Station 0x%s", Integer.toHexString(mRailEntranceLineCode),
+                    Integer.toHexString(mRailEntranceStationCode));
         } else {
             return null;
         }
@@ -218,7 +220,8 @@ public class SuicaTrip extends Trip {
             return mEndStation.getShortStationName();
         }
         if (!mIsBus) {
-            return String.format("Line 0x%s Station 0x%s", Integer.toHexString(mRailExitLineCode), Integer.toHexString(mRailExitStationCode));
+            return String.format("Line 0x%s Station 0x%s", Integer.toHexString(mRailExitLineCode),
+                    Integer.toHexString(mRailExitStationCode));
         }
         return null;
     }

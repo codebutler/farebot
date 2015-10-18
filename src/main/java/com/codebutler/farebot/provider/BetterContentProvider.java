@@ -69,7 +69,7 @@ public abstract class BetterContentProvider extends ContentProvider {
         return true;
     }
 
-    @Override public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs,
+    @Override public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(mTableName);
@@ -129,7 +129,7 @@ public abstract class BetterContentProvider extends ContentProvider {
         return count;
     }
 
-    @Override public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    @Override public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         int count;
         switch (mUriMatcher.match(uri)) {

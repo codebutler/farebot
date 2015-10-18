@@ -54,7 +54,7 @@ public class DesfireManufacturingData {
 
     private DesfireManufacturingData() { /* For XML Serializer */ }
 
-    public DesfireManufacturingData (byte[] data) {
+    public DesfireManufacturingData(byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
         hwVendorID     = stream.read();
         hwType         = stream.read();

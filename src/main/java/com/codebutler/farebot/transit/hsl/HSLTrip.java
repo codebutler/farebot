@@ -31,8 +31,8 @@ public class HSLTrip extends Trip {
 
         mArvo = HSLTransitData.bitsToLong(0, 1, usefulData);
 
-        mTimestamp = HSLTransitData.CardDateToTimestamp(HSLTransitData.bitsToLong(1, 14, usefulData), HSLTransitData.bitsToLong(15, 11, usefulData));
-        mExpireTimestamp = HSLTransitData.CardDateToTimestamp(HSLTransitData.bitsToLong(26, 14, usefulData), HSLTransitData.bitsToLong(40, 11, usefulData));
+        mTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(1, 14, usefulData), HSLTransitData.bitsToLong(15, 11, usefulData));
+        mExpireTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(26, 14, usefulData), HSLTransitData.bitsToLong(40, 11, usefulData));
 
         mFare = HSLTransitData.bitsToLong(51, 14, usefulData);
 
@@ -48,7 +48,7 @@ public class HSLTrip extends Trip {
         return this.mExpireTimestamp;
     }
 
-    public static Creator<HSLTrip> CREATOR = new Creator<HSLTrip>() {
+    public static final Creator<HSLTrip> CREATOR = new Creator<HSLTrip>() {
         public HSLTrip createFromParcel(Parcel parcel) {
             return new HSLTrip(parcel);
         }

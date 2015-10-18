@@ -122,13 +122,13 @@ public class CEPASTransaction implements Parcelable {
         }
     };
 
-    public void writeToParcel (Parcel parcel, int flags) {
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeByte(mType);
         parcel.writeInt(mAmount);
         parcel.writeInt(mDate);
         parcel.writeString(mUserData);
     }
-    public int describeContents () {
+    public int describeContents() {
         return 0;
     }
 }

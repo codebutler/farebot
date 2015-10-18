@@ -54,14 +54,14 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class AdvancedCardInfoActivity extends Activity {
-    public static String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
-    public static String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
+    public static final String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
+    public static final String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
 
     private TabPagerAdapter mTabsAdapter;
     private Card mCard;
     private Exception mError;
 
-    @Override protected void onCreate (Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_card_info);
 
@@ -73,7 +73,7 @@ public class AdvancedCardInfoActivity extends Activity {
 
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
         mCard = Card.fromXml(serializer, getIntent().getStringExtra(AdvancedCardInfoActivity.EXTRA_CARD));
-        
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
 
@@ -109,25 +109,27 @@ public class AdvancedCardInfoActivity extends Activity {
 
         CardHasManufacturingInfo infoAnnotation = mCard.getClass().getAnnotation(CardHasManufacturingInfo.class);
         if (infoAnnotation == null || infoAnnotation.value()) {
-            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.hw_detail), CardHWDetailFragment.class, getIntent().getExtras());
+            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.hw_detail), CardHWDetailFragment.class,
+                    getIntent().getExtras());
         }
 
         CardRawDataFragmentClass annotation = mCard.getClass().getAnnotation(CardRawDataFragmentClass.class);
         if (annotation != null) {
             Class rawDataFragmentClass = annotation.value();
             if (rawDataFragmentClass != null) {
-                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass, getIntent().getExtras());
+                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass,
+                        getIntent().getExtras());
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             }
         }
     }
 
-    @Override public boolean onCreateOptionsMenu (Menu menu) {
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.card_advanced_menu, menu);
         return true;
     }
 
-    @Override public boolean onOptionsItemSelected (MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         try {
             if (item.getItemId() == R.id.copy_xml) {
                 String xml = mCard.toXml(FareBotApplication.getInstance().getSerializer());

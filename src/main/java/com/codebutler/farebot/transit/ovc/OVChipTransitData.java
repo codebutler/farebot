@@ -36,6 +36,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.HeaderListItem;
 import com.codebutler.farebot.ui.ListItem;
+import com.codebutler.farebot.util.ImmutableMapBuilder;
 import com.codebutler.farebot.util.Utils;
 
 import java.text.DateFormat;
@@ -48,7 +49,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,37 +87,37 @@ public class OVChipTransitData extends TransitData {
         OVC_HEADER[10] = -28;
     }
 
-    private static Map<Integer, String> sAgencies = new HashMap<Integer, String>() {{
-        put(AGENCY_TLS,        "Trans Link Systems");
-        put(AGENCY_CONNEXXION, "Connexxion");
-        put(AGENCY_GVB,        "Gemeentelijk Vervoersbedrijf");
-        put(AGENCY_HTM,        "Haagsche Tramweg-Maatschappij");
-        put(AGENCY_NS,         "Nederlandse Spoorwegen");
-        put(AGENCY_RET,        "Rotterdamse Elektrische Tram");
-        put(AGENCY_VEOLIA,     "Veolia");
-        put(AGENCY_ARRIVA,     "Arriva");
-        put(AGENCY_SYNTUS,     "Syntus");
-        put(AGENCY_QBUZZ,      "Qbuzz");
-        put(AGENCY_DUO,        "Dienst Uitvoering Onderwijs");
-        put(AGENCY_STORE,      "Reseller");
-        put(AGENCY_DUO_ALT,    "Dienst Uitvoering Onderwijs");
-    }};
+    private static Map<Integer, String> sAgencies = new ImmutableMapBuilder<Integer, String>()
+        .put(AGENCY_TLS, "Trans Link Systems")
+        .put(AGENCY_CONNEXXION, "Connexxion")
+        .put(AGENCY_GVB, "Gemeentelijk Vervoersbedrijf")
+        .put(AGENCY_HTM, "Haagsche Tramweg-Maatschappij")
+        .put(AGENCY_NS, "Nederlandse Spoorwegen")
+        .put(AGENCY_RET, "Rotterdamse Elektrische Tram")
+        .put(AGENCY_VEOLIA, "Veolia")
+        .put(AGENCY_ARRIVA, "Arriva")
+        .put(AGENCY_SYNTUS, "Syntus")
+        .put(AGENCY_QBUZZ, "Qbuzz")
+        .put(AGENCY_DUO, "Dienst Uitvoering Onderwijs")
+        .put(AGENCY_STORE, "Reseller")
+        .put(AGENCY_DUO_ALT, "Dienst Uitvoering Onderwijs")
+        .build();
 
-    private static Map<Integer, String> sShortAgencies = new HashMap<Integer, String>() {{
-        put(AGENCY_TLS,        "TLS");
-        put(AGENCY_CONNEXXION, "Connexxion"); /* or Breng, Hermes, GVU */
-        put(AGENCY_GVB,        "GVB");
-        put(AGENCY_HTM,        "HTM");
-        put(AGENCY_NS,         "NS");
-        put(AGENCY_RET,        "RET");
-        put(AGENCY_VEOLIA,     "Veolia");
-        put(AGENCY_ARRIVA,     "Arriva");     /* or Aquabus */
-        put(AGENCY_SYNTUS,     "Syntus");
-        put(AGENCY_QBUZZ,      "Qbuzz");
-        put(AGENCY_DUO,        "DUO");
-        put(AGENCY_STORE,      "Reseller");   /* used by Albert Heijn, Primera and Hermes busses and maybe even more */
-        put(AGENCY_DUO_ALT,    "DUO");
-    }};
+    private static Map<Integer, String> sShortAgencies = new ImmutableMapBuilder<Integer, String>()
+        .put(AGENCY_TLS,        "TLS")
+        .put(AGENCY_CONNEXXION, "Connexxion") /* or Breng, Hermes, GVU */
+        .put(AGENCY_GVB,        "GVB")
+        .put(AGENCY_HTM,        "HTM")
+        .put(AGENCY_NS,         "NS")
+        .put(AGENCY_RET,        "RET")
+        .put(AGENCY_VEOLIA,     "Veolia")
+        .put(AGENCY_ARRIVA,     "Arriva")     /* or Aquabus */
+        .put(AGENCY_SYNTUS,     "Syntus")
+        .put(AGENCY_QBUZZ,      "Qbuzz")
+        .put(AGENCY_DUO,        "DUO")
+        .put(AGENCY_STORE,      "Reseller")   /* used by Albert Heijn, Primera and Hermes busses and maybe even more */
+        .put(AGENCY_DUO_ALT,    "DUO")
+        .build();
 
     private final OVChipIndex          mIndex;
     private final OVChipPreamble       mPreamble;
@@ -126,7 +126,7 @@ public class OVChipTransitData extends TransitData {
     private final OVChipTrip[]         mTrips;
     private final OVChipSubscription[] mSubscriptions;
 
-    public Creator<OVChipTransitData> CREATOR = new Creator<OVChipTransitData>() {
+    public static final Creator<OVChipTransitData> CREATOR = new Creator<OVChipTransitData>() {
         public OVChipTransitData createFromParcel(Parcel parcel) {
             return new OVChipTransitData(parcel);
         }
@@ -151,7 +151,7 @@ public class OVChipTransitData extends TransitData {
         return Arrays.equals(Arrays.copyOfRange(blockData, 0, 11), OVC_HEADER);
     }
 
-    public static TransitIdentity parseTransitIdentity (Card card) {
+    public static TransitIdentity parseTransitIdentity(Card card) {
         String hex = Utils.getHexString(((ClassicCard) card).getSector(0).getBlock(0).getData(), null);
         String id = hex.substring(0, 8);
         return new TransitIdentity("OV-chipkaart", id);
@@ -251,7 +251,7 @@ public class OVChipTransitData extends TransitData {
         return formatter.format((double)amount / 100.0);
     }
 
-    @Override public String getCardName () {
+    @Override public String getCardName() {
         return "OV-Chipkaart";
     }
 
@@ -262,7 +262,7 @@ public class OVChipTransitData extends TransitData {
         return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
-    public static String getShortAgencyName (int agency) {
+    public static String getShortAgencyName(int agency) {
         if (sShortAgencies.containsKey(agency)) {
             return sShortAgencies.get(agency);
         }

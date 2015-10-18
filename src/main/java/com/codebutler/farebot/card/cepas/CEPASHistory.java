@@ -38,11 +38,11 @@ public class CEPASHistory {
     @Attribute(name="valid") private boolean mIsValid;
     @Attribute(name="error", required=false) private String mErrorMessage;
 
-    public static CEPASHistory create (int purseId, byte[] purseData) {
+    public static CEPASHistory create(int purseId, byte[] purseData) {
         return new CEPASHistory(purseId, purseData);
     }
 
-    public CEPASHistory (int purseId, byte[] purseData) {
+    public CEPASHistory(int purseId, byte[] purseData) {
         mId = purseId;
 
         if (purseData != null) {
@@ -58,21 +58,20 @@ public class CEPASHistory {
                 transactions[i/tempData.length] = new CEPASTransaction(tempData);
             }
             mTransactions = Utils.arrayAsList(transactions);
-        }
-        else {
+        } else {
             mIsValid      = false;
             mErrorMessage = "";
             mTransactions = new ArrayList<>();
         }
     }
 
-    public CEPASHistory (int purseId, String errorMessage) {
+    public CEPASHistory(int purseId, String errorMessage) {
         mId           = purseId;
         mErrorMessage = errorMessage;
         mIsValid      = false;
     }
 
-    public CEPASHistory (int purseId, CEPASTransaction[] transactions) {
+    public CEPASHistory(int purseId, CEPASTransaction[] transactions) {
         mTransactions = Utils.arrayAsList(transactions);
         mId           = purseId;
         mIsValid      = true;
@@ -81,19 +80,19 @@ public class CEPASHistory {
 
     private CEPASHistory() { /* For XML Serializer */ }
 
-    public int getId () {
+    public int getId() {
         return mId;
     }
 
-    public List<CEPASTransaction> getTransactions () {
+    public List<CEPASTransaction> getTransactions() {
         return mTransactions;
     }
 
-    public boolean isValid () {
+    public boolean isValid() {
         return mIsValid;
     }
 
-    public String getErrorMessage () {
+    public String getErrorMessage() {
         return mErrorMessage;
     }
 }

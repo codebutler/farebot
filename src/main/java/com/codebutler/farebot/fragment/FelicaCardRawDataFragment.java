@@ -60,7 +60,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class FelicaCardRawDataFragment extends ExpandableListFragment {
     private FelicaCard mCard;
 
-    public void onCreate (Bundle bundle) {
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
         mCard = (FelicaCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));

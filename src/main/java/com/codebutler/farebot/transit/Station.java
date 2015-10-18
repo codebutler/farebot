@@ -44,8 +44,8 @@ public class Station implements Parcelable {
         mLatitude         = latitude;
         mLongitude        = longitude;
     }
-    
-    public static Creator<Station> CREATOR = new Creator<Station>() {
+
+    public static final Creator<Station> CREATOR = new Creator<Station>() {
         public Station createFromParcel(Parcel parcel) {
             return new Station(parcel);
         }
@@ -63,11 +63,11 @@ public class Station implements Parcelable {
         mLongitude        = parcel.readString();
     }
 
-    public String getStationName () {
+    public String getStationName() {
         return mStationName;
     }
 
-    public String getShortStationName () {
+    public String getShortStationName() {
         return (mShortStationName != null) ? mShortStationName : mStationName;
     }
 
@@ -79,11 +79,11 @@ public class Station implements Parcelable {
         return mLineName;
     }
 
-    public String getLatitude () {
+    public String getLatitude() {
         return mLatitude;
     }
 
-    public String getLongitude () {
+    public String getLongitude() {
         return mLongitude;
     }
 

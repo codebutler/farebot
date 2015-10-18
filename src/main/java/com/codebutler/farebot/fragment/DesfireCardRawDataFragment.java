@@ -61,37 +61,38 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
                 return mCard.getApplications().size();
             }
 
-            public int getChildrenCount (int groupPosition) {
+            public int getChildrenCount(int groupPosition) {
                 return mCard.getApplications().get(groupPosition).getFiles().size();
             }
 
-            public Object getGroup (int groupPosition) {
+            public Object getGroup(int groupPosition) {
                 return mCard.getApplications().get(groupPosition);
             }
 
-            public Object getChild (int groupPosition, int childPosition) {
+            public Object getChild(int groupPosition, int childPosition) {
                 return mCard.getApplications().get(groupPosition).getFiles().get(childPosition);
             }
 
-            public long getGroupId (int groupPosition) {
+            public long getGroupId(int groupPosition) {
                 return mCard.getApplications().get(groupPosition).getId();
             }
 
-            public long getChildId (int groupPosition, int childPosition) {
+            public long getChildId(int groupPosition, int childPosition) {
                 return mCard.getApplications().get(groupPosition).getFiles().get(childPosition).getId();
             }
 
-            public boolean hasStableIds () {
+            public boolean hasStableIds() {
                 return true;
             }
 
-            public boolean isChildSelectable (int groupPosition, int childPosition) {
+            public boolean isChildSelectable(int groupPosition, int childPosition) {
                 return true;
             }
 
-            public View getGroupView (int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+                    LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+                    convertView = layoutInflater.inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
                 }
 
                 TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
@@ -103,9 +104,11 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
                 return convertView;
             }
 
-            public View getChildView (int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+            public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
+                                     ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
+                    LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+                    convertView = layoutInflater.inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
                 }
 
                 TextView textView1 = (TextView) convertView.findViewById(android.R.id.text1);
@@ -121,7 +124,8 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
                 } else {
                     if (file.getFileSettings() instanceof StandardDesfireFileSettings) {
                         StandardDesfireFileSettings fileSettings = (StandardDesfireFileSettings) file.getFileSettings();
-                        textView2.setText(String.format("Type: %s, Size: %s", fileSettings.getFileTypeName(), String.valueOf(fileSettings.getFileSize())));
+                        textView2.setText(String.format("Type: %s, Size: %s", fileSettings.getFileTypeName(),
+                                String.valueOf(fileSettings.getFileSize())));
                     } else if (file.getFileSettings() instanceof RecordDesfireFileSettings) {
                         RecordDesfireFileSettings fileSettings = (RecordDesfireFileSettings) file.getFileSettings();
                         textView2.setText(String.format("Type: %s, Cur Records: %s, Max Records: %s, Record Size: %s",
@@ -139,7 +143,8 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
         });
     }
 
-    @Override public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    @Override public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition,
+                                              long id) {
         DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
 
         if (file instanceof InvalidDesfireFile) {

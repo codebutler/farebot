@@ -51,8 +51,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 public class ExportHelper {
-    public static String exportCardsXml(Context context) throws Exception {
 
+    private ExportHelper() { }
+
+    public static String exportCardsXml(Context context) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
         // http://code.google.com/p/android/issues/detail?id=2735
@@ -109,7 +111,7 @@ public class ExportHelper {
         return context.getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
     }
 
-    private static String xmlNodeToString (Node node) throws Exception {
+    private static String xmlNodeToString(Node node) throws Exception {
         // The amount of code required to do simple things in Java is incredible.
         Source source = new DOMSource(node);
         StringWriter stringWriter = new StringWriter();

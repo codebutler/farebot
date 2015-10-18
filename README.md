@@ -38,7 +38,7 @@ View your remaining balance, recent trips, and other information from contactles
 
 ## Supported Phones
 
-FareBot requires an NFC Android phone running 2.3 or later.
+FareBot requires an NFC Android phone running 4.0.1 or later.
 
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/

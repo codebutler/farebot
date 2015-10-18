@@ -34,7 +34,7 @@ import android.widget.ProgressBar;
 import com.codebutler.farebot.R;
 
 public abstract class BetterAsyncTask<Result> extends AsyncTask<Void, ProgressBar, BetterAsyncTask.TaskResult<Result>> {
-    private static final String TAG = "GliphTask";
+    private static final String TAG = "BetterAsyncTask";
 
     private ProgressDialog mProgressDialog;
     private Activity       mActivity;

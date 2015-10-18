@@ -82,7 +82,7 @@ public class DBUtil {
     private static final String DB_NAME = "StationCode.db";
 
     private static final int VERSION = 2;
-    
+
     private SQLiteDatabase mDatabase;
     private final Context mContext;
 
@@ -94,7 +94,7 @@ public class DBUtil {
         if (mDatabase != null) {
             return mDatabase;
         }
-        
+
         if (!this.hasDatabase()) {
             this.copyDatabase();
         }
@@ -102,7 +102,7 @@ public class DBUtil {
         return mDatabase;
 
     }
-    
+
     public synchronized void close() {
         if (mDatabase != null)
             this.mDatabase.close();
@@ -153,3 +153,4 @@ public class DBUtil {
         return mContext.getDatabasePath(DB_NAME);
     }
 }
+

@@ -36,12 +36,12 @@ public class OVChipParser {
         mIndex = index;
     }
 
-    public OVChipPreamble getPreamble () {
+    public OVChipPreamble getPreamble() {
         byte[] data = mCard.getSector(0).readBlocks(0, 3);
         return new OVChipPreamble(data);
     }
 
-    public OVChipInfo getInfo () {
+    public OVChipInfo getInfo() {
         int blockIndex = mIndex.getRecentInfoSlot();
 
         int sector = (char)blockIndex == (char)0x580 ? 22 : 23;
@@ -57,7 +57,7 @@ public class OVChipParser {
         return new OVChipInfo(data);
     }
 
-    public OVChipCredit getCredit () {
+    public OVChipCredit getCredit() {
         int blockIndex = ClassicUtils.convertBytePointerToBlock(mIndex.getRecentCreditSlot());
 
         // FIXME: Clean this up
@@ -76,7 +76,7 @@ public class OVChipParser {
         return ovchipTransactions;
     }
 
-    private byte[] readTransaction (int transactionId) {
+    private byte[] readTransaction(int transactionId) {
         int blockIndex = (transactionId % 7) * 2;
         if (transactionId <= 6){
             return mCard.getSector(35).readBlocks(blockIndex, 2);
@@ -151,7 +151,7 @@ public class OVChipParser {
         return new OVChipSubscription(subscriptionAddress, data, type1, type2, used, rest);
     }
 
-    private byte[] readSubscription (int subscriptionAddress) {
+    private byte[] readSubscription(int subscriptionAddress) {
         int blockIndex = ClassicUtils.convertBytePointerToBlock(subscriptionAddress);
 
         // FIXME: Clean this up

@@ -29,7 +29,7 @@ public class ClipperTrip extends Trip {
         mBalance        = 0;
     }
 
-    public static Creator<ClipperTrip> CREATOR = new Creator<ClipperTrip>() {
+    public static final Creator<ClipperTrip> CREATOR = new Creator<ClipperTrip>() {
         public ClipperTrip createFromParcel(Parcel parcel) {
             return new ClipperTrip(parcel);
         }
@@ -50,23 +50,23 @@ public class ClipperTrip extends Trip {
         mBalance       = parcel.readLong();
     }
 
-    @Override public long getTimestamp () {
+    @Override public long getTimestamp() {
         return mTimestamp;
     }
 
-    @Override public long getExitTimestamp () {
+    @Override public long getExitTimestamp() {
         return mExitTimestamp;
     }
 
-    @Override public String getAgencyName () {
+    @Override public String getAgencyName() {
         return ClipperTransitData.getAgencyName((int)mAgency);
     }
 
-    @Override public String getShortAgencyName () {
+    @Override public String getShortAgencyName() {
         return ClipperTransitData.getShortAgencyName((int)mAgency);
     }
 
-    @Override public String getRouteName () {
+    @Override public String getRouteName() {
         if (mAgency == ClipperData.AGENCY_GG_FERRY) {
             return ClipperData.GG_FERRY_ROUTES.get(mRoute);
         } else {
@@ -76,15 +76,15 @@ public class ClipperTrip extends Trip {
         }
     }
 
-    @Override public String getFareString () {
+    @Override public String getFareString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format((double)mFare / 100.0);
     }
 
-    @Override public double getFare () {
+    @Override public double getFare() {
         return mFare;
     }
 
-    @Override public String getBalanceString () {
+    @Override public String getBalanceString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.0);
     }
 
@@ -121,7 +121,7 @@ public class ClipperTrip extends Trip {
         }
         return null;
     }
-    @Override public String getStartStationName () {
+    @Override public String getStartStationName() {
         if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_GG_FERRY || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             Station station = getStartStation();
             if (station != null)
@@ -137,7 +137,7 @@ public class ClipperTrip extends Trip {
         }
     }
 
-    @Override public String getEndStationName () {
+    @Override public String getEndStationName() {
         if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_GG_FERRY || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             Station station = getEndStation();
             if (station != null) {

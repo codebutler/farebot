@@ -14,7 +14,7 @@ public class HSLRefill extends Refill {
     private final long mRefillAmount;
 
     public HSLRefill(byte[] data) {
-        mRefillTime = HSLTransitData.CardDateToTimestamp(HSLTransitData.bitsToLong(20, 14, data), HSLTransitData.bitsToLong(34, 11, data));
+        mRefillTime = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(20, 14, data), HSLTransitData.bitsToLong(34, 11, data));
         mRefillAmount = HSLTransitData.bitsToLong(45, 20, data);
     }
 

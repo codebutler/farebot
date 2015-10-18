@@ -63,7 +63,8 @@ public class TripMapActivity extends Activity {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(Trip.formatStationNames(trip));
-        actionBar.setSubtitle((trip.getRouteName() == null) ? trip.getAgencyName() : String.format("%s %s", trip.getAgencyName(), trip.getRouteName()));
+        actionBar.setSubtitle((trip.getRouteName() == null) ? trip.getAgencyName()
+                : String.format("%s %s", trip.getAgencyName(), trip.getRouteName()));
 
         int startMarkerId = R.drawable.marker_start;
         int endMarkerId   = R.drawable.marker_end;
@@ -73,19 +74,19 @@ public class TripMapActivity extends Activity {
         if (trip.getMode() == Trip.Mode.BUS) {
             startMarkerId = R.drawable.marker_bus_start;
             endMarkerId   = R.drawable.marker_bus_end;
-        
+
         } else if (trip.getMode() == Trip.Mode.TRAIN) {
             startMarkerId = R.drawable.marker_train_start;
             endMarkerId   = R.drawable.marker_train_end;
-        
+
         } else if (trip.getMode() == Trip.Mode.TRAM) {
             startMarkerId = R.drawable.marker_tram_start;
             endMarkerId   = R.drawable.marker_tram_end;
-        
+
         } else if (trip.getMode() == Trip.Mode.METRO) {
             startMarkerId = R.drawable.marker_metro_start;
             endMarkerId   = R.drawable.marker_metro_end;
-            
+
         } else if (trip.getMode() == Trip.Mode.FERRY) {
             startMarkerId = R.drawable.marker_ferry_start;
             endMarkerId   = R.drawable.marker_ferry_end;

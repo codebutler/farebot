@@ -48,7 +48,7 @@ public class ListItemAdapter extends ArrayAdapter<ListItem> {
         return 2;
     }
 
-    @Override public View getView (int position, View convertView, ViewGroup parent) {
+    @Override public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             int viewId = getItemViewType(position) == 0 ? R.layout.list_header : android.R.layout.simple_list_item_2;
             convertView = ((Activity) getContext()).getLayoutInflater().inflate(viewId, parent, false);

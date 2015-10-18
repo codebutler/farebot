@@ -52,7 +52,8 @@ import java.util.List;
 @CardRawDataFragmentClass(ClassicCardRawDataFragment.class)
 @CardHasManufacturingInfo(false)
 public class ClassicCard extends Card {
-    public static final byte[] PREAMBLE_KEY = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+    public static final byte[] PREAMBLE_KEY = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x00 };
 
     @ElementList(name="sectors") private List<ClassicSector> mSectors;
 

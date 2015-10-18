@@ -68,22 +68,25 @@ public class FelicaCard extends Card {
         List<FelicaSystem> systems = new ArrayList<>();
 
         // FIXME: Enumerate "areas" inside of systems ???
-                
+
         for (FeliCaLib.SystemCode code : ft.getSystemCodeList()) {
             Log.d("FelicaCard", "Got system code: " + Utils.getHexString(code.getBytes()));
 
             int systemCode = Utils.byteArrayToInt(code.getBytes());
             //ft.polling(systemCode);
 
-            FeliCaLib.IDm this_idm = ft.pollingAndGetIDm(systemCode);
-            
-            Log.d("FelicaCard", " - Got IDm: " + Utils.getHexString(this_idm.getBytes()) + "  compare: " + Utils.getHexString(idm.getBytes()));
-            
+            FeliCaLib.IDm thisIdm = ft.pollingAndGetIDm(systemCode);
+
+            Log.d("FelicaCard", " - Got IDm: " + Utils.getHexString(thisIdm.getBytes()) + "  compare: "
+                    + Utils.getHexString(idm.getBytes()));
+
             byte[] foo = idm.getBytes();
             ArrayUtils.reverse(foo);
-            Log.d("FelicaCard", " - Got Card ID? " + Utils.byteArrayToInt(idm.getBytes(), 2, 6  ) + "  " + Utils.byteArrayToInt(foo, 2, 6));
-            
-            Log.d("FelicaCard", " - Got PMm: " + Utils.getHexString(ft.getPMm().getBytes()) + "  compare: " + Utils.getHexString(pmm.getBytes()));
+            Log.d("FelicaCard", " - Got Card ID? " + Utils.byteArrayToInt(idm.getBytes(), 2, 6) + "  "
+                    + Utils.byteArrayToInt(foo, 2, 6));
+
+            Log.d("FelicaCard", " - Got PMm: " + Utils.getHexString(ft.getPMm().getBytes()) + "  compare: "
+                    + Utils.getHexString(pmm.getBytes()));
 
             List<FelicaService> services = new ArrayList<>();
 

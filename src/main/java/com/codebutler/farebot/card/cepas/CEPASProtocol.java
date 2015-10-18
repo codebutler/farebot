@@ -37,7 +37,7 @@ public class CEPASProtocol {
 
     private IsoDep mTagTech;
 
-    public CEPASProtocol (IsoDep tagTech) {
+    public CEPASProtocol(IsoDep tagTech) {
         mTagTech = tagTech;
     }
 
@@ -58,13 +58,15 @@ public class CEPASProtocol {
     public CEPASHistory getHistory(int purseId, int recordCount) throws IOException {
         try {
             byte[] fullHistoryBuff = null;
-            byte[] historyBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1, new byte[] { (byte) 0, (byte) (recordCount <= 15 ? recordCount * 16 : 15 * 16) });
+            byte[] historyBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1,
+                    new byte[] { (byte) 0, (byte) (recordCount <= 15 ? recordCount * 16 : 15 * 16) });
 
             if (historyBuff != null) {
                 if (recordCount > 15) {
                     byte[] historyBuff2 = null;
                     try {
-                        historyBuff2 = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1, new byte[] { (byte) 0x0F, (byte) ((recordCount - 15) * 16) });
+                        historyBuff2 = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1,
+                                new byte[] { (byte) 0x0F, (byte) ((recordCount - 15) * 16) });
                     } catch (CEPASException ex) {
                         Log.w(TAG, "Error reading 2nd purse history " + purseId, ex);
                     }
@@ -89,10 +91,11 @@ public class CEPASProtocol {
         }
     }
 
-    private byte[] sendRequest (byte command, byte p1, byte p2, byte Lc, byte[] parameters) throws CEPASException, IOException {
+    private byte[] sendRequest(byte command, byte p1, byte p2, byte lc, byte[] parameters) throws CEPASException,
+            IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, p1, p2, Lc, parameters));
+        byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, p1, p2, lc, parameters));
 
         if (recvBuffer[recvBuffer.length - 2] != (byte) 0x90) {
             if (recvBuffer[recvBuffer.length-2] == 0x6b) {
@@ -102,7 +105,8 @@ public class CEPASProtocol {
                 throw new CEPASException("Got invalid file size response.");
             }
 
-            throw new CEPASException("Got generic invalid response: " + Integer.toHexString( ((int)recvBuffer[recvBuffer.length-2]) & 0xff));
+            throw new CEPASException("Got generic invalid response: "
+                    + Integer.toHexString(((int)recvBuffer[recvBuffer.length-2]) & 0xff));
         }
 
         output.write(recvBuffer, 0, recvBuffer.length - 2);
@@ -117,7 +121,7 @@ public class CEPASProtocol {
         }
     }
 
-    private byte[] wrapMessage (byte command, byte p1, byte p2, byte lc, byte[] parameters) throws IOException {
+    private byte[] wrapMessage(byte command, byte p1, byte p2, byte lc, byte[] parameters) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         stream.write((byte) 0x90); // CLA
@@ -130,7 +134,7 @@ public class CEPASProtocol {
         if (parameters != null) {
             stream.write(parameters); // Data field
         }
-        
+
         return stream.toByteArray();
     }
 }

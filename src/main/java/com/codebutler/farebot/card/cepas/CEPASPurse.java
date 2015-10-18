@@ -50,7 +50,7 @@ public class CEPASPurse {
     @Attribute(name="valid", required=false) private boolean mIsValid;
     @Element(name="transaction", required=false) private CEPASTransaction mLastTransactionRecord;
 
-    public static CEPASPurse create (int purseId, byte[] purseData) {
+    public static CEPASPurse create(int purseId, byte[] purseData) {
         return new CEPASPurse(purseId, purseData);
     }
 
@@ -60,8 +60,8 @@ public class CEPASPurse {
         byte             purseStatus,
         int              purseBalance,
         int              autoLoadAmount,
-        byte[]           CAN,
-        byte[]           CSN,
+        byte[]           can,
+        byte[]           csn,
         int              purseExpiryDate,
         int              purseCreationDate,
         int              lastCreditTransactionTRP,
@@ -78,8 +78,8 @@ public class CEPASPurse {
         mPurseStatus = purseStatus;
         mPurseBalance = purseBalance;
         mAutoLoadAmount = autoLoadAmount;
-        mCAN = new HexString(CAN);
-        mCSN = new HexString(CSN);
+        mCAN = new HexString(can);
+        mCSN = new HexString(csn);
         mPurseExpiryDate = purseExpiryDate;
         mPurseCreationDate = purseCreationDate;
         mLastCreditTransactionTRP = lastCreditTransactionTRP;
@@ -94,7 +94,7 @@ public class CEPASPurse {
         mErrorMessage = "";
     }
 
-    public CEPASPurse (int purseId, String errorMessage) {
+    public CEPASPurse(int purseId, String errorMessage) {
         mId = purseId;
         mCepasVersion = 0;
         mPurseStatus = 0;
@@ -116,7 +116,7 @@ public class CEPASPurse {
         mErrorMessage = errorMessage;
     }
 
-    public CEPASPurse (int purseId, byte[] purseData) {
+    public CEPASPurse(int purseId, byte[] purseData) {
         int tmp;
         if (purseData == null) {
             purseData = new byte[128];
@@ -199,79 +199,79 @@ public class CEPASPurse {
 
     private CEPASPurse() { /* For XML Serializer */ }
 
-    public int getId () {
+    public int getId() {
         return mId;
     }
 
-    public byte getCepasVersion () {
+    public byte getCepasVersion() {
         return mCepasVersion;
     }
 
-    public byte getPurseStatus () {
+    public byte getPurseStatus() {
         return mPurseStatus;
     }
 
-    public int getPurseBalance () {
+    public int getPurseBalance() {
         return mPurseBalance;
     }
 
-    public int getAutoLoadAmount () {
+    public int getAutoLoadAmount() {
         return mAutoLoadAmount;
     }
 
-    public byte[] getCAN () {
+    public byte[] getCAN() {
         return mCAN.getData();
     }
 
-    public byte[] getCSN () {
+    public byte[] getCSN() {
         return mCSN.getData();
     }
 
-    public int getPurseExpiryDate () {
+    public int getPurseExpiryDate() {
         return mPurseExpiryDate;
     }
 
-    public int getPurseCreationDate () {
+    public int getPurseCreationDate() {
         return mPurseCreationDate;
     }
 
-    public int getLastCreditTransactionTRP () {
+    public int getLastCreditTransactionTRP() {
         return mLastCreditTransactionTRP;
     }
 
-    public byte[] getLastCreditTransactionHeader () {
+    public byte[] getLastCreditTransactionHeader() {
         return mLastCreditTransactionHeader.getData();
     }
 
-    public byte getLogfileRecordCount () {
+    public byte getLogfileRecordCount() {
         return mLogfileRecordCount;
     }
 
-    public int getIssuerDataLength () {
+    public int getIssuerDataLength() {
         return mIssuerDataLength;
     }
 
-    public int getLastTransactionTRP () {
+    public int getLastTransactionTRP() {
         return mLastTransactionTRP;
     }
 
-    public CEPASTransaction getLastTransactionRecord () {
+    public CEPASTransaction getLastTransactionRecord() {
         return mLastTransactionRecord;
     }
 
-    public byte[] getIssuerSpecificData () {
+    public byte[] getIssuerSpecificData() {
         return mIssuerSpecificData.getData();
     }
 
-    public byte getLastTransactionDebitOptionsByte () {
+    public byte getLastTransactionDebitOptionsByte() {
         return mLastTransactionDebitOptionsByte;
     }
 
-    public boolean isValid () {
+    public boolean isValid() {
         return mIsValid;
     }
 
-    public String getErrorMessage () {
+    public String getErrorMessage() {
         return mErrorMessage;
     }
 }

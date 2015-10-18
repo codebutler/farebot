@@ -46,7 +46,7 @@ public class EZLinkTransitData extends TransitData {
     private double       mBalance;
     private EZLinkTrip[] mTrips;
 
-    static HashSet<String> sbsBuses = new HashSet<String> () {
+    static HashSet<String> sbsBuses = new HashSet<String>() {
         private static final long serialVersionUID = 1L; {
             add("CT18");
             add("CT8");
@@ -314,7 +314,7 @@ public class EZLinkTransitData extends TransitData {
 
     // Data snagged from http://www.sgwiki.com/wiki/North_East_Line
     // Coordinates taken from respective Wikipedia MRT pages
-    private static TreeMap<String, MRTStation> mrtStations = new TreeMap<String, MRTStation> () {
+    private static TreeMap<String, MRTStation> mrtStations = new TreeMap<String, MRTStation>() {
         private static final long serialVersionUID = 1L; {
             // Transaction Codes
             put("GTM", new MRTStation("GTM Manual Top-up", "GTM", "GTM", null, null));
@@ -448,18 +448,18 @@ public class EZLinkTransitData extends TransitData {
             default: return "CEPAS";
         }
     }
-    
-    public static MRTStation getStation (String code) {
+
+    public static MRTStation getStation(String code) {
         return mrtStations.get(code);
     }
 
-    public static boolean check (Card card) {
+    public static boolean check(Card card) {
         if (card instanceof CEPASCard) {
             CEPASCard cepasCard = (CEPASCard) card;
-            return cepasCard.getHistory(3) != null &&
-                cepasCard.getHistory(3).isValid() &&
-                cepasCard.getPurse(3) != null &&
-                cepasCard.getPurse(3).isValid();
+            return cepasCard.getHistory(3) != null
+                    && cepasCard.getHistory(3).isValid()
+                    && cepasCard.getPurse(3) != null
+                    && cepasCard.getPurse(3).isValid();
         }
 
         return false;
@@ -470,7 +470,7 @@ public class EZLinkTransitData extends TransitData {
         return new TransitIdentity(getCardIssuer(canNo), canNo);
     }
 
-    public Creator<EZLinkTransitData> CREATOR = new Creator<EZLinkTransitData>() {
+    public static final Creator<EZLinkTransitData> CREATOR = new Creator<EZLinkTransitData>() {
         public EZLinkTransitData createFromParcel(Parcel parcel) {
             return new EZLinkTransitData(parcel);
         }
@@ -488,33 +488,32 @@ public class EZLinkTransitData extends TransitData {
         parcel.readTypedArray(mTrips, EZLinkTrip.CREATOR);
     }
 
-    public EZLinkTransitData (Card card) {
+    public EZLinkTransitData(Card card) {
         CEPASCard cepasCard = (CEPASCard) card;
-
         mSerialNumber = Utils.getHexString(cepasCard.getPurse(3).getCAN(), "<Error>");
         mBalance      = cepasCard.getPurse(3).getPurseBalance();
         mTrips        = parseTrips(cepasCard);
     }
 
-    @Override public String getCardName () {
+    @Override public String getCardName() {
         return getCardIssuer(mSerialNumber);
     }
 
-    @Override public String getBalanceString () {
+    @Override public String getBalanceString() {
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
         numberFormat.setCurrency(Currency.getInstance("SGD"));
         return numberFormat.format(mBalance / 100);
     }
 
-    @Override public String getSerialNumber () {
+    @Override public String getSerialNumber() {
         return mSerialNumber;
     }
 
-    @Override public Trip[] getTrips () {
+    @Override public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override public Refill[] getRefills () {
+    @Override public Refill[] getRefills() {
         return null;
     }
 
@@ -526,7 +525,7 @@ public class EZLinkTransitData extends TransitData {
         return null;
     }
 
-    private EZLinkTrip[] parseTrips (CEPASCard card) {
+    private EZLinkTrip[] parseTrips(CEPASCard card) {
         List<CEPASTransaction> transactions = card.getHistory(3).getTransactions();
         if (transactions != null) {
             EZLinkTrip[] trips = new EZLinkTrip[transactions.size()];

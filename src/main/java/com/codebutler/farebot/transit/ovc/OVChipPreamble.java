@@ -38,7 +38,7 @@ public class OVChipPreamble implements Parcelable {
     private final String mUnknownConstant2;
     private final int mType;
 
-    public OVChipPreamble (
+    public OVChipPreamble(
             String id,
             int checkbit,
             String manufacturer,
@@ -58,7 +58,7 @@ public class OVChipPreamble implements Parcelable {
         mType = type;
     }
 
-    public OVChipPreamble (byte[] data) {
+    public OVChipPreamble(byte[] data) {
         if (data == null) {
             data = new byte[48];
         }
@@ -155,7 +155,7 @@ public class OVChipPreamble implements Parcelable {
                     unknownConstant2, type);
         }
 
-        public OVChipPreamble[] newArray (int size) {
+        public OVChipPreamble[] newArray(int size) {
             return new OVChipPreamble[size];
         }
     };

@@ -49,12 +49,12 @@ import java.util.Locale;
 public class CardHWDetailFragment extends ListFragment {
     private Card mCard;
 
-    @Override public void onCreate (Bundle savedInstanceState) {
+    @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
         mCard = Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
-        
+
         List<ListItem> items = new ArrayList<>();
 
         if (mCard.getCardType() == CardType.MifareDesfire) {

@@ -92,10 +92,18 @@ public class OVChipTrip extends Trip {
             mFare          = inTransaction.getAmount();
         }
 
-        mIsTrain = mAgency == OVChipTransitData.AGENCY_NS || (mAgency == OVChipTransitData.AGENCY_ARRIVA && mStartStationId < 800);
-        mIsMetro = (mAgency == OVChipTransitData.AGENCY_GVB && mStartStationId < 3000) || (mAgency == OVChipTransitData.AGENCY_RET && mStartStationId < 3000);    // TODO: Needs verification!
-        mIsOther = mAgency == OVChipTransitData.AGENCY_TLS || mAgency == OVChipTransitData.AGENCY_DUO || mAgency == OVChipTransitData.AGENCY_STORE;
-        mIsFerry = mAgency == OVChipTransitData.AGENCY_ARRIVA && (mStartStationId > 4600 && mStartStationId < 4700);    // TODO: Needs verification!
+        mIsTrain = (mAgency == OVChipTransitData.AGENCY_NS)
+                || ((mAgency == OVChipTransitData.AGENCY_ARRIVA) && (mStartStationId < 800));
+
+        // TODO: Needs verification!
+        mIsMetro = (mAgency == OVChipTransitData.AGENCY_GVB && mStartStationId < 3000)
+                || (mAgency == OVChipTransitData.AGENCY_RET && mStartStationId < 3000);
+
+        mIsOther = mAgency == OVChipTransitData.AGENCY_TLS || mAgency == OVChipTransitData.AGENCY_DUO
+                || mAgency == OVChipTransitData.AGENCY_STORE;
+
+        // TODO: Needs verification!
+        mIsFerry = mAgency == OVChipTransitData.AGENCY_ARRIVA && (mStartStationId > 4600 && mStartStationId < 4700);
 
         // FIXME: Clean this up
         //mIsBusOrTram = (mAgency == AGENCY_GVB || mAgency == AGENCY_HTM || mAgency == AGENCY_RET && (!mIsMetro));
@@ -105,13 +113,17 @@ public class OVChipTrip extends Trip {
         // The only way to determine them would be to collect every single 'ovcid' out there :(
         mIsBus = (!mIsTrain && !mIsMetro && !mIsOther && !mIsFerry);
 
-        mIsCharge = mProcessType == OVChipTransitData.PROCESS_CREDIT || mProcessType == OVChipTransitData.PROCESS_TRANSFER;
-        mIsPurchase = mProcessType == OVChipTransitData.PROCESS_PURCHASE || mProcessType == OVChipTransitData.PROCESS_NODATA; // Not 100% sure about what NODATA is, but looks alright so far
+        mIsCharge = (mProcessType == OVChipTransitData.PROCESS_CREDIT)
+                || (mProcessType == OVChipTransitData.PROCESS_TRANSFER);
+
+        // Not 100% sure about what NODATA is, but looks alright so far
+        mIsPurchase = (mProcessType == OVChipTransitData.PROCESS_PURCHASE)
+                || (mProcessType == OVChipTransitData.PROCESS_NODATA);
 
         mIsBanned = mProcessType == OVChipTransitData.PROCESS_BANNED;
     }
 
-    public static Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
+    public static final Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
         public OVChipTrip createFromParcel(Parcel parcel) {
             return new OVChipTrip(parcel);
         }
@@ -260,7 +272,7 @@ public class OVChipTrip extends Trip {
             return Mode.TICKET_MACHINE;
         } else if (mIsPurchase) {
             return Mode.VENDING_MACHINE;
-    	} else if (mIsTrain) {
+        } else if (mIsTrain) {
             return Mode.TRAIN;
         } else if (mIsBus) {
             return Mode.BUS;

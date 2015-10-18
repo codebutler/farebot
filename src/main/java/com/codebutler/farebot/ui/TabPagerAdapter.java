@@ -44,12 +44,12 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
     private FragmentTransaction mCurTransaction = null;
 
     private static final class TabInfo {
-        private final Class<?> clss;
-        private final Bundle args;
+        private final Class<?> mClass;
+        private final Bundle mArgs;
 
-        public TabInfo(Class<?> _class, Bundle _args) {
-            clss = _class;
-            args = _args;
+        public TabInfo(Class<?> klass, Bundle args) {
+            mClass = klass;
+            mArgs = args;
         }
     }
 
@@ -86,7 +86,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
             mCurTransaction = mActivity.getFragmentManager().beginTransaction();
         }
 
-        Fragment fragment = Fragment.instantiate(mActivity, info.clss.getName(), info.args);
+        Fragment fragment = Fragment.instantiate(mActivity, info.mClass.getName(), info.mArgs);
                 mCurTransaction.add(R.id.pager, fragment);
                 return fragment;
     }

@@ -41,7 +41,7 @@ public class FareBotPreferenceActivity extends PreferenceActivity implements Pre
 
     private CheckBoxPreference mPreferenceLaunchFromBackground;
 
-    public void onCreate (Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.prefs);
 

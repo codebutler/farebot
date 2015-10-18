@@ -31,11 +31,11 @@ public class ListItem {
         mText2 = value;
     }
 
-    public String getText1 () {
+    public String getText1() {
         return mText1;
     }
 
-    public String getText2 () {
+    public String getText2() {
         return mText2;
     }
 }

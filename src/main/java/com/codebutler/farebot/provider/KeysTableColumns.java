@@ -25,6 +25,9 @@ package com.codebutler.farebot.provider;
 import android.provider.BaseColumns;
 
 public class KeysTableColumns implements BaseColumns {
+
+    private KeysTableColumns() { }
+
     public static final String TABLE_NAME = "keys";
 
     public static final String CARD_ID    = "card_id";

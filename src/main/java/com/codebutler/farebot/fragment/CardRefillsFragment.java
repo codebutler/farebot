@@ -41,7 +41,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class CardRefillsFragment extends ListFragment {
-    public void onCreate (Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TransitData transitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
@@ -49,11 +49,11 @@ public class CardRefillsFragment extends ListFragment {
     }
 
     private static class RefillsListAdapter extends ArrayAdapter<Refill> {
-        public RefillsListAdapter (Context context, Refill[] refills) {
+        public RefillsListAdapter(Context context, Refill[] refills) {
             super(context, 0, refills);
         }
 
-        @Override public View getView (int position, View convertView, ViewGroup parent) {
+        @Override public View getView(int position, View convertView, ViewGroup parent) {
             Activity activity = (Activity) getContext();
             LayoutInflater inflater = activity.getLayoutInflater();
 

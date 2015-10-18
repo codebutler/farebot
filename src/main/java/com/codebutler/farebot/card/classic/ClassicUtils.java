@@ -23,6 +23,9 @@
 package com.codebutler.farebot.card.classic;
 
 public class ClassicUtils {
+
+    private ClassicUtils() { }
+
     public static int convertBytePointerToBlock(int index) {
         int block;
 

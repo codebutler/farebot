@@ -25,13 +25,13 @@ package com.codebutler.farebot.transit;
 import android.os.Parcelable;
 
 public abstract class Refill implements Parcelable {
-    public abstract long getTimestamp ();
-    
-    public abstract String getAgencyName ();
-    public abstract String getShortAgencyName ();
+    public abstract long getTimestamp();
 
-    public abstract long getAmount ();
-    public abstract String getAmountString ();
+    public abstract String getAgencyName();
+    public abstract String getShortAgencyName();
+
+    public abstract long getAmount();
+    public abstract String getAmountString();
 
     public final int describeContents() {
         return 0;

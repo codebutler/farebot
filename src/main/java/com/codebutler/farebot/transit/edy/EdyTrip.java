@@ -25,14 +25,13 @@ public class EdyTrip extends Trip {
     public EdyTrip(FelicaBlock block) {
         byte[] data = block.getData();
 
-//          Data Offsets with values
-//          ------------------------
-//          0x00    type (0x20 = payment, 0x02 = charge, 0x04 = gift)
-//          0x01    sequence number (3 bytes, big-endian)
-//          0x04    date/time (upper 15 bits - added as day offset, lower 17 bits - added as second offset to Jan 1, 2000 00:00:00)
-//          0x08    transaction amount (big-endian)
-//          0x0c    balance (big-endian)
-
+        // Data Offsets with values
+        // ------------------------
+        // 0x00    type (0x20 = payment, 0x02 = charge, 0x04 = gift)
+        // 0x01    sequence number (3 bytes, big-endian)
+        // 0x04    date/time (upper 15 bits - added as day offset, lower 17 bits - added as second offset to Jan 1, 2000 00:00:00)
+        // 0x08    transaction amount (big-endian)
+        // 0x0c    balance (big-endian)
 
         mProcessType = data[0];
         mSequenceNumber = Util.toInt(data[1], data[2], data[3]);
@@ -41,7 +40,7 @@ public class EdyTrip extends Trip {
         mBalance = Util.toInt(data[12], data[13], data[14], data[15]);
     }
 
-    public static Creator<EdyTrip> CREATOR = new Creator<EdyTrip>() {
+    public static final Creator<EdyTrip> CREATOR = new Creator<EdyTrip>() {
         public EdyTrip createFromParcel(Parcel parcel) {
             return new EdyTrip(parcel);
         }
@@ -86,11 +85,11 @@ public class EdyTrip extends Trip {
             return 0;
     }
 
-    public double getFare () {
+    public double getFare() {
         return mTransactionAmount;
     }
 
-    public String getFareString () {
+    public String getFareString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
         if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT)
@@ -98,17 +97,17 @@ public class EdyTrip extends Trip {
         return format.format(mTransactionAmount);
     }
 
-    public String getBalanceString () {
+    public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
         return format.format(mBalance);
     }
 
     // use agency name for the tranaction number
-    public String getShortAgencyName () {
+    public String getShortAgencyName() {
         return getAgencyName();
     }
-    public String getAgencyName () {
+    public String getAgencyName() {
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setMinimumIntegerDigits(8);
         format.setGroupingUsed(false);
@@ -123,26 +122,23 @@ public class EdyTrip extends Trip {
     }
 
     public boolean hasTime() {
-        if (mTimestamp != null)
-            return true;
-        else
-            return false;
+        return mTimestamp != null;
     }
 
     // unused
-    public String getRouteName () {
+    public String getRouteName() {
         return null;
     }
-    public String getStartStationName () {
+    public String getStartStationName() {
         return null;
     }
-    public Station getStartStation () {
+    public Station getStartStation() {
         return null;
     }
-    public String getEndStationName () {
+    public String getEndStationName() {
         return null;
     }
-    public Station getEndStation () {
+    public Station getEndStation() {
         return null;
     }
     public int describeContents() {

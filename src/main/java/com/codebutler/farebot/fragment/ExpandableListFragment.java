@@ -45,29 +45,28 @@ import android.widget.TextView;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
-public class ExpandableListFragment extends Fragment
-    implements OnCreateContextMenuListener,
+public class ExpandableListFragment extends Fragment implements OnCreateContextMenuListener,
     ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener,
     ExpandableListView.OnGroupExpandListener {
 
     static final int INTERNAL_EMPTY_ID = 0x00ff0001;
 
-    final private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
-    final private Runnable mRequestFocus = new Runnable() {
+    private final Runnable mRequestFocus = new Runnable() {
         public void run() {
             mList.focusableViewAvailable(mList);
         }
     };
 
-    final private AdapterView.OnItemClickListener mOnClickListener
+    private final AdapterView.OnItemClickListener mOnClickListener
             = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             onListItemClick((ListView)parent, v, position, id);
         }
     };
 
-    final private ExpandableListView.OnChildClickListener mOnChildClickListener
+    private final ExpandableListView.OnChildClickListener mOnChildClickListener
             = new ExpandableListView.OnChildClickListener() {
         public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
             return onListChildClick(parent, v, groupPosition, childPosition, id);
@@ -296,9 +295,8 @@ public class ExpandableListFragment extends Fragment
             View rawListView = root.findViewById(android.R.id.list);
             if (!(rawListView instanceof ExpandableListView)) {
                 if (rawListView == null) {
-                    throw new RuntimeException(
-                            "Your content must have a ExpandableListView whose id attribute is " +
-                            "'android.R.id.list'");
+                    throw new RuntimeException("Your content must have a ExpandableListView whose id attribute is "
+                            + "'android.R.id.list'");
                 }
                 throw new RuntimeException(
                         "Content has view with id attribute 'android.R.id.list' "
@@ -345,9 +343,8 @@ public class ExpandableListFragment extends Fragment
         View emptyView = getView().findViewById(android.R.id.empty);
         mList = (ExpandableListView)getView().findViewById(android.R.id.list);
         if (mList == null) {
-            throw new RuntimeException(
-                    "Your content must have a ExpandableListView whose id attribute is " +
-                    "'android.R.id.list'");
+            throw new RuntimeException("Your content must have a ExpandableListView whose id attribute is "
+                            + "'android.R.id.list'");
         }
         if (emptyView != null) {
             mList.setEmptyView(emptyView);

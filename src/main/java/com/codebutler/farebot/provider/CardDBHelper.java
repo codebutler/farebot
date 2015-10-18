@@ -47,7 +47,7 @@ public class CardDBHelper extends SQLiteOpenHelper {
         CardsTableColumns.SCANNED_AT
     };
 
-    public static Cursor createCursor (Context context) {
+    public static Cursor createCursor(Context context) {
         return context.getContentResolver().query(CardProvider.CONTENT_URI_CARD,
             PROJECTION,
             null,
@@ -55,11 +55,11 @@ public class CardDBHelper extends SQLiteOpenHelper {
             CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
     }
 
-    public CardDBHelper (Context context) {
+    public CardDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override public void onCreate (SQLiteDatabase db) {
+    @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE cards ("
         + "_id        INTEGER PRIMARY KEY, "
         + "type       TEXT NOT NULL, "
@@ -69,7 +69,7 @@ public class CardDBHelper extends SQLiteOpenHelper {
         + ");");
     }
 
-    @Override public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion == 2) {
             db.beginTransaction();
             try {

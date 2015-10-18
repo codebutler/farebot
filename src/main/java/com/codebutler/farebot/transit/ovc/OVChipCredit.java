@@ -34,14 +34,14 @@ public class OVChipCredit implements Parcelable {
     private final int mCredit;
     private final int mBanbits;
 
-    public OVChipCredit (int id, int creditId, int credit, int banbits) {
+    public OVChipCredit(int id, int creditId, int credit, int banbits) {
         mId       = id;
         mCreditId = creditId;
         mCredit   = credit;
         mBanbits  = banbits;
     }
 
-    public OVChipCredit (byte[] data) {
+    public OVChipCredit(byte[] data) {
         if (data == null) {
             data = new byte[16];
         }
@@ -96,7 +96,7 @@ public class OVChipCredit implements Parcelable {
             return new OVChipCredit(id, creditId, credit, banbits);
         }
 
-        public OVChipCredit[] newArray (int size) {
+        public OVChipCredit[] newArray(int size) {
             return new OVChipCredit[size];
         }
     };

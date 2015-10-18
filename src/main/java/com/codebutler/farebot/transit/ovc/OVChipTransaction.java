@@ -54,7 +54,7 @@ public class OVChipTransaction implements Parcelable {
     private final int mUnknownConstant2;
     private final String mErrorMessage;
 
-    public OVChipTransaction (int transactionSlot, String errorMessage) {
+    public OVChipTransaction(int transactionSlot, String errorMessage) {
         mTransactionSlot  = transactionSlot;
         mErrorMessage     = errorMessage;
         mDate             =  0;
@@ -73,7 +73,7 @@ public class OVChipTransaction implements Parcelable {
         mUnknownConstant2 =  0;
     }
 
-    public OVChipTransaction (
+    public OVChipTransaction(
             int        transactionSlot,
             int        date,
             int        time,
@@ -108,7 +108,7 @@ public class OVChipTransaction implements Parcelable {
         mUnknownConstant2 = unknownConstant2;
     }
 
-    public OVChipTransaction (int transactionSlot, byte[] data) {
+    public OVChipTransaction(int transactionSlot, byte[] data) {
         if (data == null) {
             data = new byte[32];
         }
@@ -129,7 +129,10 @@ public class OVChipTransaction implements Parcelable {
         int subscriptionId = -1; // Default: No valid subscriptionId
         String errorMessage = "";
 
-        if (data[0] == (byte)0x00 && data[1] == (byte)0x00 && data[2] == (byte)0x00 && (data[3] & (byte)0xF0) == (byte)0x00) valid = 0;
+        if (data[0] == (byte)0x00
+                && data[1] == (byte)0x00
+                && data[2] == (byte)0x00
+                && (data[3] & (byte)0xF0) == (byte)0x00) valid = 0;
         if ((data[3] & (byte)0x10) != (byte)0x00) valid = 0;
         if ((data[3] & (byte)0x80) != (byte)0x00) valid = 0;
         if ((data[2] & (byte)0x02) != (byte)0x00) valid = 0;
@@ -150,7 +153,8 @@ public class OVChipTransaction implements Parcelable {
         } else {
             int iBitOffset = 53; // Ident, Date, Time
 
-            date = (((char)data[3] & (char)0x0F) << 10) | (((char)data[4] & (char)0xFF) << 2) | (((char)data[5] >> 6) & (char)0x03);
+            date = (((char)data[3] & (char)0x0F) << 10) | (((char)data[4] & (char)0xFF) << 2)
+                    | (((char)data[5] >> 6) & (char)0x03);
             time = (((char)data[5] & (char)0x3F) << 5) | (((char)data[6] >> 3) & (char)0x1F);
 
             if ((data[3] & (byte)0x20) != (byte)0x00) {
@@ -298,20 +302,20 @@ public class OVChipTransaction implements Parcelable {
     public static final Parcelable.Creator<OVChipTransaction> CREATOR = new Parcelable.Creator<OVChipTransaction>() {
         public OVChipTransaction createFromParcel(Parcel source) {
             int transactionSlot;
-            int    date;
-            int    time;
-            int    transfer;
-            int    company;
-            int    id;
-            int    station;
-            int    machineId;
-            int    vehicleId;
-            int    productId;
-            int    amount;
-            int    subscriptionId;
-            int    valid;
-            int    unknownConstant;
-            int    unknownConstant2;
+            int date;
+            int time;
+            int transfer;
+            int company;
+            int id;
+            int station;
+            int machineId;
+            int vehicleId;
+            int productId;
+            int amount;
+            int subscriptionId;
+            int valid;
+            int unknownConstant;
+            int unknownConstant2;
 
             transactionSlot = source.readInt();
             valid = source.readInt();
@@ -341,7 +345,7 @@ public class OVChipTransaction implements Parcelable {
                     unknownConstant2);
         }
 
-        public OVChipTransaction[] newArray (int size) {
+        public OVChipTransaction[] newArray(int size) {
             return new OVChipTransaction[size];
         }
     };
@@ -374,7 +378,8 @@ public class OVChipTransaction implements Parcelable {
          * http://www.chipinfo.nl/inchecken/
          */
 
-        if (mCompany == nextTransaction.getCompany() && mTransfer == OVChipTransitData.PROCESS_CHECKIN && nextTransaction.getTransfer() == OVChipTransitData.PROCESS_CHECKOUT) {
+        if (mCompany == nextTransaction.getCompany() && mTransfer == OVChipTransitData.PROCESS_CHECKIN
+                && nextTransaction.getTransfer() == OVChipTransitData.PROCESS_CHECKOUT) {
             if (mDate == nextTransaction.getDate()) {
                 return true;
             } else if (mDate == nextTransaction.getDate() - 1) {
@@ -384,9 +389,10 @@ public class OVChipTransaction implements Parcelable {
                 }
 
                 /*
-                 * Some companies expect a checkout at the maximum of 15 minutes after the estimated arrival at the endstation of the line.
-                 * But it's hard to determine the length of every single trip there is, so for now let's just assume a checkout at the next
-                 * day is still from the same trip. Better solutions are always welcome ;)
+                 * Some companies expect a checkout at the maximum of 15 minutes after the estimated arrival at the
+                 * endstation of the line.
+                 * But it's hard to determine the length of every single trip there is, so for now let's just assume a
+                 * checkout at the next day is still from the same trip. Better solutions are always welcome ;)
                  */
                 if (mCompany != OVChipTransitData.AGENCY_NS) {
                     return true;

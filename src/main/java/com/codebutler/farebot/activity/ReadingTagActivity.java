@@ -48,18 +48,18 @@ import com.codebutler.farebot.util.Utils;
 import java.util.Date;
 
 public class ReadingTagActivity extends Activity {
-    @Override public void onCreate (Bundle icicle) {
+    @Override public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_reading_tag);
 
         resolveIntent(getIntent());
     }
 
-    @Override public void onNewIntent (Intent intent) {
+    @Override public void onNewIntent(Intent intent) {
         resolveIntent(intent);
     }
 
-    private void resolveIntent (Intent intent) {
+    private void resolveIntent(Intent intent) {
         try {
             final Tag tag = intent.getParcelableExtra("android.nfc.extra.TAG");
             final byte[] tagId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
@@ -77,8 +77,8 @@ public class ReadingTagActivity extends Activity {
 
             new AsyncTask<Void, String, Uri>() {
                 private Exception mException;
-                
-                @Override protected Uri doInBackground (Void... params) {
+
+                @Override protected Uri doInBackground(Void... params) {
                     try {
                         Card card = Card.dumpTag(tagId, tag);
 
@@ -114,7 +114,7 @@ public class ReadingTagActivity extends Activity {
                     }
                 }
 
-                @Override protected void onPostExecute (Uri cardUri) {
+                @Override protected void onPostExecute(Uri cardUri) {
                     if (mException == null) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, cardUri);
                         intent.putExtra(CardInfoActivity.SPEAK_BALANCE_EXTRA, true);
@@ -139,7 +139,7 @@ public class ReadingTagActivity extends Activity {
                     }
                 }
             }.execute();
-            
+
         } catch (Exception ex) {
             Utils.showErrorAndFinish(this, ex);
         }

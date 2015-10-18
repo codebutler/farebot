@@ -80,11 +80,14 @@ public class HSLTransitData extends TransitData {
     private long          mKausiDirection;
 
     private static final long EPOCH = 0x32C97ED0;
-    private static final String[] regionNames = {"N/A", "Helsinki", "Espoo", "Vantaa", "Koko alue", "Seutu", "", "", "", "",  // 0-9
+    /*
+    private static final String[] regionNames = {
+        "N/A", "Helsinki", "Espoo", "Vantaa", "Koko alue", "Seutu", "", "", "", "",  // 0-9
         "", "", "", "", "", "", "", "", "", "", // 10-19
         "", "", "", "", "", "", "", "", "", "", // 20-29
         "", "", "", "", "", "", "", "", "", ""}; // 30-39
-/*    private static final Map<Long,String> vehicleNames =  Collections.unmodifiableMap(new HashMap<Long, String>() {{ 
+        */
+/*    private static final Map<Long,String> vehicleNames =  Collections.unmodifiableMap(new HashMap<Long, String>() {{
         put(1L, "Metro");
         put(18L, "Bus");
         put(16L, "Tram");
@@ -191,14 +194,14 @@ public class HSLTransitData extends TransitData {
             mArvoDuration = bitsToLong(14, 13, data);
             mArvoRegional = bitsToLong(27, 5, data);
 
-            mArvoExit = CardDateToTimestamp(bitsToLong(32, 14, data), bitsToLong(46, 11, data));
+            mArvoExit = cardDateToTimestamp(bitsToLong(32, 14, data), bitsToLong(46, 11, data));
             mArvoPurchasePrice = bitsToLong(68, 14, data);
             //mArvoDiscoGroup = bitsToLong(82, 6,data);
-            mArvoPurchase = CardDateToTimestamp(bitsToLong(88, 14, data), bitsToLong(102, 11, data)); //68 price, 82 zone?
-            mArvoExpire = CardDateToTimestamp(bitsToLong(113, 14, data), bitsToLong(127, 11, data)); //68 price, 82 zone?
+            mArvoPurchase = cardDateToTimestamp(bitsToLong(88, 14, data), bitsToLong(102, 11, data)); //68 price, 82 zone?
+            mArvoExpire = cardDateToTimestamp(bitsToLong(113, 14, data), bitsToLong(127, 11, data)); //68 price, 82 zone?
             mArvoPax = bitsToLong(138, 6, data);
 
-            mArvoXfer = CardDateToTimestamp(bitsToLong(144, 14, data), bitsToLong(158, 11, data)); //68 price, 82 zone?
+            mArvoXfer = cardDateToTimestamp(bitsToLong(144, 14, data), bitsToLong(158, 11, data)); //68 price, 82 zone?
 
             mArvoVehicleNumber = bitsToLong(169, 14, data);
 
@@ -242,10 +245,10 @@ public class HSLTransitData extends TransitData {
                 mKausiNoData = true;
             }
 
-            mKausiStart = CardDateToTimestamp(bitsToLong(19, 14, data), 0);
-            mKausiEnd = CardDateToTimestamp(bitsToLong(33, 14, data), 0);
-            mKausiPrevStart = CardDateToTimestamp(bitsToLong(67, 14, data), 0);
-            mKausiPrevEnd = CardDateToTimestamp(bitsToLong(81, 14, data), 0);
+            mKausiStart = cardDateToTimestamp(bitsToLong(19, 14, data), 0);
+            mKausiEnd = cardDateToTimestamp(bitsToLong(33, 14, data), 0);
+            mKausiPrevStart = cardDateToTimestamp(bitsToLong(67, 14, data), 0);
+            mKausiPrevEnd = cardDateToTimestamp(bitsToLong(81, 14, data), 0);
             if (mKausiPrevStart > mKausiStart) {
                 long temp = mKausiStart;
                 long temp2 = mKausiEnd;
@@ -255,9 +258,9 @@ public class HSLTransitData extends TransitData {
                 mKausiPrevEnd = temp2;
             }
             mHasKausi = mKausiEnd > (System.currentTimeMillis() / 1000.0);
-            mKausiPurchase = CardDateToTimestamp(bitsToLong(110, 14, data), bitsToLong(124, 11, data));
+            mKausiPurchase = cardDateToTimestamp(bitsToLong(110, 14, data), bitsToLong(124, 11, data));
             mKausiPurchasePrice = bitsToLong(149, 15, data);
-            mKausiLastUse = CardDateToTimestamp(bitsToLong(192, 14, data), bitsToLong(206, 11, data));
+            mKausiLastUse = cardDateToTimestamp(bitsToLong(192, 14, data), bitsToLong(206, 11, data));
             mKausiVehicleNumber = bitsToLong(217, 14, data);
             //mTrips[0].mVehicleNumber = mArvoVehicleNumber;
 
@@ -288,7 +291,7 @@ public class HSLTransitData extends TransitData {
         }
     }
 
-    public static long CardDateToTimestamp(long day, long minute) {
+    public static long cardDateToTimestamp(long day, long minute) {
         return (EPOCH) + day * (60 * 60 * 24) + minute * 60;
     }
 
@@ -314,39 +317,53 @@ public class HSLTransitData extends TransitData {
         StringBuilder ret = new StringBuilder();
         if (!mKausiNoData) {
             ret.append(GR(R.string.hsl_season_ticket)).append(":\n");
-            ret.append(GR(R.string.hsl_value_ticket_vehicle_number)).append(": ").append(mKausiVehicleNumber).append("\n");
-            ret.append(GR(R.string.hsl_value_ticket_line_number)).append(": ").append(Long.toString(mKausiLineJORE).substring(1)).append("\n");
+            ret.append(GR(R.string.hsl_value_ticket_vehicle_number)).append(": ")
+            .append(mKausiVehicleNumber).append("\n");
+            ret.append(GR(R.string.hsl_value_ticket_line_number)).append(": ")
+            .append(Long.toString(mKausiLineJORE).substring(1)).append("\n");
             ret.append("JORE extension").append(": ").append(mKausiJOREExt).append("\n");
             ret.append("Direction").append(": ").append(mKausiDirection).append("\n");
 
-            ret.append(GR(R.string.hsl_season_ticket_starts)).append(": ").append(shortDateFormat.format(mKausiStart * 1000.0));
+            ret.append(GR(R.string.hsl_season_ticket_starts)).append(": ")
+            .append(shortDateFormat.format(mKausiStart * 1000.0));
             ret.append("\n");
-            ret.append(GR(R.string.hsl_season_ticket_ends)).append(": ").append(shortDateFormat.format(mKausiEnd * 1000.0));
+            ret.append(GR(R.string.hsl_season_ticket_ends)).append(": ")
+            .append(shortDateFormat.format(mKausiEnd * 1000.0));
             ret.append("\n\n");
-            ret.append(GR(R.string.hsl_season_ticket_bought_on)).append(": ").append(shortDateTimeFormat.format(mKausiPurchase * 1000.0));
+            ret.append(GR(R.string.hsl_season_ticket_bought_on)).append(": ")
+            .append(shortDateTimeFormat.format(mKausiPurchase * 1000.0));
             ret.append("\n");
-            ret.append(GR(R.string.hsl_season_ticket_price_was)).append(": ").append(NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mKausiPurchasePrice / 100.0));
+            ret.append(GR(R.string.hsl_season_ticket_price_was)).append(": ")
+            .append(NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mKausiPurchasePrice / 100.0));
             ret.append("\n");
-            ret.append(GR(R.string.hsl_you_last_used_this_ticket)).append(": ").append(shortDateTimeFormat.format(mKausiLastUse * 1000.0));
+            ret.append(GR(R.string.hsl_you_last_used_this_ticket)).append(": ")
+            .append(shortDateTimeFormat.format(mKausiLastUse * 1000.0));
             ret.append("\n");
-            ret.append(GR(R.string.hsl_previous_season_ticket)).append(": ").append(shortDateFormat.format(mKausiPrevStart * 1000.0));
+            ret.append(GR(R.string.hsl_previous_season_ticket)).append(": ")
+            .append(shortDateFormat.format(mKausiPrevStart * 1000.0));
             ret.append(" - ").append(shortDateFormat.format(mKausiPrevEnd * 1000.0));
             ret.append("\n\n");
         }
 
         ret.append(GR(R.string.hsl_value_ticket)).append(":\n");
-        ret.append(GR(R.string.hsl_value_ticket_bought_on)).append(": ").append(shortDateTimeFormat.format(mArvoPurchase * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_expires_on)).append(": ").append(shortDateTimeFormat.format(mArvoExpire * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_last_transfer)).append(": ").append(shortDateTimeFormat.format(mArvoXfer * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_last_sign)).append(": ").append(shortDateTimeFormat.format(mArvoExit * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_price)).append(": ").append(NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mArvoPurchasePrice / 100.0)).append("\n");
+        ret.append(GR(R.string.hsl_value_ticket_bought_on)).append(": ")
+        .append(shortDateTimeFormat.format(mArvoPurchase * 1000.0)).append("\n");
+        ret.append(GR(R.string.hsl_value_ticket_expires_on)).append(": ")
+        .append(shortDateTimeFormat.format(mArvoExpire * 1000.0)).append("\n");
+        ret.append(GR(R.string.hsl_value_ticket_last_transfer)).append(": ")
+        .append(shortDateTimeFormat.format(mArvoXfer * 1000.0)).append("\n");
+        ret.append(GR(R.string.hsl_value_ticket_last_sign)).append(": ")
+        .append(shortDateTimeFormat.format(mArvoExit * 1000.0)).append("\n");
+        ret.append(GR(R.string.hsl_value_ticket_price)).append(": ")
+        .append(NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mArvoPurchasePrice / 100.0)).append("\n");
         ret.append(GR(R.string.hsl_value_ticket_disco_group)).append(": ").append(mArvoDiscoGroup).append("\n");
         ret.append(GR(R.string.hsl_value_ticket_pax)).append(": ").append(mArvoPax).append("\n");
         ret.append("Mystery1").append(": ").append(mArvoMystery1).append("\n");
         ret.append(GR(R.string.hsl_value_ticket_duration)).append(": ").append(mArvoDuration).append(" min\n");
         ret.append(GR(R.string.hsl_value_ticket_vehicle_number)).append(": ").append(mArvoVehicleNumber).append("\n");
         ret.append("Region").append(": ").append(regionNames[(int) mArvoRegional]).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_line_number)).append(": ").append(Long.toString(mArvoLineJORE).substring(1)).append("\n");
+        ret.append(GR(R.string.hsl_value_ticket_line_number)).append(": ")
+        .append(Long.toString(mArvoLineJORE).substring(1)).append("\n");
         ret.append("JORE extension").append(": ").append(mArvoJOREExt).append("\n");
         ret.append("Direction").append(": ").append(mArvoDirection).append("\n");
 
@@ -423,5 +440,4 @@ public class HSLTransitData extends TransitData {
             parcel.writeInt(0);
         }
     }
-
 }

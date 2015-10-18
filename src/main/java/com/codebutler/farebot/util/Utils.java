@@ -43,6 +43,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
+
+    private Utils() { }
+
     public static <T> List<T> arrayAsList(T... array) {
         if (array == null) {
             return new ArrayList<>();
@@ -71,14 +74,14 @@ public class Utils {
             .show();
     }
 
-    public static void showError (final Activity activity, Exception ex) {
+    public static void showError(final Activity activity, Exception ex) {
         Log.e(activity.getClass().getName(), ex.getMessage(), ex);
         new AlertDialog.Builder(activity)
             .setMessage(Utils.getErrorMessage(ex))
             .show();
     }
 
-    public static void showErrorAndFinish (final Activity activity, Exception ex) {
+    public static void showErrorAndFinish(final Activity activity, Exception ex) {
         try {
             Log.e(activity.getClass().getName(), Utils.getErrorMessage(ex));
             ex.printStackTrace();
@@ -97,15 +100,15 @@ public class Utils {
         }
     }
 
-    public static String getHexString (byte[] b) {
+    public static String getHexString(byte[] b) {
         String result = "";
         for (int i=0; i < b.length; i++) {
-            result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+            result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
         }
         return result;
     }
 
-    public static String getHexString (byte[] b, String defaultResult) {
+    public static String getHexString(byte[] b, String defaultResult) {
         try {
             return getHexString(b);
         } catch (Exception ex) {
@@ -113,11 +116,11 @@ public class Utils {
         }
     }
 
-    public static byte[] hexStringToByteArray (String s) {
+    public static byte[] hexStringToByteArray(String s) {
         if ((s.length() % 2) != 0) {
             throw new IllegalArgumentException("Bad input string: " + s);
         }
-        
+
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
@@ -136,15 +139,15 @@ public class Utils {
                 (byte)value};
     }
     */
-    
+
     public static int byteArrayToInt(byte[] b) {
         return byteArrayToInt(b, 0);
     }
-    
+
     public static int byteArrayToInt(byte[] b, int offset) {
         return byteArrayToInt(b, offset, b.length);
     }
-    
+
     public static int byteArrayToInt(byte[] b, int offset, int length) {
         return (int) byteArrayToLong(b, offset, length);
     }
@@ -167,7 +170,7 @@ public class Utils {
         return ret;
     }
 
-    public static String getErrorMessage (Throwable ex) {
+    public static String getErrorMessage(Throwable ex) {
         if (ex.getCause() != null) {
             ex = ex.getCause();
         }
@@ -213,8 +216,8 @@ public class Utils {
         return null;
     }
 
-    public static interface Matcher<T> {
-        public boolean matches(T t);
+    public interface Matcher<T> {
+        boolean matches(T t);
     }
 
     public static int convertBCDtoInteger(byte data) {
