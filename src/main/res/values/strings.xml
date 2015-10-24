@@ -22,7 +22,7 @@
 -->
 <resources>
 
-    <string name="app_name">Farebot M</string>
+    <string name="app_name">Farebot</string>
     <string name="license">Licenses</string>
     <string name="title_activity_license">Open Source Licenses</string>
     <string name="directions">Tap a card.</string>
@@ -103,7 +103,7 @@
     <string name="card_not_supported_on_device">This card is not supported by your device.</string>
     <string name="card_note_cepas">Not compatible with all devices.</string>
     <string name="visit_website">Visit Website</string>
-    <string name="title_activity_about">About Farebot M</string>
+    <string name="title_activity_about">About Farebot</string>
 
 
     <!-- Locations -->

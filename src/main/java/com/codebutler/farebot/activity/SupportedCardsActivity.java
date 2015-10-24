@@ -113,13 +113,13 @@ public class SupportedCardsActivity extends Activity {
                     CardType.CEPAS
             ));
 
-            add(new CardInfo(R.drawable.orca_card, "ORCA",
-                    R.string.location_seattle,
+            add(new CardInfo(R.drawable.opal_card, OpalTransitData.NAME,
+                    R.string.location_sydney_australia,
                     CardType.MifareDesfire
             ));
 
-            add(new CardInfo(R.drawable.opal_card, OpalTransitData.NAME,
-                    R.string.location_sydney_australia,
+            add(new CardInfo(R.drawable.orca_card, "ORCA",
+                    R.string.location_seattle,
                     CardType.MifareDesfire
             ));
 

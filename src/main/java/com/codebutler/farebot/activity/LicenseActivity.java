@@ -12,8 +12,8 @@ import com.codebutler.farebot.R;
 
 public class LicenseActivity extends Activity {
 
-    static String mLicenseIntro = "Farebot M\n" +
-            "Copyright 2011-2013 Eric Butler <eric@codebutler.com> and contributors\n" +
+    static String mLicenseIntro = "Farebot\n" +
+            "Copyright 2011-2015 Eric Butler <eric@codebutler.com> and contributors\n" +
             "Copyright 2015 Michael Farrell <micolous@gmail.com>\n" +
             "\n" +
             "This program is free software: you can redistribute it and/or modify " +

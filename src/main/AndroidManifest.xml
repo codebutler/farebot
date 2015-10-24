@@ -22,8 +22,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codebutler.farebot"
-    android:versionCode="21"
-    android:versionName="2.9.21" >
+    android:versionCode="22"
+    android:versionName="2.5.22" >
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -44,12 +44,12 @@
         android:required="true" />
 
     <application
-        android:name="com.codebutler.farebot.FareBotApplication"
         android:allowBackup="true"
         android:icon="@drawable/launcher_icon"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:name="com.codebutler.farebot.FareBotApplication">
         <activity
-            android:name="com.codebutler.farebot.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="sensorPortrait" >
             <intent-filter>
@@ -67,32 +67,30 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.codebutler.farebot.activity.ReadingTagActivity"
+            android:name=".activity.ReadingTagActivity"
             android:configChanges="keyboardHidden|orientation"
             android:launchMode="singleTop"
             android:noHistory="true"
             android:screenOrientation="sensorPortrait" />
         <activity
-            android:name="com.codebutler.farebot.activity.BackgroundTagActivity"
+            android:name=".activity.BackgroundTagActivity"
             android:configChanges="keyboardHidden|orientation"
             android:enabled="false"
             android:launchMode="singleTop"
             android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
             </intent-filter>
-
             <meta-data
                 android:name="android.nfc.action.TECH_DISCOVERED"
                 android:resource="@xml/filter_nfc" />
         </activity>
         <activity
-            android:name="com.codebutler.farebot.activity.CardInfoActivity"
+            android:name=".activity.CardInfoActivity"
             android:configChanges="keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -103,35 +101,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.codebutler.farebot.activity.AdvancedCardInfoActivity"
+            android:name=".activity.AdvancedCardInfoActivity"
             android:configChanges="keyboardHidden|orientation" />
         <activity
-            android:name="com.codebutler.farebot.activity.FareBotPreferenceActivity"
+            android:name=".activity.FareBotPreferenceActivity"
             android:label="@string/preferences" />
         <activity
-            android:name="com.codebutler.farebot.activity.TripMapActivity"
+            android:name=".activity.TripMapActivity"
             android:configChanges="keyboardHidden|orientation" />
         <activity
-            android:name="com.codebutler.farebot.activity.SupportedCardsActivity"
+            android:name=".activity.SupportedCardsActivity"
             android:label="@string/supported_cards"
             android:screenOrientation="sensorPortrait" />
         <activity
-            android:name="com.codebutler.farebot.activity.CardsActivity"
+            android:name=".activity.CardsActivity"
             android:label="@string/scanned_cards"
             android:screenOrientation="sensorPortrait" />
         <activity
-            android:name="com.codebutler.farebot.activity.KeysActivity"
+            android:name=".activity.KeysActivity"
             android:label="@string/keys" />
         <activity
-            android:name="com.codebutler.farebot.activity.AddKeyActivity"
+            android:name=".activity.AddKeyActivity"
             android:label="@string/add_key"
             android:theme="@style/FareBotDialog" >
-            <intent-filter android:priority="1" >
+            <intent-filter android:priority="1">
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <action android:name="android.intent.action.VIEW" />
-
                 <data
                     android:mimeType="application/octet-stream"
                     android:pathPattern=".*\\.farebotkeys"
@@ -142,6 +138,13 @@
                     android:scheme="content" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.LicenseActivity"
+            android:label="@string/title_activity_license" />
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:screenOrientation="sensorPortrait" />
 
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"
@@ -162,14 +165,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="f4580b524c880c2a6dc6110e8ebfebd817385ae0" />
-
-        <activity
-            android:name="com.codebutler.farebot.activity.LicenseActivity"
-            android:label="@string/title_activity_license" />
-        <activity
-            android:name="com.codebutler.farebot.activity.AboutActivity"
-            android:label="@string/title_activity_about"
-            android:screenOrientation="sensorPortrait" />
     </application>
 
 </manifest>
