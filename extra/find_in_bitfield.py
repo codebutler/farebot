@@ -67,7 +67,7 @@ def bitfinder(input_data, integer, pad=0, byte_aligned_only=False):
 
 def main():
 	parser = ArgumentParser()
-	parser.add_argument('input_file', nargs=1, type=FileType('rb'),
+	parser.add_argument('input_file', nargs='+', type=FileType('rb'),
 		help='Input file to search. Only use small files, this program is not memory efficient')
 	parser.add_argument('-i', '--integer', type=int, required=True,
 		help='Integer to search for')
@@ -77,33 +77,37 @@ def main():
 		help='Only return values that are aligned to bytes (divisible by 8)')
 	
 	options = parser.parse_args()
-	results_be, results_le, results_be_revbits, results_le_revbits = \
-		bitfinder(options.input_file[0].read(), options.integer, options.pad,
-			options.byte_aligned)
-	
-	print ('Filename: %s' % options.input_file[0].name)
-	print ('Integer: %d padded to %d bits' % (options.integer, options.pad))
-	if options.byte_aligned:
-		print ('Only byte-aligned values.')
-	if results_be:
-		print ('Big-endian offsets: %r' % (results_be,))
-	else:
-		print ('No big-endian offsets found.')
-	
-	if results_le:
-		print ('Little-endian offsets: %r' % (results_le,))
-	else:
-		print ('No little-endian offsets found.')
+	for fh in options.input_file:
+		results_be, results_le, results_be_revbits, results_le_revbits = \
+			bitfinder(fh.read(), options.integer, options.pad,
+				options.byte_aligned)
 
-	if results_be_revbits:
-		print ('Big-endian bit-reversed offsets: %r' % (results_be_revbits,))
-	else:
-		print ('No big-endian bit-reversed offsets found.')
+		print ('Filename: %s' % fh.name)
+		print ('Integer: %d padded to %d bits' % (options.integer, options.pad))
+		if options.byte_aligned:
+			print ('Only byte-aligned values.')
+		if results_be:
+			print ('Big-endian offsets: %r' % (results_be,))
+		else:
+			print ('No big-endian offsets found.')
 	
-	if results_le_revbits:
-		print ('Little-endian bit-reversed offsets: %r' % (results_le_revbits,))
-	else:
-		print ('No little-endian bit-reversed offsets found.')
+		if results_le:
+			print ('Little-endian offsets: %r' % (results_le,))
+		else:
+			print ('No little-endian offsets found.')
+
+		if results_be_revbits:
+			print ('Big-endian bit-reversed offsets: %r' % (results_be_revbits,))
+		else:
+			print ('No big-endian bit-reversed offsets found.')
+
+		if results_le_revbits:
+			print ('Little-endian bit-reversed offsets: %r' % (results_le_revbits,))
+		else:
+			print ('No little-endian bit-reversed offsets found.')
+		
+		print ("")
+
 
 
 if __name__ == '__main__':
