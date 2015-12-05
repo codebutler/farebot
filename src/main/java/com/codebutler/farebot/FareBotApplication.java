@@ -45,8 +45,9 @@ import com.codebutler.farebot.xml.FelicaIDmTransform;
 import com.codebutler.farebot.xml.FelicaPMmTransform;
 import com.codebutler.farebot.xml.HexString;
 import com.codebutler.farebot.xml.SkippableRegistryStrategy;
-import com.crashlytics.android.Crashlytics;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import net.kazzz.felica.lib.FeliCaLib;
 
 import org.simpleframework.xml.Serializer;
@@ -71,6 +72,7 @@ public class FareBotApplication extends Application {
     private DBUtil mSuicaDBUtil;
     private OVChipDBUtil mOVChipDBUtil;
     private final Serializer mSerializer;
+    private boolean mMifareClassicSupport;
 
     public FareBotApplication() {
         sInstance = this;
@@ -126,8 +128,13 @@ public class FareBotApplication extends Application {
         return mSerializer;
     }
 
+    public boolean getMifareClassicSupport() { return mMifareClassicSupport; }
+
     @Override public void onCreate() {
         super.onCreate();
+
+        // Check for Mifare Classic support
+        mMifareClassicSupport = this.getPackageManager().hasSystemFeature("com.nxp.mifare");
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
             .detectAll()
@@ -135,7 +142,7 @@ public class FareBotApplication extends Application {
             .build());
 
         if (!BuildConfig.DEBUG) {
-            Crashlytics.start(this);
+            Fabric.with(this, new Crashlytics());
         }
     }
 }

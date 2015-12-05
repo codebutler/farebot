@@ -40,7 +40,6 @@ import com.codebutler.farebot.util.Utils;
 
 import org.simpleframework.xml.Serializer;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,8 +93,8 @@ public class CardHWDetailFragment extends ListFragment {
             items.add(new ListItem("Purse Status", Byte.toString(purse.getPurseStatus())));
             items.add(new ListItem("Purse Balance", NumberFormat.getCurrencyInstance(Locale.US).format(purse.getPurseBalance()/100.0)));
 
-            items.add(new ListItem("Purse Creation Date", DateFormat.getDateInstance(DateFormat.LONG).format(purse.getPurseCreationDate()*1000L)));
-            items.add(new ListItem("Purse Expiry Date", DateFormat.getDateInstance(DateFormat.LONG).format(purse.getPurseExpiryDate()*1000L)));
+            items.add(new ListItem("Purse Creation Date", Utils.longDateFormat(purse.getPurseCreationDate()*1000L)));
+            items.add(new ListItem("Purse Expiry Date", Utils.longDateFormat(purse.getPurseExpiryDate()*1000L)));
             items.add(new ListItem("Autoload Amount", Integer.toString(purse.getAutoLoadAmount())));
             items.add(new ListItem("CAN", Utils.getHexString(purse.getCAN(), "<Error>")));
             items.add(new ListItem("CSN", Utils.getHexString(purse.getCSN(), "<Error>")));

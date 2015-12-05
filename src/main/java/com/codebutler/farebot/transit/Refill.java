@@ -36,4 +36,11 @@ public abstract class Refill implements Parcelable {
     public final int describeContents() {
         return 0;
     }
+
+    public static class Comparator implements java.util.Comparator<Refill> {
+        @Override public int compare(Refill lhs, Refill rhs) {
+            // For consistency with Trip, this is reversed.
+            return Long.valueOf(rhs.getTimestamp()).compareTo(lhs.getTimestamp());
+        }
+    }
 }

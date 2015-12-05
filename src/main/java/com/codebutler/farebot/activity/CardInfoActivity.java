@@ -48,10 +48,12 @@ import com.codebutler.farebot.fragment.CardInfoFragment;
 import com.codebutler.farebot.fragment.CardRefillsFragment;
 import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragment.CardTripsFragment;
+import com.codebutler.farebot.fragment.UnauthorizedCardFragment;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.edy.EdyTransitData;
 import com.codebutler.farebot.transit.suica.SuicaTransitData;
+import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitData;
 import com.codebutler.farebot.ui.TabPagerAdapter;
 import com.codebutler.farebot.util.Utils;
 
@@ -138,6 +140,11 @@ public class CardInfoActivity extends Activity {
                 args.putString(AdvancedCardInfoActivity.EXTRA_CARD,
                         mCard.toXml(FareBotApplication.getInstance().getSerializer()));
                 args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
+
+                if (mTransitData instanceof UnauthorizedClassicTransitData) {
+                    mTabsAdapter.addTab(actionBar.newTab(), UnauthorizedCardFragment.class, args);
+                    return;
+                }
 
                 mTabsAdapter.addTab(actionBar.newTab().setText(R.string.balance), CardBalanceFragment.class, args);
 

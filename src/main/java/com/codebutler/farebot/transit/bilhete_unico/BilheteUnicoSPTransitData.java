@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.bilhete_unico;
 import android.os.Parcel;
 
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.UnauthorizedException;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
@@ -67,8 +68,13 @@ public class BilheteUnicoSPTransitData extends TransitData {
     };
 
     public static boolean check(ClassicCard card) {
-        byte[] blockData = card.getSector(0).getBlock(0).getData();
-        return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
+        try {
+            byte[] blockData = card.getSector(0).getBlock(0).getData();
+            return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
+        } catch (UnauthorizedException ex) {
+            // TODO: implement a better way to handle identifying this card without a key
+            return false;
+        }
     }
 
     public static TransitIdentity parseTransitIdentity(Card card) {
