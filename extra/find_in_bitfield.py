@@ -83,6 +83,7 @@ def main():
 	
 	print ('Filename: %s' % options.input_file[0].name)
 	print ('Integer: %d padded to %d bits' % (options.integer, options.pad))
+
 	if options.byte_aligned:
 		print ('Only byte-aligned values.')
 	if results_be:
