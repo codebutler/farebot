@@ -1,10 +1,10 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url 'http://download.crashlytics.com/maven' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath 'com.android.tools.build:gradle:2.0.0-alpha3'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.16.0'
     }
 }
@@ -28,11 +28,11 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:23.1.0'
-    compile 'com.google.android.gms:play-services:8.1.0'
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.google.android.gms:play-services-maps:8.3.0'
     compile 'com.crashlytics.android:crashlytics:1.1.13'
-    compile 'org.apache.commons:commons-io:1.3.2'
-    compile 'org.apache.commons:commons-lang3:3.1'
+    compile 'commons-io:commons-io:2.4'
+    compile 'org.apache.commons:commons-lang3:3.4'
     compile('org.simpleframework:simple-xml:2.7.1') {
         exclude module: 'stax'
         exclude module: 'stax-api'
@@ -57,10 +57,19 @@ afterEvaluate {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
+
+    productFlavors {
+        dev {
+            minSdkVersion 21
+            applicationId "com.codebutler.farebot.dev"
+        }
+        prod {
+            minSdkVersion 15
+        }
+    }
 
     defaultConfig {
-        minSdkVersion 15
         targetSdkVersion 23
     }
 
@@ -77,11 +86,8 @@ android {
     }
 
     buildTypes {
-        dev.initWith(buildTypes.debug)
-        dev {
-            applicationIdSuffix '.dev'
-        }
         release {
+            // runProguard true
             signingConfig signingConfigs.release
         }
     }
