@@ -22,14 +22,15 @@
 
 package com.codebutler.farebot.card.cepas;
 
+import com.codebutler.farebot.util.Utils;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class CEPASProtocol {
     private static final String TAG = "CEPASProtocol";
+    private static final String CEPAS_SELECT_FILE_COMMAND = "00A40000024000";
 
     /* Status codes */
     private static final byte OPERATION_OK      = (byte) 0x00;
@@ -43,6 +44,7 @@ public class CEPASProtocol {
 
     public CEPASPurse getPurse(int purseId) throws IOException {
         try {
+            sendSelectFile();
             byte[] purseBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 0, new byte[] { (byte) 0 });
             if (purseBuff != null) {
                 return new CEPASPurse(purseId, purseBuff);
@@ -89,6 +91,10 @@ public class CEPASProtocol {
             Log.w(TAG, "Error reading purse history " + purseId, ex);
             return new CEPASHistory(purseId, ex.getMessage());
         }
+    }
+
+    private byte[] sendSelectFile() throws IOException{
+        return mTagTech.transceive(Utils.hexStringToByteArray(CEPAS_SELECT_FILE_COMMAND));
     }
 
     private byte[] sendRequest(byte command, byte p1, byte p2, byte lc, byte[] parameters) throws CEPASException,
