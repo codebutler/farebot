@@ -15,6 +15,7 @@ final class ClipperData {
     static final int AGENCY_MUNI         = 0x12;
     static final int AGENCY_GG_FERRY     = 0x19;
     static final int AGENCY_SF_BAY_FERRY = 0x1b;
+    static final int AGENCY_WHOLE_FOODS  = 0x302;
 
     static final Map<Integer, String> AGENCIES = new ImmutableMapBuilder<Integer, String>()
         .put(AGENCY_ACTRAN,       "Alameda-Contra Costa Transit District")
@@ -26,10 +27,11 @@ final class ClipperData {
         .put(AGENCY_MUNI,         "San Francisco Municipal")
         .put(AGENCY_GG_FERRY,     "Golden Gate Ferry")
         .put(AGENCY_SF_BAY_FERRY, "San Francisco Bay Ferry")
+        .put(AGENCY_WHOLE_FOODS,  "Whole Foods Grocery Store")
         .build();
 
     static final Map<Integer, String> SHORT_AGENCIES = new ImmutableMapBuilder<Integer, String>()
-        .put(AGENCY_ACTRAN, "ACTransit")
+        .put(AGENCY_ACTRAN,       "ACTransit")
         .put(AGENCY_BART,         "BART")
         .put(AGENCY_CALTRAIN,     "Caltrain")
         .put(AGENCY_GGT,          "GGT")
@@ -38,6 +40,7 @@ final class ClipperData {
         .put(AGENCY_MUNI,         "Muni")
         .put(AGENCY_GG_FERRY,     "GG Ferry")
         .put(AGENCY_SF_BAY_FERRY, "SF Bay Ferry")
+        .put(AGENCY_WHOLE_FOODS,  "Whole Foods")
         .build();
 
     static final Map<Long, Station> BART_STATIONS = new ImmutableMapBuilder<Long, Station>()

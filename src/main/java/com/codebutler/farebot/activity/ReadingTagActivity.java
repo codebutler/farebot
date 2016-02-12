@@ -24,10 +24,12 @@ package com.codebutler.farebot.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -90,21 +92,47 @@ public class ReadingTagActivity extends Activity {
                                 Log.d("ReadingTagActivity", "Got Card XML: " + line);
                             }
                         }
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ReadingTagActivity.this);
+                        boolean overwriteLast = prefs.getBoolean("pref_overwrite_card_data", false);
+                        boolean found = false;
 
                         String tagIdString = Utils.getHexString(card.getTagId());
 
                         ContentValues values = new ContentValues();
+                        Uri oldUri = null;
+                        Uri uri;
+                        String selection = CardsTableColumns.TAG_SERIAL+"=?";
+                        String[] selection_args = {tagIdString};
+                        if(overwriteLast){
+                            oldUri = CardProvider.CONTENT_URI_CARD;
+                            Cursor cursor = getContentResolver().query(oldUri, null, selection, selection_args, null);
+                            if(cursor.moveToFirst()) {
+                                found = true;
+                                values.put(CardsTableColumns.TYPE, cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE)));
+                                values.put(CardsTableColumns.TAG_SERIAL, cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL)));
+                                values.put(CardsTableColumns.DATA, cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA)));
+                                values.put(CardsTableColumns.SCANNED_AT, cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+                                oldUri = ContentUris.withAppendedId(oldUri, cursor.getLong(cursor.getColumnIndex(CardsTableColumns._ID)));
+                            }
+                            cursor.close();
+                        }
+
                         values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());
                         values.put(CardsTableColumns.TAG_SERIAL, tagIdString);
                         values.put(CardsTableColumns.DATA, cardXml);
                         values.put(CardsTableColumns.SCANNED_AT, card.getScannedAt().getTime());
 
-                        Uri uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
+                        if(overwriteLast && found){
+                            getContentResolver().update(oldUri, values, null, null);
+                            uri = oldUri;
+                        } else {
+                            uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
+                        }
 
-                        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(ReadingTagActivity.this).edit();
-                        prefs.putString(FareBotApplication.PREF_LAST_READ_ID, tagIdString);
-                        prefs.putLong(FareBotApplication.PREF_LAST_READ_AT, new Date().getTime());
-                        prefs.apply();
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString(FareBotApplication.PREF_LAST_READ_ID, tagIdString);
+                        editor.putLong(FareBotApplication.PREF_LAST_READ_AT, new Date().getTime());
+                        editor.apply();
 
                         return uri;
 

@@ -34,4 +34,5 @@ public class CardsTableColumns implements BaseColumns {
     public static final String TAG_SERIAL = "serial";
     public static final String DATA       = "data";
     public static final String SCANNED_AT = "scanned_at";
+    public static final String NICKNAME   = "nickname";
 }

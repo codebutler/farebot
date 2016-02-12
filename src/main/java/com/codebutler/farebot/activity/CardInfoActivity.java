@@ -24,6 +24,10 @@ package com.codebutler.farebot.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -34,10 +38,13 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.view.ViewPager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
@@ -48,6 +55,7 @@ import com.codebutler.farebot.fragment.CardInfoFragment;
 import com.codebutler.farebot.fragment.CardRefillsFragment;
 import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragment.CardTripsFragment;
+import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.edy.EdyTransitData;
@@ -99,6 +107,9 @@ public class CardInfoActivity extends Activity {
                     String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
 
                     mCard = Card.fromXml(FareBotApplication.getInstance().getSerializer(), data);
+                    if(cursor.getColumnIndex(CardsTableColumns.NICKNAME) != -1) {
+                        mCard.setNickname(cursor.getString(cursor.getColumnIndex(CardsTableColumns.NICKNAME)));
+                    }
                     mTransitData = mCard.parseTransitData();
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CardInfoActivity.this);
@@ -130,9 +141,7 @@ public class CardInfoActivity extends Activity {
                     return;
                 }
 
-                String titleSerial = (mTransitData.getSerialNumber() != null) ? mTransitData.getSerialNumber()
-                        : Utils.getHexString(mCard.getTagId(), "");
-                actionBar.setTitle(mTransitData.getCardName() + " " + titleSerial);
+                actionBar.setTitle(mTransitData.getCardName() + " " + mCard.getNickname());
 
                 Bundle args = new Bundle();
                 args.putString(AdvancedCardInfoActivity.EXTRA_CARD,
@@ -194,6 +203,8 @@ public class CardInfoActivity extends Activity {
         } else if (item.getItemId() == R.id.advanced_info) {
             showAdvancedInfo(null);
             return true;
+        } else if (item.getItemId() == R.id.nickname_card) {
+            showNicknameCardDlg();
         }
         return false;
     }
@@ -206,5 +217,48 @@ public class CardInfoActivity extends Activity {
             intent.putExtra(AdvancedCardInfoActivity.EXTRA_ERROR, ex);
         }
         startActivity(intent);
+    }
+
+    private void showNicknameCardDlg() {
+        final EditText editor = new EditText(this);
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override public void onClick(DialogInterface dialog, int which) {
+                try {
+                    String newnick = editor.getText().toString();
+                    if(newnick.length()==0){
+                        newnick = null;
+                    }
+                    mCard.setNickname(newnick);
+                    String selection = CardsTableColumns.TAG_SERIAL+"=?";
+                    String[] selection_args = {Utils.getHexString(mCard.getTagId())};
+                    Cursor cursor = getContentResolver().query(CardProvider.CONTENT_URI_CARD, null, selection, selection_args, null);
+                    ContentValues values = new ContentValues();
+                    if(cursor.moveToFirst()) {
+                        values.put(CardsTableColumns.NICKNAME, mCard.getNickname());
+                        Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, cursor.getLong(cursor.getColumnIndex(CardsTableColumns._ID)));
+                        getContentResolver().update(uri, values, null, null);
+                    } else {
+                        throw new Exception("Error, could not find card by ID!");
+                    }
+                    cursor.close();
+                    final ActionBar actionBar = getActionBar();
+                    actionBar.setTitle(mTransitData.getCardName() + " " + mCard.getNickname());
+                } catch (Exception ex) {
+                    Log.e("Card", "Failed to save", ex);
+                    throw new RuntimeException(ex);
+                }
+                Toast.makeText(CardInfoActivity.this, "Card Nickname Saved", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        editor.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        editor.setText(mCard.getNickname());
+        new AlertDialog.Builder(this)
+                .setTitle("Set Card Nickname")
+                .setMessage("Set a custom nickname for this card")
+                .setView(editor)
+                .setPositiveButton(android.R.string.ok, listener)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 }

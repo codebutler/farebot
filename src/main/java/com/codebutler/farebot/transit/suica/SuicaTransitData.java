@@ -115,6 +115,10 @@ public class SuicaTransitData extends TransitData {
         return null;
     }
 
+    @Override public boolean hasSerialNumber() {
+        return false;
+    }
+
     @Override public Trip[] getTrips() {
         return mTrips;
     }

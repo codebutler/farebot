@@ -45,6 +45,7 @@ public abstract class Card {
     @Attribute(name="type") private CardType mType;
     @Attribute(name="id") private HexString mTagId;
     @Attribute(name="scanned_at") private Date mScannedAt;
+    @Attribute(name="nickname", required=false) private String mNickname;
 
     protected Card() { }
 
@@ -52,6 +53,13 @@ public abstract class Card {
         mType = type;
         mTagId = new HexString(tagId);
         mScannedAt = scannedAt;
+    }
+
+    protected Card(CardType type, byte[] tagId, Date scannedAt, String nick) {
+        mType = type;
+        mTagId = new HexString(tagId);
+        mScannedAt = scannedAt;
+        mNickname = nick;
     }
 
     public static Card dumpTag(byte[] tagId, Tag tag) throws Exception {
@@ -98,6 +106,23 @@ public abstract class Card {
 
     public Date getScannedAt() {
         return mScannedAt;
+    }
+
+    public void setNickname(String nick){
+        mNickname = nick;
+    }
+
+    public String getNickname() {
+        if(mNickname == null){
+            TransitData data = parseTransitData();
+            String titleSerial = (data.getSerialNumber() != null) ? data.getSerialNumber()
+                    : Utils.getHexString(getTagId(), "");
+        }
+        return mNickname;
+    }
+
+    public boolean hasNickname(){
+        return mNickname != null;
     }
 
     public abstract TransitIdentity parseTransitIdentity();
