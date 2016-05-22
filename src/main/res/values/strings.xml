@@ -139,7 +139,6 @@
     <string name="error">Error</string>
     <string name="keys">Keys</string>
     <string name="delete">Delete</string>
-    <string name="add_key_directions">Save your keys binary dump file with a .farebotkeys extension, email the dump file as an attachment to yourself, and open it on this device.</string>
     <string name="no_keys">No keys.</string>
     <string name="nfc_unavailable">NFC Unavailable</string>
     <string name="hsl_pass_is_valid">Valid season ticket</string>
@@ -174,4 +173,5 @@
     <string name="general">General</string>
     <string name="launch_from_background">Launch from background</string>
     <string name="error_report_sent">Error report sent!</string>
+    <string name="mifare_classic">MIFARE Classic</string>
 </resources>

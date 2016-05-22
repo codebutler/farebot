@@ -26,6 +26,6 @@
     <item
         android:id="@+id/add_key"
         android:title="@string/add_key"
-        android:icon="@drawable/ic_action_new"
+        android:icon="@drawable/ic_add_white_24dp"
         android:showAsAction="always" />
 </menu>

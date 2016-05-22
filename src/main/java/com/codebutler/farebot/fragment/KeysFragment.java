@@ -22,12 +22,12 @@
 
 package com.codebutler.farebot.fragment;
 
-import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -43,6 +43,7 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.activity.AddKeyActivity;
 import com.codebutler.farebot.provider.CardKeyProvider;
 import com.codebutler.farebot.provider.KeysTableColumns;
 import com.codebutler.farebot.util.BetterAsyncTask;
@@ -133,10 +134,7 @@ public class KeysFragment extends ListFragment implements AdapterView.OnItemLong
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.add_key) {
-            new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.add_key_directions)
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
+            startActivity(new Intent(getActivity(), AddKeyActivity.class));
             return true;
         }
         return false;

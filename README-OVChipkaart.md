@@ -12,8 +12,6 @@ The database is created with [ovc-tools][0], specifically my [fork][1] of it (no
 
 To fully read an OV-chipkaart you will need the keys for all the sectors. These keys can be obtained with [mfocGUI][2] and can be found in the Keys folder after dumping. If you want to save some time, you could dump only the so called 'A' keys as those are the only ones that are used ;).
 
-For use in FareBot, save the key dump with a `.farebotkeys` extension, email the file to yourself, and open it on your device.
-
 ## TODO / FIXME
 
 * Normally every trip has an end time (ExitTimeStamp) and it would be nice if it would be displayed. 

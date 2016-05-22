@@ -95,10 +95,7 @@ public class AdvancedCardInfoActivity extends Activity {
                 findViewById(R.id.unauthorized_card).setVisibility(View.VISIBLE);
                 findViewById(R.id.load_keys).setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
-                        new AlertDialog.Builder(AdvancedCardInfoActivity.this)
-                            .setMessage(R.string.add_key_directions)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
+                        startActivity(new Intent(AdvancedCardInfoActivity.this, AddKeyActivity.class));
                     }
                 });
             } else {

@@ -132,15 +132,7 @@
         <activity
             android:name=".activity.AddKeyActivity"
             android:label="@string/add_key"
-            android:theme="@style/FareBotDialog">
-            <intent-filter android:priority="1">
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="android.intent.action.VIEW"/>
-                <data android:scheme="file" android:pathPattern=".*\\.farebotkeys" android:mimeType="application/octet-stream"/>
-                <data android:scheme="content" android:pathPattern=".*\\.farebotkeys" android:mimeType="application/octet-stream"/>
-            </intent-filter>
-        </activity>
+            android:theme="@style/FareBotDialog"/>
 
         <provider
             android:name="com.codebutler.farebot.provider.CardProvider"

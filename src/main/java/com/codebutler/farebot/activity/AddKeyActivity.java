@@ -27,12 +27,14 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.nfc.tech.MifareClassic;
 import android.nfc.tech.MifareUltralight;
 import android.nfc.tech.NfcF;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
@@ -56,6 +58,8 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class AddKeyActivity extends Activity {
+    private static final int REQUEST_SELECT_FILE = 1;
+
     private NfcAdapter mNfcAdapter;
     private PendingIntent mPendingIntent;
     private String[][] mTechLists = new String[][] {
@@ -90,7 +94,7 @@ public class AddKeyActivity extends Activity {
                         ClassicCardKeys keys = ClassicCardKeys.fromDump(keyType, mKeyData);
 
                         ContentValues values = new ContentValues();
-                        values.put(KeysTableColumns.CARD_ID,   mTagId);
+                        values.put(KeysTableColumns.CARD_ID, mTagId);
                         values.put(KeysTableColumns.CARD_TYPE, mCardType);
                         values.put(KeysTableColumns.KEY_DATA, keys.toJSON().toString());
 
@@ -110,22 +114,21 @@ public class AddKeyActivity extends Activity {
         });
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
-        Utils.checkNfcEnabled(this, mNfcAdapter);
+        if (mNfcAdapter == null) {
+            finish();
+            return;
+        }
 
         Intent intent = getIntent();
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        if (getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_VIEW) && getIntent().getData() != null) {
-            try {
-                InputStream stream = getContentResolver().openInputStream(getIntent().getData());
-                mKeyData = IOUtils.toByteArray(stream);
-            } catch (IOException e) {
-                Utils.showErrorAndFinish(this, e);
-            }
-        } else {
-            finish();
+        showFileSelector();
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_SELECT_FILE && resultCode == RESULT_OK) {
+            loadFile(data.getData());
         }
     }
 
@@ -145,7 +148,7 @@ public class AddKeyActivity extends Activity {
 
         if (ArrayUtils.contains(tag.getTechList(), "android.nfc.tech.MifareClassic")) {
             mCardType = "MifareClassic";
-            ((TextView) findViewById(R.id.card_type)).setText("MIFARE Classic");
+            ((TextView) findViewById(R.id.card_type)).setText(R.string.mifare_classic);
             ((TextView) findViewById(R.id.card_id)).setText(mTagId);
             ((TextView) findViewById(R.id.key_data)).setText(Utils.getHexString(mKeyData, "").toUpperCase());
 
@@ -158,6 +161,31 @@ public class AddKeyActivity extends Activity {
                 .setMessage(R.string.card_keys_not_supported)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
+        }
+    }
+
+    private void showFileSelector() {
+        Intent intent = new Intent();
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        } else {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+        }
+        startActivityForResult(intent, REQUEST_SELECT_FILE);
+    }
+
+    private void loadFile(Uri uri) {
+        try {
+            InputStream stream = getContentResolver().openInputStream(uri);
+            if (stream != null) {
+                mKeyData = IOUtils.toByteArray(stream);
+            } else {
+                finish();
+            }
+        } catch (IOException e) {
+            Utils.showErrorAndFinish(this, e);
         }
     }
 }
