@@ -62,6 +62,8 @@ import org.simpleframework.xml.transform.RegistryMatcher;
 
 import java.util.Date;
 
+import io.fabric.sdk.android.Fabric;
+
 public class FareBotApplication extends Application {
     public static final String PREF_LAST_READ_ID = "last_read_id";
     public static final String PREF_LAST_READ_AT = "last_read_at";
@@ -135,7 +137,7 @@ public class FareBotApplication extends Application {
             .build());
 
         if (!BuildConfig.DEBUG) {
-            Crashlytics.start(this);
+            Fabric.with(this, new Crashlytics());
         }
     }
 }
