@@ -29,6 +29,10 @@
             android:title="@string/launch_from_background"
             android:persistent="false"
             android:key="pref_launch_from_background"/>
+        <CheckBoxPreference
+            android:title="Overwrite Card Data"
+            android:summary="On duplicate cards, overwrite old data rather than creating new data"
+            android:key="pref_overwrite_card_data" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/accessibility">
         <CheckBoxPreference

@@ -31,7 +31,7 @@ import com.codebutler.farebot.BuildConfig;
 
 public class CardDBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "cards.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
 
     public static final int CARD_COLLECTION_URI_INDICATOR = 1;
     public static final int SINGLE_CARD_URI_INDICATOR = 2;
@@ -44,7 +44,8 @@ public class CardDBHelper extends SQLiteOpenHelper {
         CardsTableColumns.TYPE,
         CardsTableColumns.TAG_SERIAL,
         CardsTableColumns.DATA,
-        CardsTableColumns.SCANNED_AT
+        CardsTableColumns.SCANNED_AT,
+        CardsTableColumns.NICKNAME
     };
 
     public static Cursor createCursor(Context context) {
@@ -65,17 +66,30 @@ public class CardDBHelper extends SQLiteOpenHelper {
         + "type       TEXT NOT NULL, "
         + "serial     TEXT NOT NULL, "
         + "data       BLOB NOT NULL, "
-        + "scanned_at LONG"
+        + "scanned_at LONG, "
+        + "nickname   TEXT"
         + ");");
     }
 
     @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 1 && newVersion == 2) {
+        if (oldVersion == 1 && (newVersion == 2 || newVersion == 3)) {
             db.beginTransaction();
             try {
                 db.execSQL("ALTER TABLE cards RENAME TO cards_old");
                 onCreate(db);
                 db.execSQL("INSERT INTO cards (type, serial, data) SELECT type, serial, data from cards_old");
+                db.execSQL("DROP TABLE cards_old");
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+            return;
+        } else if (oldVersion == 2 && newVersion == 3) {
+            db.beginTransaction();
+            try{
+                db.execSQL("ALTER TABLE cards RENAME TO cards_old");
+                onCreate(db);
+                db.execSQL("INSERT INTO cards (_id, type, serial, data, scanned_at) SELECT _id, type, serial, data, scanned_at from cards_old");
                 db.execSQL("DROP TABLE cards_old");
                 db.setTransactionSuccessful();
             } finally {

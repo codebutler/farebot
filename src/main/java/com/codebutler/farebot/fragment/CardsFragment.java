@@ -217,6 +217,7 @@ public class CardsFragment extends ListFragment {
            int type = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
            String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
            Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+           String nickname = cursor.getString(cursor.getColumnIndex(CardsTableColumns.NICKNAME));
 
            String cacheKey = serial + scannedAt.getTime();
 
@@ -237,7 +238,9 @@ public class CardsFragment extends ListFragment {
            TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
 
            if (identity != null) {
-               if (identity.getSerialNumber() != null) {
+               if (nickname != null){
+                   textView1.setText(String.format("%s: %s", identity.getName(), nickname));
+               } else if (identity.getSerialNumber() != null) {
                    textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
                } else {
                    // textView1.setText(identity.getName());

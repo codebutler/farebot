@@ -31,6 +31,7 @@ import java.util.List;
 public abstract class TransitData implements Parcelable {
     public abstract String getBalanceString();
     public abstract String getSerialNumber();
+    public boolean hasSerialNumber() { return true; };
     public abstract Trip[] getTrips();
     public abstract Refill[] getRefills();
     public abstract Subscription[] getSubscriptions();
