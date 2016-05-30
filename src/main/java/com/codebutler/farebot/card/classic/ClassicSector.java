@@ -1,11 +1,11 @@
 /*
  * ClassicSector.java
  *
- * Copyright (C) 2012 Eric Butler
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
  *
- * Authors:
- * Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
- * Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
+ * Copyright (C) 2012, 2014 Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

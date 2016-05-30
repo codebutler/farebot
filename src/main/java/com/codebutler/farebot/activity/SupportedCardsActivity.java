@@ -1,10 +1,13 @@
 /*
  * SupportedCardsActivity.java
  *
- * Copyright (C) 2011 Eric Butler
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
  *
- * Authors:
- * Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2012, 2014-2015 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2013 Chris Norden <thisiscnn@gmail.com>
+ * Copyright (C) 2013 Marcelo Liberato <mliberato@gmail.com>
+ * Copyright (C) 2013 Lauri Andler <lauri.andler@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

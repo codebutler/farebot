@@ -1,10 +1,12 @@
 /*
  * CEPASCard.java
  *
- * Copyright (C) 2011 Eric Butler
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
  *
- * Authors:
- * Sean Cross <sean@chumby.com>
+ * Copyright (C) 2011-2012, 2014 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2011 Sean Cross <sean@chumby.com>
+ * Copyright (C) 2012 tbonang <bonang@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

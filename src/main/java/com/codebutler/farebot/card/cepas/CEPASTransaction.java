@@ -1,10 +1,13 @@
 /*
  * CEPASTransaction.java
  *
- * Copyright (C) 2011 Eric Butler
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
  *
- * Authors:
- * Sean Cross <sean@chumby.com>
+ * Copyright (C) 2011-2012, 2014-2015 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2011 Sean Cross <sean@chumby.com>
+ * Copyright (C) 2012 tbonang <bonang@gmail.com>
+ * Copyright (C) 2012 Victor Heng <bakavic@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.card.cepas;
 
 import android.os.Parcel;

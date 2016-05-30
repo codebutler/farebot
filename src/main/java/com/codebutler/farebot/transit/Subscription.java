@@ -1,13 +1,11 @@
 /*
  * Subscription.java
  *
- * Copyright (C) 2011 Eric Butler
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
  *
- * Authors:
- * Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
- *
- * Based on code from http://http://www.huuf.info/OV/
- * by Huuf. See project URL for complete author information.
+ * Copyright (C) 2011-2012, 2015 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
