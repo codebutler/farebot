@@ -131,10 +131,8 @@ public class EZLinkTrip extends Trip {
             return numberFormat.format(balance / 100.0);
     }
 
-    @Override public double getFare() {
-        if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
-            return 0.0;
-        return mTransaction.getAmount() / 100.0;
+    @Override public boolean hasFare() {
+        return (mTransaction.getType() != CEPASTransaction.TransactionType.CREATION);
     }
 
     @Override public String getBalanceString() {

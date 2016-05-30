@@ -180,8 +180,8 @@ public class OrcaTrip extends Trip {
         return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100.0);
     }
 
-    @Override public double getFare() {
-        return mFare;
+    @Override public boolean hasFare() {
+        return true;
     }
 
     @Override public String getBalanceString() {

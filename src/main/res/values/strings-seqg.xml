@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Go Card (South East Queensland/Brisbane, AU)
+    These are deliberately separated strings in order to match the terminology of the agency.
+-->
+<resources>
+    <string name="seqgo_refill_manual">Manual top-up</string>
+    <string name="seqgo_refill_automatic">Automatic top-up</string>
+    <string name="seqgo_card_note">Does not support Go Access, Explore or SEEQ cards.</string>
+</resources>

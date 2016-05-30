@@ -1,177 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  strings.xml
+    strings.xml
 
-  Copyright (C) 2011 Eric Butler
+    This file is part of FareBot.
+    Learn more at: https://codebutler.github.io/farebot/
 
-  Authors:
-  Eric Butler <eric@codebutler.com>
+    Copyright (C) 2011-2012, 2016 Eric Butler <eric@codebutler.com>
+    Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+    Copyright (C) 2013 Chris Norden <thisiscnn@gmail.com>
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
-
-<resources>
-    <string name="app_name">FareBot</string>
-    <string name="directions">Tap a card.</string>
-    <string name="reading_card">Reading Card</string>
-    <string name="dont_move">Do not move card</string>
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="about">About</string>
+    <string name="accessibility">Accessibility</string>
+    <string name="add_key">Add Key</string>
     <string name="advanced_info">Advanced Info</string>
-    <string name="delete_card">Delete Card</string>
-    <string name="unknown_card">Unknown Card</string>
-    <string name="hw_detail">Manufacturing Info</string>
-    <string name="data">Raw Data</string>
-    <string name="copy_xml">Copy</string>
-    <string name="share_xml">Share</string>
-    <string name="save_xml">Save to USB Storage</string>
-    <string name="trips">Trips</string>
-    <string name="history">History</string>
+    <string name="app_name">FareBot</string>
     <string name="balance">Balance</string>
-    <string name="refills">Refills</string>
-    <string name="no_trip_data">No trips found. Has this card been used?</string>
-    <string name="no_refill_data">No refills found. Has this card only been used with a pass?</string>
-    <string name="import_xml">Import</string>
+    <string name="balance_speech">Balance <xliff:g example="$13.37" id="balance">%s</xliff:g></string>
+    <string name="block_title_format">Block: %s</string>
+    <string name="card_epoch">Card Epoch</string>
+    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
+    <string name="card_not_supported_on_device">This card is not supported by your device.</string>
+    <string name="card_note_cepas">Not compatible with all devices.</string>
+    <string name="card_preview_reader">Beta version of card reader.</string>
+    <string name="card_type">Card type</string>
+    <string name="checksum">Checksum</string>
+    <string name="copy_xml">Copy</string>
+    <string name="data">Raw Data</string>
+    <string name="date">Date</string>
+    <string name="delete">Delete</string>
+    <string name="delete_card">Delete Card</string>
+    <string name="directions">Tap a card.</string>
+    <string name="dont_move">Do not move card</string>
+    <string name="error">Error</string>
+    <string name="error_report_sent">Error report sent!</string>
+    <string name="export">Export</string>
+    <string name="export_all">Export All</string>
+    <string name="fare_cancelled_format">%s (Cancelled)</string>
+    <string name="fully_locked_desc">
+        This card does not have any part of it which is freely readable without a key. You have no keys installed which are valid for this card.\n\n
+        If the card is currently supported by FareBot, you will be able to make this card work once you have installed keys for it. Please consult the online documentation for more information about acquiring keys.\n\n
+        If your card is not currently supported by FareBot, it is unlikely it will ever be supported by this software, unless this key is broken.\n\n
+        Please contact your municipal transport authority in order to allow some level of open data access on issued cards. It is possible to safely allow limited read access to data on public transport smartcards.
+    </string>
+    <string name="fully_locked_title">Card is fully locked!</string>
+    <string name="general">General</string>
+    <string name="history">History</string>
+    <string name="hw_detail">Manufacturing Info</string>
     <string name="import_clipboard">Import from Clipboard</string>
     <string name="import_file">Import from File</string>
     <string name="import_sd">Import from USB Storage</string>
-    <string name="export">Export</string>
-    <string name="export_all">Export All</string>
-    <string name="about">About</string>
+    <string name="import_xml">Import</string>
+    <string name="info">Info</string>
+    <string name="invalid_sector_title_format">Sector: 0x%1$s (Invalid: %2$s)</string>
+    <string name="keys">Keys</string>
+    <string name="keys_required">Encryption keys are required to read this card.</string>
+    <string name="last_transaction">Last transaction</string>
+    <string name="launch_from_background">Launch from background</string>
+    <string name="load_keys">Load Keys</string>
+    <string name="loading">Loading…</string>
+    <string name="locked_card">Locked Card</string>
+    <string name="mifare_classic">MIFARE Classic</string>
+    <string name="need_stations">Not all station names are known.</string>
+    <string name="nfc_off_error">NFC is turned off</string>
+    <string name="nfc_unavailable">NFC Unavailable</string>
+    <string name="no_keys">No keys.</string>
+    <string name="no_scanned_cards">You have not scanned any cards.</string>
+    <string name="no_trip_data">No trips found. Has this card been used?</string>
+    <string name="page_title_format">Page: 0x%s</string>
+    <string name="pass_or_transfer">Pass/Xfer</string>
     <string name="preferences">Preferences</string>
-    <string name="accessibility">Accessibility</string>
+    <string name="reading_card">Reading Card</string>
+    <string name="report_error">Report Error</string>
+    <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
+    <string name="report_error_privacy_title">Privacy Notice</string>
+    <string name="save_xml">Save to USB Storage</string>
+    <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
+    <string name="scanned_cards">History</string>
+    <string name="sector_title_format">Sector: 0x%s</string>
+    <string name="share_xml">Share</string>
     <string name="speak_balance">Speak Balance</string>
     <string name="speak_balance_summary">Proof of concept</string>
-    <string name="balance_speech">Balance %s</string>
-    <string name="loading">Loading…</string>
-    <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
-    <string name="supported_cards">Supported Cards</string>
-    <string name="pass_or_transfer">Pass/Xfer</string>
-    <string name="transaction_sequence">#</string>
-
-    <string name="felica_terminal_fare_adjustment">Fare Adjustment Machine</string>
-    <string name="felica_terminal_portable">Portable Terminal</string>
-    <string name="felica_terminal_vehicle">Vehicle Terminal (on bus)</string>
-    <string name="felica_terminal_ticket">Ticket Machine</string>
-    <string name="felica_terminal_deposit_quick_charge">Quick Charge Machine</string>
-    <string name="felica_terminal_tvm_tokyo_monorail">Tokyo Monorail Ticket Machine</string>
-    <string name="felica_terminal_tvm_etc">Ticket Machine, etc.</string>
-    <string name="felica_terminal_ticket_gate">Ticket Gate</string>
-    <string name="felica_terminal_simple_ticket_gate">Simple Ticket Gate</string>
-    <string name="felica_terminal_booth">Booth</string>
-    <string name="felica_terminal_booth_green">Booth (Green)</string>
-    <string name="felica_terminal_ticket_gate_terminal">Ticket Gate Terminal</string>
-    <string name="felica_terminal_mobile_phone">Mobile Phone</string>
-    <string name="felica_terminal_connection_adjustment">Connection Adjustment Machine</string>
-    <string name="felica_terminal_transfer_adjustment">Transfer Adjustment Machine</string>
-    <string name="felica_terminal_simple_deposit">Simple Deposit Machine</string>
-    <string name="felica_terminal_pos">Point of Sale Terminal</string>
-    <string name="felica_terminal_vending">Vending Machine</string>
-
-    <string name="felica_process_fare_exit_gate">Fare Gate</string>
-    <string name="felica_process_charge">Charge</string>
-    <string name="felica_process_purchase_magnetic">Magnetic Ticket</string>
-    <string name="felica_process_fare_adjustment">Fare Adjustment</string>
-    <string name="felica_process_admission_payment">Admission Payment</string>
-    <string name="felica_process_booth_exit">Station Master Booth Exit</string>
-    <string name="felica_process_issue_new">New Issue</string>
-    <string name="felica_process_booth_deduction">Booth Deduction</string>
-    <string name="felica_process_bus_pitapa">Bus (PiTaPa)</string>
-    <string name="felica_process_bus_iruca">Bus (IruCa)</string>
-    <string name="felica_process_reissue">Re-issue</string>
-    <string name="felica_process_payment_shinkansen">Shinkansen Payment</string>
-    <string name="felica_process_entry_a_autocharge">Entry A (Autocharge)</string>
-    <string name="felica_process_exit_a_autocharge">Exit A (Autocharge)</string>
-    <string name="felica_process_deposit_bus">Bus Deposit</string>
-    <string name="felica_process_purchase_special_ticket">Ticket (Special Bus/Streetcar)</string>
-    <string name="felica_process_merchandise_purchase">Merchandise</string>
-    <string name="felica_process_bonus_charge">Bonus Charge</string>
-    <string name="felica_process_register_deposit">Register Deposit</string>
-    <string name="felica_process_merchandise_cancel">Cancel Merchandise</string>
-    <string name="felica_process_merchandise_admission">Merchandise/Admission</string>
-    <string name="felica_process_merchandise_purchase_cash">Merchandise (partially with cash)</string>
-    <string name="felica_process_merchandise_admission_cash">Merchandise/Admission (partially with cash)</string>
-    <string name="felica_process_payment_thirdparty">Payment (3rd Party)</string>
-    <string name="felica_process_admission_thirdparty">Admission Payment (3rd Party)</string>
-    <string name="nfc_off_error">NFC is turned off</string>
-    <string name="turn_on_nfc">Please enable NFC to read card information.</string>
-    <string name="wireless_settings">Wireless Settings</string>
-    <string name="report_error">Report Error</string>
-    <string name="unknown_card_description">This card is not yet supported by FareBot. Only raw data can be displayed.</string>
-    <string name="report_error_privacy_title">Privacy Notice</string>
-    <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
-    <string name="scanned_cards">Scanned Cards</string>
-    <string name="no_scanned_cards">You have not scanned any cards.</string>
-
-    <string name="location_seattle">Seattle, WA</string>
-    <string name="location_san_francisco">San Francisco, CA</string>
-    <string name="location_singapore">Singapore</string>
-    <string name="location_tokyo">Tokyo, Japan</string>
-    <string name="location_kansai">Kansai, Japan</string>
-    <string name="location_the_netherlands">The Netherlands</string>
-    <string name="location_sao_paulo">São Paulo, Brazil</string>
-    <string name="location_helsinki_finland">Helsinki, Finland</string>
-    <string name="block_title_format">Block: %s</string>
-    <string name="sector_title_format">Sector: 0x%s</string>
-    <string name="unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>
-    <string name="invalid_sector_title_format">Sector: 0x%1$s (Invalid: %2$s)</string>
-
     <string name="subscriptions">Subscriptions</string>
-    <string name="info">Info</string>
-    <string name="valid_format">Valid %1$s to %2$s</string>
-    <string name="card_note_ezlink">Not compatible with all devices.</string>
-    <string name="card_note_ovchip">Requires encryption keys.</string>
-    <string name="card_note_bilheteunicosp">Requires encryption keys.</string>
+    <string name="supported_cards">Supported Cards</string>
+    <string name="time">Time</string>
+    <string name="transaction_sequence">#</string>
+    <string name="transaction_type">Transaction type</string>
+    <string name="turn_on_nfc">Please enable NFC to read card information.</string>
+    <string name="unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>
+    <string name="unknown_card">Unknown Card</string>
+    <string name="unknown_card_description">This card is not yet supported. Only raw data can be displayed.</string>
+    <string name="unknown_card_header">Unknown card format</string>
     <string name="unknown_format">Unknown (%s)</string>
-    <string name="keys_required">Encryption keys are required to read this card.</string>
-    <string name="load_keys">Load Keys</string>
-    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
-    <string name="add_key">Add Key</string>
-    <string name="error">Error</string>
-    <string name="keys">Keys</string>
-    <string name="delete">Delete</string>
-    <string name="no_keys">No keys.</string>
-    <string name="nfc_unavailable">NFC Unavailable</string>
-    <string name="hsl_pass_is_valid">Valid season ticket</string>
-    <string name="hsl_1zone_ticket">Internal ticket</string>
-    <string name="hsl_2zone_ticket">Regional ticket</string>
-    <string name="hsl_balance_refill">Balance refill</string>
-    <string name="hsl_balance_ticket">Value ticket</string>
-    <string name="hsl_value_ticket_is_valid">Valid value ticket</string>
-    <string name="hsl_pass_ticket">Season ticket</string>
-    <string name="hsl_season_ticket_starts">Season ticket starts</string>
-    <string name="hsl_season_ticket_ends">Season ticket ends</string>
-    <string name="hsl_season_ticket_bought_on">Season ticket bought on</string>
-    <string name="hsl_previous_season_ticket">Previous season ticket was</string>
-    <string name="hsl_season_ticket_price_was">The season ticket\'s price was</string>
-    <string name="hsl_you_last_used_this_ticket">You last used this ticket on</string>
-    <string name="hsl_person_format">%s person</string>
-    <string name="hsl_mins_format">%s mins</string>
-    <string name="hsl_value_ticket">Value ticket</string>
-    <string name="hsl_value_ticket_bought_on">Ticket bought</string>
-    <string name="hsl_value_ticket_expires_on">Ticket expires</string>
-    <string name="hsl_value_ticket_last_transfer">Last transfer</string>
-    <string name="hsl_value_ticket_last_sign">Last sign</string>
-    <string name="hsl_value_ticket_price">Price of value ticket</string>
-    <string name="hsl_value_ticket_disco_group">Discount group</string>
-    <string name="hsl_value_ticket_pax">Group size</string>
-    <string name="hsl_value_ticket_duration">Ticket validity</string>
-    <string name="hsl_value_ticket_vehicle_number">Vehicle number</string>
-    <string name="hsl_value_ticket_vehicle_type">Vehicle type</string>
-    <string name="hsl_value_ticket_line_number">Line number</string>
-    <string name="hsl_season_ticket">Season ticket</string>
-    <string name="fare_cancelled_format">%s (Cancelled)</string>
-    <string name="general">General</string>
-    <string name="launch_from_background">Launch from background</string>
-    <string name="error_report_sent">Error report sent!</string>
-    <string name="mifare_classic">MIFARE Classic</string>
+    <string name="unknown_more_info">More information</string>
+    <!-- TRANSLATORS: This is used on a list item, which will direct users to FareBot's website when touched. -->
+    <string name="unknown_more_info_desc">Touch here for more information about FareBot\'s support of this card.</string>
+    <string name="valid_format">Valid %1$s to %2$s</string>
+    <string name="vehicle_type">Vehicle type</string>
+    <string name="wireless_settings">Wireless Settings</string>
 </resources>

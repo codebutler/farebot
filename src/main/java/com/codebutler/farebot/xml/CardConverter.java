@@ -28,6 +28,7 @@ import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.felica.FelicaCard;
+import com.codebutler.farebot.card.ultralight.UltralightCard;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.Converter;
@@ -52,6 +53,8 @@ public class CardConverter implements Converter<Card> {
                 return mSerializer.read(FelicaCard.class, node);
             case MifareClassic:
                 return mSerializer.read(ClassicCard.class, node);
+            case MifareUltralight:
+                return mSerializer.read(UltralightCard.class, node);
             default:
                 throw new UnsupportedOperationException("Unsupported card type: " + type);
         }

@@ -87,6 +87,11 @@ public class Station implements Parcelable {
         return mLongitude;
     }
 
+    public boolean hasLocation() {
+        return getLatitude() != null && !getLatitude().isEmpty()
+                && getLongitude() != null && !getLongitude().isEmpty();
+    }
+
     public int describeContents() {
         return 0;
     }

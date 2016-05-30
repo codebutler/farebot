@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Locations -->
+    <string name="location_seattle">Seattle, WA, USA</string>
+    <string name="location_san_francisco">San Francisco, CA, USA</string>
+    <string name="location_singapore">Singapore</string>
+    <string name="location_tokyo">Tokyo, Japan</string>
+    <string name="location_kansai">Kansai, Japan</string>
+    <string name="location_the_netherlands">The Netherlands</string>
+    <string name="location_sao_paulo">São Paulo, Brazil</string>
+    <string name="location_helsinki_finland">Helsinki, Finland</string>
+    <string name="location_sydney_australia">Sydney, Australia</string>
+    <!-- i18n: "SE QLD" is an abbreviation for "South East Queensland".  "Queensland" is a state of Australia. -->
+    <string name="location_brisbane_seq_australia">Brisbane &amp; SE QLD, Australia</string>
+    <string name="location_victoria_australia">Victoria, Australia</string>
+</resources>

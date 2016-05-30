@@ -61,8 +61,21 @@ public class ClassicCardKeys extends CardKeys {
         mSectorKeys = sectorKeys;
     }
 
+    /**
+     * Gets the key for a particular sector on the card.
+     * @param sectorNumber The sector number to retrieve the key for
+     * @return A ClassicSectorKey for that sector, or null if there is no known key or the value is
+     * out of range.
+     */
     public ClassicSectorKey keyForSector(int sectorNumber) {
+        if (sectorNumber >= mSectorKeys.length) {
+            return null;
+        }
         return mSectorKeys[sectorNumber];
+    }
+
+    public ClassicSectorKey[] keys() {
+        return mSectorKeys.clone();
     }
 
     public JSONObject toJSON() {

@@ -29,6 +29,7 @@ import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.felica.FelicaCard;
+import com.codebutler.farebot.card.ultralight.UltralightCard;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.util.Utils;
@@ -64,6 +65,8 @@ public abstract class Card {
             return FelicaCard.dumpTag(tagId, tag);
         else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareClassic"))
             return ClassicCard.dumpTag(tagId, tag);
+        else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareUltralight"))
+            return UltralightCard.dumpTag(tagId, tag);
         else
             throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
     }

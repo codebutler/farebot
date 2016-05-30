@@ -32,10 +32,24 @@ public abstract class TransitData implements Parcelable {
     public abstract String getBalanceString();
     public abstract String getSerialNumber();
     public abstract Trip[] getTrips();
-    public abstract Refill[] getRefills();
+
+    public Refill[] getRefills() {
+        return null;
+    }
+
     public abstract Subscription[] getSubscriptions();
     public abstract List<ListItem> getInfo();
     public abstract String getCardName();
+
+    /**
+     * If a TransitData provider doesn't know some of the stops / stations on a user's card, then
+     * it may raise a signal to the user to submit the unknown stations to our web service.
+     *
+     * @return false if all stations are known (default), true if there are unknown stations
+     */
+    public boolean hasUnknownStations() {
+        return false;
+    }
 
     public final int describeContents() {
         return 0;

@@ -26,6 +26,7 @@ import com.codebutler.farebot.card.desfire.DesfireFileSettings;
 import com.codebutler.farebot.card.desfire.RecordDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.StandardDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.UnsupportedDesfireFileSettings;
+import com.codebutler.farebot.card.desfire.ValueDesfireFileSettings;
 import com.codebutler.farebot.util.Utils;
 
 import org.simpleframework.xml.convert.Converter;
@@ -41,34 +42,58 @@ public class DesfireFileSettingsConverter implements Converter<DesfireFileSettin
         int recordSize = -1;
         int maxRecords = -1;
         int curRecords = -1;
+        int lowerLimit = -1;
+        int upperLimit = -1;
+        int limitedCreditValue = -1;
+        boolean limitedCreditEnabled = false;
 
         while (true) {
             InputNode node = source.getNext();
             if (node == null) {
                 break;
             }
-            switch (node.getName()) {
-                case "filetype":
-                    fileType = Byte.parseByte(node.getValue());
-                    break;
-                case "filesize":
-                    fileSize = Integer.parseInt(node.getValue());
-                    break;
-                case "commsetting":
-                    commSetting = Byte.parseByte(node.getValue());
-                    break;
-                case "accessrights":
-                    accessRights = Utils.hexStringToByteArray(node.getValue());
-                    break;
-                case "recordsize":
-                    recordSize = Integer.parseInt(node.getValue());
-                    break;
-                case "maxrecords":
-                    maxRecords = Integer.parseInt(node.getValue());
-                    break;
-                case "currecords":
-                    curRecords = Integer.parseInt(node.getValue());
-                    break;
+
+            String value = node.getValue();
+
+            if (value != null) {
+                switch (node.getName()) {
+                    case "filetype":
+                        fileType = Byte.parseByte(value);
+                        break;
+                    case "filesize":
+                        fileSize = Integer.parseInt(value);
+                        break;
+                    case "commsetting":
+                        commSetting = Byte.parseByte(value);
+                        break;
+                    case "accessrights":
+                        accessRights = Utils.hexStringToByteArray(value);
+                        break;
+
+                    case "recordsize":
+                        recordSize = Integer.parseInt(value);
+                        break;
+                    case "maxrecords":
+                        maxRecords = Integer.parseInt(value);
+                        break;
+                    case "currecords":
+                        curRecords = Integer.parseInt(value);
+                        break;
+
+                    case "min":
+                        lowerLimit = Integer.parseInt(value);
+                        break;
+                    case "max":
+                        upperLimit = Integer.parseInt(value);
+                        break;
+                    case "limitcredit":
+                        limitedCreditValue = Integer.parseInt(value);
+                        break;
+                    case "limitcreditenabled":
+                        limitedCreditEnabled = Boolean.parseBoolean(value);
+                        break;
+
+                }
             }
         }
 
@@ -80,6 +105,8 @@ public class DesfireFileSettingsConverter implements Converter<DesfireFileSettin
             case DesfireFileSettings.CYCLIC_RECORD_FILE:
                 return new RecordDesfireFileSettings(fileType, commSetting, accessRights, recordSize, maxRecords,
                         curRecords);
+            case DesfireFileSettings.VALUE_FILE:
+                return new ValueDesfireFileSettings(fileType, commSetting, accessRights, lowerLimit, upperLimit, limitedCreditValue, limitedCreditEnabled);
             default:
                 return new UnsupportedDesfireFileSettings(fileType);
         }

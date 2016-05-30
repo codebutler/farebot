@@ -26,10 +26,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.codebutler.farebot.ui.ReasonableGallery
-        android:id="@+id/gallery"
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fadingEdge="horizontal"
-        android:spacing="20dp" />
+        android:id="@+id/gallery"
+        android:clickable="false" />
 </LinearLayout>

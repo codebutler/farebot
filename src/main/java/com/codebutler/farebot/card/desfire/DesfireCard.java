@@ -1,11 +1,8 @@
 /*
  * DesfireCard.java
  *
- * This file is part of FareBot.
- * Learn more at: https://codebutler.github.io/farebot/
- *
- * Copyright (C) 2011-2012, 2014-2015 Eric Butler <eric@codebutler.com>
- * Copyright (C) 2013 Lauri Andler <lauri.andler@gmail.com>
+ * Copyright 2011 Eric Butler <eric@codebutler.com>
+ * Copyright 2016 Michael Farrell <micolous+git@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +31,11 @@ import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.clipper.ClipperTransitData;
 import com.codebutler.farebot.transit.hsl.HSLTransitData;
+import com.codebutler.farebot.transit.myki.MykiTransitData;
+import com.codebutler.farebot.transit.opal.OpalTransitData;
 import com.codebutler.farebot.transit.orca.OrcaTransitData;
+import com.codebutler.farebot.transit.stub.AdelaideMetrocardStubTransitData;
+import com.codebutler.farebot.transit.stub.AtHopStubTransitData;
 import com.codebutler.farebot.util.Utils;
 
 import org.simpleframework.xml.Element;
@@ -42,6 +43,7 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,18 +75,24 @@ public class DesfireCard extends Card {
                 List<DesfireFile> files = new ArrayList<>();
 
                 for (int fileId : desfireTag.getFileList()) {
+                    DesfireFileSettings settings = null;
                     try {
-                        DesfireFileSettings settings = desfireTag.getFileSettings(fileId);
+                        settings = desfireTag.getFileSettings(fileId);
                         byte[] data;
-                        if (settings instanceof StandardDesfireFileSettings)
+                        if (settings instanceof StandardDesfireFileSettings) {
                             data = desfireTag.readFile(fileId);
-                        else
+                        } else if (settings instanceof ValueDesfireFileSettings) {
+                            data = desfireTag.getValue(fileId);
+                        } else {
                             data = desfireTag.readRecord(fileId);
+                        }
                         files.add(DesfireFile.create(fileId, settings, data));
+                    } catch (AccessControlException ex) {
+                        files.add(new UnauthorizedDesfireFile(fileId, ex.getMessage(), settings));
                     } catch (IOException ex) {
                         throw ex;
                     } catch (Exception ex) {
-                        files.add(new InvalidDesfireFile(fileId, ex.toString()));
+                        files.add(new InvalidDesfireFile(fileId, ex.toString(), settings));
                     }
                 }
 
@@ -119,6 +127,16 @@ public class DesfireCard extends Card {
             return ClipperTransitData.parseTransitIdentity(this);
         if (HSLTransitData.check(this))
             return HSLTransitData.parseTransitIdentity(this);
+        if (OpalTransitData.check(this))
+            return OpalTransitData.parseTransitIdentity(this);
+        if (MykiTransitData.check(this))
+            return MykiTransitData.parseTransitIdentity(this);
+
+        // Stub card types go last
+        if (AdelaideMetrocardStubTransitData.check(this))
+            return AdelaideMetrocardStubTransitData.parseTransitIdentity(this);
+        if (AtHopStubTransitData.check(this))
+            return AtHopStubTransitData.parseTransitIdentity(this);
         return null;
     }
 
@@ -129,6 +147,16 @@ public class DesfireCard extends Card {
             return new ClipperTransitData(this);
         if (HSLTransitData.check(this))
             return new HSLTransitData(this);
+        if (OpalTransitData.check(this))
+            return new OpalTransitData(this);
+        if (MykiTransitData.check(this))
+            return new MykiTransitData(this);
+
+        // Stub card types go last
+        if (AdelaideMetrocardStubTransitData.check(this))
+            return new AdelaideMetrocardStubTransitData(this);
+        if (AtHopStubTransitData.check(this))
+            return new AtHopStubTransitData(this);
         return null;
     }
 

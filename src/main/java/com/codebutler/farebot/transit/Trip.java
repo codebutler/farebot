@@ -47,19 +47,41 @@ public abstract class Trip implements Parcelable {
     public abstract String getRouteName();
     public abstract String getAgencyName();
     public abstract String getShortAgencyName();
-    public abstract String getFareString();
     public abstract String getBalanceString();
     public abstract String getStartStationName();
     public abstract Station getStartStation();
     public abstract String getEndStationName();
     public abstract Station getEndStation();
-    public abstract double getFare();
+
+    /**
+     * If true, it means that this activity has a known fare associated with it.  This should be
+     * true for most transaction types.
+     *
+     * Reasons for this being false, including not actually having the trip cost available, and for
+     * events like card activation and card banning which have no cost associated with the action.
+     *
+     * If a trip is free of charge, this should still be set to true.  However, if the trip is
+     * associated with a monthly travel pass, then this should be set to false.
+     *
+     * @return true if there is a financial transaction associated with the Trip.
+     */
+    public abstract boolean hasFare();
+
+    /**
+     * Formats the cost of the trip in the appropriate local currency.  Be aware that your
+     * implementation should use language-specific formatting and not rely on the system language
+     * for that information.
+     *
+     * For example, if a phone is set to English and travels to Japan, it does not make sense to
+     * format their travel costs in dollars.  Instead, it should be shown in Yen, which the Japanese
+     * currency formatter does.
+     *
+     * @return The cost of the fare formatted in the local currency of the card.
+     */
+    public abstract String getFareString();
+
     public abstract Mode getMode();
     public abstract boolean hasTime();
-
-    public static boolean hasLocation(Station station) {
-        return ((station != null) && ((station.getLatitude() != null) || station.getLongitude() != null));
-    }
 
     public static String formatStationNames(Trip trip) {
         List<String> stationText = new ArrayList<>();

@@ -24,20 +24,10 @@
 package com.codebutler.farebot.transit.ovc;
 
 import android.content.Context;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.util.Log;
 
-import org.apache.commons.io.IOUtils;
+import com.codebutler.farebot.util.DBUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-public class OVChipDBUtil {
+public class OVChipDBUtil extends DBUtil {
     public static final String TABLE_NAME = "stations_data";
     public static final String COLUMN_ROW_COMPANY = "company";
     public static final String COLUMN_ROW_OVCID = "ovcid";
@@ -61,76 +51,23 @@ public class OVChipDBUtil {
             COLUMN_ROW_LAT,
     };
 
-    private static final String TAG = "OVChipDBUtil";
-
-    private static final String DB_PATH = "/data/data/com.codebutler.farebot/databases/";
-    private static final String DB_NAME = "stations.sqlite";
+    private static final String DB_NAME = "ovc_stations.db3";
 
     private static final int VERSION = 2;
 
-    private SQLiteDatabase mDatabase;
-    private final Context mContext;
-
     public OVChipDBUtil(Context context) {
-        this.mContext = context;
+        super(context);
     }
 
-    public SQLiteDatabase openDatabase() throws SQLException, IOException {
-        if (mDatabase != null) {
-            return mDatabase;
-        }
-
-        if (!this.hasDatabase()) {
-            this.copyDatabase();
-        }
-
-        mDatabase = SQLiteDatabase.openDatabase(new File(DB_PATH, DB_NAME).getPath(), null,
-                SQLiteDatabase.OPEN_READONLY);
-        return mDatabase;
+    @Override
+    protected String getDBName() {
+        return DB_NAME;
     }
 
-    public synchronized void close() {
-        if (mDatabase != null)
-            this.mDatabase.close();
+    @Override
+    protected int getDesiredVersion() {
+        return VERSION;
     }
 
-    private boolean hasDatabase() {
-        SQLiteDatabase tempDatabase = null;
 
-        File file = new File(DB_PATH, DB_NAME);
-        if (!file.exists()) {
-            return false;
-        }
-
-        try {
-            tempDatabase = SQLiteDatabase.openDatabase(file.getPath(), null, SQLiteDatabase.OPEN_READONLY);
-            int currentVersion = tempDatabase.getVersion();
-            if (currentVersion != VERSION) {
-                Log.d(TAG, String.format("Updating OVChip database. Old: %s, new: %s", currentVersion, VERSION));
-                tempDatabase.close();
-                tempDatabase = null;
-            }
-        } catch (SQLiteException ignored) { }
-
-        if (tempDatabase != null){
-            tempDatabase.close();
-        }
-
-        return (tempDatabase != null);
-    }
-
-    private void copyDatabase() {
-        InputStream in   = null;
-        OutputStream out = null;
-        try {
-            in  = this.mContext.getAssets().open(DB_NAME);
-            out = new FileOutputStream(new File(DB_PATH, DB_NAME));
-            IOUtils.copy(in, out);
-        } catch (IOException e) {
-            throw new RuntimeException("Error copying database", e);
-        } finally {
-            IOUtils.closeQuietly(out);
-            IOUtils.closeQuietly(in);
-        }
-    }
 }

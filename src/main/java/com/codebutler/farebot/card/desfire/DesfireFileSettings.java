@@ -50,7 +50,7 @@ public abstract class DesfireFileSettings {
         else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE)
             return new RecordDesfireFileSettings(stream);
         else if (fileType == VALUE_FILE)
-            throw new UnsupportedOperationException("Value files not yet supported");
+            return new ValueDesfireFileSettings(stream);
         else
             throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
     }

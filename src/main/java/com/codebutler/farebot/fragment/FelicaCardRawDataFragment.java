@@ -46,6 +46,7 @@ import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.card.felica.FelicaSystem;
+import com.codebutler.farebot.card.felica.FelicaUtils;
 import com.codebutler.farebot.util.Utils;
 
 import org.simpleframework.xml.Serializer;
@@ -147,7 +148,7 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
             FelicaSystem system = mCard.getSystems().get(groupPosition);
 
             TextView textView = (TextView) view.findViewById(android.R.id.text1);
-            textView.setText(String.format("System: 0x%s", Integer.toHexString(system.getCode())));
+            textView.setText(String.format("System: 0x%s (%s)", Integer.toHexString(system.getCode()), FelicaUtils.getFriendlySystemName(system.getCode())));
 
             return view;
         }
@@ -165,8 +166,9 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
             FelicaSystem system = mCard.getSystems().get(groupPosition);
             FelicaService service = system.getServices().get(childPosition);
 
-            textView1.setText(String.format("Service: 0x%s", Integer.toHexString(service.getServiceCode())));
-            textView2.setText(String.format("%s block(s)", service.getBlocks().size()));
+            textView1.setText(String.format("Service: 0x%s (%s)", Integer.toHexString(service.getServiceCode()),
+                    FelicaUtils.getFriendlyServiceName(system.getCode(), service.getServiceCode())));
+            textView2.setText(Utils.localizePlural(R.plurals.block_count, service.getBlocks().size(), service.getBlocks().size()));
 
             return view;
         }

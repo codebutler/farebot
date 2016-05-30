@@ -28,22 +28,26 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.WindowManager;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class Utils {
-
+    private static final String TAG = "Utils";
     private Utils() { }
 
     public static <T> List<T> arrayAsList(T... array) {
@@ -153,13 +157,25 @@ public class Utils {
     }
 
     public static long byteArrayToLong(byte[] b, int offset, int length) {
-        if (b.length < length)
-            throw new IllegalArgumentException("length must be less than or equal to b.length");
+        if (b.length < offset + length)
+            throw new IllegalArgumentException("offset + length must be less than or equal to b.length");
 
         long value = 0;
         for (int i = 0; i < length; i++) {
             int shift = (length - 1 - i) * 8;
             value += (b[i + offset] & 0x000000FF) << shift;
+        }
+        return value;
+    }
+
+    public static BigInteger byteArrayToBigInteger(byte[] b, int offset, int length) {
+        if (b.length < offset + length)
+            throw new IllegalArgumentException("offset + length must be less than or equal to b.length");
+
+        BigInteger value = BigInteger.valueOf(0);
+        for (int i = 0; i < length; i++) {
+            value = value.shiftLeft(8);
+            value = value.add(BigInteger.valueOf(b[i+offset] & 0x000000ff));
         }
         return value;
     }
@@ -185,17 +201,35 @@ public class Utils {
     }
 
     public static String getDeviceInfoString() {
-        return String.format("Version: %s\nModel: %s (%s %s)\nOS: %s\n\n",
-            getVersionString(),
-            Build.MODEL,
-            Build.MANUFACTURER,
-            Build.BRAND,
-            Build.VERSION.RELEASE);
+        FareBotApplication app = FareBotApplication.getInstance();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(app);
+        boolean nfcAvailable = nfcAdapter != null;
+        boolean nfcEnabled = false;
+        if (nfcAvailable) {
+            nfcEnabled = nfcAdapter.isEnabled();
+        }
+
+        return String.format("Version: %s\nModel: %s (%s)\nManufacturer: %s (%s)\nAndroid OS: %s (%s)\n\nNFC: %s, Mifare Classic: %s\n\n",
+                // Version:
+                getVersionString(),
+                // Model
+                Build.MODEL,
+                Build.DEVICE,
+                // Manufacturer / brand:
+                Build.MANUFACTURER,
+                Build.BRAND,
+                // OS:
+                Build.VERSION.RELEASE,
+                Build.ID,
+                // NFC:
+                nfcAvailable ? (nfcEnabled ? "enabled" : "disabled") : "not available",
+                app.getMifareClassicSupport() ? "supported" : "not supported"
+        );
     }
 
     private static String getVersionString() {
         PackageInfo info = getPackageInfo();
-        return String.format("%s (Build %s)", info.versionName, info.versionCode);
+        return String.format("%s (%s)", info.versionName, info.versionCode);
     }
 
     private static PackageInfo getPackageInfo() {
@@ -228,8 +262,43 @@ public class Utils {
         return (buffer >> (iStartBit)) & ((char)0xFF >> (8 - iLength));
     }
 
+    /**
+     * Reverses a byte array, such that the last byte is first, and the first byte is last.
+     *
+     * @param buffer Source buffer to reverse
+     * @param iStartByte Start position in the buffer to read from
+     * @param iLength Number of bytes to read
+     * @return A new byte array, of length iLength, with the bytes reversed
+     */
+    public static byte[] reverseBuffer(byte[] buffer, int iStartByte, int iLength) {
+        byte[] reversed = new byte[iLength];
+        int iEndByte = iStartByte + iLength;
+        for (int x=0; x<iLength; x++) {
+            reversed[x] = buffer[iEndByte - x - 1];
+        }
+        return reversed;
+    }
+
+    /**
+     * Given an unsigned integer value, calculate the two's complement of the value if it is
+     * actually a negative value
+     * @param input Input value to convert
+     * @param highestBit The position of the highest bit in the number, 0-indexed.
+     * @return A signed integer containing it's converted value.
+     */
+    public static int unsignedToTwoComplement(int input, int highestBit) {
+        if (getBitsFromInteger(input, highestBit, 1) == 1) {
+            // inverse all bits
+            input ^= (2 << highestBit) - 1;
+            return -(1 + input);
+        }
+
+        return input;
+    }
+
     /* Based on function from mfocGUI by 'Huuf' (http://www.huuf.info/OV/) */
     public static int getBitsFromBuffer(byte[] buffer, int iStartBit, int iLength) {
+        // Note: Assumes big-endian
         int iEndBit = iStartBit + iLength - 1;
         int iSByte = iStartBit / 8;
         int iSBit = iStartBit % 8;
@@ -249,5 +318,132 @@ public class Utils {
 
             return uRet;
         }
+    }
+
+    /**
+     * Given a string resource (R.string), localize the string according to the language preferences
+     * on the device.
+     * @param stringResource R.string to localize.
+     * @param formatArgs Formatting arguments to pass
+     * @return Localized string
+     */
+    public static String localizeString(int stringResource, Object... formatArgs) {
+        Resources res = FareBotApplication.getInstance().getResources();
+        return res.getString(stringResource, formatArgs);
+    }
+
+    /**
+     * Given a plural resource (R.plurals), localize the string according to the language preferences
+     * on the device.
+     * @param pluralResource R.plurals to localize.
+     * @param quantity Quantity to use for pluaralisation rules
+     * @param formatArgs Formatting arguments to pass
+     * @return Localized string
+     */
+    public static String localizePlural(int pluralResource, int quantity, Object... formatArgs) {
+        Resources res = FareBotApplication.getInstance().getResources();
+        return res.getQuantityString(pluralResource, quantity, formatArgs);
+    }
+
+    public static String longDateFormat(Date date) {
+        return DateFormat.getLongDateFormat(FareBotApplication.getInstance()).format(date);
+    }
+
+    public static String longDateFormat(long milliseconds) {
+        return longDateFormat(new Date(milliseconds));
+    }
+
+    public static String dateFormat(Date date) {
+        return DateFormat.getDateFormat(FareBotApplication.getInstance()).format(date);
+    }
+
+    public static String dateFormat(long milliseconds) {
+        return dateFormat(new Date(milliseconds));
+    }
+
+    public static String timeFormat(Date date) {
+        return DateFormat.getTimeFormat(FareBotApplication.getInstance()).format(date);
+    }
+
+    public static String timeFormat(long milliseconds) {
+        return timeFormat(new Date(milliseconds));
+    }
+
+    public static String dateTimeFormat(Date date) {
+        return dateFormat(date) + " " + timeFormat(date);
+    }
+
+    public static int[] digitsOf(int integer) {
+        return digitsOf((long) integer);
+    }
+
+    public static int[] digitsOf(long integer) {
+        return digitsOf(String.valueOf(integer));
+    }
+
+    public static int[] digitsOf(String integer) {
+        int[] out = new int[integer.length()];
+        for (int index = 0; index < integer.length(); index++) {
+            out[index] = Integer.valueOf(integer.substring(index, index+1));
+        }
+
+        return out;
+    }
+
+    /**
+     * Sum an array of integers.
+     * @param ints Input array of integers.
+     * @return All the values added together.
+     */
+    public static int sum(int[] ints) {
+        int sum = 0;
+        for (int i : ints) {
+            sum += i;
+        }
+        return sum;
+    }
+
+    public static int luhnChecksum(String cardNumber) {
+        int[] digits = digitsOf(cardNumber);
+        // even digits, counting from the last digit on the card
+        int[] evenDigits = new int[(int)Math.ceil(cardNumber.length() / 2.0)];
+        int checksum = 0, p = 0;
+        int q = cardNumber.length() - 1;
+
+        for (int i=0; i<cardNumber.length(); i++) {
+            if (i % 2 == 1) {
+                // we treat it as a 1-indexed array
+                // so the first digit is odd
+                evenDigits[p++] = digits[q - i];
+            } else {
+                checksum += digits[q - i];
+            }
+        }
+
+        for (int d : evenDigits) {
+            checksum += sum(digitsOf(d*2));
+        }
+
+        Log.d(TAG, String.format("luhnChecksum(%s) = %d", cardNumber, checksum));
+        return checksum % 10;
+    }
+
+    /**
+     * Given a partial card number, calculate the Luhn check digit.
+     * @param partialCardNumber Partial card number.
+     * @return Final digit for card number.
+     */
+    public static int calculateLuhn(String partialCardNumber) {
+        int checkDigit = luhnChecksum(partialCardNumber + "0");
+        return checkDigit == 0 ? 0 : 10 - checkDigit;
+    }
+
+    /**
+     * Given a complete card number, validate the Luhn check digit.
+     * @param cardNumber Complete card number.
+     * @return true if valid, false if invalid.
+     */
+    public static boolean validateLuhn(String cardNumber) {
+        return luhnChecksum(cardNumber) == 0;
     }
 }

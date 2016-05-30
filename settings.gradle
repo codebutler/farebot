@@ -1,0 +1,2 @@
+include 'nfc-felica-lib'
+project(':nfc-felica-lib').projectDir = new File('third_party/nfc-felica-lib')

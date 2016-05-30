@@ -32,8 +32,9 @@ import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings;
 import com.codebutler.farebot.card.desfire.InvalidDesfireFile;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
-import com.codebutler.farebot.card.felica.DBUtil;
+import com.codebutler.farebot.card.felica.FelicaDBUtil;
 import com.codebutler.farebot.transit.ovc.OVChipDBUtil;
+import com.codebutler.farebot.transit.seq_go.SeqGoDBUtil;
 import com.codebutler.farebot.xml.Base64String;
 import com.codebutler.farebot.xml.CardConverter;
 import com.codebutler.farebot.xml.CardTypeTransform;
@@ -65,20 +66,24 @@ import java.util.Date;
 import io.fabric.sdk.android.Fabric;
 
 public class FareBotApplication extends Application {
+
     public static final String PREF_LAST_READ_ID = "last_read_id";
     public static final String PREF_LAST_READ_AT = "last_read_at";
 
     private static FareBotApplication sInstance;
 
-    private DBUtil mSuicaDBUtil;
+    private FelicaDBUtil mFelicaDBUtil;
     private OVChipDBUtil mOVChipDBUtil;
+    private SeqGoDBUtil mSeqGoDBUtil;
     private final Serializer mSerializer;
+    private boolean mMifareClassicSupport;
 
     public FareBotApplication() {
         sInstance = this;
 
-        mSuicaDBUtil = new DBUtil(this);
+        mFelicaDBUtil = new FelicaDBUtil(this);
         mOVChipDBUtil = new OVChipDBUtil(this);
+        mSeqGoDBUtil = new SeqGoDBUtil(this);
 
         try {
             Visitor visitor = new Visitor() {
@@ -116,20 +121,31 @@ public class FareBotApplication extends Application {
         return sInstance;
     }
 
-    public DBUtil getSuicaDBUtil() {
-        return mSuicaDBUtil;
+    public FelicaDBUtil getFelicaDBUtil() {
+        return mFelicaDBUtil;
     }
 
     public OVChipDBUtil getOVChipDBUtil() {
         return mOVChipDBUtil;
     }
 
+    public SeqGoDBUtil getSeqGoDBUtil() {
+        return mSeqGoDBUtil;
+    }
+
     public Serializer getSerializer() {
         return mSerializer;
     }
 
+    public boolean getMifareClassicSupport() {
+        return mMifareClassicSupport;
+    }
+
     @Override public void onCreate() {
         super.onCreate();
+
+        // Check for Mifare Classic support
+        mMifareClassicSupport = this.getPackageManager().hasSystemFeature("com.nxp.mifare");
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
             .detectAll()

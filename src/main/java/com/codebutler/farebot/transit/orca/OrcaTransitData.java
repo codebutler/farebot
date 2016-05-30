@@ -32,7 +32,6 @@ import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
-import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -128,10 +127,6 @@ public class OrcaTransitData extends TransitData {
 
     @Override public Trip[] getTrips() {
         return mTrips;
-    }
-
-    @Override public Refill[] getRefills() {
-        return null;
     }
 
     @Override public Subscription[] getSubscriptions() {

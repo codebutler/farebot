@@ -10,12 +10,9 @@
     <string name="copy_xml">コピー</string>
     <string name="share_xml">共有</string>
     <string name="save_xml">USBストレージに保存する</string>
-    <string name="trips">旅行</string>
     <string name="history">ヒストリー</string>
     <string name="balance">残高</string>
-    <string name="refills">リフィル</string>
     <string name="no_trip_data">旅行の情報は見つかりませんでした。このカードが使用しましたか</string>
-    <string name="no_refill_data">リフィルの情報がありません</string>
     <string name="import_xml">インポート</string>
     <string name="import_clipboard">クリップボードからインポート</string>
     <string name="import_file">ファイルからインポート</string>
@@ -58,7 +55,6 @@
     <string name="felica_process_purchase_magnetic">券購(磁気券購入)</string>
     <string name="felica_process_fare_adjustment">精算</string>
     <string name="felica_process_admission_payment">精算(入場精算)</string>
-    <string name="felica_process_both_exit">窓出(改札窓口処理)</string>
     <string name="felica_process_issue_new">新規(新規発行)</string>
     <string name="felica_process_booth_deduction">控除(窓口控除)</string>
     <string name="felica_process_bus_pitapa">バス(PiTaPa系)</string>

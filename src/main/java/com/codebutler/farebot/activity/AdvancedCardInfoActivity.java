@@ -51,9 +51,6 @@ import com.crashlytics.android.Crashlytics;
 
 import org.simpleframework.xml.Serializer;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 public class AdvancedCardInfoActivity extends Activity {
     public static final String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
     public static final String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
@@ -83,9 +80,9 @@ public class AdvancedCardInfoActivity extends Activity {
         actionBar.setTitle(mCard.getCardType().toString() + " " + Utils.getHexString(mCard.getTagId(), "<error>"));
 
         if (mCard.getScannedAt().getTime() > 0) {
-            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(mCard.getScannedAt());
-            String time = new SimpleDateFormat("h:m a", Locale.US).format(mCard.getScannedAt());
-            actionBar.setSubtitle(String.format("Scanned on %s at %s.", date, time));
+            String date = Utils.dateFormat(mCard.getScannedAt());
+            String time = Utils.timeFormat(mCard.getScannedAt());
+            actionBar.setSubtitle(Utils.localizeString(R.string.scanned_at_format, time, date));
         }
 
         if (getIntent().hasExtra(EXTRA_ERROR)) {

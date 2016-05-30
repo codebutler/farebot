@@ -40,6 +40,7 @@ dependencies {
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
+    compile project(':nfc-felica-lib')
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 

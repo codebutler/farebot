@@ -38,7 +38,10 @@ import com.codebutler.farebot.key.ClassicSectorKey;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitData;
+import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitData;
 import com.codebutler.farebot.transit.ovc.OVChipTransitData;
+import com.codebutler.farebot.transit.seq_go.SeqGoTransitData;
+import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitData;
 import com.codebutler.farebot.util.Utils;
 
 import org.simpleframework.xml.ElementList;
@@ -80,21 +83,53 @@ public class ClassicCard extends Card {
                 try {
                     boolean authSuccess = false;
 
-                    ClassicSectorKey sectorKey;
-                    if (keys != null && (sectorKey = keys.keyForSector(sectorIndex)) != null) {
-                        if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
-                        } else {
-                            authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
-                        }
-                    }
-
+                    // Try the default keys first
                     if (!authSuccess && sectorIndex == 0) {
                         authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY);
                     }
 
                     if (!authSuccess) {
                         authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, MifareClassic.KEY_DEFAULT);
+                    }
+
+                    if (keys != null) {
+                        // Try with a 1:1 sector mapping on our key list first
+                        if (!authSuccess) {
+                            ClassicSectorKey sectorKey = keys.keyForSector(sectorIndex);
+                            if (sectorKey != null) {
+                                if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
+                                } else {
+                                    authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
+                                }
+                            }
+                        }
+
+                        if (!authSuccess) {
+                            // Be a little more forgiving on the key list.  Lets try all the keys!
+                            //
+                            // This takes longer, of course, but means that users aren't scratching
+                            // their heads when we don't get the right key straight away.
+                            ClassicSectorKey[] cardKeys = keys.keys();
+
+                            for (int keyIndex = 0; keyIndex < cardKeys.length; keyIndex++) {
+                                if (keyIndex == sectorIndex) {
+                                    // We tried this before
+                                    continue;
+                                }
+
+                                if (cardKeys[keyIndex].getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, cardKeys[keyIndex].getKey());
+                                } else {
+                                    authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, cardKeys[keyIndex].getKey());
+                                }
+
+                                if (authSuccess) {
+                                    // Jump out if we have the key
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     if (authSuccess) {
@@ -125,11 +160,24 @@ public class ClassicCard extends Card {
     }
 
     @Override public TransitIdentity parseTransitIdentity() {
+        // All .check() methods should work without a key, and throw an UnauthorizedException
+        // Otherwise UnauthorizedClassicTransitData will not trigger
         if (OVChipTransitData.check(this)) {
             return OVChipTransitData.parseTransitIdentity(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
             return BilheteUnicoSPTransitData.parseTransitIdentity(this);
+        } else if (ManlyFastFerryTransitData.check(this)) {
+            return ManlyFastFerryTransitData.parseTransitIdentity(this);
+        } else if (SeqGoTransitData.check(this)) {
+            return SeqGoTransitData.parseTransitIdentity(this);
+        } else if (UnauthorizedClassicTransitData.check(this)) {
+            // This check must be LAST.
+            //
+            // This is to throw up a warning whenever there is a card with all locked sectors
+            return UnauthorizedClassicTransitData.parseTransitIdentity(this);
         }
+
+        // The card could not be identified, but has some open sectors.
         return null;
     }
 
@@ -138,7 +186,18 @@ public class ClassicCard extends Card {
             return new OVChipTransitData(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
             return new BilheteUnicoSPTransitData(this);
+        } else if (ManlyFastFerryTransitData.check(this)) {
+            return new ManlyFastFerryTransitData(this);
+        } else if (SeqGoTransitData.check(this)) {
+            return new SeqGoTransitData(this);
+        } else if (UnauthorizedClassicTransitData.check(this)) {
+            // This check must be LAST.
+            //
+            // This is to throw up a warning whenever there is a card with all locked sectors
+            return new UnauthorizedClassicTransitData();
         }
+
+        // The card could not be identified, but has some open sectors.
         return null;
     }
 

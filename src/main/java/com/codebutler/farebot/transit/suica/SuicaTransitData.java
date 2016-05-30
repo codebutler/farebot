@@ -27,7 +27,7 @@
  * http://sourceforge.jp/projects/felicalib/wiki/suica
  *
  * Some of these resources have been translated into English at:
- * https://github.com/codebutler/farebot/wiki/Suica
+ * https://github.com/codebutler/farebot/wiki/suica
  */
 
 package com.codebutler.farebot.transit.suica;
@@ -37,7 +37,6 @@ import android.os.Parcel;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
-import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -117,10 +116,6 @@ public class SuicaTransitData extends TransitData {
 
     @Override public Trip[] getTrips() {
         return mTrips;
-    }
-
-    @Override public Refill[] getRefills() {
-        return null;
     }
 
     @Override public Subscription[] getSubscriptions() {

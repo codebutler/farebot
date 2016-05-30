@@ -43,18 +43,21 @@ import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.activity.TripMapActivity;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.transit.Refill;
+import com.codebutler.farebot.transit.RefillTrip;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.orca.OrcaTrip;
-import com.codebutler.farebot.transit.ovc.OVChipTrip;
+import com.codebutler.farebot.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.simpleframework.xml.Serializer;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
 
 public class CardTripsFragment extends ListFragment {
     private Card        mCard;
@@ -70,9 +73,26 @@ public class CardTripsFragment extends ListFragment {
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_card_trips, null);
 
-        if (mTransitData.getTrips() != null && mTransitData.getTrips().length > 0)
-            setListAdapter(new UseLogListAdapter(getActivity(), mTransitData.getTrips()));
-        else {
+        List<Trip> trips = new ArrayList<>();
+        if (mTransitData.getTrips() != null && mTransitData.getTrips().length > 0) {
+            for (Trip t : mTransitData.getTrips()) {
+                trips.add(t);
+            }
+        }
+
+        // This is for "legacy" implementations which have a separate list of refills.
+        if (mTransitData.getRefills() != null && mTransitData.getRefills().length > 0) {
+            for (Refill r : mTransitData.getRefills()) {
+                trips.add(new RefillTrip(r));
+            }
+        }
+
+        // Explicitly sort these events
+        Collections.sort(trips, new Trip.Comparator());
+
+        if (trips.size() > 0) {
+            setListAdapter(new UseLogListAdapter(getActivity(), trips.toArray(new Trip[trips.size()])));
+        } else {
             view.findViewById(android.R.id.list).setVisibility(View.GONE);
             view.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
         }
@@ -82,9 +102,11 @@ public class CardTripsFragment extends ListFragment {
 
     @Override public void onListItemClick(ListView l, View v, int position, long id) {
         Trip trip = (Trip) getListAdapter().getItem(position);
-
-        if (!(Trip.hasLocation(trip.getStartStation())) && (!Trip.hasLocation(trip.getEndStation())))
+        if (trip == null
+                || !((trip.getStartStation() != null && trip.getStartStation().hasLocation())
+                || (trip.getEndStation() != null && trip.getEndStation().hasLocation()))) {
             return;
+        }
 
         Intent intent = new Intent(getActivity(), TripMapActivity.class);
         intent.putExtra(TripMapActivity.TRIP_EXTRA, trip);
@@ -111,8 +133,7 @@ public class CardTripsFragment extends ListFragment {
             View listHeader = convertView.findViewById(R.id.list_header);
             if (isFirstInSection(position)) {
                 listHeader.setVisibility(View.VISIBLE);
-                DateFormat dateInstance = DateFormat.getDateInstance(DateFormat.LONG);
-                ((TextView) listHeader.findViewById(android.R.id.text1)).setText(dateInstance.format(date));
+                ((TextView) listHeader.findViewById(android.R.id.text1)).setText(Utils.longDateFormat(date));
             } else {
                 listHeader.setVisibility(View.GONE);
             }
@@ -149,7 +170,7 @@ public class CardTripsFragment extends ListFragment {
             }
 
             if (trip.hasTime()) {
-                timeTextView.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(date));
+                timeTextView.setText(Utils.timeFormat(date));
                 timeTextView.setVisibility(View.VISIBLE);
             } else {
                 timeTextView.setVisibility(View.INVISIBLE);
@@ -168,12 +189,14 @@ public class CardTripsFragment extends ListFragment {
                 routeTextView.setVisibility(View.INVISIBLE);
             }
 
-            if (trip.getFare() != 0) {
+            fareTextView.setVisibility(View.VISIBLE);
+            if (trip.hasFare()) {
                 fareTextView.setText(trip.getFareString());
             } else if (trip instanceof OrcaTrip) {
                 fareTextView.setText(R.string.pass_or_transfer);
-            } else if (trip instanceof OVChipTrip) {
-                fareTextView.setText(trip.getFareString());
+            } else {
+                // Hide the text "Fare" for hasFare == false
+                fareTextView.setVisibility(View.INVISIBLE);
             }
 
             String stationText = Trip.formatStationNames(trip);
@@ -189,7 +212,11 @@ public class CardTripsFragment extends ListFragment {
 
         @Override public boolean isEnabled(int position) {
             Trip trip = getItem(position);
-            return Trip.hasLocation(trip.getStartStation()) || Trip.hasLocation(trip.getEndStation());
+            if (trip == null) {
+                return false;
+            }
+            return (trip.getStartStation() != null && trip.getStartStation().hasLocation())
+                    || (trip.getEndStation() != null && trip.getEndStation().hasLocation());
         }
 
         private boolean isFirstInSection(int position) {
@@ -199,7 +226,7 @@ public class CardTripsFragment extends ListFragment {
             Date date2 = new Date(getItem(position - 1).getTimestamp() * 1000);
 
             return ((date1.getYear() != date2.getYear()) || (date1.getMonth() != date2.getMonth())
-                    || (date1.getDay() != date2.getDay()));
+                    || (date1.getDate() != date2.getDate()));
         }
 
         public boolean isLastInSection(int position) {
@@ -209,7 +236,7 @@ public class CardTripsFragment extends ListFragment {
             Date date2 = new Date(getItem(position + 1).getTimestamp() * 1000);
 
             return ((date1.getYear() != date2.getYear()) || (date1.getMonth() != date2.getMonth())
-                    || (date1.getDay() != date2.getDay()));
+                    || (date1.getDate() != date2.getDate()));
         }
     }
 }

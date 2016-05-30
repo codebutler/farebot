@@ -37,6 +37,8 @@ public class DesfireFile {
     public static DesfireFile create(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
         if (fileSettings instanceof RecordDesfireFileSettings) {
             return new RecordDesfireFile(fileId, fileSettings, fileData);
+        } else if (fileSettings instanceof ValueDesfireFileSettings) {
+            return new ValueDesfireFile(fileId, fileSettings, fileData);
         } else {
             return new DesfireFile(fileId, fileSettings, fileData);
         }

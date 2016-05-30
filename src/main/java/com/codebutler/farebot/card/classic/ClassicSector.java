@@ -34,13 +34,18 @@ import java.util.List;
 @Root(name="sector")
 public class ClassicSector {
     @Attribute(name="index") private int mIndex;
-    @ElementList(name="blocks") private List<ClassicBlock> mBlocks;
+    @ElementList(name="blocks", required=false, empty=false) private List<ClassicBlock> mBlocks;
 
     protected ClassicSector() { }
 
     public ClassicSector(int index, ClassicBlock[] blocks) {
         mIndex  = index;
-        mBlocks = Utils.arrayAsList(blocks);
+        if (blocks == null) {
+            // invalid / unauthorised sectors should be null
+            mBlocks = null;
+        } else {
+            mBlocks = Utils.arrayAsList(blocks);
+        }
     }
 
     public int getIndex() {

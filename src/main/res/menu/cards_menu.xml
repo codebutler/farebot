@@ -24,22 +24,17 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/import_xml"
-        android:title="@string/import_xml">
+    <item android:title="@string/import_xml">
         <menu>
             <item android:id="@+id/import_clipboard"
                   android:title="@string/import_clipboard" />
             <item android:id="@+id/import_file"
-                  android:title="@string/import_file"
-                  android:visible="false" />
+                  android:title="@string/import_file" />
             <item android:id="@+id/import_sd"
                   android:title="@string/import_sd" />
         </menu>
     </item>
-    <item
-        android:id="@+id/export_all"
-        android:title="@string/export_all">
+    <item android:title="@string/export_all">
         <menu>
             <item android:id="@+id/copy_xml"
                   android:title="@string/copy_xml" />

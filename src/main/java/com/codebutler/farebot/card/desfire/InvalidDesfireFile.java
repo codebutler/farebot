@@ -29,10 +29,10 @@ import org.simpleframework.xml.Root;
 public class InvalidDesfireFile extends DesfireFile {
     @Element(name="error") private String mErrorMessage;
 
-    private InvalidDesfireFile() { /* For XML Serializer */ }
+    protected InvalidDesfireFile() { /* For XML Serializer */ }
 
-    public InvalidDesfireFile(int fileId, String errorMessage) {
-        super(fileId, null, new byte[0]);
+    public InvalidDesfireFile(int fileId, String errorMessage, DesfireFileSettings settings) {
+        super(fileId, settings, new byte[0]);
         mErrorMessage = errorMessage;
     }
 

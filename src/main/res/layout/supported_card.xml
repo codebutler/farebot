@@ -29,10 +29,11 @@
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/card"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingTop="2dp">
         <ImageView
             android:id="@+id/image"
             android:layout_width="wrap_content"
@@ -49,9 +50,10 @@
         android:id="@+id/note"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="32dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="2dp"
         android:layout_below="@id/card"
         android:textSize="16sp"
-        android:textColor="#999"
+        android:textColor="@android:color/darker_gray"
         android:gravity="center" />
 </RelativeLayout>

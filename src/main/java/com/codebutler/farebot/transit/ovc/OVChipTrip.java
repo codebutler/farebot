@@ -305,8 +305,8 @@ public class OVChipTrip extends Trip {
         return (mTimestamp != null);
     }
 
-    @Override public double getFare() {
-        return mFare;
+    @Override public boolean hasFare() {
+        return true;
     }
 
     @Override public String getFareString() {

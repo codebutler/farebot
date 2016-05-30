@@ -98,8 +98,8 @@ public class MergedOrcaTrip extends Trip {
         return mEndTrip.getStartStation();
     }
 
-    @Override public double getFare() {
-        return mStartTrip.getFare();
+    @Override public boolean hasFare() {
+        return mStartTrip.hasFare();
     }
 
     @Override public Mode getMode() {
