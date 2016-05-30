@@ -4,8 +4,8 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha1'
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.android.tools.build:gradle:2.2.0-alpha2'
+        classpath 'io.fabric.tools:gradle:1.21.6'
     }
 }
 
@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.google.android.gms:play-services-maps:9.0.0'
+    compile 'com.google.android.gms:play-services-maps:9.0.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true
     }
@@ -59,7 +59,7 @@ afterEvaluate {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     productFlavors {
         dev {
