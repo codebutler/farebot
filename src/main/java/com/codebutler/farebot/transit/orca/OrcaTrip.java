@@ -44,7 +44,7 @@ public class OrcaTrip extends Trip {
     final long mTransType;
 
     private static final Map<Long, Station> LINK_STATIONS = new ImmutableMapBuilder<Long, Station>()
-            .put(10352L, new Station("Capitol Hill Station",               "Captiol Hill",  "47.6192",    "-122.3202"))
+            .put(10352L, new Station("Capitol Hill Station",               "Capitol Hill",  "47.6192",    "-122.3202"))
             .put(10351L, new Station("University of Washington Station",   "UW Station",    "47.6496",    "-122.3037"))
             .put(13193L, new Station("Westlake Station",                   "Westlake",      "47.6113968", "-122.337502"))
             .put(13194L, new Station("University Station",                 "University",    "47.6072502", "-122.335754"))
