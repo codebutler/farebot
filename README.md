@@ -2,6 +2,8 @@
 
 View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!
 
+[![Build Status](https://travis-ci.org/codebutler/farebot.svg?branch=master)](https://travis-ci.org/codebutler/farebot)
+
 ## Written By
 
 * [Eric Butler][5] <eric@codebutler.com>
