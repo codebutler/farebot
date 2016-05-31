@@ -26,6 +26,7 @@ package com.codebutler.farebot.provider;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.BuildConfig;
 
@@ -57,4 +58,12 @@ class KeysDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Not Implemented...
     }
+
+    static class Creator implements BetterContentProvider.SQLiteOpenHelperCreator {
+
+        @Override
+        public SQLiteOpenHelper create(@NonNull Context context) {
+            return new KeysDBHelper(context);
+        }
+    };
 }

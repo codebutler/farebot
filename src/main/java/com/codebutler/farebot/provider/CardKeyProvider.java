@@ -32,12 +32,14 @@ import com.codebutler.farebot.BuildConfig;
 import java.util.Date;
 
 public class CardKeyProvider extends BetterContentProvider {
+
     private static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".keyprovider";
+
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/keys");
 
     public CardKeyProvider() {
         super(
-                KeysDBHelper.class,
+                new KeysDBHelper.Creator(),
                 KeysDBHelper.KEY_DIR_TYPE,
                 KeysDBHelper.KEY_ITEM_TYPE,
                 KeysTableColumns.TABLE_NAME,

@@ -33,11 +33,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 public abstract class BetterContentProvider extends ContentProvider {
     private SQLiteOpenHelper mHelper;
-    private Class<? extends SQLiteOpenHelper> mHelperClass;
+    private SQLiteOpenHelperCreator mHelperCreator;
     private String mItemType;
     private Uri mContentUri;
     private String mDirType;
@@ -47,9 +48,9 @@ public abstract class BetterContentProvider extends ContentProvider {
     static final int CODE_COLLECTION = 100;
     static final int CODE_SINGLE = 101;
 
-    BetterContentProvider(Class<? extends SQLiteOpenHelper> helperClass, String dirType, String itemType,
+    BetterContentProvider(SQLiteOpenHelperCreator helperCreator, String dirType, String itemType,
                           String tableName, Uri contentUri) {
-        mHelperClass = helperClass;
+        mHelperCreator = helperCreator;
         mDirType = dirType;
         mItemType = itemType;
         mTableName = tableName;
@@ -62,11 +63,7 @@ public abstract class BetterContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        try {
-            mHelper = mHelperClass.getConstructor(Context.class).newInstance(getContext());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        mHelper = mHelperCreator.create(getContext());
         return true;
     }
 
@@ -177,5 +174,10 @@ public abstract class BetterContentProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
+    }
+
+    interface SQLiteOpenHelperCreator {
+
+        SQLiteOpenHelper create(@NonNull Context context);
     }
 }
