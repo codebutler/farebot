@@ -44,17 +44,15 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
-def password = null
-
 def askPassword() {
-    return 'security -q find-generic-password -g -l farebot-release'.execute().err.text.split('"')[1]
+    return 'security -q find-generic-password -w -g -l farebot-release'.execute().text.trim()
 }
 
-afterEvaluate {
-    validateReleaseSigning.doFirst {
-        password = askPassword()
-        signingConfig.storePassword = password
-        signingConfig.keyPassword = password
+gradle.taskGraph.whenReady { taskGraph ->
+    if(taskGraph.hasTask(':assembleProdRelease')) {
+        def password = askPassword()
+        android.signingConfigs.release.storePassword = password
+        android.signingConfigs.release.keyPassword = password
     }
 }
 
