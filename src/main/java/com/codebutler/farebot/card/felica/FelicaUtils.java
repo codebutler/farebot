@@ -4,15 +4,15 @@ import net.kazzz.felica.lib.FeliCaLib;
 
 /**
  * Utilities for working with FeliCa cards.
- *
  */
 public final class FelicaUtils {
 
-    private FelicaUtils() { }
+    private FelicaUtils() {
+    }
 
     /**
      * Translates the System name to something human readable.
-     *
+     * <p>
      * Systems in FeliCa are like Applications in MIFARE.  They represent
      * a particular system operator's data.
      *

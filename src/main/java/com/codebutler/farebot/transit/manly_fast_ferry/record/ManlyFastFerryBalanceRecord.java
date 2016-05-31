@@ -24,12 +24,17 @@ import com.codebutler.farebot.util.Utils;
 /**
  * Represents a "preamble" type record.
  */
-public class ManlyFastFerryBalanceRecord extends ManlyFastFerryRecord implements Comparable<ManlyFastFerryBalanceRecord> {
+public class ManlyFastFerryBalanceRecord
+        extends ManlyFastFerryRecord
+        implements Comparable<ManlyFastFerryBalanceRecord> {
+
     private int mBalance;
     private int mVersion;
 
     public static ManlyFastFerryBalanceRecord recordFromBytes(byte[] input) {
-        if (input[0] != 0x01) throw new AssertionError();
+        if (input[0] != 0x01) {
+            throw new AssertionError();
+        }
 
 
         ManlyFastFerryBalanceRecord record = new ManlyFastFerryBalanceRecord();
@@ -39,10 +44,12 @@ public class ManlyFastFerryBalanceRecord extends ManlyFastFerryRecord implements
         return record;
     }
 
-    protected ManlyFastFerryBalanceRecord() {}
+    private ManlyFastFerryBalanceRecord() {
+    }
 
     /**
      * The balance of the card, in cents.
+     *
      * @return int number of cents.
      */
     public int getBalance() {

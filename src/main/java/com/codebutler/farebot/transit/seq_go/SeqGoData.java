@@ -19,11 +19,9 @@
 
 package com.codebutler.farebot.transit.seq_go;
 
-import android.annotation.SuppressLint;
-
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.util.ImmutableMapBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,18 +31,16 @@ public final class SeqGoData {
 
     private SeqGoData() { }
 
-    public static final int VEHICLE_FARE_MACHINE = 1;
-    public static final int VEHICLE_BUS = 4;
-    public static final int VEHICLE_RAIL = 5;
-    public static final int VEHICLE_FERRY = 18;
+    private static final int VEHICLE_FARE_MACHINE = 1;
+    private static final int VEHICLE_BUS = 4;
+    private static final int VEHICLE_RAIL = 5;
+    private static final int VEHICLE_FERRY = 18;
 
-    @SuppressLint("UseSparseArrays")
-    public static final Map<Integer, Trip.Mode> VEHICLES = new HashMap<Integer, Trip.Mode>() {{
-        put(VEHICLE_FARE_MACHINE, Trip.Mode.TICKET_MACHINE);
-        put(VEHICLE_RAIL, Trip.Mode.TRAIN);
-        put(VEHICLE_FERRY, Trip.Mode.FERRY);
-        put(VEHICLE_BUS, Trip.Mode.BUS);
+    public static final Map<Integer, Trip.Mode> VEHICLES = new ImmutableMapBuilder<Integer, Trip.Mode>()
+            .put(VEHICLE_FARE_MACHINE, Trip.Mode.TICKET_MACHINE)
+            .put(VEHICLE_RAIL, Trip.Mode.TRAIN)
+            .put(VEHICLE_FERRY, Trip.Mode.FERRY)
+            .put(VEHICLE_BUS, Trip.Mode.BUS)
+            .build();
         // TODO: Gold Coast Light Rail
-    }};
-
 }

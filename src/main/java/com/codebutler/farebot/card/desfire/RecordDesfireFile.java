@@ -29,7 +29,7 @@ import org.simpleframework.xml.Root;
 
 import java.util.List;
 
-@Root(name="file")
+@Root(name = "file")
 public class RecordDesfireFile extends DesfireFile {
     private transient List<DesfireRecord> mRecords;
 

@@ -42,7 +42,7 @@ public class ManlyFastFerryRefill extends Refill {
         mEpoch = epoch;
     }
 
-    public ManlyFastFerryRefill(Parcel parcel) {
+    private ManlyFastFerryRefill(Parcel parcel) {
         mPurse = new ManlyFastFerryPurseRecord(parcel);
         mEpoch = new GregorianCalendar();
         mEpoch.setTimeInMillis(parcel.readLong());
@@ -77,21 +77,24 @@ public class ManlyFastFerryRefill extends Refill {
 
     @Override
     public String getAmountString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)getAmount() / 100);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getAmount() / 100);
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        mPurse.writeToParcel(parcel, i);
+    public void writeToParcel(Parcel parcel, int flags) {
+        mPurse.writeToParcel(parcel, flags);
         parcel.writeLong(mEpoch.getTimeInMillis());
     }
 
-    public static final Parcelable.Creator<ManlyFastFerryRefill> CREATOR = new Parcelable.Creator<ManlyFastFerryRefill>() {
+    public static final Parcelable.Creator<ManlyFastFerryRefill> CREATOR
+            = new Parcelable.Creator<ManlyFastFerryRefill>() {
 
+        @Override
         public ManlyFastFerryRefill createFromParcel(Parcel in) {
             return new ManlyFastFerryRefill(in);
         }
 
+        @Override
         public ManlyFastFerryRefill[] newArray(int size) {
             return new ManlyFastFerryRefill[size];
         }

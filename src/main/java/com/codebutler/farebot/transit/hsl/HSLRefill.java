@@ -31,42 +31,62 @@ import com.codebutler.farebot.transit.Refill;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class HSLRefill extends Refill {
+class HSLRefill extends Refill {
+
+    public static final Creator<HSLRefill> CREATOR = new Creator<HSLRefill>() {
+        @Override
+        public HSLRefill createFromParcel(Parcel source) {
+            return new HSLRefill(source);
+        }
+
+        @Override
+        public HSLRefill[] newArray(int size) {
+            return new HSLRefill[size];
+        }
+    };
+
     private final long mRefillTime;
     private final long mRefillAmount;
 
-    public HSLRefill(byte[] data) {
-        mRefillTime = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(20, 14, data), HSLTransitData.bitsToLong(34, 11, data));
+    HSLRefill(byte[] data) {
+        mRefillTime = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(20, 14, data),
+                HSLTransitData.bitsToLong(34, 11, data));
         mRefillAmount = HSLTransitData.bitsToLong(45, 20, data);
     }
 
-    public HSLRefill(Parcel parcel) {
+    private HSLRefill(Parcel parcel) {
         mRefillTime = parcel.readLong();
         mRefillAmount = parcel.readLong();
     }
 
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(mRefillTime);
         dest.writeLong(mRefillAmount);
     }
 
-    @Override public long getTimestamp() {
+    @Override
+    public long getTimestamp() {
         return mRefillTime;
     }
 
-    @Override public String getAgencyName() {
+    @Override
+    public String getAgencyName() {
         return FareBotApplication.getInstance().getString(R.string.hsl_balance_refill);
     }
 
-    @Override public String getShortAgencyName() {
+    @Override
+    public String getShortAgencyName() {
         return FareBotApplication.getInstance().getString(R.string.hsl_balance_refill);
     }
 
-    @Override public long getAmount() {
+    @Override
+    public long getAmount() {
         return mRefillAmount;
     }
 
-    @Override public String getAmountString() {
+    @Override
+    public String getAmountString() {
         return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mRefillAmount / 100.0);
     }
 }

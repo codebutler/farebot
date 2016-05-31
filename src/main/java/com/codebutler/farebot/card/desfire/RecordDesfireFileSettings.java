@@ -30,22 +30,29 @@ import org.simpleframework.xml.Root;
 
 import java.io.ByteArrayInputStream;
 
-@Root(name="settings")
+@Root(name = "settings")
 public class RecordDesfireFileSettings extends DesfireFileSettings {
-    @Element(name="recordsize") private int mRecordSize;
-    @Element(name="maxrecords") private int mMaxRecords;
-    @Element(name="currecords") private int mCurRecords;
+    @Element(name = "recordsize") private int mRecordSize;
+    @Element(name = "maxrecords") private int mMaxRecords;
+    @Element(name = "currecords") private int mCurRecords;
 
+    @SuppressWarnings("unused")
     private RecordDesfireFileSettings() { /* For XML Serializer */ }
 
-    public RecordDesfireFileSettings(byte fileType, byte commSetting, byte[] accessRights, int recordSize, int maxRecords, int curRecords) {
+    public RecordDesfireFileSettings(
+            byte fileType,
+            byte commSetting,
+            byte[] accessRights,
+            int recordSize,
+            int maxRecords,
+            int curRecords) {
         super(fileType, commSetting, accessRights);
         this.mRecordSize = recordSize;
         this.mMaxRecords = maxRecords;
         this.mCurRecords = curRecords;
     }
 
-    public RecordDesfireFileSettings(ByteArrayInputStream stream) {
+    RecordDesfireFileSettings(ByteArrayInputStream stream) {
         super(stream);
 
         byte[] buf = new byte[3];

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.ui;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -47,7 +48,7 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         private final Class<?> mClass;
         private final Bundle mArgs;
 
-        public TabInfo(Class<?> klass, Bundle args) {
+        TabInfo(Class<?> klass, Bundle args) {
             mClass = klass;
             mArgs = args;
         }
@@ -70,15 +71,19 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         notifyDataSetChanged();
     }
 
-    @Override public int getCount() {
+    @Override
+    public int getCount() {
         return mTabs.size();
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
+    @SuppressWarnings("deprecation")
     public void startUpdate(View view) {
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
+    @SuppressLint("CommitTransaction")
+    @SuppressWarnings("deprecation")
     public Object instantiateItem(View view, int position) {
         TabInfo info = mTabs.get(position);
 
@@ -87,11 +92,13 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         }
 
         Fragment fragment = Fragment.instantiate(mActivity, info.mClass.getName(), info.mArgs);
-                mCurTransaction.add(R.id.pager, fragment);
-                return fragment;
+        mCurTransaction.add(R.id.pager, fragment);
+        return fragment;
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
+    @SuppressLint("CommitTransaction")
+    @SuppressWarnings("deprecation")
     public void destroyItem(View view, int i, Object object) {
         if (mCurTransaction == null) {
             mCurTransaction = mActivity.getFragmentManager().beginTransaction();
@@ -99,7 +106,8 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         mCurTransaction.hide((Fragment) object);
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
+    @SuppressWarnings("deprecation")
     public void finishUpdate(View view) {
         if (mCurTransaction != null) {
             mCurTransaction.commitAllowingStateLoss();
@@ -108,27 +116,34 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         }
     }
 
-    @Override public boolean isViewFromObject(View view, Object object) {
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
         return ((Fragment) object).getView() == view;
     }
 
-    @Override public Parcelable saveState() {
+    @Override
+    public Parcelable saveState() {
         return null;
     }
 
-    @Override public void restoreState(Parcelable parcelable, ClassLoader classLoader) {
+    @Override
+    public void restoreState(Parcelable parcelable, ClassLoader classLoader) {
     }
 
+    @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
     }
 
+    @Override
     public void onPageSelected(int position) {
         mActionBar.setSelectedNavigationItem(position);
     }
 
+    @Override
     public void onPageScrollStateChanged(int state) {
     }
 
+    @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         Object tag = tab.getTag();
         for (int i = 0; i < mTabs.size(); i++) {
@@ -138,9 +153,11 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
         }
     }
 
+    @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 }

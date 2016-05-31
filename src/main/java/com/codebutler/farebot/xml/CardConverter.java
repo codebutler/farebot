@@ -42,7 +42,8 @@ public class CardConverter implements Converter<Card> {
         mSerializer = serializer;
     }
 
-    @Override public Card read(InputNode node) throws Exception {
+    @Override
+    public Card read(InputNode node) throws Exception {
         CardType type = CardType.parseValue(node.getAttribute("type").getValue());
         switch (type) {
             case MifareDesfire:
@@ -60,7 +61,8 @@ public class CardConverter implements Converter<Card> {
         }
     }
 
-    @Override public void write(OutputNode node, Card value) throws Exception {
+    @Override
+    public void write(OutputNode node, Card value) throws Exception {
         throw new SkippableRegistryStrategy.SkipException();
     }
 }

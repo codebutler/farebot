@@ -31,7 +31,7 @@ import android.os.Parcelable;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
-@Root(name="transaction")
+@Root(name = "transaction")
 public class CEPASTransaction implements Parcelable {
     @Attribute(name = "type") private byte mType;
     @Attribute(name = "amount") private int mAmount;
@@ -40,7 +40,9 @@ public class CEPASTransaction implements Parcelable {
 
     public enum TransactionType {
         MRT,
-        TOP_UP, /* Old MRT transit info is unhyphenated - renamed from OLD_MRT to TOP_UP, as it seems like the code has been repurposed. */
+        // Old MRT transit info is unhyphenated - renamed from OLD_MRT to TOP_UP,
+        // as it seems like the code has been repurposed.
+        TOP_UP,
         BUS,
         BUS_REFUND,
         CREATION,
@@ -56,8 +58,9 @@ public class CEPASTransaction implements Parcelable {
 
         tmp = (0x00ff0000 & ((rawData[1])) << 16) | (0x0000ff00 & (rawData[2] << 8)) | (0x000000ff & (rawData[3]));
         /* Sign-extend the value */
-        if (0 != (rawData[1] & 0x80))
+        if (0 != (rawData[1] & 0x80)) {
             tmp |= 0xff000000;
+        }
         mAmount = tmp;
 
         /* Date is expressed "in seconds", but the epoch is January 1 1995, SGT */
@@ -68,13 +71,12 @@ public class CEPASTransaction implements Parcelable {
                 + 788947200 - (16 * 3600);
 
         byte[] userData = new byte[9];
-        for (int i = 0; i < 8; i++)
-            userData[i] = rawData[i + 8];
+        System.arraycopy(rawData, 8, userData, 0, 8);
         userData[8] = '\0';
         mUserData = new String(userData);
     }
 
-    public CEPASTransaction(byte type, int amount, int date, String userData) {
+    private CEPASTransaction(byte type, int amount, int date, String userData) {
         mType = type;
         mAmount = amount;
         mDate = date;
@@ -84,20 +86,24 @@ public class CEPASTransaction implements Parcelable {
     private CEPASTransaction() { /* For XML Serializer */ }
 
     public TransactionType getType() {
-        if (mType == 48)
-            return TransactionType.MRT;
-        if (mType == 117 || mType == 3)
-            return TransactionType.TOP_UP;
-        if (mType == 49)
-            return TransactionType.BUS;
-        if (mType == 118)
-            return TransactionType.BUS_REFUND;
-        if (mType == -16 || mType == 5)
-            return TransactionType.CREATION;
-        if (mType == 4)
-            return TransactionType.SERVICE;
-        if (mType == 1)
-            return TransactionType.RETAIL;
+        switch (mType) {
+            case 48:
+                return TransactionType.MRT;
+            case 117:
+            case 3:
+                return TransactionType.TOP_UP;
+            case 49:
+                return TransactionType.BUS;
+            case 118:
+                return TransactionType.BUS_REFUND;
+            case -16:
+            case 5:
+                return TransactionType.CREATION;
+            case 4:
+                return TransactionType.SERVICE;
+            case 1:
+                return TransactionType.RETAIL;
+        }
         return TransactionType.UNKNOWN;
     }
 
@@ -114,6 +120,7 @@ public class CEPASTransaction implements Parcelable {
     }
 
     public static final Parcelable.Creator<CEPASTransaction> CREATOR = new Parcelable.Creator<CEPASTransaction>() {
+        @Override
         public CEPASTransaction createFromParcel(Parcel source) {
             byte type = source.readByte();
             int amount = source.readInt();
@@ -121,17 +128,22 @@ public class CEPASTransaction implements Parcelable {
             String userData = source.readString();
             return new CEPASTransaction(type, amount, date, userData);
         }
+
+        @Override
         public CEPASTransaction[] newArray(int size) {
             return new CEPASTransaction[size];
         }
     };
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeByte(mType);
         parcel.writeInt(mAmount);
         parcel.writeInt(mDate);
         parcel.writeString(mUserData);
     }
+
+    @Override
     public int describeContents() {
         return 0;
     }

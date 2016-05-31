@@ -47,23 +47,25 @@ public class EdyTransitData extends TransitData {
     private EdyTrip[] mTrips;
 
     // defines
-    public static final int FELICA_SERVICE_EDY_ID       = 0x110B;
-    public static final int FELICA_SERVICE_EDY_BALANCE  = 0x1317;
-    public static final int FELICA_SERVICE_EDY_HISTORY  = 0x170F;
+    private static final int FELICA_SERVICE_EDY_ID = 0x110B;
+    private static final int FELICA_SERVICE_EDY_BALANCE = 0x1317;
+    private static final int FELICA_SERVICE_EDY_HISTORY = 0x170F;
 
-    public static final int FELICA_MODE_EDY_DEBIT       = 0x20;
-    public static final int FELICA_MODE_EDY_CHARGE      = 0x02;
-    public static final int FELICA_MODE_EDY_GIFT        = 0x04;
+    public static final int FELICA_MODE_EDY_DEBIT = 0x20;
+    public static final int FELICA_MODE_EDY_CHARGE = 0x02;
+    public static final int FELICA_MODE_EDY_GIFT = 0x04;
 
     // private data
     private byte[] mSerialNumber = new byte[8];
-    private int    mCurrentBalance;
+    private int mCurrentBalance;
 
     public static final Creator<EdyTransitData> CREATOR = new Creator<EdyTransitData>() {
+        @Override
         public EdyTransitData createFromParcel(Parcel parcel) {
             return new EdyTransitData(parcel);
         }
 
+        @Override
         public EdyTransitData[] newArray(int size) {
             return new EdyTransitData[size];
         }
@@ -77,7 +79,7 @@ public class EdyTransitData extends TransitData {
         return new TransitIdentity("Edy", null);
     }
 
-    public EdyTransitData(Parcel parcel) {
+    private EdyTransitData(Parcel parcel) {
         mTrips = new EdyTrip[parcel.readInt()];
         parcel.readTypedArray(mTrips, EdyTrip.CREATOR);
     }
@@ -88,8 +90,8 @@ public class EdyTransitData extends TransitData {
         List<FelicaBlock> blocksID = serviceID.getBlocks();
         FelicaBlock blockID = blocksID.get(0);
         byte[] dataID = blockID.getData();
-        for (int i=2; i<10; i++) {
-            mSerialNumber[i-2] = dataID[i];
+        for (int i = 2; i < 10; i++) {
+            mSerialNumber[i - 2] = dataID[i];
         }
 
         // current balance info in block 0, bytes 0-3, little-endian ordering
@@ -114,39 +116,47 @@ public class EdyTransitData extends TransitData {
         mTrips = trips.toArray(new EdyTrip[trips.size()]);
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
         return format.format(mCurrentBalance);
     }
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         StringBuilder str = new StringBuilder(20);
-        for (int i=0; i<8; i+=2) {
+        for (int i = 0; i < 8; i += 2) {
             str.append(String.format("%02X", mSerialNumber[i]));
-            str.append(String.format("%02X", mSerialNumber[i+1]));
-            if (i < 6)
+            str.append(String.format("%02X", mSerialNumber[i + 1]));
+            if (i < 6) {
                 str.append(" ");
+            }
         }
         return str.toString();
     }
 
-    @Override public Trip[] getTrips() {
+    @Override
+    public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override public Subscription[] getSubscriptions() {
+    @Override
+    public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override public List<ListItem> getInfo() {
+    @Override
+    public List<ListItem> getInfo() {
         return null;
     }
 
-    @Override public String getCardName() {
+    @Override
+    public String getCardName() {
         return "Edy";
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mTrips.length);
         parcel.writeTypedArray(mTrips, flags);

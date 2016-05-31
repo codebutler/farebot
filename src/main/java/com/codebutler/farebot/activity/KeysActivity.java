@@ -27,7 +27,8 @@ import android.app.Fragment;
 import com.codebutler.farebot.fragment.KeysFragment;
 
 public class KeysActivity extends FragmentWrapperActivity {
-    @Override protected Fragment createFragment() {
+    @Override
+    protected Fragment createFragment() {
         return new KeysFragment();
     }
 }

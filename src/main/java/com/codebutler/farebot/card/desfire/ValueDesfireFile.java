@@ -9,8 +9,8 @@ import org.simpleframework.xml.Root;
 /**
  * Represents a value file in Desfire
  */
-@Root(name="file")
-public class ValueDesfireFile extends DesfireFile {
+@Root(name = "file")
+class ValueDesfireFile extends DesfireFile {
     private int mValue;
 
     private ValueDesfireFile() { /* For XML Serializer */ }

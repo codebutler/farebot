@@ -43,6 +43,7 @@ public class CardInfoFragment extends ListFragment {
     private Card mCard;
     private TransitData mTransitData;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
@@ -50,14 +51,16 @@ public class CardInfoFragment extends ListFragment {
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 
-    @Override public void onViewCreated(View view, Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         setListAdapter(new ListItemAdapter(getActivity(), mTransitData.getInfo()));
     }
 
 
-    @Override public void onListItemClick(ListView parent, View v, int position, long id) {
+    @Override
+    public void onListItemClick(ListView parent, View v, int position, long id) {
         ListItem listItem = (ListItem) getListAdapter().getItem(position);
 
         if (listItem instanceof UriListItem) {

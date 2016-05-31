@@ -29,50 +29,88 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
-@Root(name="purse")
+@Root(name = "purse")
 public class CEPASPurse {
-    @Attribute(name="auto-load-amount", required=false) private int mAutoLoadAmount;
-    @Attribute(name="can", required=false) private HexString mCAN;
-    @Attribute(name="cepas-version", required=false) private byte mCepasVersion;
-    @Attribute(name="csn", required=false) private HexString mCSN;
-    @Attribute(name="error", required=false) private String mErrorMessage;
-    @Attribute(name="id", required=false) private int mId;
-    @Attribute(name="issuer-data-length", required=false) private int mIssuerDataLength;
-    @Attribute(name="issuer-specific-data", required=false) private HexString mIssuerSpecificData;
-    @Attribute(name="last-credit-transaction-header", required=false) private HexString mLastCreditTransactionHeader;
-    @Attribute(name="last-credit-transaction-trp", required=false) private int mLastCreditTransactionTRP;
-    @Attribute(name="last-transaction-debit-options", required=false) private byte mLastTransactionDebitOptionsByte;
-    @Attribute(name="last-transaction-trp", required=false) private int mLastTransactionTRP;
-    @Attribute(name="logfile-record-count", required=false) private byte mLogfileRecordCount;
-    @Attribute(name="purse-balance", required=false) private int mPurseBalance;
-    @Attribute(name="purse-expiry-date", required=false) private int mPurseExpiryDate;
-    @Attribute(name="purse-status", required=false) private byte mPurseStatus;
-    @Attribute(name="purse-creation-date", required=false) private int mPurseCreationDate;
-    @Attribute(name="valid", required=false) private boolean mIsValid;
-    @Element(name="transaction", required=false) private CEPASTransaction mLastTransactionRecord;
+
+    @Attribute(name = "auto-load-amount", required = false)
+    private int mAutoLoadAmount;
+
+    @Attribute(name = "can", required = false)
+    private HexString mCAN;
+
+    @Attribute(name = "cepas-version", required = false)
+    private byte mCepasVersion;
+
+    @Attribute(name = "csn", required = false)
+    private HexString mCSN;
+
+    @Attribute(name = "error", required = false)
+    private String mErrorMessage;
+
+    @Attribute(name = "id", required = false)
+    private int mId;
+
+    @Attribute(name = "issuer-data-length", required = false)
+    private int mIssuerDataLength;
+
+    @Attribute(name = "issuer-specific-data", required = false)
+    private HexString mIssuerSpecificData;
+
+    @Attribute(name = "last-credit-transaction-header", required = false)
+    private HexString mLastCreditTransactionHeader;
+
+    @Attribute(name = "last-credit-transaction-trp", required = false)
+    private int mLastCreditTransactionTRP;
+
+    @Attribute(name = "last-transaction-debit-options", required = false)
+    private byte mLastTransactionDebitOptionsByte;
+
+    @Attribute(name = "last-transaction-trp", required = false)
+    private int mLastTransactionTRP;
+
+    @Attribute(name = "logfile-record-count", required = false)
+    private byte mLogfileRecordCount;
+
+    @Attribute(name = "purse-balance", required = false)
+    private int mPurseBalance;
+
+    @Attribute(name = "purse-expiry-date", required = false)
+    private int mPurseExpiryDate;
+
+    @Attribute(name = "purse-status", required = false)
+    private byte mPurseStatus;
+
+    @Attribute(name = "purse-creation-date", required = false)
+    private int mPurseCreationDate;
+
+    @Attribute(name = "valid", required = false)
+    private boolean mIsValid;
+
+    @Element(name = "transaction", required = false)
+    private CEPASTransaction mLastTransactionRecord;
 
     public static CEPASPurse create(int purseId, byte[] purseData) {
         return new CEPASPurse(purseId, purseData);
     }
 
     public CEPASPurse(
-        int              id,
-        byte             cepasVersion,
-        byte             purseStatus,
-        int              purseBalance,
-        int              autoLoadAmount,
-        byte[]           can,
-        byte[]           csn,
-        int              purseExpiryDate,
-        int              purseCreationDate,
-        int              lastCreditTransactionTRP,
-        byte[]           lastCreditTransactionHeader,
-        byte             logfileRecordCount,
-        int              issuerDataLength,
-        int              lastTransactionTRP,
-        CEPASTransaction lastTransactionRecord,
-        byte[]           issuerSpecificData,
-        byte             lastTransactionDebitOptionsByte
+            int id,
+            byte cepasVersion,
+            byte purseStatus,
+            int purseBalance,
+            int autoLoadAmount,
+            byte[] can,
+            byte[] csn,
+            int purseExpiryDate,
+            int purseCreationDate,
+            int lastCreditTransactionTRP,
+            byte[] lastCreditTransactionHeader,
+            byte logfileRecordCount,
+            int issuerDataLength,
+            int lastTransactionTRP,
+            CEPASTransaction lastTransactionRecord,
+            byte[] issuerSpecificData,
+            byte lastTransactionDebitOptionsByte
     ) {
         mId = id;
         mCepasVersion = cepasVersion;
@@ -95,7 +133,7 @@ public class CEPASPurse {
         mErrorMessage = "";
     }
 
-    public CEPASPurse(int purseId, String errorMessage) {
+    CEPASPurse(int purseId, String errorMessage) {
         mId = purseId;
         mCepasVersion = 0;
         mPurseStatus = 0;
@@ -117,8 +155,7 @@ public class CEPASPurse {
         mErrorMessage = errorMessage;
     }
 
-    public CEPASPurse(int purseId, byte[] purseData) {
-        int tmp;
+    CEPASPurse(int purseId, byte[] purseData) {
         if (purseData == null) {
             purseData = new byte[128];
             mIsValid = false;
@@ -128,50 +165,49 @@ public class CEPASPurse {
             mErrorMessage = "";
         }
 
-        mId           = purseId;
+        mId = purseId;
         mCepasVersion = purseData[0];
-        mPurseStatus  = purseData[1];
+        mPurseStatus = purseData[1];
 
-        tmp = (0x00ff0000 & ((purseData[2])) << 16) | (0x0000ff00 & (purseData[3] << 8)) | (0x000000ff & (purseData[4]));
+        int tmp = (0x00ff0000 & ((purseData[2])) << 16)
+                | (0x0000ff00 & (purseData[3] << 8))
+                | (0x000000ff & (purseData[4]));
         /* Sign-extend the value */
-        if (0 != (purseData[2] & 0x80))
+        if (0 != (purseData[2] & 0x80)) {
             tmp |= 0xff000000;
+        }
         mPurseBalance = tmp;
 
-        tmp = (0x00ff0000 & ((purseData[5])) << 16) | (0x0000ff00 & (purseData[6] << 8)) | (0x000000ff & (purseData[7]));
+        tmp = (0x00ff0000 & ((purseData[5])) << 16)
+                | (0x0000ff00 & (purseData[6] << 8))
+                | (0x000000ff & (purseData[7]));
         /* Sign-extend the value */
-        if (0 != (purseData[5] & 0x80))
+        if (0 != (purseData[5] & 0x80)) {
             tmp |= 0xff000000;
+        }
         mAutoLoadAmount = tmp;
 
         byte[] can = new byte[8];
-        for (int i=0; i<can.length; i++) {
-            can[i] = purseData[8 + i];
-        }
+        System.arraycopy(purseData, 8, can, 0, can.length);
 
         mCAN = new HexString(can);
 
         byte[] csn = new byte[8];
-        for (int i=0; i<csn.length; i++) {
-            csn[i] = purseData[16 + i];
-        }
+        System.arraycopy(purseData, 16, csn, 0, csn.length);
 
         mCSN = new HexString(csn);
 
         /* Epoch begins January 1, 1995 */
-        mPurseExpiryDate   = 788947200 + (86400 * ((0xff00 & (purseData[24] << 8)) | (0x00ff & (purseData[25] << 0))));
+        mPurseExpiryDate = 788947200 + (86400 * ((0xff00 & (purseData[24] << 8)) | (0x00ff & (purseData[25] << 0))));
         mPurseCreationDate = 788947200 + (86400 * ((0xff00 & (purseData[26] << 8)) | (0x00ff & (purseData[27] << 0))));
 
         mLastCreditTransactionTRP = ((0xff000000 & (purseData[28] << 24))
-                                   | (0x00ff0000 & (purseData[29] << 16))
-                                   | (0x0000ff00 & (purseData[30] << 8))
-                                   | (0x000000ff & (purseData[31] << 0)));
+                | (0x00ff0000 & (purseData[29] << 16))
+                | (0x0000ff00 & (purseData[30] << 8))
+                | (0x000000ff & (purseData[31] << 0)));
 
         byte[] lastCreditTransactionHeader = new byte[8];
-
-        for (int i = 0; i < 8; i++) {
-            lastCreditTransactionHeader[i] = purseData[32 + i];
-        }
+        System.arraycopy(purseData, 32, lastCreditTransactionHeader, 0, 8);
 
         mLastCreditTransactionHeader = new HexString(lastCreditTransactionHeader);
 
@@ -180,24 +216,21 @@ public class CEPASPurse {
         mIssuerDataLength = 0x00ff & purseData[41];
 
         mLastTransactionTRP = ((0xff000000 & (purseData[42] << 24))
-                             | (0x00ff0000 & (purseData[43] << 16))
-                             | (0x0000ff00 & (purseData[44] << 8))
-                             | (0x000000ff & (purseData[45] << 0))); {
-            byte[] tmpTransaction = new byte[16];
-            for (int i = 0; i < tmpTransaction.length; i++)
-                tmpTransaction[i] = purseData[46+i];
-            mLastTransactionRecord = new CEPASTransaction(tmpTransaction);
-        }
+                | (0x00ff0000 & (purseData[43] << 16))
+                | (0x0000ff00 & (purseData[44] << 8))
+                | (0x000000ff & (purseData[45] << 0)));
+        byte[] tmpTransaction = new byte[16];
+        System.arraycopy(purseData, 46, tmpTransaction, 0, tmpTransaction.length);
+        mLastTransactionRecord = new CEPASTransaction(tmpTransaction);
 
         byte[] issuerSpecificData = new byte[mIssuerDataLength];
-        for (int i = 0; i < issuerSpecificData.length; i++) {
-            issuerSpecificData[i] = purseData[62+i];
-        }
+        System.arraycopy(purseData, 62, issuerSpecificData, 0, issuerSpecificData.length);
         mIssuerSpecificData = new HexString(issuerSpecificData);
 
-        mLastTransactionDebitOptionsByte = purseData[62+mIssuerDataLength];
+        mLastTransactionDebitOptionsByte = purseData[62 + mIssuerDataLength];
     }
 
+    @SuppressWarnings("unused")
     private CEPASPurse() { /* For XML Serializer */ }
 
     public int getId() {

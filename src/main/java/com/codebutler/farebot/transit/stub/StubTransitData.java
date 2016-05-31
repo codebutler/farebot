@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.stub;
 
 import android.net.Uri;
@@ -34,37 +35,42 @@ import java.util.List;
 
 /**
  * Abstract class used to identify cards that we don't yet know the format of.
- *
+ * <p>
  * This allows the cards to be identified by name but will not attempt to read the content.
  */
 public abstract class StubTransitData extends TransitData {
 
     // Stub out elements that we can't support
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         return null;
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         return null;
     }
 
-    @Override public Trip[] getTrips() {
+    @Override
+    public Trip[] getTrips() {
         return null;
     }
 
-    @Override public Subscription[] getSubscriptions() {
+    @Override
+    public Subscription[] getSubscriptions() {
         return null;
     }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) { }
 
-    public Uri getMoreInfoPage() {
+    protected Uri getMoreInfoPage() {
         return null;
     }
 
-    @Override public List<ListItem> getInfo() {
+    @Override
+    public List<ListItem> getInfo() {
         ArrayList<ListItem> items = new ArrayList<>();
 
         items.add(new HeaderListItem(R.string.general));

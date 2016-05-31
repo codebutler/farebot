@@ -41,7 +41,8 @@ public class DesfireFileConverter implements Converter<DesfireFile> {
         mSerializer = serializer;
     }
 
-    @Override public DesfireFile read(InputNode source) throws Exception {
+    @Override
+    public DesfireFile read(InputNode source) throws Exception {
         int id = Integer.parseInt(source.getAttribute("id").getValue());
         InputNode nUnauthorized = source.getAttribute("unauthorized");
         boolean unauthorized = false;
@@ -81,7 +82,8 @@ public class DesfireFileConverter implements Converter<DesfireFile> {
         return DesfireFile.create(id, settings, data);
     }
 
-    @Override public void write(OutputNode node, DesfireFile value) throws Exception {
+    @Override
+    public void write(OutputNode node, DesfireFile value) throws Exception {
         throw new SkippableRegistryStrategy.SkipException();
     }
 }

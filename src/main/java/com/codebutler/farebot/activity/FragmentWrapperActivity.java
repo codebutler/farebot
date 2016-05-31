@@ -36,7 +36,8 @@ import com.codebutler.farebot.R;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public abstract class FragmentWrapperActivity extends Activity {
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -52,7 +53,8 @@ public abstract class FragmentWrapperActivity extends Activity {
         }
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -64,7 +66,7 @@ public abstract class FragmentWrapperActivity extends Activity {
 
     protected abstract Fragment createFragment();
 
-    protected Fragment getFragment() {
+    private Fragment getFragment() {
         return getFragmentManager().findFragmentByTag("fragment");
     }
 }

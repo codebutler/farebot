@@ -83,10 +83,12 @@ public class OVChipSubscription extends Subscription {
             .build();
 
     public static final Creator<OVChipSubscription> CREATOR = new Creator<OVChipSubscription>() {
+        @Override
         public OVChipSubscription createFromParcel(Parcel parcel) {
             return new OVChipSubscription(parcel);
         }
 
+        @Override
         public OVChipSubscription[] newArray(int size) {
             return new OVChipSubscription[size];
         }
@@ -127,7 +129,8 @@ public class OVChipSubscription extends Subscription {
 
             if ((fieldbits & 0x0000400) != 0x00) {
                 subscription = Utils.getBitsFromBuffer(data, iBitOffset, 16);
-                iBitOffset += 24; /* skipping the first 8 bits, as they are not used OR don't belong to subscriptiontype at all */
+                // skipping the first 8 bits, as they are not used OR don't belong to subscriptiontype at all
+                iBitOffset += 24;
             }
 
             if ((fieldbits & 0x0000800) != 0x00) {
@@ -180,93 +183,92 @@ public class OVChipSubscription extends Subscription {
             throw new IllegalArgumentException("Not valid");
         }
 
-        mId            = id;
-        mAgency        = company;
-        mSubscription  = subscription;
-        mUnknown1      = unknown1;
+        mId = id;
+        mAgency = company;
+        mSubscription = subscription;
+        mUnknown1 = unknown1;
         mValidFromDate = validFromDate;
         mValidFromTime = validFromTime;
-        mValidToDate   = validToDate;
-        mValidToTime   = validToTime;
-        mUnknown2      = unknown2;
-        mMachineId     = machineId;
+        mValidToDate = validToDate;
+        mValidToTime = validToTime;
+        mUnknown2 = unknown2;
+        mMachineId = machineId;
     }
 
-    public OVChipSubscription(Parcel parcel) {
-        mId            = parcel.readInt();
-        mUnknown1      = parcel.readInt();
+    private OVChipSubscription(Parcel parcel) {
+        mId = parcel.readInt();
+        mUnknown1 = parcel.readInt();
         mValidFromDate = parcel.readLong();
         mValidFromTime = parcel.readLong();
-        mValidToDate   = parcel.readLong();
-        mValidToTime   = parcel.readLong();
-        mUnknown2      = parcel.readInt();
-        mAgency        = parcel.readInt();
-        mMachineId     = parcel.readInt();
-        mSubscription  = parcel.readInt();
+        mValidToDate = parcel.readLong();
+        mValidToTime = parcel.readLong();
+        mUnknown2 = parcel.readInt();
+        mAgency = parcel.readInt();
+        mMachineId = parcel.readInt();
+        mSubscription = parcel.readInt();
 
         mSubscriptionAddress = parcel.readInt();
-        mType1               = parcel.readInt();
-        mType2               = parcel.readInt();
-        mUsed                = parcel.readInt();
-        mRest                = parcel.readInt();
+        mType1 = parcel.readInt();
+        mType2 = parcel.readInt();
+        mUsed = parcel.readInt();
+        mRest = parcel.readInt();
     }
 
-    public static String getSubscriptionName(int subscription) {
-        if (SUBSCRIPTIONS.containsKey(subscription)) {
-            return SUBSCRIPTIONS.get(subscription);
-        }
-        return "Unknown Subscription (0x" + Long.toString(subscription, 16) + ")";
-    }
-
-    @Override public int getId() {
+    @Override
+    public int getId() {
         return mId;
     }
 
-    @Override public Date getValidFrom() {
-        if (mValidFromTime != 0)
+    @Override
+    public Date getValidFrom() {
+        if (mValidFromTime != 0) {
             return OVChipTransitData.convertDate((int) mValidFromDate, (int) mValidFromTime);
-        else
+        } else {
             return OVChipTransitData.convertDate((int) mValidFromDate);
+        }
     }
 
-    @Override public Date getValidTo() {
-        if (mValidToTime != 0)
+    @Override
+    public Date getValidTo() {
+        if (mValidToTime != 0) {
             return OVChipTransitData.convertDate((int) mValidToDate, (int) mValidToTime);
-        else
+        } else {
             return OVChipTransitData.convertDate((int) mValidToDate);
+        }
     }
 
-    @Override public String getSubscriptionName() {
-        return getSubscriptionName(mSubscription);
+    @Override
+    public String getSubscriptionName() {
+        if (SUBSCRIPTIONS.containsKey(mSubscription)) {
+            return SUBSCRIPTIONS.get(mSubscription);
+        }
+        return "Unknown Subscription (0x" + Long.toString(mSubscription, 16) + ")";
     }
 
-    @Override public String getActivation() {
+    @Override
+    public String getActivation() {
         if (mType1 != 0) {
             return mUsed != 0 ? "Activated and used" : "Activated but not used";
         }
         return "Deactivated";
     }
 
-    @Override public int getMachineId() {
+    @Override
+    public int getMachineId() {
         return mMachineId;
     }
 
-    @Override public String getAgencyName() {
+    @Override
+    public String getAgencyName() {
         return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
     }
 
-    @Override public String getShortAgencyName() {
+    @Override
+    public String getShortAgencyName() {
         return OVChipTransitData.getShortAgencyName(mAgency);
     }
 
-    public int getUnknown1() {
-        return mUnknown1;
-    }
-
-    public int getUnknown2() {
-        return mUnknown2;
-    }
-
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mId);
         parcel.writeInt(mUnknown1);

@@ -35,16 +35,18 @@ import com.codebutler.farebot.transit.Trip;
 
 import java.util.Date;
 
-public class OVChipTrip extends Trip {
-    public static final java.util.Comparator<? super OVChipTrip> ID_ORDER =  new java.util.Comparator<OVChipTrip>() {
-        @Override public int compare(OVChipTrip t1, OVChipTrip t2) {
+class OVChipTrip extends Trip {
+
+    static final java.util.Comparator<? super OVChipTrip> ID_ORDER = new java.util.Comparator<OVChipTrip>() {
+        @Override
+        public int compare(OVChipTrip t1, OVChipTrip t2) {
             return Integer.valueOf(t1.getId()).compareTo(t2.getId());
         }
     };
 
-    private final int     mId;
-    private final int     mProcessType;
-    private final int     mAgency;
+    private final int mId;
+    private final int mProcessType;
+    private final int mAgency;
     private final boolean mIsBus;
     private final boolean mIsTrain;
     private final boolean mIsMetro;
@@ -53,19 +55,19 @@ public class OVChipTrip extends Trip {
     private final boolean mIsCharge;
     private final boolean mIsPurchase;
     private final boolean mIsBanned;
-    private final Date    mTimestamp;
-    private final long    mFare;
-    private final Date    mExitTimestamp;
+    private final Date mTimestamp;
+    private final long mFare;
+    private final Date mExitTimestamp;
     private final Station mStartStation;
     private final Station mEndStation;
-    private final int     mStartStationId;
-    private final int     mEndStationId;
+    private final int mStartStationId;
+    private final int mEndStationId;
 
-    public OVChipTrip(OVChipTransaction transaction) {
+    OVChipTrip(OVChipTransaction transaction) {
         this(transaction, null);
     }
 
-    public OVChipTrip(OVChipTransaction inTransaction, OVChipTransaction outTransaction) {
+    OVChipTrip(OVChipTransaction inTransaction, OVChipTransaction outTransaction) {
         mId = inTransaction.getId();
 
         mProcessType = inTransaction.getTransfer();
@@ -77,19 +79,19 @@ public class OVChipTrip extends Trip {
         mStartStation = getStation(mAgency, mStartStationId);
 
         if (outTransaction != null) {
-            mEndStationId  = outTransaction.getStation();
+            mEndStationId = outTransaction.getStation();
             if (getStation(mAgency, outTransaction.getStation()) != null) {
                 mEndStation = getStation(mAgency, outTransaction.getStation());
             } else {
                 mEndStation = new Station(String.format("Unknown (%s)", mEndStationId), null, null);
             }
             mExitTimestamp = OVChipTransitData.convertDate(outTransaction.getDate(), outTransaction.getTime());
-            mFare          = outTransaction.getAmount();
+            mFare = outTransaction.getAmount();
         } else {
-            mEndStation    = null;
-            mEndStationId  = 0;
+            mEndStation = null;
+            mEndStationId = 0;
             mExitTimestamp = null;
-            mFare          = inTransaction.getAmount();
+            mFare = inTransaction.getAmount();
         }
 
         mIsTrain = (mAgency == OVChipTransitData.AGENCY_NS)
@@ -124,19 +126,21 @@ public class OVChipTrip extends Trip {
     }
 
     public static final Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
+        @Override
         public OVChipTrip createFromParcel(Parcel parcel) {
             return new OVChipTrip(parcel);
         }
 
+        @Override
         public OVChipTrip[] newArray(int size) {
             return new OVChipTrip[size];
         }
     };
 
-    public OVChipTrip(Parcel parcel) {
+    private OVChipTrip(Parcel parcel) {
         mId = parcel.readInt();
 
-//        mSame = (parcel.readInt() == 1);
+        // mSame = (parcel.readInt() == 1);
 
         mProcessType = parcel.readInt();
         mAgency = parcel.readInt();
@@ -174,14 +178,16 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    @Override public int describeContents() {
+    @Override
+    public int describeContents() {
         return 0;
     }
 
-    @Override public void writeToParcel(Parcel parcel, int flags) {
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mId);
 
-//        parcel.writeInt(mSame ? 1 : 0);
+        // parcel.writeInt(mSame ? 1 : 0);
 
         parcel.writeInt(mProcessType);
         parcel.writeInt(mAgency);
@@ -222,27 +228,32 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    public int getId() {
+    private int getId() {
         return mId;
     }
 
-    @Override public String getRouteName() {
+    @Override
+    public String getRouteName() {
         return null;
     }
 
-    @Override public String getAgencyName() {
+    @Override
+    public String getAgencyName() {
         return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
     }
 
-    @Override public String getShortAgencyName() {
+    @Override
+    public String getShortAgencyName() {
         return OVChipTransitData.getShortAgencyName(mAgency);
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         return null;
     }
 
-    @Override public String getStartStationName() {
+    @Override
+    public String getStartStationName() {
         if (mStartStation != null && !TextUtils.isEmpty(mStartStation.getStationName())) {
             return mStartStation.getStationName();
         } else {
@@ -250,22 +261,26 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    @Override public Station getStartStation() {
+    @Override
+    public Station getStartStation() {
         return mStartStation;
     }
 
-    @Override public String getEndStationName() {
+    @Override
+    public String getEndStationName() {
         if (mEndStation != null && !TextUtils.isEmpty(mEndStation.getStationName())) {
             return mEndStation.getStationName();
         }
         return null;
     }
 
-    @Override public Station getEndStation() {
+    @Override
+    public Station getEndStation() {
         return mEndStation;
     }
 
-    @Override public Mode getMode() {
+    @Override
+    public Mode getMode() {
         if (mIsBanned) {
             return Mode.BANNED;
         } else if (mIsCharge) {
@@ -287,30 +302,37 @@ public class OVChipTrip extends Trip {
         }
     }
 
-    @Override public long getTimestamp() {
-        if (mTimestamp != null)
+    @Override
+    public long getTimestamp() {
+        if (mTimestamp != null) {
             return mTimestamp.getTime() / 1000;
-        else
+        } else {
             return 0;
+        }
     }
 
+    @Override
     public long getExitTimestamp() {
-        if (mExitTimestamp != null)
+        if (mExitTimestamp != null) {
             return mExitTimestamp.getTime() / 1000;
-        else
+        } else {
             return 0;
+        }
     }
 
+    @Override
     public boolean hasTime() {
         return (mTimestamp != null);
     }
 
-    @Override public boolean hasFare() {
+    @Override
+    public boolean hasFare() {
         return true;
     }
 
-    @Override public String getFareString() {
-        return OVChipTransitData.convertAmount((int)mFare);
+    @Override
+    public String getFareString() {
+        return OVChipTransitData.convertAmount((int) mFare);
     }
 
     private static Station getStation(int companyCode, int stationCode) {
@@ -320,7 +342,7 @@ public class OVChipTrip extends Trip {
                     OVChipDBUtil.TABLE_NAME,
                     OVChipDBUtil.COLUMNS_STATIONDATA,
                     String.format("%s = ? AND %s = ?", OVChipDBUtil.COLUMN_ROW_COMPANY, OVChipDBUtil.COLUMN_ROW_OVCID),
-                    new String[] {
+                    new String[]{
                             String.valueOf(companyCode),
                             String.valueOf(stationCode)
                     },
@@ -336,13 +358,14 @@ public class OVChipTrip extends Trip {
                 return null;
             }
 
-            String cityName    = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_CITY));
+            String cityName = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_CITY));
             String stationName = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_NAME));
-            String latitude    = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_LAT));
-            String longitude   = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_LON));
+            String latitude = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_LAT));
+            String longitude = cursor.getString(cursor.getColumnIndex(OVChipDBUtil.COLUMN_ROW_LON));
 
-            if (cityName != null)
+            if (cityName != null) {
                 stationName = cityName.concat(", " + stationName);
+            }
 
             return new Station(stationName, latitude, longitude);
         } catch (Exception e) {

@@ -30,7 +30,7 @@ import org.json.JSONObject;
 
 public class ClassicSectorKey {
     private static final String TYPE = "type";
-    private static final String KEY  = "key";
+    private static final String KEY = "key";
 
     public static final String TYPE_KEYA = "KeyA";
     public static final String TYPE_KEYB = "KeyB";
@@ -39,27 +39,27 @@ public class ClassicSectorKey {
     private byte[] mKey;
 
     public static ClassicSectorKey fromJSON(JSONObject json) throws JSONException {
-      return new ClassicSectorKey(json.getString(TYPE), Utils.hexStringToByteArray(json.getString(KEY)));
+        return new ClassicSectorKey(json.getString(TYPE), Utils.hexStringToByteArray(json.getString(KEY)));
     }
 
     public ClassicSectorKey(String type, byte[] key) {
-      mType = type;
-      mKey  = key;
+        mType = type;
+        mKey = key;
     }
 
     public String getType() {
-      return mType;
+        return mType;
     }
 
     public byte[] getKey() {
-      return mKey;
+        return mKey;
     }
 
     public JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
             json.put(TYPE, mType);
-            json.put(KEY,  Utils.getHexString(mKey));
+            json.put(KEY, Utils.getHexString(mKey));
             return json;
         } catch (Exception ex) {
             throw new RuntimeException(ex);

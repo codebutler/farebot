@@ -28,12 +28,13 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
 
-@Root(name="block")
+@Root(name = "block")
 public class FelicaBlock {
-    @Attribute(name="address") private byte mAddr;
+    @Attribute(name = "address") private byte mAddr;
     @Text private Base64String mData;
 
-    FelicaBlock() { }
+    FelicaBlock() {
+    }
 
     public FelicaBlock(byte addr, byte[] data) {
         mAddr = addr;

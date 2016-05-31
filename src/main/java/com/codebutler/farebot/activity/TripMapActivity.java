@@ -46,6 +46,7 @@ public class TripMapActivity extends Activity {
 
     private GoogleMap mMap;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -67,7 +68,7 @@ public class TripMapActivity extends Activity {
                 : String.format("%s %s", trip.getAgencyName(), trip.getRouteName()));
 
         int startMarkerId = R.drawable.marker_start;
-        int endMarkerId   = R.drawable.marker_end;
+        int endMarkerId = R.drawable.marker_end;
 
         /* FIXME: Need icons...
 
@@ -110,7 +111,8 @@ public class TripMapActivity extends Activity {
 
         final LatLngBounds bounds = builder.build();
         findViewById(R.id.map).post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (points.size() == 1) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(points.get(0), 17));
                 } else {
@@ -121,7 +123,8 @@ public class TripMapActivity extends Activity {
         });
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
@@ -132,10 +135,10 @@ public class TripMapActivity extends Activity {
     private LatLng addStationMarker(Station station, int iconId) {
         LatLng pos = new LatLng(Double.valueOf(station.getLatitude()), Double.valueOf(station.getLongitude()));
         mMap.addMarker(new MarkerOptions()
-            .position(pos)
-            .title(station.getStationName())
-            .snippet(station.getCompanyName())
-            .icon(BitmapDescriptorFactory.fromResource(iconId))
+                .position(pos)
+                .title(station.getStationName())
+                .snippet(station.getCompanyName())
+                .icon(BitmapDescriptorFactory.fromResource(iconId))
         );
         return pos;
     }

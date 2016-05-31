@@ -36,31 +36,32 @@ import android.provider.BaseColumns;
 import android.text.TextUtils;
 
 public abstract class BetterContentProvider extends ContentProvider {
-    private SQLiteOpenHelper        mHelper;
+    private SQLiteOpenHelper mHelper;
     private Class<? extends SQLiteOpenHelper> mHelperClass;
-    private String                  mItemType;
-    private Uri                     mContentUri;
-    private String                  mDirType;
-    private String                  mTableName;
-    private UriMatcher              mUriMatcher;
+    private String mItemType;
+    private Uri mContentUri;
+    private String mDirType;
+    private String mTableName;
+    private UriMatcher mUriMatcher;
 
-    protected static final int CODE_COLLECTION = 100;
-    protected static final int CODE_SINGLE     = 101;
+    static final int CODE_COLLECTION = 100;
+    static final int CODE_SINGLE = 101;
 
-    public BetterContentProvider(Class<? extends SQLiteOpenHelper> helperClass, String dirType, String itemType,
-            String tableName, Uri contentUri) {
+    BetterContentProvider(Class<? extends SQLiteOpenHelper> helperClass, String dirType, String itemType,
+                          String tableName, Uri contentUri) {
         mHelperClass = helperClass;
-        mDirType     = dirType;
-        mItemType    = itemType;
-        mTableName   = tableName;
-        mContentUri  = contentUri;
+        mDirType = dirType;
+        mItemType = itemType;
+        mTableName = tableName;
+        mContentUri = contentUri;
 
         String basePath = contentUri.getPath().substring(1);
 
         mUriMatcher = createUriMatcher(contentUri, basePath);
     }
 
-    @Override public boolean onCreate() {
+    @Override
+    public boolean onCreate() {
         try {
             mHelper = mHelperClass.getConstructor(Context.class).newInstance(getContext());
         } catch (Exception e) {
@@ -69,8 +70,9 @@ public abstract class BetterContentProvider extends ContentProvider {
         return true;
     }
 
-    @Override public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(mTableName);
         appendWheres(builder, mUriMatcher, uri);
@@ -82,7 +84,8 @@ public abstract class BetterContentProvider extends ContentProvider {
         return cursor;
     }
 
-    @Override public String getType(Uri uri) {
+    @Override
+    public String getType(Uri uri) {
         switch (mUriMatcher.match(uri)) {
             case CODE_COLLECTION:
                 return mDirType;
@@ -93,7 +96,8 @@ public abstract class BetterContentProvider extends ContentProvider {
         }
     }
 
-    @Override public Uri insert(Uri uri, ContentValues values) {
+    @Override
+    public Uri insert(Uri uri, ContentValues values) {
         if (mUriMatcher.match(uri) != CODE_COLLECTION) {
             throw new IllegalArgumentException("Incorrect URI: " + uri);
         }
@@ -107,18 +111,19 @@ public abstract class BetterContentProvider extends ContentProvider {
         return itemUri;
     }
 
-    @Override public int delete(Uri uri, String selection, String[] selectionArgs) {
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         int count = 0;
         switch (mUriMatcher.match(uri)) {
             case CODE_SINGLE:
                 String rowId = uri.getPathSegments().get(1);
                 if (TextUtils.isEmpty(selection)) {
-                    count = db.delete(mTableName, BaseColumns._ID + "=?", new String[] { rowId });
+                    count = db.delete(mTableName, BaseColumns._ID + "=?", new String[]{rowId});
                 } else {
                     count = db.delete(mTableName,
-                        selection + " AND " + BaseColumns._ID + "=" + rowId,
-                        selectionArgs);
+                            selection + " AND " + BaseColumns._ID + "=" + rowId,
+                            selectionArgs);
                 }
                 break;
             case CODE_COLLECTION:
@@ -129,12 +134,13 @@ public abstract class BetterContentProvider extends ContentProvider {
         return count;
     }
 
-    @Override public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         int count;
         switch (mUriMatcher.match(uri)) {
             case CODE_COLLECTION:
-                count = db.update(mTableName, values, selection,  selectionArgs);
+                count = db.update(mTableName, values, selection, selectionArgs);
                 break;
             case CODE_SINGLE:
                 String rowId = uri.getPathSegments().get(1);
@@ -142,8 +148,8 @@ public abstract class BetterContentProvider extends ContentProvider {
                     count = db.update(mTableName, values, BaseColumns._ID + "=" + rowId, null);
                 } else {
                     count = db.update(mTableName, values,
-                        selection + " AND " + BaseColumns._ID + "=" + rowId,
-                        selectionArgs);
+                            selection + " AND " + BaseColumns._ID + "=" + rowId,
+                            selectionArgs);
                 }
                 break;
             default:
@@ -153,14 +159,14 @@ public abstract class BetterContentProvider extends ContentProvider {
         return count;
     }
 
-    protected UriMatcher createUriMatcher(Uri contentUri, String basePath) {
+    UriMatcher createUriMatcher(Uri contentUri, String basePath) {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        matcher.addURI(contentUri.getAuthority(), basePath,        CODE_COLLECTION);
+        matcher.addURI(contentUri.getAuthority(), basePath, CODE_COLLECTION);
         matcher.addURI(contentUri.getAuthority(), basePath + "/#", CODE_SINGLE);
         return matcher;
     }
 
-    protected void appendWheres(SQLiteQueryBuilder builder, UriMatcher matcher, Uri uri) {
+    void appendWheres(SQLiteQueryBuilder builder, UriMatcher matcher, Uri uri) {
         switch (matcher.match(uri)) {
             case CODE_COLLECTION:
                 // Nothing needed here

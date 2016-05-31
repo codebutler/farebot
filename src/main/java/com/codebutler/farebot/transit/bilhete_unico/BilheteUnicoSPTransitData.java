@@ -45,23 +45,25 @@ public class BilheteUnicoSPTransitData extends TransitData {
     private static final String NAME = "Bilhete Único";
 
     private static final byte[] MANUFACTURER = {
-        (byte) 0x62,
-        (byte) 0x63,
-        (byte) 0x64,
-        (byte) 0x65,
-        (byte) 0x66,
-        (byte) 0x67,
-        (byte) 0x68,
-        (byte) 0x69
+            (byte) 0x62,
+            (byte) 0x63,
+            (byte) 0x64,
+            (byte) 0x65,
+            (byte) 0x66,
+            (byte) 0x67,
+            (byte) 0x68,
+            (byte) 0x69
     };
 
     private final BilheteUnicoSPCredit mCredit;
 
     public static final Creator<BilheteUnicoSPTransitData> CREATOR = new Creator<BilheteUnicoSPTransitData>() {
+        @Override
         public BilheteUnicoSPTransitData createFromParcel(Parcel parcel) {
             return new BilheteUnicoSPTransitData(parcel);
         }
 
+        @Override
         public BilheteUnicoSPTransitData[] newArray(int size) {
             return new BilheteUnicoSPTransitData[size];
         }
@@ -76,50 +78,58 @@ public class BilheteUnicoSPTransitData extends TransitData {
         return new TransitIdentity(NAME, null);
     }
 
-    public BilheteUnicoSPTransitData(Parcel parcel) {
-        mCredit   = parcel.readParcelable(OVChipCredit.class.getClassLoader());
+    private BilheteUnicoSPTransitData(Parcel parcel) {
+        mCredit = parcel.readParcelable(OVChipCredit.class.getClassLoader());
     }
 
     public BilheteUnicoSPTransitData(ClassicCard card) {
         mCredit = new BilheteUnicoSPCredit(card.getSector(8).getBlock(1).getData());
     }
 
-    public static String convertAmount(int amount) {
+    private static String convertAmount(int amount) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         formatter.setCurrency(Currency.getInstance("BRL"));
 
-        return formatter.format((double)amount / 100.0);
+        return formatter.format((double) amount / 100.0);
     }
 
-    @Override public String getCardName() {
+    @Override
+    public String getCardName() {
         return NAME;
     }
 
-    @Override public void writeToParcel(Parcel parcel, int flags) {
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeParcelable(mCredit, flags);
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         return BilheteUnicoSPTransitData.convertAmount(mCredit.getCredit());
     }
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         return null;
     }
 
-    @Override public Trip[] getTrips() {
+    @Override
+    public Trip[] getTrips() {
         return null;
     }
 
-    @Override public Refill[] getRefills() {
+    @Override
+    public Refill[] getRefills() {
         return null;
     }
 
-    @Override public List<ListItem> getInfo() {
+    @Override
+    public List<ListItem> getInfo() {
         return null;
     }
 
-    @Override public Subscription[] getSubscriptions() {
+    @Override
+    public Subscription[] getSubscriptions() {
         return null;
     }
 }

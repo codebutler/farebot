@@ -31,7 +31,8 @@ import org.simpleframework.xml.stream.InputNode;
 import org.simpleframework.xml.stream.OutputNode;
 
 public class ClassicSectorConverter implements Converter<ClassicSector> {
-    @Override public ClassicSector read(InputNode node) throws Exception {
+    @Override
+    public ClassicSector read(InputNode node) throws Exception {
         int sectorIndex = Integer.parseInt(node.getAttribute("index").getValue());
 
         if (node.getAttribute("unauthorized") != null && node.getAttribute("unauthorized").getValue().equals("true")) {
@@ -45,7 +46,8 @@ public class ClassicSectorConverter implements Converter<ClassicSector> {
         throw new SkippableRegistryStrategy.SkipException();
     }
 
-    @Override public void write(OutputNode node, ClassicSector value) throws Exception {
+    @Override
+    public void write(OutputNode node, ClassicSector value) throws Exception {
         throw new SkippableRegistryStrategy.SkipException();
     }
 }

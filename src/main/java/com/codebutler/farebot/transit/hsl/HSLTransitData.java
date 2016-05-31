@@ -17,7 +17,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+1 * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -46,53 +46,67 @@ import java.util.List;
 import java.util.Locale;
 
 public class HSLTransitData extends TransitData {
-    private String        mSerialNumber;
-    private double        mBalance;
+
+    public static final Creator<HSLTransitData> CREATOR = new Creator<HSLTransitData>() {
+        @Override
+        public HSLTransitData createFromParcel(Parcel source) {
+            return new HSLTransitData(source);
+        }
+
+        @Override
+        public HSLTransitData[] newArray(int size) {
+            return new HSLTransitData[size];
+        }
+    };
+
+    private String mSerialNumber;
+    private double mBalance;
     private List<HSLTrip> mTrips;
-    private boolean       mHasKausi;
-    private long          mKausiStart;
-    private long          mKausiEnd;
-    private long          mKausiPrevStart;
-    private long          mKausiPrevEnd;
-    private long          mKausiPurchasePrice;
-    private long          mKausiLastUse;
-    private long          mKausiPurchase;
-    private HSLRefill     mLastRefill;
-    private boolean       mKausiNoData;
-    private long          mArvoExit;
-    private long          mArvoPurchase;
-    private long          mArvoExpire;
-    private long          mArvoPax;
-    private long          mArvoPurchasePrice;
-    private long          mArvoXfer;
-    private long          mArvoDiscoGroup;
-    private long          mArvoMystery1;
-    private long          mArvoDuration;
-    private long          mArvoRegional;
-    private long          mArvoJOREExt;
-    private long          mArvoVehicleNumber;
-    private long          mArvoUnknown;
-    private long          mArvoLineJORE;
-    private long          mKausiVehicleNumber;
-    private long          mKausiUnknown;
-    private long          mKausiLineJORE;
-    private long          mKausiJOREExt;
-    private long          mArvoDirection;
-    private long          mKausiDirection;
+    private boolean mHasKausi;
+    private long mKausiStart;
+    private long mKausiEnd;
+    private long mKausiPrevStart;
+    private long mKausiPrevEnd;
+    private long mKausiPurchasePrice;
+    private long mKausiLastUse;
+    private long mKausiPurchase;
+    private HSLRefill mLastRefill;
+    private boolean mKausiNoData;
+    private long mArvoExit;
+    private long mArvoPurchase;
+    private long mArvoExpire;
+    private long mArvoPax;
+    private long mArvoPurchasePrice;
+    private long mArvoXfer;
+    private long mArvoDiscoGroup;
+    private long mArvoMystery1;
+    private long mArvoDuration;
+    private long mArvoRegional;
+    private long mArvoJOREExt;
+    private long mArvoVehicleNumber;
+    private long mArvoUnknown;
+    private long mArvoLineJORE;
+    private long mKausiVehicleNumber;
+    private long mKausiUnknown;
+    private long mKausiLineJORE;
+    private long mKausiJOREExt;
+    private long mArvoDirection;
+    private long mKausiDirection;
 
     private static final long EPOCH = 0x32C97ED0;
+
     /*
     private static final String[] regionNames = {
         "N/A", "Helsinki", "Espoo", "Vantaa", "Koko alue", "Seutu", "", "", "", "",  // 0-9
         "", "", "", "", "", "", "", "", "", "", // 10-19
         "", "", "", "", "", "", "", "", "", "", // 20-29
         "", "", "", "", "", "", "", "", "", ""}; // 30-39
-        */
-/*    private static final Map<Long,String> vehicleNames =  Collections.unmodifiableMap(new HashMap<Long, String>() {{
+    private static final Map<Long,String> vehicleNames =  Collections.unmodifiableMap(new HashMap<Long, String>() {{
         put(1L, "Metro");
         put(18L, "Bus");
         put(16L, "Tram");
-    }});*/
+    }});
+    */
 
     public static boolean check(Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x1120ef) != null);
@@ -108,28 +122,28 @@ public class HSLTransitData extends TransitData {
     }
 
     public HSLTransitData(Parcel parcel) {
-        mSerialNumber       = parcel.readString();
-        mBalance            = parcel.readDouble();
-        mArvoMystery1       = parcel.readLong();
-        mArvoDuration       = parcel.readLong();
-        mArvoRegional       = parcel.readLong();
-        mArvoExit           = parcel.readLong();
-        mArvoPurchasePrice  = parcel.readLong();
-        mArvoDiscoGroup     = parcel.readLong();
-        mArvoPurchase       = parcel.readLong();
-        mArvoExpire         = parcel.readLong();
-        mArvoPax            = parcel.readLong();
-        mArvoXfer           = parcel.readLong();
-        mArvoVehicleNumber  = parcel.readLong();
-        mArvoUnknown        = parcel.readLong();
-        mArvoLineJORE       = parcel.readLong();
-        mArvoJOREExt        = parcel.readLong();
-        mArvoDirection      = parcel.readLong();
+        mSerialNumber = parcel.readString();
+        mBalance = parcel.readDouble();
+        mArvoMystery1 = parcel.readLong();
+        mArvoDuration = parcel.readLong();
+        mArvoRegional = parcel.readLong();
+        mArvoExit = parcel.readLong();
+        mArvoPurchasePrice = parcel.readLong();
+        mArvoDiscoGroup = parcel.readLong();
+        mArvoPurchase = parcel.readLong();
+        mArvoExpire = parcel.readLong();
+        mArvoPax = parcel.readLong();
+        mArvoXfer = parcel.readLong();
+        mArvoVehicleNumber = parcel.readLong();
+        mArvoUnknown = parcel.readLong();
+        mArvoLineJORE = parcel.readLong();
+        mArvoJOREExt = parcel.readLong();
+        mArvoDirection = parcel.readLong();
         mKausiVehicleNumber = parcel.readLong();
-        mKausiUnknown       = parcel.readLong();
-        mKausiLineJORE      = parcel.readLong();
-        mKausiJOREExt       = parcel.readLong();
-        mKausiDirection     = parcel.readLong();
+        mKausiUnknown = parcel.readLong();
+        mKausiLineJORE = parcel.readLong();
+        mKausiJOREExt = parcel.readLong();
+        mKausiDirection = parcel.readLong();
 
         mTrips = new ArrayList<>();
         parcel.readTypedList(mTrips, HSLTrip.CREATOR);
@@ -198,11 +212,17 @@ public class HSLTransitData extends TransitData {
             mArvoExit = cardDateToTimestamp(bitsToLong(32, 14, data), bitsToLong(46, 11, data));
             mArvoPurchasePrice = bitsToLong(68, 14, data);
             //mArvoDiscoGroup = bitsToLong(82, 6,data);
-            mArvoPurchase = cardDateToTimestamp(bitsToLong(88, 14, data), bitsToLong(102, 11, data)); //68 price, 82 zone?
-            mArvoExpire = cardDateToTimestamp(bitsToLong(113, 14, data), bitsToLong(127, 11, data)); //68 price, 82 zone?
+
+            //68 price, 82 zone?
+            mArvoPurchase = cardDateToTimestamp(bitsToLong(88, 14, data), bitsToLong(102, 11, data));
+
+            //68 price, 82 zone?
+            mArvoExpire = cardDateToTimestamp(bitsToLong(113, 14, data), bitsToLong(127, 11, data));
+
             mArvoPax = bitsToLong(138, 6, data);
 
-            mArvoXfer = cardDateToTimestamp(bitsToLong(144, 14, data), bitsToLong(158, 11, data)); //68 price, 82 zone?
+            //68 price, 82 zone?
+            mArvoXfer = cardDateToTimestamp(bitsToLong(144, 14, data), bitsToLong(158, 11, data));
 
             mArvoVehicleNumber = bitsToLong(169, 14, data);
 
@@ -251,8 +271,8 @@ public class HSLTransitData extends TransitData {
             mKausiPrevStart = cardDateToTimestamp(bitsToLong(67, 14, data), 0);
             mKausiPrevEnd = cardDateToTimestamp(bitsToLong(81, 14, data), 0);
             if (mKausiPrevStart > mKausiStart) {
-                long temp = mKausiStart;
-                long temp2 = mKausiEnd;
+                final long temp = mKausiStart;
+                final long temp2 = mKausiEnd;
                 mKausiStart = mKausiPrevStart;
                 mKausiEnd = mKausiPrevEnd;
                 mKausiPrevStart = temp;
@@ -296,17 +316,21 @@ public class HSLTransitData extends TransitData {
         return (EPOCH) + day * (60 * 60 * 24) + minute * 60;
     }
 
-    @Override public String getCardName() {
+    @Override
+    public String getCardName() {
         return "HSL";
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         FareBotApplication app = FareBotApplication.getInstance();
         String ret = NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mBalance / 100);
-        if (mHasKausi)
+        if (mHasKausi) {
             ret += "\n" + app.getString(R.string.hsl_pass_is_valid);
-        if (mArvoExpire * 1000.0 > System.currentTimeMillis())
+        }
+        if (mArvoExpire * 1000.0 > System.currentTimeMillis()) {
             ret += "\n" + app.getString(R.string.hsl_value_ticket_is_valid) + "!";
+        }
         return ret;
     }
 
@@ -372,24 +396,29 @@ public class HSLTransitData extends TransitData {
     }
     */
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         return mSerialNumber;
     }
 
-    @Override public Trip[] getTrips() {
+    @Override
+    public Trip[] getTrips() {
         return mTrips.toArray(new HSLTrip[mTrips.size()]);
     }
 
-    @Override public Refill[] getRefills() {
+    @Override
+    public Refill[] getRefills() {
         Refill[] ret = {mLastRefill};
         return ret;
     }
 
-    @Override public Subscription[] getSubscriptions() {
+    @Override
+    public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override public List<ListItem> getInfo() {
+    @Override
+    public List<ListItem> getInfo() {
         return null;
     }
 
@@ -410,6 +439,7 @@ public class HSLTransitData extends TransitData {
         return new ArrayList<>();
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mSerialNumber);
         parcel.writeDouble(mBalance);

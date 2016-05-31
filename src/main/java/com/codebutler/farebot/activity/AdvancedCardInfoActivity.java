@@ -52,19 +52,21 @@ import com.crashlytics.android.Crashlytics;
 import org.simpleframework.xml.Serializer;
 
 public class AdvancedCardInfoActivity extends Activity {
-    public static final String EXTRA_CARD  = "com.codebutler.farebot.EXTRA_CARD";
+    public static final String EXTRA_CARD = "com.codebutler.farebot.EXTRA_CARD";
     public static final String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
 
     private TabPagerAdapter mTabsAdapter;
     private Card mCard;
     private Exception mError;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_card_info);
 
         findViewById(R.id.error_button).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 reportError();
             }
         });
@@ -92,7 +94,8 @@ public class AdvancedCardInfoActivity extends Activity {
             } else if (mError instanceof UnauthorizedException) {
                 findViewById(R.id.unauthorized_card).setVisibility(View.VISIBLE);
                 findViewById(R.id.load_keys).setOnClickListener(new View.OnClickListener() {
-                    @Override public void onClick(View view) {
+                    @Override
+                    public void onClick(View view) {
                         startActivity(new Intent(AdvancedCardInfoActivity.this, AddKeyActivity.class));
                     }
                 });
@@ -119,12 +122,14 @@ public class AdvancedCardInfoActivity extends Activity {
         }
     }
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.card_advanced_menu, menu);
         return true;
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         try {
             if (item.getItemId() == R.id.copy_xml) {
                 String xml = mCard.toXml(FareBotApplication.getInstance().getSerializer());
@@ -148,15 +153,16 @@ public class AdvancedCardInfoActivity extends Activity {
             }
         } catch (Exception ex) {
             new AlertDialog.Builder(this)
-                .setMessage(ex.toString())
-                .show();
+                    .setMessage(ex.toString())
+                    .show();
         }
         return false;
     }
 
     private void reportError() {
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            @Override public void onClick(DialogInterface dialog, int which) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 try {
                     Crashlytics.log(mCard.toXml(FareBotApplication.getInstance().getSerializer()));
                 } catch (Exception ex) {
@@ -167,10 +173,10 @@ public class AdvancedCardInfoActivity extends Activity {
             }
         };
         new AlertDialog.Builder(this)
-            .setTitle(R.string.report_error_privacy_title)
-            .setMessage(R.string.report_error_privacy_message)
-            .setPositiveButton(android.R.string.ok, listener)
-            .setNegativeButton(android.R.string.cancel, null)
-            .show();
+                .setTitle(R.string.report_error_privacy_title)
+                .setMessage(R.string.report_error_privacy_message)
+                .setPositiveButton(android.R.string.ok, listener)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 }

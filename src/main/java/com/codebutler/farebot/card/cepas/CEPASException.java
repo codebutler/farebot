@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.card.cepas;
 
-public class CEPASException extends Exception {
-    public CEPASException(String detailMessage) {
+class CEPASException extends Exception {
+    CEPASException(String detailMessage) {
         super(detailMessage);
     }
 }

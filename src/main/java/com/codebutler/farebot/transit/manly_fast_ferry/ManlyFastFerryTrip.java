@@ -44,7 +44,7 @@ public class ManlyFastFerryTrip extends Trip {
         mEpoch = epoch;
     }
 
-    public ManlyFastFerryTrip(Parcel parcel) {
+    private ManlyFastFerryTrip(Parcel parcel) {
         mPurse = new ManlyFastFerryPurseRecord(parcel);
         mEpoch = new GregorianCalendar();
         mEpoch.setTimeInMillis(parcel.readLong());
@@ -86,7 +86,7 @@ public class ManlyFastFerryTrip extends Trip {
 
     @Override
     public String getFareString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)mPurse.getTransactionValue() / 100.);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mPurse.getTransactionValue() / 100.);
     }
 
     @Override
@@ -144,15 +144,16 @@ public class ManlyFastFerryTrip extends Trip {
 
     public static final Parcelable.Creator<ManlyFastFerryTrip> CREATOR = new Parcelable.Creator<ManlyFastFerryTrip>() {
 
+        @Override
         public ManlyFastFerryTrip createFromParcel(Parcel in) {
             return new ManlyFastFerryTrip(in);
         }
 
+        @Override
         public ManlyFastFerryTrip[] newArray(int size) {
             return new ManlyFastFerryTrip[size];
         }
     };
-
 
 
 }

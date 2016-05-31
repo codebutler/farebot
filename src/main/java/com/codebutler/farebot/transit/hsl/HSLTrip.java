@@ -33,17 +33,17 @@ import com.codebutler.farebot.transit.Trip;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class HSLTrip extends Trip {
-    String mLine;
-    long mVehicleNumber;
-    long mTimestamp;
-    long mFare;
-    final long mNewBalance;
-    long mArvo;
-    long mExpireTimestamp;
-    long mPax;
+class HSLTrip extends Trip {
+    String mLine = null;
+    long mVehicleNumber = -1;
+    long mTimestamp = -1;
+    long mFare = -1;
+    private final long mNewBalance;
+    long mArvo = -1;
+    long mExpireTimestamp = -1;
+    long mPax = -1;
 
-    public HSLTrip(DesfireRecord record) {
+    HSLTrip(DesfireRecord record) {
         byte[] useData = record.getData();
         long[] usefulData = new long[useData.length];
 
@@ -53,11 +53,11 @@ public class HSLTrip extends Trip {
 
         mArvo = HSLTransitData.bitsToLong(0, 1, usefulData);
 
-        mTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(1, 14, usefulData), HSLTransitData.bitsToLong(15, 11, usefulData));
-        mExpireTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(26, 14, usefulData), HSLTransitData.bitsToLong(40, 11, usefulData));
-
+        mTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(1, 14, usefulData),
+                HSLTransitData.bitsToLong(15, 11, usefulData));
+        mExpireTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(26, 14, usefulData),
+                HSLTransitData.bitsToLong(40, 11, usefulData));
         mFare = HSLTransitData.bitsToLong(51, 14, usefulData);
-
         mPax = HSLTransitData.bitsToLong(65, 5, usefulData);
         mLine = null;
         mVehicleNumber = -1;
@@ -71,16 +71,18 @@ public class HSLTrip extends Trip {
     }
 
     public static final Creator<HSLTrip> CREATOR = new Creator<HSLTrip>() {
+        @Override
         public HSLTrip createFromParcel(Parcel parcel) {
             return new HSLTrip(parcel);
         }
 
+        @Override
         public HSLTrip[] newArray(int size) {
             return new HSLTrip[size];
         }
     };
 
-    HSLTrip(Parcel parcel) {
+    private HSLTrip(Parcel parcel) {
         // mArvo, mTimestamp, mExpireTimestamp, mFare, mPax, mNewBalance
         mArvo = parcel.readLong();
         mTimestamp = parcel.readLong();
@@ -92,24 +94,27 @@ public class HSLTrip extends Trip {
         mVehicleNumber = -1;
     }
 
-    public HSLTrip() {
-        mArvo = mTimestamp = mExpireTimestamp = mFare = mPax = mNewBalance = mVehicleNumber = -1;
-        mLine = null;
+    HSLTrip() {
+        mNewBalance = -1;
     }
 
-    @Override public long getTimestamp() {
+    @Override
+    public long getTimestamp() {
         return mTimestamp;
     }
 
-    @Override public long getExitTimestamp() {
+    @Override
+    public long getExitTimestamp() {
         return 0;
     }
 
-    @Override public String getAgencyName() {
+    @Override
+    public String getAgencyName() {
         FareBotApplication app = FareBotApplication.getInstance();
-        String pax = app.getString(R.string.hsl_person_format, mPax);
+        String pax = app.getString(R.string.hsl_person_format, String.valueOf(mPax));
         if (mArvo == 1) {
-            String mins = app.getString(R.string.hsl_mins_format, ((this.mExpireTimestamp - this.mTimestamp) / 60));
+            String mins = app.getString(R.string.hsl_mins_format,
+                    String.valueOf((this.mExpireTimestamp - this.mTimestamp) / 60));
             String type = app.getString(R.string.hsl_balance_ticket);
             return String.format("%s, %s, %s", type, pax, mins);
         } else {
@@ -118,72 +123,89 @@ public class HSLTrip extends Trip {
         }
     }
 
-    @Override public String getShortAgencyName() {
+    @Override
+    public String getShortAgencyName() {
         return getAgencyName();
     }
 
-    @Override public String getRouteName() {
+    @Override
+    public String getRouteName() {
         if (mLine != null) {
-             // FIXME: i18n
+            // FIXME: i18n
             return String.format("Line %s, Vehicle %s", mLine.substring(1), mVehicleNumber);
         }
         return null;
     }
 
-    @Override public String getFareString() {
+    @Override
+    public String getFareString() {
         return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mFare / 100.0);
     }
 
-    @Override public boolean hasFare() {
+    @Override
+    public boolean hasFare() {
         return true;
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mNewBalance / 100);
     }
 
-    @Override public String getEndStationName() {
+    @Override
+    public String getEndStationName() {
         return null;
     }
 
-    @Override public Station getEndStation() {
+    @Override
+    public Station getEndStation() {
         return null;
     }
 
-    @Override public Mode getMode() {
+    @Override
+    public Mode getMode() {
         if (mLine != null) {
-            if (mLine.equals("1300"))
+            if (mLine.equals("1300")) {
                 return Mode.METRO;
-            if (mLine.equals("1019"))
+            }
+            if (mLine.equals("1019")) {
                 return Mode.FERRY;
-            if (mLine.startsWith("100") || mLine.equals("1010"))
+            }
+            if (mLine.startsWith("100") || mLine.equals("1010")) {
                 return Mode.TRAM;
-            if (mLine.startsWith("3"))
+            }
+            if (mLine.startsWith("3")) {
                 return Mode.TRAIN;
+            }
             return Mode.BUS;
         } else {
             return Mode.BUS;
         }
     }
 
-    @Override public boolean hasTime() {
+    @Override
+    public boolean hasTime() {
         return false;
     }
 
     public long getCoachNumber() {
-        if (mVehicleNumber > -1)
+        if (mVehicleNumber > -1) {
             return mVehicleNumber;
+        }
         return mPax;
     }
 
-    @Override public String getStartStationName() {
+    @Override
+    public String getStartStationName() {
         return null;
     }
 
-    @Override public Station getStartStation() {
+    @Override
+    public Station getStartStation() {
         return null;
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         // mArvo, mTimestamp, mExpireTimestamp, mFare, mPax, mNewBalance
         parcel.writeLong(mArvo);
@@ -194,6 +216,7 @@ public class HSLTrip extends Trip {
         parcel.writeLong(mNewBalance);
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }

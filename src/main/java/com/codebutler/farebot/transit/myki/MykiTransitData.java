@@ -30,16 +30,30 @@ import com.codebutler.farebot.util.Utils;
 
 /**
  * Transit data type for Myki (Melbourne, AU).
- *
+ * <p>
  * This is a very limited implementation of reading Myki, because most of the data is stored in
  * locked files.
- *
+ * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Myki
  */
 public class MykiTransitData extends StubTransitData {
+
     public static final String NAME = "Myki";
-    private long   mSerialNumber1;
-    private long   mSerialNumber2;
+
+    public static final Creator<MykiTransitData> CREATOR = new Creator<MykiTransitData>() {
+        @Override
+        public MykiTransitData createFromParcel(Parcel source) {
+            return new MykiTransitData(source);
+        }
+
+        @Override
+        public MykiTransitData[] newArray(int size) {
+            return new MykiTransitData[size];
+        }
+    };
+
+    private long mSerialNumber1;
+    private long mSerialNumber2;
 
     public static boolean check(Card card) {
         return (card instanceof DesfireCard)
@@ -61,16 +75,18 @@ public class MykiTransitData extends StubTransitData {
         try {
             mSerialNumber1 = Utils.getBitsFromBuffer(metadata, 96, 32);
             mSerialNumber2 = Utils.getBitsFromBuffer(metadata, 64, 32);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException("Error parsing Myki data", ex);
         }
     }
 
-    @Override public String getCardName() {
+    @Override
+    public String getCardName() {
         return NAME;
     }
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         return formatSerialNumber(mSerialNumber1, mSerialNumber2);
     }
 
@@ -89,6 +105,7 @@ public class MykiTransitData extends StubTransitData {
         return new TransitIdentity(NAME, formatSerialNumber(serialNumber1, serialNumber2));
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeLong(mSerialNumber1);
         parcel.writeLong(mSerialNumber2);

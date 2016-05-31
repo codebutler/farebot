@@ -31,15 +31,20 @@ public abstract class Subscription implements Parcelable {
     public abstract int getId();
 
     public abstract Date getValidFrom();
+
     public abstract Date getValidTo();
 
     public abstract String getAgencyName();
+
     public abstract String getShortAgencyName();
 
     public abstract int getMachineId();
+
     public abstract String getSubscriptionName();
+
     public abstract String getActivation();
 
+    @Override
     public final int describeContents() {
         return 0;
     }

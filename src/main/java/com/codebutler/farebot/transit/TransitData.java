@@ -30,7 +30,9 @@ import java.util.List;
 
 public abstract class TransitData implements Parcelable {
     public abstract String getBalanceString();
+
     public abstract String getSerialNumber();
+
     public abstract Trip[] getTrips();
 
     public Refill[] getRefills() {
@@ -38,7 +40,9 @@ public abstract class TransitData implements Parcelable {
     }
 
     public abstract Subscription[] getSubscriptions();
+
     public abstract List<ListItem> getInfo();
+
     public abstract String getCardName();
 
     /**
@@ -51,6 +55,7 @@ public abstract class TransitData implements Parcelable {
         return false;
     }
 
+    @Override
     public final int describeContents() {
         return 0;
     }

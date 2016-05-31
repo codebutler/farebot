@@ -16,7 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.stub;
+
+import android.os.Parcel;
 
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
@@ -24,11 +27,27 @@ import com.codebutler.farebot.transit.TransitIdentity;
 
 /**
  * Stub implementation for Adelaide Metrocard (AU).
- *
+ * <p>
  * https://github.com/micolous/metrodroid/wiki/Metrocard-%28Adelaide%29
  */
 public class AdelaideMetrocardStubTransitData extends StubTransitData {
-    public AdelaideMetrocardStubTransitData(Card card) {}
+
+    public static final Creator<AdelaideMetrocardStubTransitData> CREATOR
+            = new Creator<AdelaideMetrocardStubTransitData>() {
+        @Override
+        public AdelaideMetrocardStubTransitData createFromParcel(Parcel source) {
+            return new AdelaideMetrocardStubTransitData();
+        }
+
+        @Override
+        public AdelaideMetrocardStubTransitData[] newArray(int size) {
+            return new AdelaideMetrocardStubTransitData[size];
+        }
+    };
+
+    public AdelaideMetrocardStubTransitData(Card card) { }
+
+    private AdelaideMetrocardStubTransitData() { }
 
     @Override
     public String getCardName() {

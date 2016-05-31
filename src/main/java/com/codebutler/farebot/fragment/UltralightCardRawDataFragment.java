@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.fragment;
 
 import android.app.Activity;
@@ -42,10 +43,12 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
 
     private UltralightCard mCard;
 
+    @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = (UltralightCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
+        mCard = (UltralightCard) Card.fromXml(serializer,
+                getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         setListAdapter(new UltralightRawDataAdapter(getActivity(), mCard));
     }
 
@@ -97,7 +100,8 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = mActivity.getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+                view = mActivity.getLayoutInflater()
+                        .inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
             }
 
             UltralightPage sector = (UltralightPage) getGroup(groupPosition);
@@ -110,15 +114,22 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
         }
 
         @Override
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        public View getChildView(
+                int groupPosition,
+                int childPosition,
+                boolean isLastChild,
+                View convertView,
+                ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = mActivity.getLayoutInflater().inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
+                view = mActivity.getLayoutInflater()
+                        .inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
             }
 
             byte[] block = (byte[]) getChild(groupPosition, childPosition);
 
-            //((TextView) view.findViewById(android.R.id.text1)).setText(mActivity.getString(R.string.block_title_format, block.getIndex()));
+            //((TextView) view.findViewById(android.R.id.text1))
+            // .setText(mActivity.getString(R.string.block_title_format, block.getIndex()));
             ((TextView) view.findViewById(android.R.id.text2)).setText(Utils.getHexString(block));
 
             return view;

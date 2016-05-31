@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.seq_go.record;
 
 import com.codebutler.farebot.util.Utils;
@@ -30,7 +31,9 @@ public class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoB
     private int mBalance;
 
     public static SeqGoBalanceRecord recordFromBytes(byte[] input) {
-        if (input[0] != 0x01) throw new AssertionError();
+        if (input[0] != 0x01) {
+            throw new AssertionError();
+        }
 
 
         SeqGoBalanceRecord record = new SeqGoBalanceRecord();
@@ -43,10 +46,12 @@ public class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoB
         return record;
     }
 
-    protected SeqGoBalanceRecord() {}
+    private SeqGoBalanceRecord() {
+    }
 
     /**
      * The balance of the card, in cents.
+     *
      * @return int number of cents.
      */
     public int getBalance() {

@@ -53,10 +53,12 @@ public class SuicaTransitData extends TransitData {
     private SuicaTrip[] mTrips;
 
     public static final Creator<SuicaTransitData> CREATOR = new Creator<SuicaTransitData>() {
+        @Override
         public SuicaTransitData createFromParcel(Parcel parcel) {
             return new SuicaTransitData(parcel);
         }
 
+        @Override
         public SuicaTransitData[] newArray(int size) {
             return new SuicaTransitData[size];
         }
@@ -70,7 +72,7 @@ public class SuicaTransitData extends TransitData {
         return new TransitIdentity("Suica", null); // FIXME: Could be ICOCA, etc.
     }
 
-    public SuicaTransitData(Parcel parcel) {
+    private SuicaTransitData(Parcel parcel) {
         mTrips = new SuicaTrip[parcel.readInt()];
         parcel.readTypedArray(mTrips, SuicaTrip.CREATOR);
     }
@@ -103,33 +105,41 @@ public class SuicaTransitData extends TransitData {
         mTrips = trips.toArray(new SuicaTrip[trips.size()]);
     }
 
-    @Override public String getBalanceString() {
-        if (mTrips.length > 0)
+    @Override
+    public String getBalanceString() {
+        if (mTrips.length > 0) {
             return mTrips[0].getBalanceString();
+        }
         return null;
     }
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         // FIXME: Find where this is on the card.
         return null;
     }
 
-    @Override public Trip[] getTrips() {
+    @Override
+    public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override public Subscription[] getSubscriptions() {
+    @Override
+    public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override public List<ListItem> getInfo() {
+    @Override
+    public List<ListItem> getInfo() {
         return null;
     }
 
-    @Override public String getCardName() {
+    @Override
+    public String getCardName() {
         return "Suica"; // FIXME: Could be ICOCA, etc.
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mTrips.length);
         parcel.writeTypedArray(mTrips, flags);

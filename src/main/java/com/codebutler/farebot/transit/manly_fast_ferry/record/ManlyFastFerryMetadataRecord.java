@@ -38,12 +38,10 @@ public class ManlyFastFerryMetadataRecord extends ManlyFastFerryRegularRecord {
         assert input[0] == 0x02;
         assert input[1] == 0x03;
 
+        final int epochDays = Utils.byteArrayToInt(input, 5, 2);
+
         ManlyFastFerryMetadataRecord record = new ManlyFastFerryMetadataRecord();
-
-        int epochDays = Utils.byteArrayToInt(input, 5, 2);
-
         record.mCardSerial = Utils.getHexString(Arrays.copyOfRange(input, 7, 11));
-
         record.mEpochDate = new GregorianCalendar();
         record.mEpochDate.setTimeInMillis(MANLY_BASE_EPOCH.getTimeInMillis());
         record.mEpochDate.add(Calendar.DATE, epochDays);
@@ -51,7 +49,8 @@ public class ManlyFastFerryMetadataRecord extends ManlyFastFerryRegularRecord {
         return record;
     }
 
-    protected ManlyFastFerryMetadataRecord() { }
+    private ManlyFastFerryMetadataRecord() {
+    }
 
     public String getCardSerial() {
         return mCardSerial;

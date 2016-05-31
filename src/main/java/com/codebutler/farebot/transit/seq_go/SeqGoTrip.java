@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.seq_go;
 
 import android.os.Parcel;
@@ -163,7 +164,7 @@ public class SeqGoTrip extends Trip {
         parcel.writeInt(mEndStation);
     }
 
-    public SeqGoTrip(Parcel parcel) {
+    private SeqGoTrip(Parcel parcel) {
         mJourneyId = parcel.readInt();
         long startTime = parcel.readLong();
         if (startTime != 0) {
@@ -182,14 +183,17 @@ public class SeqGoTrip extends Trip {
         mEndStation = parcel.readInt();
     }
 
-    public SeqGoTrip() {}
+    public SeqGoTrip() {
+    }
 
     public static final Parcelable.Creator<SeqGoTrip> CREATOR = new Parcelable.Creator<SeqGoTrip>() {
 
+        @Override
         public SeqGoTrip createFromParcel(Parcel in) {
             return new SeqGoTrip(in);
         }
 
+        @Override
         public SeqGoTrip[] newArray(int size) {
             return new SeqGoTrip[size];
         }

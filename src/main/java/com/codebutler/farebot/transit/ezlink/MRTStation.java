@@ -23,17 +23,38 @@
 
 package com.codebutler.farebot.transit.ezlink;
 
+import android.os.Parcel;
+
 import com.codebutler.farebot.transit.Station;
 
-public class MRTStation extends Station {
+class MRTStation extends Station {
+
+    public static final Creator<MRTStation> CREATOR = new Creator<MRTStation>() {
+        @Override
+        public MRTStation createFromParcel(Parcel source) {
+            return new MRTStation(source);
+        }
+
+        @Override
+        public MRTStation[] newArray(int size) {
+            return new MRTStation[size];
+        }
+    };
+
     private final String mCode;
     private final String mAbbreviation;
 
-    public MRTStation(String name, String code, String abbreviation, String latitude, String longitude) {
+    MRTStation(String name, String code, String abbreviation, String latitude, String longitude) {
         super(name, latitude, longitude);
 
-        mCode         = code;
+        mCode = code;
         mAbbreviation = abbreviation;
+    }
+
+    private MRTStation(Parcel source) {
+        super(source);
+        mCode = source.readString();
+        mAbbreviation = source.readString();
     }
 
     public String getCode() {
@@ -42,5 +63,12 @@ public class MRTStation extends Station {
 
     public String getAbbreviation() {
         return mAbbreviation;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        super.writeToParcel(parcel, flags);
+        parcel.writeString(mCode);
+        parcel.writeString(mAbbreviation);
     }
 }

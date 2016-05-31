@@ -9,7 +9,7 @@ import org.simpleframework.xml.Root;
 /**
  * Represents a page of data on a Mifare Ultralight (4 bytes)
  */
-@Root(name="page")
+@Root(name = "page")
 public class UltralightPage {
     @Attribute(name = "index")
     private int mIndex;

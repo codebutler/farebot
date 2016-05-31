@@ -21,6 +21,7 @@ package com.codebutler.farebot.transit.seq_go.record;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.seq_go.SeqGoData;
@@ -34,15 +35,29 @@ import java.util.GregorianCalendar;
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#tap-record-type
  */
 public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparable<SeqGoTapRecord> {
+
+    public static final Creator<SeqGoTapRecord> CREATOR = new Creator<SeqGoTapRecord>() {
+        @Override
+        public SeqGoTapRecord createFromParcel(Parcel source) {
+            return new SeqGoTapRecord(source);
+        }
+
+        @Override
+        public SeqGoTapRecord[] newArray(int size) {
+            return new SeqGoTapRecord[size];
+        }
+    };
+
     private GregorianCalendar mTimestamp;
     private int mMode;
     private int mJourney;
     private int mStation;
     private int mChecksum;
 
-
     public static SeqGoTapRecord recordFromBytes(byte[] input) {
-        if (input[0] != 0x31) throw new AssertionError("not a tap record");
+        if (input[0] != 0x31) {
+            throw new AssertionError("not a tap record");
+        }
 
         SeqGoTapRecord record = new SeqGoTapRecord();
 
@@ -63,7 +78,8 @@ public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparabl
         return record;
     }
 
-    protected SeqGoTapRecord() {}
+    private SeqGoTapRecord() {
+    }
 
     @Override
     public int describeContents() {
@@ -79,7 +95,7 @@ public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparabl
         parcel.writeInt(mChecksum);
     }
 
-    public SeqGoTapRecord(Parcel parcel) {
+    private SeqGoTapRecord(Parcel parcel) {
         mTimestamp = new GregorianCalendar();
         mTimestamp.setTimeInMillis(parcel.readLong());
         mMode = parcel.readInt();
@@ -112,15 +128,18 @@ public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparabl
         return mChecksum;
     }
 
-
     @Override
-    public int compareTo(SeqGoTapRecord rhs) {
+    public int compareTo(@NonNull SeqGoTapRecord rhs) {
         // Group by journey, then by timestamp.
         // First trip in a journey goes first, and should (generally) be in pairs.
         if (rhs.mJourney == this.mJourney) {
             return this.mTimestamp.compareTo(rhs.mTimestamp);
         } else {
-            return Integer.compare(this.mJourney, rhs.mJourney);
+            return integerCompare(this.mJourney, rhs.mJourney);
         }
+    }
+
+    private static int integerCompare(int lhs, int rhs) {
+        return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
     }
 }

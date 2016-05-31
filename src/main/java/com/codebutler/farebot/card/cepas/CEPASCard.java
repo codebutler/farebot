@@ -40,10 +40,10 @@ import org.simpleframework.xml.Root;
 import java.util.Date;
 import java.util.List;
 
-@Root(name="card")
+@Root(name = "card")
 public class CEPASCard extends Card {
-    @ElementList(name="purses") private List<CEPASPurse> mPurses;
-    @ElementList(name="histories") private List<CEPASHistory> mHistories;
+    @ElementList(name = "purses") private List<CEPASPurse> mPurses;
+    @ElementList(name = "histories") private List<CEPASHistory> mHistories;
 
     public static CEPASCard dumpTag(Tag tag) throws Exception {
         IsoDep tech = IsoDep.get(tag);
@@ -69,8 +69,9 @@ public class CEPASCard extends Card {
                 }
             }
         } finally {
-            if (tech.isConnected())
+            if (tech.isConnected()) {
                 tech.close();
+            }
         }
 
         return new CEPASCard(tag.getId(), new Date(), cepasPurses, cepasHistories);
@@ -84,15 +85,19 @@ public class CEPASCard extends Card {
 
     private CEPASCard() { /* For XML Serializer */ }
 
-    @Override public TransitIdentity parseTransitIdentity() {
-        if (EZLinkTransitData.check(this))
+    @Override
+    public TransitIdentity parseTransitIdentity() {
+        if (EZLinkTransitData.check(this)) {
             return EZLinkTransitData.parseTransitIdentity(this);
+        }
         return null;
     }
 
-    @Override public TransitData parseTransitData() {
-        if (EZLinkTransitData.check(this))
-           return new EZLinkTransitData(this);
+    @Override
+    public TransitData parseTransitData() {
+        if (EZLinkTransitData.check(this)) {
+            return new EZLinkTransitData(this);
+        }
         return null;
     }
 

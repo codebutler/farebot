@@ -52,14 +52,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Root(name="card")
+@Root(name = "card")
 @CardRawDataFragmentClass(ClassicCardRawDataFragment.class)
 @CardHasManufacturingInfo(false)
 public class ClassicCard extends Card {
-    public static final byte[] PREAMBLE_KEY = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00 };
+    private static final byte[] PREAMBLE_KEY = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x00};
 
-    @ElementList(name="sectors") private List<ClassicSector> mSectors;
+    @ElementList(name = "sectors") private List<ClassicSector> mSectors;
 
     private ClassicCard() { /* For XML Serializer */ }
 
@@ -119,9 +119,11 @@ public class ClassicCard extends Card {
                                 }
 
                                 if (cardKeys[keyIndex].getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, cardKeys[keyIndex].getKey());
+                                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex,
+                                            cardKeys[keyIndex].getKey());
                                 } else {
-                                    authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, cardKeys[keyIndex].getKey());
+                                    authSuccess = tech.authenticateSectorWithKeyB(sectorIndex,
+                                            cardKeys[keyIndex].getKey());
                                 }
 
                                 if (authSuccess) {
@@ -159,7 +161,8 @@ public class ClassicCard extends Card {
         }
     }
 
-    @Override public TransitIdentity parseTransitIdentity() {
+    @Override
+    public TransitIdentity parseTransitIdentity() {
         // All .check() methods should work without a key, and throw an UnauthorizedException
         // Otherwise UnauthorizedClassicTransitData will not trigger
         if (OVChipTransitData.check(this)) {
@@ -181,7 +184,8 @@ public class ClassicCard extends Card {
         return null;
     }
 
-    @Override public TransitData parseTransitData() {
+    @Override
+    public TransitData parseTransitData() {
         if (OVChipTransitData.check(this)) {
             return new OVChipTransitData(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {

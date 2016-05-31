@@ -37,21 +37,23 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class EdyTrip extends Trip {
+class EdyTrip extends Trip {
+
     private final int mProcessType;
     private final int mSequenceNumber;
     private final Date mTimestamp;
     private final int mTransactionAmount;
     private final int mBalance;
 
-    public EdyTrip(FelicaBlock block) {
+    EdyTrip(FelicaBlock block) {
         byte[] data = block.getData();
 
         // Data Offsets with values
         // ------------------------
         // 0x00    type (0x20 = payment, 0x02 = charge, 0x04 = gift)
         // 0x01    sequence number (3 bytes, big-endian)
-        // 0x04    date/time (upper 15 bits - added as day offset, lower 17 bits - added as second offset to Jan 1, 2000 00:00:00)
+        // 0x04    date/time (upper 15 bits - added as day offset,
+        //         lower 17 bits - added as second offset to Jan 1, 2000 00:00:00)
         // 0x08    transaction amount (big-endian)
         // 0x0c    balance (big-endian)
 
@@ -63,23 +65,26 @@ public class EdyTrip extends Trip {
     }
 
     public static final Creator<EdyTrip> CREATOR = new Creator<EdyTrip>() {
+        @Override
         public EdyTrip createFromParcel(Parcel parcel) {
             return new EdyTrip(parcel);
         }
 
+        @Override
         public EdyTrip[] newArray(int size) {
             return new EdyTrip[size];
         }
     };
 
-    public EdyTrip(Parcel parcel) {
+    private EdyTrip(Parcel parcel) {
         mProcessType = parcel.readInt();
         mSequenceNumber = parcel.readInt();
-        mTimestamp  = new Date(parcel.readLong());
+        mTimestamp = new Date(parcel.readLong());
         mTransactionAmount = parcel.readInt();
         mBalance = parcel.readInt();
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mProcessType);
         parcel.writeInt(mSequenceNumber);
@@ -88,6 +93,7 @@ public class EdyTrip extends Trip {
         parcel.writeInt(mBalance);
     }
 
+    @Override
     public Mode getMode() {
         if (mProcessType == EdyTransitData.FELICA_MODE_EDY_DEBIT) {
             return Mode.POS;
@@ -100,25 +106,31 @@ public class EdyTrip extends Trip {
         }
     }
 
+    @Override
     public long getTimestamp() {
-        if (mTimestamp != null)
+        if (mTimestamp != null) {
             return mTimestamp.getTime() / 1000;
-        else
+        } else {
             return 0;
+        }
     }
 
+    @Override
     public boolean hasFare() {
         return true;
     }
 
+    @Override
     public String getFareString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
-        if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT)
+        if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
             return "+" + format.format(mTransactionAmount);
+        }
         return format.format(mTransactionAmount);
     }
 
+    @Override
     public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
@@ -126,46 +138,64 @@ public class EdyTrip extends Trip {
     }
 
     // use agency name for the tranaction number
+    @Override
     public String getShortAgencyName() {
         return getAgencyName();
     }
+
+    @Override
     public String getAgencyName() {
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setMinimumIntegerDigits(8);
         format.setGroupingUsed(false);
         Application app = FareBotApplication.getInstance();
         String str;
-        if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT)
+        if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
             str = app.getString(R.string.felica_process_charge);
-        else
+        } else {
             str = app.getString(R.string.felica_process_merchandise_purchase);
+        }
         str += " " + app.getString(R.string.transaction_sequence) + format.format(mSequenceNumber);
         return str;
     }
 
+    @Override
     public boolean hasTime() {
         return mTimestamp != null;
     }
 
     // unused
+    @Override
     public String getRouteName() {
         return null;
     }
+
+    @Override
     public String getStartStationName() {
         return null;
     }
+
+    @Override
     public Station getStartStation() {
         return null;
     }
+
+    @Override
     public String getEndStationName() {
         return null;
     }
+
+    @Override
     public Station getEndStation() {
         return null;
     }
+
+    @Override
     public int describeContents() {
         return 0;
     }
+
+    @Override
     public long getExitTimestamp() {
         return 0;
     }

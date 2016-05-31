@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.codebutler.farebot.transit.opal;
 
+package com.codebutler.farebot.transit.opal;
 
 import android.os.Parcel;
 
@@ -35,7 +35,19 @@ import java.util.Date;
  *
  * Dates given are not valid.
  */
-public class OpalSubscription extends Subscription {
+class OpalSubscription extends Subscription {
+
+    public static final Creator<OpalSubscription> CREATOR = new Creator<OpalSubscription>() {
+        @Override
+        public OpalSubscription createFromParcel(Parcel source) {
+            return new OpalSubscription();
+        }
+
+        @Override
+        public OpalSubscription[] newArray(int size) {
+            return new OpalSubscription[size];
+        }
+    };
 
     @Override
     public int getId() {
@@ -80,6 +92,5 @@ public class OpalSubscription extends Subscription {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-    }
+    public void writeToParcel(Parcel parcel, int i) { }
 }

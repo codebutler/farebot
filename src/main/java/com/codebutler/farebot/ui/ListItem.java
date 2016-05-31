@@ -25,8 +25,8 @@ package com.codebutler.farebot.ui;
 import com.codebutler.farebot.util.Utils;
 
 public class ListItem {
-    protected final String mText1;
-    protected final String mText2;
+    private final String mText1;
+    private final String mText2;
 
     public ListItem(int nameResource, int valueResource) {
         this(nameResource, Utils.localizeString(valueResource));

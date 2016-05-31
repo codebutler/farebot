@@ -50,47 +50,58 @@ import org.simpleframework.xml.Serializer;
 public class DesfireCardRawDataFragment extends ExpandableListFragment {
     private DesfireCard mCard;
 
-    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_card_raw_data, null);
     }
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
         mCard = (DesfireCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
         setListAdapter(new BaseExpandableListAdapter() {
+            @Override
             public int getGroupCount() {
                 return mCard.getApplications().size();
             }
 
+            @Override
             public int getChildrenCount(int groupPosition) {
                 return mCard.getApplications().get(groupPosition).getFiles().size();
             }
 
+            @Override
             public Object getGroup(int groupPosition) {
                 return mCard.getApplications().get(groupPosition);
             }
 
+            @Override
             public Object getChild(int groupPosition, int childPosition) {
                 return mCard.getApplications().get(groupPosition).getFiles().get(childPosition);
             }
 
+            @Override
             public long getGroupId(int groupPosition) {
                 return mCard.getApplications().get(groupPosition).getId();
             }
 
+            @Override
             public long getChildId(int groupPosition, int childPosition) {
                 return mCard.getApplications().get(groupPosition).getFiles().get(childPosition).getId();
             }
 
+            @Override
             public boolean hasStableIds() {
                 return true;
             }
 
+            @Override
             public boolean isChildSelectable(int groupPosition, int childPosition) {
                 return true;
             }
 
+            @Override
             public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                 if (convertView == null) {
                     LayoutInflater layoutInflater = getActivity().getLayoutInflater();
@@ -106,6 +117,7 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
                 return convertView;
             }
 
+            @Override
             public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
                                      ViewGroup parent) {
                 if (convertView == null) {
@@ -157,8 +169,9 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
         });
     }
 
-    @Override public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition,
-                                              long id) {
+    @Override
+    public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition,
+                                    long id) {
         DesfireFile file = (DesfireFile) getExpandableListAdapter().getChild(groupPosition, childPosition);
 
         if (file instanceof InvalidDesfireFile) {
@@ -168,10 +181,10 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
         String data = Utils.getHexString(file.getData(), "");
 
         new AlertDialog.Builder(getActivity())
-            .setTitle("File Content")
-            .setPositiveButton(android.R.string.ok, null)
-            .setMessage(data)
-            .show();
+                .setTitle("File Content")
+                .setPositiveButton(android.R.string.ok, null)
+                .setMessage(data)
+                .show();
 
         return true;
     }

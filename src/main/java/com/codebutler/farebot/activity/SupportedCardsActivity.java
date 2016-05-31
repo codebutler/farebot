@@ -55,6 +55,7 @@ import java.util.ArrayList;
  * @author Eric Butler, Michael Farrell
  */
 public class SupportedCardsActivity extends Activity {
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_supported_cards);
@@ -64,7 +65,8 @@ public class SupportedCardsActivity extends Activity {
         ((ListView) findViewById(R.id.gallery)).setAdapter(new CardsAdapter(this));
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -75,7 +77,7 @@ public class SupportedCardsActivity extends Activity {
     }
 
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
-        public CardsAdapter(Context context) {
+        CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
 
             add(new CardInfo(R.drawable.bilheteunicosp_card, "Bilhete Único",
@@ -165,7 +167,8 @@ public class SupportedCardsActivity extends Activity {
 
         }
 
-        @Override public View getView(int position, View convertView, ViewGroup group) {
+        @Override
+        public View getView(int position, View convertView, ViewGroup group) {
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.supported_card, null);
             }
@@ -231,21 +234,35 @@ public class SupportedCardsActivity extends Activity {
         private CardInfo(int imageId, String name, int locationId, CardType cardType) {
             this(imageId, name, locationId, cardType, false);
         }
+
         private CardInfo(int imageId, String name, int locationId, CardType cardType, boolean keysRequired) {
             this(imageId, name, locationId, cardType, keysRequired, false);
         }
 
-        private CardInfo(int imageId, String name, int locationId, CardType cardType, boolean keysRequired, boolean preview) {
+        private CardInfo(
+                int imageId,
+                String name,
+                int locationId,
+                CardType cardType,
+                boolean keysRequired,
+                boolean preview) {
             this(imageId, name, locationId, cardType, keysRequired, false, 0);
         }
 
-        private CardInfo(int imageId, String name, int locationId, CardType cardType, boolean keysRequired, boolean preview, int resourceExtraNote) {
-            mImageId      = imageId;
-            mName         = name;
-            mLocationId   = locationId;
-            mCardType     = cardType;
+        private CardInfo(
+                int imageId,
+                String name,
+                int locationId,
+                CardType cardType,
+                boolean keysRequired,
+                boolean preview,
+                int resourceExtraNote) {
+            mImageId = imageId;
+            mName = name;
+            mLocationId = locationId;
+            mCardType = cardType;
             mKeysRequired = keysRequired;
-            mPreview      = preview;
+            mPreview = preview;
             mResourceExtraNote = resourceExtraNote;
         }
 
@@ -272,6 +289,7 @@ public class SupportedCardsActivity extends Activity {
         /**
          * Indicates if the card is a "preview" / beta decoder, with possibly
          * incomplete / incorrect data.
+         *
          * @return true if this is a beta version of the card decoder.
          */
         public boolean getPreview() {

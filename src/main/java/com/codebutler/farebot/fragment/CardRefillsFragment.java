@@ -41,6 +41,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class CardRefillsFragment extends ListFragment {
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -49,11 +50,12 @@ public class CardRefillsFragment extends ListFragment {
     }
 
     private static class RefillsListAdapter extends ArrayAdapter<Refill> {
-        public RefillsListAdapter(Context context, Refill[] refills) {
+        RefillsListAdapter(Context context, Refill[] refills) {
             super(context, 0, refills);
         }
 
-        @Override public View getView(int position, View convertView, ViewGroup parent) {
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
             Activity activity = (Activity) getContext();
             LayoutInflater inflater = activity.getLayoutInflater();
 
@@ -65,8 +67,8 @@ public class CardRefillsFragment extends ListFragment {
             Date date = new Date(refill.getTimestamp() * 1000);
 
             TextView dateTimeTextView = (TextView) convertView.findViewById(R.id.datetime_text_view);
-            TextView agencyTextView   = (TextView) convertView.findViewById(R.id.agency_text_view);
-            TextView amountTextView   = (TextView) convertView.findViewById(R.id.amount_text_view);
+            TextView agencyTextView = (TextView) convertView.findViewById(R.id.agency_text_view);
+            TextView amountTextView = (TextView) convertView.findViewById(R.id.amount_text_view);
 
             dateTimeTextView.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date));
             agencyTextView.setText(refill.getShortAgencyName());

@@ -34,7 +34,8 @@ import org.simpleframework.xml.stream.InputNode;
 import org.simpleframework.xml.stream.OutputNode;
 
 public class DesfireFileSettingsConverter implements Converter<DesfireFileSettings> {
-    @Override public DesfireFileSettings read(InputNode source) throws Exception {
+    @Override
+    public DesfireFileSettings read(InputNode source) throws Exception {
         byte fileType = -1;
         int fileSize = -1;
         byte commSetting = -1;
@@ -106,13 +107,21 @@ public class DesfireFileSettingsConverter implements Converter<DesfireFileSettin
                 return new RecordDesfireFileSettings(fileType, commSetting, accessRights, recordSize, maxRecords,
                         curRecords);
             case DesfireFileSettings.VALUE_FILE:
-                return new ValueDesfireFileSettings(fileType, commSetting, accessRights, lowerLimit, upperLimit, limitedCreditValue, limitedCreditEnabled);
+                return new ValueDesfireFileSettings(
+                        fileType,
+                        commSetting,
+                        accessRights,
+                        lowerLimit,
+                        upperLimit,
+                        limitedCreditValue,
+                        limitedCreditEnabled);
             default:
                 return new UnsupportedDesfireFileSettings(fileType);
         }
     }
 
-    @Override public void write(OutputNode node, DesfireFileSettings value) throws Exception {
+    @Override
+    public void write(OutputNode node, DesfireFileSettings value) throws Exception {
         throw new SkippableRegistryStrategy.SkipException();
     }
 }

@@ -30,10 +30,10 @@ import org.simpleframework.xml.Root;
 
 import java.util.List;
 
-@Root(name="service")
+@Root(name = "service")
 public class FelicaService {
-    @Attribute(name="code") private int mServiceCode;
-    @ElementList(name="blocks") private List<FelicaBlock> mBlocks;
+    @Attribute(name = "code") private int mServiceCode;
+    @ElementList(name = "blocks") private List<FelicaBlock> mBlocks;
 
     private FelicaService() { /* For XML Serializer */ }
 

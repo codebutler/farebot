@@ -24,9 +24,16 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.CallSuper;
 
 public class Station implements Parcelable {
-    private final String mCompanyName, mLineName, mStationName, mShortStationName, mLatitude, mLongitude;
+
+    private final String mCompanyName;
+    private final String mLineName;
+    private final String mStationName;
+    private final String mShortStationName;
+    private final String mLatitude;
+    private final String mLongitude;
 
     public Station(String stationName, String latitude, String longitude) {
         this(stationName, null, latitude, longitude);
@@ -36,31 +43,40 @@ public class Station implements Parcelable {
         this(null, null, stationName, shortStationName, latitude, longitude);
     }
 
-    public Station(String companyName, String lineName, String stationName, String shortStationName, String latitude, String longitude) {
-        mCompanyName      = companyName;
-        mLineName         = lineName;
-        mStationName      = stationName;
+    public Station(
+            String companyName,
+            String lineName,
+            String stationName,
+            String shortStationName,
+            String latitude,
+            String longitude) {
+        mCompanyName = companyName;
+        mLineName = lineName;
+        mStationName = stationName;
         mShortStationName = shortStationName;
-        mLatitude         = latitude;
-        mLongitude        = longitude;
+        mLatitude = latitude;
+        mLongitude = longitude;
     }
 
     public static final Creator<Station> CREATOR = new Creator<Station>() {
+        @Override
         public Station createFromParcel(Parcel parcel) {
             return new Station(parcel);
         }
+
+        @Override
         public Station[] newArray(int size) {
             return new Station[size];
         }
     };
 
-    private Station(Parcel parcel) {
-        mCompanyName      = parcel.readString();
-        mLineName         = parcel.readString();
-        mStationName      = parcel.readString();
+    protected Station(Parcel parcel) {
+        mCompanyName = parcel.readString();
+        mLineName = parcel.readString();
+        mStationName = parcel.readString();
         mShortStationName = parcel.readString();
-        mLatitude         = parcel.readString();
-        mLongitude        = parcel.readString();
+        mLatitude = parcel.readString();
+        mLongitude = parcel.readString();
     }
 
     public String getStationName() {
@@ -92,10 +108,13 @@ public class Station implements Parcelable {
                 && getLongitude() != null && !getLongitude().isEmpty();
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }
 
+    @Override
+    @CallSuper
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mCompanyName);
         parcel.writeString(mLineName);

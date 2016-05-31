@@ -28,12 +28,14 @@ import java.util.Calendar;
 import java.util.Date;
 
 final class EdyUtil {
-    private EdyUtil() { }
+    private EdyUtil() {
+    }
 
     static Date extractDate(byte[] data) {
         int fulloffset = Util.toInt(data[4], data[5], data[6], data[7]);
-        if (fulloffset == 0)
+        if (fulloffset == 0) {
             return null;
+        }
 
         int dateoffset = fulloffset >>> 17;
         int timeoffset = fulloffset & 0x1ffff;

@@ -29,6 +29,7 @@
  * Some of these resources have been translated into English at:
  * https://github.com/micolous/metrodroid/wiki/Suica
  */
+
 package com.codebutler.farebot.transit.suica;
 
 import android.os.Parcel;
@@ -58,7 +59,7 @@ public class SuicaTrip extends Trip {
 
     private final long mFare;
     private final Date mTimestamp;
-    private final int  mRegionCode;
+    private final int mRegionCode;
 
     private int mRailEntranceLineCode;
     private int mRailEntranceStationCode;
@@ -96,12 +97,12 @@ public class SuicaTrip extends Trip {
         mConsoleType = data[0];
         mProcessType = data[1];
 
-        mIsBus         = mConsoleType == (byte) 0x05;
+        mIsBus = mConsoleType == (byte) 0x05;
         mIsProductSale = (mConsoleType == (byte) 0xc7 || mConsoleType == (byte) 0xc8);
         mIsCharge = (mProcessType == (byte) 0x02);
 
         mTimestamp = SuicaUtil.extractDate(mIsProductSale, data);
-        mBalance   = (long) Util.toInt(data[11], data[10]);
+        mBalance = (long) Util.toInt(data[11], data[10]);
 
         mRegionCode = data[15] & 0xFF;
 
@@ -119,111 +120,130 @@ public class SuicaTrip extends Trip {
 
         if (!mIsProductSale && !mIsCharge) {
             if (mIsBus) {
-                mBusLineCode  = Util.toInt(data[6], data[7]);
-                mBusStopCode  = Util.toInt(data[8], data[9]);
+                mBusLineCode = Util.toInt(data[6], data[7]);
+                mBusStopCode = Util.toInt(data[8], data[9]);
                 mStartStation = SuicaUtil.getBusStop(mRegionCode, mBusLineCode, mBusStopCode);
 
             } else {
-                mRailEntranceLineCode    = data[6] & 0xFF;
+                mRailEntranceLineCode = data[6] & 0xFF;
                 mRailEntranceStationCode = data[7] & 0xFF;
-                mRailExitLineCode        = data[8] & 0xFF;
-                mRailExitStationCode     = data[9] & 0xFF;
+                mRailExitLineCode = data[8] & 0xFF;
+                mRailExitStationCode = data[9] & 0xFF;
                 mStartStation = SuicaUtil.getRailStation(mRegionCode, mRailEntranceLineCode, mRailEntranceStationCode);
-                mEndStation   = SuicaUtil.getRailStation(mRegionCode, mRailExitLineCode, mRailExitStationCode);
+                mEndStation = SuicaUtil.getRailStation(mRegionCode, mRailExitLineCode, mRailExitStationCode);
             }
         }
     }
 
     public static final Creator<SuicaTrip> CREATOR = new Creator<SuicaTrip>() {
+        @Override
         public SuicaTrip createFromParcel(Parcel parcel) {
             return new SuicaTrip(parcel);
         }
 
+        @Override
         public SuicaTrip[] newArray(int size) {
             return new SuicaTrip[size];
         }
     };
 
-    public SuicaTrip(Parcel parcel) {
+    private SuicaTrip(Parcel parcel) {
         mBalance = parcel.readLong();
 
         mConsoleType = parcel.readInt();
         mProcessType = parcel.readInt();
 
         mIsProductSale = (parcel.readInt() == 1);
-        mIsBus         = (parcel.readInt() == 1);
+        mIsBus = (parcel.readInt() == 1);
 
         mIsCharge = (parcel.readInt() == 1);
 
-        mFare       = parcel.readLong();
-        mTimestamp  = new Date(parcel.readLong());
+        mFare = parcel.readLong();
+        mTimestamp = new Date(parcel.readLong());
         mRegionCode = parcel.readInt();
 
-        mRailEntranceLineCode    = parcel.readInt();
+        mRailEntranceLineCode = parcel.readInt();
         mRailEntranceStationCode = parcel.readInt();
-        mRailExitLineCode        = parcel.readInt();
-        mRailExitStationCode     = parcel.readInt();
+        mRailExitLineCode = parcel.readInt();
+        mRailExitStationCode = parcel.readInt();
 
         mBusLineCode = parcel.readInt();
         mBusStopCode = parcel.readInt();
 
-        if (parcel.readInt() == 1)
+        if (parcel.readInt() == 1) {
             mStartStation = parcel.readParcelable(Station.class.getClassLoader());
-        if (parcel.readInt() == 1)
+        }
+        if (parcel.readInt() == 1) {
             mEndStation = parcel.readParcelable(Station.class.getClassLoader());
+        }
     }
 
-    @Override public long getTimestamp() {
-        if (mTimestamp != null)
+    @Override
+    public long getTimestamp() {
+        if (mTimestamp != null) {
             return mTimestamp.getTime() / 1000;
-        else
+        } else {
             return 0;
+        }
     }
 
-    @Override public long getExitTimestamp() {
+    @Override
+    public long getExitTimestamp() {
         return 0;
     }
 
+    @Override
     public boolean hasTime() {
         return mIsProductSale;
     }
 
-    @Override public String getRouteName() {
-        return (mStartStation != null) ?  mStartStation.getLineName() : (getConsoleType() + " " + getProcessType());
+    @Override
+    public String getRouteName() {
+        return (mStartStation != null) ? mStartStation.getLineName() : (getConsoleType() + " " + getProcessType());
     }
 
-    @Override public String getAgencyName() {
+    @Override
+    public String getAgencyName() {
         return (mStartStation != null) ? mStartStation.getCompanyName() : null;
     }
 
-    @Override public String getShortAgencyName() {
+    @Override
+    public String getShortAgencyName() {
         return getAgencyName();
     }
 
-    @Override public boolean hasFare() {
+    @Override
+    public boolean hasFare() {
         return true;
     }
 
-    @Override public String getFareString() {
+    @Override
+    public String getFareString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
-        if (mFare < 0) return "+" + format.format(-mFare);
-        else return format.format(mFare);
+        if (mFare < 0) {
+            return "+" + format.format(-mFare);
+        } else {
+            return format.format(mFare);
+        }
     }
 
     public long getBalance() {
         return mBalance;
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
         return format.format(mBalance);
     }
 
-    @Override public String getStartStationName() {
-        if (mIsProductSale || mIsCharge)
+    @Override
+    public String getStartStationName() {
+        if (mIsProductSale || mIsCharge) {
             return null;
+        }
 
         if (mStartStation != null) {
             return mStartStation.getShortStationName();
@@ -239,13 +259,16 @@ public class SuicaTrip extends Trip {
         }
     }
 
-    @Override public Station getStartStation() {
+    @Override
+    public Station getStartStation() {
         return mStartStation;
     }
 
-    @Override public String getEndStationName() {
-        if (mIsProductSale || mIsCharge || isTVM())
+    @Override
+    public String getEndStationName() {
+        if (mIsProductSale || mIsCharge || isTVM()) {
             return null;
+        }
 
         if (mEndStation != null) {
             return mEndStation.getShortStationName();
@@ -257,11 +280,13 @@ public class SuicaTrip extends Trip {
         return null;
     }
 
-    @Override public Station getEndStation() {
+    @Override
+    public Station getEndStation() {
         return mEndStation;
     }
 
-    @Override public Mode getMode() {
+    @Override
+    public Mode getMode() {
         int consoleType = mConsoleType & 0xFF;
         if (isTVM()) {
             return Mode.TICKET_MACHINE;
@@ -276,11 +301,11 @@ public class SuicaTrip extends Trip {
         }
     }
 
-    public String getConsoleType() {
+    private String getConsoleType() {
         return SuicaUtil.getConsoleTypeName(mConsoleType);
     }
 
-    public String getProcessType() {
+    private String getProcessType() {
         return SuicaUtil.getProcessTypeName(mProcessType);
     }
 
@@ -326,6 +351,7 @@ public class SuicaTrip extends Trip {
     }
     */
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeLong(mBalance);
 
@@ -364,13 +390,14 @@ public class SuicaTrip extends Trip {
         }
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }
 
     private boolean isTVM() {
         int consoleType = mConsoleType & 0xFF;
-        int[] tvmConsoleTypes = { 0x03, 0x07, 0x08, 0x12, 0x13, 0x14, 0x15 };
+        int[] tvmConsoleTypes = {0x03, 0x07, 0x08, 0x12, 0x13, 0x14, 0x15};
         return ArrayUtils.contains(tvmConsoleTypes, consoleType);
     }
 }

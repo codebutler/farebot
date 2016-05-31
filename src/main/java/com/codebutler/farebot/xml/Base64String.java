@@ -39,15 +39,18 @@ public class Base64String {
         return mData;
     }
 
-    public String toBase64() {
+    private String toBase64() {
         return Base64.encodeToString(mData, Base64.NO_WRAP);
     }
 
     public static final class Transform implements org.simpleframework.xml.transform.Transform<Base64String> {
-        @Override public Base64String read(String value) throws Exception {
+        @Override
+        public Base64String read(String value) throws Exception {
             return new Base64String(value);
         }
-        @Override public String write(Base64String value) throws Exception {
+
+        @Override
+        public String write(Base64String value) throws Exception {
             return value.toBase64();
         }
     }

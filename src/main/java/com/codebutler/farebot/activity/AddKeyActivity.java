@@ -62,35 +62,40 @@ public class AddKeyActivity extends Activity {
 
     private NfcAdapter mNfcAdapter;
     private PendingIntent mPendingIntent;
-    private String[][] mTechLists = new String[][] {
-        new String[] { IsoDep.class.getName() },
-        new String[] { MifareClassic.class.getName() },
-        new String[] { MifareUltralight.class.getName() },
-        new String[] { NfcF.class.getName() }
+    private String[][] mTechLists = new String[][]{
+            new String[]{IsoDep.class.getName()},
+            new String[]{MifareClassic.class.getName()},
+            new String[]{MifareUltralight.class.getName()},
+            new String[]{NfcF.class.getName()}
     };
 
     private byte[] mKeyData;
     private String mTagId;
     private String mCardType;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_key);
         getWindow().setLayout(WRAP_CONTENT, MATCH_PARENT);
 
         findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
+            @Override
+            public void onClick(View view) {
                 setResult(RESULT_CANCELED);
                 finish();
             }
         });
 
         findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
-                final String keyType = ((RadioButton) findViewById(R.id.is_key_a)).isChecked() ? ClassicSectorKey.TYPE_KEYA : ClassicSectorKey.TYPE_KEYB;
+            @Override
+            public void onClick(View view) {
+                final String keyType = ((RadioButton) findViewById(R.id.is_key_a)).isChecked()
+                        ? ClassicSectorKey.TYPE_KEYA : ClassicSectorKey.TYPE_KEYB;
 
                 new BetterAsyncTask<Void>(AddKeyActivity.this, true, false) {
-                    @Override protected Void doInBackground() throws Exception {
+                    @Override
+                    protected Void doInBackground() throws Exception {
                         ClassicCardKeys keys = ClassicCardKeys.fromDump(keyType, mKeyData);
 
                         ContentValues values = new ContentValues();
@@ -103,7 +108,8 @@ public class AddKeyActivity extends Activity {
                         return null;
                     }
 
-                    @Override protected void onResult(Void unused) {
+                    @Override
+                    protected void onResult(Void unused) {
                         Intent intent = new Intent(AddKeyActivity.this, KeysActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
@@ -126,23 +132,27 @@ public class AddKeyActivity extends Activity {
         showFileSelector();
     }
 
-    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SELECT_FILE && resultCode == RESULT_OK) {
             loadFile(data.getData());
         }
     }
 
-    @Override protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
         mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, mTechLists);
     }
 
-    @Override protected void onPause() {
+    @Override
+    protected void onPause() {
         super.onPause();
         mNfcAdapter.disableForegroundDispatch(this);
     }
 
-    @Override protected void onNewIntent(Intent intent) {
+    @Override
+    protected void onNewIntent(Intent intent) {
         Tag tag = intent.getParcelableExtra("android.nfc.extra.TAG");
         mTagId = Utils.getHexString(tag.getId(), "");
 
@@ -158,9 +168,9 @@ public class AddKeyActivity extends Activity {
 
         } else {
             new AlertDialog.Builder(this)
-                .setMessage(R.string.card_keys_not_supported)
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
+                    .setMessage(R.string.card_keys_not_supported)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
         }
     }
 

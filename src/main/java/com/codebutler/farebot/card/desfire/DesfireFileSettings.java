@@ -29,14 +29,14 @@ import org.simpleframework.xml.Element;
 import java.io.ByteArrayInputStream;
 
 public abstract class DesfireFileSettings {
-    @Element(name="filetype") private byte mFileType;
-    @Element(name="commsettings") private byte mCommSetting;
-    @Element(name="accessrights") private HexString mAccessRights;
+    @Element(name = "filetype") private byte mFileType;
+    @Element(name = "commsettings") private byte mCommSetting;
+    @Element(name = "accessrights") private HexString mAccessRights;
 
     /* DesfireFile Types */
     public static final byte STANDARD_DATA_FILE = (byte) 0x00;
-    public static final byte BACKUP_DATA_FILE   = (byte) 0x01;
-    public static final byte VALUE_FILE         = (byte) 0x02;
+    public static final byte BACKUP_DATA_FILE = (byte) 0x01;
+    public static final byte VALUE_FILE = (byte) 0x02;
     public static final byte LINEAR_RECORD_FILE = (byte) 0x03;
     public static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
 
@@ -45,14 +45,15 @@ public abstract class DesfireFileSettings {
 
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
 
-        if (fileType == STANDARD_DATA_FILE || fileType == BACKUP_DATA_FILE)
+        if (fileType == STANDARD_DATA_FILE || fileType == BACKUP_DATA_FILE) {
             return new StandardDesfireFileSettings(stream);
-        else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE)
+        } else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE) {
             return new RecordDesfireFileSettings(stream);
-        else if (fileType == VALUE_FILE)
+        } else if (fileType == VALUE_FILE) {
             return new ValueDesfireFileSettings(stream);
-        else
+        } else {
             throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
+        }
     }
 
     DesfireFileSettings() { /* For XML Serializer */ }

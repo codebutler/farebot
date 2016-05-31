@@ -30,10 +30,10 @@ import org.simpleframework.xml.Root;
 
 import java.util.List;
 
-@Root(name="application")
+@Root(name = "application")
 public class DesfireApplication {
-    @Attribute(name="id") private String mId;
-    @ElementList(name="files") private List<DesfireFile> mFiles;
+    @Attribute(name = "id") private String mId;
+    @ElementList(name = "files") private List<DesfireFile> mFiles;
 
     private DesfireApplication() { /* For XML Serializer */ }
 
@@ -52,8 +52,9 @@ public class DesfireApplication {
 
     public DesfireFile getFile(int fileId) {
         for (DesfireFile file : mFiles) {
-            if (file.getId() == fileId)
+            if (file.getId() == fileId) {
                 return file;
+            }
         }
         return null;
     }

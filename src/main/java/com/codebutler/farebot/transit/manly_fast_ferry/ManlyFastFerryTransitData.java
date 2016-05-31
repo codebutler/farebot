@@ -50,21 +50,33 @@ import java.util.Locale;
 
 /**
  * Transit data type for Manly Fast Ferry Smartcard (Sydney, AU).
- *
+ * <p>
  * This transit card is a system made by ERG Group (now Videlli Limited / Vix Technology).
- *
+ * <p>
  * Note: This is a distinct private company who run their own ferry service to Manly, separate to
  * Transport for NSW's Manly Ferry service.
- *
+ * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Manly-Fast-Ferry
  */
 public class ManlyFastFerryTransitData extends TransitData {
-    private String            mSerialNumber;
-    private GregorianCalendar mEpochDate;
-    private int               mBalance;
-    private Trip[]            mTrips;
-    private Refill[]          mRefills;
 
+    public static final Creator<ManlyFastFerryTransitData> CREATOR = new Creator<ManlyFastFerryTransitData>() {
+        @Override
+        public ManlyFastFerryTransitData createFromParcel(Parcel source) {
+            return new ManlyFastFerryTransitData(source);
+        }
+
+        @Override
+        public ManlyFastFerryTransitData[] newArray(int size) {
+            return new ManlyFastFerryTransitData[size];
+        }
+    };
+
+    private String mSerialNumber;
+    private GregorianCalendar mEpochDate;
+    private int mBalance;
+    private Trip[] mTrips;
+    private Refill[] mRefills;
 
     public static final String NAME = "Manly Fast Ferry";
 
@@ -103,7 +115,7 @@ public class ManlyFastFerryTransitData extends TransitData {
         if (!(metadata instanceof ManlyFastFerryMetadataRecord)) {
             throw new AssertionError("Unexpected Manly record type: " + metadata.getClass().toString());
         }
-        return new TransitIdentity(NAME, ((ManlyFastFerryMetadataRecord)metadata).getCardSerial());
+        return new TransitIdentity(NAME, ((ManlyFastFerryMetadataRecord) metadata).getCardSerial());
     }
 
     // Parcel
@@ -116,6 +128,7 @@ public class ManlyFastFerryTransitData extends TransitData {
         mRefills = parcel.createTypedArray(ManlyFastFerryRefill.CREATOR);
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mSerialNumber);
         parcel.writeLong(mEpochDate.getTimeInMillis());
@@ -151,10 +164,10 @@ public class ManlyFastFerryTransitData extends TransitData {
 
         for (ManlyFastFerryRecord record : records) {
             if (record instanceof ManlyFastFerryMetadataRecord) {
-                mSerialNumber = ((ManlyFastFerryMetadataRecord)record).getCardSerial();
-                mEpochDate = ((ManlyFastFerryMetadataRecord)record).getEpochDate();
+                mSerialNumber = ((ManlyFastFerryMetadataRecord) record).getCardSerial();
+                mEpochDate = ((ManlyFastFerryMetadataRecord) record).getEpochDate();
             } else if (record instanceof ManlyFastFerryBalanceRecord) {
-                balances.add((ManlyFastFerryBalanceRecord)record);
+                balances.add((ManlyFastFerryBalanceRecord) record);
             }
         }
 
@@ -168,9 +181,9 @@ public class ManlyFastFerryTransitData extends TransitData {
         ArrayList<Trip> trips = new ArrayList<>();
         ArrayList<Refill> refills = new ArrayList<>();
 
-        for (ManlyFastFerryRecord record: records) {
+        for (ManlyFastFerryRecord record : records) {
             if (record instanceof ManlyFastFerryPurseRecord) {
-                ManlyFastFerryPurseRecord purseRecord = (ManlyFastFerryPurseRecord)record;
+                ManlyFastFerryPurseRecord purseRecord = (ManlyFastFerryPurseRecord) record;
 
                 // Now convert this.
                 if (purseRecord.getIsCredit()) {
@@ -192,11 +205,12 @@ public class ManlyFastFerryTransitData extends TransitData {
 
     @Override
     public String getBalanceString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mBalance / 100.);
     }
 
     // Structures
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         return mSerialNumber;
     }
 

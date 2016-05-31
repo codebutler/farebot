@@ -60,21 +60,25 @@ public class CardInfoActivity extends Activity {
 
     private static final String KEY_SELECTED_TAB = "selected_tab";
 
-    private Card            mCard;
-    private TransitData     mTransitData;
+    private Card mCard;
+    private TransitData mTransitData;
     private TabPagerAdapter mTabsAdapter;
-    private TextToSpeech    mTTS;
+    private TextToSpeech mTTS;
 
     private OnInitListener mTTSInitListener = new OnInitListener() {
+        @Override
         public void onInit(int status) {
             String balance = mTransitData.getBalanceString();
             if (status == TextToSpeech.SUCCESS && balance != null) {
-                mTTS.speak(getString(R.string.balance_speech, mTransitData.getBalanceString()), TextToSpeech.QUEUE_FLUSH, null);
+                mTTS.speak(getString(R.string.balance_speech,
+                        mTransitData.getBalanceString()),
+                        TextToSpeech.QUEUE_FLUSH, null);
             }
         }
     };
 
-    @Override protected void onCreate(final Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_card_info);
@@ -89,7 +93,8 @@ public class CardInfoActivity extends Activity {
             private Exception mException;
             public boolean mSpeakBalanceEnabled;
 
-            @Override protected Void doInBackground(Void... voids) {
+            @Override
+            protected Void doInBackground(Void... voids) {
                 try {
                     Uri uri = getIntent().getData();
                     Cursor cursor = getContentResolver().query(uri, null, null, null, null);
@@ -109,7 +114,8 @@ public class CardInfoActivity extends Activity {
                 return null;
             }
 
-            @Override protected void onPostExecute(Void aVoid) {
+            @Override
+            protected void onPostExecute(Void aVoid) {
                 findViewById(R.id.loading).setVisibility(View.GONE);
                 findViewById(R.id.pager).setVisibility(View.VISIBLE);
 
@@ -153,7 +159,8 @@ public class CardInfoActivity extends Activity {
                 }
 
                 if (mTransitData.getSubscriptions() != null) {
-                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.subscriptions), CardSubscriptionsFragment.class,
+                    mTabsAdapter.addTab(actionBar.newTab().setText(R.string.subscriptions),
+                            CardSubscriptionsFragment.class,
                             args);
                 }
 
@@ -181,16 +188,19 @@ public class CardInfoActivity extends Activity {
         }.execute();
     }
 
-    @Override protected void onSaveInstanceState(Bundle bundle) {
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
         bundle.putInt(KEY_SELECTED_TAB, ((ViewPager) findViewById(R.id.pager)).getCurrentItem());
     }
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.card_info_menu, menu);
         return true;
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, CardsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

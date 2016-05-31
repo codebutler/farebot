@@ -27,7 +27,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 public class BackgroundTagActivity extends Activity {
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = new Intent(this, ReadingTagActivity.class);

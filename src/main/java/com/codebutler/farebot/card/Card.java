@@ -43,11 +43,12 @@ import java.io.StringWriter;
 import java.util.Date;
 
 public abstract class Card {
-    @Attribute(name="type") private CardType mType;
-    @Attribute(name="id") private HexString mTagId;
-    @Attribute(name="scanned_at") private Date mScannedAt;
+    @Attribute(name = "type") private CardType mType;
+    @Attribute(name = "id") private HexString mTagId;
+    @Attribute(name = "scanned_at") private Date mScannedAt;
 
-    protected Card() { }
+    protected Card() {
+    }
 
     protected Card(CardType type, byte[] tagId, Date scannedAt) {
         mType = type;
@@ -57,18 +58,19 @@ public abstract class Card {
 
     public static Card dumpTag(byte[] tagId, Tag tag) throws Exception {
         final String[] techs = tag.getTechList();
-        if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB"))
+        if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB")) {
             return CEPASCard.dumpTag(tag);
-        else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep"))
+        } else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep")) {
             return DesfireCard.dumpTag(tag);
-        else if (ArrayUtils.contains(techs, "android.nfc.tech.NfcF"))
+        } else if (ArrayUtils.contains(techs, "android.nfc.tech.NfcF")) {
             return FelicaCard.dumpTag(tagId, tag);
-        else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareClassic"))
+        } else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareClassic")) {
             return ClassicCard.dumpTag(tagId, tag);
-        else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareUltralight"))
+        } else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareUltralight")) {
             return UltralightCard.dumpTag(tagId, tag);
-        else
+        } else {
             throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
+        }
     }
 
     public static Card fromXml(Serializer serializer, String xml) {
@@ -104,5 +106,6 @@ public abstract class Card {
     }
 
     public abstract TransitIdentity parseTransitIdentity();
+
     public abstract TransitData parseTransitData();
 }

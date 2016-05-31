@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.seq_go;
 
 import android.os.Parcel;
@@ -46,7 +47,7 @@ import java.util.Locale;
 
 /**
  * Transit data type for Go card (Brisbane / South-East Queensland, AU), used by Translink.
- *
+ * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29
  *
  * @author Michael Farrell
@@ -54,28 +55,30 @@ import java.util.Locale;
 public class SeqGoTransitData extends TransitData {
 
     public static final String NAME = "Go card";
-    static final byte[] MANUFACTURER = {
-        0x16, 0x18, 0x1A, 0x1B,
-        0x1C, 0x1D, 0x1E, 0x1F
+
+    private static final byte[] MANUFACTURER = {
+            0x16, 0x18, 0x1A, 0x1B,
+            0x1C, 0x1D, 0x1E, 0x1F
     };
 
-    BigInteger mSerialNumber;
-    int mBalance;
-    SeqGoRefill[] mRefills;
-    SeqGoTrip[] mTrips;
-    boolean mHasUnknownStations = false;
+    private BigInteger mSerialNumber;
+    private int mBalance;
+    private SeqGoRefill[] mRefills;
+    private SeqGoTrip[] mTrips;
+    private boolean mHasUnknownStations = false;
 
-    /*
     public static final Creator<SeqGoTransitData> CREATOR = new Creator<SeqGoTransitData>() {
+        @Override
         public SeqGoTransitData createFromParcel(Parcel parcel) {
             return new SeqGoTransitData(parcel);
         }
 
+        @Override
         public SeqGoTransitData[] newArray(int size) {
             return new SeqGoTransitData[size];
         }
     };
-*/
+
     public static boolean check(ClassicCard card) {
         try {
             byte[] blockData = card.getSector(0).getBlock(1).getData();
@@ -146,13 +149,13 @@ public class SeqGoTransitData extends TransitData {
 
         for (SeqGoRecord record : records) {
             if (record instanceof SeqGoBalanceRecord) {
-                balances.add((SeqGoBalanceRecord)record);
+                balances.add((SeqGoBalanceRecord) record);
             } else if (record instanceof SeqGoTopupRecord) {
-                SeqGoTopupRecord topupRecord = (SeqGoTopupRecord)record;
+                SeqGoTopupRecord topupRecord = (SeqGoTopupRecord) record;
 
                 refills.add(new SeqGoRefill(topupRecord));
             } else if (record instanceof SeqGoTapRecord) {
-                taps.add((SeqGoTapRecord)record);
+                taps.add((SeqGoTapRecord) record);
             }
         }
 
@@ -184,9 +187,10 @@ public class SeqGoTransitData extends TransitData {
 
                 // Peek at the next record and see if it is part of
                 // this journey
-                if (taps.size() > i+1 && taps.get(i+1).getJourney() == tapOn.getJourney() && taps.get(i+1).getMode() == tapOn.getMode()) {
+                if (taps.size() > i + 1 && taps.get(i + 1).getJourney() == tapOn.getJourney()
+                        && taps.get(i + 1).getMode() == tapOn.getMode()) {
                     // There is a tap off.  Lets put that data in
-                    SeqGoTapRecord tapOff = taps.get(i+1);
+                    SeqGoTapRecord tapOff = taps.get(i + 1);
 
                     trip.mEndTime = tapOff.getTimestamp();
                     trip.mEndStation = tapOff.getStation();
@@ -222,7 +226,7 @@ public class SeqGoTransitData extends TransitData {
 
     @Override
     public String getBalanceString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mBalance / 100.);
     }
 
     @Override

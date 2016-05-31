@@ -52,7 +52,8 @@ import javax.xml.transform.stream.StreamResult;
 
 public class ExportHelper {
 
-    private ExportHelper() { }
+    private ExportHelper() {
+    }
 
     public static String exportCardsXml(Context context) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -88,13 +89,14 @@ public class ExportHelper {
 
         Element rootElement = doc.getDocumentElement();
 
-        if (rootElement.getNodeName().equals("card"))
-            return new Uri[] { importCard(context, rootElement) };
+        if (rootElement.getNodeName().equals("card")) {
+            return new Uri[]{importCard(context, rootElement)};
+        }
 
         NodeList cardNodes = rootElement.getElementsByTagName("card");
         Uri[] results = new Uri[cardNodes.getLength()];
         for (int i = 0; i < cardNodes.getLength(); i++) {
-            results[i] = importCard(context, (Element)cardNodes.item(i));
+            results[i] = importCard(context, (Element) cardNodes.item(i));
         }
         return results;
     }

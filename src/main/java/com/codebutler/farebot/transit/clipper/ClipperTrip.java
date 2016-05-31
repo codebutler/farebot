@@ -31,65 +31,74 @@ import com.codebutler.farebot.transit.Trip;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class ClipperTrip extends Trip {
-    final long mTimestamp;
-    final long mExitTimestamp;
-    final long mFare;
-    final long mAgency;
-    final long mFrom;
-    final long mTo;
-    final long mRoute;
-    long mBalance;
+class ClipperTrip extends Trip {
 
-    public ClipperTrip(long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route) {
-        mTimestamp      = timestamp;
-        mExitTimestamp  = exitTimestamp;
-        mFare           = fare;
-        mAgency         = agency;
-        mFrom           = from;
-        mTo             = to;
-        mRoute          = route;
-        mBalance        = 0;
+    private final long mTimestamp;
+    private final long mExitTimestamp;
+    private final long mAgency;
+    private final long mFrom;
+    private final long mTo;
+    private final long mRoute;
+
+    long mBalance;
+    long mFare;
+
+    ClipperTrip(long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route) {
+        mTimestamp = timestamp;
+        mExitTimestamp = exitTimestamp;
+        mFare = fare;
+        mAgency = agency;
+        mFrom = from;
+        mTo = to;
+        mRoute = route;
+        mBalance = 0;
     }
 
     public static final Creator<ClipperTrip> CREATOR = new Creator<ClipperTrip>() {
+        @Override
         public ClipperTrip createFromParcel(Parcel parcel) {
             return new ClipperTrip(parcel);
         }
 
+        @Override
         public ClipperTrip[] newArray(int size) {
             return new ClipperTrip[size];
         }
     };
 
-    ClipperTrip(Parcel parcel) {
-        mTimestamp     = parcel.readLong();
+    private ClipperTrip(Parcel parcel) {
+        mTimestamp = parcel.readLong();
         mExitTimestamp = parcel.readLong();
-        mFare          = parcel.readLong();
-        mAgency        = parcel.readLong();
-        mFrom          = parcel.readLong();
-        mTo            = parcel.readLong();
-        mRoute         = parcel.readLong();
-        mBalance       = parcel.readLong();
+        mFare = parcel.readLong();
+        mAgency = parcel.readLong();
+        mFrom = parcel.readLong();
+        mTo = parcel.readLong();
+        mRoute = parcel.readLong();
+        mBalance = parcel.readLong();
     }
 
-    @Override public long getTimestamp() {
+    @Override
+    public long getTimestamp() {
         return mTimestamp;
     }
 
-    @Override public long getExitTimestamp() {
+    @Override
+    public long getExitTimestamp() {
         return mExitTimestamp;
     }
 
-    @Override public String getAgencyName() {
-        return ClipperTransitData.getAgencyName((int)mAgency);
+    @Override
+    public String getAgencyName() {
+        return ClipperTransitData.getAgencyName((int) mAgency);
     }
 
-    @Override public String getShortAgencyName() {
-        return ClipperTransitData.getShortAgencyName((int)mAgency);
+    @Override
+    public String getShortAgencyName() {
+        return ClipperTransitData.getShortAgencyName((int) mAgency);
     }
 
-    @Override public String getRouteName() {
+    @Override
+    public String getRouteName() {
         if (mAgency == ClipperData.AGENCY_GG_FERRY) {
             return ClipperData.GG_FERRY_ROUTES.get(mRoute);
         } else {
@@ -99,19 +108,23 @@ public class ClipperTrip extends Trip {
         }
     }
 
-    @Override public String getFareString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)mFare / 100.0);
+    @Override
+    public String getFareString() {
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mFare / 100.0);
     }
 
-    @Override public boolean hasFare() {
+    @Override
+    public boolean hasFare() {
         return true;
     }
 
-    @Override public String getBalanceString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)mBalance / 100.0);
+    @Override
+    public String getBalanceString() {
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mBalance / 100.0);
     }
 
-    @Override public Station getStartStation() {
+    @Override
+    public Station getStartStation() {
         if (mAgency == ClipperData.AGENCY_BART) {
             if (ClipperData.BART_STATIONS.containsKey(mFrom)) {
                 return ClipperData.BART_STATIONS.get(mFrom);
@@ -128,7 +141,8 @@ public class ClipperTrip extends Trip {
         return null;
     }
 
-    @Override public Station getEndStation() {
+    @Override
+    public Station getEndStation() {
         if (mAgency == ClipperData.AGENCY_BART) {
             if (ClipperData.BART_STATIONS.containsKey(mTo)) {
                 return ClipperData.BART_STATIONS.get(mTo);
@@ -144,13 +158,18 @@ public class ClipperTrip extends Trip {
         }
         return null;
     }
-    @Override public String getStartStationName() {
-        if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_GG_FERRY || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
+
+    @Override
+    public String getStartStationName() {
+        if (mAgency == ClipperData.AGENCY_BART
+                || mAgency == ClipperData.AGENCY_GG_FERRY
+                || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             Station station = getStartStation();
-            if (station != null)
+            if (station != null) {
                 return station.getShortStationName();
-            else
+            } else {
                 return "Station #0x" + Long.toString(mFrom, 16);
+            }
         } else if (mAgency == ClipperData.AGENCY_MUNI) {
             return null; // Coach number is not collected
         } else if (mAgency == ClipperData.AGENCY_GGT || mAgency == ClipperData.AGENCY_CALTRAIN) {
@@ -160,8 +179,11 @@ public class ClipperTrip extends Trip {
         }
     }
 
-    @Override public String getEndStationName() {
-        if (mAgency == ClipperData.AGENCY_BART || mAgency == ClipperData.AGENCY_GG_FERRY || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
+    @Override
+    public String getEndStationName() {
+        if (mAgency == ClipperData.AGENCY_BART
+                || mAgency == ClipperData.AGENCY_GG_FERRY
+                || mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             Station station = getEndStation();
             if (station != null) {
                 return station.getShortStationName();
@@ -171,40 +193,53 @@ public class ClipperTrip extends Trip {
         } else if (mAgency == ClipperData.AGENCY_MUNI) {
             return null; // Coach number is not collected
         } else if (mAgency == ClipperData.AGENCY_GGT || mAgency == ClipperData.AGENCY_CALTRAIN) {
-            if (mTo == 0xffff)
+            if (mTo == 0xffff) {
                 return "(End of line)";
+            }
             return "Zone #0x" + Long.toString(mTo, 16);
         } else {
             return "(Unknown Station)";
         }
     }
 
-    @Override public Mode getMode() {
-        if (mAgency == ClipperData.AGENCY_ACTRAN)
+    @Override
+    public Mode getMode() {
+        if (mAgency == ClipperData.AGENCY_ACTRAN) {
             return Mode.BUS;
-        if (mAgency == ClipperData.AGENCY_BART)
+        }
+        if (mAgency == ClipperData.AGENCY_BART) {
             return Mode.METRO;
-        if (mAgency == ClipperData.AGENCY_CALTRAIN)
+        }
+        if (mAgency == ClipperData.AGENCY_CALTRAIN) {
             return Mode.TRAIN;
-        if (mAgency == ClipperData.AGENCY_GGT)
+        }
+        if (mAgency == ClipperData.AGENCY_GGT) {
             return Mode.BUS;
-        if (mAgency == ClipperData.AGENCY_SAMTRANS)
+        }
+        if (mAgency == ClipperData.AGENCY_SAMTRANS) {
             return Mode.BUS;
-        if (mAgency == ClipperData.AGENCY_VTA)
+        }
+        if (mAgency == ClipperData.AGENCY_VTA) {
             return Mode.BUS; // FIXME: or Mode.TRAM for light rail
-        if (mAgency == ClipperData.AGENCY_MUNI)
+        }
+        if (mAgency == ClipperData.AGENCY_MUNI) {
             return Mode.BUS; // FIXME: or Mode.TRAM for "Muni Metro"
-        if (mAgency == ClipperData.AGENCY_GG_FERRY)
+        }
+        if (mAgency == ClipperData.AGENCY_GG_FERRY) {
             return Mode.FERRY;
-        if (mAgency == ClipperData.AGENCY_SF_BAY_FERRY)
+        }
+        if (mAgency == ClipperData.AGENCY_SF_BAY_FERRY) {
             return Mode.FERRY;
+        }
         return Mode.OTHER;
     }
 
-    @Override public boolean hasTime() {
+    @Override
+    public boolean hasTime() {
         return true;
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeLong(mTimestamp);
         parcel.writeLong(mExitTimestamp);
@@ -216,6 +251,7 @@ public class ClipperTrip extends Trip {
         parcel.writeLong(mBalance);
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }

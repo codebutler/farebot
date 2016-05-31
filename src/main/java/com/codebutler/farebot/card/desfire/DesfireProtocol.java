@@ -29,41 +29,42 @@ import com.codebutler.farebot.util.Utils;
 import java.io.ByteArrayOutputStream;
 import java.security.AccessControlException;
 
-public class DesfireProtocol {
+class DesfireProtocol {
     // Reference: http://neteril.org/files/M075031_desfire.pdf
     // Commands
-    static final byte GET_MANUFACTURING_DATA    = (byte) 0x60;
-    static final byte GET_APPLICATION_DIRECTORY = (byte) 0x6A;
-    static final byte GET_ADDITIONAL_FRAME      = (byte) 0xAF;
-    static final byte SELECT_APPLICATION        = (byte) 0x5A;
-    static final byte READ_DATA                 = (byte) 0xBD;
-    static final byte READ_RECORD               = (byte) 0xBB;
-    static final byte GET_VALUE                 = (byte) 0x6C;
-    static final byte GET_FILES                 = (byte) 0x6F;
-    static final byte GET_FILE_SETTINGS         = (byte) 0xF5;
+    private static final byte GET_MANUFACTURING_DATA = (byte) 0x60;
+    private static final byte GET_APPLICATION_DIRECTORY = (byte) 0x6A;
+    private static final byte GET_ADDITIONAL_FRAME = (byte) 0xAF;
+    private static final byte SELECT_APPLICATION = (byte) 0x5A;
+    private static final byte READ_DATA = (byte) 0xBD;
+    private static final byte READ_RECORD = (byte) 0xBB;
+    private static final byte GET_VALUE = (byte) 0x6C;
+    private static final byte GET_FILES = (byte) 0x6F;
+    private static final byte GET_FILE_SETTINGS = (byte) 0xF5;
 
     // Status codes (Section 3.4)
-    static final byte OPERATION_OK         = (byte) 0x00;
-    static final byte PERMISSION_DENIED    = (byte) 0x9D;
-    static final byte AUTHENTICATION_ERROR = (byte) 0xAE;
-    static final byte ADDITIONAL_FRAME     = (byte) 0xAF;
+    private static final byte OPERATION_OK = (byte) 0x00;
+    private static final byte PERMISSION_DENIED = (byte) 0x9D;
+    private static final byte AUTHENTICATION_ERROR = (byte) 0xAE;
+    private static final byte ADDITIONAL_FRAME = (byte) 0xAF;
 
     private IsoDep mTagTech;
 
-    public DesfireProtocol(IsoDep tagTech) {
+    DesfireProtocol(IsoDep tagTech) {
         mTagTech = tagTech;
     }
 
-    public DesfireManufacturingData getManufacturingData() throws Exception {
+    DesfireManufacturingData getManufacturingData() throws Exception {
         byte[] respBuffer = sendRequest(GET_MANUFACTURING_DATA);
 
-        if (respBuffer.length != 28)
+        if (respBuffer.length != 28) {
             throw new Exception("Invalid response");
+        }
 
         return new DesfireManufacturingData(respBuffer);
     }
 
-    public int[] getAppList() throws Exception {
+    int[] getAppList() throws Exception {
         byte[] appDirBuf = sendRequest(GET_APPLICATION_DIRECTORY);
 
         int[] appIds = new int[appDirBuf.length / 3];
@@ -78,7 +79,7 @@ public class DesfireProtocol {
         return appIds;
     }
 
-    public void selectApp(int appId) throws Exception {
+    void selectApp(int appId) throws Exception {
         byte[] appIdBuff = new byte[3];
         appIdBuff[0] = (byte) ((appId & 0xFF0000) >> 16);
         appIdBuff[1] = (byte) ((appId & 0xFF00) >> 8);
@@ -87,21 +88,21 @@ public class DesfireProtocol {
         sendRequest(SELECT_APPLICATION, appIdBuff);
     }
 
-    public int[] getFileList() throws Exception {
+    int[] getFileList() throws Exception {
         byte[] buf = sendRequest(GET_FILES);
         int[] fileIds = new int[buf.length];
         for (int x = 0; x < buf.length; x++) {
-            fileIds[x] = (int)buf[x];
+            fileIds[x] = (int) buf[x];
         }
         return fileIds;
     }
 
-    public DesfireFileSettings getFileSettings(int fileNo) throws Exception {
-        byte[] data = sendRequest(GET_FILE_SETTINGS, new byte[] { (byte) fileNo });
+    DesfireFileSettings getFileSettings(int fileNo) throws Exception {
+        byte[] data = sendRequest(GET_FILE_SETTINGS, new byte[]{(byte) fileNo});
         return DesfireFileSettings.create(data);
     }
 
-    public byte[] readFile(int fileNo) throws Exception {
+    byte[] readFile(int fileNo) throws Exception {
         return sendRequest(READ_DATA, new byte[]{
                 (byte) fileNo,
                 (byte) 0x0, (byte) 0x0, (byte) 0x0,
@@ -109,7 +110,7 @@ public class DesfireProtocol {
         });
     }
 
-    public byte[] readRecord(int fileNum) throws Exception {
+    byte[] readRecord(int fileNum) throws Exception {
         return sendRequest(READ_RECORD, new byte[]{
                 (byte) fileNum,
                 (byte) 0x0, (byte) 0x0, (byte) 0x0,
@@ -117,8 +118,8 @@ public class DesfireProtocol {
         });
     }
 
-    public byte[] getValue(int fileNum) throws Exception {
-        return sendRequest(GET_VALUE, new byte[] {
+    byte[] getValue(int fileNum) throws Exception {
+        return sendRequest(GET_VALUE, new byte[]{
                 (byte) fileNum
         });
     }
@@ -133,8 +134,9 @@ public class DesfireProtocol {
         byte[] recvBuffer = mTagTech.transceive(wrapMessage(command, parameters));
 
         while (true) {
-            if (recvBuffer[recvBuffer.length - 2] != (byte) 0x91)
+            if (recvBuffer[recvBuffer.length - 2] != (byte) 0x91) {
                 throw new Exception("Invalid response");
+            }
 
             output.write(recvBuffer, 0, recvBuffer.length - 2);
 

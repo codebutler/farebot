@@ -27,7 +27,8 @@ import android.app.Fragment;
 import com.codebutler.farebot.fragment.CardsFragment;
 
 public class CardsActivity extends FragmentWrapperActivity {
-    @Override protected Fragment createFragment() {
+    @Override
+    protected Fragment createFragment() {
         return new CardsFragment();
     }
 }

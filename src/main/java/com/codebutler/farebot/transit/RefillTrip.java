@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit;
 
 import android.os.Parcel;
@@ -25,10 +26,27 @@ import android.os.Parcel;
  * to what the Japanese cards (Edy, Suica) already had implemented for themselves.
  */
 public class RefillTrip extends Trip {
-    protected Refill mRefill;
+
+    public static final Creator<RefillTrip> CREATOR = new Creator<RefillTrip>() {
+        @Override
+        public RefillTrip createFromParcel(Parcel source) {
+            return new RefillTrip(source);
+        }
+
+        @Override
+        public RefillTrip[] newArray(int size) {
+            return new RefillTrip[size];
+        }
+    };
+
+    private final Refill mRefill;
 
     public RefillTrip(Refill refill) {
-        this.mRefill = refill;
+        mRefill = refill;
+    }
+
+    private RefillTrip(Parcel source) {
+        mRefill = source.readParcelable(Refill.class.getClassLoader());
     }
 
     @Override

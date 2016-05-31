@@ -87,8 +87,12 @@ public class FareBotApplication extends Application {
 
         try {
             Visitor visitor = new Visitor() {
-                @Override public void read(Type type, NodeMap<InputNode> node) throws Exception { }
-                @Override public void write(Type type, NodeMap<OutputNode> node) throws Exception {
+                @Override
+                public void read(Type type, NodeMap<InputNode> node) throws Exception {
+                }
+
+                @Override
+                public void write(Type type, NodeMap<OutputNode> node) throws Exception {
                     node.remove("class");
                 }
             };
@@ -141,16 +145,17 @@ public class FareBotApplication extends Application {
         return mMifareClassicSupport;
     }
 
-    @Override public void onCreate() {
+    @Override
+    public void onCreate() {
         super.onCreate();
 
         // Check for Mifare Classic support
         mMifareClassicSupport = this.getPackageManager().hasSystemFeature("com.nxp.mifare");
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-            .detectAll()
-            .penaltyLog()
-            .build());
+                .detectAll()
+                .penaltyLog()
+                .build());
 
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());

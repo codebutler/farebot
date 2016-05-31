@@ -60,9 +60,10 @@ import java.util.List;
 
 
 public class CardTripsFragment extends ListFragment {
-    private Card        mCard;
+    private Card mCard;
     private TransitData mTransitData;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Serializer serializer = FareBotApplication.getInstance().getSerializer();
@@ -70,7 +71,8 @@ public class CardTripsFragment extends ListFragment {
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 
-    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_card_trips, null);
 
         List<Trip> trips = new ArrayList<>();
@@ -100,7 +102,8 @@ public class CardTripsFragment extends ListFragment {
         return view;
     }
 
-    @Override public void onListItemClick(ListView l, View v, int position, long id) {
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
         Trip trip = (Trip) getListAdapter().getItem(position);
         if (trip == null
                 || !((trip.getStartStation() != null && trip.getStartStation().hasLocation())
@@ -114,11 +117,12 @@ public class CardTripsFragment extends ListFragment {
     }
 
     private static class UseLogListAdapter extends ArrayAdapter<Trip> {
-        public UseLogListAdapter(Context context, Trip[] items) {
+        UseLogListAdapter(Context context, Trip[] items) {
             super(context, 0, items);
         }
 
-        @Override public View getView(int position, View convertView, ViewGroup parent) {
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
             Activity activity = (Activity) getContext();
             LayoutInflater inflater = activity.getLayoutInflater();
 
@@ -141,11 +145,11 @@ public class CardTripsFragment extends ListFragment {
             convertView.findViewById(R.id.list_divider).setVisibility(isLastInSection(position)
                     ? View.INVISIBLE : View.VISIBLE);
 
-            ImageView iconImageView   = (ImageView) convertView.findViewById(R.id.icon_image_view);
-            TextView  timeTextView    = (TextView)  convertView.findViewById(R.id.time_text_view);
-            TextView  routeTextView   = (TextView)  convertView.findViewById(R.id.route_text_view);
-            TextView  fareTextView    = (TextView)  convertView.findViewById(R.id.fare_text_view);
-            TextView  stationTextView = (TextView)  convertView.findViewById(R.id.station_text_view);
+            final ImageView iconImageView = (ImageView) convertView.findViewById(R.id.icon_image_view);
+            final TextView timeTextView = (TextView) convertView.findViewById(R.id.time_text_view);
+            final TextView routeTextView = (TextView) convertView.findViewById(R.id.route_text_view);
+            final TextView fareTextView = (TextView) convertView.findViewById(R.id.fare_text_view);
+            final TextView stationTextView = (TextView) convertView.findViewById(R.id.station_text_view);
 
             if (trip.getMode() == Trip.Mode.BUS) {
                 iconImageView.setImageResource(R.drawable.bus);
@@ -177,10 +181,12 @@ public class CardTripsFragment extends ListFragment {
             }
 
             List<String> routeText = new ArrayList<>();
-            if (trip.getShortAgencyName() != null)
+            if (trip.getShortAgencyName() != null) {
                 routeText.add("<b>" + trip.getShortAgencyName() + "</b>");
-            if (trip.getRouteName() != null)
+            }
+            if (trip.getRouteName() != null) {
                 routeText.add(trip.getRouteName());
+            }
 
             if (routeText.size() > 0) {
                 routeTextView.setText(Html.fromHtml(StringUtils.join(routeText, " ")));
@@ -210,7 +216,8 @@ public class CardTripsFragment extends ListFragment {
             return convertView;
         }
 
-        @Override public boolean isEnabled(int position) {
+        @Override
+        public boolean isEnabled(int position) {
             Trip trip = getItem(position);
             if (trip == null) {
                 return false;
@@ -220,7 +227,9 @@ public class CardTripsFragment extends ListFragment {
         }
 
         private boolean isFirstInSection(int position) {
-            if (position == 0) return true;
+            if (position == 0) {
+                return true;
+            }
 
             Date date1 = new Date(getItem(position).getTimestamp() * 1000);
             Date date2 = new Date(getItem(position - 1).getTimestamp() * 1000);
@@ -230,7 +239,9 @@ public class CardTripsFragment extends ListFragment {
         }
 
         public boolean isLastInSection(int position) {
-            if (position == getCount() - 1) return true;
+            if (position == getCount() - 1) {
+                return true;
+            }
 
             Date date1 = new Date(getItem(position).getTimestamp() * 1000);
             Date date2 = new Date(getItem(position + 1).getTimestamp() * 1000);

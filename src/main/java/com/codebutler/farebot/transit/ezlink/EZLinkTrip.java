@@ -40,34 +40,41 @@ public class EZLinkTrip extends Trip {
         mCardName = cardName;
     }
 
-    EZLinkTrip(Parcel parcel) {
+    private EZLinkTrip(Parcel parcel) {
         mTransaction = parcel.readParcelable(CEPASTransaction.class.getClassLoader());
         mCardName = parcel.readString();
     }
 
     public static final Creator<EZLinkTrip> CREATOR = new Creator<EZLinkTrip>() {
+        @Override
         public EZLinkTrip createFromParcel(Parcel parcel) {
             return new EZLinkTrip(parcel);
         }
+
+        @Override
         public EZLinkTrip[] newArray(int size) {
             return new EZLinkTrip[size];
         }
     };
 
-    @Override public long getTimestamp() {
+    @Override
+    public long getTimestamp() {
         return mTransaction.getTimestamp();
     }
 
-    @Override public long getExitTimestamp() {
+    @Override
+    public long getExitTimestamp() {
         return 0;
     }
 
-    @Override public String getAgencyName() {
+    @Override
+    public String getAgencyName() {
         if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS
                 || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
             String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
-            if (EZLinkTransitData.sbsBuses.contains(routeString))
+            if (EZLinkTransitData.SBS_BUSES.contains(routeString)) {
                 return "SBS";
+            }
             return "SMRT";
         }
         if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION
@@ -81,18 +88,24 @@ public class EZLinkTrip extends Trip {
         return "SMRT";
     }
 
-    @Override public String getShortAgencyName() {
+    @Override
+    public String getShortAgencyName() {
         if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS
                 || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
             String routeString = mTransaction.getUserData().substring(3, 7).replace(" ", "");
-            if (EZLinkTransitData.sbsBuses.contains(routeString))
+            if (EZLinkTransitData.SBS_BUSES.contains(routeString)) {
                 return "SBS";
+            }
             return "SMRT";
         }
         if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION
                 || mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP
                 || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
-            if (mCardName.equals("EZ-Link")) return "EZ"; else return mCardName;
+            if (mCardName.equals("EZ-Link")) {
+                return "EZ";
+            } else {
+                return mCardName;
+            }
         }
         if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL) {
             return "POS";
@@ -100,111 +113,129 @@ public class EZLinkTrip extends Trip {
         return "SMRT";
     }
 
-    @Override public String getRouteName() {
+    @Override
+    public String getRouteName() {
         if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS) {
-            if (mTransaction.getUserData().startsWith("SVC"))
+            if (mTransaction.getUserData().startsWith("SVC")) {
                 return "Bus #" + mTransaction.getUserData().substring(3, 7).replace(" ", "");
+            }
             return "(Unknown Bus Route)";
-        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
             return "Bus Refund";
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT) {
             return "MRT";
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP) {
             return "Top-up";
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION) {
             return "First use";
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL) {
             return "Retail Purchase";
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
             return "Service Charge";
+        }
         return "(Unknown Route)";
     }
 
-    @Override public String getFareString() {
+    @Override
+    public String getFareString() {
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
         numberFormat.setCurrency(Currency.getInstance("SGD"));
 
         int balance = -mTransaction.getAmount();
-        if (balance < 0)
+        if (balance < 0) {
             return "Credit " + numberFormat.format(-balance / 100.0);
-        else
+        } else {
             return numberFormat.format(balance / 100.0);
+        }
     }
 
-    @Override public boolean hasFare() {
+    @Override
+    public boolean hasFare() {
         return (mTransaction.getType() != CEPASTransaction.TransactionType.CREATION);
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         return "(???)";
     }
 
-    @Override public Station getStartStation() {
-        if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
+    @Override
+    public Station getStartStation() {
+        if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION) {
             return null;
+        }
         if (mTransaction.getUserData().charAt(3) == '-'
-            || mTransaction.getUserData().charAt(3) == ' ') {
+                || mTransaction.getUserData().charAt(3) == ' ') {
             String startStationAbbr = mTransaction.getUserData().substring(0, 3);
             return EZLinkTransitData.getStation(startStationAbbr);
         }
         return null;
     }
 
-    @Override public Station getEndStation() {
-        if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION)
+    @Override
+    public Station getEndStation() {
+        if (mTransaction.getType() == CEPASTransaction.TransactionType.CREATION) {
             return null;
+        }
         if (mTransaction.getUserData().charAt(3) == '-'
-            || mTransaction.getUserData().charAt(3) == ' ') {
+                || mTransaction.getUserData().charAt(3) == ' ') {
             String endStationAbbr = mTransaction.getUserData().substring(4, 7);
             return EZLinkTransitData.getStation(endStationAbbr);
         }
         return null;
     }
 
-    @Override public String getStartStationName() {
+    @Override
+    public String getStartStationName() {
         Station startStation = getStartStation();
-        if (startStation != null)
+        if (startStation != null) {
             return startStation.getStationName();
-        else if (mTransaction.getUserData().charAt(3) == '-'
-            || mTransaction.getUserData().charAt(3) == ' ') {
+        } else if (mTransaction.getUserData().charAt(3) == '-'
+                || mTransaction.getUserData().charAt(3) == ' ') {
             return mTransaction.getUserData().substring(0, 3); // extract startStationAbbr
         }
         return mTransaction.getUserData();
     }
 
-    @Override public String getEndStationName() {
+    @Override
+    public String getEndStationName() {
         Station endStation = getEndStation();
-        if (endStation != null)
+        if (endStation != null) {
             return endStation.getStationName();
-        else if (mTransaction.getUserData().charAt(3) == '-'
-            || mTransaction.getUserData().charAt(3) == ' ') {
+        } else if (mTransaction.getUserData().charAt(3) == '-'
+                || mTransaction.getUserData().charAt(3) == ' ') {
             return mTransaction.getUserData().substring(4, 7); // extract endStationAbbr
         }
         return null;
     }
 
-    @Override public Mode getMode() {
+    @Override
+    public Mode getMode() {
         if (mTransaction.getType() == CEPASTransaction.TransactionType.BUS
-                || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND)
+                || mTransaction.getType() == CEPASTransaction.TransactionType.BUS_REFUND) {
             return Mode.BUS;
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.MRT) {
             return Mode.METRO;
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.TOP_UP) {
             return Mode.TICKET_MACHINE;
-        else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL
-                || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE)
+        } else if (mTransaction.getType() == CEPASTransaction.TransactionType.RETAIL
+                || mTransaction.getType() == CEPASTransaction.TransactionType.SERVICE) {
             return Mode.POS;
+        }
         return Mode.OTHER;
     }
 
-    @Override public boolean hasTime() {
+    @Override
+    public boolean hasTime() {
         return true;
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeParcelable(mTransaction, flags);
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }

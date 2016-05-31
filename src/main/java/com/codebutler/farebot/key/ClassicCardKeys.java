@@ -63,6 +63,7 @@ public class ClassicCardKeys extends CardKeys {
 
     /**
      * Gets the key for a particular sector on the card.
+     *
      * @param sectorNumber The sector number to retrieve the key for
      * @return A ClassicSectorKey for that sector, or null if there is no known key or the value is
      * out of range.
@@ -78,6 +79,7 @@ public class ClassicCardKeys extends CardKeys {
         return mSectorKeys.clone();
     }
 
+    @Override
     public JSONObject toJSON() {
         try {
             JSONArray keysJson = new JSONArray();

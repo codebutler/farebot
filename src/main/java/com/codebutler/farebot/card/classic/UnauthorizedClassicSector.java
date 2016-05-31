@@ -28,25 +28,28 @@ import com.codebutler.farebot.card.UnauthorizedException;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
-@Root(name="sector")
+@Root(name = "sector")
 public class UnauthorizedClassicSector extends ClassicSector {
-    @Attribute(name="unauthorized") public static final boolean UNAUTHORIZED = true;
+    @Attribute(name = "unauthorized") public static final boolean UNAUTHORIZED = true;
 
-    private UnauthorizedClassicSector() { /** For XML serializer **/ }
+    private UnauthorizedClassicSector() { /** For XML serializer **/}
 
     public UnauthorizedClassicSector(int sectorIndex) {
         super(sectorIndex, null);
     }
 
-    @Override public byte[] readBlocks(int startBlock, int blockCount) {
+    @Override
+    public byte[] readBlocks(int startBlock, int blockCount) {
         throw new UnauthorizedException();
     }
 
-    @Override public java.util.List<ClassicBlock> getBlocks() {
+    @Override
+    public java.util.List<ClassicBlock> getBlocks() {
         throw new UnauthorizedException();
     }
 
-    @Override public ClassicBlock getBlock(int index) {
+    @Override
+    public ClassicBlock getBlock(int index) {
         throw new UnauthorizedException();
     }
 }

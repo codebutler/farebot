@@ -29,27 +29,32 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.codebutler.farebot.BuildConfig;
 
-public class KeysDBHelper extends SQLiteOpenHelper {
+
+class KeysDBHelper extends SQLiteOpenHelper {
+
     private static final String DATABASE_NAME = "keys.db";
     private static final int DATABASE_VERSION = 3;
 
-    public static final String KEY_DIR_TYPE  = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".key";
-    public static final String KEY_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".key";
+    static final String KEY_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".key";
+    static final String KEY_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".key";
 
+    @SuppressWarnings("WeakerAccess")
     public KeysDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override public void onCreate(SQLiteDatabase db) {
+    @Override
+    public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + KeysTableColumns.TABLE_NAME + " ("
-            + KeysTableColumns._ID        + " INTEGER PRIMARY KEY, "
-            + KeysTableColumns.CARD_ID    + " TEXT NOT NULL, "
-            + KeysTableColumns.CARD_TYPE  + " TEXT NOT NULL, "
-            + KeysTableColumns.KEY_DATA   + " BLOB NOT NULL, "
-            + KeysTableColumns.CREATED_AT + " LONG NOT NULL)");
+                + KeysTableColumns._ID + " INTEGER PRIMARY KEY, "
+                + KeysTableColumns.CARD_ID + " TEXT NOT NULL, "
+                + KeysTableColumns.CARD_TYPE + " TEXT NOT NULL, "
+                + KeysTableColumns.KEY_DATA + " BLOB NOT NULL, "
+                + KeysTableColumns.CREATED_AT + " LONG NOT NULL)");
     }
 
-    @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Not Implemented...
     }
 }

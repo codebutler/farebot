@@ -23,7 +23,8 @@
 package com.codebutler.farebot.card;
 
 public class UnsupportedCardException extends Exception {
-    @Override public String getMessage() {
+    @Override
+    public String getMessage() {
         return "Unsupported card data.";
     }
 }

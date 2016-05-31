@@ -28,7 +28,8 @@ import android.os.Parcelable;
 
 import com.codebutler.farebot.util.Utils;
 
-public class OVChipPreamble implements Parcelable {
+class OVChipPreamble implements Parcelable {
+
     private final String mId;
     private final int mCheckbit;
     private final String mManufacturer;
@@ -38,7 +39,7 @@ public class OVChipPreamble implements Parcelable {
     private final String mUnknownConstant2;
     private final int mType;
 
-    public OVChipPreamble(
+    private OVChipPreamble(
             String id,
             int checkbit,
             String manufacturer,
@@ -58,39 +59,21 @@ public class OVChipPreamble implements Parcelable {
         mType = type;
     }
 
-    public OVChipPreamble(byte[] data) {
+    OVChipPreamble(byte[] data) {
         if (data == null) {
             data = new byte[48];
         }
 
-        String id;
-        int checkbit;
-        String manufacturer;
-        String publisher;
-        String unknownConstant1;
-        int expdate;
-        String unknownConstant2;
-        int type;
-
         String hex = Utils.getHexString(data, null);
 
-        id = hex.substring(0, 8);
-        checkbit = Utils.getBitsFromBuffer(data, 32, 8);
-        manufacturer = hex.substring(10, 20);
-        publisher = hex.substring(20, 32);
-        unknownConstant1 = hex.substring(32, 54);
-        expdate = Utils.getBitsFromBuffer(data, 216, 20);
-        unknownConstant2 = hex.substring(59, 68);
-        type = Utils.getBitsFromBuffer(data, 276, 4);
-
-        mId = id;
-        mCheckbit = checkbit;
-        mManufacturer = manufacturer;
-        mPublisher = publisher;
-        mUnknownConstant1 = unknownConstant1;
-        mExpdate = expdate;
-        mUnknownConstant2 = unknownConstant2;
-        mType = type;
+        mId = hex.substring(0, 8);
+        mCheckbit = Utils.getBitsFromBuffer(data, 32, 8);
+        mManufacturer = hex.substring(10, 20);
+        mPublisher = hex.substring(20, 32);
+        mUnknownConstant1 = hex.substring(32, 54);
+        mExpdate = Utils.getBitsFromBuffer(data, 216, 20);
+        mUnknownConstant2 = hex.substring(59, 68);
+        mType = Utils.getBitsFromBuffer(data, 276, 4);
     }
 
     public String getId() {
@@ -125,29 +108,22 @@ public class OVChipPreamble implements Parcelable {
         return mType;
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }
 
     public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
+        @Override
         public OVChipPreamble createFromParcel(Parcel source) {
-            String id;
-            int checkbit;
-            String manufacturer;
-            String publisher;
-            String unknownConstant1;
-            int expdate;
-            String unknownConstant2;
-            int type;
-
-            id = source.readString();
-            checkbit = source.readInt();
-            manufacturer = source.readString();
-            publisher = source.readString();
-            unknownConstant1 = source.readString();
-            expdate = source.readInt();
-            unknownConstant2 = source.readString();
-            type = source.readInt();
+            final String id = source.readString();
+            final int checkbit = source.readInt();
+            final String manufacturer = source.readString();
+            final String publisher = source.readString();
+            final String unknownConstant1 = source.readString();
+            final int expdate = source.readInt();
+            final String unknownConstant2 = source.readString();
+            final int type = source.readInt();
 
             return new OVChipPreamble(id, checkbit,
                     manufacturer, publisher,
@@ -155,11 +131,13 @@ public class OVChipPreamble implements Parcelable {
                     unknownConstant2, type);
         }
 
+        @Override
         public OVChipPreamble[] newArray(int size) {
             return new OVChipPreamble[size];
         }
     };
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mId);
         parcel.writeInt(mCheckbit);

@@ -26,7 +26,9 @@ public class ManlyFastFerryRegularRecord extends ManlyFastFerryRecord {
 
     public static ManlyFastFerryRegularRecord recordFromBytes(byte[] input) {
         ManlyFastFerryRegularRecord record = null;
-        if (input[0] != 0x02) throw new AssertionError("Regular record must start with 0x02");
+        if (input[0] != 0x02) {
+            throw new AssertionError("Regular record must start with 0x02");
+        }
 
         switch (input[1]) {
             case 0x02:

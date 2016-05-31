@@ -29,48 +29,48 @@ import org.simpleframework.xml.Root;
 
 import java.io.ByteArrayInputStream;
 
-@Root(name="manufacturing-data")
+@Root(name = "manufacturing-data")
 public class DesfireManufacturingData {
-    @Element(name="hw-vendor-id") public int hwVendorID;
-    @Element(name="hw-type") public int hwType;
-    @Element(name="hw-sub-type") public int hwSubType;
-    @Element(name="hw-major-version") public int hwMajorVersion;
-    @Element(name="hw-minor-version") public int hwMinorVersion;
-    @Element(name="hw-storage-size") public int hwStorageSize;
-    @Element(name="hw-protocol") public int hwProtocol;
+    @Element(name = "hw-vendor-id") public int hwVendorID;
+    @Element(name = "hw-type") public int hwType;
+    @Element(name = "hw-sub-type") public int hwSubType;
+    @Element(name = "hw-major-version") public int hwMajorVersion;
+    @Element(name = "hw-minor-version") public int hwMinorVersion;
+    @Element(name = "hw-storage-size") public int hwStorageSize;
+    @Element(name = "hw-protocol") public int hwProtocol;
 
-    @Element(name="sw-vendor-id") public int swVendorID;
-    @Element(name="sw-type") public int swType;
-    @Element(name="sw-sub-type") public int swSubType;
-    @Element(name="sw-major-version") public int swMajorVersion;
-    @Element(name="sw-minor-version") public int swMinorVersion;
-    @Element(name="sw-storage-size") public int swStorageSize;
-    @Element(name="sw-protocol") public int swProtocol;
+    @Element(name = "sw-vendor-id") public int swVendorID;
+    @Element(name = "sw-type") public int swType;
+    @Element(name = "sw-sub-type") public int swSubType;
+    @Element(name = "sw-major-version") public int swMajorVersion;
+    @Element(name = "sw-minor-version") public int swMinorVersion;
+    @Element(name = "sw-storage-size") public int swStorageSize;
+    @Element(name = "sw-protocol") public int swProtocol;
 
-    @Element(name="uid") public int uid;
-    @Element(name="batch-no") public int batchNo;
-    @Element(name="week-prod") public int weekProd;
-    @Element(name="year-prod") public int yearProd;
+    @Element(name = "uid") public int uid;
+    @Element(name = "batch-no") public int batchNo;
+    @Element(name = "week-prod") public int weekProd;
+    @Element(name = "year-prod") public int yearProd;
 
     private DesfireManufacturingData() { /* For XML Serializer */ }
 
     public DesfireManufacturingData(byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
-        hwVendorID     = stream.read();
-        hwType         = stream.read();
-        hwSubType      = stream.read();
+        hwVendorID = stream.read();
+        hwType = stream.read();
+        hwSubType = stream.read();
         hwMajorVersion = stream.read();
         hwMinorVersion = stream.read();
-        hwStorageSize  = stream.read();
-        hwProtocol     = stream.read();
+        hwStorageSize = stream.read();
+        hwProtocol = stream.read();
 
-        swVendorID     = stream.read();
-        swType         = stream.read();
-        swSubType      = stream.read();
+        swVendorID = stream.read();
+        swType = stream.read();
+        swSubType = stream.read();
         swMajorVersion = stream.read();
         swMinorVersion = stream.read();
-        swStorageSize  = stream.read();
-        swProtocol     = stream.read();
+        swStorageSize = stream.read();
+        swProtocol = stream.read();
 
         // FIXME: This has fewer digits than what's contained in EXTRA_ID, why?
         byte[] buf = new byte[7];

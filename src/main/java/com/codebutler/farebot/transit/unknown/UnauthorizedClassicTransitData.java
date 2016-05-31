@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.unknown;
 
 import android.os.Parcel;
@@ -41,19 +42,22 @@ public class UnauthorizedClassicTransitData extends TransitData {
 
     public static final Creator<UnauthorizedClassicTransitData> CREATOR
             = new Creator<UnauthorizedClassicTransitData>() {
-        @Override public UnauthorizedClassicTransitData createFromParcel(Parcel source) {
+        @Override
+        public UnauthorizedClassicTransitData createFromParcel(Parcel source) {
             return new UnauthorizedClassicTransitData();
         }
 
-        @Override public UnauthorizedClassicTransitData[] newArray(int size) {
+        @Override
+        public UnauthorizedClassicTransitData[] newArray(int size) {
             return new UnauthorizedClassicTransitData[size];
         }
     };
 
     /**
      * This should be the last executed Mifare Classic check, after all the other checks are done.
-     *
+     * <p>
      * This is because it will catch others' cards.
+     *
      * @param card Card to read.
      * @return true if all sectors on the card are locked.
      */
@@ -103,5 +107,6 @@ public class UnauthorizedClassicTransitData extends TransitData {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) { }
+    public void writeToParcel(Parcel parcel, int i) {
+    }
 }

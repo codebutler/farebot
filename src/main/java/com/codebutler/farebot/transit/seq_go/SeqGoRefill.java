@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.transit.seq_go;
 
 import android.os.Parcel;
@@ -63,7 +64,7 @@ public class SeqGoRefill extends Refill {
 
     @Override
     public String getAmountString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double)getAmount() / 100);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getAmount() / 100);
     }
 
     @Override
@@ -71,16 +72,18 @@ public class SeqGoRefill extends Refill {
         mTopup.writeToParcel(parcel, i);
     }
 
-    public SeqGoRefill(Parcel parcel) {
+    private SeqGoRefill(Parcel parcel) {
         mTopup = new SeqGoTopupRecord(parcel);
     }
 
     public static final Parcelable.Creator<SeqGoRefill> CREATOR = new Parcelable.Creator<SeqGoRefill>() {
 
+        @Override
         public SeqGoRefill createFromParcel(Parcel in) {
             return new SeqGoRefill(in);
         }
 
+        @Override
         public SeqGoRefill[] newArray(int size) {
             return new SeqGoRefill[size];
         }

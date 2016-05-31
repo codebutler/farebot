@@ -49,20 +49,33 @@ import java.util.List;
 import java.util.Locale;
 
 public class OrcaTransitData extends TransitData {
+
+    public static final Creator<OrcaTransitData> CREATOR = new Creator<OrcaTransitData>() {
+        @Override
+        public OrcaTransitData createFromParcel(Parcel source) {
+            return new OrcaTransitData(source);
+        }
+
+        @Override
+        public OrcaTransitData[] newArray(int size) {
+            return new OrcaTransitData[size];
+        }
+    };
+
     static final int AGENCY_KCM = 0x04;
-    static final int AGENCY_PT  = 0x06;
-    static final int AGENCY_ST  = 0x07;
-    static final int AGENCY_CT  = 0x02;
+    static final int AGENCY_PT = 0x06;
+    static final int AGENCY_ST = 0x07;
+    static final int AGENCY_CT = 0x02;
     static final int AGENCY_WSF = 0x08;
-    static final int AGENCY_ET  = 0x03;
+    static final int AGENCY_ET = 0x03;
 
-    static final int TRANS_TYPE_PURSE_USE   = 0x0c;
+    static final int TRANS_TYPE_PURSE_USE = 0x0c;
     static final int TRANS_TYPE_CANCEL_TRIP = 0x01;
-    static final int TRANS_TYPE_TAP_IN      = 0x03;
-    static final int TRANS_TYPE_TAP_OUT     = 0x07;
-    static final int TRANS_TYPE_PASS_USE    = 0x60;
+    private static final int TRANS_TYPE_TAP_IN = 0x03;
+    private static final int TRANS_TYPE_TAP_OUT = 0x07;
+    static final int TRANS_TYPE_PASS_USE = 0x60;
 
-    private int    mSerialNumber;
+    private int mSerialNumber;
     private double mBalance;
     private Trip[] mTrips;
 
@@ -79,12 +92,12 @@ public class OrcaTransitData extends TransitData {
         }
     }
 
-    public OrcaTransitData(Parcel parcel) {
+    private OrcaTransitData(Parcel parcel) {
         mSerialNumber = parcel.readInt();
-        mBalance      = parcel.readDouble();
+        mBalance = parcel.readDouble();
 
         parcel.readInt();
-        mTrips = (Trip[]) parcel.readParcelableArray(null);
+        mTrips = (Trip[]) parcel.readParcelableArray(Trip.class.getClassLoader());
     }
 
     public OrcaTransitData(Card card) {
@@ -113,27 +126,33 @@ public class OrcaTransitData extends TransitData {
         }
     }
 
-    @Override public String getCardName() {
+    @Override
+    public String getCardName() {
         return "ORCA";
     }
 
-    @Override public String getBalanceString() {
+    @Override
+    public String getBalanceString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100);
     }
 
-    @Override public String getSerialNumber() {
+    @Override
+    public String getSerialNumber() {
         return Integer.toString(mSerialNumber);
     }
 
-    @Override public Trip[] getTrips() {
+    @Override
+    public Trip[] getTrips() {
         return mTrips;
     }
 
-    @Override public Subscription[] getSubscriptions() {
+    @Override
+    public Subscription[] getSubscriptions() {
         return null;
     }
 
-    @Override public List<ListItem> getInfo() {
+    @Override
+    public List<ListItem> getInfo() {
         return null;
     }
 
@@ -153,7 +172,7 @@ public class OrcaTransitData extends TransitData {
 
             for (int i = 0; i < useLog.length; i++) {
                 OrcaTrip trip = useLog[i];
-                OrcaTrip nextTrip = (i+1 < useLog.length) ? useLog[i+1] : null;
+                OrcaTrip nextTrip = (i + 1 < useLog.length) ? useLog[i + 1] : null;
 
                 if (isSameTrip(trip, nextTrip)) {
                     trips.add(new MergedOrcaTrip(trip, nextTrip));
@@ -172,10 +191,11 @@ public class OrcaTransitData extends TransitData {
         return firstTrip != null
                 && secondTrip != null
                 && firstTrip.mTransType == TRANS_TYPE_TAP_IN
-                && (secondTrip.mTransType ==TRANS_TYPE_TAP_OUT || secondTrip.mTransType == TRANS_TYPE_CANCEL_TRIP)
+                && (secondTrip.mTransType == TRANS_TYPE_TAP_OUT || secondTrip.mTransType == TRANS_TYPE_CANCEL_TRIP)
                 && firstTrip.mAgency == secondTrip.mAgency;
     }
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mSerialNumber);
         parcel.writeDouble(mBalance);

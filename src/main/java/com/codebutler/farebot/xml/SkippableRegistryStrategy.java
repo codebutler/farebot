@@ -43,7 +43,8 @@ public class SkippableRegistryStrategy extends RegistryStrategy {
     }
 
     @SuppressWarnings("unchecked")
-    @Override public Value read(Type type, NodeMap<InputNode> node, Map map) throws Exception {
+    @Override
+    public Value read(Type type, NodeMap<InputNode> node, Map map) throws Exception {
         try {
             return super.read(type, node, map);
         } catch (SkipException ignored) {
@@ -51,7 +52,8 @@ public class SkippableRegistryStrategy extends RegistryStrategy {
         }
     }
 
-    @Override public boolean write(Type type, Object value, NodeMap<OutputNode> node, Map map) throws Exception {
+    @Override
+    public boolean write(Type type, Object value, NodeMap<OutputNode> node, Map map) throws Exception {
         try {
             return super.write(type, value, node, map);
         } catch (SkipException ignored) {
@@ -59,5 +61,6 @@ public class SkippableRegistryStrategy extends RegistryStrategy {
         }
     }
 
-    public static class SkipException extends Exception { }
+    public static class SkipException extends Exception {
+    }
 }

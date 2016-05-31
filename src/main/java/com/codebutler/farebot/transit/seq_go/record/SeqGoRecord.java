@@ -23,7 +23,8 @@ package com.codebutler.farebot.transit.seq_go.record;
  * Represents a record on a SEQ Go Card (Translink).
  */
 public class SeqGoRecord {
-    protected SeqGoRecord() {}
+    SeqGoRecord() {
+    }
 
     public static SeqGoRecord recordFromBytes(byte[] input) {
         SeqGoRecord record = null;

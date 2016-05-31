@@ -48,14 +48,16 @@ import com.codebutler.farebot.util.Utils;
 import java.util.Date;
 
 public class ReadingTagActivity extends Activity {
-    @Override public void onCreate(Bundle icicle) {
+    @Override
+    public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_reading_tag);
 
         resolveIntent(getIntent());
     }
 
-    @Override public void onNewIntent(Intent intent) {
+    @Override
+    public void onNewIntent(Intent intent) {
         resolveIntent(intent);
     }
 
@@ -78,7 +80,8 @@ public class ReadingTagActivity extends Activity {
             new AsyncTask<Void, String, Uri>() {
                 private Exception mException;
 
-                @Override protected Uri doInBackground(Void... params) {
+                @Override
+                protected Uri doInBackground(Void... params) {
                     try {
                         Card card = Card.dumpTag(tagId, tag);
 
@@ -99,14 +102,13 @@ public class ReadingTagActivity extends Activity {
                         values.put(CardsTableColumns.DATA, cardXml);
                         values.put(CardsTableColumns.SCANNED_AT, card.getScannedAt().getTime());
 
-                        Uri uri = getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
-
-                        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(ReadingTagActivity.this).edit();
+                        SharedPreferences.Editor prefs
+                                = PreferenceManager.getDefaultSharedPreferences(ReadingTagActivity.this).edit();
                         prefs.putString(FareBotApplication.PREF_LAST_READ_ID, tagIdString);
                         prefs.putLong(FareBotApplication.PREF_LAST_READ_AT, new Date().getTime());
                         prefs.apply();
 
-                        return uri;
+                        return getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
 
                     } catch (Exception ex) {
                         mException = ex;
@@ -114,7 +116,8 @@ public class ReadingTagActivity extends Activity {
                     }
                 }
 
-                @Override protected void onPostExecute(Uri cardUri) {
+                @Override
+                protected void onPostExecute(Uri cardUri) {
                     if (mException == null) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, cardUri);
                         intent.putExtra(CardInfoActivity.SPEAK_BALANCE_EXTRA, true);
@@ -129,6 +132,7 @@ public class ReadingTagActivity extends Activity {
                                 .setMessage(ex.getMessage())
                                 .setCancelable(false)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
                                     public void onClick(DialogInterface arg0, int arg1) {
                                         finish();
                                     }

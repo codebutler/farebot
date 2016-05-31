@@ -27,7 +27,7 @@ import java.util.Arrays;
 /**
  * Represents a "preamble" type record.
  */
-public class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
+class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
 
     private static final byte[] OLD_CARD_ID = {0x00, 0x00, 0x00};
 
@@ -37,7 +37,8 @@ public class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
         ManlyFastFerryPreambleRecord record = new ManlyFastFerryPreambleRecord();
 
         // Check that the record is valid for a preamble
-        if (!Arrays.equals(Arrays.copyOfRange(input, 0, ManlyFastFerryTransitData.SIGNATURE.length), ManlyFastFerryTransitData.SIGNATURE)) {
+        if (!Arrays.equals(Arrays.copyOfRange(input, 0, ManlyFastFerryTransitData.SIGNATURE.length),
+                ManlyFastFerryTransitData.SIGNATURE)) {
             throw new IllegalArgumentException("Preamble signature does not match");
         }
 
@@ -50,11 +51,10 @@ public class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
         return record;
     }
 
-    protected ManlyFastFerryPreambleRecord() {}
+    private ManlyFastFerryPreambleRecord() { }
 
     /**
      * Returns the card serial number. Returns null on old cards.
-     *
      */
     public String getCardSerial() {
         return mCardSerial;

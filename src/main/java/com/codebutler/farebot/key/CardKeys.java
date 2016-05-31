@@ -39,7 +39,8 @@ public abstract class CardKeys {
     public static CardKeys forTagId(byte[] tagId) throws Exception {
         String tagIdString = Utils.getHexString(tagId);
         FareBotApplication app = FareBotApplication.getInstance();
-        Cursor cursor = app.getContentResolver().query(Uri.withAppendedPath(CardKeyProvider.CONTENT_URI, tagIdString), null, null, null, null);
+        Cursor cursor = app.getContentResolver().query(Uri.withAppendedPath(CardKeyProvider.CONTENT_URI, tagIdString),
+                null, null, null, null);
         if (cursor.moveToFirst()) {
             return CardKeys.fromCursor(cursor);
         } else {
@@ -49,7 +50,7 @@ public abstract class CardKeys {
 
     private static CardKeys fromCursor(Cursor cursor) throws JSONException {
         String cardType = cursor.getString(cursor.getColumnIndex(KeysTableColumns.CARD_TYPE));
-        String keyData  = cursor.getString(cursor.getColumnIndex(KeysTableColumns.KEY_DATA));
+        String keyData = cursor.getString(cursor.getColumnIndex(KeysTableColumns.KEY_DATA));
 
         JSONObject keyJSON = new JSONObject(keyData);
 

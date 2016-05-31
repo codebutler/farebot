@@ -26,12 +26,13 @@ import android.provider.BaseColumns;
 
 public class CardsTableColumns implements BaseColumns {
 
-    private CardsTableColumns() { }
+    private CardsTableColumns() {
+    }
 
     public static final String TABLE_NAME = "cards";
 
-    public static final String TYPE       = "type";
+    public static final String TYPE = "type";
     public static final String TAG_SERIAL = "serial";
-    public static final String DATA       = "data";
+    public static final String DATA = "data";
     public static final String SCANNED_AT = "scanned_at";
 }

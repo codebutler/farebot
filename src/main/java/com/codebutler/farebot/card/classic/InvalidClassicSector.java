@@ -26,10 +26,10 @@ package com.codebutler.farebot.card.classic;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
-@Root(name="sector")
+@Root(name = "sector")
 public class InvalidClassicSector extends ClassicSector {
-    @Attribute(name="error") private String mError;
-    @Attribute(name="invalid") public final boolean mInvalid = true;
+    @Attribute(name = "error") private String mError;
+    @Attribute(name = "invalid") public final boolean mInvalid = true;
 
     public InvalidClassicSector(int index, String error) {
         super(index, null);
@@ -40,15 +40,18 @@ public class InvalidClassicSector extends ClassicSector {
         return mError;
     }
 
-    @Override public byte[] readBlocks(int startBlock, int blockCount) {
+    @Override
+    public byte[] readBlocks(int startBlock, int blockCount) {
         throw new IllegalStateException(mError);
     }
 
-    @Override public java.util.List<ClassicBlock> getBlocks() {
+    @Override
+    public java.util.List<ClassicBlock> getBlocks() {
         throw new IllegalStateException(mError);
     }
 
-    @Override public ClassicBlock getBlock(int index) {
+    @Override
+    public ClassicBlock getBlock(int index) {
         throw new IllegalStateException(mError);
     }
 }

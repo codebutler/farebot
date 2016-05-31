@@ -29,16 +29,16 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
-@Root(name="block")
+@Root(name = "block")
 public class ClassicBlock {
-    public static final String TYPE_DATA         = "data";
-    public static final String TYPE_VALUE        = "value";
-    public static final String TYPE_TRAILER      = "trailer";
+    public static final String TYPE_DATA = "data";
+    private static final String TYPE_VALUE = "value";
+    public static final String TYPE_TRAILER = "trailer";
     public static final String TYPE_MANUFACTURER = "manufacturer";
 
-    @Attribute(name="index") private int mIndex;
-    @Attribute(name="type") private String mType;
-    @Element(name="data") private Base64String mData;
+    @Attribute(name = "index") private int mIndex;
+    @Attribute(name = "type") private String mType;
+    @Element(name = "data") private Base64String mData;
 
     public static ClassicBlock create(String type, int index, byte[] data) {
         if (type.equals(TYPE_DATA) || type.equals(TYPE_VALUE)) {
@@ -47,9 +47,10 @@ public class ClassicBlock {
         return null;
     }
 
-    public ClassicBlock() { }
+    public ClassicBlock() {
+    }
 
-    public ClassicBlock(int index, String type, byte[] data) {
+    private ClassicBlock(int index, String type, byte[] data) {
         mIndex = index;
         mType = type;
         mData = new Base64String(data);

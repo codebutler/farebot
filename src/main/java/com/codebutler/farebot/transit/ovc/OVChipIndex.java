@@ -30,7 +30,7 @@ import com.codebutler.farebot.util.Utils;
 
 import java.util.Arrays;
 
-public class OVChipIndex implements Parcelable {
+class OVChipIndex implements Parcelable {
     private int mRecentTransactionSlot;     // Most recent transaction slot (0xFB0 or 0xFD0)
     private int mRecentInfoSlot;            // Most recent card information index slot (0x5C0 or 0x580)
     private int mRecentSubscriptionSlot;    // Most recent subscription index slot (0xF10 or 0xF30)
@@ -38,7 +38,7 @@ public class OVChipIndex implements Parcelable {
     private int mRecentCreditSlot;          // Most recent credit index slot (0xF90 or 0xFA0)
     private int[] mSubscriptionIndex;
 
-    public OVChipIndex(
+    private OVChipIndex(
             int recentTransactionSlot,
             int recentInfoSlot,
             int recentSubscriptionSlot,
@@ -54,40 +54,35 @@ public class OVChipIndex implements Parcelable {
         mSubscriptionIndex = subscriptionIndex;
     }
 
-    public OVChipIndex(byte[] data) {
-        int recentTransactionSlot;
-        int recentInfoSlot;
-        int recentSubscriptionSlot;
-        int recentTravelhistorySlot;
-        int recentCreditSlot;
-        int[] subscriptionIndex;
+    OVChipIndex(byte[] data) {
+        final byte[] firstSlot = Arrays.copyOfRange(data, 0, data.length / 2);
+        final byte[] secondSlot = Arrays.copyOfRange(data, data.length / 2, data.length);
 
-        byte[] firstSlot = Arrays.copyOfRange(data, 0, data.length / 2);
-        byte[] secondSlot = Arrays.copyOfRange(data, data.length / 2, data.length);
+        final int iIDa3 = ((firstSlot[1] & (char) 0x3F) << 10) | ((firstSlot[2] & (char) 0xFF) << 2)
+                | ((firstSlot[3] >> 6) & (char) 0x03);
+        final int iIDb3 = ((secondSlot[1] & (char) 0x3F) << 10) | ((secondSlot[2] & (char) 0xFF) << 2)
+                | ((secondSlot[3] >> 6) & (char) 0x03);
 
-        int iIDa3 = ((firstSlot[1] & (char)0x3F) << 10) | ((firstSlot[2] & (char)0xFF) << 2)
-                | ((firstSlot[3] >> 6) & (char)0x03);
-        int iIDb3 = ((secondSlot[1] & (char)0x3F) << 10) | ((secondSlot[2] & (char)0xFF) << 2)
-                | ((secondSlot[3] >> 6) & (char)0x03);
+        final int recentTransactionSlot = (iIDb3 > iIDa3 ? (char) (0xFB0) : (char) (0xFD0));
+        final byte[] buffer = (iIDb3 > iIDa3 ? secondSlot : firstSlot);
 
-        recentTransactionSlot = (iIDb3 > iIDa3 ? (char)(0xFB0) : (char)(0xFD0));
-        byte[] buffer = (iIDb3 > iIDa3 ? secondSlot : firstSlot);
+        final int cardindex = ((buffer[3] >> 5) & (char) 0x01);
+        final int recentInfoSlot = (cardindex == 1 ? (char) 0x5C0 : (char) 0x580);
 
-        int cardindex = ((buffer[3] >> 5) & (char)0x01);
-        recentInfoSlot = (cardindex == 1 ? (char)0x5C0 : (char)0x580);
+        final int indexes = ((buffer[31] >> 5) & (byte) 0x07);
+        final int recentSubscriptionSlot = (((byte) indexes & (byte) 0x04) == (byte) 0x00
+                ? (char) 0xF10 : (char) 0xF30);
+        final int recentTravelhistorySlot = (((byte) indexes & (byte) 0x02) == (byte) 0x00
+                ? (char) 0xF50 : (char) 0xF70);
+        final int recentCreditSlot = (((byte) indexes & (byte) 0x01) == (byte) 0x00 ? (char) 0xF90 : (char) 0xFA0);
 
-        int indexes = ((buffer[31] >> 5) & (byte)0x07);
-        recentSubscriptionSlot = (((byte)indexes & (byte)0x04) == (byte)0x00 ? (char)0xF10 : (char)0xF30);
-        recentTravelhistorySlot = (((byte)indexes & (byte)0x02) == (byte)0x00 ? (char)0xF50 : (char)0xF70);
-        recentCreditSlot = (((byte)indexes & (byte)0x01) == (byte)0x00 ? (char)0xF90 : (char)0xFA0);
-
-        subscriptionIndex = new int[12];
+        int[] subscriptionIndex = new int[12];
         int offset = 108;
 
         for (int i = 0; i < 12; i++) {
             int bits = Utils.getBitsFromBuffer(buffer, offset + (i * 4), 4);
-            subscriptionIndex[i] = (bits < 5 ? ((char)0x800 + bits * (byte)0x30) : bits > 9
-                    ? ((char)0xA00 + (bits - 10) * (byte)0x30) : ((char)0x900 + (bits - 5) * (byte)0x30));
+            subscriptionIndex[i] = (bits < 5 ? ((char) 0x800 + bits * (byte) 0x30) : bits > 9
+                    ? ((char) 0xA00 + (bits - 10) * (byte) 0x30) : ((char) 0x900 + (bits - 5) * (byte) 0x30));
         }
 
         mRecentTransactionSlot = recentTransactionSlot;
@@ -98,50 +93,45 @@ public class OVChipIndex implements Parcelable {
         mSubscriptionIndex = subscriptionIndex;
     }
 
-    public int getRecentTransactionSlot() {
+    int getRecentTransactionSlot() {
         return mRecentTransactionSlot;
     }
 
-    public int getRecentInfoSlot() {
+    int getRecentInfoSlot() {
         return mRecentInfoSlot;
     }
 
-    public int getRecentSubscriptionSlot() {
+    int getRecentSubscriptionSlot() {
         return mRecentSubscriptionSlot;
     }
 
-    public int getRecentTravelhistorySlot() {
+    int getRecentTravelhistorySlot() {
         return mRecentTravelhistorySlot;
     }
 
-    public int getRecentCreditSlot() {
+    int getRecentCreditSlot() {
         return mRecentCreditSlot;
     }
 
-    public int[] getSubscriptionIndex() {
+    int[] getSubscriptionIndex() {
         return mSubscriptionIndex;
     }
 
+    @Override
     public int describeContents() {
         return 0;
     }
 
     public static final Parcelable.Creator<OVChipIndex> CREATOR = new Parcelable.Creator<OVChipIndex>() {
+        @Override
         public OVChipIndex createFromParcel(Parcel source) {
-            int recentTransactionSlot;
-            int recentInfoSlot;
-            int recentSubscriptionSlot;
-            int recentTravelhistorySlot;
-            int recentCreditSlot;
-            int[] subscriptionIndex;
+            int recentTransactionSlot = source.readInt();
+            int recentInfoSlot = source.readInt();
+            int recentSubscriptionSlot = source.readInt();
+            int recentTravelhistorySlot = source.readInt();
+            int recentCreditSlot = source.readInt();
 
-            recentTransactionSlot = source.readInt();
-            recentInfoSlot = source.readInt();
-            recentSubscriptionSlot = source.readInt();
-            recentTravelhistorySlot = source.readInt();
-            recentCreditSlot = source.readInt();
-
-            subscriptionIndex = new int[source.readInt()];
+            int[] subscriptionIndex = new int[source.readInt()];
             source.readIntArray(subscriptionIndex);
 
             return new OVChipIndex(recentTransactionSlot,
@@ -150,11 +140,13 @@ public class OVChipIndex implements Parcelable {
                     subscriptionIndex);
         }
 
+        @Override
         public OVChipIndex[] newArray(int size) {
             return new OVChipIndex[size];
         }
     };
 
+    @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(mRecentTransactionSlot);
         parcel.writeInt(mRecentInfoSlot);

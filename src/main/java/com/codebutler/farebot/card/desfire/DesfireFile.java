@@ -28,11 +28,11 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
-@Root(name="file")
+@Root(name = "file")
 public class DesfireFile {
-    @Attribute(name="id") private int mId;
-    @Element(name="settings", required=false) private DesfireFileSettings mSettings;
-    @Element(name="data", required=false) private Base64String mData;
+    @Attribute(name = "id") private int mId;
+    @Element(name = "settings", required = false) private DesfireFileSettings mSettings;
+    @Element(name = "data", required = false) private Base64String mData;
 
     public static DesfireFile create(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
         if (fileSettings instanceof RecordDesfireFileSettings) {

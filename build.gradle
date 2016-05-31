@@ -106,6 +106,12 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
+        disable 'MissingTranslation', 'InvalidPackage'
     }
+}
+
+checkstyle {
+    ignoreFailures = false
+    toolVersion = "6.11.2"
 }

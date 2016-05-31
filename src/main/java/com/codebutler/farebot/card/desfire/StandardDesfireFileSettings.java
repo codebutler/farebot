@@ -30,9 +30,9 @@ import org.simpleframework.xml.Root;
 
 import java.io.ByteArrayInputStream;
 
-@Root(name="settings")
+@Root(name = "settings")
 public class StandardDesfireFileSettings extends DesfireFileSettings {
-    @Element(name="filesize") private int mFileSize;
+    @Element(name = "filesize") private int mFileSize;
 
     private StandardDesfireFileSettings() { /* For XML Serializer */ }
 

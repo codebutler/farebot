@@ -25,14 +25,13 @@ import java.util.List;
 
 /**
  * Utility class for reading Mifare Ultralight / Ultralight C
- *
  */
-@Root(name="card")
+@Root(name = "card")
 @CardRawDataFragmentClass(UltralightCardRawDataFragment.class)
 @CardHasManufacturingInfo(false)
 public class UltralightCard extends Card {
-    @ElementList(name="pages") private List<UltralightPage> mPages;
-    @Attribute(name="ultralightType") private int mUltralightType;
+    @ElementList(name = "pages") private List<UltralightPage> mPages;
+    @Attribute(name = "ultralightType") private int mUltralightType;
 
     private static final int ULTRALIGHT_SIZE = 0x0F;
     private static final int ULTRALIGHT_C_SIZE = 0x2B;
@@ -65,7 +64,8 @@ public class UltralightCard extends Card {
 
                 // unknown
                 default:
-                    throw new UnsupportedTagException(new String[] {"Ultralight"}, "Unknown Ultralight type " + tech.getType());
+                    throw new UnsupportedTagException(new String[]{"Ultralight"},
+                            "Unknown Ultralight type " + tech.getType());
             }
 
             // Now iterate through the pages and grab all the datas
@@ -98,13 +98,15 @@ public class UltralightCard extends Card {
     }
 
 
-    @Override public TransitIdentity parseTransitIdentity() {
+    @Override
+    public TransitIdentity parseTransitIdentity() {
 
         // The card could not be identified.
         return null;
     }
 
-    @Override public TransitData parseTransitData() {
+    @Override
+    public TransitData parseTransitData() {
 
         // The card could not be identified.
         return null;
@@ -121,6 +123,7 @@ public class UltralightCard extends Card {
     /**
      * Get the type of Ultralight card this is.  This is either MifareUltralight.TYPE_ULTRALIGHT,
      * or MifareUltralight.TYPE_ULTRALIGHT_C.
+     *
      * @return Type of Ultralight card this is.
      */
     public int getUltralightType() {

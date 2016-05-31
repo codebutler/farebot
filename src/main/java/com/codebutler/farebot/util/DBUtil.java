@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.util;
 
 import android.content.Context;
@@ -38,13 +39,14 @@ import java.io.OutputStream;
 public abstract class DBUtil {
 
     /**
-     * Implementing clases should specify the filename of their database.
+     * Implementing classes should specify the filename of their database.
+     *
      * @return Path, relative to FareBot's data folder, where to store the database file.
      */
     protected abstract String getDBName();
 
     /**
-     * Implementing clases should specify what the target version of database they should expect.
+     * Implementing classes should specify what the target version of database they should expect.
      *
      * @return The desired database version, as defined in PRAGMA user_version
      */
@@ -53,13 +55,13 @@ public abstract class DBUtil {
     /**
      * If set to true, this will allow a database which has a greater PRAGMA user_version to
      * satisfy the database requirements.
-     *
+     * <p>
      * If set to false, the database version (PRAGMA user_version) must be exactly the same as the
      * return value of getDesiredVersion().
      *
      * @return true if exact match is required, false if it just must be at minimum this number.
      */
-    protected boolean allowGreaterDatabaseVersions() {
+    private boolean allowGreaterDatabaseVersions() {
         return false;
     }
 
@@ -68,7 +70,7 @@ public abstract class DBUtil {
     private SQLiteDatabase mDatabase;
     private final Context mContext;
 
-    public DBUtil(Context context) {
+    protected DBUtil(Context context) {
         this.mContext = context;
     }
 
@@ -87,8 +89,9 @@ public abstract class DBUtil {
     }
 
     public synchronized void close() {
-        if (mDatabase != null)
+        if (mDatabase != null) {
             this.mDatabase.close();
+        }
     }
 
     private boolean hasDatabase() {
@@ -96,23 +99,28 @@ public abstract class DBUtil {
 
         File file = getDBFile();
         if (!file.exists()) {
-            Log.d(TAG, String.format("Database for %s does not exist, will install version %s", getDBName(), getDesiredVersion()));
+            Log.d(TAG, String.format("Database for %s does not exist, will install version %s",
+                    getDBName(), getDesiredVersion()));
             return false;
         }
 
         try {
             tempDatabase = SQLiteDatabase.openDatabase(file.getPath(), null, SQLiteDatabase.OPEN_READONLY);
             int currentVersion = tempDatabase.getVersion();
-            if (allowGreaterDatabaseVersions() ? currentVersion < getDesiredVersion() : currentVersion != getDesiredVersion()) {
-                Log.d(TAG, String.format("Updating %s database. Old: %s, new: %s", getDBName(), currentVersion, getDesiredVersion()));
+            if (allowGreaterDatabaseVersions()
+                    ? currentVersion < getDesiredVersion()
+                    : currentVersion != getDesiredVersion()) {
+                Log.d(TAG, String.format("Updating %s database. Old: %s, new: %s", getDBName(), currentVersion,
+                        getDesiredVersion()));
                 tempDatabase.close();
                 tempDatabase = null;
             } else {
-                Log.d(TAG, String.format("Not updating %s database. Current: %s, app has: %s" , getDBName(), currentVersion, getDesiredVersion()));
+                Log.d(TAG, String.format("Not updating %s database. Current: %s, app has: %s", getDBName(),
+                        currentVersion, getDesiredVersion()));
             }
         } catch (SQLiteException ignored) { }
 
-        if (tempDatabase != null){
+        if (tempDatabase != null) {
             tempDatabase.close();
         }
 
@@ -120,10 +128,10 @@ public abstract class DBUtil {
     }
 
     private void copyDatabase() {
-        InputStream in   = null;
+        InputStream in = null;
         OutputStream out = null;
         try {
-            in  = this.mContext.getAssets().open(getDBName());
+            in = this.mContext.getAssets().open(getDBName());
             out = new FileOutputStream(getDBFile());
             IOUtils.copy(in, out);
         } catch (IOException e) {
@@ -134,7 +142,7 @@ public abstract class DBUtil {
         }
     }
 
-    public File getDBFile() {
+    private File getDBFile() {
         return new File(mContext.getCacheDir().getAbsolutePath() + "/" + getDBName());
     }
 }

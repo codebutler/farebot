@@ -39,15 +39,18 @@ public class HexString {
         return mData;
     }
 
-    public String toHexString() {
+    private String toHexString() {
         return Utils.getHexString(mData);
     }
 
     public static final class Transform implements org.simpleframework.xml.transform.Transform<HexString> {
-        @Override public HexString read(String value) throws Exception {
+        @Override
+        public HexString read(String value) throws Exception {
             return new HexString(value);
         }
-        @Override public String write(HexString value) throws Exception {
+
+        @Override
+        public String write(HexString value) throws Exception {
             return value.toHexString();
         }
     }

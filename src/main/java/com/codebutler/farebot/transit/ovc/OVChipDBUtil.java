@@ -28,18 +28,21 @@ import android.content.Context;
 import com.codebutler.farebot.util.DBUtil;
 
 public class OVChipDBUtil extends DBUtil {
-    public static final String TABLE_NAME = "stations_data";
-    public static final String COLUMN_ROW_COMPANY = "company";
-    public static final String COLUMN_ROW_OVCID = "ovcid";
-    public static final String COLUMN_ROW_NAME = "name";
-    public static final String COLUMN_ROW_CITY = "city";
-    public static final String COLUMN_ROW_LONGNAME = "longname";
-    public static final String COLUMN_ROW_HALTENR = "haltenr";
-    public static final String COLUMN_ROW_ZONE = "zone";
-    public static final String COLUMN_ROW_LON = "lon";
-    public static final String COLUMN_ROW_LAT = "lat";
 
-    public static final String[] COLUMNS_STATIONDATA = {
+    static final String TABLE_NAME = "stations_data";
+
+    static final String COLUMN_ROW_COMPANY = "company";
+    static final String COLUMN_ROW_OVCID = "ovcid";
+    static final String COLUMN_ROW_NAME = "name";
+    static final String COLUMN_ROW_CITY = "city";
+    static final String COLUMN_ROW_LON = "lon";
+    static final String COLUMN_ROW_LAT = "lat";
+
+    private static final String COLUMN_ROW_LONGNAME = "longname";
+    private static final String COLUMN_ROW_HALTENR = "haltenr";
+    private static final String COLUMN_ROW_ZONE = "zone";
+
+    static final String[] COLUMNS_STATIONDATA = {
             COLUMN_ROW_COMPANY,
             COLUMN_ROW_OVCID,
             COLUMN_ROW_NAME,

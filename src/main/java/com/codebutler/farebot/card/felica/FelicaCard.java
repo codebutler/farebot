@@ -49,12 +49,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Root(name="card")
+@Root(name = "card")
 @CardRawDataFragmentClass(FelicaCardRawDataFragment.class)
 public class FelicaCard extends Card {
-    @Element(name="idm") private FeliCaLib.IDm mIDm;
-    @Element(name="pmm") private FeliCaLib.PMm mPMm;
-    @ElementList(name="systems") private List<FelicaSystem> mSystems;
+    @Element(name = "idm") private FeliCaLib.IDm mIDm;
+    @Element(name = "pmm") private FeliCaLib.PMm mPMm;
+    @ElementList(name = "systems") private List<FelicaSystem> mSystems;
 
     private FelicaCard() { /* For XML Serializer */ }
 
@@ -66,8 +66,9 @@ public class FelicaCard extends Card {
         FeliCaLib.IDm idm = ft.pollingAndGetIDm(FeliCaLib.SYSTEMCODE_ANY);
         FeliCaLib.PMm pmm = ft.getPMm();
 
-        if (idm == null)
+        if (idm == null) {
             throw new Exception("Failed to read IDm");
+        }
 
         List<FelicaSystem> systems = new ArrayList<>();
 
@@ -129,8 +130,8 @@ public class FelicaCard extends Card {
 
     public FelicaCard(byte[] tagId, Date scannedAt, FeliCaLib.IDm idm, FeliCaLib.PMm pmm, FelicaSystem[] systems) {
         super(CardType.FeliCa, tagId, scannedAt);
-        mIDm     = idm;
-        mPMm     = pmm;
+        mIDm = idm;
+        mPMm = pmm;
         mSystems = Utils.arrayAsList(systems);
     }
 
@@ -180,20 +181,24 @@ public class FelicaCard extends Card {
         return null;
     }
 
-    @Override public TransitIdentity parseTransitIdentity() {
-        if (SuicaTransitData.check(this))
+    @Override
+    public TransitIdentity parseTransitIdentity() {
+        if (SuicaTransitData.check(this)) {
             return SuicaTransitData.parseTransitIdentity(this);
-        else if (EdyTransitData.check(this))
+        } else if (EdyTransitData.check(this)) {
             return EdyTransitData.parseTransitIdentity(this);
+        }
         return null;
     }
 
-    @Override public TransitData parseTransitData() {
+    @Override
+    public TransitData parseTransitData() {
         Log.d("FelicaCard", "parseTransitData() called!!");
-        if (SuicaTransitData.check(this))
+        if (SuicaTransitData.check(this)) {
             return new SuicaTransitData(this);
-        else if (EdyTransitData.check(this))
+        } else if (EdyTransitData.check(this)) {
             return new EdyTransitData(this);
+        }
         return null;
     }
 }

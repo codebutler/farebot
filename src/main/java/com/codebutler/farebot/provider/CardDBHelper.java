@@ -30,46 +30,48 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.codebutler.farebot.BuildConfig;
 
 public class CardDBHelper extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "cards.db";
-    public static final int DATABASE_VERSION = 2;
+    private static final String DATABASE_NAME = "cards.db";
+    private static final int DATABASE_VERSION = 2;
 
     public static final int CARD_COLLECTION_URI_INDICATOR = 1;
     public static final int SINGLE_CARD_URI_INDICATOR = 2;
 
-    public static final String CARD_DIR_TYPE  = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".card";
+    public static final String CARD_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".card";
     public static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".card";
 
-    public static final String[] PROJECTION = new String[] {
-        CardsTableColumns._ID,
-        CardsTableColumns.TYPE,
-        CardsTableColumns.TAG_SERIAL,
-        CardsTableColumns.DATA,
-        CardsTableColumns.SCANNED_AT
+    public static final String[] PROJECTION = new String[]{
+            CardsTableColumns._ID,
+            CardsTableColumns.TYPE,
+            CardsTableColumns.TAG_SERIAL,
+            CardsTableColumns.DATA,
+            CardsTableColumns.SCANNED_AT
     };
 
     public static Cursor createCursor(Context context) {
         return context.getContentResolver().query(CardProvider.CONTENT_URI_CARD,
-            PROJECTION,
-            null,
-            null,
-            CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
+                PROJECTION,
+                null,
+                null,
+                CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
     }
 
     public CardDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override public void onCreate(SQLiteDatabase db) {
+    @Override
+    public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE cards ("
-        + "_id        INTEGER PRIMARY KEY, "
-        + "type       TEXT NOT NULL, "
-        + "serial     TEXT NOT NULL, "
-        + "data       BLOB NOT NULL, "
-        + "scanned_at LONG"
-        + ");");
+                + "_id        INTEGER PRIMARY KEY, "
+                + "type       TEXT NOT NULL, "
+                + "serial     TEXT NOT NULL, "
+                + "data       BLOB NOT NULL, "
+                + "scanned_at LONG"
+                + ");");
     }
 
-    @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion == 2) {
             db.beginTransaction();
             try {

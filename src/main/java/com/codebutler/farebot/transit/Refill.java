@@ -28,17 +28,21 @@ public abstract class Refill implements Parcelable {
     public abstract long getTimestamp();
 
     public abstract String getAgencyName();
+
     public abstract String getShortAgencyName();
 
     public abstract long getAmount();
+
     public abstract String getAmountString();
 
+    @Override
     public final int describeContents() {
         return 0;
     }
 
     public static class Comparator implements java.util.Comparator<Refill> {
-        @Override public int compare(Refill lhs, Refill rhs) {
+        @Override
+        public int compare(Refill lhs, Refill rhs) {
             // For consistency with Trip, this is reversed.
             return Long.valueOf(rhs.getTimestamp()).compareTo(lhs.getTimestamp());
         }

@@ -35,20 +35,24 @@ import com.codebutler.farebot.ui.ListItem;
 
 import java.util.List;
 
-public class ListItemAdapter extends ArrayAdapter<ListItem> {
-    public ListItemAdapter(Context context, List<ListItem> items) {
+class ListItemAdapter extends ArrayAdapter<ListItem> {
+
+    ListItemAdapter(Context context, List<ListItem> items) {
         super(context, 0, items);
     }
 
-    @Override public int getItemViewType(int position) {
+    @Override
+    public int getItemViewType(int position) {
         return (getItem(position) instanceof HeaderListItem) ? 0 : 1;
     }
 
-    @Override public int getViewTypeCount() {
+    @Override
+    public int getViewTypeCount() {
         return 2;
     }
 
-    @Override public View getView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             int viewId = getItemViewType(position) == 0 ? R.layout.list_header : android.R.layout.simple_list_item_2;
             convertView = ((Activity) getContext()).getLayoutInflater().inflate(viewId, parent, false);
@@ -65,7 +69,8 @@ public class ListItemAdapter extends ArrayAdapter<ListItem> {
         return convertView;
     }
 
-    @Override public boolean isEnabled(int position) {
+    @Override
+    public boolean isEnabled(int position) {
         return false;
     }
 }

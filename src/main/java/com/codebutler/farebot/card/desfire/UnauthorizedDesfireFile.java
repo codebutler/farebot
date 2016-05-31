@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.codebutler.farebot.card.desfire;
 
 import org.simpleframework.xml.Attribute;
@@ -25,17 +26,19 @@ import org.simpleframework.xml.Root;
  * Represents a DESFire file which could not be read due to
  * access control limits.
  */
-@Root(name="file")
+@Root(name = "file")
 public class UnauthorizedDesfireFile extends InvalidDesfireFile {
-    @Attribute(name="unauthorized") public static final boolean UNAUTHORIZED = true;
+    @Attribute(name = "unauthorized") public static final boolean UNAUTHORIZED = true;
 
+    @SuppressWarnings("unused")
     private UnauthorizedDesfireFile() { /* For XML Serializer */ }
 
     public UnauthorizedDesfireFile(int fileId, String errorMessage, DesfireFileSettings settings) {
         super(fileId, errorMessage, settings);
     }
 
-    @Override public byte[] getData() {
+    @Override
+    public byte[] getData() {
         throw new IllegalStateException(String.format("Unauthorized access to file: %s", getErrorMessage()));
     }
 }

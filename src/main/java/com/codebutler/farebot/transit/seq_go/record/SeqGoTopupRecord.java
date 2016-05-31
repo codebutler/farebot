@@ -32,6 +32,19 @@ import java.util.GregorianCalendar;
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#top-up-record-type
  */
 public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
+
+    public static final Creator<SeqGoTopupRecord> CREATOR = new Creator<SeqGoTopupRecord>() {
+        @Override
+        public SeqGoTopupRecord createFromParcel(Parcel source) {
+            return new SeqGoTopupRecord(source);
+        }
+
+        @Override
+        public SeqGoTopupRecord[] newArray(int size) {
+            return new SeqGoTopupRecord[size];
+        }
+    };
+
     private GregorianCalendar mTimestamp;
     private int mCredit;
     private int mStation;
@@ -39,7 +52,9 @@ public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
     private boolean mAutomatic;
 
     public static SeqGoTopupRecord recordFromBytes(byte[] input) {
-        if ((input[0] != 0x01 && input[0] != 0x31) || input[1] != 0x01) throw new AssertionError("Not a topup record");
+        if ((input[0] != 0x01 && input[0] != 0x31) || input[1] != 0x01) {
+            throw new AssertionError("Not a topup record");
+        }
 
         SeqGoTopupRecord record = new SeqGoTopupRecord();
 
@@ -59,7 +74,8 @@ public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
         return record;
     }
 
-    protected SeqGoTopupRecord() {}
+    private SeqGoTopupRecord() {
+    }
 
     @Override
     public int describeContents() {

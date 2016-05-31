@@ -76,15 +76,17 @@ public class CardsFragment extends ListFragment {
     private Map<String, TransitIdentity> mDataCache;
 
     private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
-        @Override public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
             return new CursorLoader(getActivity(), CardProvider.CONTENT_URI_CARD,
-                CardDBHelper.PROJECTION,
-                null,
-                null,
-                CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
+                    CardDBHelper.PROJECTION,
+                    null,
+                    null,
+                    CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
         }
 
-        @Override public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        @Override
+        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             if (getListAdapter() == null) {
                 setListAdapter(new CardsAdapter());
                 setListShown(true);
@@ -94,17 +96,21 @@ public class CardsFragment extends ListFragment {
             ((CursorAdapter) getListAdapter()).swapCursor(cursor);
         }
 
-        @Override public void onLoaderReset(Loader<Cursor> cursorLoader) {}
+        @Override
+        public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        }
     };
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
         mDataCache = new HashMap<>();
     }
 
-    @Override public void onViewCreated(View view, Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         registerForContextMenu(getListView());
@@ -112,7 +118,8 @@ public class CardsFragment extends ListFragment {
         getLoaderManager().initLoader(0, null, mLoaderCallbacks);
     }
 
-    @Override public void onListItemClick(ListView l, View v, int position, long id) {
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
         Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
         Intent intent = new Intent(getActivity(), CardInfoActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
@@ -120,15 +127,18 @@ public class CardsFragment extends ListFragment {
         startActivity(intent);
     }
 
-    @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.cards_menu, menu);
     }
 
-    @Override public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         getActivity().getMenuInflater().inflate(R.menu.card_context_menu, menu);
     }
 
-    @Override public boolean onContextItemSelected(android.view.MenuItem item) {
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         if (item.getItemId() == R.id.delete_card) {
             long id = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id;
             Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
@@ -138,55 +148,54 @@ public class CardsFragment extends ListFragment {
         return false;
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-       try {
-           if (item.getItemId() == R.id.import_clipboard) {
-               @SuppressWarnings("deprecation")
-               ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
-               onCardsImported(ExportHelper.importCardsXml(getActivity(), clipboard.getText().toString()));
-               return true;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        try {
+            @SuppressWarnings("deprecation")
+            ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
 
-           } else if (item.getItemId() == R.id.import_file) {
-               Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
-               Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-               i.putExtra(Intent.EXTRA_STREAM, uri);
-               i.setType("application/xml");
-               startActivityForResult(Intent.createChooser(i, "Select File"), REQUEST_SELECT_FILE);
-               return true;
-
-           } else if (item.getItemId() == R.id.import_sd) {
-               String xml = FileUtils.readFileToString(new File(SD_EXPORT_PATH));
-               onCardsImported(ExportHelper.importCardsXml(getActivity(), xml));
-               return true;
-
-           } else if (item.getItemId() == R.id.copy_xml) {
-               @SuppressWarnings("deprecation")
-               ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
-               clipboard.setText(ExportHelper.exportCardsXml(getActivity()));
-               Toast.makeText(getActivity(), "Copied to clipboard.", Toast.LENGTH_SHORT).show();
-               return true;
-
-           } else if (item.getItemId() == R.id.share_xml) {
-               Intent intent = new Intent(Intent.ACTION_SEND);
-               intent.setType("text/plain");
-               intent.putExtra(Intent.EXTRA_TEXT, ExportHelper.exportCardsXml(getActivity()));
-               startActivity(intent);
-               return true;
-
-           } else if (item.getItemId() == R.id.save_xml) {
-               String xml = ExportHelper.exportCardsXml(getActivity());
-               File file = new File(SD_EXPORT_PATH);
-               FileUtils.writeStringToFile(file, xml, "UTF-8");
-               Toast.makeText(getActivity(), "Wrote FareBot-Export.xml to USB Storage.", Toast.LENGTH_SHORT).show();
-               return true;
-           }
-       } catch (Exception ex) {
-           Utils.showError(getActivity(), ex);
-       }
-       return false;
+            int itemId = item.getItemId();
+            switch (itemId) {
+                case R.id.import_clipboard:
+                    onCardsImported(ExportHelper.importCardsXml(getActivity(), clipboard.getText().toString()));
+                    return true;
+                case R.id.import_file:
+                    Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
+                    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                    i.putExtra(Intent.EXTRA_STREAM, uri);
+                    i.setType("application/xml");
+                    startActivityForResult(Intent.createChooser(i, "Select File"), REQUEST_SELECT_FILE);
+                    return true;
+                case R.id.import_sd:
+                    String importXml = FileUtils.readFileToString(new File(SD_EXPORT_PATH));
+                    onCardsImported(ExportHelper.importCardsXml(getActivity(), importXml));
+                    return true;
+                case R.id.copy_xml:
+                    clipboard.setText(ExportHelper.exportCardsXml(getActivity()));
+                    Toast.makeText(getActivity(), "Copied to clipboard.", Toast.LENGTH_SHORT).show();
+                    return true;
+                case R.id.share_xml:
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, ExportHelper.exportCardsXml(getActivity()));
+                    startActivity(intent);
+                    return true;
+                case R.id.save_xml:
+                    String saveXml = ExportHelper.exportCardsXml(getActivity());
+                    File file = new File(SD_EXPORT_PATH);
+                    FileUtils.writeStringToFile(file, saveXml, "UTF-8");
+                    Toast.makeText(getActivity(), "Wrote FareBot-Export.xml to USB Storage.", Toast.LENGTH_SHORT)
+                            .show();
+                    return true;
+            }
+        } catch (Exception ex) {
+            Utils.showError(getActivity(), ex);
+        }
+        return false;
     }
 
-    @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_SELECT_FILE) {
                 Uri uri = data.getData();
@@ -209,53 +218,55 @@ public class CardsFragment extends ListFragment {
     }
 
     private class CardsAdapter extends ResourceCursorAdapter {
-       public CardsAdapter() {
-           super(getActivity(), android.R.layout.simple_list_item_2, null, false);
-       }
+        CardsAdapter() {
+            super(getActivity(), android.R.layout.simple_list_item_2, null, false);
+        }
 
-       @Override public void bindView(View view, Context context, Cursor cursor) {
-           int type = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-           String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-           Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            int type = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
+            String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
+            Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
 
-           String cacheKey = serial + scannedAt.getTime();
+            String cacheKey = serial + scannedAt.getTime();
 
-           if (!mDataCache.containsKey(cacheKey)) {
-               String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
-               try {
-                   Serializer serializer = FareBotApplication.getInstance().getSerializer();
-                   mDataCache.put(cacheKey, Card.fromXml(serializer, data).parseTransitIdentity());
-               } catch (Exception ex) {
-                   String error = String.format("Error: %s", Utils.getErrorMessage(ex));
-                   mDataCache.put(cacheKey, new TransitIdentity(error, null));
-               }
-           }
+            if (!mDataCache.containsKey(cacheKey)) {
+                String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
+                try {
+                    Serializer serializer = FareBotApplication.getInstance().getSerializer();
+                    mDataCache.put(cacheKey, Card.fromXml(serializer, data).parseTransitIdentity());
+                } catch (Exception ex) {
+                    String error = String.format("Error: %s", Utils.getErrorMessage(ex));
+                    mDataCache.put(cacheKey, new TransitIdentity(error, null));
+                }
+            }
 
-           TransitIdentity identity = mDataCache.get(cacheKey);
+            TransitIdentity identity = mDataCache.get(cacheKey);
 
-           TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
-           TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
+            TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
+            TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
 
-           if (identity != null) {
-               if (identity.getSerialNumber() != null) {
-                   textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
-               } else {
-                   // textView1.setText(identity.getName());
-                   textView1.setText(String.format("%s: %s", identity.getName(), serial));
-               }
-               DateFormat timeInstance = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
-               DateFormat dateInstance = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
-               textView2.setText(getString(R.string.scanned_at_format, timeInstance.format(scannedAt),
-                       dateInstance.format(scannedAt)));
-           } else {
-               textView1.setText(getString(R.string.unknown_card));
-               textView2.setText(String.format("%s - %s", CardType.values()[type].toString(), serial));
-           }
-       }
+            if (identity != null) {
+                if (identity.getSerialNumber() != null) {
+                    textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
+                } else {
+                    // textView1.setText(identity.getName());
+                    textView1.setText(String.format("%s: %s", identity.getName(), serial));
+                }
+                DateFormat timeInstance = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
+                DateFormat dateInstance = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+                textView2.setText(getString(R.string.scanned_at_format, timeInstance.format(scannedAt),
+                        dateInstance.format(scannedAt)));
+            } else {
+                textView1.setText(getString(R.string.unknown_card));
+                textView2.setText(String.format("%s - %s", CardType.values()[type].toString(), serial));
+            }
+        }
 
-       @Override protected void onContentChanged() {
-           super.onContentChanged();
-           mDataCache.clear();
-       }
+        @Override
+        protected void onContentChanged() {
+            super.onContentChanged();
+            mDataCache.clear();
+        }
     }
 }

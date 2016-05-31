@@ -48,11 +48,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Root(name="card")
+@Root(name = "card")
 @CardRawDataFragmentClass(DesfireCardRawDataFragment.class)
 public class DesfireCard extends Card {
-    @Element(name="manufacturing-data") private DesfireManufacturingData mManfData;
-    @ElementList(name="applications") private List<DesfireApplication> mApplications;
+    @Element(name = "manufacturing-data") private DesfireManufacturingData mManfData;
+    @ElementList(name = "applications") private List<DesfireApplication> mApplications;
 
     public static DesfireCard dumpTag(Tag tag) throws Exception {
         List<DesfireApplication> apps = new ArrayList<>();
@@ -62,7 +62,7 @@ public class DesfireCard extends Card {
         tech.connect();
 
         DesfireManufacturingData manufData;
-        DesfireApplication[]     appsArray;
+        DesfireApplication[] appsArray;
 
         try {
             DesfireProtocol desfireTag = new DesfireProtocol(tech);
@@ -105,8 +105,9 @@ public class DesfireCard extends Card {
             appsArray = new DesfireApplication[apps.size()];
             apps.toArray(appsArray);
         } finally {
-            if (tech.isConnected())
+            if (tech.isConnected()) {
                 tech.close();
+            }
         }
 
         return new DesfireCard(tag.getId(), new Date(), manufData, appsArray);
@@ -120,43 +121,59 @@ public class DesfireCard extends Card {
         mApplications = Utils.arrayAsList(apps);
     }
 
-    @Override public TransitIdentity parseTransitIdentity() {
-        if (OrcaTransitData.check(this))
+    @Override
+    public TransitIdentity parseTransitIdentity() {
+        if (OrcaTransitData.check(this)) {
             return OrcaTransitData.parseTransitIdentity(this);
-        if (ClipperTransitData.check(this))
+        }
+        if (ClipperTransitData.check(this)) {
             return ClipperTransitData.parseTransitIdentity(this);
-        if (HSLTransitData.check(this))
+        }
+        if (HSLTransitData.check(this)) {
             return HSLTransitData.parseTransitIdentity(this);
-        if (OpalTransitData.check(this))
+        }
+        if (OpalTransitData.check(this)) {
             return OpalTransitData.parseTransitIdentity(this);
-        if (MykiTransitData.check(this))
+        }
+        if (MykiTransitData.check(this)) {
             return MykiTransitData.parseTransitIdentity(this);
+        }
 
         // Stub card types go last
-        if (AdelaideMetrocardStubTransitData.check(this))
+        if (AdelaideMetrocardStubTransitData.check(this)) {
             return AdelaideMetrocardStubTransitData.parseTransitIdentity(this);
-        if (AtHopStubTransitData.check(this))
+        }
+        if (AtHopStubTransitData.check(this)) {
             return AtHopStubTransitData.parseTransitIdentity(this);
+        }
         return null;
     }
 
-    @Override public TransitData parseTransitData() {
-        if (OrcaTransitData.check(this))
+    @Override
+    public TransitData parseTransitData() {
+        if (OrcaTransitData.check(this)) {
             return new OrcaTransitData(this);
-        if (ClipperTransitData.check(this))
+        }
+        if (ClipperTransitData.check(this)) {
             return new ClipperTransitData(this);
-        if (HSLTransitData.check(this))
+        }
+        if (HSLTransitData.check(this)) {
             return new HSLTransitData(this);
-        if (OpalTransitData.check(this))
+        }
+        if (OpalTransitData.check(this)) {
             return new OpalTransitData(this);
-        if (MykiTransitData.check(this))
+        }
+        if (MykiTransitData.check(this)) {
             return new MykiTransitData(this);
+        }
 
         // Stub card types go last
-        if (AdelaideMetrocardStubTransitData.check(this))
+        if (AdelaideMetrocardStubTransitData.check(this)) {
             return new AdelaideMetrocardStubTransitData(this);
-        if (AtHopStubTransitData.check(this))
+        }
+        if (AtHopStubTransitData.check(this)) {
             return new AtHopStubTransitData(this);
+        }
         return null;
     }
 
@@ -166,8 +183,9 @@ public class DesfireCard extends Card {
 
     public DesfireApplication getApplication(int appId) {
         for (DesfireApplication app : mApplications) {
-            if (app.getId() == appId)
+            if (app.getId() == appId) {
                 return app;
+            }
         }
         return null;
     }
