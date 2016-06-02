@@ -48,18 +48,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class ClipperTransitData extends TransitData {
-    private static final int RECORD_LENGTH = 32;
-
-    private long mSerialNumber;
-    private short mBalance;
-    private ClipperTrip[] mTrips;
-    private ClipperRefill[] mRefills;
-
-    private static final long EPOCH_OFFSET = 0x83aa7f18;
-
-    public static boolean check(Card card) {
-        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
-    }
 
     public static final Creator<ClipperTransitData> CREATOR = new Creator<ClipperTransitData>() {
         @Override
@@ -73,14 +61,13 @@ public class ClipperTransitData extends TransitData {
         }
     };
 
-    public static TransitIdentity parseTransitIdentity(Card card) {
-        try {
-            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
-            return new TransitIdentity("Clipper", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Clipper serial", ex);
-        }
-    }
+    private static final int RECORD_LENGTH = 32;
+    private static final long EPOCH_OFFSET = 0x83aa7f18;
+
+    private final long mSerialNumber;
+    private final short mBalance;
+    private final ClipperTrip[] mTrips;
+    private final ClipperRefill[] mRefills;
 
     private ClipperTransitData(Parcel parcel) {
         mSerialNumber = parcel.readLong();
@@ -125,6 +112,19 @@ public class ClipperTransitData extends TransitData {
         }
 
         setBalances();
+    }
+
+    public static boolean check(Card card) {
+        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
+    }
+
+    public static TransitIdentity parseTransitIdentity(Card card) {
+        try {
+            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
+            return new TransitIdentity("Clipper", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing Clipper serial", ex);
+        }
     }
 
     @Override
@@ -272,7 +272,7 @@ public class ClipperTransitData extends TransitData {
 
         while (tripIdx < mTrips.length) {
             while (refillIdx < mRefills.length && mRefills[refillIdx].getTimestamp() > mTrips[tripIdx].getTimestamp()) {
-                balance -= mRefills[refillIdx].mAmount;
+                balance -= mRefills[refillIdx].getAmount();
                 refillIdx++;
             }
             mTrips[tripIdx].mBalance = balance;

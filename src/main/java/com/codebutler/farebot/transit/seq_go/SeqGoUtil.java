@@ -38,10 +38,9 @@ import java.util.GregorianCalendar;
  */
 public final class SeqGoUtil {
 
-    private SeqGoUtil() {
-    }
-
     private static final String TAG = "SeqGoUtil";
+
+    private SeqGoUtil() { }
 
     /**
      * Date format:

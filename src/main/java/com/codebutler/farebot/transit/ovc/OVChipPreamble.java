@@ -30,6 +30,30 @@ import com.codebutler.farebot.util.Utils;
 
 class OVChipPreamble implements Parcelable {
 
+    public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
+        @Override
+        public OVChipPreamble createFromParcel(Parcel source) {
+            final String id = source.readString();
+            final int checkbit = source.readInt();
+            final String manufacturer = source.readString();
+            final String publisher = source.readString();
+            final String unknownConstant1 = source.readString();
+            final int expdate = source.readInt();
+            final String unknownConstant2 = source.readString();
+            final int type = source.readInt();
+
+            return new OVChipPreamble(id, checkbit,
+                    manufacturer, publisher,
+                    unknownConstant1, expdate,
+                    unknownConstant2, type);
+        }
+
+        @Override
+        public OVChipPreamble[] newArray(int size) {
+            return new OVChipPreamble[size];
+        }
+    };
+
     private final String mId;
     private final int mCheckbit;
     private final String mManufacturer;
@@ -112,30 +136,6 @@ class OVChipPreamble implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
-        @Override
-        public OVChipPreamble createFromParcel(Parcel source) {
-            final String id = source.readString();
-            final int checkbit = source.readInt();
-            final String manufacturer = source.readString();
-            final String publisher = source.readString();
-            final String unknownConstant1 = source.readString();
-            final int expdate = source.readInt();
-            final String unknownConstant2 = source.readString();
-            final int type = source.readInt();
-
-            return new OVChipPreamble(id, checkbit,
-                    manufacturer, publisher,
-                    unknownConstant1, expdate,
-                    unknownConstant2, type);
-        }
-
-        @Override
-        public OVChipPreamble[] newArray(int size) {
-            return new OVChipPreamble[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

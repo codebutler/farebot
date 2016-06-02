@@ -51,8 +51,20 @@ public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparabl
     private GregorianCalendar mTimestamp;
     private int mMode;
     private int mJourney;
+
     private int mStation;
     private int mChecksum;
+
+    private SeqGoTapRecord() { }
+
+    private SeqGoTapRecord(Parcel parcel) {
+        mTimestamp = new GregorianCalendar();
+        mTimestamp.setTimeInMillis(parcel.readLong());
+        mMode = parcel.readInt();
+        mJourney = parcel.readInt();
+        mStation = parcel.readInt();
+        mChecksum = parcel.readInt();
+    }
 
     public static SeqGoTapRecord recordFromBytes(byte[] input) {
         if (input[0] != 0x31) {
@@ -78,9 +90,6 @@ public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparabl
         return record;
     }
 
-    private SeqGoTapRecord() {
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -93,15 +102,6 @@ public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparabl
         parcel.writeInt(mJourney);
         parcel.writeInt(mStation);
         parcel.writeInt(mChecksum);
-    }
-
-    private SeqGoTapRecord(Parcel parcel) {
-        mTimestamp = new GregorianCalendar();
-        mTimestamp.setTimeInMillis(parcel.readLong());
-        mMode = parcel.readInt();
-        mJourney = parcel.readInt();
-        mStation = parcel.readInt();
-        mChecksum = parcel.readInt();
     }
 
     public Trip.Mode getMode() {

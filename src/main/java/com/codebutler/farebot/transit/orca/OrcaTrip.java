@@ -36,12 +36,18 @@ import java.util.Locale;
 import java.util.Map;
 
 public class OrcaTrip extends Trip {
-    private final long mTimestamp;
-    private final long mCoachNum;
-    private final long mFare;
-    private final long mNewBalance;
-    final long mAgency;
-    final long mTransType;
+
+    public static final Creator<OrcaTrip> CREATOR = new Creator<OrcaTrip>() {
+        @Override
+        public OrcaTrip createFromParcel(Parcel parcel) {
+            return new OrcaTrip(parcel);
+        }
+
+        @Override
+        public OrcaTrip[] newArray(int size) {
+            return new OrcaTrip[size];
+        }
+    };
 
     private static final Map<Long, Station> LINK_STATIONS = new ImmutableMapBuilder<Long, Station>()
             .put(10352L, new Station("Capitol Hill Station", "Capitol Hill", "47.6192", "-122.3202"))
@@ -71,7 +77,15 @@ public class OrcaTrip extends Trip {
             .put(10103, new Station("Bainbridge Island Terminal", "Bainbridge", "47.62362", "-122.51082"))
             .build();
 
-    public OrcaTrip(DesfireRecord record) {
+    final long mAgency;
+    final long mTransType;
+
+    private final long mTimestamp;
+    private final long mCoachNum;
+    private final long mFare;
+    private final long mNewBalance;
+
+    OrcaTrip(DesfireRecord record) {
         byte[] useData = record.getData();
         long[] usefulData = new long[useData.length];
 
@@ -99,19 +113,7 @@ public class OrcaTrip extends Trip {
         mTransType = (usefulData[17]);
     }
 
-    public static final Creator<OrcaTrip> CREATOR = new Creator<OrcaTrip>() {
-        @Override
-        public OrcaTrip createFromParcel(Parcel parcel) {
-            return new OrcaTrip(parcel);
-        }
-
-        @Override
-        public OrcaTrip[] newArray(int size) {
-            return new OrcaTrip[size];
-        }
-    };
-
-    OrcaTrip(Parcel parcel) {
+    private OrcaTrip(Parcel parcel) {
         mTimestamp = parcel.readLong();
         mCoachNum = parcel.readLong();
         mFare = parcel.readLong();

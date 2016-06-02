@@ -29,6 +29,23 @@ import android.os.Parcelable;
 import com.codebutler.farebot.util.Utils;
 
 public class OVChipCredit implements Parcelable {
+
+    public static final Parcelable.Creator<OVChipCredit> CREATOR = new Parcelable.Creator<OVChipCredit>() {
+        @Override
+        public OVChipCredit createFromParcel(Parcel source) {
+            int id = source.readInt();
+            int creditId = source.readInt();
+            int credit = source.readInt();
+            int banbits = source.readInt();
+            return new OVChipCredit(id, creditId, credit, banbits);
+        }
+
+        @Override
+        public OVChipCredit[] newArray(int size) {
+            return new OVChipCredit[size];
+        }
+    };
+
     private final int mId;
     private final int mCreditId;
     private final int mCredit;
@@ -82,22 +99,6 @@ public class OVChipCredit implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Parcelable.Creator<OVChipCredit> CREATOR = new Parcelable.Creator<OVChipCredit>() {
-        @Override
-        public OVChipCredit createFromParcel(Parcel source) {
-            int id = source.readInt();
-            int creditId = source.readInt();
-            int credit = source.readInt();
-            int banbits = source.readInt();
-            return new OVChipCredit(id, creditId, credit, banbits);
-        }
-
-        @Override
-        public OVChipCredit[] newArray(int size) {
-            return new OVChipCredit[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

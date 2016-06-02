@@ -46,9 +46,18 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class EZLinkTransitData extends TransitData {
-    private String mSerialNumber;
-    private double mBalance;
-    private EZLinkTrip[] mTrips;
+
+    public static final Creator<EZLinkTransitData> CREATOR = new Creator<EZLinkTransitData>() {
+        @Override
+        public EZLinkTransitData createFromParcel(Parcel parcel) {
+            return new EZLinkTransitData(parcel);
+        }
+
+        @Override
+        public EZLinkTransitData[] newArray(int size) {
+            return new EZLinkTransitData[size];
+        }
+    };
 
     static final HashSet<String> SBS_BUSES = new HashSet<String>() {
         private static final long serialVersionUID = 1L;
@@ -453,6 +462,25 @@ public class EZLinkTransitData extends TransitData {
         }
     };
 
+    private String mSerialNumber;
+    private double mBalance;
+    private EZLinkTrip[] mTrips;
+
+    public EZLinkTransitData(Card card) {
+        CEPASCard cepasCard = (CEPASCard) card;
+        mSerialNumber = Utils.getHexString(cepasCard.getPurse(3).getCAN(), "<Error>");
+        mBalance = cepasCard.getPurse(3).getPurseBalance();
+        mTrips = parseTrips(cepasCard);
+    }
+
+    private EZLinkTransitData(Parcel parcel) {
+        mSerialNumber = parcel.readString();
+        mBalance = parcel.readDouble();
+
+        mTrips = new EZLinkTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, EZLinkTrip.CREATOR);
+    }
+
     private static String getCardIssuer(String canNo) {
         int issuerId = Integer.parseInt(canNo.substring(0, 3));
         switch (issuerId) {
@@ -465,7 +493,7 @@ public class EZLinkTransitData extends TransitData {
         }
     }
 
-    public static MRTStation getStation(String code) {
+    static MRTStation getStation(String code) {
         return MRT_STATIONS.get(code);
     }
 
@@ -484,33 +512,6 @@ public class EZLinkTransitData extends TransitData {
     public static TransitIdentity parseTransitIdentity(Card card) {
         String canNo = Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>");
         return new TransitIdentity(getCardIssuer(canNo), canNo);
-    }
-
-    public static final Creator<EZLinkTransitData> CREATOR = new Creator<EZLinkTransitData>() {
-        @Override
-        public EZLinkTransitData createFromParcel(Parcel parcel) {
-            return new EZLinkTransitData(parcel);
-        }
-
-        @Override
-        public EZLinkTransitData[] newArray(int size) {
-            return new EZLinkTransitData[size];
-        }
-    };
-
-    private EZLinkTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readString();
-        mBalance = parcel.readDouble();
-
-        mTrips = new EZLinkTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, EZLinkTrip.CREATOR);
-    }
-
-    public EZLinkTransitData(Card card) {
-        CEPASCard cepasCard = (CEPASCard) card;
-        mSerialNumber = Utils.getHexString(cepasCard.getPurse(3).getCAN(), "<Error>");
-        mBalance = cepasCard.getPurse(3).getPurseBalance();
-        mTrips = parseTrips(cepasCard);
     }
 
     @Override

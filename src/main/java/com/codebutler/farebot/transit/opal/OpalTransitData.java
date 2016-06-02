@@ -63,6 +63,11 @@ public class OpalTransitData extends TransitData {
         }
     };
 
+    public static final String NAME = "Opal";
+
+    private static final GregorianCalendar OPAL_EPOCH = new GregorianCalendar(1980, Calendar.JANUARY, 1);
+    private static final OpalSubscription OPAL_AUTOMATIC_TOP_UP = new OpalSubscription();
+
     private int mSerialNumber;
     private int mBalance; // cents
     private int mChecksum;
@@ -74,15 +79,6 @@ public class OpalTransitData extends TransitData {
     private int mDay;
     private int mTransactionNumber;
     private int mLastDigit;
-
-    private static final GregorianCalendar OPAL_EPOCH = new GregorianCalendar(1980, Calendar.JANUARY, 1);
-    private static final OpalSubscription OPAL_AUTOMATIC_TOP_UP = new OpalSubscription();
-
-    public static final String NAME = "Opal";
-
-    public static boolean check(Card card) {
-        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x314553) != null);
-    }
 
     private OpalTransitData(Parcel parcel) {
         mSerialNumber = parcel.readInt();
@@ -123,6 +119,10 @@ public class OpalTransitData extends TransitData {
         }
 
         mBalance = Utils.unsignedToTwoComplement(iRawBalance, 20);
+    }
+
+    public static boolean check(Card card) {
+        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x314553) != null);
     }
 
     @Override

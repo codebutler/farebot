@@ -33,14 +33,13 @@ import com.codebutler.farebot.BuildConfig;
 
 class KeysDBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "keys.db";
-    private static final int DATABASE_VERSION = 3;
-
     static final String KEY_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".key";
     static final String KEY_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".key";
 
-    @SuppressWarnings("WeakerAccess")
-    public KeysDBHelper(Context context) {
+    private static final String DATABASE_NAME = "keys.db";
+    private static final int DATABASE_VERSION = 3;
+
+    private KeysDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -65,5 +64,5 @@ class KeysDBHelper extends SQLiteOpenHelper {
         public SQLiteOpenHelper create(@NonNull Context context) {
             return new KeysDBHelper(context);
         }
-    };
+    }
 }

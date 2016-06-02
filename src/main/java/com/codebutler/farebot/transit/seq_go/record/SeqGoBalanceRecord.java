@@ -30,6 +30,8 @@ public class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoB
     private int mVersion;
     private int mBalance;
 
+    private SeqGoBalanceRecord() { }
+
     public static SeqGoBalanceRecord recordFromBytes(byte[] input) {
         if (input[0] != 0x01) {
             throw new AssertionError();
@@ -44,9 +46,6 @@ public class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoB
         record.mBalance = Utils.byteArrayToInt(balance, 0, 2);
 
         return record;
-    }
-
-    private SeqGoBalanceRecord() {
     }
 
     /**

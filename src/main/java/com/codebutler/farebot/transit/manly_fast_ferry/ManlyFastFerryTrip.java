@@ -35,11 +35,25 @@ import java.util.Locale;
  * Trips on the card are "purse debits", and it is not possible to tell it apart from non-ticket
  * usage (like cafe purchases).
  */
-public class ManlyFastFerryTrip extends Trip {
+class ManlyFastFerryTrip extends Trip {
+
+    public static final Parcelable.Creator<ManlyFastFerryTrip> CREATOR = new Parcelable.Creator<ManlyFastFerryTrip>() {
+
+        @Override
+        public ManlyFastFerryTrip createFromParcel(Parcel in) {
+            return new ManlyFastFerryTrip(in);
+        }
+
+        @Override
+        public ManlyFastFerryTrip[] newArray(int size) {
+            return new ManlyFastFerryTrip[size];
+        }
+    };
+
     private GregorianCalendar mEpoch;
     private ManlyFastFerryPurseRecord mPurse;
 
-    public ManlyFastFerryTrip(ManlyFastFerryPurseRecord purse, GregorianCalendar epoch) {
+    ManlyFastFerryTrip(ManlyFastFerryPurseRecord purse, GregorianCalendar epoch) {
         mPurse = purse;
         mEpoch = epoch;
     }
@@ -141,19 +155,4 @@ public class ManlyFastFerryTrip extends Trip {
         mPurse.writeToParcel(parcel, i);
         parcel.writeLong(mEpoch.getTimeInMillis());
     }
-
-    public static final Parcelable.Creator<ManlyFastFerryTrip> CREATOR = new Parcelable.Creator<ManlyFastFerryTrip>() {
-
-        @Override
-        public ManlyFastFerryTrip createFromParcel(Parcel in) {
-            return new ManlyFastFerryTrip(in);
-        }
-
-        @Override
-        public ManlyFastFerryTrip[] newArray(int size) {
-            return new ManlyFastFerryTrip[size];
-        }
-    };
-
-
 }

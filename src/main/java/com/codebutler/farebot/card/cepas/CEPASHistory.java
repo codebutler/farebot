@@ -34,14 +34,18 @@ import java.util.List;
 
 @Root(name = "history")
 public class CEPASHistory {
-    @Attribute(name = "id") private int mId;
-    @ElementList(name = "transaction", inline = true, required = false) private List<CEPASTransaction> mTransactions;
-    @Attribute(name = "valid") private boolean mIsValid;
-    @Attribute(name = "error", required = false) private String mErrorMessage;
 
-    public static CEPASHistory create(int purseId, byte[] purseData) {
-        return new CEPASHistory(purseId, purseData);
-    }
+    @Attribute(name = "id")
+    private int mId;
+
+    @ElementList(name = "transaction", inline = true, required = false)
+    private List<CEPASTransaction> mTransactions;
+
+    @Attribute(name = "valid")
+    private boolean mIsValid;
+
+    @Attribute(name = "error", required = false)
+    private String mErrorMessage;
 
     CEPASHistory(int purseId, byte[] purseData) {
         mId = purseId;
@@ -71,15 +75,12 @@ public class CEPASHistory {
         mIsValid = false;
     }
 
-    public CEPASHistory(int purseId, CEPASTransaction[] transactions) {
-        mTransactions = Utils.arrayAsList(transactions);
-        mId = purseId;
-        mIsValid = true;
-        mErrorMessage = "";
-    }
-
     @SuppressWarnings("unused")
     private CEPASHistory() { /* For XML Serializer */ }
+
+    public static CEPASHistory create(int purseId, byte[] purseData) {
+        return new CEPASHistory(purseId, purseData);
+    }
 
     public int getId() {
         return mId;

@@ -29,9 +29,6 @@ import org.simpleframework.xml.Element;
 import java.io.ByteArrayInputStream;
 
 public abstract class DesfireFileSettings {
-    @Element(name = "filetype") private byte mFileType;
-    @Element(name = "commsettings") private byte mCommSetting;
-    @Element(name = "accessrights") private HexString mAccessRights;
 
     /* DesfireFile Types */
     public static final byte STANDARD_DATA_FILE = (byte) 0x00;
@@ -40,21 +37,9 @@ public abstract class DesfireFileSettings {
     public static final byte LINEAR_RECORD_FILE = (byte) 0x03;
     public static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
 
-    public static DesfireFileSettings create(byte[] data) throws Exception {
-        byte fileType = data[0];
-
-        ByteArrayInputStream stream = new ByteArrayInputStream(data);
-
-        if (fileType == STANDARD_DATA_FILE || fileType == BACKUP_DATA_FILE) {
-            return new StandardDesfireFileSettings(stream);
-        } else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE) {
-            return new RecordDesfireFileSettings(stream);
-        } else if (fileType == VALUE_FILE) {
-            return new ValueDesfireFileSettings(stream);
-        } else {
-            throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
-        }
-    }
+    @Element(name = "filetype") private byte mFileType;
+    @Element(name = "commsettings") private byte mCommSetting;
+    @Element(name = "accessrights") private HexString mAccessRights;
 
     DesfireFileSettings() { /* For XML Serializer */ }
 
@@ -71,6 +56,22 @@ public abstract class DesfireFileSettings {
         this.mFileType = fileType;
         this.mCommSetting = commSetting;
         this.mAccessRights = new HexString(accessRights);
+    }
+
+    public static DesfireFileSettings create(byte[] data) throws Exception {
+        byte fileType = data[0];
+
+        ByteArrayInputStream stream = new ByteArrayInputStream(data);
+
+        if (fileType == STANDARD_DATA_FILE || fileType == BACKUP_DATA_FILE) {
+            return new StandardDesfireFileSettings(stream);
+        } else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE) {
+            return new RecordDesfireFileSettings(stream);
+        } else if (fileType == VALUE_FILE) {
+            return new ValueDesfireFileSettings(stream);
+        } else {
+            throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
+        }
     }
 
     public byte getFileType() {

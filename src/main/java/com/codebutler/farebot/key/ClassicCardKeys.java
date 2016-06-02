@@ -31,10 +31,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClassicCardKeys extends CardKeys {
+
     private static final String KEYS = "keys";
     private static final int KEY_LEN = 6;
 
     private ClassicSectorKey[] mSectorKeys;
+
+    private ClassicCardKeys(ClassicSectorKey[] sectorKeys) {
+        mSectorKeys = sectorKeys;
+    }
 
     public static ClassicCardKeys fromDump(String keyType, byte[] keyData) {
         List<ClassicSectorKey> keys = new ArrayList<>();
@@ -55,10 +60,6 @@ public class ClassicCardKeys extends CardKeys {
             sectorKeys[i] = ClassicSectorKey.fromJSON(keysJson.getJSONObject(i));
         }
         return new ClassicCardKeys(sectorKeys);
-    }
-
-    private ClassicCardKeys(ClassicSectorKey[] sectorKeys) {
-        mSectorKeys = sectorKeys;
     }
 
     /**

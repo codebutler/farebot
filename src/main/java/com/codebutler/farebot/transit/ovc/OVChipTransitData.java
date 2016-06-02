@@ -53,28 +53,42 @@ import java.util.List;
 import java.util.Map;
 
 public class OVChipTransitData extends TransitData {
-    public static final int PROCESS_PURCHASE = 0x00;
-    public static final int PROCESS_CHECKIN = 0x01;
-    public static final int PROCESS_CHECKOUT = 0x02;
-    public static final int PROCESS_TRANSFER = 0x06;
-    public static final int PROCESS_BANNED = 0x07;
-    public static final int PROCESS_CREDIT = -0x02;
-    public static final int PROCESS_NODATA = -0x03;
 
-    public static final int AGENCY_TLS = 0x00;
-    private static final int AGENCY_CONNEXXION = 0x01;
-    public static final int AGENCY_GVB = 0x02;
-    private static final int AGENCY_HTM = 0x03;
-    public static final int AGENCY_NS = 0x04;
-    public static final int AGENCY_RET = 0x05;
-    private static final int AGENCY_VEOLIA = 0x07;
-    public static final int AGENCY_ARRIVA = 0x08;
-    private static final int AGENCY_SYNTUS = 0x09;
-    private static final int AGENCY_QBUZZ = 0x0A;
+    public static final Creator<OVChipTransitData> CREATOR = new Creator<OVChipTransitData>() {
+        @Override
+        public OVChipTransitData createFromParcel(Parcel parcel) {
+            return new OVChipTransitData(parcel);
+        }
+
+        @Override
+        public OVChipTransitData[] newArray(int size) {
+            return new OVChipTransitData[size];
+        }
+    };
+
+    static final int PROCESS_PURCHASE = 0x00;
+    static final int PROCESS_CHECKIN = 0x01;
+    static final int PROCESS_CHECKOUT = 0x02;
+    static final int PROCESS_TRANSFER = 0x06;
+    static final int PROCESS_BANNED = 0x07;
+    static final int PROCESS_CREDIT = -0x02;
+    static final int PROCESS_NODATA = -0x03;
+
+    static final int AGENCY_TLS = 0x00;
+    static final int AGENCY_CONNEXXION = 0x01;
+    static final int AGENCY_GVB = 0x02;
+    static final int AGENCY_HTM = 0x03;
+    static final int AGENCY_NS = 0x04;
+    static final int AGENCY_RET = 0x05;
+    static final int AGENCY_VEOLIA = 0x07;
+    static final int AGENCY_ARRIVA = 0x08;
+    static final int AGENCY_SYNTUS = 0x09;
+    static final int AGENCY_QBUZZ = 0x0A;
+
     // Could also be 2C though... ( http://www.ov-chipkaart.me/forum/viewtopic.php?f=10&t=299 )
-    public static final int AGENCY_DUO = 0x0C;
-    public static final int AGENCY_STORE = 0x19;
-    private static final int AGENCY_DUO_ALT = 0x2C;
+    static final int AGENCY_DUO = 0x0C;
+    static final int AGENCY_STORE = 0x19;
+    static final int AGENCY_DUO_ALT = 0x2C;
 
     private static final byte[] OVC_MANUFACTURER = {
             (byte) 0x98, (byte) 0x02, (byte) 0x00 /*, (byte) 0x64, (byte) 0x8E */
@@ -129,42 +143,6 @@ public class OVChipTransitData extends TransitData {
     private final OVChipCredit mCredit;
     private final OVChipTrip[] mTrips;
     private final OVChipSubscription[] mSubscriptions;
-
-    public static final Creator<OVChipTransitData> CREATOR = new Creator<OVChipTransitData>() {
-        @Override
-        public OVChipTransitData createFromParcel(Parcel parcel) {
-            return new OVChipTransitData(parcel);
-        }
-
-        @Override
-        public OVChipTransitData[] newArray(int size) {
-            return new OVChipTransitData[size];
-        }
-    };
-
-    public static boolean check(Card card) {
-        if (!(card instanceof ClassicCard)) {
-            return false;
-        }
-
-        ClassicCard classicCard = (ClassicCard) card;
-
-        if (classicCard.getSectors().size() != 40) {
-            return false;
-        }
-
-        // Starting at 0×010, 8400 0000 0603 a000 13ae e401 xxxx 0e80 80e8 seems to exist on all OVC's
-        // (with xxxx different).
-        // http://www.ov-chipkaart.de/back-up/3-8-11/www.ov-chipkaart.me/blog/index7e09.html?page_id=132
-        byte[] blockData = classicCard.getSector(0).readBlocks(1, 1);
-        return Arrays.equals(Arrays.copyOfRange(blockData, 0, 11), OVC_HEADER);
-    }
-
-    public static TransitIdentity parseTransitIdentity(Card card) {
-        String hex = Utils.getHexString(((ClassicCard) card).getSector(0).getBlock(0).getData(), null);
-        String id = hex.substring(0, 8);
-        return new TransitIdentity("OV-chipkaart", id);
-    }
 
     private OVChipTransitData(Parcel parcel) {
         mTrips = new OVChipTrip[parcel.readInt()];
@@ -234,6 +212,30 @@ public class OVChipTransitData extends TransitData {
         });
 
         mSubscriptions = subs.toArray(new OVChipSubscription[subs.size()]);
+    }
+
+    public static boolean check(Card card) {
+        if (!(card instanceof ClassicCard)) {
+            return false;
+        }
+
+        ClassicCard classicCard = (ClassicCard) card;
+
+        if (classicCard.getSectors().size() != 40) {
+            return false;
+        }
+
+        // Starting at 0×010, 8400 0000 0603 a000 13ae e401 xxxx 0e80 80e8 seems to exist on all OVC's
+        // (with xxxx different).
+        // http://www.ov-chipkaart.de/back-up/3-8-11/www.ov-chipkaart.me/blog/index7e09.html?page_id=132
+        byte[] blockData = classicCard.getSector(0).readBlocks(1, 1);
+        return Arrays.equals(Arrays.copyOfRange(blockData, 0, 11), OVC_HEADER);
+    }
+
+    public static TransitIdentity parseTransitIdentity(Card card) {
+        String hex = Utils.getHexString(((ClassicCard) card).getSector(0).getBlock(0).getData(), null);
+        String id = hex.substring(0, 8);
+        return new TransitIdentity("OV-chipkaart", id);
     }
 
     public static Date convertDate(int date) {

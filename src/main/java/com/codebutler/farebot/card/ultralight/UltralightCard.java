@@ -30,12 +30,14 @@ import java.util.List;
 @CardRawDataFragmentClass(UltralightCardRawDataFragment.class)
 @CardHasManufacturingInfo(false)
 public class UltralightCard extends Card {
-    @ElementList(name = "pages") private List<UltralightPage> mPages;
-    @Attribute(name = "ultralightType") private int mUltralightType;
 
     private static final int ULTRALIGHT_SIZE = 0x0F;
     private static final int ULTRALIGHT_C_SIZE = 0x2B;
 
+    @ElementList(name = "pages") private List<UltralightPage> mPages;
+    @Attribute(name = "ultralightType") private int mUltralightType;
+
+    @SuppressWarnings("unused")
     private UltralightCard() { /* For XML Serializer */ }
 
     private UltralightCard(byte[] tagId, Date scannedAt, int ultralightType, UltralightPage[] pages) {

@@ -29,6 +29,7 @@ import com.codebutler.farebot.ui.ListItem;
 import java.util.List;
 
 public abstract class TransitData implements Parcelable {
+
     public abstract String getBalanceString();
 
     public abstract String getSerialNumber();

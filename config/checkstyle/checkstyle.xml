@@ -313,6 +313,9 @@ Description: https://source.android.com/source/code-style.html
         <!-- overloaded methods must be grouped together -->
         <module name="OverloadMethodsDeclarationOrder"/>
 
+        <!-- some sanity for declaration order -->
+        <module name="DeclarationOrder"/>
+
         <!-- Require variables to be declared close to where they are used -->
         <module name="VariableDeclarationUsageDistance"/>
 

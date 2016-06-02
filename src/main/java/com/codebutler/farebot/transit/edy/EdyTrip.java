@@ -39,6 +39,18 @@ import java.util.Locale;
 
 class EdyTrip extends Trip {
 
+    public static final Creator<EdyTrip> CREATOR = new Creator<EdyTrip>() {
+        @Override
+        public EdyTrip createFromParcel(Parcel parcel) {
+            return new EdyTrip(parcel);
+        }
+
+        @Override
+        public EdyTrip[] newArray(int size) {
+            return new EdyTrip[size];
+        }
+    };
+
     private final int mProcessType;
     private final int mSequenceNumber;
     private final Date mTimestamp;
@@ -63,18 +75,6 @@ class EdyTrip extends Trip {
         mTransactionAmount = Util.toInt(data[8], data[9], data[10], data[11]);
         mBalance = Util.toInt(data[12], data[13], data[14], data[15]);
     }
-
-    public static final Creator<EdyTrip> CREATOR = new Creator<EdyTrip>() {
-        @Override
-        public EdyTrip createFromParcel(Parcel parcel) {
-            return new EdyTrip(parcel);
-        }
-
-        @Override
-        public EdyTrip[] newArray(int size) {
-            return new EdyTrip[size];
-        }
-    };
 
     private EdyTrip(Parcel parcel) {
         mProcessType = parcel.readInt();

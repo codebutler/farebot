@@ -33,9 +33,13 @@ import java.util.Date;
 
 public class CardKeyProvider extends BetterContentProvider {
 
+    public static final Uri CONTENT_URI;
+
     private static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".keyprovider";
 
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/keys");
+    static {
+        CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/keys");
+    }
 
     public CardKeyProvider() {
         super(

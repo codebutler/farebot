@@ -33,6 +33,8 @@ class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
 
     private String mCardSerial;
 
+    private ManlyFastFerryPreambleRecord() { }
+
     public static ManlyFastFerryPreambleRecord recordFromBytes(byte[] input) {
         ManlyFastFerryPreambleRecord record = new ManlyFastFerryPreambleRecord();
 
@@ -50,8 +52,6 @@ class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
         }
         return record;
     }
-
-    private ManlyFastFerryPreambleRecord() { }
 
     /**
      * Returns the card serial number. Returns null on old cards.

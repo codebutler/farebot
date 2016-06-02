@@ -30,14 +30,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.codebutler.farebot.BuildConfig;
 
 public class CardDBHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "cards.db";
-    private static final int DATABASE_VERSION = 2;
-
-    public static final int CARD_COLLECTION_URI_INDICATOR = 1;
-    public static final int SINGLE_CARD_URI_INDICATOR = 2;
-
-    public static final String CARD_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".card";
-    public static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".card";
 
     public static final String[] PROJECTION = new String[]{
             CardsTableColumns._ID,
@@ -47,16 +39,25 @@ public class CardDBHelper extends SQLiteOpenHelper {
             CardsTableColumns.SCANNED_AT
     };
 
+    static final int CARD_COLLECTION_URI_INDICATOR = 1;
+    static final int SINGLE_CARD_URI_INDICATOR = 2;
+
+    static final String CARD_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".card";
+    static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".card";
+
+    private static final String DATABASE_NAME = "cards.db";
+    private static final int DATABASE_VERSION = 2;
+
+    CardDBHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
     public static Cursor createCursor(Context context) {
         return context.getContentResolver().query(CardProvider.CONTENT_URI_CARD,
                 PROJECTION,
                 null,
                 null,
                 CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
-    }
-
-    public CardDBHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override

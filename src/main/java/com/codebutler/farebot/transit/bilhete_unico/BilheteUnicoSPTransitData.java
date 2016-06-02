@@ -42,6 +42,18 @@ import java.util.List;
 
 public class BilheteUnicoSPTransitData extends TransitData {
 
+    public static final Creator<BilheteUnicoSPTransitData> CREATOR = new Creator<BilheteUnicoSPTransitData>() {
+        @Override
+        public BilheteUnicoSPTransitData createFromParcel(Parcel parcel) {
+            return new BilheteUnicoSPTransitData(parcel);
+        }
+
+        @Override
+        public BilheteUnicoSPTransitData[] newArray(int size) {
+            return new BilheteUnicoSPTransitData[size];
+        }
+    };
+
     private static final String NAME = "Bilhete Único";
 
     private static final byte[] MANUFACTURER = {
@@ -57,17 +69,13 @@ public class BilheteUnicoSPTransitData extends TransitData {
 
     private final BilheteUnicoSPCredit mCredit;
 
-    public static final Creator<BilheteUnicoSPTransitData> CREATOR = new Creator<BilheteUnicoSPTransitData>() {
-        @Override
-        public BilheteUnicoSPTransitData createFromParcel(Parcel parcel) {
-            return new BilheteUnicoSPTransitData(parcel);
-        }
+    private BilheteUnicoSPTransitData(Parcel parcel) {
+        mCredit = parcel.readParcelable(OVChipCredit.class.getClassLoader());
+    }
 
-        @Override
-        public BilheteUnicoSPTransitData[] newArray(int size) {
-            return new BilheteUnicoSPTransitData[size];
-        }
-    };
+    public BilheteUnicoSPTransitData(ClassicCard card) {
+        mCredit = new BilheteUnicoSPCredit(card.getSector(8).getBlock(1).getData());
+    }
 
     public static boolean check(ClassicCard card) {
         byte[] blockData = card.getSector(0).getBlock(0).getData();
@@ -76,14 +84,6 @@ public class BilheteUnicoSPTransitData extends TransitData {
 
     public static TransitIdentity parseTransitIdentity(Card card) {
         return new TransitIdentity(NAME, null);
-    }
-
-    private BilheteUnicoSPTransitData(Parcel parcel) {
-        mCredit = parcel.readParcelable(OVChipCredit.class.getClassLoader());
-    }
-
-    public BilheteUnicoSPTransitData(ClassicCard card) {
-        mCredit = new BilheteUnicoSPCredit(card.getSector(8).getBlock(1).getData());
     }
 
     private static String convertAmount(int amount) {

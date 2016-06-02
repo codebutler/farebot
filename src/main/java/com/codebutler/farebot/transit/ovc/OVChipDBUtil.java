@@ -38,25 +38,29 @@ public class OVChipDBUtil extends DBUtil {
     static final String COLUMN_ROW_LON = "lon";
     static final String COLUMN_ROW_LAT = "lat";
 
+    static final String[] COLUMNS_STATIONDATA;
+
     private static final String COLUMN_ROW_LONGNAME = "longname";
     private static final String COLUMN_ROW_HALTENR = "haltenr";
     private static final String COLUMN_ROW_ZONE = "zone";
 
-    static final String[] COLUMNS_STATIONDATA = {
-            COLUMN_ROW_COMPANY,
-            COLUMN_ROW_OVCID,
-            COLUMN_ROW_NAME,
-            COLUMN_ROW_CITY,
-            COLUMN_ROW_LONGNAME,
-            COLUMN_ROW_HALTENR,
-            COLUMN_ROW_ZONE,
-            COLUMN_ROW_LON,
-            COLUMN_ROW_LAT,
-    };
-
     private static final String DB_NAME = "ovc_stations.db3";
 
     private static final int VERSION = 2;
+
+    static {
+        COLUMNS_STATIONDATA = new String[]{
+                COLUMN_ROW_COMPANY,
+                COLUMN_ROW_OVCID,
+                COLUMN_ROW_NAME,
+                COLUMN_ROW_CITY,
+                COLUMN_ROW_LONGNAME,
+                COLUMN_ROW_HALTENR,
+                COLUMN_ROW_ZONE,
+                COLUMN_ROW_LON,
+                COLUMN_ROW_LAT,
+        };
+    }
 
     public OVChipDBUtil(Context context) {
         super(context);

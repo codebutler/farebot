@@ -55,18 +55,6 @@ public class MykiTransitData extends StubTransitData {
     private long mSerialNumber1;
     private long mSerialNumber2;
 
-    public static boolean check(Card card) {
-        return (card instanceof DesfireCard)
-                && (((DesfireCard) card).getApplication(4594) != null)
-                && (((DesfireCard) card).getApplication(15732978) != null);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public MykiTransitData(Parcel parcel) {
-        mSerialNumber1 = parcel.readLong();
-        mSerialNumber2 = parcel.readLong();
-    }
-
     public MykiTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
         byte[] metadata = desfireCard.getApplication(4594).getFile(15).getData();
@@ -78,6 +66,17 @@ public class MykiTransitData extends StubTransitData {
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Myki data", ex);
         }
+    }
+
+    private MykiTransitData(Parcel parcel) {
+        mSerialNumber1 = parcel.readLong();
+        mSerialNumber2 = parcel.readLong();
+    }
+
+    public static boolean check(Card card) {
+        return (card instanceof DesfireCard)
+                && (((DesfireCard) card).getApplication(4594) != null)
+                && (((DesfireCard) card).getApplication(15732978) != null);
     }
 
     @Override

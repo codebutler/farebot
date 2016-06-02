@@ -30,8 +30,6 @@ import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 
 public class MergedOrcaTrip extends Trip {
-    private final OrcaTrip mStartTrip;
-    private final OrcaTrip mEndTrip;
 
     public static final Creator<MergedOrcaTrip> CREATOR = new Creator<MergedOrcaTrip>() {
         @Override
@@ -48,7 +46,10 @@ public class MergedOrcaTrip extends Trip {
         }
     };
 
-    public MergedOrcaTrip(OrcaTrip startTrip, OrcaTrip endTrip) {
+    private final OrcaTrip mStartTrip;
+    private final OrcaTrip mEndTrip;
+
+    MergedOrcaTrip(OrcaTrip startTrip, OrcaTrip endTrip) {
         mStartTrip = startTrip;
         mEndTrip = endTrip;
     }

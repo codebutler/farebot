@@ -32,22 +32,19 @@ import com.codebutler.farebot.util.Utils;
 import java.util.Date;
 import java.util.Map;
 
-public class OVChipSubscription extends Subscription {
-    private final int mId;
-    private final int mUnknown1;
-    private final long mValidFromDate;
-    private final long mValidFromTime;
-    private final long mValidToDate;
-    private final long mValidToTime;
-    private final int mUnknown2;
-    private final int mAgency;
-    private final int mMachineId;
-    private final int mSubscription;
-    private final int mSubscriptionAddress;
-    private final int mType1;
-    private final int mType2;
-    private final int mUsed;
-    private final int mRest;
+class OVChipSubscription extends Subscription {
+
+    public static final Creator<OVChipSubscription> CREATOR = new Creator<OVChipSubscription>() {
+        @Override
+        public OVChipSubscription createFromParcel(Parcel parcel) {
+            return new OVChipSubscription(parcel);
+        }
+
+        @Override
+        public OVChipSubscription[] newArray(int size) {
+            return new OVChipSubscription[size];
+        }
+    };
 
     private static final Map<Integer, String> SUBSCRIPTIONS = new ImmutableMapBuilder<Integer, String>()
             /* It seems that all the IDs are unique, so why bother with the companies? */
@@ -82,19 +79,23 @@ public class OVChipSubscription extends Subscription {
             .put(0x0BBD, "Fietssupplement")
             .build();
 
-    public static final Creator<OVChipSubscription> CREATOR = new Creator<OVChipSubscription>() {
-        @Override
-        public OVChipSubscription createFromParcel(Parcel parcel) {
-            return new OVChipSubscription(parcel);
-        }
+    private final int mId;
+    private final int mUnknown1;
+    private final long mValidFromDate;
+    private final long mValidFromTime;
+    private final long mValidToDate;
+    private final long mValidToTime;
+    private final int mUnknown2;
+    private final int mAgency;
+    private final int mMachineId;
+    private final int mSubscription;
+    private final int mSubscriptionAddress;
+    private final int mType1;
+    private final int mType2;
+    private final int mUsed;
+    private final int mRest;
 
-        @Override
-        public OVChipSubscription[] newArray(int size) {
-            return new OVChipSubscription[size];
-        }
-    };
-
-    public OVChipSubscription(int subscriptionAddress, byte[] data, int type1, int type2, int used, int rest) {
+    OVChipSubscription(int subscriptionAddress, byte[] data, int type1, int type2, int used, int rest) {
         mSubscriptionAddress = subscriptionAddress;
         mType1 = type1;
         mType2 = type2;

@@ -33,11 +33,26 @@ import java.util.Locale;
 /**
  * Describes top-up amounts "purse credits".
  */
-public class ManlyFastFerryRefill extends Refill {
+class ManlyFastFerryRefill extends Refill {
+
+    public static final Parcelable.Creator<ManlyFastFerryRefill> CREATOR
+            = new Parcelable.Creator<ManlyFastFerryRefill>() {
+
+        @Override
+        public ManlyFastFerryRefill createFromParcel(Parcel in) {
+            return new ManlyFastFerryRefill(in);
+        }
+
+        @Override
+        public ManlyFastFerryRefill[] newArray(int size) {
+            return new ManlyFastFerryRefill[size];
+        }
+    };
+
     private GregorianCalendar mEpoch;
     private ManlyFastFerryPurseRecord mPurse;
 
-    public ManlyFastFerryRefill(ManlyFastFerryPurseRecord purse, GregorianCalendar epoch) {
+    ManlyFastFerryRefill(ManlyFastFerryPurseRecord purse, GregorianCalendar epoch) {
         mPurse = purse;
         mEpoch = epoch;
     }
@@ -85,18 +100,4 @@ public class ManlyFastFerryRefill extends Refill {
         mPurse.writeToParcel(parcel, flags);
         parcel.writeLong(mEpoch.getTimeInMillis());
     }
-
-    public static final Parcelable.Creator<ManlyFastFerryRefill> CREATOR
-            = new Parcelable.Creator<ManlyFastFerryRefill>() {
-
-        @Override
-        public ManlyFastFerryRefill createFromParcel(Parcel in) {
-            return new ManlyFastFerryRefill(in);
-        }
-
-        @Override
-        public ManlyFastFerryRefill[] newArray(int size) {
-            return new ManlyFastFerryRefill[size];
-        }
-    };
 }

@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 
 @Root(name = "manufacturing-data")
 public class DesfireManufacturingData {
+
     @Element(name = "hw-vendor-id") public int hwVendorID;
     @Element(name = "hw-type") public int hwType;
     @Element(name = "hw-sub-type") public int hwSubType;
@@ -52,9 +53,7 @@ public class DesfireManufacturingData {
     @Element(name = "week-prod") public int weekProd;
     @Element(name = "year-prod") public int yearProd;
 
-    private DesfireManufacturingData() { /* For XML Serializer */ }
-
-    public DesfireManufacturingData(byte[] data) {
+    DesfireManufacturingData(byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
         hwVendorID = stream.read();
         hwType = stream.read();
@@ -86,4 +85,6 @@ public class DesfireManufacturingData {
         weekProd = stream.read();
         yearProd = stream.read();
     }
+
+    private DesfireManufacturingData() { /* For XML Serializer */ }
 }

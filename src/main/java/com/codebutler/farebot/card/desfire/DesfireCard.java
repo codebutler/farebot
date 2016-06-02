@@ -51,8 +51,21 @@ import java.util.List;
 @Root(name = "card")
 @CardRawDataFragmentClass(DesfireCardRawDataFragment.class)
 public class DesfireCard extends Card {
-    @Element(name = "manufacturing-data") private DesfireManufacturingData mManfData;
-    @ElementList(name = "applications") private List<DesfireApplication> mApplications;
+
+    @Element(name = "manufacturing-data")
+    private DesfireManufacturingData mManfData;
+
+    @ElementList(name = "applications")
+    private List<DesfireApplication> mApplications;
+
+    @SuppressWarnings("unused")
+    private DesfireCard() { /* For XML Serializer */ }
+
+    private DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication[] apps) {
+        super(CardType.MifareDesfire, tagId, scannedAt);
+        mManfData = manfData;
+        mApplications = Utils.arrayAsList(apps);
+    }
 
     public static DesfireCard dumpTag(Tag tag) throws Exception {
         List<DesfireApplication> apps = new ArrayList<>();
@@ -111,14 +124,6 @@ public class DesfireCard extends Card {
         }
 
         return new DesfireCard(tag.getId(), new Date(), manufData, appsArray);
-    }
-
-    private DesfireCard() { /* For XML Serializer */ }
-
-    DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication[] apps) {
-        super(CardType.MifareDesfire, tagId, scannedAt);
-        mManfData = manfData;
-        mApplications = Utils.arrayAsList(apps);
     }
 
     @Override

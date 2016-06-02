@@ -44,20 +44,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class EdyTransitData extends TransitData {
-    private EdyTrip[] mTrips;
-
-    // defines
-    private static final int FELICA_SERVICE_EDY_ID = 0x110B;
-    private static final int FELICA_SERVICE_EDY_BALANCE = 0x1317;
-    private static final int FELICA_SERVICE_EDY_HISTORY = 0x170F;
-
-    public static final int FELICA_MODE_EDY_DEBIT = 0x20;
-    public static final int FELICA_MODE_EDY_CHARGE = 0x02;
-    public static final int FELICA_MODE_EDY_GIFT = 0x04;
-
-    // private data
-    private byte[] mSerialNumber = new byte[8];
-    private int mCurrentBalance;
 
     public static final Creator<EdyTransitData> CREATOR = new Creator<EdyTransitData>() {
         @Override
@@ -71,18 +57,19 @@ public class EdyTransitData extends TransitData {
         }
     };
 
-    public static boolean check(FelicaCard card) {
-        return (card.getSystem(FeliCaLib.SYSTEMCODE_EDY) != null);
-    }
+    // defines
+    static final int FELICA_MODE_EDY_DEBIT = 0x20;
+    static final int FELICA_MODE_EDY_CHARGE = 0x02;
+    static final int FELICA_MODE_EDY_GIFT = 0x04;
 
-    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
-        return new TransitIdentity("Edy", null);
-    }
+    private static final int FELICA_SERVICE_EDY_ID = 0x110B;
+    private static final int FELICA_SERVICE_EDY_BALANCE = 0x1317;
+    private static final int FELICA_SERVICE_EDY_HISTORY = 0x170F;
 
-    private EdyTransitData(Parcel parcel) {
-        mTrips = new EdyTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, EdyTrip.CREATOR);
-    }
+    // private data
+    private EdyTrip[] mTrips;
+    private byte[] mSerialNumber = new byte[8];
+    private int mCurrentBalance;
 
     public EdyTransitData(FelicaCard card) {
         // card ID is in block 0, bytes 2-9, big-endian ordering
@@ -114,6 +101,19 @@ public class EdyTransitData extends TransitData {
         }
 
         mTrips = trips.toArray(new EdyTrip[trips.size()]);
+    }
+
+    private EdyTransitData(Parcel parcel) {
+        mTrips = new EdyTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, EdyTrip.CREATOR);
+    }
+
+    public static boolean check(FelicaCard card) {
+        return (card.getSystem(FeliCaLib.SYSTEMCODE_EDY) != null);
+    }
+
+    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
+        return new TransitIdentity("Edy", null);
     }
 
     @Override

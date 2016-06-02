@@ -31,29 +31,32 @@ import org.simpleframework.xml.Root;
 
 @Root(name = "block")
 public class ClassicBlock {
-    public static final String TYPE_DATA = "data";
-    private static final String TYPE_VALUE = "value";
+
     public static final String TYPE_TRAILER = "trailer";
     public static final String TYPE_MANUFACTURER = "manufacturer";
+
+    static final String TYPE_DATA = "data";
+
+    private static final String TYPE_VALUE = "value";
 
     @Attribute(name = "index") private int mIndex;
     @Attribute(name = "type") private String mType;
     @Element(name = "data") private Base64String mData;
+
+    @SuppressWarnings("unused")
+    public ClassicBlock() { /* For XML Serializer */ }
+
+    private ClassicBlock(int index, String type, byte[] data) {
+        mIndex = index;
+        mType = type;
+        mData = new Base64String(data);
+    }
 
     public static ClassicBlock create(String type, int index, byte[] data) {
         if (type.equals(TYPE_DATA) || type.equals(TYPE_VALUE)) {
             return new ClassicBlock(index, type, data);
         }
         return null;
-    }
-
-    public ClassicBlock() {
-    }
-
-    private ClassicBlock(int index, String type, byte[] data) {
-        mIndex = index;
-        mType = type;
-        mData = new Base64String(data);
     }
 
     public int getIndex() {

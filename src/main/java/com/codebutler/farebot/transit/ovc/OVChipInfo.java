@@ -31,7 +31,27 @@ import com.codebutler.farebot.util.Utils;
 import java.util.Calendar;
 import java.util.Date;
 
-public class OVChipInfo implements Parcelable {
+class OVChipInfo implements Parcelable {
+
+    public static final Parcelable.Creator<OVChipInfo> CREATOR = new Parcelable.Creator<OVChipInfo>() {
+        @Override
+        public OVChipInfo createFromParcel(Parcel source) {
+            int company = source.readInt();
+            int expdate = source.readInt();
+            Date birthdate = new Date(source.readLong());
+            int active = source.readInt();
+            int limit = source.readInt();
+            int charge = source.readInt();
+            int unknown = source.readInt();
+            return new OVChipInfo(company, expdate, birthdate, active, limit, charge, unknown);
+        }
+
+        @Override
+        public OVChipInfo[] newArray(int size) {
+            return new OVChipInfo[size];
+        }
+    };
+
     private final int mCompany;
     private final int mExpdate;
     private final Date mBirthdate;
@@ -40,7 +60,7 @@ public class OVChipInfo implements Parcelable {
     private final int mCharge;
     private final int mUnknown;
 
-    public OVChipInfo(
+    private OVChipInfo(
             int company,
             int expdate,
             Date birthdate,
@@ -58,7 +78,7 @@ public class OVChipInfo implements Parcelable {
         mUnknown = unknown;
     }
 
-    public OVChipInfo(byte[] data) {
+    OVChipInfo(byte[] data) {
         if (data == null) {
             data = new byte[48];
         }
@@ -138,25 +158,6 @@ public class OVChipInfo implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Parcelable.Creator<OVChipInfo> CREATOR = new Parcelable.Creator<OVChipInfo>() {
-        @Override
-        public OVChipInfo createFromParcel(Parcel source) {
-            int company = source.readInt();
-            int expdate = source.readInt();
-            Date birthdate = new Date(source.readLong());
-            int active = source.readInt();
-            int limit = source.readInt();
-            int charge = source.readInt();
-            int unknown = source.readInt();
-            return new OVChipInfo(company, expdate, birthdate, active, limit, charge, unknown);
-        }
-
-        @Override
-        public OVChipInfo[] newArray(int size) {
-            return new OVChipInfo[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

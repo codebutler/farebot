@@ -33,27 +33,6 @@ import java.util.Locale;
 
 class ClipperTrip extends Trip {
 
-    private final long mTimestamp;
-    private final long mExitTimestamp;
-    private final long mAgency;
-    private final long mFrom;
-    private final long mTo;
-    private final long mRoute;
-
-    long mBalance;
-    long mFare;
-
-    ClipperTrip(long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route) {
-        mTimestamp = timestamp;
-        mExitTimestamp = exitTimestamp;
-        mFare = fare;
-        mAgency = agency;
-        mFrom = from;
-        mTo = to;
-        mRoute = route;
-        mBalance = 0;
-    }
-
     public static final Creator<ClipperTrip> CREATOR = new Creator<ClipperTrip>() {
         @Override
         public ClipperTrip createFromParcel(Parcel parcel) {
@@ -65,6 +44,27 @@ class ClipperTrip extends Trip {
             return new ClipperTrip[size];
         }
     };
+
+    long mBalance;
+    long mFare;
+
+    private final long mTimestamp;
+    private final long mExitTimestamp;
+    private final long mAgency;
+    private final long mFrom;
+    private final long mTo;
+    private final long mRoute;
+
+    ClipperTrip(long timestamp, long exitTimestamp, long fare, long agency, long from, long to, long route) {
+        mTimestamp = timestamp;
+        mExitTimestamp = exitTimestamp;
+        mFare = fare;
+        mAgency = agency;
+        mFrom = from;
+        mTo = to;
+        mRoute = route;
+        mBalance = 0;
+    }
 
     private ClipperTrip(Parcel parcel) {
         mTimestamp = parcel.readLong();

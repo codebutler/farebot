@@ -50,7 +50,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SuicaTransitData extends TransitData {
-    private SuicaTrip[] mTrips;
 
     public static final Creator<SuicaTransitData> CREATOR = new Creator<SuicaTransitData>() {
         @Override
@@ -64,18 +63,7 @@ public class SuicaTransitData extends TransitData {
         }
     };
 
-    public static boolean check(FelicaCard card) {
-        return (card.getSystem(FeliCaLib.SYSTEMCODE_SUICA) != null);
-    }
-
-    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
-        return new TransitIdentity("Suica", null); // FIXME: Could be ICOCA, etc.
-    }
-
-    private SuicaTransitData(Parcel parcel) {
-        mTrips = new SuicaTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, SuicaTrip.CREATOR);
-    }
+    private SuicaTrip[] mTrips;
 
     public SuicaTransitData(FelicaCard card) {
         FelicaService service = card.getSystem(FeliCaLib.SYSTEMCODE_SUICA).getService(FeliCaLib.SERVICE_SUICA_HISTORY);
@@ -103,6 +91,19 @@ public class SuicaTransitData extends TransitData {
         Collections.reverse(trips);
 
         mTrips = trips.toArray(new SuicaTrip[trips.size()]);
+    }
+
+    private SuicaTransitData(Parcel parcel) {
+        mTrips = new SuicaTrip[parcel.readInt()];
+        parcel.readTypedArray(mTrips, SuicaTrip.CREATOR);
+    }
+
+    public static boolean check(FelicaCard card) {
+        return (card.getSystem(FeliCaLib.SYSTEMCODE_SUICA) != null);
+    }
+
+    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
+        return new TransitIdentity("Suica", null); // FIXME: Could be ICOCA, etc.
     }
 
     @Override

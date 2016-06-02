@@ -30,7 +30,21 @@ import java.util.GregorianCalendar;
 /**
  * Represents trip events on Go Card.
  */
-public class SeqGoTrip extends Trip {
+class SeqGoTrip extends Trip {
+
+    public static final Parcelable.Creator<SeqGoTrip> CREATOR = new Parcelable.Creator<SeqGoTrip>() {
+
+        @Override
+        public SeqGoTrip createFromParcel(Parcel in) {
+            return new SeqGoTrip(in);
+        }
+
+        @Override
+        public SeqGoTrip[] newArray(int size) {
+            return new SeqGoTrip[size];
+        }
+    };
+
     int mJourneyId;
     Mode mMode;
     GregorianCalendar mStartTime;
@@ -38,6 +52,26 @@ public class SeqGoTrip extends Trip {
     int mStartStation;
     int mEndStation;
 
+    SeqGoTrip() { }
+
+    private SeqGoTrip(Parcel parcel) {
+        mJourneyId = parcel.readInt();
+        long startTime = parcel.readLong();
+        if (startTime != 0) {
+            mStartTime = new GregorianCalendar();
+            mStartTime.setTimeInMillis(startTime);
+        }
+
+        long endTime = parcel.readLong();
+        if (endTime != 0) {
+            mEndTime = new GregorianCalendar();
+            mEndTime.setTimeInMillis(endTime);
+        }
+
+        mMode = Mode.valueOf(parcel.readString());
+        mStartStation = parcel.readInt();
+        mEndStation = parcel.readInt();
+    }
 
     @Override
     public long getTimestamp() {
@@ -163,39 +197,4 @@ public class SeqGoTrip extends Trip {
         parcel.writeInt(mStartStation);
         parcel.writeInt(mEndStation);
     }
-
-    private SeqGoTrip(Parcel parcel) {
-        mJourneyId = parcel.readInt();
-        long startTime = parcel.readLong();
-        if (startTime != 0) {
-            mStartTime = new GregorianCalendar();
-            mStartTime.setTimeInMillis(startTime);
-        }
-
-        long endTime = parcel.readLong();
-        if (endTime != 0) {
-            mEndTime = new GregorianCalendar();
-            mEndTime.setTimeInMillis(endTime);
-        }
-
-        mMode = Mode.valueOf(parcel.readString());
-        mStartStation = parcel.readInt();
-        mEndStation = parcel.readInt();
-    }
-
-    public SeqGoTrip() {
-    }
-
-    public static final Parcelable.Creator<SeqGoTrip> CREATOR = new Parcelable.Creator<SeqGoTrip>() {
-
-        @Override
-        public SeqGoTrip createFromParcel(Parcel in) {
-            return new SeqGoTrip(in);
-        }
-
-        @Override
-        public SeqGoTrip[] newArray(int size) {
-            return new SeqGoTrip[size];
-        }
-    };
 }

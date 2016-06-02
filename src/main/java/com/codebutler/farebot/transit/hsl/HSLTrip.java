@@ -34,14 +34,29 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 class HSLTrip extends Trip {
+
+    public static final Creator<HSLTrip> CREATOR = new Creator<HSLTrip>() {
+        @Override
+        public HSLTrip createFromParcel(Parcel parcel) {
+            return new HSLTrip(parcel);
+        }
+
+        @Override
+        public HSLTrip[] newArray(int size) {
+            return new HSLTrip[size];
+        }
+    };
+
     String mLine = null;
     long mVehicleNumber = -1;
     long mTimestamp = -1;
     long mFare = -1;
-    private final long mNewBalance;
     long mArvo = -1;
     long mExpireTimestamp = -1;
+
     long mPax = -1;
+
+    private final long mNewBalance;
 
     HSLTrip(DesfireRecord record) {
         byte[] useData = record.getData();
@@ -66,21 +81,9 @@ class HSLTrip extends Trip {
 
     }
 
-    public double getExpireTimestamp() {
-        return this.mExpireTimestamp;
+    HSLTrip() {
+        mNewBalance = -1;
     }
-
-    public static final Creator<HSLTrip> CREATOR = new Creator<HSLTrip>() {
-        @Override
-        public HSLTrip createFromParcel(Parcel parcel) {
-            return new HSLTrip(parcel);
-        }
-
-        @Override
-        public HSLTrip[] newArray(int size) {
-            return new HSLTrip[size];
-        }
-    };
 
     private HSLTrip(Parcel parcel) {
         // mArvo, mTimestamp, mExpireTimestamp, mFare, mPax, mNewBalance
@@ -94,8 +97,8 @@ class HSLTrip extends Trip {
         mVehicleNumber = -1;
     }
 
-    HSLTrip() {
-        mNewBalance = -1;
+    public double getExpireTimestamp() {
+        return this.mExpireTimestamp;
     }
 
     @Override

@@ -38,6 +38,15 @@ import java.io.OutputStream;
  */
 public abstract class DBUtil {
 
+    private static final String TAG = "DBUtil";
+
+    private SQLiteDatabase mDatabase;
+    private final Context mContext;
+
+    protected DBUtil(Context context) {
+        mContext = context;
+    }
+
     /**
      * Implementing classes should specify the filename of their database.
      *
@@ -63,15 +72,6 @@ public abstract class DBUtil {
      */
     private boolean allowGreaterDatabaseVersions() {
         return false;
-    }
-
-    private static final String TAG = "DBUtil";
-
-    private SQLiteDatabase mDatabase;
-    private final Context mContext;
-
-    protected DBUtil(Context context) {
-        this.mContext = context;
     }
 
     public SQLiteDatabase openDatabase() throws SQLException, IOException {

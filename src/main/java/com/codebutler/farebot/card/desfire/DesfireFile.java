@@ -34,6 +34,14 @@ public class DesfireFile {
     @Element(name = "settings", required = false) private DesfireFileSettings mSettings;
     @Element(name = "data", required = false) private Base64String mData;
 
+    DesfireFile() { /* For XML Serializer */ }
+
+    DesfireFile(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
+        mId = fileId;
+        mSettings = fileSettings;
+        mData = new Base64String(fileData);
+    }
+
     public static DesfireFile create(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
         if (fileSettings instanceof RecordDesfireFileSettings) {
             return new RecordDesfireFile(fileId, fileSettings, fileData);
@@ -42,14 +50,6 @@ public class DesfireFile {
         } else {
             return new DesfireFile(fileId, fileSettings, fileData);
         }
-    }
-
-    DesfireFile() { /* For XML Serializer */ }
-
-    DesfireFile(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        mId = fileId;
-        mSettings = fileSettings;
-        mData = new Base64String(fileData);
     }
 
     public DesfireFileSettings getFileSettings() {

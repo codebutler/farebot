@@ -31,20 +31,18 @@ public class ManlyFastFerryBalanceRecord
     private int mBalance;
     private int mVersion;
 
+    private ManlyFastFerryBalanceRecord() { }
+
     public static ManlyFastFerryBalanceRecord recordFromBytes(byte[] input) {
         if (input[0] != 0x01) {
             throw new AssertionError();
         }
-
 
         ManlyFastFerryBalanceRecord record = new ManlyFastFerryBalanceRecord();
         record.mVersion = Utils.byteArrayToInt(input, 2, 1);
         record.mBalance = Utils.byteArrayToInt(input, 11, 4);
 
         return record;
-    }
-
-    private ManlyFastFerryBalanceRecord() {
     }
 
     /**

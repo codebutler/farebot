@@ -37,6 +37,18 @@ import java.util.Date;
 
 class OVChipTrip extends Trip {
 
+    public static final Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
+        @Override
+        public OVChipTrip createFromParcel(Parcel parcel) {
+            return new OVChipTrip(parcel);
+        }
+
+        @Override
+        public OVChipTrip[] newArray(int size) {
+            return new OVChipTrip[size];
+        }
+    };
+
     static final java.util.Comparator<? super OVChipTrip> ID_ORDER = new java.util.Comparator<OVChipTrip>() {
         @Override
         public int compare(OVChipTrip t1, OVChipTrip t2) {
@@ -124,18 +136,6 @@ class OVChipTrip extends Trip {
 
         mIsBanned = mProcessType == OVChipTransitData.PROCESS_BANNED;
     }
-
-    public static final Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
-        @Override
-        public OVChipTrip createFromParcel(Parcel parcel) {
-            return new OVChipTrip(parcel);
-        }
-
-        @Override
-        public OVChipTrip[] newArray(int size) {
-            return new OVChipTrip[size];
-        }
-    };
 
     private OVChipTrip(Parcel parcel) {
         mId = parcel.readInt();

@@ -36,8 +36,7 @@ public class ClassicSector {
     @Attribute(name = "index") private int mIndex;
     @ElementList(name = "blocks", required = false, empty = false) private List<ClassicBlock> mBlocks;
 
-    protected ClassicSector() {
-    }
+    protected ClassicSector() { }
 
     public ClassicSector(int index, ClassicBlock[] blocks) {
         mIndex = index;

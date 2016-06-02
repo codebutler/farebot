@@ -89,10 +89,6 @@ public class CEPASPurse {
     @Element(name = "transaction", required = false)
     private CEPASTransaction mLastTransactionRecord;
 
-    public static CEPASPurse create(int purseId, byte[] purseData) {
-        return new CEPASPurse(purseId, purseData);
-    }
-
     public CEPASPurse(
             int id,
             byte cepasVersion,
@@ -232,6 +228,10 @@ public class CEPASPurse {
 
     @SuppressWarnings("unused")
     private CEPASPurse() { /* For XML Serializer */ }
+
+    public static CEPASPurse create(int purseId, byte[] purseData) {
+        return new CEPASPurse(purseId, purseData);
+    }
 
     public int getId() {
         return mId;

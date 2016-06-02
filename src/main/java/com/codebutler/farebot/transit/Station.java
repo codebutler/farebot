@@ -28,6 +28,18 @@ import android.support.annotation.CallSuper;
 
 public class Station implements Parcelable {
 
+    public static final Creator<Station> CREATOR = new Creator<Station>() {
+        @Override
+        public Station createFromParcel(Parcel parcel) {
+            return new Station(parcel);
+        }
+
+        @Override
+        public Station[] newArray(int size) {
+            return new Station[size];
+        }
+    };
+
     private final String mCompanyName;
     private final String mLineName;
     private final String mStationName;
@@ -57,18 +69,6 @@ public class Station implements Parcelable {
         mLatitude = latitude;
         mLongitude = longitude;
     }
-
-    public static final Creator<Station> CREATOR = new Creator<Station>() {
-        @Override
-        public Station createFromParcel(Parcel parcel) {
-            return new Station(parcel);
-        }
-
-        @Override
-        public Station[] newArray(int size) {
-            return new Station[size];
-        }
-    };
 
     protected Station(Parcel parcel) {
         mCompanyName = parcel.readString();

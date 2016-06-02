@@ -59,6 +59,8 @@ public class HSLTransitData extends TransitData {
         }
     };
 
+    private static final long EPOCH = 0x32C97ED0;
+
     private String mSerialNumber;
     private double mBalance;
     private List<HSLTrip> mTrips;
@@ -93,8 +95,6 @@ public class HSLTransitData extends TransitData {
     private long mArvoDirection;
     private long mKausiDirection;
 
-    private static final long EPOCH = 0x32C97ED0;
-
     /*
     private static final String[] regionNames = {
         "N/A", "Helsinki", "Espoo", "Vantaa", "Koko alue", "Seutu", "", "", "", "",  // 0-9
@@ -107,65 +107,6 @@ public class HSLTransitData extends TransitData {
         put(16L, "Tram");
     }});
     */
-
-    public static boolean check(Card card) {
-        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x1120ef) != null);
-    }
-
-    public static TransitIdentity parseTransitIdentity(Card card) {
-        try {
-            byte[] data = ((DesfireCard) card).getApplication(0x1120ef).getFile(0x08).getData();
-            return new TransitIdentity("HSL", Utils.getHexString(data).substring(2, 20));
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing HSL serial", ex);
-        }
-    }
-
-    public HSLTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readString();
-        mBalance = parcel.readDouble();
-        mArvoMystery1 = parcel.readLong();
-        mArvoDuration = parcel.readLong();
-        mArvoRegional = parcel.readLong();
-        mArvoExit = parcel.readLong();
-        mArvoPurchasePrice = parcel.readLong();
-        mArvoDiscoGroup = parcel.readLong();
-        mArvoPurchase = parcel.readLong();
-        mArvoExpire = parcel.readLong();
-        mArvoPax = parcel.readLong();
-        mArvoXfer = parcel.readLong();
-        mArvoVehicleNumber = parcel.readLong();
-        mArvoUnknown = parcel.readLong();
-        mArvoLineJORE = parcel.readLong();
-        mArvoJOREExt = parcel.readLong();
-        mArvoDirection = parcel.readLong();
-        mKausiVehicleNumber = parcel.readLong();
-        mKausiUnknown = parcel.readLong();
-        mKausiLineJORE = parcel.readLong();
-        mKausiJOREExt = parcel.readLong();
-        mKausiDirection = parcel.readLong();
-
-        mTrips = new ArrayList<>();
-        parcel.readTypedList(mTrips, HSLTrip.CREATOR);
-    }
-
-    public static long bitsToLong(int start, int len, byte[] data) {
-        long ret = 0;
-        for (int i = start; i < start + len; ++i) {
-            long bit = ((data[i / 8] >> (7 - i % 8)) & 1);
-            ret = ret | (bit << ((start + len - 1) - i));
-        }
-        return ret;
-    }
-
-    public static long bitsToLong(int start, int len, long[] data) {
-        long ret = 0;
-        for (int i = start; i < start + len; ++i) {
-            long bit = ((data[i / 8] >> (7 - i % 8)) & 1);
-            ret = ret | (bit << ((start + len - 1) - i));
-        }
-        return ret;
-    }
 
     public HSLTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
@@ -312,7 +253,66 @@ public class HSLTransitData extends TransitData {
         }
     }
 
-    public static long cardDateToTimestamp(long day, long minute) {
+    private HSLTransitData(Parcel parcel) {
+        mSerialNumber = parcel.readString();
+        mBalance = parcel.readDouble();
+        mArvoMystery1 = parcel.readLong();
+        mArvoDuration = parcel.readLong();
+        mArvoRegional = parcel.readLong();
+        mArvoExit = parcel.readLong();
+        mArvoPurchasePrice = parcel.readLong();
+        mArvoDiscoGroup = parcel.readLong();
+        mArvoPurchase = parcel.readLong();
+        mArvoExpire = parcel.readLong();
+        mArvoPax = parcel.readLong();
+        mArvoXfer = parcel.readLong();
+        mArvoVehicleNumber = parcel.readLong();
+        mArvoUnknown = parcel.readLong();
+        mArvoLineJORE = parcel.readLong();
+        mArvoJOREExt = parcel.readLong();
+        mArvoDirection = parcel.readLong();
+        mKausiVehicleNumber = parcel.readLong();
+        mKausiUnknown = parcel.readLong();
+        mKausiLineJORE = parcel.readLong();
+        mKausiJOREExt = parcel.readLong();
+        mKausiDirection = parcel.readLong();
+
+        mTrips = new ArrayList<>();
+        parcel.readTypedList(mTrips, HSLTrip.CREATOR);
+    }
+
+    public static boolean check(Card card) {
+        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x1120ef) != null);
+    }
+
+    public static TransitIdentity parseTransitIdentity(Card card) {
+        try {
+            byte[] data = ((DesfireCard) card).getApplication(0x1120ef).getFile(0x08).getData();
+            return new TransitIdentity("HSL", Utils.getHexString(data).substring(2, 20));
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing HSL serial", ex);
+        }
+    }
+
+    static long bitsToLong(int start, int len, byte[] data) {
+        long ret = 0;
+        for (int i = start; i < start + len; ++i) {
+            long bit = ((data[i / 8] >> (7 - i % 8)) & 1);
+            ret = ret | (bit << ((start + len - 1) - i));
+        }
+        return ret;
+    }
+
+    static long bitsToLong(int start, int len, long[] data) {
+        long ret = 0;
+        for (int i = start; i < start + len; ++i) {
+            long bit = ((data[i / 8] >> (7 - i % 8)) & 1);
+            ret = ret | (bit << ((start + len - 1) - i));
+        }
+        return ret;
+    }
+
+    static long cardDateToTimestamp(long day, long minute) {
         return (EPOCH) + day * (60 * 60 * 24) + minute * 60;
     }
 

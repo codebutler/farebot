@@ -46,6 +46,15 @@ public class ManlyFastFerryPurseRecord extends ManlyFastFerryRegularRecord imple
     private boolean mIsCredit;
     private int mTransactionValue;
 
+    public ManlyFastFerryPurseRecord(Parcel parcel) {
+        mDay = parcel.readInt();
+        mMinute = parcel.readInt();
+        mIsCredit = parcel.readInt() == 1;
+        mTransactionValue = parcel.readInt();
+    }
+
+    private ManlyFastFerryPurseRecord() { }
+
     public static ManlyFastFerryPurseRecord recordFromBytes(byte[] input) {
         if (input[0] != 0x02) {
             throw new AssertionError("PurseRecord input[0] != 0x02");
@@ -80,16 +89,6 @@ public class ManlyFastFerryPurseRecord extends ManlyFastFerryRegularRecord imple
         }
 
         return record;
-    }
-
-    private ManlyFastFerryPurseRecord() {
-    }
-
-    public ManlyFastFerryPurseRecord(Parcel parcel) {
-        mDay = parcel.readInt();
-        mMinute = parcel.readInt();
-        mIsCredit = parcel.readInt() == 1;
-        mTransactionValue = parcel.readInt();
     }
 
     @Override

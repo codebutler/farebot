@@ -56,17 +56,6 @@ public class SeqGoTransitData extends TransitData {
 
     public static final String NAME = "Go card";
 
-    private static final byte[] MANUFACTURER = {
-            0x16, 0x18, 0x1A, 0x1B,
-            0x1C, 0x1D, 0x1E, 0x1F
-    };
-
-    private BigInteger mSerialNumber;
-    private int mBalance;
-    private SeqGoRefill[] mRefills;
-    private SeqGoTrip[] mTrips;
-    private boolean mHasUnknownStations = false;
-
     public static final Creator<SeqGoTransitData> CREATOR = new Creator<SeqGoTransitData>() {
         @Override
         public SeqGoTransitData createFromParcel(Parcel parcel) {
@@ -79,41 +68,22 @@ public class SeqGoTransitData extends TransitData {
         }
     };
 
-    public static boolean check(ClassicCard card) {
-        try {
-            byte[] blockData = card.getSector(0).getBlock(1).getData();
-            return Arrays.equals(Arrays.copyOfRange(blockData, 1, 9), MANUFACTURER);
-        } catch (UnauthorizedException ex) {
-            // It is not possible to identify the card without a key
-            return false;
-        }
-    }
+    private static final byte[] MANUFACTURER = {
+            0x16, 0x18, 0x1A, 0x1B,
+            0x1C, 0x1D, 0x1E, 0x1F
+    };
 
+    private BigInteger mSerialNumber;
+    private int mBalance;
+    private SeqGoRefill[] mRefills;
+    private SeqGoTrip[] mTrips;
+    private boolean mHasUnknownStations = false;
 
-    public static TransitIdentity parseTransitIdentity(ClassicCard card) {
-        byte[] serialData = card.getSector(0).getBlock(0).getData();
-        serialData = Utils.reverseBuffer(serialData, 0, 4);
-        BigInteger serialNumber = Utils.byteArrayToBigInteger(serialData, 0, 4);
-        return new TransitIdentity(NAME, formatSerialNumber(serialNumber));
-    }
-
-    private static String formatSerialNumber(BigInteger serialNumber) {
-        String serial = serialNumber.toString();
-        while (serial.length() < 12) {
-            serial = "0" + serial;
-        }
-
-        serial = "016" + serial;
-        return serial + Utils.calculateLuhn(serial);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public SeqGoTransitData(Parcel parcel) {
+    private SeqGoTransitData(Parcel parcel) {
         mSerialNumber = new BigInteger(parcel.readString());
         mBalance = parcel.readInt();
         parcel.readTypedArray(mTrips, SeqGoTrip.CREATOR);
         parcel.readTypedArray(mRefills, SeqGoRefill.CREATOR);
-
     }
 
     public SeqGoTransitData(ClassicCard card) {
@@ -222,6 +192,33 @@ public class SeqGoTransitData extends TransitData {
 
         mTrips = trips.toArray(new SeqGoTrip[trips.size()]);
         mRefills = refills.toArray(new SeqGoRefill[refills.size()]);
+    }
+
+    public static boolean check(ClassicCard card) {
+        try {
+            byte[] blockData = card.getSector(0).getBlock(1).getData();
+            return Arrays.equals(Arrays.copyOfRange(blockData, 1, 9), MANUFACTURER);
+        } catch (UnauthorizedException ex) {
+            // It is not possible to identify the card without a key
+            return false;
+        }
+    }
+
+    public static TransitIdentity parseTransitIdentity(ClassicCard card) {
+        byte[] serialData = card.getSector(0).getBlock(0).getData();
+        serialData = Utils.reverseBuffer(serialData, 0, 4);
+        BigInteger serialNumber = Utils.byteArrayToBigInteger(serialData, 0, 4);
+        return new TransitIdentity(NAME, formatSerialNumber(serialNumber));
+    }
+
+    private static String formatSerialNumber(BigInteger serialNumber) {
+        String serial = serialNumber.toString();
+        while (serial.length() < 12) {
+            serial = "0" + serial;
+        }
+
+        serial = "016" + serial;
+        return serial + Utils.calculateLuhn(serial);
     }
 
     @Override

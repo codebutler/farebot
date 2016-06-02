@@ -31,19 +31,7 @@ import com.codebutler.farebot.transit.Trip;
 import java.text.NumberFormat;
 import java.util.Currency;
 
-public class EZLinkTrip extends Trip {
-    private final CEPASTransaction mTransaction;
-    private final String mCardName;
-
-    public EZLinkTrip(CEPASTransaction transaction, String cardName) {
-        mTransaction = transaction;
-        mCardName = cardName;
-    }
-
-    private EZLinkTrip(Parcel parcel) {
-        mTransaction = parcel.readParcelable(CEPASTransaction.class.getClassLoader());
-        mCardName = parcel.readString();
-    }
+class EZLinkTrip extends Trip {
 
     public static final Creator<EZLinkTrip> CREATOR = new Creator<EZLinkTrip>() {
         @Override
@@ -56,6 +44,19 @@ public class EZLinkTrip extends Trip {
             return new EZLinkTrip[size];
         }
     };
+
+    private final CEPASTransaction mTransaction;
+    private final String mCardName;
+
+    EZLinkTrip(CEPASTransaction transaction, String cardName) {
+        mTransaction = transaction;
+        mCardName = cardName;
+    }
+
+    private EZLinkTrip(Parcel parcel) {
+        mTransaction = parcel.readParcelable(CEPASTransaction.class.getClassLoader());
+        mCardName = parcel.readString();
+    }
 
     @Override
     public long getTimestamp() {

@@ -37,6 +37,9 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 public abstract class BetterContentProvider extends ContentProvider {
+    static final int CODE_COLLECTION = 100;
+    static final int CODE_SINGLE = 101;
+
     private SQLiteOpenHelper mHelper;
     private SQLiteOpenHelperCreator mHelperCreator;
     private String mItemType;
@@ -44,9 +47,6 @@ public abstract class BetterContentProvider extends ContentProvider {
     private String mDirType;
     private String mTableName;
     private UriMatcher mUriMatcher;
-
-    static final int CODE_COLLECTION = 100;
-    static final int CODE_SINGLE = 101;
 
     BetterContentProvider(SQLiteOpenHelperCreator helperCreator, String dirType, String itemType,
                           String tableName, Uri contentUri) {

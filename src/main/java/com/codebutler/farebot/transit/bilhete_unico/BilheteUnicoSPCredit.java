@@ -29,14 +29,29 @@ import android.os.Parcelable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class BilheteUnicoSPCredit implements Parcelable {
+class BilheteUnicoSPCredit implements Parcelable {
+
+    public static final Parcelable.Creator<BilheteUnicoSPCredit> CREATOR
+            = new Parcelable.Creator<BilheteUnicoSPCredit>() {
+        @Override
+        public BilheteUnicoSPCredit createFromParcel(Parcel source) {
+            int credit = source.readInt();
+            return new BilheteUnicoSPCredit(credit);
+        }
+
+        @Override
+        public BilheteUnicoSPCredit[] newArray(int size) {
+            return new BilheteUnicoSPCredit[size];
+        }
+    };
+
     private final int mCredit;
 
     private BilheteUnicoSPCredit(int credit) {
         mCredit = credit;
     }
 
-    public BilheteUnicoSPCredit(byte[] data) {
+    BilheteUnicoSPCredit(byte[] data) {
         if (data == null) {
             data = new byte[16];
         }
@@ -52,20 +67,6 @@ public class BilheteUnicoSPCredit implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Parcelable.Creator<BilheteUnicoSPCredit> CREATOR
-            = new Parcelable.Creator<BilheteUnicoSPCredit>() {
-        @Override
-        public BilheteUnicoSPCredit createFromParcel(Parcel source) {
-            int credit = source.readInt();
-            return new BilheteUnicoSPCredit(credit);
-        }
-
-        @Override
-        public BilheteUnicoSPCredit[] newArray(int size) {
-            return new BilheteUnicoSPCredit[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

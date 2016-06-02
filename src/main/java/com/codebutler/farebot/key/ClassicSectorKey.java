@@ -29,22 +29,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ClassicSectorKey {
-    private static final String TYPE = "type";
-    private static final String KEY = "key";
 
     public static final String TYPE_KEYA = "KeyA";
     public static final String TYPE_KEYB = "KeyB";
 
+    private static final String TYPE = "type";
+    private static final String KEY = "key";
+
     private String mType;
     private byte[] mKey;
 
-    public static ClassicSectorKey fromJSON(JSONObject json) throws JSONException {
-        return new ClassicSectorKey(json.getString(TYPE), Utils.hexStringToByteArray(json.getString(KEY)));
-    }
-
-    public ClassicSectorKey(String type, byte[] key) {
+    ClassicSectorKey(String type, byte[] key) {
         mType = type;
         mKey = key;
+    }
+
+    static ClassicSectorKey fromJSON(JSONObject json) throws JSONException {
+        return new ClassicSectorKey(json.getString(TYPE), Utils.hexStringToByteArray(json.getString(KEY)));
     }
 
     public String getType() {
@@ -55,7 +56,7 @@ public class ClassicSectorKey {
         return mKey;
     }
 
-    public JSONObject toJSON() {
+    JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
             json.put(TYPE, mType);

@@ -33,11 +33,29 @@ import java.util.Locale;
 /**
  * Represents a top-up event on the Go card.
  */
-public class SeqGoRefill extends Refill {
+class SeqGoRefill extends Refill {
+
+    public static final Parcelable.Creator<SeqGoRefill> CREATOR = new Parcelable.Creator<SeqGoRefill>() {
+
+        @Override
+        public SeqGoRefill createFromParcel(Parcel in) {
+            return new SeqGoRefill(in);
+        }
+
+        @Override
+        public SeqGoRefill[] newArray(int size) {
+            return new SeqGoRefill[size];
+        }
+    };
+
     private SeqGoTopupRecord mTopup;
 
-    public SeqGoRefill(SeqGoTopupRecord topup) {
+    SeqGoRefill(SeqGoTopupRecord topup) {
         mTopup = topup;
+    }
+
+    private SeqGoRefill(Parcel parcel) {
+        mTopup = new SeqGoTopupRecord(parcel);
     }
 
     @Override
@@ -71,21 +89,4 @@ public class SeqGoRefill extends Refill {
     public void writeToParcel(Parcel parcel, int i) {
         mTopup.writeToParcel(parcel, i);
     }
-
-    private SeqGoRefill(Parcel parcel) {
-        mTopup = new SeqGoTopupRecord(parcel);
-    }
-
-    public static final Parcelable.Creator<SeqGoRefill> CREATOR = new Parcelable.Creator<SeqGoRefill>() {
-
-        @Override
-        public SeqGoRefill createFromParcel(Parcel in) {
-            return new SeqGoRefill(in);
-        }
-
-        @Override
-        public SeqGoRefill[] newArray(int size) {
-            return new SeqGoRefill[size];
-        }
-    };
 }

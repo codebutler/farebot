@@ -33,6 +33,23 @@ import org.simpleframework.xml.Root;
 
 @Root(name = "transaction")
 public class CEPASTransaction implements Parcelable {
+
+    public static final Parcelable.Creator<CEPASTransaction> CREATOR = new Parcelable.Creator<CEPASTransaction>() {
+        @Override
+        public CEPASTransaction createFromParcel(Parcel source) {
+            byte type = source.readByte();
+            int amount = source.readInt();
+            int date = source.readInt();
+            String userData = source.readString();
+            return new CEPASTransaction(type, amount, date, userData);
+        }
+
+        @Override
+        public CEPASTransaction[] newArray(int size) {
+            return new CEPASTransaction[size];
+        }
+    };
+
     @Attribute(name = "type") private byte mType;
     @Attribute(name = "amount") private int mAmount;
     @Attribute(name = "date") private int mDate;
@@ -51,7 +68,7 @@ public class CEPASTransaction implements Parcelable {
         UNKNOWN,
     }
 
-    public CEPASTransaction(byte[] rawData) {
+    CEPASTransaction(byte[] rawData) {
         int tmp;
 
         mType = rawData[0];
@@ -118,22 +135,6 @@ public class CEPASTransaction implements Parcelable {
     public String getUserData() {
         return mUserData;
     }
-
-    public static final Parcelable.Creator<CEPASTransaction> CREATOR = new Parcelable.Creator<CEPASTransaction>() {
-        @Override
-        public CEPASTransaction createFromParcel(Parcel source) {
-            byte type = source.readByte();
-            int amount = source.readInt();
-            int date = source.readInt();
-            String userData = source.readString();
-            return new CEPASTransaction(type, amount, date, userData);
-        }
-
-        @Override
-        public CEPASTransaction[] newArray(int size) {
-            return new CEPASTransaction[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

@@ -29,10 +29,13 @@ import java.util.GregorianCalendar;
  * Represents a "preamble" type record.
  */
 public class ManlyFastFerryMetadataRecord extends ManlyFastFerryRegularRecord {
+
+    private static final GregorianCalendar MANLY_BASE_EPOCH = new GregorianCalendar(2000, Calendar.JANUARY, 1);
+
     private String mCardSerial;
     private GregorianCalendar mEpochDate;
 
-    private static final GregorianCalendar MANLY_BASE_EPOCH = new GregorianCalendar(2000, Calendar.JANUARY, 1);
+    private ManlyFastFerryMetadataRecord() { }
 
     public static ManlyFastFerryMetadataRecord recordFromBytes(byte[] input) {
         assert input[0] == 0x02;
@@ -47,9 +50,6 @@ public class ManlyFastFerryMetadataRecord extends ManlyFastFerryRegularRecord {
         record.mEpochDate.add(Calendar.DATE, epochDays);
 
         return record;
-    }
-
-    private ManlyFastFerryMetadataRecord() {
     }
 
     public String getCardSerial() {

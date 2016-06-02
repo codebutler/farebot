@@ -42,8 +42,18 @@ import java.util.List;
 
 @Root(name = "card")
 public class CEPASCard extends Card {
+
     @ElementList(name = "purses") private List<CEPASPurse> mPurses;
     @ElementList(name = "histories") private List<CEPASHistory> mHistories;
+
+    private CEPASCard(byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
+        super(CardType.CEPAS, tagId, scannedAt);
+        mPurses = Utils.arrayAsList(purses);
+        mHistories = Utils.arrayAsList(histories);
+    }
+
+    @SuppressWarnings("unused")
+    private CEPASCard() { /* For XML Serializer */ }
 
     public static CEPASCard dumpTag(Tag tag) throws Exception {
         IsoDep tech = IsoDep.get(tag);
@@ -76,14 +86,6 @@ public class CEPASCard extends Card {
 
         return new CEPASCard(tag.getId(), new Date(), cepasPurses, cepasHistories);
     }
-
-    private CEPASCard(byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
-        super(CardType.CEPAS, tagId, scannedAt);
-        mPurses = Utils.arrayAsList(purses);
-        mHistories = Utils.arrayAsList(histories);
-    }
-
-    private CEPASCard() { /* For XML Serializer */ }
 
     @Override
     public TransitIdentity parseTransitIdentity() {

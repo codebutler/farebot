@@ -56,7 +56,15 @@ public class FelicaCard extends Card {
     @Element(name = "pmm") private FeliCaLib.PMm mPMm;
     @ElementList(name = "systems") private List<FelicaSystem> mSystems;
 
+    @SuppressWarnings("unused")
     private FelicaCard() { /* For XML Serializer */ }
+
+    private FelicaCard(byte[] tagId, Date scannedAt, FeliCaLib.IDm idm, FeliCaLib.PMm pmm, FelicaSystem[] systems) {
+        super(CardType.FeliCa, tagId, scannedAt);
+        mIDm = idm;
+        mPMm = pmm;
+        mSystems = Utils.arrayAsList(systems);
+    }
 
     // https://github.com/tmurakam/felicalib/blob/master/src/dump/dump.c
     // https://github.com/tmurakam/felica2money/blob/master/src/card/Suica.cs
@@ -126,13 +134,6 @@ public class FelicaCard extends Card {
 
         FelicaSystem[] systemsArray = systems.toArray(new FelicaSystem[systems.size()]);
         return new FelicaCard(tagId, new Date(), idm, pmm, systemsArray);
-    }
-
-    public FelicaCard(byte[] tagId, Date scannedAt, FeliCaLib.IDm idm, FeliCaLib.PMm pmm, FelicaSystem[] systems) {
-        super(CardType.FeliCa, tagId, scannedAt);
-        mIDm = idm;
-        mPMm = pmm;
-        mSystems = Utils.arrayAsList(systems);
     }
 
     public FeliCaLib.IDm getIDm() {

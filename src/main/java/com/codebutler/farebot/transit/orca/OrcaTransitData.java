@@ -71,34 +71,14 @@ public class OrcaTransitData extends TransitData {
 
     static final int TRANS_TYPE_PURSE_USE = 0x0c;
     static final int TRANS_TYPE_CANCEL_TRIP = 0x01;
+    static final int TRANS_TYPE_PASS_USE = 0x60;
+
     private static final int TRANS_TYPE_TAP_IN = 0x03;
     private static final int TRANS_TYPE_TAP_OUT = 0x07;
-    static final int TRANS_TYPE_PASS_USE = 0x60;
 
     private int mSerialNumber;
     private double mBalance;
     private Trip[] mTrips;
-
-    public static boolean check(Card card) {
-        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
-    }
-
-    public static TransitIdentity parseTransitIdentity(Card card) {
-        try {
-            byte[] data = ((DesfireCard) card).getApplication(0xffffff).getFile(0x0f).getData();
-            return new TransitIdentity("ORCA", String.valueOf(Utils.byteArrayToInt(data, 4, 4)));
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing ORCA serial", ex);
-        }
-    }
-
-    private OrcaTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readInt();
-        mBalance = parcel.readDouble();
-
-        parcel.readInt();
-        mTrips = (Trip[]) parcel.readParcelableArray(Trip.class.getClassLoader());
-    }
 
     public OrcaTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
@@ -123,6 +103,27 @@ public class OrcaTransitData extends TransitData {
             mTrips = parseTrips(desfireCard);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA trips", ex);
+        }
+    }
+
+    private OrcaTransitData(Parcel parcel) {
+        mSerialNumber = parcel.readInt();
+        mBalance = parcel.readDouble();
+
+        parcel.readInt();
+        mTrips = (Trip[]) parcel.readParcelableArray(Trip.class.getClassLoader());
+    }
+
+    public static boolean check(Card card) {
+        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x3010f2) != null);
+    }
+
+    public static TransitIdentity parseTransitIdentity(Card card) {
+        try {
+            byte[] data = ((DesfireCard) card).getApplication(0xffffff).getFile(0x0f).getData();
+            return new TransitIdentity("ORCA", String.valueOf(Utils.byteArrayToInt(data, 4, 4)));
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing ORCA serial", ex);
         }
     }
 

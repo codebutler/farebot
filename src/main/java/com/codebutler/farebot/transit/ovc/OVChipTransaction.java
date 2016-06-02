@@ -32,6 +32,43 @@ import java.util.Comparator;
 
 class OVChipTransaction implements Parcelable {
 
+    public static final Parcelable.Creator<OVChipTransaction> CREATOR = new Parcelable.Creator<OVChipTransaction>() {
+        @Override
+        public OVChipTransaction createFromParcel(Parcel source) {
+            int transactionSlot = source.readInt();
+            int valid = source.readInt();
+
+            if (valid == 0) {
+                return new OVChipTransaction(transactionSlot, source.readString());
+            }
+
+            int date = source.readInt();
+            int time = source.readInt();
+            int transfer = source.readInt();
+            int company = source.readInt();
+            int id = source.readInt();
+            int station = source.readInt();
+            int machineId = source.readInt();
+            int vehicleId = source.readInt();
+            int productId = source.readInt();
+            int amount = source.readInt();
+            int subscriptionId = source.readInt();
+            int unknownConstant = source.readInt();
+            int unknownConstant2 = source.readInt();
+
+            return new OVChipTransaction(transactionSlot,
+                    date, time, transfer, company, id, station,
+                    machineId, vehicleId, productId, amount,
+                    subscriptionId, valid, unknownConstant,
+                    unknownConstant2);
+        }
+
+        @Override
+        public OVChipTransaction[] newArray(int size) {
+            return new OVChipTransaction[size];
+        }
+    };
+
     static final Comparator<OVChipTransaction> ID_ORDER = new Comparator<OVChipTransaction>() {
         @Override
         public int compare(OVChipTransaction t1, OVChipTransaction t2) {
@@ -331,43 +368,6 @@ class OVChipTransaction implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Parcelable.Creator<OVChipTransaction> CREATOR = new Parcelable.Creator<OVChipTransaction>() {
-        @Override
-        public OVChipTransaction createFromParcel(Parcel source) {
-            int transactionSlot = source.readInt();
-            int valid = source.readInt();
-
-            if (valid == 0) {
-                return new OVChipTransaction(transactionSlot, source.readString());
-            }
-
-            int date = source.readInt();
-            int time = source.readInt();
-            int transfer = source.readInt();
-            int company = source.readInt();
-            int id = source.readInt();
-            int station = source.readInt();
-            int machineId = source.readInt();
-            int vehicleId = source.readInt();
-            int productId = source.readInt();
-            int amount = source.readInt();
-            int subscriptionId = source.readInt();
-            int unknownConstant = source.readInt();
-            int unknownConstant2 = source.readInt();
-
-            return new OVChipTransaction(transactionSlot,
-                    date, time, transfer, company, id, station,
-                    machineId, vehicleId, productId, amount,
-                    subscriptionId, valid, unknownConstant,
-                    unknownConstant2);
-        }
-
-        @Override
-        public OVChipTransaction[] newArray(int size) {
-            return new OVChipTransaction[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

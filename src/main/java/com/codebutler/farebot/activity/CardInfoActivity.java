@@ -55,8 +55,10 @@ import com.codebutler.farebot.ui.TabPagerAdapter;
 import com.codebutler.farebot.util.Utils;
 
 public class CardInfoActivity extends Activity {
+
     public static final String EXTRA_TRANSIT_DATA = "transit_data";
-    public static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
+
+    static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
 
     private static final String KEY_SELECTED_TAB = "selected_tab";
 
@@ -90,8 +92,10 @@ public class CardInfoActivity extends Activity {
         actionBar.setTitle(R.string.loading);
 
         new AsyncTask<Void, Void, Void>() {
+
+            boolean mSpeakBalanceEnabled;
+
             private Exception mException;
-            public boolean mSpeakBalanceEnabled;
 
             @Override
             protected Void doInBackground(Void... voids) {

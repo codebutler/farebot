@@ -51,6 +51,17 @@ public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
     private int mChecksum;
     private boolean mAutomatic;
 
+    private SeqGoTopupRecord() { }
+
+    public SeqGoTopupRecord(Parcel parcel) {
+        mTimestamp = new GregorianCalendar();
+        mTimestamp.setTimeInMillis(parcel.readLong());
+        mCredit = parcel.readInt();
+        mStation = parcel.readInt();
+        mChecksum = parcel.readInt();
+        mAutomatic = parcel.readInt() == 1;
+    }
+
     public static SeqGoTopupRecord recordFromBytes(byte[] input) {
         if ((input[0] != 0x01 && input[0] != 0x31) || input[1] != 0x01) {
             throw new AssertionError("Not a topup record");
@@ -74,9 +85,6 @@ public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
         return record;
     }
 
-    private SeqGoTopupRecord() {
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -89,15 +97,6 @@ public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
         parcel.writeInt(mStation);
         parcel.writeInt(mChecksum);
         parcel.writeInt(mAutomatic ? 1 : 0);
-    }
-
-    public SeqGoTopupRecord(Parcel parcel) {
-        mTimestamp = new GregorianCalendar();
-        mTimestamp.setTimeInMillis(parcel.readLong());
-        mCredit = parcel.readInt();
-        mStation = parcel.readInt();
-        mChecksum = parcel.readInt();
-        mAutomatic = parcel.readInt() == 1;
     }
 
     public GregorianCalendar getTimestamp() {

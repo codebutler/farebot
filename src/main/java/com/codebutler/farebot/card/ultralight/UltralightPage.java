@@ -11,21 +11,23 @@ import org.simpleframework.xml.Root;
  */
 @Root(name = "page")
 public class UltralightPage {
+
     @Attribute(name = "index")
     private int mIndex;
+
     @Element(name = "data")
     private Base64String mData;
 
-    public static UltralightPage create(int index, byte[] data) {
-        return new UltralightPage(index, data);
-    }
+    @SuppressWarnings("unused")
+    public UltralightPage() { /* For XML Serializer */ }
 
-    public UltralightPage() {
-    }
-
-    public UltralightPage(int index, byte[] data) {
+    UltralightPage(int index, byte[] data) {
         mIndex = index;
         mData = new Base64String(data);
+    }
+
+    public static UltralightPage create(int index, byte[] data) {
+        return new UltralightPage(index, data);
     }
 
     public int getIndex() {
@@ -35,6 +37,4 @@ public class UltralightPage {
     public byte[] getData() {
         return mData.getData();
     }
-
-
 }

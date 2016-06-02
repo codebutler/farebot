@@ -31,6 +31,31 @@ import com.codebutler.farebot.util.Utils;
 import java.util.Arrays;
 
 class OVChipIndex implements Parcelable {
+
+    public static final Parcelable.Creator<OVChipIndex> CREATOR = new Parcelable.Creator<OVChipIndex>() {
+        @Override
+        public OVChipIndex createFromParcel(Parcel source) {
+            int recentTransactionSlot = source.readInt();
+            int recentInfoSlot = source.readInt();
+            int recentSubscriptionSlot = source.readInt();
+            int recentTravelhistorySlot = source.readInt();
+            int recentCreditSlot = source.readInt();
+
+            int[] subscriptionIndex = new int[source.readInt()];
+            source.readIntArray(subscriptionIndex);
+
+            return new OVChipIndex(recentTransactionSlot,
+                    recentInfoSlot, recentSubscriptionSlot,
+                    recentTravelhistorySlot, recentCreditSlot,
+                    subscriptionIndex);
+        }
+
+        @Override
+        public OVChipIndex[] newArray(int size) {
+            return new OVChipIndex[size];
+        }
+    };
+
     private int mRecentTransactionSlot;     // Most recent transaction slot (0xFB0 or 0xFD0)
     private int mRecentInfoSlot;            // Most recent card information index slot (0x5C0 or 0x580)
     private int mRecentSubscriptionSlot;    // Most recent subscription index slot (0xF10 or 0xF30)
@@ -121,30 +146,6 @@ class OVChipIndex implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Parcelable.Creator<OVChipIndex> CREATOR = new Parcelable.Creator<OVChipIndex>() {
-        @Override
-        public OVChipIndex createFromParcel(Parcel source) {
-            int recentTransactionSlot = source.readInt();
-            int recentInfoSlot = source.readInt();
-            int recentSubscriptionSlot = source.readInt();
-            int recentTravelhistorySlot = source.readInt();
-            int recentCreditSlot = source.readInt();
-
-            int[] subscriptionIndex = new int[source.readInt()];
-            source.readIntArray(subscriptionIndex);
-
-            return new OVChipIndex(recentTransactionSlot,
-                    recentInfoSlot, recentSubscriptionSlot,
-                    recentTravelhistorySlot, recentCreditSlot,
-                    subscriptionIndex);
-        }
-
-        @Override
-        public OVChipIndex[] newArray(int size) {
-            return new OVChipIndex[size];
-        }
-    };
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {

@@ -46,7 +46,20 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class SuicaTrip extends Trip {
+class SuicaTrip extends Trip {
+
+    public static final Creator<SuicaTrip> CREATOR = new Creator<SuicaTrip>() {
+        @Override
+        public SuicaTrip createFromParcel(Parcel parcel) {
+            return new SuicaTrip(parcel);
+        }
+
+        @Override
+        public SuicaTrip[] newArray(int size) {
+            return new SuicaTrip[size];
+        }
+    };
+
     private final long mBalance;
 
     private final int mConsoleType;
@@ -72,7 +85,7 @@ public class SuicaTrip extends Trip {
     private Station mStartStation;
     private Station mEndStation;
 
-    public SuicaTrip(FelicaBlock block, long previousBalance) {
+    SuicaTrip(FelicaBlock block, long previousBalance) {
         byte[] data = block.getData();
 
         // 00000080000000000000000000000000
@@ -134,18 +147,6 @@ public class SuicaTrip extends Trip {
             }
         }
     }
-
-    public static final Creator<SuicaTrip> CREATOR = new Creator<SuicaTrip>() {
-        @Override
-        public SuicaTrip createFromParcel(Parcel parcel) {
-            return new SuicaTrip(parcel);
-        }
-
-        @Override
-        public SuicaTrip[] newArray(int size) {
-            return new SuicaTrip[size];
-        }
-    };
 
     private SuicaTrip(Parcel parcel) {
         mBalance = parcel.readLong();

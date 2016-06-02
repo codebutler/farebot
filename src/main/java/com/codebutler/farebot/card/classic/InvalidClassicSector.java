@@ -28,8 +28,12 @@ import org.simpleframework.xml.Root;
 
 @Root(name = "sector")
 public class InvalidClassicSector extends ClassicSector {
-    @Attribute(name = "error") private String mError;
-    @Attribute(name = "invalid") public final boolean mInvalid = true;
+
+    @Attribute(name = "invalid")
+    private final boolean mInvalid = true;
+
+    @Attribute(name = "error")
+    private final String mError;
 
     public InvalidClassicSector(int index, String error) {
         super(index, null);

@@ -29,11 +29,7 @@ import com.codebutler.farebot.transit.Refill;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class ClipperRefill extends Refill {
-    private final long mTimestamp;
-    final long mAmount;
-    private final long mMachineID;
-    private final long mAgency;
+class ClipperRefill extends Refill {
 
     public static final Creator<ClipperRefill> CREATOR = new Creator<ClipperRefill>() {
         @Override
@@ -47,7 +43,12 @@ public class ClipperRefill extends Refill {
         }
     };
 
-    public ClipperRefill(long timestamp, long amount, long agency, long machineid) {
+    private final long mTimestamp;
+    private final long mAmount;
+    private final long mMachineID;
+    private final long mAgency;
+
+    ClipperRefill(long timestamp, long amount, long agency, long machineid) {
         mTimestamp = timestamp;
         mAmount = amount;
         mMachineID = machineid;
