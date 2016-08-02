@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources
-    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources>
     <plurals name="block_count">
         <item quantity="one">%d block</item>
         <item quantity="other">%d blocks</item>
+    </plurals>
+    <plurals name="cards_imported">
+        <item quantity="one">Card Imported</item>
+        <item quantity="other">%d Cards Imported</item>
     </plurals>
 </resources>

@@ -26,18 +26,20 @@ package com.codebutler.farebot.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
-import android.text.ClipboardManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardHasManufacturingInfo;
@@ -49,15 +51,15 @@ import com.codebutler.farebot.ui.TabPagerAdapter;
 import com.codebutler.farebot.util.Utils;
 import com.crashlytics.android.Crashlytics;
 
-import org.simpleframework.xml.Serializer;
-
 public class AdvancedCardInfoActivity extends Activity {
     public static final String EXTRA_CARD = "com.codebutler.farebot.EXTRA_CARD";
+    public static final String EXTRA_RAW_CARD = "com.codebutler.farebot.EXTRA_RAW_CARD";
     public static final String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
 
     private TabPagerAdapter mTabsAdapter;
     private Card mCard;
     private Exception mError;
+    private String mSerializedRawCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +73,15 @@ public class AdvancedCardInfoActivity extends Activity {
             }
         });
 
-        Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = Card.fromXml(serializer, getIntent().getStringExtra(AdvancedCardInfoActivity.EXTRA_CARD));
+        mCard = getIntent().getParcelableExtra(EXTRA_CARD);
+        mSerializedRawCard = getIntent().getStringExtra(EXTRA_RAW_CARD);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(mCard.getCardType().toString() + " " + Utils.getHexString(mCard.getTagId(), "<error>"));
+        actionBar.setTitle(mCard.getCardType().toString() + " " + mCard.getTagId().hex());
 
         if (mCard.getScannedAt().getTime() > 0) {
             String date = Utils.dateFormat(mCard.getScannedAt());
@@ -105,20 +107,20 @@ public class AdvancedCardInfoActivity extends Activity {
             }
         }
 
-        CardHasManufacturingInfo infoAnnotation = mCard.getClass().getAnnotation(CardHasManufacturingInfo.class);
+        CardHasManufacturingInfo infoAnnotation = getSupermostClass(mCard.getClass())
+                .getAnnotation(CardHasManufacturingInfo.class);
         if (infoAnnotation == null || infoAnnotation.value()) {
             mTabsAdapter.addTab(actionBar.newTab().setText(R.string.hw_detail), CardHWDetailFragment.class,
                     getIntent().getExtras());
         }
 
-        CardRawDataFragmentClass annotation = mCard.getClass().getAnnotation(CardRawDataFragmentClass.class);
+        CardRawDataFragmentClass annotation = getSupermostClass(mCard.getClass())
+                .getAnnotation(CardRawDataFragmentClass.class);
         if (annotation != null) {
             Class rawDataFragmentClass = annotation.value();
-            if (rawDataFragmentClass != null) {
-                mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass,
-                        getIntent().getExtras());
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            }
+            mTabsAdapter.addTab(actionBar.newTab().setText(R.string.data), rawDataFragmentClass,
+                    getIntent().getExtras());
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         }
     }
 
@@ -131,25 +133,22 @@ public class AdvancedCardInfoActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
-            if (item.getItemId() == R.id.copy_xml) {
-                String xml = mCard.toXml(FareBotApplication.getInstance().getSerializer());
-                @SuppressWarnings("deprecation")
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setText(xml);
-                Toast.makeText(this, "Copied to clipboard.", Toast.LENGTH_SHORT).show();
-                return true;
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
-            } else if (item.getItemId() == R.id.share_xml) {
-                String xml = mCard.toXml(FareBotApplication.getInstance().getSerializer());
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, xml);
-                startActivity(intent);
-                return true;
-
-            } else if (item.getItemId() == android.R.id.home) {
-                finish();
-                return true;
+            switch (item.getItemId()) {
+                case R.id.copy:
+                    clipboardManager.setPrimaryClip(ClipData.newPlainText(null, mSerializedRawCard));
+                    Toast.makeText(this, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+                    return true;
+                case R.id.share:
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, mSerializedRawCard);
+                    startActivity(intent);
+                    return true;
+                case android.R.id.home:
+                    finish();
+                    return true;
             }
         } catch (Exception ex) {
             new AlertDialog.Builder(this)
@@ -164,7 +163,7 @@ public class AdvancedCardInfoActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    Crashlytics.log(mCard.toXml(FareBotApplication.getInstance().getSerializer()));
+                    Crashlytics.log(mSerializedRawCard);
                 } catch (Exception ex) {
                     Crashlytics.logException(ex);
                 }
@@ -178,5 +177,13 @@ public class AdvancedCardInfoActivity extends Activity {
                 .setPositiveButton(android.R.string.ok, listener)
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    @NonNull
+    private Class<?> getSupermostClass(Class aClass) {
+        while (aClass.getSuperclass() != Object.class) {
+            aClass = aClass.getSuperclass();
+        }
+        return aClass;
     }
 }

@@ -25,35 +25,13 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
+import com.google.auto.value.AutoValue;
 
-@Root(name = "transaction")
-public class CEPASTransaction implements Parcelable {
-
-    public static final Parcelable.Creator<CEPASTransaction> CREATOR = new Parcelable.Creator<CEPASTransaction>() {
-        @Override
-        public CEPASTransaction createFromParcel(Parcel source) {
-            byte type = source.readByte();
-            int amount = source.readInt();
-            int date = source.readInt();
-            String userData = source.readString();
-            return new CEPASTransaction(type, amount, date, userData);
-        }
-
-        @Override
-        public CEPASTransaction[] newArray(int size) {
-            return new CEPASTransaction[size];
-        }
-    };
-
-    @Attribute(name = "type") private byte mType;
-    @Attribute(name = "amount") private int mAmount;
-    @Attribute(name = "date") private int mDate;
-    @Attribute(name = "user-data") private String mUserData;
+@AutoValue
+public abstract class CEPASTransaction implements Parcelable {
 
     public enum TransactionType {
         MRT,
@@ -65,23 +43,29 @@ public class CEPASTransaction implements Parcelable {
         CREATION,
         RETAIL,
         SERVICE,
-        UNKNOWN,
+        UNKNOWN;
     }
 
-    CEPASTransaction(byte[] rawData) {
+    @NonNull
+    public static CEPASTransaction create(byte rawType, int amount, int timestamp, String userData) {
+        return new AutoValue_CEPASTransaction(rawType, amount, timestamp, userData);
+    }
+
+    @NonNull
+    public static CEPASTransaction create(@NonNull byte[] rawData) {
         int tmp;
 
-        mType = rawData[0];
+        int type = rawData[0];
 
         tmp = (0x00ff0000 & ((rawData[1])) << 16) | (0x0000ff00 & (rawData[2] << 8)) | (0x000000ff & (rawData[3]));
         /* Sign-extend the value */
         if (0 != (rawData[1] & 0x80)) {
             tmp |= 0xff000000;
         }
-        mAmount = tmp;
+        int amount = tmp;
 
         /* Date is expressed "in seconds", but the epoch is January 1 1995, SGT */
-        mDate = ((0xff000000 & (rawData[4] << 24))
+        int date = ((0xff000000 & (rawData[4] << 24))
                 | (0x00ff0000 & (rawData[5] << 16))
                 | (0x0000ff00 & (rawData[6] << 8))
                 | (0x000000ff & (rawData[7] << 0)))
@@ -90,20 +74,14 @@ public class CEPASTransaction implements Parcelable {
         byte[] userData = new byte[9];
         System.arraycopy(rawData, 8, userData, 0, 8);
         userData[8] = '\0';
-        mUserData = new String(userData);
+        String userDataString = new String(userData);
+
+        return new AutoValue_CEPASTransaction(type, amount, date, userDataString);
     }
 
-    private CEPASTransaction(byte type, int amount, int date, String userData) {
-        mType = type;
-        mAmount = amount;
-        mDate = date;
-        mUserData = userData;
-    }
-
-    private CEPASTransaction() { /* For XML Serializer */ }
-
+    @NonNull
     public TransactionType getType() {
-        switch (mType) {
+        switch (getRawType()) {
             case 48:
                 return TransactionType.MRT;
             case 117:
@@ -124,28 +102,12 @@ public class CEPASTransaction implements Parcelable {
         return TransactionType.UNKNOWN;
     }
 
-    public int getAmount() {
-        return mAmount;
-    }
+    public abstract int getRawType();
 
-    public int getTimestamp() {
-        return mDate;
-    }
+    public abstract int getAmount();
 
-    public String getUserData() {
-        return mUserData;
-    }
+    public abstract int getTimestamp();
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeByte(mType);
-        parcel.writeInt(mAmount);
-        parcel.writeInt(mDate);
-        parcel.writeString(mUserData);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    @NonNull
+    public abstract String getUserData();
 }

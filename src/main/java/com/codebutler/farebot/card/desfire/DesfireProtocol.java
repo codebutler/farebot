@@ -24,6 +24,8 @@ package com.codebutler.farebot.card.desfire;
 
 import android.nfc.tech.IsoDep;
 
+import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings;
+import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData;
 import com.codebutler.farebot.util.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -54,14 +56,14 @@ class DesfireProtocol {
         mTagTech = tagTech;
     }
 
-    DesfireManufacturingData getManufacturingData() throws Exception {
+    RawDesfireManufacturingData getManufacturingData() throws Exception {
         byte[] respBuffer = sendRequest(GET_MANUFACTURING_DATA);
 
         if (respBuffer.length != 28) {
             throw new Exception("Invalid response");
         }
 
-        return new DesfireManufacturingData(respBuffer);
+        return RawDesfireManufacturingData.create(respBuffer);
     }
 
     int[] getAppList() throws Exception {
@@ -97,9 +99,9 @@ class DesfireProtocol {
         return fileIds;
     }
 
-    DesfireFileSettings getFileSettings(int fileNo) throws Exception {
+    RawDesfireFileSettings getFileSettings(int fileNo) throws Exception {
         byte[] data = sendRequest(GET_FILE_SETTINGS, new byte[]{(byte) fileNo});
-        return DesfireFileSettings.create(data);
+        return RawDesfireFileSettings.create(data);
     }
 
     byte[] readFile(int fileNo) throws Exception {

@@ -1,129 +1,60 @@
-/*
- * ExportHelper.java
- *
- * This file is part of FareBot.
- * Learn more at: https://codebutler.github.io/farebot/
- *
- * Copyright (C) 2011-2012, 2014-2015 Eric Butler <eric@codebutler.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.codebutler.farebot.util;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
+import com.codebutler.farebot.BuildConfig;
+import com.codebutler.farebot.card.RawCard;
+import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.provider.CardDBHelper;
-import com.codebutler.farebot.provider.CardProvider;
-import com.codebutler.farebot.provider.CardsTableColumns;
+import com.google.gson.Gson;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ExportHelper {
 
-    private ExportHelper() {
+    @NonNull private final Context mContext;
+    @NonNull private final CardPersister mCardPersister;
+    @NonNull private final Gson mGson;
+
+    public ExportHelper(@NonNull Context context, @NonNull CardPersister cardPersister, @NonNull Gson gson) {
+        mContext = context;
+        mCardPersister = cardPersister;
+        mGson = gson;
     }
 
-    public static String exportCardsXml(Context context) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-        // http://code.google.com/p/android/issues/detail?id=2735
-        factory.setNamespaceAware(true);
-
-        DocumentBuilder builder = factory.newDocumentBuilder();
-
-        Document exportDoc = builder.newDocument();
-        Element cardsElement = exportDoc.createElement("cards");
-        exportDoc.appendChild(cardsElement);
-
-        Cursor cursor = CardDBHelper.createCursor(context);
-
+    @NonNull
+    public String exportCards() {
+        List<RawCard> cards = new ArrayList<>();
+        Cursor cursor = CardDBHelper.createCursor(mContext);
         while (cursor.moveToNext()) {
-            int type = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-            String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-            String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
-
-            Document doc = builder.parse(new InputSource(new StringReader(data)));
-            Element rootElement = doc.getDocumentElement();
-
-            cardsElement.appendChild(exportDoc.adoptNode(rootElement.cloneNode(true)));
+            cards.add(mCardPersister.readCard(cursor));
         }
-
-        return xmlNodeToString(exportDoc);
+        Export export = new Export();
+        export.versionName = BuildConfig.VERSION_NAME;
+        export.versionCode = BuildConfig.VERSION_CODE;
+        export.cards = cards;
+        return mGson.toJson(export);
     }
 
-    public static Uri[] importCardsXml(Context context, String xml) throws Exception {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = builder.parse(new InputSource(new StringReader(xml)));
-
-        Element rootElement = doc.getDocumentElement();
-
-        if (rootElement.getNodeName().equals("card")) {
-            return new Uri[]{importCard(context, rootElement)};
+    @NonNull
+    public List<Uri> importCards(@NonNull String exportJsonString) {
+        List<Uri> uris = new ArrayList<>();
+        Export export = mGson.fromJson(exportJsonString, Export.class);
+        for (RawCard card : export.cards) {
+            uris.add(mCardPersister.saveCard(card));
         }
-
-        NodeList cardNodes = rootElement.getElementsByTagName("card");
-        Uri[] results = new Uri[cardNodes.getLength()];
-        for (int i = 0; i < cardNodes.getLength(); i++) {
-            results[i] = importCard(context, (Element) cardNodes.item(i));
-        }
-        return results;
+        return Collections.unmodifiableList(uris);
     }
 
-    private static Uri importCard(Context context, Element cardElement) throws Exception {
-        String xml = xmlNodeToString(cardElement);
-
-        ContentValues values = new ContentValues();
-        values.put(CardsTableColumns.TYPE, cardElement.getAttribute("type"));
-        values.put(CardsTableColumns.TAG_SERIAL, cardElement.getAttribute("id"));
-        values.put(CardsTableColumns.DATA, xml);
-        values.put(CardsTableColumns.SCANNED_AT, cardElement.getAttribute("scanned_at"));
-
-        return context.getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
-    }
-
-    private static String xmlNodeToString(Node node) throws Exception {
-        // The amount of code required to do simple things in Java is incredible.
-        Source source = new DOMSource(node);
-        StringWriter stringWriter = new StringWriter();
-        Result result = new StreamResult(stringWriter);
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        transformer.setURIResolver(null);
-        transformer.transform(source, result);
-        return stringWriter.getBuffer().toString();
+    @SuppressWarnings("checkstyle:membername")
+    private static class Export {
+        String versionName;
+        int versionCode;
+        List<RawCard> cards;
     }
 }

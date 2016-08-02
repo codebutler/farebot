@@ -74,11 +74,11 @@ public class BilheteUnicoSPTransitData extends TransitData {
     }
 
     public BilheteUnicoSPTransitData(ClassicCard card) {
-        mCredit = new BilheteUnicoSPCredit(card.getSector(8).getBlock(1).getData());
+        mCredit = new BilheteUnicoSPCredit(card.getSector(8).getBlock(1).getData().bytes());
     }
 
     public static boolean check(ClassicCard card) {
-        byte[] blockData = card.getSector(0).getBlock(0).getData();
+        byte[] blockData = card.getSector(0).getBlock(0).getData().bytes();
         return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
     }
 

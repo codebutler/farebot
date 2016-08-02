@@ -22,31 +22,30 @@
 
 package com.codebutler.farebot.card.felica;
 
-import com.codebutler.farebot.util.Utils;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 import java.util.List;
 
-@Root(name = "service")
-public class FelicaService {
-    @Attribute(name = "code") private int mServiceCode;
-    @ElementList(name = "blocks") private List<FelicaBlock> mBlocks;
+@AutoValue
+public abstract class FelicaService implements Parcelable {
 
-    private FelicaService() { /* For XML Serializer */ }
-
-    public FelicaService(int serviceCode, FelicaBlock[] blocks) {
-        mServiceCode = serviceCode;
-        mBlocks = Utils.arrayAsList(blocks);
+    @NonNull
+    public static FelicaService create(int serviceCode, @NonNull List<FelicaBlock> blocks) {
+        return new AutoValue_FelicaService(serviceCode, blocks);
     }
 
-    public int getServiceCode() {
-        return mServiceCode;
+    @NonNull
+    public static TypeAdapter<FelicaService> typeAdapter(@NonNull Gson gson) {
+        return new AutoValue_FelicaService.GsonTypeAdapter(gson);
     }
 
-    public List<FelicaBlock> getBlocks() {
-        return mBlocks;
-    }
+    public abstract int getServiceCode();
+
+    @NonNull
+    public abstract List<FelicaBlock> getBlocks();
 }

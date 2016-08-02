@@ -1,78 +1,41 @@
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.util.Utils;
+import android.support.annotation.NonNull;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
-
-import java.io.ByteArrayInputStream;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
 /**
  * Contains FileSettings for Value file types.
  * See GetFileSettings for schemadata.
  */
-@Root(name = "settings")
-public class ValueDesfireFileSettings extends DesfireFileSettings {
-    @Element(name = "min") private int mLowerLimit;
-    @Element(name = "max") private int mUpperLimit;
-    @Element(name = "limitcredit") private int mLimitedCreditValue;
-    @Element(name = "limitcreditenabled") private boolean mLimitedCreditEnabled;
+@AutoValue
+public abstract class ValueDesfireFileSettings extends DesfireFileSettings {
 
-    private ValueDesfireFileSettings() { /* For XML Serializer */ }
-
-    public ValueDesfireFileSettings(
+    @NonNull
+    public static ValueDesfireFileSettings create(
             byte fileType,
             byte commSetting,
-            byte[] accessRights,
+            @NonNull byte[] accessRights,
             int lowerLimit,
             int upperLimit,
             int limitedCreditValue,
             boolean limitedCreditEnabled) {
-        super(fileType, commSetting, accessRights);
-
-        this.mLowerLimit = lowerLimit;
-        this.mUpperLimit = upperLimit;
-        this.mLimitedCreditValue = limitedCreditValue;
-        this.mLimitedCreditEnabled = limitedCreditEnabled;
+        return new AutoValue_ValueDesfireFileSettings(
+                fileType,
+                commSetting,
+                ByteArray.create(accessRights),
+                lowerLimit,
+                upperLimit,
+                limitedCreditValue,
+                limitedCreditEnabled);
     }
 
-    public ValueDesfireFileSettings(ByteArrayInputStream stream) {
-        super(stream);
+    public abstract int getLowerLimit();
 
-        byte[] buf = new byte[4];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mLowerLimit = Utils.byteArrayToInt(buf);
+    public abstract int getUpperLimit();
 
-        buf = new byte[4];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mUpperLimit = Utils.byteArrayToInt(buf);
+    public abstract int getLimitedCreditValue();
 
-        buf = new byte[4];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mLimitedCreditValue = Utils.byteArrayToInt(buf);
-
-        buf = new byte[1];
-        stream.read(buf, 0, buf.length);
-        mLimitedCreditEnabled = buf[0] != 0x00;
-    }
-
-    public int getLowerLimit() {
-        return mLowerLimit;
-    }
-
-    public int getUpperLimit() {
-        return mUpperLimit;
-    }
-
-    public int getLimitedCreditValue() {
-        return mLimitedCreditValue;
-    }
-
-    public boolean getLimitedCreditEnabled() {
-        return mLimitedCreditEnabled;
-    }
+    public abstract boolean getLimitedCreditEnabled();
 }

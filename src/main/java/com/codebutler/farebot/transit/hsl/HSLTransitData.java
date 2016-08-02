@@ -114,14 +114,14 @@ public class HSLTransitData extends TransitData {
         byte[] data;
 
         try {
-            data = desfireCard.getApplication(0x1120ef).getFile(0x08).getData();
+            data = desfireCard.getApplication(0x1120ef).getFile(0x08).getData().bytes();
             mSerialNumber = Utils.getHexString(data).substring(2, 20);  //Utils.byteArrayToInt(data, 1, 9);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing HSL serial", ex);
         }
 
         try {
-            data = desfireCard.getApplication(0x1120ef).getFile(0x02).getData();
+            data = desfireCard.getApplication(0x1120ef).getFile(0x02).getData().bytes();
             mBalance = bitsToLong(0, 20, data);
             mLastRefill = new HSLRefill(data);
         } catch (Exception ex) {
@@ -144,7 +144,7 @@ public class HSLTransitData extends TransitData {
         }
 
         try {
-            data = desfireCard.getApplication(0x1120ef).getFile(0x03).getData();
+            data = desfireCard.getApplication(0x1120ef).getFile(0x03).getData().bytes();
             mArvoMystery1 = bitsToLong(0, 9, data);
             mArvoDiscoGroup = bitsToLong(9, 5, data);
             mArvoDuration = bitsToLong(14, 13, data);
@@ -201,7 +201,7 @@ public class HSLTransitData extends TransitData {
         }
 
         try {
-            data = desfireCard.getApplication(0x1120ef).getFile(0x01).getData();
+            data = desfireCard.getApplication(0x1120ef).getFile(0x01).getData().bytes();
 
             if (bitsToLong(19, 14, data) == 0 && bitsToLong(67, 14, data) == 0) {
                 mKausiNoData = true;
@@ -287,7 +287,7 @@ public class HSLTransitData extends TransitData {
 
     public static TransitIdentity parseTransitIdentity(Card card) {
         try {
-            byte[] data = ((DesfireCard) card).getApplication(0x1120ef).getFile(0x08).getData();
+            byte[] data = ((DesfireCard) card).getApplication(0x1120ef).getFile(0x08).getData().bytes();
             return new TransitIdentity("HSL", Utils.getHexString(data).substring(2, 20));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing HSL serial", ex);

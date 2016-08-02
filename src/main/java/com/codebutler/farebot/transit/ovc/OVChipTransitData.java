@@ -233,7 +233,7 @@ public class OVChipTransitData extends TransitData {
     }
 
     public static TransitIdentity parseTransitIdentity(Card card) {
-        String hex = Utils.getHexString(((ClassicCard) card).getSector(0).getBlock(0).getData(), null);
+        String hex = Utils.getHexString(((ClassicCard) card).getSector(0).getBlock(0).getData().bytes(), null);
         String id = hex.substring(0, 8);
         return new TransitIdentity("OV-chipkaart", id);
     }

@@ -58,7 +58,7 @@ class EdyTrip extends Trip {
     private final int mBalance;
 
     EdyTrip(FelicaBlock block) {
-        byte[] data = block.getData();
+        byte[] data = block.getData().bytes();
 
         // Data Offsets with values
         // ------------------------

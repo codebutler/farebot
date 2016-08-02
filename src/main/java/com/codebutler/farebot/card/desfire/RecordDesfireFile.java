@@ -22,33 +22,37 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.util.Utils;
+import android.support.annotation.NonNull;
+
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.simpleframework.xml.Root;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Root(name = "file")
-public class RecordDesfireFile extends DesfireFile {
-    private transient List<DesfireRecord> mRecords;
+@AutoValue
+public abstract class RecordDesfireFile implements DesfireFile {
 
-    private RecordDesfireFile() { /* For XML Serializer */ }
-
-    RecordDesfireFile(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        super(fileId, fileSettings, fileData);
-
-        RecordDesfireFileSettings settings = (RecordDesfireFileSettings) fileSettings;
-
-        DesfireRecord[] records = new DesfireRecord[settings.getCurRecords()];
-        for (int i = 0; i < settings.getCurRecords(); i++) {
-            int offset = settings.getRecordSize() * i;
-            records[i] = new DesfireRecord(ArrayUtils.subarray(getData(), offset, offset + settings.getRecordSize()));
-        }
-        mRecords = Utils.arrayAsList(records);
+    @NonNull
+    public static RecordDesfireFile create(
+            int fileId,
+            @NonNull DesfireFileSettings fileSettings,
+            @NonNull byte[] fileData) {
+        return new AutoValue_RecordDesfireFile(fileId, fileSettings, ByteArray.create(fileData));
     }
 
+    @NonNull
     public List<DesfireRecord> getRecords() {
-        return mRecords;
+        RecordDesfireFileSettings settings = (RecordDesfireFileSettings) getFileSettings();
+        List<DesfireRecord> records = new ArrayList<>(settings.getCurRecords());
+        for (int i = 0; i < settings.getCurRecords(); i++) {
+            int start = settings.getRecordSize() * i;
+            int end = start + settings.getRecordSize();
+            records.add(DesfireRecord.create(ArrayUtils.subarray(getData().bytes(), start, end)));
+        }
+        return Collections.unmodifiableList(records);
     }
 }

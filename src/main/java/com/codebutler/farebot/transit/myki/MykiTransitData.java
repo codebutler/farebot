@@ -57,7 +57,7 @@ public class MykiTransitData extends StubTransitData {
 
     public MykiTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
-        byte[] metadata = desfireCard.getApplication(4594).getFile(15).getData();
+        byte[] metadata = desfireCard.getApplication(4594).getFile(15).getData().bytes();
         metadata = Utils.reverseBuffer(metadata, 0, 16);
 
         try {
@@ -96,7 +96,7 @@ public class MykiTransitData extends StubTransitData {
 
     public static TransitIdentity parseTransitIdentity(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
-        byte[] data = desfireCard.getApplication(4594).getFile(15).getData();
+        byte[] data = desfireCard.getApplication(4594).getFile(15).getData().bytes();
         data = Utils.reverseBuffer(data, 0, 16);
 
         long serialNumber1 = Utils.getBitsFromBuffer(data, 96, 32);

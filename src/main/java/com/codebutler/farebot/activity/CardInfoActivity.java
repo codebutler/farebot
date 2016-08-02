@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
@@ -42,16 +43,18 @@ import android.view.View;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.UnsupportedCardException;
 import com.codebutler.farebot.fragment.CardBalanceFragment;
 import com.codebutler.farebot.fragment.CardInfoFragment;
 import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragment.CardTripsFragment;
 import com.codebutler.farebot.fragment.UnauthorizedCardFragment;
-import com.codebutler.farebot.provider.CardsTableColumns;
+import com.codebutler.farebot.serialize.CardSerializer;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitData;
 import com.codebutler.farebot.ui.TabPagerAdapter;
+import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.util.Utils;
 
 public class CardInfoActivity extends Activity {
@@ -62,10 +65,13 @@ public class CardInfoActivity extends Activity {
 
     private static final String KEY_SELECTED_TAB = "selected_tab";
 
+    private RawCard mRawCard;
     private Card mCard;
     private TransitData mTransitData;
     private TabPagerAdapter mTabsAdapter;
     private TextToSpeech mTTS;
+    private CardPersister mCardPersister;
+    private CardSerializer mCardSerializer;
 
     private OnInitListener mTTSInitListener = new OnInitListener() {
         @Override
@@ -83,13 +89,19 @@ public class CardInfoActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mCardPersister = ((FareBotApplication) getApplication()).getCardPersister();
+        mCardSerializer = ((FareBotApplication) getApplication()).getCardSerializer();
+
         setContentView(R.layout.activity_card_info);
+
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
 
         final ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(R.string.loading);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(R.string.loading);
+        }
 
         new AsyncTask<Void, Void, Void>() {
 
@@ -105,14 +117,14 @@ public class CardInfoActivity extends Activity {
                     startManagingCursor(cursor);
                     cursor.moveToFirst();
 
-                    String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
-
-                    mCard = Card.fromXml(FareBotApplication.getInstance().getSerializer(), data);
+                    mRawCard = mCardPersister.readCard(cursor);
+                    mCard = mRawCard.parse();
                     mTransitData = mCard.parseTransitData();
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CardInfoActivity.this);
                     mSpeakBalanceEnabled = prefs.getBoolean("pref_key_speak_balance", false);
                 } catch (Exception ex) {
+                    Log.e("CardInfoActivity", "Failed to read", ex);
                     mException = ex;
                 }
                 return null;
@@ -140,13 +152,13 @@ public class CardInfoActivity extends Activity {
                     return;
                 }
 
-                String titleSerial = (mTransitData.getSerialNumber() != null) ? mTransitData.getSerialNumber()
-                        : Utils.getHexString(mCard.getTagId(), "");
+                String titleSerial = (mTransitData.getSerialNumber() != null)
+                        ? mTransitData.getSerialNumber()
+                        : mCard.getTagId().hex();
                 actionBar.setTitle(mTransitData.getCardName() + " " + titleSerial);
 
                 Bundle args = new Bundle();
-                args.putString(AdvancedCardInfoActivity.EXTRA_CARD,
-                        mCard.toXml(FareBotApplication.getInstance().getSerializer()));
+                args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
                 args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
 
                 if (mTransitData instanceof UnauthorizedClassicTransitData) {
@@ -217,10 +229,10 @@ public class CardInfoActivity extends Activity {
         return false;
     }
 
-    private void showAdvancedInfo(Exception ex) {
+    private void showAdvancedInfo(@Nullable Exception ex) {
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
-        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD,
-                mCard.toXml(FareBotApplication.getInstance().getSerializer()));
+        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
+        intent.putExtra(AdvancedCardInfoActivity.EXTRA_RAW_CARD, mCardSerializer.serialize(mRawCard));
         if (ex != null) {
             intent.putExtra(AdvancedCardInfoActivity.EXTRA_ERROR, ex);
         }

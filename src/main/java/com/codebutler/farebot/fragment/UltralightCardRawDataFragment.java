@@ -29,41 +29,39 @@ import android.widget.TextView;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.ultralight.UltralightCard;
 import com.codebutler.farebot.card.ultralight.UltralightPage;
+import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard;
+import com.codebutler.farebot.serialize.CardSerializer;
 import com.codebutler.farebot.util.Utils;
-
-import org.simpleframework.xml.Serializer;
 
 /**
  * Shows raw data of the Mifare Ultralight / Ultralight C
  */
 public class UltralightCardRawDataFragment extends ExpandableListFragment {
 
-    private UltralightCard mCard;
-
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = (UltralightCard) Card.fromXml(serializer,
-                getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
-        setListAdapter(new UltralightRawDataAdapter(getActivity(), mCard));
+
+        CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
+        String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
+        RawUltralightCard rawCard = (RawUltralightCard) cardSerializer.deserialize(serializedCard);
+
+        setListAdapter(new UltralightRawDataAdapter(getActivity(), rawCard));
     }
 
     private static class UltralightRawDataAdapter extends BaseExpandableListAdapter {
         private Activity mActivity;
-        private UltralightCard mCard;
+        private RawUltralightCard mRawCard;
 
-        private UltralightRawDataAdapter(Activity mActivity, UltralightCard mCard) {
-            this.mActivity = mActivity;
-            this.mCard = mCard;
+        private UltralightRawDataAdapter(Activity activity, RawUltralightCard rawCard) {
+            mActivity = activity;
+            mRawCard = rawCard;
         }
 
         @Override
         public int getGroupCount() {
-            return mCard.getPages().length;
+            return mRawCard.pages().size();
         }
 
         @Override
@@ -72,13 +70,13 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
         }
 
         @Override
-        public Object getGroup(int groupPosition) {
-            return mCard.getPage(groupPosition);
+        public UltralightPage getGroup(int groupPosition) {
+            return mRawCard.pages().get(groupPosition);
         }
 
         @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            return mCard.getPage(groupPosition).getData();
+        public UltralightPage getChild(int groupPosition, int childPosition) {
+            return mRawCard.pages().get(groupPosition);
         }
 
         @Override
@@ -104,7 +102,7 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
                         .inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
             }
 
-            UltralightPage sector = (UltralightPage) getGroup(groupPosition);
+            UltralightPage sector = getGroup(groupPosition);
             String sectorIndexString = Integer.toHexString(sector.getIndex());
 
             TextView textView = (TextView) view.findViewById(android.R.id.text1);
@@ -126,11 +124,13 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
                         .inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
             }
 
-            byte[] block = (byte[]) getChild(groupPosition, childPosition);
+            TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
+            TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
 
-            //((TextView) view.findViewById(android.R.id.text1))
-            // .setText(mActivity.getString(R.string.block_title_format, block.getIndex()));
-            ((TextView) view.findViewById(android.R.id.text2)).setText(Utils.getHexString(block));
+            UltralightPage page = getChild(groupPosition, childPosition);
+            byte[] block = page.getData().bytes();
+            textView1.setText(mActivity.getString(R.string.block_title_format, String.valueOf(page.getIndex())));
+            textView2.setText(Utils.getHexString(block));
 
             return view;
         }
@@ -140,6 +140,4 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
             return false;
         }
     }
-
-
 }

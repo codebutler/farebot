@@ -22,45 +22,18 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.xml.Base64String;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import com.codebutler.farebot.ByteArray;
 
-@Root(name = "file")
-public class DesfireFile {
-    @Attribute(name = "id") private int mId;
-    @Element(name = "settings", required = false) private DesfireFileSettings mSettings;
-    @Element(name = "data", required = false) private Base64String mData;
+public interface DesfireFile extends Parcelable {
 
-    DesfireFile() { /* For XML Serializer */ }
+    int getId();
 
-    DesfireFile(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        mId = fileId;
-        mSettings = fileSettings;
-        mData = new Base64String(fileData);
-    }
+    @NonNull
+    DesfireFileSettings getFileSettings();
 
-    public static DesfireFile create(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        if (fileSettings instanceof RecordDesfireFileSettings) {
-            return new RecordDesfireFile(fileId, fileSettings, fileData);
-        } else if (fileSettings instanceof ValueDesfireFileSettings) {
-            return new ValueDesfireFile(fileId, fileSettings, fileData);
-        } else {
-            return new DesfireFile(fileId, fileSettings, fileData);
-        }
-    }
-
-    public DesfireFileSettings getFileSettings() {
-        return mSettings;
-    }
-
-    public int getId() {
-        return mId;
-    }
-
-    public byte[] getData() {
-        return mData.getData();
-    }
+    @NonNull
+    ByteArray getData();
 }

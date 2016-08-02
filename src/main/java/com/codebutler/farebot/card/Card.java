@@ -22,90 +22,30 @@
 
 package com.codebutler.farebot.card;
 
-import android.nfc.Tag;
-import android.util.Log;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.card.cepas.CEPASCard;
-import com.codebutler.farebot.card.classic.ClassicCard;
-import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.card.felica.FelicaCard;
-import com.codebutler.farebot.card.ultralight.UltralightCard;
+import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
-import com.codebutler.farebot.util.Utils;
-import com.codebutler.farebot.xml.HexString;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Serializer;
-
-import java.io.StringWriter;
 import java.util.Date;
 
-public abstract class Card {
-    @Attribute(name = "type") private CardType mType;
-    @Attribute(name = "id") private HexString mTagId;
-    @Attribute(name = "scanned_at") private Date mScannedAt;
+public interface Card extends Parcelable {
 
-    protected Card() {
-    }
+    @NonNull
+    CardType getCardType();
 
-    protected Card(CardType type, byte[] tagId, Date scannedAt) {
-        mType = type;
-        mTagId = new HexString(tagId);
-        mScannedAt = scannedAt;
-    }
+    @NonNull
+    ByteArray getTagId();
 
-    public static Card dumpTag(byte[] tagId, Tag tag) throws Exception {
-        final String[] techs = tag.getTechList();
-        if (ArrayUtils.contains(techs, "android.nfc.tech.NfcB")) {
-            return CEPASCard.dumpTag(tag);
-        } else if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep")) {
-            return DesfireCard.dumpTag(tag);
-        } else if (ArrayUtils.contains(techs, "android.nfc.tech.NfcF")) {
-            return FelicaCard.dumpTag(tagId, tag);
-        } else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareClassic")) {
-            return ClassicCard.dumpTag(tagId, tag);
-        } else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareUltralight")) {
-            return UltralightCard.dumpTag(tagId, tag);
-        } else {
-            throw new UnsupportedTagException(techs, Utils.getHexString(tag.getId()));
-        }
-    }
+    @NonNull
+    Date getScannedAt();
 
-    public static Card fromXml(Serializer serializer, String xml) {
-        try {
-            return serializer.read(Card.class, xml);
-        } catch (Exception ex) {
-            Log.e("Card", "Failed to deserialize", ex);
-            throw new RuntimeException(ex);
-        }
-    }
+    @Nullable
+    TransitIdentity parseTransitIdentity();
 
-    public String toXml(Serializer serializer) {
-        try {
-            StringWriter writer = new StringWriter();
-            serializer.write(this, writer);
-            return writer.toString();
-        } catch (Exception ex) {
-            Log.e("Card", "Failed to serialize", ex);
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public CardType getCardType() {
-        return mType;
-    }
-
-    public byte[] getTagId() {
-        return mTagId.getData();
-    }
-
-    public Date getScannedAt() {
-        return mScannedAt;
-    }
-
-    public abstract TransitIdentity parseTransitIdentity();
-
-    public abstract TransitData parseTransitData();
+    @Nullable
+    TransitData parseTransitData();
 }

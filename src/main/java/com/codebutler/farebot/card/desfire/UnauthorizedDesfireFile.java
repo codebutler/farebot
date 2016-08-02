@@ -19,26 +19,32 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
+import android.support.annotation.NonNull;
+
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
 /**
  * Represents a DESFire file which could not be read due to
  * access control limits.
  */
-@Root(name = "file")
-public class UnauthorizedDesfireFile extends InvalidDesfireFile {
-    @Attribute(name = "unauthorized") public static final boolean UNAUTHORIZED = true;
+@AutoValue
+public abstract class UnauthorizedDesfireFile implements DesfireFile {
 
-    @SuppressWarnings("unused")
-    private UnauthorizedDesfireFile() { /* For XML Serializer */ }
-
-    public UnauthorizedDesfireFile(int fileId, String errorMessage, DesfireFileSettings settings) {
-        super(fileId, errorMessage, settings);
+    @NonNull
+    public static UnauthorizedDesfireFile create(
+            int fileId,
+            @NonNull DesfireFileSettings settings,
+            @NonNull String errorMessage) {
+        return new AutoValue_UnauthorizedDesfireFile(fileId, settings, errorMessage);
     }
 
+    @NonNull
+    public abstract String getErrorMessage();
+
+    @NonNull
     @Override
-    public byte[] getData() {
+    public ByteArray getData() {
         throw new IllegalStateException(String.format("Unauthorized access to file: %s", getErrorMessage()));
     }
 }

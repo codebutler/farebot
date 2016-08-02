@@ -22,6 +22,12 @@
 
 package com.codebutler.farebot.card;
 
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
+
 public enum CardType {
     MifareClassic(0),
     MifareUltralight(1),
@@ -57,6 +63,19 @@ public enum CardType {
                 return "FeliCa";
             default:
                 return "Unknown";
+        }
+    }
+
+    public static class GsonTypeAdapter extends TypeAdapter<CardType> {
+
+        @Override
+        public void write(JsonWriter out, CardType value) throws IOException {
+            out.value(value.name());
+        }
+
+        @Override
+        public CardType read(JsonReader in) throws IOException {
+            return CardType.parseValue(in.nextString());
         }
     }
 }

@@ -22,30 +22,29 @@
 
 package com.codebutler.farebot.card.felica;
 
-import com.codebutler.farebot.xml.Base64String;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
-import org.simpleframework.xml.Text;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
-@Root(name = "block")
-public class FelicaBlock {
-    @Attribute(name = "address") private byte mAddr;
-    @Text private Base64String mData;
+@AutoValue
+public abstract class FelicaBlock implements Parcelable {
 
-    FelicaBlock() {
+    @NonNull
+    public static FelicaBlock create(byte addr, @NonNull byte[] data) {
+        return new AutoValue_FelicaBlock(addr, ByteArray.create(data));
     }
 
-    public FelicaBlock(byte addr, byte[] data) {
-        mAddr = addr;
-        mData = new Base64String(data);
+    @NonNull
+    public static TypeAdapter<FelicaBlock> typeAdapter(@NonNull Gson gson) {
+        return new AutoValue_FelicaBlock.GsonTypeAdapter(gson);
     }
 
-    public byte getAddress() {
-        return mAddr;
-    }
+    public abstract byte getAddress();
 
-    public byte[] getData() {
-        return mData.getData();
-    }
+    @NonNull
+    public abstract ByteArray getData();
 }

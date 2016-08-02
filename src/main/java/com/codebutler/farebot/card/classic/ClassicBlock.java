@@ -23,51 +23,30 @@
 
 package com.codebutler.farebot.card.classic;
 
-import com.codebutler.farebot.xml.Base64String;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
-@Root(name = "block")
-public class ClassicBlock {
+@AutoValue
+public abstract class ClassicBlock implements Parcelable {
 
-    public static final String TYPE_TRAILER = "trailer";
+    public static final String TYPE_DATA = "data";
     public static final String TYPE_MANUFACTURER = "manufacturer";
+    public static final String TYPE_TRAILER = "trailer";
+    public static final String TYPE_VALUE = "value";
 
-    static final String TYPE_DATA = "data";
-
-    private static final String TYPE_VALUE = "value";
-
-    @Attribute(name = "index") private int mIndex;
-    @Attribute(name = "type") private String mType;
-    @Element(name = "data") private Base64String mData;
-
-    @SuppressWarnings("unused")
-    public ClassicBlock() { /* For XML Serializer */ }
-
-    private ClassicBlock(int index, String type, byte[] data) {
-        mIndex = index;
-        mType = type;
-        mData = new Base64String(data);
+    @NonNull
+    public static ClassicBlock create(@NonNull String type, int index, @NonNull ByteArray data) {
+        return new AutoValue_ClassicBlock(type, index, data);
     }
 
-    public static ClassicBlock create(String type, int index, byte[] data) {
-        if (type.equals(TYPE_DATA) || type.equals(TYPE_VALUE)) {
-            return new ClassicBlock(index, type, data);
-        }
-        return null;
-    }
+    @NonNull
+    public abstract String getType();
 
-    public int getIndex() {
-        return mIndex;
-    }
+    public abstract int getIndex();
 
-    public String getType() {
-        return mType;
-    }
-
-    public byte[] getData() {
-        return mData.getData();
-    }
+    @NonNull
+    public abstract ByteArray getData();
 }

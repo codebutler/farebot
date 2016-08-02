@@ -22,34 +22,26 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.util.Utils;
+import android.support.annotation.NonNull;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
-import java.io.ByteArrayInputStream;
+@AutoValue
+public abstract class StandardDesfireFileSettings extends DesfireFileSettings {
 
-@Root(name = "settings")
-public class StandardDesfireFileSettings extends DesfireFileSettings {
-    @Element(name = "filesize") private int mFileSize;
-
-    private StandardDesfireFileSettings() { /* For XML Serializer */ }
-
-    StandardDesfireFileSettings(ByteArrayInputStream stream) {
-        super(stream);
-        byte[] buf = new byte[3];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mFileSize = Utils.byteArrayToInt(buf);
+    @NonNull
+    public static StandardDesfireFileSettings create(
+            byte fileType,
+            byte commSetting,
+            @NonNull byte[] accessRights,
+            int fileSize) {
+        return new AutoValue_StandardDesfireFileSettings(
+                fileType,
+                commSetting,
+                ByteArray.create(accessRights),
+                fileSize);
     }
 
-    public StandardDesfireFileSettings(byte fileType, byte commSetting, byte[] accessRights, int fileSize) {
-        super(fileType, commSetting, accessRights);
-        this.mFileSize = fileSize;
-    }
-
-    public int getFileSize() {
-        return mFileSize;
-    }
+    public abstract int getFileSize();
 }

@@ -108,7 +108,7 @@ public class ManlyFastFerryTransitData extends TransitData {
                     continue;
                 }
 
-                ManlyFastFerryRecord record = ManlyFastFerryRecord.recordFromBytes(block.getData());
+                ManlyFastFerryRecord record = ManlyFastFerryRecord.recordFromBytes(block.getData().bytes());
 
                 if (record != null) {
                     records.add(record);
@@ -167,8 +167,8 @@ public class ManlyFastFerryTransitData extends TransitData {
         byte[] file1; //, file2;
 
         try {
-            file1 = card.getSector(0).getBlock(1).getData();
-            //file2 = card.getSector(0).getBlock(2).getData();
+            file1 = card.getSector(0).getBlock(1).getData().bytes();
+            //file2 = card.getSector(0).getBlock(2).bytes();
         } catch (UnauthorizedException ex) {
             // These blocks of the card are not protected.
             // This must not be a Manly Fast Ferry smartcard.
@@ -186,7 +186,7 @@ public class ManlyFastFerryTransitData extends TransitData {
     }
 
     public static TransitIdentity parseTransitIdentity(ClassicCard card) {
-        byte[] file2 = card.getSector(0).getBlock(2).getData();
+        byte[] file2 = card.getSector(0).getBlock(2).getData().bytes();
         ManlyFastFerryRecord metadata = ManlyFastFerryRecord.recordFromBytes(file2);
         if (!(metadata instanceof ManlyFastFerryMetadataRecord)) {
             throw new AssertionError("Unexpected Manly record type: " + metadata.getClass().toString());

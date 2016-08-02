@@ -26,6 +26,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.BuildConfig;
 
@@ -46,9 +47,9 @@ public class CardDBHelper extends SQLiteOpenHelper {
     static final String CARD_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".card";
 
     private static final String DATABASE_NAME = "cards.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
-    CardDBHelper(Context context) {
+    CardDBHelper(@NonNull Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -85,6 +86,9 @@ public class CardDBHelper extends SQLiteOpenHelper {
                 db.endTransaction();
             }
             return;
+        } else if (oldVersion == 2 && newVersion == 3) {
+            // The new schema stores completely different data. Sorry world.
+            db.execSQL("DELETE FROM cards");
         }
         throw new UnsupportedOperationException("Not yet implemented");
     }

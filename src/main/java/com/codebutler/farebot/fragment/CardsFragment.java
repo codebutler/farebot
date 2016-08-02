@@ -25,6 +25,8 @@ package com.codebutler.farebot.fragment;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -34,7 +36,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.ClipboardManager;
+import android.support.annotation.NonNull;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,32 +52,33 @@ import android.widget.Toast;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.CardInfoActivity;
-import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
+import com.codebutler.farebot.serialize.CardSerializer;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.util.ExportHelper;
 import com.codebutler.farebot.util.Utils;
 
 import org.apache.commons.io.FileUtils;
-import org.simpleframework.xml.Serializer;
 
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CardsFragment extends ListFragment {
+
     private static final int REQUEST_SELECT_FILE = 1;
-    private static final String SD_EXPORT_PATH = Environment.getExternalStorageDirectory() + "/FareBot-Export.xml";
+    private static final String FILENAME = "farebot-export.jso";
 
-    private Map<String, TransitIdentity> mDataCache;
+    private final Map<String, TransitIdentity> mDataCache = new HashMap<>();
 
-    private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+    private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
             return new CursorLoader(getActivity(), CardProvider.CONTENT_URI_CARD,
@@ -97,16 +100,20 @@ public class CardsFragment extends ListFragment {
         }
 
         @Override
-        public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        }
+        public void onLoaderReset(Loader<Cursor> cursorLoader) { }
     };
+
+    private ExportHelper mExportHelper;
+    private CardSerializer mCardSerializer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        mDataCache = new HashMap<>();
+        FareBotApplication application = (FareBotApplication) getActivity().getApplication();
+        mExportHelper = application.getExportHelper();
+        mCardSerializer = application.getCardSerializer();
     }
 
     @Override
@@ -150,42 +157,38 @@ public class CardsFragment extends ListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        ClipboardManager clipboardManager
+                = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         try {
-            @SuppressWarnings("deprecation")
-            ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
-
             int itemId = item.getItemId();
             switch (itemId) {
-                case R.id.import_clipboard:
-                    onCardsImported(ExportHelper.importCardsXml(getActivity(), clipboard.getText().toString()));
-                    return true;
                 case R.id.import_file:
                     Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
-                    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                    i.putExtra(Intent.EXTRA_STREAM, uri);
-                    i.setType("application/xml");
-                    startActivityForResult(Intent.createChooser(i, "Select File"), REQUEST_SELECT_FILE);
+                    Intent target = new Intent(Intent.ACTION_GET_CONTENT);
+                    target.putExtra(Intent.EXTRA_STREAM, uri);
+                    target.setType("application/json");
+                    startActivityForResult(Intent.createChooser(target, getString(R.string.select_file)),
+                            REQUEST_SELECT_FILE);
                     return true;
-                case R.id.import_sd:
-                    String importXml = FileUtils.readFileToString(new File(SD_EXPORT_PATH));
-                    onCardsImported(ExportHelper.importCardsXml(getActivity(), importXml));
+                case R.id.import_clipboard:
+                    ClipData clip = clipboardManager.getPrimaryClip();
+                    if (clip != null && clip.getItemCount() > 0) {
+                        String text = clip.getItemAt(0).coerceToText(getActivity()).toString();
+                        onCardsImported(mExportHelper.importCards(text));
+                    }
                     return true;
-                case R.id.copy_xml:
-                    clipboard.setText(ExportHelper.exportCardsXml(getActivity()));
-                    Toast.makeText(getActivity(), "Copied to clipboard.", Toast.LENGTH_SHORT).show();
+                case R.id.copy:
+                    clipboardManager.setPrimaryClip(ClipData.newPlainText(null, mExportHelper.exportCards()));
+                    Toast.makeText(getActivity(), R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
                     return true;
-                case R.id.share_xml:
+                case R.id.share:
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, ExportHelper.exportCardsXml(getActivity()));
+                    intent.putExtra(Intent.EXTRA_TEXT, mExportHelper.exportCards());
                     startActivity(intent);
                     return true;
-                case R.id.save_xml:
-                    String saveXml = ExportHelper.exportCardsXml(getActivity());
-                    File file = new File(SD_EXPORT_PATH);
-                    FileUtils.writeStringToFile(file, saveXml, "UTF-8");
-                    Toast.makeText(getActivity(), "Wrote FareBot-Export.xml to USB Storage.", Toast.LENGTH_SHORT)
-                            .show();
+                case R.id.save:
+                    exportToFile();
                     return true;
             }
         } catch (Exception ex) {
@@ -199,21 +202,28 @@ public class CardsFragment extends ListFragment {
         try {
             if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_SELECT_FILE) {
                 Uri uri = data.getData();
-                String xml = org.apache.commons.io.FileUtils.readFileToString(new File(uri.getPath()));
-                onCardsImported(ExportHelper.importCardsXml(getActivity(), xml));
+                String json = FileUtils.readFileToString(new File(uri.getPath()));
+                onCardsImported(mExportHelper.importCards(json));
             }
         } catch (Exception ex) {
             Utils.showError(getActivity(), ex);
         }
     }
 
-    private void onCardsImported(Uri[] uris) {
-        ((CursorAdapter) ((ListView) getView().findViewById(android.R.id.list)).getAdapter()).notifyDataSetChanged();
-        if (uris.length == 1) {
-            Toast.makeText(getActivity(), "Card imported!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(Intent.ACTION_VIEW, uris[0]));
-        } else {
-            Toast.makeText(getActivity(), "Cards Imported: " + uris.length, Toast.LENGTH_SHORT).show();
+    private void onCardsImported(@NonNull List<Uri> uris) {
+        ((CursorAdapter) getListAdapter()).notifyDataSetChanged();
+        getResources().getQuantityString(R.plurals.cards_imported, uris.size());
+        if (uris.size() == 1) {
+            startActivity(new Intent(Intent.ACTION_VIEW, uris.get(0)));
+        }
+    }
+
+    private void exportToFile() {
+        try {
+            FileUtils.writeStringToFile(new File(FILENAME), mExportHelper.exportCards(), "UTF-8");
+            Toast.makeText(getActivity(), getString(R.string.saved_to_x, FILENAME), Toast.LENGTH_SHORT).show();
+        } catch (Exception ex) {
+            Utils.showError(getActivity(), ex);
         }
     }
 
@@ -233,8 +243,7 @@ public class CardsFragment extends ListFragment {
             if (!mDataCache.containsKey(cacheKey)) {
                 String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
                 try {
-                    Serializer serializer = FareBotApplication.getInstance().getSerializer();
-                    mDataCache.put(cacheKey, Card.fromXml(serializer, data).parseTransitIdentity());
+                    mDataCache.put(cacheKey, mCardSerializer.deserialize(data).parse().parseTransitIdentity());
                 } catch (Exception ex) {
                     String error = String.format("Error: %s", Utils.getErrorMessage(ex));
                     mDataCache.put(cacheKey, new TransitIdentity(error, null));
@@ -250,7 +259,6 @@ public class CardsFragment extends ListFragment {
                 if (identity.getSerialNumber() != null) {
                     textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
                 } else {
-                    // textView1.setText(identity.getName());
                     textView1.setText(String.format("%s: %s", identity.getName(), serial));
                 }
                 DateFormat timeInstance = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);

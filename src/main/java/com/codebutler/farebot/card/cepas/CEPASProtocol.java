@@ -25,44 +25,50 @@
 package com.codebutler.farebot.card.cepas;
 
 import android.nfc.tech.IsoDep;
+import android.support.annotation.NonNull;
 import android.util.Log;
+
+import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory;
+import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 class CEPASProtocol {
+
     private static final String TAG = "CEPASProtocol";
+
     private static final byte[] CEPAS_SELECT_FILE_COMMAND = new byte[]{
             (byte) 0x00, (byte) 0xA4, (byte) 0x00, (byte) 0x00,
             (byte) 0x02, (byte) 0x40, (byte) 0x00};
-
 
     /* Status codes */
     private static final byte OPERATION_OK = (byte) 0x00;
     private static final byte PERMISSION_DENIED = (byte) 0x9D;
 
-    private IsoDep mTagTech;
+    @NonNull private final IsoDep mTagTech;
 
-    CEPASProtocol(IsoDep tagTech) {
+    CEPASProtocol(@NonNull IsoDep tagTech) {
         mTagTech = tagTech;
     }
 
-    CEPASPurse getPurse(int purseId) throws IOException {
+    RawCEPASPurse getPurse(int purseId) throws IOException {
         try {
             sendSelectFile();
             byte[] purseBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 0, new byte[]{(byte) 0});
             if (purseBuff != null) {
-                return new CEPASPurse(purseId, purseBuff);
+                return RawCEPASPurse.create(purseId, purseBuff);
             } else {
-                return new CEPASPurse(purseId, "No purse found");
+                return RawCEPASPurse.create(purseId, "No purse found");
             }
         } catch (CEPASException ex) {
             Log.w(TAG, "Error reading purse " + purseId, ex);
-            return new CEPASPurse(purseId, ex.getMessage());
+            return RawCEPASPurse.create(purseId, ex.getMessage());
         }
     }
 
-    CEPASHistory getHistory(int purseId, int recordCount) throws IOException {
+    @NonNull
+    RawCEPASHistory getHistory(int purseId, int recordCount) throws IOException {
         try {
             byte[] fullHistoryBuff = null;
             byte[] historyBuff = sendRequest((byte) 0x32, (byte) (purseId), (byte) 0, (byte) 1,
@@ -89,13 +95,13 @@ class CEPASProtocol {
             }
 
             if (fullHistoryBuff != null) {
-                return new CEPASHistory(purseId, fullHistoryBuff);
+                return RawCEPASHistory.create(purseId, fullHistoryBuff);
             } else {
-                return new CEPASHistory(purseId, "No history found");
+                return RawCEPASHistory.create(purseId, "No history found");
             }
         } catch (CEPASException ex) {
             Log.w(TAG, "Error reading purse history " + purseId, ex);
-            return new CEPASHistory(purseId, ex.getMessage());
+            return RawCEPASHistory.create(purseId, ex.getMessage());
         }
     }
 

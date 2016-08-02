@@ -22,36 +22,37 @@
 
 package com.codebutler.farebot.card.felica;
 
-import com.codebutler.farebot.util.Utils;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 import java.util.List;
 
-@Root(name = "system")
-public class FelicaSystem {
-    @Attribute(name = "code") private int mCode;
-    @ElementList(name = "services") private List<FelicaService> mServices;
+@AutoValue
+public abstract class FelicaSystem implements Parcelable {
 
-    private FelicaSystem() { /* For XML Serializer */ }
-
-    public FelicaSystem(int code, FelicaService[] services) {
-        mCode = code;
-        mServices = Utils.arrayAsList(services);
+    @NonNull
+    public static FelicaSystem create(int code, @NonNull List<FelicaService> services) {
+        return new AutoValue_FelicaSystem(code, services);
     }
 
-    public int getCode() {
-        return mCode;
+    @NonNull
+    public static TypeAdapter<FelicaSystem> typeAdapter(@NonNull Gson gson) {
+        return new AutoValue_FelicaSystem.GsonTypeAdapter(gson);
     }
 
-    public List<FelicaService> getServices() {
-        return mServices;
-    }
+    public abstract int getCode();
 
+    @NonNull
+    public abstract List<FelicaService> getServices();
+
+    @Nullable
     public FelicaService getService(int serviceCode) {
-        for (FelicaService service : mServices) {
+        for (FelicaService service : getServices()) {
             if (service.getServiceCode() == serviceCode) {
                 return service;
             }

@@ -22,13 +22,12 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.xml.HexString;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Element;
+import com.codebutler.farebot.ByteArray;
 
-import java.io.ByteArrayInputStream;
-
-public abstract class DesfireFileSettings {
+public abstract class DesfireFileSettings implements Parcelable {
 
     /* DesfireFile Types */
     public static final byte STANDARD_DATA_FILE = (byte) 0x00;
@@ -37,57 +36,17 @@ public abstract class DesfireFileSettings {
     public static final byte LINEAR_RECORD_FILE = (byte) 0x03;
     public static final byte CYCLIC_RECORD_FILE = (byte) 0x04;
 
-    @Element(name = "filetype") private byte mFileType;
-    @Element(name = "commsettings") private byte mCommSetting;
-    @Element(name = "accessrights") private HexString mAccessRights;
+    public abstract byte getFileType();
 
-    DesfireFileSettings() { /* For XML Serializer */ }
+    abstract byte getCommSetting();
 
-    DesfireFileSettings(ByteArrayInputStream stream) {
-        mFileType = (byte) stream.read();
-        mCommSetting = (byte) stream.read();
+    @NonNull
+    abstract ByteArray getAccessRights();
 
-        byte[] accessRights = new byte[2];
-        stream.read(accessRights, 0, accessRights.length);
-        this.mAccessRights = new HexString(accessRights);
-    }
-
-    DesfireFileSettings(byte fileType, byte commSetting, byte[] accessRights) {
-        this.mFileType = fileType;
-        this.mCommSetting = commSetting;
-        this.mAccessRights = new HexString(accessRights);
-    }
-
-    public static DesfireFileSettings create(byte[] data) throws Exception {
-        byte fileType = data[0];
-
-        ByteArrayInputStream stream = new ByteArrayInputStream(data);
-
-        if (fileType == STANDARD_DATA_FILE || fileType == BACKUP_DATA_FILE) {
-            return new StandardDesfireFileSettings(stream);
-        } else if (fileType == LINEAR_RECORD_FILE || fileType == CYCLIC_RECORD_FILE) {
-            return new RecordDesfireFileSettings(stream);
-        } else if (fileType == VALUE_FILE) {
-            return new ValueDesfireFileSettings(stream);
-        } else {
-            throw new Exception("Unknown file type: " + Integer.toHexString(fileType));
-        }
-    }
-
-    public byte getFileType() {
-        return mFileType;
-    }
-
-    public byte getCommSetting() {
-        return mCommSetting;
-    }
-
-    public HexString getAccessRights() {
-        return mAccessRights;
-    }
-
+    @NonNull
+    // FIXME: Localize
     public String getFileTypeName() {
-        switch (mFileType) {
+        switch (getFileType()) {
             case STANDARD_DATA_FILE:
                 return "Standard";
             case BACKUP_DATA_FILE:

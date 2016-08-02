@@ -24,7 +24,6 @@ package com.codebutler.farebot.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,24 +33,31 @@ import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.codebutler.farebot.BuildConfig;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.RawCard;
+import com.codebutler.farebot.card.TagReader;
+import com.codebutler.farebot.card.TagReaderFactory;
 import com.codebutler.farebot.card.UnsupportedTagException;
-import com.codebutler.farebot.provider.CardProvider;
-import com.codebutler.farebot.provider.CardsTableColumns;
+import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.Date;
 
 public class ReadingTagActivity extends Activity {
+
+    private CardPersister mCardPersister;
+    private TagReaderFactory mTagReaderFactory;
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_reading_tag);
+
+        FareBotApplication app = (FareBotApplication) getApplication();
+        mCardPersister = app.getCardPersister();
+        mTagReaderFactory = app.getTagReaderFactory();
 
         resolveIntent(getIntent());
     }
@@ -83,24 +89,11 @@ public class ReadingTagActivity extends Activity {
                 @Override
                 protected Uri doInBackground(Void... params) {
                     try {
-                        Card card = Card.dumpTag(tagId, tag);
+                        TagReader tagReader = mTagReaderFactory.getTagReader(tagId, tag);
 
-                        String cardXml = card.toXml(FareBotApplication.getInstance().getSerializer());
+                        RawCard card = tagReader.readTag();
 
-                        if (BuildConfig.DEBUG) {
-                            Log.d("ReadingTagActivity", "Got Card XML");
-                            for (String line : cardXml.split("\n")) {
-                                Log.d("ReadingTagActivity", "Got Card XML: " + line);
-                            }
-                        }
-
-                        String tagIdString = Utils.getHexString(card.getTagId());
-
-                        ContentValues values = new ContentValues();
-                        values.put(CardsTableColumns.TYPE, card.getCardType().toInteger());
-                        values.put(CardsTableColumns.TAG_SERIAL, tagIdString);
-                        values.put(CardsTableColumns.DATA, cardXml);
-                        values.put(CardsTableColumns.SCANNED_AT, card.getScannedAt().getTime());
+                        String tagIdString = card.tagId().hex();
 
                         SharedPreferences.Editor prefs
                                 = PreferenceManager.getDefaultSharedPreferences(ReadingTagActivity.this).edit();
@@ -108,8 +101,7 @@ public class ReadingTagActivity extends Activity {
                         prefs.putLong(FareBotApplication.PREF_LAST_READ_AT, new Date().getTime());
                         prefs.apply();
 
-                        return getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
-
+                        return mCardPersister.saveCard(card);
                     } catch (Exception ex) {
                         mException = ex;
                         return null;

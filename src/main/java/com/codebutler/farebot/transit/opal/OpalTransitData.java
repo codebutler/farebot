@@ -96,7 +96,7 @@ public class OpalTransitData extends TransitData {
 
     public OpalTransitData(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
-        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData();
+        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
         int iRawBalance;
 
         data = Utils.reverseBuffer(data, 0, 16);
@@ -173,7 +173,7 @@ public class OpalTransitData extends TransitData {
 
     public static TransitIdentity parseTransitIdentity(Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
-        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData();
+        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
         data = Utils.reverseBuffer(data, 0, 5);
 
         int lastDigit = Utils.getBitsFromBuffer(data, 4, 4);

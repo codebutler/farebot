@@ -20,9 +20,10 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
@@ -36,125 +37,36 @@ import com.codebutler.farebot.transit.opal.OpalTransitData;
 import com.codebutler.farebot.transit.orca.OrcaTransitData;
 import com.codebutler.farebot.transit.stub.AdelaideMetrocardStubTransitData;
 import com.codebutler.farebot.transit.stub.AtHopStubTransitData;
-import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
-
-import java.io.IOException;
-import java.security.AccessControlException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Root(name = "card")
+@AutoValue
 @CardRawDataFragmentClass(DesfireCardRawDataFragment.class)
-public class DesfireCard extends Card {
+public abstract class DesfireCard implements Card {
 
-    @Element(name = "manufacturing-data")
-    private DesfireManufacturingData mManfData;
-
-    @ElementList(name = "applications")
-    private List<DesfireApplication> mApplications;
-
-    @SuppressWarnings("unused")
-    private DesfireCard() { /* For XML Serializer */ }
-
-    private DesfireCard(byte[] tagId, Date scannedAt, DesfireManufacturingData manfData, DesfireApplication[] apps) {
-        super(CardType.MifareDesfire, tagId, scannedAt);
-        mManfData = manfData;
-        mApplications = Utils.arrayAsList(apps);
+    @NonNull
+    public static DesfireCard create(
+            @NonNull ByteArray tagId,
+            @NonNull Date scannedAt,
+            @NonNull List<DesfireApplication> applications,
+            @NonNull DesfireManufacturingData manufacturingData) {
+        return new AutoValue_DesfireCard(
+                tagId,
+                scannedAt,
+                applications,
+                manufacturingData);
     }
 
-    public static DesfireCard dumpTag(Tag tag) throws Exception {
-        List<DesfireApplication> apps = new ArrayList<>();
-
-        IsoDep tech = IsoDep.get(tag);
-
-        tech.connect();
-
-        DesfireManufacturingData manufData;
-        DesfireApplication[] appsArray;
-
-        try {
-            DesfireProtocol desfireTag = new DesfireProtocol(tech);
-
-            manufData = desfireTag.getManufacturingData();
-
-            for (int appId : desfireTag.getAppList()) {
-                desfireTag.selectApp(appId);
-
-                List<DesfireFile> files = new ArrayList<>();
-
-                for (int fileId : desfireTag.getFileList()) {
-                    DesfireFileSettings settings = null;
-                    try {
-                        settings = desfireTag.getFileSettings(fileId);
-                        byte[] data;
-                        if (settings instanceof StandardDesfireFileSettings) {
-                            data = desfireTag.readFile(fileId);
-                        } else if (settings instanceof ValueDesfireFileSettings) {
-                            data = desfireTag.getValue(fileId);
-                        } else {
-                            data = desfireTag.readRecord(fileId);
-                        }
-                        files.add(DesfireFile.create(fileId, settings, data));
-                    } catch (AccessControlException ex) {
-                        files.add(new UnauthorizedDesfireFile(fileId, ex.getMessage(), settings));
-                    } catch (IOException ex) {
-                        throw ex;
-                    } catch (Exception ex) {
-                        files.add(new InvalidDesfireFile(fileId, ex.toString(), settings));
-                    }
-                }
-
-                DesfireFile[] filesArray = new DesfireFile[files.size()];
-                files.toArray(filesArray);
-
-                apps.add(new DesfireApplication(appId, filesArray));
-            }
-
-            appsArray = new DesfireApplication[apps.size()];
-            apps.toArray(appsArray);
-        } finally {
-            if (tech.isConnected()) {
-                tech.close();
-            }
-        }
-
-        return new DesfireCard(tag.getId(), new Date(), manufData, appsArray);
+    @NonNull
+    @Override
+    public CardType getCardType() {
+        return CardType.MifareDesfire;
     }
 
     @Override
-    public TransitIdentity parseTransitIdentity() {
-        if (OrcaTransitData.check(this)) {
-            return OrcaTransitData.parseTransitIdentity(this);
-        }
-        if (ClipperTransitData.check(this)) {
-            return ClipperTransitData.parseTransitIdentity(this);
-        }
-        if (HSLTransitData.check(this)) {
-            return HSLTransitData.parseTransitIdentity(this);
-        }
-        if (OpalTransitData.check(this)) {
-            return OpalTransitData.parseTransitIdentity(this);
-        }
-        if (MykiTransitData.check(this)) {
-            return MykiTransitData.parseTransitIdentity(this);
-        }
-
-        // Stub card types go last
-        if (AdelaideMetrocardStubTransitData.check(this)) {
-            return AdelaideMetrocardStubTransitData.parseTransitIdentity(this);
-        }
-        if (AtHopStubTransitData.check(this)) {
-            return AtHopStubTransitData.parseTransitIdentity(this);
-        }
-        return null;
-    }
-
-    @Override
+    @Nullable
     public TransitData parseTransitData() {
         if (OrcaTransitData.check(this)) {
             return new OrcaTransitData(this);
@@ -182,20 +94,47 @@ public class DesfireCard extends Card {
         return null;
     }
 
-    public List<DesfireApplication> getApplications() {
-        return mApplications;
+    @NonNull
+    public abstract List<DesfireApplication> getApplications();
+
+    @NonNull
+    public abstract DesfireManufacturingData getManufacturingData();
+
+    @Override
+    @Nullable
+    public TransitIdentity parseTransitIdentity() {
+        if (OrcaTransitData.check(this)) {
+            return OrcaTransitData.parseTransitIdentity(this);
+        }
+        if (ClipperTransitData.check(this)) {
+            return ClipperTransitData.parseTransitIdentity(this);
+        }
+        if (HSLTransitData.check(this)) {
+            return HSLTransitData.parseTransitIdentity(this);
+        }
+        if (OpalTransitData.check(this)) {
+            return OpalTransitData.parseTransitIdentity(this);
+        }
+        if (MykiTransitData.check(this)) {
+            return MykiTransitData.parseTransitIdentity(this);
+        }
+        // Stub card types go last
+        if (AdelaideMetrocardStubTransitData.check(this)) {
+            return AdelaideMetrocardStubTransitData.parseTransitIdentity(this);
+        }
+        if (AtHopStubTransitData.check(this)) {
+            return AtHopStubTransitData.parseTransitIdentity(this);
+        }
+        return null;
     }
 
+    @Nullable
     public DesfireApplication getApplication(int appId) {
-        for (DesfireApplication app : mApplications) {
+        for (DesfireApplication app : getApplications()) {
             if (app.getId() == appId) {
                 return app;
             }
         }
         return null;
-    }
-
-    public DesfireManufacturingData getManufacturingData() {
-        return mManfData;
     }
 }

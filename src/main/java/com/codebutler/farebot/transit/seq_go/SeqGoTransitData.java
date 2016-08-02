@@ -87,7 +87,7 @@ public class SeqGoTransitData extends TransitData {
     }
 
     public SeqGoTransitData(ClassicCard card) {
-        byte[] serialData = card.getSector(0).getBlock(0).getData();
+        byte[] serialData = card.getSector(0).getBlock(0).getData().bytes();
         serialData = Utils.reverseBuffer(serialData, 0, 4);
         mSerialNumber = Utils.byteArrayToBigInteger(serialData, 0, 4);
 
@@ -103,7 +103,7 @@ public class SeqGoTransitData extends TransitData {
                     continue;
                 }
 
-                SeqGoRecord record = SeqGoRecord.recordFromBytes(block.getData());
+                SeqGoRecord record = SeqGoRecord.recordFromBytes(block.getData().bytes());
 
                 if (record != null) {
                     records.add(record);
@@ -196,7 +196,7 @@ public class SeqGoTransitData extends TransitData {
 
     public static boolean check(ClassicCard card) {
         try {
-            byte[] blockData = card.getSector(0).getBlock(1).getData();
+            byte[] blockData = card.getSector(0).getBlock(1).getData().bytes();
             return Arrays.equals(Arrays.copyOfRange(blockData, 1, 9), MANUFACTURER);
         } catch (UnauthorizedException ex) {
             // It is not possible to identify the card without a key
@@ -205,7 +205,7 @@ public class SeqGoTransitData extends TransitData {
     }
 
     public static TransitIdentity parseTransitIdentity(ClassicCard card) {
-        byte[] serialData = card.getSector(0).getBlock(0).getData();
+        byte[] serialData = card.getSector(0).getBlock(0).getData().bytes();
         serialData = Utils.reverseBuffer(serialData, 0, 4);
         BigInteger serialNumber = Utils.byteArrayToBigInteger(serialData, 0, 4);
         return new TransitIdentity(NAME, formatSerialNumber(serialNumber));

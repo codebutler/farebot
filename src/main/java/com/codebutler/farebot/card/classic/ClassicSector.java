@@ -23,48 +23,29 @@
 
 package com.codebutler.farebot.card.classic;
 
-import com.codebutler.farebot.util.Utils;
-
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
-@Root(name = "sector")
-public class ClassicSector {
-    @Attribute(name = "index") private int mIndex;
-    @ElementList(name = "blocks", required = false, empty = false) private List<ClassicBlock> mBlocks;
+public abstract class ClassicSector implements Parcelable {
 
-    protected ClassicSector() { }
+    public abstract int getIndex();
 
-    public ClassicSector(int index, ClassicBlock[] blocks) {
-        mIndex = index;
-        if (blocks == null) {
-            // invalid / unauthorised sectors should be null
-            mBlocks = null;
-        } else {
-            mBlocks = Utils.arrayAsList(blocks);
-        }
-    }
+    @NonNull
+    public abstract List<ClassicBlock> getBlocks();
 
-    public int getIndex() {
-        return mIndex;
-    }
-
-    public List<ClassicBlock> getBlocks() {
-        return mBlocks;
-    }
-
+    @NonNull
     public ClassicBlock getBlock(int index) {
-        return mBlocks.get(index);
+        return getBlocks().get(index);
     }
 
+    @NonNull
     public byte[] readBlocks(int startBlock, int blockCount) {
         int readBlocks = 0;
         byte[] data = new byte[blockCount * 16];
         for (int index = startBlock; index < (startBlock + blockCount); index++) {
-            byte[] blockData = getBlock(index).getData();
+            byte[] blockData = getBlock(index).getData().bytes();
             System.arraycopy(blockData, 0, data, readBlocks * 16, blockData.length);
             readBlocks++;
         }

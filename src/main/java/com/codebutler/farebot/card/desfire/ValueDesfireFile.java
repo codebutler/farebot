@@ -1,31 +1,31 @@
 package com.codebutler.farebot.card.desfire;
 
+import android.support.annotation.NonNull;
+
+import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.simpleframework.xml.Root;
 
 
 /**
  * Represents a value file in Desfire
  */
-@Root(name = "file")
-class ValueDesfireFile extends DesfireFile {
-    private int mValue;
+@AutoValue
+public abstract class ValueDesfireFile implements DesfireFile {
 
-    private ValueDesfireFile() { /* For XML Serializer */ }
-
-    ValueDesfireFile(int fileId, DesfireFileSettings fileSettings, byte[] fileData) {
-        super(fileId, fileSettings, fileData);
-
+    @NonNull
+    public static ValueDesfireFile create(
+            int fileId,
+            @NonNull DesfireFileSettings fileSettings,
+            @NonNull byte[] fileData) {
         byte[] myData = ArrayUtils.clone(fileData);
         ArrayUtils.reverse(myData);
-        mValue = Utils.byteArrayToInt(myData);
-
+        int value = Utils.byteArrayToInt(myData);
+        return new AutoValue_ValueDesfireFile(fileId, fileSettings, ByteArray.create(fileData), value);
     }
 
-    public int getValue() {
-        return mValue;
-    }
+    public abstract int getValue();
 }
 

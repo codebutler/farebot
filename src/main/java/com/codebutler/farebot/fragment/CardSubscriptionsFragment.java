@@ -31,7 +31,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
@@ -40,8 +39,6 @@ import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.util.Utils;
 
-import org.simpleframework.xml.Serializer;
-
 public class CardSubscriptionsFragment extends ListFragment {
     private Card mCard;
     private TransitData mTransitData;
@@ -49,8 +46,7 @@ public class CardSubscriptionsFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
+        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 

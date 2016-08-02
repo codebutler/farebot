@@ -24,44 +24,22 @@ package com.codebutler.farebot;
 
 import android.app.Application;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;
-import com.codebutler.farebot.card.classic.ClassicSector;
-import com.codebutler.farebot.card.desfire.DesfireFile;
-import com.codebutler.farebot.card.desfire.DesfireFileSettings;
-import com.codebutler.farebot.card.desfire.InvalidDesfireFile;
-import com.codebutler.farebot.card.desfire.RecordDesfireFile;
+import com.codebutler.farebot.card.RawCard;
+import com.codebutler.farebot.card.TagReaderFactory;
 import com.codebutler.farebot.card.felica.FelicaDBUtil;
+import com.codebutler.farebot.persist.CardPersister;
+import com.codebutler.farebot.serialize.CardJsonSerializer;
+import com.codebutler.farebot.serialize.CardSerializer;
+import com.codebutler.farebot.serialize.FareBotTypeAdapterFactory;
 import com.codebutler.farebot.transit.ovc.OVChipDBUtil;
 import com.codebutler.farebot.transit.seq_go.SeqGoDBUtil;
-import com.codebutler.farebot.xml.Base64String;
-import com.codebutler.farebot.xml.CardConverter;
-import com.codebutler.farebot.xml.CardTypeTransform;
-import com.codebutler.farebot.xml.ClassicSectorConverter;
-import com.codebutler.farebot.xml.DesfireFileConverter;
-import com.codebutler.farebot.xml.DesfireFileSettingsConverter;
-import com.codebutler.farebot.xml.EpochDateTransform;
-import com.codebutler.farebot.xml.FelicaIDmTransform;
-import com.codebutler.farebot.xml.FelicaPMmTransform;
-import com.codebutler.farebot.xml.HexString;
-import com.codebutler.farebot.xml.SkippableRegistryStrategy;
+import com.codebutler.farebot.util.ExportHelper;
 import com.crashlytics.android.Crashlytics;
-
-import net.kazzz.felica.lib.FeliCaLib;
-
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.Registry;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Type;
-import org.simpleframework.xml.strategy.Visitor;
-import org.simpleframework.xml.strategy.VisitorStrategy;
-import org.simpleframework.xml.stream.InputNode;
-import org.simpleframework.xml.stream.NodeMap;
-import org.simpleframework.xml.stream.OutputNode;
-import org.simpleframework.xml.transform.RegistryMatcher;
-
-import java.util.Date;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -75,82 +53,44 @@ public class FareBotApplication extends Application {
     private FelicaDBUtil mFelicaDBUtil;
     private OVChipDBUtil mOVChipDBUtil;
     private SeqGoDBUtil mSeqGoDBUtil;
-    private final Serializer mSerializer;
+    private CardJsonSerializer mCardJsonSerializer;
     private boolean mMifareClassicSupport;
+    private ExportHelper mExportHelper;
+    private CardPersister mCardPersister;
+    private TagReaderFactory mTagReaderFactory;
 
     public FareBotApplication() {
         sInstance = this;
-
-        mFelicaDBUtil = new FelicaDBUtil(this);
-        mOVChipDBUtil = new OVChipDBUtil(this);
-        mSeqGoDBUtil = new SeqGoDBUtil(this);
-
-        try {
-            Visitor visitor = new Visitor() {
-                @Override
-                public void read(Type type, NodeMap<InputNode> node) throws Exception {
-                }
-
-                @Override
-                public void write(Type type, NodeMap<OutputNode> node) throws Exception {
-                    node.remove("class");
-                }
-            };
-            Registry registry = new Registry();
-            RegistryMatcher matcher = new RegistryMatcher();
-            mSerializer = new Persister(new VisitorStrategy(visitor, new SkippableRegistryStrategy(registry)), matcher);
-
-            DesfireFileConverter desfireFileConverter = new DesfireFileConverter(mSerializer);
-            registry.bind(DesfireFile.class, desfireFileConverter);
-            registry.bind(RecordDesfireFile.class, desfireFileConverter);
-            registry.bind(InvalidDesfireFile.class, desfireFileConverter);
-
-            registry.bind(DesfireFileSettings.class, new DesfireFileSettingsConverter());
-            registry.bind(ClassicSector.class, new ClassicSectorConverter());
-            registry.bind(Card.class, new CardConverter(mSerializer));
-
-            matcher.bind(HexString.class, HexString.Transform.class);
-            matcher.bind(Base64String.class, Base64String.Transform.class);
-            matcher.bind(Date.class, EpochDateTransform.class);
-            matcher.bind(FeliCaLib.IDm.class, FelicaIDmTransform.class);
-            matcher.bind(FeliCaLib.PMm.class, FelicaPMmTransform.class);
-            matcher.bind(CardType.class, CardTypeTransform.class);
-
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
+    @Deprecated
     public static FareBotApplication getInstance() {
         return sInstance;
-    }
-
-    public FelicaDBUtil getFelicaDBUtil() {
-        return mFelicaDBUtil;
-    }
-
-    public OVChipDBUtil getOVChipDBUtil() {
-        return mOVChipDBUtil;
-    }
-
-    public SeqGoDBUtil getSeqGoDBUtil() {
-        return mSeqGoDBUtil;
-    }
-
-    public Serializer getSerializer() {
-        return mSerializer;
-    }
-
-    public boolean getMifareClassicSupport() {
-        return mMifareClassicSupport;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        mFelicaDBUtil = new FelicaDBUtil(this);
+        mOVChipDBUtil = new OVChipDBUtil(this);
+        mSeqGoDBUtil = new SeqGoDBUtil(this);
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapterFactory(FareBotTypeAdapterFactory.create())
+                .registerTypeAdapterFactory(new RawCard.GsonTypeAdapterFactory())
+                .registerTypeAdapter(ByteArray.class, new ByteArray.GsonTypeAdapter())
+                .registerTypeAdapter(CardType.class, new CardType.GsonTypeAdapter())
+                .create();
+
+        mCardJsonSerializer = new CardJsonSerializer(gson);
+
         // Check for Mifare Classic support
         mMifareClassicSupport = this.getPackageManager().hasSystemFeature("com.nxp.mifare");
+
+        mCardPersister = new CardPersister(this, mCardJsonSerializer);
+        mExportHelper = new ExportHelper(this, mCardPersister, gson);
+        mTagReaderFactory = new TagReaderFactory();
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectAll()
@@ -160,5 +100,44 @@ public class FareBotApplication extends Application {
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
+    }
+
+    @NonNull
+    public ExportHelper getExportHelper() {
+        return mExportHelper;
+    }
+
+    @NonNull
+    public FelicaDBUtil getFelicaDBUtil() {
+        return mFelicaDBUtil;
+    }
+
+    @NonNull
+    public OVChipDBUtil getOVChipDBUtil() {
+        return mOVChipDBUtil;
+    }
+
+    @NonNull
+    public SeqGoDBUtil getSeqGoDBUtil() {
+        return mSeqGoDBUtil;
+    }
+
+    @NonNull
+    public CardSerializer getCardSerializer() {
+        return mCardJsonSerializer;
+    }
+
+    @NonNull
+    public CardPersister getCardPersister() {
+        return mCardPersister;
+    }
+
+    @NonNull
+    public TagReaderFactory getTagReaderFactory() {
+        return mTagReaderFactory;
+    }
+
+    public boolean getMifareClassicSupport() {
+        return mMifareClassicSupport;
     }
 }

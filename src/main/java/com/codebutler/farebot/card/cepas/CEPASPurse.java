@@ -23,73 +23,18 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import com.codebutler.farebot.xml.HexString;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
-@Root(name = "purse")
-public class CEPASPurse {
+@AutoValue
+public abstract class CEPASPurse implements Parcelable {
 
-    @Attribute(name = "auto-load-amount", required = false)
-    private int mAutoLoadAmount;
-
-    @Attribute(name = "can", required = false)
-    private HexString mCAN;
-
-    @Attribute(name = "cepas-version", required = false)
-    private byte mCepasVersion;
-
-    @Attribute(name = "csn", required = false)
-    private HexString mCSN;
-
-    @Attribute(name = "error", required = false)
-    private String mErrorMessage;
-
-    @Attribute(name = "id", required = false)
-    private int mId;
-
-    @Attribute(name = "issuer-data-length", required = false)
-    private int mIssuerDataLength;
-
-    @Attribute(name = "issuer-specific-data", required = false)
-    private HexString mIssuerSpecificData;
-
-    @Attribute(name = "last-credit-transaction-header", required = false)
-    private HexString mLastCreditTransactionHeader;
-
-    @Attribute(name = "last-credit-transaction-trp", required = false)
-    private int mLastCreditTransactionTRP;
-
-    @Attribute(name = "last-transaction-debit-options", required = false)
-    private byte mLastTransactionDebitOptionsByte;
-
-    @Attribute(name = "last-transaction-trp", required = false)
-    private int mLastTransactionTRP;
-
-    @Attribute(name = "logfile-record-count", required = false)
-    private byte mLogfileRecordCount;
-
-    @Attribute(name = "purse-balance", required = false)
-    private int mPurseBalance;
-
-    @Attribute(name = "purse-expiry-date", required = false)
-    private int mPurseExpiryDate;
-
-    @Attribute(name = "purse-status", required = false)
-    private byte mPurseStatus;
-
-    @Attribute(name = "purse-creation-date", required = false)
-    private int mPurseCreationDate;
-
-    @Attribute(name = "valid", required = false)
-    private boolean mIsValid;
-
-    @Element(name = "transaction", required = false)
-    private CEPASTransaction mLastTransactionRecord;
-
-    public CEPASPurse(
+    @NonNull
+    public static CEPASPurse create(
             int id,
             byte cepasVersion,
             byte purseStatus,
@@ -106,64 +51,68 @@ public class CEPASPurse {
             int lastTransactionTRP,
             CEPASTransaction lastTransactionRecord,
             byte[] issuerSpecificData,
-            byte lastTransactionDebitOptionsByte
-    ) {
-        mId = id;
-        mCepasVersion = cepasVersion;
-        mPurseStatus = purseStatus;
-        mPurseBalance = purseBalance;
-        mAutoLoadAmount = autoLoadAmount;
-        mCAN = new HexString(can);
-        mCSN = new HexString(csn);
-        mPurseExpiryDate = purseExpiryDate;
-        mPurseCreationDate = purseCreationDate;
-        mLastCreditTransactionTRP = lastCreditTransactionTRP;
-        mLastCreditTransactionHeader = new HexString(lastCreditTransactionHeader);
-        mLogfileRecordCount = logfileRecordCount;
-        mIssuerDataLength = issuerDataLength;
-        mLastTransactionTRP = lastTransactionTRP;
-        mLastTransactionRecord = lastTransactionRecord;
-        mIssuerSpecificData = new HexString(issuerSpecificData);
-        mLastTransactionDebitOptionsByte = lastTransactionDebitOptionsByte;
-        mIsValid = true;
-        mErrorMessage = "";
+            byte lastTransactionDebitOptionsByte) {
+        return new AutoValue_CEPASPurse(
+                id,
+                cepasVersion,
+                purseStatus,
+                purseBalance,
+                autoLoadAmount,
+                ByteArray.create(can),
+                ByteArray.create(csn),
+                purseExpiryDate,
+                purseCreationDate,
+                lastCreditTransactionTRP,
+                ByteArray.create(lastCreditTransactionHeader),
+                logfileRecordCount,
+                issuerDataLength,
+                lastTransactionTRP,
+                lastTransactionRecord,
+                ByteArray.create(issuerSpecificData),
+                lastTransactionDebitOptionsByte,
+                true,
+                null);
     }
 
-    CEPASPurse(int purseId, String errorMessage) {
-        mId = purseId;
-        mCepasVersion = 0;
-        mPurseStatus = 0;
-        mPurseBalance = 0;
-        mAutoLoadAmount = 0;
-        mCAN = null;
-        mCSN = null;
-        mPurseExpiryDate = 0;
-        mPurseCreationDate = 0;
-        mLastCreditTransactionTRP = 0;
-        mLastCreditTransactionHeader = null;
-        mLogfileRecordCount = 0;
-        mIssuerDataLength = 0;
-        mLastTransactionTRP = 0;
-        mLastTransactionRecord = null;
-        mIssuerSpecificData = null;
-        mLastTransactionDebitOptionsByte = 0;
-        mIsValid = false;
-        mErrorMessage = errorMessage;
+    @NonNull
+    public static CEPASPurse create(int purseId, String errorMessage) {
+        return new AutoValue_CEPASPurse(
+                purseId,
+                (byte) 0,
+                (byte) 0,
+                0,
+                0,
+                null,
+                null,
+                0,
+                0,
+                0,
+                null,
+                (byte) 0,
+                0,
+                0,
+                null,
+                null,
+                (byte) 0,
+                false,
+                errorMessage);
     }
 
-    CEPASPurse(int purseId, byte[] purseData) {
+    @NonNull
+    public static CEPASPurse create(int purseId, @NonNull byte[] purseData) {
+        boolean isValid;
+        String errorMessage;
         if (purseData == null) {
             purseData = new byte[128];
-            mIsValid = false;
-            mErrorMessage = "";
+            isValid = false;
+            errorMessage = "";
         } else {
-            mIsValid = true;
-            mErrorMessage = "";
+            isValid = true;
+            errorMessage = "";
         }
 
-        mId = purseId;
-        mCepasVersion = purseData[0];
-        mPurseStatus = purseData[1];
+        byte cepasVersion = purseData[0];
+        byte purseStatus = purseData[1];
 
         int tmp = (0x00ff0000 & ((purseData[2])) << 16)
                 | (0x0000ff00 & (purseData[3] << 8))
@@ -172,7 +121,7 @@ public class CEPASPurse {
         if (0 != (purseData[2] & 0x80)) {
             tmp |= 0xff000000;
         }
-        mPurseBalance = tmp;
+        int purseBalance = tmp;
 
         tmp = (0x00ff0000 & ((purseData[5])) << 16)
                 | (0x0000ff00 & (purseData[6] << 8))
@@ -181,131 +130,101 @@ public class CEPASPurse {
         if (0 != (purseData[5] & 0x80)) {
             tmp |= 0xff000000;
         }
-        mAutoLoadAmount = tmp;
+        int autoLoadAmount = tmp;
 
         byte[] can = new byte[8];
         System.arraycopy(purseData, 8, can, 0, can.length);
 
-        mCAN = new HexString(can);
-
         byte[] csn = new byte[8];
         System.arraycopy(purseData, 16, csn, 0, csn.length);
 
-        mCSN = new HexString(csn);
-
         /* Epoch begins January 1, 1995 */
-        mPurseExpiryDate = 788947200 + (86400 * ((0xff00 & (purseData[24] << 8)) | (0x00ff & (purseData[25] << 0))));
-        mPurseCreationDate = 788947200 + (86400 * ((0xff00 & (purseData[26] << 8)) | (0x00ff & (purseData[27] << 0))));
+        int purseExpiryDate = 788947200 + (86400 * ((0xff00 & (purseData[24] << 8)) | (0x00ff & purseData[25])));
+        int purseCreationDate = 788947200 + (86400 * ((0xff00 & (purseData[26] << 8)) | (0x00ff & purseData[27])));
 
-        mLastCreditTransactionTRP = ((0xff000000 & (purseData[28] << 24))
+        int lastCreditTransactionTRP = ((0xff000000 & (purseData[28] << 24))
                 | (0x00ff0000 & (purseData[29] << 16))
                 | (0x0000ff00 & (purseData[30] << 8))
-                | (0x000000ff & (purseData[31] << 0)));
+                | (0x000000ff & (purseData[31])));
 
         byte[] lastCreditTransactionHeader = new byte[8];
         System.arraycopy(purseData, 32, lastCreditTransactionHeader, 0, 8);
 
-        mLastCreditTransactionHeader = new HexString(lastCreditTransactionHeader);
+        byte logfileRecordCount = purseData[40];
 
-        mLogfileRecordCount = purseData[40];
+        int issuerDataLength = 0x00ff & purseData[41];
 
-        mIssuerDataLength = 0x00ff & purseData[41];
-
-        mLastTransactionTRP = ((0xff000000 & (purseData[42] << 24))
+        int lastTransactionTRP = ((0xff000000 & (purseData[42] << 24))
                 | (0x00ff0000 & (purseData[43] << 16))
                 | (0x0000ff00 & (purseData[44] << 8))
-                | (0x000000ff & (purseData[45] << 0)));
+                | (0x000000ff & (purseData[45])));
         byte[] tmpTransaction = new byte[16];
         System.arraycopy(purseData, 46, tmpTransaction, 0, tmpTransaction.length);
-        mLastTransactionRecord = new CEPASTransaction(tmpTransaction);
+        CEPASTransaction lastTransactionRecord = CEPASTransaction.create(tmpTransaction);
 
-        byte[] issuerSpecificData = new byte[mIssuerDataLength];
+        byte[] issuerSpecificData = new byte[issuerDataLength];
         System.arraycopy(purseData, 62, issuerSpecificData, 0, issuerSpecificData.length);
-        mIssuerSpecificData = new HexString(issuerSpecificData);
 
-        mLastTransactionDebitOptionsByte = purseData[62 + mIssuerDataLength];
+        byte lastTransactionDebitOptionsByte = purseData[62 + issuerDataLength];
+
+        return new AutoValue_CEPASPurse(
+                purseId,
+                cepasVersion,
+                purseStatus,
+                purseBalance,
+                autoLoadAmount,
+                ByteArray.create(can),
+                ByteArray.create(csn),
+                purseExpiryDate,
+                purseCreationDate,
+                lastCreditTransactionTRP,
+                ByteArray.create(lastCreditTransactionHeader),
+                logfileRecordCount,
+                issuerDataLength,
+                lastTransactionTRP,
+                lastTransactionRecord,
+                ByteArray.create(issuerSpecificData),
+                lastTransactionDebitOptionsByte,
+                isValid,
+                errorMessage);
     }
 
-    @SuppressWarnings("unused")
-    private CEPASPurse() { /* For XML Serializer */ }
+    public abstract int getId();
 
-    public static CEPASPurse create(int purseId, byte[] purseData) {
-        return new CEPASPurse(purseId, purseData);
-    }
+    public abstract byte getCepasVersion();
 
-    public int getId() {
-        return mId;
-    }
+    public abstract byte getPurseStatus();
 
-    public byte getCepasVersion() {
-        return mCepasVersion;
-    }
+    public abstract int getPurseBalance();
 
-    public byte getPurseStatus() {
-        return mPurseStatus;
-    }
+    public abstract int getAutoLoadAmount();
 
-    public int getPurseBalance() {
-        return mPurseBalance;
-    }
+    public abstract ByteArray getCAN();
 
-    public int getAutoLoadAmount() {
-        return mAutoLoadAmount;
-    }
+    public abstract ByteArray getCSN();
 
-    public byte[] getCAN() {
-        return mCAN.getData();
-    }
+    public abstract int getPurseExpiryDate();
 
-    public byte[] getCSN() {
-        return mCSN.getData();
-    }
+    public abstract int getPurseCreationDate();
 
-    public int getPurseExpiryDate() {
-        return mPurseExpiryDate;
-    }
+    public abstract int getLastCreditTransactionTRP();
 
-    public int getPurseCreationDate() {
-        return mPurseCreationDate;
-    }
+    public abstract ByteArray getLastCreditTransactionHeader();
 
-    public int getLastCreditTransactionTRP() {
-        return mLastCreditTransactionTRP;
-    }
+    public abstract byte getLogfileRecordCount();
 
-    public byte[] getLastCreditTransactionHeader() {
-        return mLastCreditTransactionHeader.getData();
-    }
+    public abstract int getIssuerDataLength();
 
-    public byte getLogfileRecordCount() {
-        return mLogfileRecordCount;
-    }
+    public abstract int getLastTransactionTRP();
 
-    public int getIssuerDataLength() {
-        return mIssuerDataLength;
-    }
+    public abstract CEPASTransaction getLastTransactionRecord();
 
-    public int getLastTransactionTRP() {
-        return mLastTransactionTRP;
-    }
+    public abstract ByteArray getIssuerSpecificData();
 
-    public CEPASTransaction getLastTransactionRecord() {
-        return mLastTransactionRecord;
-    }
+    public abstract byte getLastTransactionDebitOptionsByte();
 
-    public byte[] getIssuerSpecificData() {
-        return mIssuerSpecificData.getData();
-    }
+    public abstract boolean isValid();
 
-    public byte getLastTransactionDebitOptionsByte() {
-        return mLastTransactionDebitOptionsByte;
-    }
-
-    public boolean isValid() {
-        return mIsValid;
-    }
-
-    public String getErrorMessage() {
-        return mErrorMessage;
-    }
+    @Nullable
+    public abstract String getErrorMessage();
 }

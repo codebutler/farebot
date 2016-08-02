@@ -36,7 +36,6 @@ import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
-import com.codebutler.farebot.util.Utils;
 
 import java.text.NumberFormat;
 import java.util.Currency;
@@ -468,7 +467,7 @@ public class EZLinkTransitData extends TransitData {
 
     public EZLinkTransitData(Card card) {
         CEPASCard cepasCard = (CEPASCard) card;
-        mSerialNumber = Utils.getHexString(cepasCard.getPurse(3).getCAN(), "<Error>");
+        mSerialNumber = cepasCard.getPurse(3).getCAN().hex();
         mBalance = cepasCard.getPurse(3).getPurseBalance();
         mTrips = parseTrips(cepasCard);
     }
@@ -510,7 +509,7 @@ public class EZLinkTransitData extends TransitData {
     }
 
     public static TransitIdentity parseTransitIdentity(Card card) {
-        String canNo = Utils.getHexString(((CEPASCard) card).getPurse(3).getCAN(), "<Error>");
+        String canNo = ((CEPASCard) card).getPurse(3).getCAN().hex();
         return new TransitIdentity(getCardIssuer(canNo), canNo);
     }
 

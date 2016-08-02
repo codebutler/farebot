@@ -86,14 +86,14 @@ public class ClipperTransitData extends TransitData {
         byte[] data;
 
         try {
-            data = desfireCard.getApplication(0x9011f2).getFile(0x08).getData();
+            data = desfireCard.getApplication(0x9011f2).getFile(0x08).getData().bytes();
             mSerialNumber = Utils.byteArrayToLong(data, 1, 4);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Clipper serial", ex);
         }
 
         try {
-            data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData();
+            data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData().bytes();
             mBalance = (short) (((0xFF & data[18]) << 8) | (0xFF & data[19]));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Clipper balance", ex);
@@ -120,7 +120,7 @@ public class ClipperTransitData extends TransitData {
 
     public static TransitIdentity parseTransitIdentity(Card card) {
         try {
-            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData();
+            byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData().bytes();
             return new TransitIdentity("Clipper", String.valueOf(Utils.byteArrayToLong(data, 1, 4)));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Clipper serial", ex);
@@ -170,7 +170,7 @@ public class ClipperTransitData extends TransitData {
          *  be only a regular file.  As such, we'll need to extract the records
          *  manually.
          */
-        byte[] data = file.getData();
+        byte[] data = file.getData().bytes();
         int pos = data.length - RECORD_LENGTH;
         List<ClipperTrip> result = new ArrayList<>();
         while (pos > 0) {
@@ -230,7 +230,7 @@ public class ClipperTransitData extends TransitData {
          *  be only a regular file.  As such, we'll need to extract the records
          *  manually.
          */
-        byte[] data = file.getData();
+        byte[] data = file.getData().bytes();
         int pos = data.length - RECORD_LENGTH;
         List<ClipperRefill> result = new ArrayList<>();
         while (pos > 0) {

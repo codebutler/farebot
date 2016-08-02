@@ -22,64 +22,34 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.util.Utils;
+import android.support.annotation.NonNull;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
-import java.io.ByteArrayInputStream;
+@AutoValue
+public abstract class RecordDesfireFileSettings extends DesfireFileSettings {
 
-@Root(name = "settings")
-public class RecordDesfireFileSettings extends DesfireFileSettings {
-    @Element(name = "recordsize") private int mRecordSize;
-    @Element(name = "maxrecords") private int mMaxRecords;
-    @Element(name = "currecords") private int mCurRecords;
-
-    @SuppressWarnings("unused")
-    private RecordDesfireFileSettings() { /* For XML Serializer */ }
-
-    public RecordDesfireFileSettings(
+    @NonNull
+    public static RecordDesfireFileSettings create(
             byte fileType,
             byte commSetting,
-            byte[] accessRights,
+            @NonNull byte[] accessRights,
             int recordSize,
             int maxRecords,
             int curRecords) {
-        super(fileType, commSetting, accessRights);
-        this.mRecordSize = recordSize;
-        this.mMaxRecords = maxRecords;
-        this.mCurRecords = curRecords;
+        return new AutoValue_RecordDesfireFileSettings(
+                fileType,
+                commSetting,
+                ByteArray.create(accessRights),
+                recordSize,
+                maxRecords,
+                curRecords);
     }
 
-    RecordDesfireFileSettings(ByteArrayInputStream stream) {
-        super(stream);
+    public abstract int getRecordSize();
 
-        byte[] buf = new byte[3];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mRecordSize = Utils.byteArrayToInt(buf);
+    public abstract int getMaxRecords();
 
-        buf = new byte[3];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mMaxRecords = Utils.byteArrayToInt(buf);
-
-        buf = new byte[3];
-        stream.read(buf, 0, buf.length);
-        ArrayUtils.reverse(buf);
-        mCurRecords = Utils.byteArrayToInt(buf);
-    }
-
-    public int getRecordSize() {
-        return mRecordSize;
-    }
-
-    public int getMaxRecords() {
-        return mMaxRecords;
-    }
-
-    public int getCurRecords() {
-        return mCurRecords;
-    }
+    public abstract int getCurRecords();
 }

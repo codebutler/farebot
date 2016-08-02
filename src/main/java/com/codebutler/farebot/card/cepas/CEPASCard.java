@@ -24,69 +24,40 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitData;
-import com.codebutler.farebot.util.Utils;
-
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import com.google.auto.value.AutoValue;
 
 import java.util.Date;
 import java.util.List;
 
-@Root(name = "card")
-public class CEPASCard extends Card {
+@AutoValue
+public abstract class CEPASCard implements Card, Parcelable {
 
-    @ElementList(name = "purses") private List<CEPASPurse> mPurses;
-    @ElementList(name = "histories") private List<CEPASHistory> mHistories;
-
-    private CEPASCard(byte[] tagId, Date scannedAt, CEPASPurse[] purses, CEPASHistory[] histories) {
-        super(CardType.CEPAS, tagId, scannedAt);
-        mPurses = Utils.arrayAsList(purses);
-        mHistories = Utils.arrayAsList(histories);
+    @NonNull
+    public static CEPASCard create(
+            @NonNull ByteArray tagId,
+            @NonNull Date scannedAt,
+            @NonNull List<CEPASPurse> purses,
+            @NonNull List<CEPASHistory> histories) {
+        return new AutoValue_CEPASCard(tagId, scannedAt, purses, histories);
     }
 
-    @SuppressWarnings("unused")
-    private CEPASCard() { /* For XML Serializer */ }
-
-    public static CEPASCard dumpTag(Tag tag) throws Exception {
-        IsoDep tech = IsoDep.get(tag);
-
-        tech.connect();
-
-        CEPASPurse[] cepasPurses = new CEPASPurse[16];
-        CEPASHistory[] cepasHistories = new CEPASHistory[16];
-
-        try {
-            CEPASProtocol cepasTag = new CEPASProtocol(tech);
-
-            for (int purseId = 0; purseId < cepasPurses.length; purseId++) {
-                cepasPurses[purseId] = cepasTag.getPurse(purseId);
-            }
-
-            for (int historyId = 0; historyId < cepasHistories.length; historyId++) {
-                if (cepasPurses[historyId].isValid()) {
-                    int recordCount = Integer.parseInt(Byte.toString(cepasPurses[historyId].getLogfileRecordCount()));
-                    cepasHistories[historyId] = cepasTag.getHistory(historyId, recordCount);
-                } else {
-                    cepasHistories[historyId] = new CEPASHistory(historyId, (byte[]) null);
-                }
-            }
-        } finally {
-            if (tech.isConnected()) {
-                tech.close();
-            }
-        }
-
-        return new CEPASCard(tag.getId(), new Date(), cepasPurses, cepasHistories);
+    @NonNull
+    @Override
+    public CardType getCardType() {
+        return CardType.CEPAS;
     }
 
+    @Nullable
     @Override
     public TransitIdentity parseTransitIdentity() {
         if (EZLinkTransitData.check(this)) {
@@ -95,6 +66,7 @@ public class CEPASCard extends Card {
         return null;
     }
 
+    @Nullable
     @Override
     public TransitData parseTransitData() {
         if (EZLinkTransitData.check(this)) {
@@ -103,11 +75,19 @@ public class CEPASCard extends Card {
         return null;
     }
 
+    @NonNull
+    public abstract List<CEPASPurse> getPurses();
+
+    @NonNull
+    public abstract List<CEPASHistory> getHistories();
+
+    @Nullable
     public CEPASPurse getPurse(int purse) {
-        return mPurses.get(purse);
+        return getPurses().get(purse);
     }
 
+    @Nullable
     public CEPASHistory getHistory(int purse) {
-        return mHistories.get(purse);
+        return getHistories().get(purse);
     }
 }

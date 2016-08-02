@@ -76,7 +76,7 @@ public class EdyTransitData extends TransitData {
         FelicaService serviceID = card.getSystem(FeliCaLib.SYSTEMCODE_EDY).getService(FELICA_SERVICE_EDY_ID);
         List<FelicaBlock> blocksID = serviceID.getBlocks();
         FelicaBlock blockID = blocksID.get(0);
-        byte[] dataID = blockID.getData();
+        byte[] dataID = blockID.getData().bytes();
         for (int i = 2; i < 10; i++) {
             mSerialNumber[i - 2] = dataID[i];
         }
@@ -85,7 +85,7 @@ public class EdyTransitData extends TransitData {
         FelicaService serviceBalance = card.getSystem(FeliCaLib.SYSTEMCODE_EDY).getService(FELICA_SERVICE_EDY_BALANCE);
         List<FelicaBlock> blocksBalance = serviceBalance.getBlocks();
         FelicaBlock blockBalance = blocksBalance.get(0);
-        byte[] dataBalance = blockBalance.getData();
+        byte[] dataBalance = blockBalance.getData().bytes();
         mCurrentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
 
         // now read the transaction history

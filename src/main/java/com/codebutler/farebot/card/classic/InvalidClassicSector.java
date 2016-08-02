@@ -23,39 +23,38 @@
 
 package com.codebutler.farebot.card.classic;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
+import android.support.annotation.NonNull;
 
-@Root(name = "sector")
-public class InvalidClassicSector extends ClassicSector {
+import com.google.auto.value.AutoValue;
 
-    @Attribute(name = "invalid")
-    private final boolean mInvalid = true;
+import java.util.List;
 
-    @Attribute(name = "error")
-    private final String mError;
+@AutoValue
+public abstract class InvalidClassicSector extends ClassicSector {
 
-    public InvalidClassicSector(int index, String error) {
-        super(index, null);
-        mError = error;
+    @NonNull
+    public static InvalidClassicSector create(int index, String error) {
+        return new AutoValue_InvalidClassicSector(index, error);
     }
 
-    public String getError() {
-        return mError;
-    }
+    @NonNull
+    public abstract String getError();
 
+    @NonNull
     @Override
     public byte[] readBlocks(int startBlock, int blockCount) {
-        throw new IllegalStateException(mError);
+        throw new IllegalStateException(getError());
     }
 
+    @NonNull
     @Override
-    public java.util.List<ClassicBlock> getBlocks() {
-        throw new IllegalStateException(mError);
+    public List<ClassicBlock> getBlocks() {
+        throw new IllegalStateException(getError());
     }
 
+    @NonNull
     @Override
     public ClassicBlock getBlock(int index) {
-        throw new IllegalStateException(mError);
+        throw new IllegalStateException(getError());
     }
 }

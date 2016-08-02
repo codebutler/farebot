@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -40,36 +41,40 @@ import android.widget.Toast;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
-import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.felica.FelicaBlock;
-import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.card.felica.FelicaSystem;
 import com.codebutler.farebot.card.felica.FelicaUtils;
+import com.codebutler.farebot.card.felica.raw.RawFelicaCard;
+import com.codebutler.farebot.serialize.CardSerializer;
 import com.codebutler.farebot.util.Utils;
-
-import org.simpleframework.xml.Serializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 @CardRawDataFragmentClass(FelicaCardRawDataFragment.class)
 public class FelicaCardRawDataFragment extends ExpandableListFragment {
-    private FelicaCard mCard;
+
+    private RawFelicaCard mRawCard;
 
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = (FelicaCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
-        setListAdapter(new FelicaRawDataAdapter(getActivity(), mCard));
+
+        CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
+        String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
+        mRawCard = (RawFelicaCard) cardSerializer.deserialize(serializedCard);
+
+        setListAdapter(new FelicaRawDataAdapter(getActivity(), mRawCard));
     }
 
     @Override
+    @SuppressLint("InflateParams")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_card_raw_data, null);
     }
@@ -80,10 +85,10 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
 
         List<String> items = new ArrayList<>();
         for (FelicaBlock block : service.getBlocks()) {
-            items.add(String.format("%02d: %s", block.getAddress(), Utils.getHexString(block.getData(), "<ERR>")));
+            items.add(String.format(Locale.US, "%02d: %s", block.getAddress(), block.getData().hex()));
         }
 
-        final ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(), R.layout.monospace_list_item, items);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.monospace_list_item, items);
         new AlertDialog.Builder(getActivity())
                 .setTitle(String.format("Service 0x%s", Integer.toHexString(service.getServiceCode())))
                 .setPositiveButton(android.R.string.ok, null)
@@ -104,41 +109,41 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
 
     private static class FelicaRawDataAdapter extends BaseExpandableListAdapter {
         private Activity mActivity;
-        private FelicaCard mCard;
+        private RawFelicaCard mRawCard;
 
-        private FelicaRawDataAdapter(Activity activity, FelicaCard card) {
+        private FelicaRawDataAdapter(Activity activity, RawFelicaCard rawCard) {
             mActivity = activity;
-            mCard = card;
+            mRawCard = rawCard;
         }
 
         @Override
         public int getGroupCount() {
-            return mCard.getSystems().size();
+            return mRawCard.systems().size();
         }
 
         @Override
-        public Object getGroup(int groupPosition) {
-            return mCard.getSystems().get(groupPosition);
+        public FelicaSystem getGroup(int groupPosition) {
+            return mRawCard.systems().get(groupPosition);
         }
 
         @Override
         public long getGroupId(int groupPosition) {
-            return mCard.getSystems().get(groupPosition).getCode();
+            return mRawCard.systems().get(groupPosition).getCode();
         }
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            return mCard.getSystems().get(groupPosition).getServices().size();
+            return mRawCard.systems().get(groupPosition).getServices().size();
         }
 
         @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            return mCard.getSystems().get(groupPosition).getServices().get(childPosition);
+        public FelicaService getChild(int groupPosition, int childPosition) {
+            return mRawCard.systems().get(groupPosition).getServices().get(childPosition);
         }
 
         @Override
         public long getChildId(int groupPosition, int childPosition) {
-            return mCard.getSystems().get(groupPosition).getServices().get(childPosition).getServiceCode();
+            return mRawCard.systems().get(groupPosition).getServices().get(childPosition).getServiceCode();
         }
 
         @Override
@@ -159,7 +164,7 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
                 view.setLayoutParams(new AbsListView.LayoutParams(MATCH_PARENT, 80));
             }
 
-            FelicaSystem system = mCard.getSystems().get(groupPosition);
+            FelicaSystem system = mRawCard.systems().get(groupPosition);
 
             TextView textView = (TextView) view.findViewById(android.R.id.text1);
             textView.setText(String.format("System: 0x%s (%s)", Integer.toHexString(system.getCode()),
@@ -184,7 +189,7 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
             TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
             TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
 
-            FelicaSystem system = mCard.getSystems().get(groupPosition);
+            FelicaSystem system = mRawCard.systems().get(groupPosition);
             FelicaService service = system.getServices().get(childPosition);
 
             textView1.setText(String.format("Service: 0x%s (%s)", Integer.toHexString(service.getServiceCode()),

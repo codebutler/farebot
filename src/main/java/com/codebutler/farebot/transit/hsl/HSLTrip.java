@@ -59,7 +59,7 @@ class HSLTrip extends Trip {
     private final long mNewBalance;
 
     HSLTrip(DesfireRecord record) {
-        byte[] useData = record.getData();
+        byte[] useData = record.getData().bytes();
         long[] usefulData = new long[useData.length];
 
         for (int i = 0; i < useData.length; i++) {

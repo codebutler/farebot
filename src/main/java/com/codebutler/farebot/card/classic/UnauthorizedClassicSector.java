@@ -23,31 +23,32 @@
 
 package com.codebutler.farebot.card.classic;
 
+import android.support.annotation.NonNull;
+
 import com.codebutler.farebot.card.UnauthorizedException;
+import com.google.auto.value.AutoValue;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
+@AutoValue
+public abstract class UnauthorizedClassicSector extends ClassicSector {
 
-@Root(name = "sector")
-public class UnauthorizedClassicSector extends ClassicSector {
-    @Attribute(name = "unauthorized") public static final boolean UNAUTHORIZED = true;
-
-    private UnauthorizedClassicSector() { /** For XML serializer **/}
-
-    public UnauthorizedClassicSector(int sectorIndex) {
-        super(sectorIndex, null);
+    @NonNull
+    public static UnauthorizedClassicSector create(int sectorIndex) {
+        return new AutoValue_UnauthorizedClassicSector(sectorIndex);
     }
 
+    @NonNull
     @Override
     public byte[] readBlocks(int startBlock, int blockCount) {
         throw new UnauthorizedException();
     }
 
+    @NonNull
     @Override
     public java.util.List<ClassicBlock> getBlocks() {
         throw new UnauthorizedException();
     }
 
+    @NonNull
     @Override
     public ClassicBlock getBlock(int index) {
         throw new UnauthorizedException();

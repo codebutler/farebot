@@ -22,69 +22,153 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.util.Utils;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.io.ByteArrayInputStream;
 
-@Root(name = "manufacturing-data")
-public class DesfireManufacturingData {
+@AutoValue
+public abstract class DesfireManufacturingData implements Parcelable {
 
-    @Element(name = "hw-vendor-id") public int hwVendorID;
-    @Element(name = "hw-type") public int hwType;
-    @Element(name = "hw-sub-type") public int hwSubType;
-    @Element(name = "hw-major-version") public int hwMajorVersion;
-    @Element(name = "hw-minor-version") public int hwMinorVersion;
-    @Element(name = "hw-storage-size") public int hwStorageSize;
-    @Element(name = "hw-protocol") public int hwProtocol;
+    @NonNull
+    public static DesfireManufacturingData.Builder builder() {
+        return new AutoValue_DesfireManufacturingData.Builder();
+    }
 
-    @Element(name = "sw-vendor-id") public int swVendorID;
-    @Element(name = "sw-type") public int swType;
-    @Element(name = "sw-sub-type") public int swSubType;
-    @Element(name = "sw-major-version") public int swMajorVersion;
-    @Element(name = "sw-minor-version") public int swMinorVersion;
-    @Element(name = "sw-storage-size") public int swStorageSize;
-    @Element(name = "sw-protocol") public int swProtocol;
-
-    @Element(name = "uid") public int uid;
-    @Element(name = "batch-no") public int batchNo;
-    @Element(name = "week-prod") public int weekProd;
-    @Element(name = "year-prod") public int yearProd;
-
-    DesfireManufacturingData(byte[] data) {
+    @NonNull
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static DesfireManufacturingData create(@NonNull byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
-        hwVendorID = stream.read();
-        hwType = stream.read();
-        hwSubType = stream.read();
-        hwMajorVersion = stream.read();
-        hwMinorVersion = stream.read();
-        hwStorageSize = stream.read();
-        hwProtocol = stream.read();
+        int hwVendorID = stream.read();
+        int hwType = stream.read();
+        int hwSubType = stream.read();
+        int hwMajorVersion = stream.read();
+        int hwMinorVersion = stream.read();
+        int hwStorageSize = stream.read();
+        int hwProtocol = stream.read();
 
-        swVendorID = stream.read();
-        swType = stream.read();
-        swSubType = stream.read();
-        swMajorVersion = stream.read();
-        swMinorVersion = stream.read();
-        swStorageSize = stream.read();
-        swProtocol = stream.read();
+        int swVendorID = stream.read();
+        int swType = stream.read();
+        int swSubType = stream.read();
+        int swMajorVersion = stream.read();
+        int swMinorVersion = stream.read();
+        int swStorageSize = stream.read();
+        int swProtocol = stream.read();
 
         // FIXME: This has fewer digits than what's contained in EXTRA_ID, why?
         byte[] buf = new byte[7];
         stream.read(buf, 0, buf.length);
-        uid = Utils.byteArrayToInt(buf);
+        int uid = Utils.byteArrayToInt(buf);
 
         // FIXME: This is returning a negative number. Probably is unsigned.
         buf = new byte[5];
         stream.read(buf, 0, buf.length);
-        batchNo = Utils.byteArrayToInt(buf);
+        int batchNo = Utils.byteArrayToInt(buf);
 
         // FIXME: These numbers aren't making sense.
-        weekProd = stream.read();
-        yearProd = stream.read();
+        int weekProd = stream.read();
+        int yearProd = stream.read();
+
+        return new AutoValue_DesfireManufacturingData.Builder()
+                .hwVendorID(hwVendorID)
+                .hwType(hwType)
+                .hwSubType(hwSubType)
+                .hwMajorVersion(hwMajorVersion)
+                .hwMinorVersion(hwMinorVersion)
+                .hwStorageSize(hwStorageSize)
+                .hwProtocol(hwProtocol)
+                .swVendorID(swVendorID)
+                .swType(swType)
+                .swSubType(swSubType)
+                .swMajorVersion(swMajorVersion)
+                .swMinorVersion(swMinorVersion)
+                .swStorageSize(swStorageSize)
+                .swProtocol(swProtocol)
+                .uid(uid)
+                .batchNo(batchNo)
+                .weekProd(weekProd)
+                .yearProd(yearProd)
+                .build();
     }
 
-    private DesfireManufacturingData() { /* For XML Serializer */ }
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder hwVendorID(int hwVendorID);
+
+        public abstract Builder hwType(int hwType);
+
+        public abstract Builder hwSubType(int hwSubType);
+
+        public abstract Builder hwMajorVersion(int hwMajorVersion);
+
+        public abstract Builder hwMinorVersion(int hwMinorVersion);
+
+        public abstract Builder hwStorageSize(int hwStorageSize);
+
+        public abstract Builder hwProtocol(int hwProtocol);
+
+        public abstract Builder swVendorID(int swVendorID);
+
+        public abstract Builder swType(int swType);
+
+        public abstract Builder swSubType(int swSubType);
+
+        public abstract Builder swMajorVersion(int swMajorVersion);
+
+        public abstract Builder swMinorVersion(int swMinorVersion);
+
+        public abstract Builder swStorageSize(int swStorageSize);
+
+        public abstract Builder swProtocol(int swProtocol);
+
+        public abstract Builder uid(int uid);
+
+        public abstract Builder batchNo(int batchNo);
+
+        public abstract Builder weekProd(int weekProd);
+
+        public abstract Builder yearProd(int yearProd);
+
+        public abstract DesfireManufacturingData build();
+    }
+
+    public abstract int getHwVendorID();
+
+    public abstract int getHwType();
+
+    public abstract int getHwSubType();
+
+    public abstract int getHwMajorVersion();
+
+    public abstract int getHwMinorVersion();
+
+    public abstract int getHwStorageSize();
+
+    public abstract int getHwProtocol();
+
+    public abstract int getSwVendorID();
+
+    public abstract int getSwType();
+
+    public abstract int getSwSubType();
+
+    public abstract int getSwMajorVersion();
+
+    public abstract int getSwMinorVersion();
+
+    public abstract int getSwStorageSize();
+
+    public abstract int getSwProtocol();
+
+    public abstract int getUid();
+
+    public abstract int getBatchNo();
+
+    public abstract int getWeekProd();
+
+    public abstract int getYearProd();
 }

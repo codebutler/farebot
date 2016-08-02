@@ -23,78 +23,52 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import com.codebutler.farebot.util.Utils;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import com.google.auto.value.AutoValue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Root(name = "history")
-public class CEPASHistory {
+@AutoValue
+public abstract class CEPASHistory implements Parcelable {
 
-    @Attribute(name = "id")
-    private int mId;
+    @NonNull
+    public static CEPASHistory create(int id, @NonNull List<CEPASTransaction> transactions) {
+        return new AutoValue_CEPASHistory(id, transactions, true, null);
+    }
 
-    @ElementList(name = "transaction", inline = true, required = false)
-    private List<CEPASTransaction> mTransactions;
+    @NonNull
+    public static CEPASHistory create(int purseId, @NonNull String errorMessage) {
+        return new AutoValue_CEPASHistory(purseId, null, false, errorMessage);
+    }
 
-    @Attribute(name = "valid")
-    private boolean mIsValid;
-
-    @Attribute(name = "error", required = false)
-    private String mErrorMessage;
-
-    CEPASHistory(int purseId, byte[] purseData) {
-        mId = purseId;
-
-        if (purseData != null) {
-            mIsValid = true;
-            mErrorMessage = "";
-            int recordSize = 16;
-            int purseCount = purseData.length / recordSize;
-            CEPASTransaction[] transactions = new CEPASTransaction[purseCount];
-            for (int i = 0; i < purseData.length; i += recordSize) {
-                byte[] tempData = new byte[recordSize];
-                System.arraycopy(purseData, i, tempData, 0, tempData.length);
-                transactions[i / tempData.length] = new CEPASTransaction(tempData);
-            }
-            mTransactions = Utils.arrayAsList(transactions);
-        } else {
-            mIsValid = false;
-            mErrorMessage = "";
-            mTransactions = new ArrayList<>();
+    @NonNull
+    public static CEPASHistory create(int purseId, @Nullable byte[] historyData) {
+        if (historyData == null) {
+            return new AutoValue_CEPASHistory(purseId, Collections.<CEPASTransaction>emptyList(), false, null);
         }
+        int recordSize = 16;
+        int purseCount = historyData.length / recordSize;
+        List<CEPASTransaction> transactions = new ArrayList<>(purseCount);
+        for (int i = 0; i < historyData.length; i += recordSize) {
+            byte[] tempData = new byte[recordSize];
+            System.arraycopy(historyData, i, tempData, 0, tempData.length);
+            transactions.add(CEPASTransaction.create(tempData));
+        }
+        return new AutoValue_CEPASHistory(purseId, transactions, true, null);
     }
 
-    CEPASHistory(int purseId, String errorMessage) {
-        mId = purseId;
-        mErrorMessage = errorMessage;
-        mIsValid = false;
-    }
+    public abstract int getId();
 
-    @SuppressWarnings("unused")
-    private CEPASHistory() { /* For XML Serializer */ }
+    @Nullable
+    public abstract List<CEPASTransaction> getTransactions();
 
-    public static CEPASHistory create(int purseId, byte[] purseData) {
-        return new CEPASHistory(purseId, purseData);
-    }
+    public abstract boolean isValid();
 
-    public int getId() {
-        return mId;
-    }
-
-    public List<CEPASTransaction> getTransactions() {
-        return mTransactions;
-    }
-
-    public boolean isValid() {
-        return mIsValid;
-    }
-
-    public String getErrorMessage() {
-        return mErrorMessage;
-    }
+    @Nullable
+    public abstract String getErrorMessage();
 }

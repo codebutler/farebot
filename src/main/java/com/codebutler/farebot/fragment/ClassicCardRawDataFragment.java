@@ -34,39 +34,40 @@ import android.widget.TextView;
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.classic.ClassicBlock;
-import com.codebutler.farebot.card.classic.ClassicCard;
-import com.codebutler.farebot.card.classic.ClassicSector;
-import com.codebutler.farebot.card.classic.InvalidClassicSector;
-import com.codebutler.farebot.card.classic.UnauthorizedClassicSector;
-import com.codebutler.farebot.util.Utils;
-
-import org.simpleframework.xml.Serializer;
+import com.codebutler.farebot.card.classic.raw.RawClassicBlock;
+import com.codebutler.farebot.card.classic.raw.RawClassicCard;
+import com.codebutler.farebot.card.classic.raw.RawClassicSector;
+import com.codebutler.farebot.serialize.CardSerializer;
 
 import java.util.List;
 
 public class ClassicCardRawDataFragment extends ExpandableListFragment {
 
-    private ClassicCard mCard;
+    private RawClassicCard mRawCard;
 
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = (ClassicCard) Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
-        setListAdapter(new ClassicRawDataAdapter(getActivity(), mCard));
+
+        CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
+        String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
+        mRawCard = (RawClassicCard) cardSerializer.deserialize(serializedCard);
+        setListAdapter(new ClassicRawDataAdapter(getActivity(), mRawCard));
     }
 
     @Override
     public boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-        ClassicSector sector = mCard.getSector(groupPosition);
-        ClassicBlock block = sector.getBlock(childPosition);
+        RawClassicSector sector = mRawCard.sectors().get(groupPosition);
+        List<RawClassicBlock> blocks = sector.blocks();
+        if (blocks == null) {
+            return false;
+        }
+        RawClassicBlock block = blocks.get(childPosition);
 
-        String data = Utils.getHexString(block.getData(), "");
+        String data = block.data().hex();
 
-        String sectorTitle = getString(R.string.sector_title_format, String.valueOf(sector.getIndex()));
-        String blockTitle = getString(R.string.block_title_format, String.valueOf(block.getIndex()));
+        String sectorTitle = getString(R.string.sector_title_format, String.valueOf(sector.index()));
+        String blockTitle = getString(R.string.block_title_format, String.valueOf(block.index()));
         new AlertDialog.Builder(getActivity())
                 .setTitle(String.format("%s, %s", sectorTitle, blockTitle))
                 .setPositiveButton(android.R.string.ok, null)
@@ -78,37 +79,33 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
 
     private static class ClassicRawDataAdapter extends BaseExpandableListAdapter {
         private Activity mActivity;
-        private ClassicCard mCard;
+        private RawClassicCard mRawCard;
 
-        private ClassicRawDataAdapter(Activity mActivity, ClassicCard mCard) {
-            this.mActivity = mActivity;
-            this.mCard = mCard;
+        private ClassicRawDataAdapter(Activity activity, RawClassicCard rawClassicCard) {
+            mActivity = activity;
+            mRawCard = rawClassicCard;
         }
 
         @Override
         public int getGroupCount() {
-            return mCard.getSectors().size();
+            return mRawCard.sectors().size();
         }
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            ClassicSector sector = mCard.getSector(groupPosition);
-            if (!(sector instanceof UnauthorizedClassicSector)) {
-                List<ClassicBlock> blocks = sector.getBlocks();
-                return (blocks == null) ? 0 : blocks.size();
-            } else {
-                return 0;
-            }
+            RawClassicSector sector = mRawCard.sectors().get(groupPosition);
+            List<RawClassicBlock> blocks = sector.blocks();
+            return blocks != null ? blocks.size() : 0;
         }
 
         @Override
-        public Object getGroup(int groupPosition) {
-            return mCard.getSector(groupPosition);
+        public RawClassicSector getGroup(int groupPosition) {
+            return mRawCard.sectors().get(groupPosition);
         }
 
         @Override
         public Object getChild(int groupPosition, int childPosition) {
-            return mCard.getSector(groupPosition).getBlocks().get(childPosition);
+            return mRawCard.sectors().get(groupPosition).blocks().get(childPosition);
         }
 
         @Override
@@ -134,17 +131,22 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
                         .inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
             }
 
-            ClassicSector sector = (ClassicSector) getGroup(groupPosition);
-            String sectorIndexString = Integer.toHexString(sector.getIndex());
+            RawClassicSector sector = getGroup(groupPosition);
+            String sectorIndexString = Integer.toHexString(sector.index());
 
             TextView textView = (TextView) view.findViewById(android.R.id.text1);
-            if (sector instanceof UnauthorizedClassicSector) {
-                textView.setText(mActivity.getString(R.string.unauthorized_sector_title_format, sectorIndexString));
-            } else if (sector instanceof InvalidClassicSector) {
-                textView.setText(mActivity.getString(R.string.invalid_sector_title_format, sectorIndexString,
-                        ((InvalidClassicSector) sector).getError()));
-            } else {
-                textView.setText(mActivity.getString(R.string.sector_title_format, sectorIndexString));
+
+            switch (sector.type()) {
+                case RawClassicSector.TYPE_UNAUTHORIZED:
+                    textView.setText(mActivity.getString(R.string.unauthorized_sector_title_format, sectorIndexString));
+                    break;
+                case RawClassicSector.TYPE_INVALID:
+                    textView.setText(mActivity.getString(R.string.invalid_sector_title_format, sectorIndexString,
+                            sector.errorMessage()));
+                    break;
+                default:
+                    textView.setText(mActivity.getString(R.string.sector_title_format, sectorIndexString));
+                    break;
             }
 
             return view;
@@ -163,11 +165,11 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
                         .inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
             }
 
-            ClassicBlock block = (ClassicBlock) getChild(groupPosition, childPosition);
+            RawClassicBlock block = (RawClassicBlock) getChild(groupPosition, childPosition);
 
             ((TextView) view.findViewById(android.R.id.text1))
-                    .setText(mActivity.getString(R.string.block_title_format, String.valueOf(block.getIndex())));
-            ((TextView) view.findViewById(android.R.id.text2)).setText(block.getType());
+                    .setText(mActivity.getString(R.string.block_title_format, String.valueOf(block.index())));
+            ((TextView) view.findViewById(android.R.id.text2)).setText(block.type());
 
             return view;
         }

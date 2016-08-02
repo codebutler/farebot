@@ -22,18 +22,19 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.xml.Base64String;
+import android.support.annotation.NonNull;
 
-public class DesfireRecord {
-    private Base64String mData;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
-    private DesfireRecord() { /* For XML Serializer */ }
+@AutoValue
+public abstract class DesfireRecord {
 
-    public DesfireRecord(byte[] data) {
-        mData = new Base64String(data);
+    @NonNull
+    static DesfireRecord create(@NonNull byte[] data) {
+        return new AutoValue_DesfireRecord(ByteArray.create(data));
     }
 
-    public byte[] getData() {
-        return mData.getData();
-    }
+    @NonNull
+    public abstract ByteArray getData();
 }

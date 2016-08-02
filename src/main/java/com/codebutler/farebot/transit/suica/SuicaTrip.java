@@ -86,7 +86,7 @@ class SuicaTrip extends Trip {
     private Station mEndStation;
 
     SuicaTrip(FelicaBlock block, long previousBalance) {
-        byte[] data = block.getData();
+        byte[] data = block.getData().bytes();
 
         // 00000080000000000000000000000000
         // 00 00 - console type

@@ -22,36 +22,30 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import com.codebutler.farebot.util.Utils;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
-@Root(name = "application")
-public class DesfireApplication {
-    @Attribute(name = "id") private String mId;
-    @ElementList(name = "files") private List<DesfireFile> mFiles;
+@AutoValue
+public abstract class DesfireApplication implements Parcelable {
 
-    private DesfireApplication() { /* For XML Serializer */ }
-
-    public DesfireApplication(int id, DesfireFile[] files) {
-        mId = String.valueOf(id);
-        mFiles = Utils.arrayAsList(files);
+    @NonNull
+    public static DesfireApplication create(int id, @NonNull List<DesfireFile> files) {
+        return new AutoValue_DesfireApplication(id, files);
     }
 
-    public int getId() {
-        return Integer.parseInt(mId);
-    }
+    public abstract int getId();
 
-    public List<DesfireFile> getFiles() {
-        return mFiles;
-    }
+    @NonNull
+    public abstract List<DesfireFile> getFiles();
 
+    @Nullable
     public DesfireFile getFile(int fileId) {
-        for (DesfireFile file : mFiles) {
+        for (DesfireFile file : getFiles()) {
             if (file.getId() == fileId) {
                 return file;
             }

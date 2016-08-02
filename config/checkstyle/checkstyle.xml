@@ -12,10 +12,11 @@ Description: https://source.android.com/source/code-style.html
     <!-- Require UTF-8 encoding for all files -->
     <property name="charset" value="UTF-8"/>
 
-    <!-- Default severity is error -->
-    <property name="severity" value="warning"/>
+    <module name="SuppressWarningsFilter" />
 
     <module name="TreeWalker">
+
+        <module name="SuppressWarningsHolder" />
 
         <!--#################################################################-->
         <!--################ NAMING CHECKS ##################################-->
@@ -317,7 +318,7 @@ Description: https://source.android.com/source/code-style.html
         <module name="DeclarationOrder"/>
 
         <!-- Require variables to be declared close to where they are used -->
-        <module name="VariableDeclarationUsageDistance"/>
+        <!--<module name="VariableDeclarationUsageDistance"/>-->
 
         <!-- Require that equals() and hashCode() are overridden together -->
         <module name="EqualsHashCode"/>

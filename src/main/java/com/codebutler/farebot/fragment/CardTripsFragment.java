@@ -37,7 +37,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
@@ -51,7 +50,6 @@ import com.codebutler.farebot.transit.orca.OrcaTrip;
 import com.codebutler.farebot.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.simpleframework.xml.Serializer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,8 +64,7 @@ public class CardTripsFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Serializer serializer = FareBotApplication.getInstance().getSerializer();
-        mCard = Card.fromXml(serializer, getArguments().getString(AdvancedCardInfoActivity.EXTRA_CARD));
+        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 

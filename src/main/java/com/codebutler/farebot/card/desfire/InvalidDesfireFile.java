@@ -22,26 +22,28 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import android.support.annotation.NonNull;
 
-@Root(name = "file")
-public class InvalidDesfireFile extends DesfireFile {
-    @Element(name = "error") private String mErrorMessage;
+import com.codebutler.farebot.ByteArray;
+import com.google.auto.value.AutoValue;
 
-    protected InvalidDesfireFile() { /* For XML Serializer */ }
+@AutoValue
+public abstract class InvalidDesfireFile implements DesfireFile {
 
-    public InvalidDesfireFile(int fileId, String errorMessage, DesfireFileSettings settings) {
-        super(fileId, settings, new byte[0]);
-        mErrorMessage = errorMessage;
+    @NonNull
+    public static InvalidDesfireFile create(
+            int id,
+            @NonNull DesfireFileSettings fileSettings,
+            @NonNull String errorMessage) {
+        return new AutoValue_InvalidDesfireFile(id, fileSettings, errorMessage);
     }
 
-    public String getErrorMessage() {
-        return mErrorMessage;
-    }
+    @NonNull
+    public abstract String getErrorMessage();
 
+    @NonNull
     @Override
-    public byte[] getData() {
-        throw new IllegalStateException(String.format("Invalid file: %s", mErrorMessage));
+    public ByteArray getData() {
+        throw new IllegalStateException(String.format("Invalid file: %s", getErrorMessage()));
     }
 }
