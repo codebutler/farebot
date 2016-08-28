@@ -19,7 +19,6 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
@@ -27,6 +26,7 @@ import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.seq_go.SeqGoData;
 import com.codebutler.farebot.transit.seq_go.SeqGoUtil;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.GregorianCalendar;
 
@@ -34,112 +34,55 @@ import java.util.GregorianCalendar;
  * Tap record type
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#tap-record-type
  */
-public class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparable<SeqGoTapRecord> {
+@AutoValue
+public abstract class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparable<SeqGoTapRecord> {
 
-    public static final Creator<SeqGoTapRecord> CREATOR = new Creator<SeqGoTapRecord>() {
-        @Override
-        public SeqGoTapRecord createFromParcel(Parcel source) {
-            return new SeqGoTapRecord(source);
-        }
-
-        @Override
-        public SeqGoTapRecord[] newArray(int size) {
-            return new SeqGoTapRecord[size];
-        }
-    };
-
-    private GregorianCalendar mTimestamp;
-    private int mMode;
-    private int mJourney;
-
-    private int mStation;
-    private int mChecksum;
-
-    private SeqGoTapRecord() { }
-
-    private SeqGoTapRecord(Parcel parcel) {
-        mTimestamp = new GregorianCalendar();
-        mTimestamp.setTimeInMillis(parcel.readLong());
-        mMode = parcel.readInt();
-        mJourney = parcel.readInt();
-        mStation = parcel.readInt();
-        mChecksum = parcel.readInt();
-    }
-
+    @NonNull
     public static SeqGoTapRecord recordFromBytes(byte[] input) {
         if (input[0] != 0x31) {
             throw new AssertionError("not a tap record");
         }
 
-        SeqGoTapRecord record = new SeqGoTapRecord();
+        int mode = Utils.byteArrayToInt(input, 1, 1);
+        GregorianCalendar timestamp = SeqGoUtil.unpackDate(Utils.reverseBuffer(input, 2, 4));
+        int journey = Utils.byteArrayToInt(Utils.reverseBuffer(input, 5, 2)) >> 3;
+        int station = Utils.byteArrayToInt(Utils.reverseBuffer(input, 12, 2));
+        int checksum = Utils.byteArrayToInt(Utils.reverseBuffer(input, 14, 2));
 
-        record.mMode = Utils.byteArrayToInt(input, 1, 1);
-
-        byte[] ts = Utils.reverseBuffer(input, 2, 4);
-        record.mTimestamp = SeqGoUtil.unpackDate(ts);
-
-        byte[] journey = Utils.reverseBuffer(input, 5, 2);
-        record.mJourney = Utils.byteArrayToInt(journey) >> 3;
-
-        byte[] station = Utils.reverseBuffer(input, 12, 2);
-        record.mStation = Utils.byteArrayToInt(station);
-
-        byte[] checksum = Utils.reverseBuffer(input, 14, 2);
-        record.mChecksum = Utils.byteArrayToInt(checksum);
-
-        return record;
+        return new AutoValue_SeqGoTapRecord(mode, timestamp, journey, station, checksum);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(mTimestamp.getTimeInMillis());
-        parcel.writeInt(mMode);
-        parcel.writeInt(mJourney);
-        parcel.writeInt(mStation);
-        parcel.writeInt(mChecksum);
-    }
-
+    @NonNull
     public Trip.Mode getMode() {
-        if (SeqGoData.VEHICLES.containsKey(mMode)) {
-            return SeqGoData.VEHICLES.get(mMode);
+        if (SeqGoData.VEHICLES.containsKey(getModeData())) {
+            return SeqGoData.VEHICLES.get(getModeData());
         } else {
             return Trip.Mode.OTHER;
         }
-    }
-
-    public GregorianCalendar getTimestamp() {
-        return mTimestamp;
-    }
-
-    public int getJourney() {
-        return mJourney;
-    }
-
-    public int getStation() {
-        return mStation;
-    }
-
-    public int getChecksum() {
-        return mChecksum;
     }
 
     @Override
     public int compareTo(@NonNull SeqGoTapRecord rhs) {
         // Group by journey, then by timestamp.
         // First trip in a journey goes first, and should (generally) be in pairs.
-        if (rhs.mJourney == this.mJourney) {
-            return this.mTimestamp.compareTo(rhs.mTimestamp);
+        if (rhs.getJourney() == this.getJourney()) {
+            return this.getTimestamp().compareTo(rhs.getTimestamp());
         } else {
-            return integerCompare(this.mJourney, rhs.mJourney);
+            return integerCompare(this.getJourney(), rhs.getJourney());
         }
     }
 
     private static int integerCompare(int lhs, int rhs) {
         return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
     }
+
+    abstract int getModeData();
+
+    public abstract GregorianCalendar getTimestamp();
+
+    public abstract int getJourney();
+
+    public abstract int getStation();
+
+    public abstract int getChecksum();
 }

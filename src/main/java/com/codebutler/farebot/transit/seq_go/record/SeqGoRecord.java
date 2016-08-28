@@ -19,13 +19,14 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
+import android.support.annotation.Nullable;
+
 /**
  * Represents a record on a SEQ Go Card (Translink).
  */
-public class SeqGoRecord {
-    SeqGoRecord() {
-    }
+public abstract class SeqGoRecord {
 
+    @Nullable
     public static SeqGoRecord recordFromBytes(byte[] input) {
         SeqGoRecord record = null;
         switch (input[0]) {

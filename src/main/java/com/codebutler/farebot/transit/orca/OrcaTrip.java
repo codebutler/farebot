@@ -24,68 +24,51 @@
 
 package com.codebutler.farebot.transit.orca;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.desfire.DesfireRecord;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.util.ImmutableMapBuilder;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
 
-public class OrcaTrip extends Trip {
-
-    public static final Creator<OrcaTrip> CREATOR = new Creator<OrcaTrip>() {
-        @Override
-        public OrcaTrip createFromParcel(Parcel parcel) {
-            return new OrcaTrip(parcel);
-        }
-
-        @Override
-        public OrcaTrip[] newArray(int size) {
-            return new OrcaTrip[size];
-        }
-    };
+@AutoValue
+public abstract class OrcaTrip extends Trip {
 
     private static final Map<Long, Station> LINK_STATIONS = new ImmutableMapBuilder<Long, Station>()
-            .put(10352L, new Station("Capitol Hill Station", "Capitol Hill", "47.6192", "-122.3202"))
-            .put(10351L, new Station("University of Washington Station", "UW Station", "47.6496", "-122.3037"))
-            .put(13193L, new Station("Westlake Station", "Westlake", "47.6113968", "-122.337502"))
-            .put(13194L, new Station("University Station", "University", "47.6072502", "-122.335754"))
-            .put(13195L, new Station("Pioneer Square Station", "Pioneer Sq", "47.6021461", "-122.33107"))
-            .put(13196L, new Station("International District Station", "ID", "47.5976601", "-122.328217"))
-            .put(13197L, new Station("Stadium Station", "Stadium", "47.5918121", "-122.327354"))
-            .put(13198L, new Station("SODO Station", "SODO", "47.5799484", "-122.327515"))
-            .put(13199L, new Station("Beacon Hill Station", "Beacon Hill", "47.5791245", "-122.311287"))
-            .put(13200L, new Station("Mount Baker Station", "Mount Baker", "47.5764389", "-122.297737"))
-            .put(13201L, new Station("Columbia City Station", "Columbia City", "47.5589523", "-122.292343"))
-            .put(13202L, new Station("Othello Station", "Othello", "47.5375366", "-122.281471"))
-            .put(13203L, new Station("Rainier Beach Station", "Rainier Beach", "47.5222626", "-122.279579"))
-            .put(13204L, new Station("Tukwila International Blvd Station", "Tukwila", "47.4642754", "-122.288391"))
-            .put(13205L, new Station("Seatac Airport Station", "Sea-Tac", "47.4445305", "-122.297012"))
+            .put(10352L, Station.create("Capitol Hill Station", "Capitol Hill", "47.6192", "-122.3202"))
+            .put(10351L, Station.create("University of Washington Station", "UW Station", "47.6496", "-122.3037"))
+            .put(13193L, Station.create("Westlake Station", "Westlake", "47.6113968", "-122.337502"))
+            .put(13194L, Station.create("University Station", "University", "47.6072502", "-122.335754"))
+            .put(13195L, Station.create("Pioneer Square Station", "Pioneer Sq", "47.6021461", "-122.33107"))
+            .put(13196L, Station.create("International District Station", "ID", "47.5976601", "-122.328217"))
+            .put(13197L, Station.create("Stadium Station", "Stadium", "47.5918121", "-122.327354"))
+            .put(13198L, Station.create("SODO Station", "SODO", "47.5799484", "-122.327515"))
+            .put(13199L, Station.create("Beacon Hill Station", "Beacon Hill", "47.5791245", "-122.311287"))
+            .put(13200L, Station.create("Mount Baker Station", "Mount Baker", "47.5764389", "-122.297737"))
+            .put(13201L, Station.create("Columbia City Station", "Columbia City", "47.5589523", "-122.292343"))
+            .put(13202L, Station.create("Othello Station", "Othello", "47.5375366", "-122.281471"))
+            .put(13203L, Station.create("Rainier Beach Station", "Rainier Beach", "47.5222626", "-122.279579"))
+            .put(13204L, Station.create("Tukwila International Blvd Station", "Tukwila", "47.4642754", "-122.288391"))
+            .put(13205L, Station.create("Seatac Airport Station", "Sea-Tac", "47.4445305", "-122.297012"))
             .build();
 
     private static Map<Integer, Station> sSounderStations = new ImmutableMapBuilder<Integer, Station>()
-            .put(3, new Station("King Street Station", "King Street", "47.598445", "-122.330161"))
-            .put(5, new Station("Kent Station", "Kent", "47.384257", "-122.233151"))
+            .put(3, Station.create("King Street Station", "King Street", "47.598445", "-122.330161"))
+            .put(5, Station.create("Kent Station", "Kent", "47.384257", "-122.233151"))
             .build();
 
     private static Map<Integer, Station> sWSFTerminals = new ImmutableMapBuilder<Integer, Station>()
-            .put(10101, new Station("Seattle Terminal", "Seattle", "47.602722", "-122.338512"))
-            .put(10103, new Station("Bainbridge Island Terminal", "Bainbridge", "47.62362", "-122.51082"))
+            .put(10101, Station.create("Seattle Terminal", "Seattle", "47.602722", "-122.338512"))
+            .put(10103, Station.create("Bainbridge Island Terminal", "Bainbridge", "47.62362", "-122.51082"))
             .build();
 
-    final long mAgency;
-    final long mTransType;
-
-    private final long mTimestamp;
-    private final long mCoachNum;
-    private final long mFare;
-    private final long mNewBalance;
-
-    OrcaTrip(DesfireRecord record) {
+    @NonNull
+    static OrcaTrip create(@NonNull DesfireRecord record) {
         byte[] useData = record.getData().bytes();
         long[] usefulData = new long[useData.length];
 
@@ -93,38 +76,27 @@ public class OrcaTrip extends Trip {
             usefulData[i] = ((long) useData[i]) & 0xFF;
         }
 
-        mTimestamp = ((0x0F & usefulData[3]) << 28)
+        long timestamp = ((0x0F & usefulData[3]) << 28)
                 | (usefulData[4] << 20)
                 | (usefulData[5] << 12)
                 | (usefulData[6] << 4)
                 | (usefulData[7] >> 4);
 
-        mCoachNum = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
+        long coachNumber = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
 
+        long fare;
         if (usefulData[15] == 0x00 || usefulData[15] == 0xFF) {
             // FIXME: This appears to be some sort of special case for transfers and passes.
-            mFare = 0;
+            fare = 0;
         } else {
-            mFare = (usefulData[15] << 7) | (usefulData[16] >> 1);
+            fare = (usefulData[15] << 7) | (usefulData[16] >> 1);
         }
 
-        mNewBalance = (usefulData[34] << 8) | usefulData[35];
-        mAgency = usefulData[3] >> 4;
-        mTransType = (usefulData[17]);
-    }
+        long newBalance = (usefulData[34] << 8) | usefulData[35];
+        long agency = usefulData[3] >> 4;
+        long transType = (usefulData[17]);
 
-    private OrcaTrip(Parcel parcel) {
-        mTimestamp = parcel.readLong();
-        mCoachNum = parcel.readLong();
-        mFare = parcel.readLong();
-        mNewBalance = parcel.readLong();
-        mAgency = parcel.readLong();
-        mTransType = parcel.readLong();
-    }
-
-    @Override
-    public long getTimestamp() {
-        return mTimestamp;
+        return new AutoValue_OrcaTrip(timestamp, agency, transType, coachNumber, fare, newBalance);
     }
 
     @Override
@@ -134,7 +106,7 @@ public class OrcaTrip extends Trip {
 
     @Override
     public String getAgencyName() {
-        switch ((int) mAgency) {
+        switch ((int) getAgency()) {
             case OrcaTransitData.AGENCY_CT:
                 return "Community Transit";
             case OrcaTransitData.AGENCY_KCM:
@@ -148,12 +120,12 @@ public class OrcaTrip extends Trip {
             case OrcaTransitData.AGENCY_ET:
                 return "Everett Transit";
         }
-        return String.format("Unknown Agency: %s", mAgency);
+        return String.format("Unknown Agency: %s", getAgency());
     }
 
     @Override
     public String getShortAgencyName() {
-        switch ((int) mAgency) {
+        switch ((int) getAgency()) {
             case OrcaTransitData.AGENCY_CT:
                 return "CT";
             case OrcaTransitData.AGENCY_KCM:
@@ -167,7 +139,7 @@ public class OrcaTrip extends Trip {
             case OrcaTransitData.AGENCY_ET:
                 return "ET";
         }
-        return String.format("Unknown Agency: %s", mAgency);
+        return String.format("Unknown Agency: %s", getAgency());
     }
 
     @Override
@@ -178,9 +150,9 @@ public class OrcaTrip extends Trip {
             return "Sounder Train";
         } else {
             // FIXME: Need to find bus route #s
-            if (mAgency == OrcaTransitData.AGENCY_ST) {
+            if (getAgency() == OrcaTransitData.AGENCY_ST) {
                 return "Express Bus";
-            } else if (mAgency == OrcaTransitData.AGENCY_KCM) {
+            } else if (getAgency() == OrcaTransitData.AGENCY_KCM) {
                 return "Bus";
             }
             return null;
@@ -189,7 +161,7 @@ public class OrcaTrip extends Trip {
 
     @Override
     public String getFareString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(mFare / 100.0);
+        return NumberFormat.getCurrencyInstance(Locale.US).format(getFare() / 100.0);
     }
 
     @Override
@@ -199,17 +171,17 @@ public class OrcaTrip extends Trip {
 
     @Override
     public String getBalanceString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(mNewBalance / 100);
+        return NumberFormat.getCurrencyInstance(Locale.US).format(getNewBalance() / 100);
     }
 
     @Override
     public Station getStartStation() {
         if (isLink()) {
-            return LINK_STATIONS.get(mCoachNum);
+            return LINK_STATIONS.get(getCoachNumber());
         } else if (isSounder()) {
-            return sSounderStations.get((int) mCoachNum);
-        } else if (mAgency == OrcaTransitData.AGENCY_WSF) {
-            return sWSFTerminals.get((int) mCoachNum);
+            return sSounderStations.get((int) getCoachNumber());
+        } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
+            return sWSFTerminals.get((int) getCoachNumber());
         }
         return null;
     }
@@ -217,27 +189,27 @@ public class OrcaTrip extends Trip {
     @Override
     public String getStartStationName() {
         if (isLink()) {
-            if (LINK_STATIONS.containsKey(mCoachNum)) {
-                return LINK_STATIONS.get(mCoachNum).getStationName();
+            if (LINK_STATIONS.containsKey(getCoachNumber())) {
+                return LINK_STATIONS.get(getCoachNumber()).getStationName();
             } else {
-                return String.format("Unknown Station #%s", mCoachNum);
+                return String.format("Unknown Station #%s", getCoachNumber());
             }
         } else if (isSounder()) {
-            int stationNumber = (int) mCoachNum;
+            int stationNumber = (int) getCoachNumber();
             if (sSounderStations.containsKey(stationNumber)) {
                 return sSounderStations.get(stationNumber).getStationName();
             } else {
                 return String.format("Unknown Station #%s", stationNumber);
             }
-        } else if (mAgency == OrcaTransitData.AGENCY_WSF) {
-            int terminalNumber = (int) mCoachNum;
+        } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
+            int terminalNumber = (int) getCoachNumber();
             if (sWSFTerminals.containsKey(terminalNumber)) {
                 return sWSFTerminals.get(terminalNumber).getStationName();
             } else {
                 return String.format("Unknown Terminal #%s", terminalNumber);
             }
         } else {
-            return String.format("Coach #%s", String.valueOf(mCoachNum));
+            return String.format("Coach #%s", String.valueOf(getCoachNumber()));
         }
     }
 
@@ -259,7 +231,7 @@ public class OrcaTrip extends Trip {
             return Mode.METRO;
         } else if (isSounder()) {
             return Mode.TRAIN;
-        } else if (mAgency == OrcaTransitData.AGENCY_WSF) {
+        } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
             return Mode.FERRY;
         } else {
             return Mode.BUS;
@@ -271,34 +243,21 @@ public class OrcaTrip extends Trip {
         return true;
     }
 
-    public long getCoachNumber() {
-        return mCoachNum;
-    }
-
-    public long getTransType() {
-        return mTransType;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeLong(mTimestamp);
-        parcel.writeLong(mCoachNum);
-        parcel.writeLong(mFare);
-        parcel.writeLong(mNewBalance);
-        parcel.writeLong(mAgency);
-        parcel.writeLong(mTransType);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
     private boolean isLink() {
-        return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum > 10000);
+        return (getAgency() == OrcaTransitData.AGENCY_ST && getCoachNumber() > 10000);
     }
 
     private boolean isSounder() {
-        return (mAgency == OrcaTransitData.AGENCY_ST && mCoachNum < 20);
+        return (getAgency() == OrcaTransitData.AGENCY_ST && getCoachNumber() < 20);
     }
+
+    abstract long getAgency();
+
+    abstract long getTransType();
+
+    abstract long getCoachNumber();
+
+    abstract long getFare();
+
+    abstract long getNewBalance();
 }

@@ -22,120 +22,100 @@
 
 package com.codebutler.farebot.transit.orca;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
+import com.google.auto.value.AutoValue;
 
-public class MergedOrcaTrip extends Trip {
+@AutoValue
+public abstract class MergedOrcaTrip extends Trip {
 
-    public static final Creator<MergedOrcaTrip> CREATOR = new Creator<MergedOrcaTrip>() {
-        @Override
-        public MergedOrcaTrip createFromParcel(Parcel parcel) {
-            return new MergedOrcaTrip(
-                    (OrcaTrip) parcel.readParcelable(OrcaTrip.class.getClassLoader()),
-                    (OrcaTrip) parcel.readParcelable(OrcaTrip.class.getClassLoader())
-            );
-        }
-
-        @Override
-        public MergedOrcaTrip[] newArray(int size) {
-            return new MergedOrcaTrip[size];
-        }
-    };
-
-    private final OrcaTrip mStartTrip;
-    private final OrcaTrip mEndTrip;
-
-    MergedOrcaTrip(OrcaTrip startTrip, OrcaTrip endTrip) {
-        mStartTrip = startTrip;
-        mEndTrip = endTrip;
+    @NonNull
+    static MergedOrcaTrip create(@NonNull OrcaTrip startTrip, @NonNull OrcaTrip endTrip) {
+        return new AutoValue_MergedOrcaTrip(startTrip, endTrip);
     }
 
     @Override
     public long getTimestamp() {
-        return mStartTrip.getTimestamp();
+        return getStartTrip().getTimestamp();
     }
 
     @Override
     public long getExitTimestamp() {
-        return mEndTrip.getTimestamp();
+        return getEndTrip().getTimestamp();
     }
 
     @Override
     public String getRouteName() {
-        return mStartTrip.getRouteName();
+        return getStartTrip().getRouteName();
     }
 
     @Override
     public String getAgencyName() {
-        return mStartTrip.getAgencyName();
+        return getStartTrip().getAgencyName();
     }
 
     @Override
     public String getShortAgencyName() {
-        return mStartTrip.getShortAgencyName();
+        return getStartTrip().getShortAgencyName();
     }
 
     @Override
     public String getFareString() {
-        if (mEndTrip.mTransType == OrcaTransitData.TRANS_TYPE_CANCEL_TRIP) {
+        if (getEndTrip().getTransType() == OrcaTransitData.TRANS_TYPE_CANCEL_TRIP) {
             return FareBotApplication.getInstance()
-                    .getString(R.string.fare_cancelled_format, mStartTrip.getFareString());
+                    .getString(R.string.fare_cancelled_format, getStartTrip().getFareString());
         }
-        return mStartTrip.getFareString();
+        return getStartTrip().getFareString();
     }
 
     @Override
     public String getBalanceString() {
-        return mEndTrip.getBalanceString();
+        return getEndTrip().getBalanceString();
     }
 
     @Override
     public String getStartStationName() {
-        return mStartTrip.getStartStationName();
+        return getStartTrip().getStartStationName();
     }
 
     @Override
     public Station getStartStation() {
-        return mStartTrip.getStartStation();
+        return getStartTrip().getStartStation();
     }
 
     @Override
     public String getEndStationName() {
-        return mEndTrip.getStartStationName();
+        return getEndTrip().getStartStationName();
     }
 
     @Override
     public Station getEndStation() {
-        return mEndTrip.getStartStation();
+        return getEndTrip().getStartStation();
     }
 
     @Override
     public boolean hasFare() {
-        return mStartTrip.hasFare();
+        return getStartTrip().hasFare();
     }
 
     @Override
     public Mode getMode() {
-        return mStartTrip.getMode();
+        return getStartTrip().getMode();
     }
 
     @Override
     public boolean hasTime() {
-        return mStartTrip.hasTime();
+        return getStartTrip().hasTime();
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        mStartTrip.writeToParcel(parcel, flags);
-        mEndTrip.writeToParcel(parcel, flags);
-    }
+    @NonNull
+    abstract OrcaTrip getStartTrip();
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    @NonNull
+    abstract OrcaTrip getEndTrip();
+
 }

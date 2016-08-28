@@ -23,51 +23,16 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.Comparator;
 
-class OVChipTransaction implements Parcelable {
-
-    public static final Parcelable.Creator<OVChipTransaction> CREATOR = new Parcelable.Creator<OVChipTransaction>() {
-        @Override
-        public OVChipTransaction createFromParcel(Parcel source) {
-            int transactionSlot = source.readInt();
-            int valid = source.readInt();
-
-            if (valid == 0) {
-                return new OVChipTransaction(transactionSlot, source.readString());
-            }
-
-            int date = source.readInt();
-            int time = source.readInt();
-            int transfer = source.readInt();
-            int company = source.readInt();
-            int id = source.readInt();
-            int station = source.readInt();
-            int machineId = source.readInt();
-            int vehicleId = source.readInt();
-            int productId = source.readInt();
-            int amount = source.readInt();
-            int subscriptionId = source.readInt();
-            int unknownConstant = source.readInt();
-            int unknownConstant2 = source.readInt();
-
-            return new OVChipTransaction(transactionSlot,
-                    date, time, transfer, company, id, station,
-                    machineId, vehicleId, productId, amount,
-                    subscriptionId, valid, unknownConstant,
-                    unknownConstant2);
-        }
-
-        @Override
-        public OVChipTransaction[] newArray(int size) {
-            return new OVChipTransaction[size];
-        }
-    };
+@AutoValue
+abstract class OVChipTransaction implements Parcelable {
 
     static final Comparator<OVChipTransaction> ID_ORDER = new Comparator<OVChipTransaction>() {
         @Override
@@ -76,78 +41,8 @@ class OVChipTransaction implements Parcelable {
         }
     };
 
-    private final int mTransactionSlot;
-    private final int mDate;
-    private final int mTime;
-    private final int mTransfer;
-    private final int mCompany;
-    private final int mId;
-    private final int mStation;
-    private final int mMachineId;
-    private final int mVehicleId;
-    private final int mProductId;
-    private final int mAmount;
-    private final int mSubscriptionId;
-    private final int mValid;
-    private final int mUnknownConstant;
-    private final int mUnknownConstant2;
-    private final String mErrorMessage;
-
-    private OVChipTransaction(int transactionSlot, String errorMessage) {
-        mTransactionSlot = transactionSlot;
-        mErrorMessage = errorMessage;
-        mDate = 0;
-        mTime = 0;
-        mTransfer = -3; // Default: No-data
-        mCompany = 0;
-        mId = 0;
-        mStation = 0;
-        mMachineId = 0;
-        mVehicleId = 0;
-        mProductId = 0;
-        mAmount = 0;
-        mSubscriptionId = -1; // Default: No valid subscriptionId
-        mValid = 0;
-        mUnknownConstant = 0;
-        mUnknownConstant2 = 0;
-    }
-
-    private OVChipTransaction(
-            int transactionSlot,
-            int date,
-            int time,
-            int transfer,
-            int company,
-            int id,
-            int station,
-            int machineId,
-            int vehicleId,
-            int productId,
-            int amount,
-            int subscriptionId,
-            int valid,
-            int unknownConstant,
-            int unknownConstant2
-    ) {
-        mTransactionSlot = transactionSlot;
-        mErrorMessage = "";
-        mDate = date;
-        mTime = time;
-        mTransfer = transfer;
-        mCompany = company;
-        mId = id;
-        mStation = station;
-        mMachineId = machineId;
-        mVehicleId = vehicleId;
-        mProductId = productId;
-        mAmount = amount;
-        mSubscriptionId = subscriptionId;
-        mValid = valid;
-        mUnknownConstant = unknownConstant;
-        mUnknownConstant2 = unknownConstant2;
-    }
-
-    OVChipTransaction(int transactionSlot, byte[] data) {
+    @NonNull
+    static OVChipTransaction create(int transactionSlot, byte[] data) {
         if (data == null) {
             data = new byte[32];
         }
@@ -281,116 +176,57 @@ class OVChipTransaction implements Parcelable {
             }
         }
 
-        mDate = date;
-        mTime = time;
-        mTransfer = transfer;
-        mCompany = company;
-        mId = id;
-        mStation = station;
-        mMachineId = machineId;
-        mVehicleId = vehicleId;
-        mProductId = productId;
-        mAmount = amount;
-        mSubscriptionId = subscriptionId;
-        mValid = valid;
-        mUnknownConstant = unknownConstant;
-        mUnknownConstant2 = unknownConstant2;
-
-        mTransactionSlot = transactionSlot;
-        mErrorMessage = errorMessage;
+        return new AutoValue_OVChipTransaction.Builder()
+                .date(date)
+                .time(time)
+                .transfer(transfer)
+                .company(company)
+                .id(id)
+                .station(station)
+                .machineId(machineId)
+                .vehicleId(vehicleId)
+                .productId(productId)
+                .amount(amount)
+                .subscriptionId(subscriptionId)
+                .valid(valid)
+                .unknownConstant(unknownConstant)
+                .unknownConstant2(unknownConstant2)
+                .transactionSlot(transactionSlot)
+                .errorMessage(errorMessage)
+                .build();
     }
 
-    public int getTransactionSlot() {
-        return mTransactionSlot;
-    }
+    public abstract int getTransactionSlot();
 
-    public int getDate() {
-        return mDate;
-    }
+    public abstract int getDate();
 
-    public int getTime() {
-        return mTime;
-    }
+    public abstract int getTime();
 
-    public int getTransfer() {
-        return mTransfer;
-    }
+    public abstract int getTransfer();
 
-    public int getCompany() {
-        return mCompany;
-    }
+    public abstract int getCompany();
 
-    public int getId() {
-        return mId;
-    }
+    public abstract int getId();
 
-    public int getStation() {
-        return mStation;
-    }
+    public abstract int getStation();
 
-    public int getMachineId() {
-        return mMachineId;
-    }
+    public abstract int getMachineId();
 
-    public int getVehicleId() {
-        return mVehicleId;
-    }
+    public abstract int getVehicleId();
 
-    public int getProductId() {
-        return mProductId;
-    }
+    public abstract int getProductId();
 
-    public int getAmount() {
-        return mAmount;
-    }
+    public abstract int getAmount();
 
-    public int getSubscriptionId() {
-        return mSubscriptionId;
-    }
+    public abstract int getSubscriptionId();
 
-    public int getValid() {
-        return mValid;
-    }
+    public abstract int getValid();
 
-    public int getUnknownConstant() {
-        return mUnknownConstant;
-    }
+    public abstract int getUnknownConstant();
 
-    public int getUnknownConstant2() {
-        return mUnknownConstant2;
-    }
+    public abstract int getUnknownConstant2();
 
-    public String getErrorMessage() {
-        return mErrorMessage;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mTransactionSlot);
-        parcel.writeInt(mValid);
-        if (mValid == 0) {
-            parcel.writeString(mErrorMessage);
-        } else {
-            parcel.writeInt(mDate);
-            parcel.writeInt(mTime);
-            parcel.writeInt(mTransfer);
-            parcel.writeInt(mCompany);
-            parcel.writeInt(mId);
-            parcel.writeInt(mStation);
-            parcel.writeInt(mMachineId);
-            parcel.writeInt(mVehicleId);
-            parcel.writeInt(mProductId);
-            parcel.writeInt(mAmount);
-            parcel.writeInt(mSubscriptionId);
-            parcel.writeInt(mUnknownConstant);
-            parcel.writeInt(mUnknownConstant2);
-        }
-    }
+    public abstract String getErrorMessage();
 
     public boolean isSameTrip(OVChipTransaction nextTransaction) {
         /*
@@ -398,13 +234,13 @@ class OVChipTransaction implements Parcelable {
          * http://www.chipinfo.nl/inchecken/
          */
 
-        if (mCompany == nextTransaction.getCompany() && mTransfer == OVChipTransitData.PROCESS_CHECKIN
+        if (getCompany() == nextTransaction.getCompany() && getTransfer() == OVChipTransitData.PROCESS_CHECKIN
                 && nextTransaction.getTransfer() == OVChipTransitData.PROCESS_CHECKOUT) {
-            if (mDate == nextTransaction.getDate()) {
+            if (getDate() == nextTransaction.getDate()) {
                 return true;
-            } else if (mDate == nextTransaction.getDate() - 1) {
+            } else if (getDate() == nextTransaction.getDate() - 1) {
                 // All NS trips get reset at 4 AM (except if it's a night train, but that's out of our scope).
-                if (mCompany == OVChipTransitData.AGENCY_NS && nextTransaction.getTime() < 240) {
+                if (getCompany() == OVChipTransitData.AGENCY_NS && nextTransaction.getTime() < 240) {
                     return true;
                 }
 
@@ -414,12 +250,49 @@ class OVChipTransaction implements Parcelable {
                  * But it's hard to determine the length of every single trip there is, so for now let's just assume a
                  * checkout at the next day is still from the same trip. Better solutions are always welcome ;)
                  */
-                if (mCompany != OVChipTransitData.AGENCY_NS) {
+                if (getCompany() != OVChipTransitData.AGENCY_NS) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    @AutoValue.Builder
+    abstract static class Builder {
+        abstract Builder transactionSlot(int transactionSlot);
+
+        abstract Builder date(int date);
+
+        abstract Builder time(int time);
+
+        abstract Builder transfer(int transfer);
+
+        abstract Builder company(int company);
+
+        abstract Builder id(int id);
+
+        abstract Builder station(int station);
+
+        abstract Builder machineId(int machineId);
+
+        abstract Builder vehicleId(int vehicleId);
+
+        abstract Builder productId(int productId);
+
+        abstract Builder amount(int amount);
+
+        abstract Builder subscriptionId(int subscriptionId);
+
+        abstract Builder valid(int valid);
+
+        abstract Builder unknownConstant(int unknownConstant);
+
+        abstract Builder unknownConstant2(int unknownConstant2);
+
+        abstract Builder errorMessage(String errorMessage);
+
+        abstract OVChipTransaction build();
     }
 }

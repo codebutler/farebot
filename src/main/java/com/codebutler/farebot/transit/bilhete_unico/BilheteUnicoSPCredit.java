@@ -23,53 +23,25 @@
 
 package com.codebutler.farebot.transit.bilhete_unico;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.auto.value.AutoValue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-class BilheteUnicoSPCredit implements Parcelable {
+@AutoValue
+abstract class BilheteUnicoSPCredit implements Parcelable {
 
-    public static final Parcelable.Creator<BilheteUnicoSPCredit> CREATOR
-            = new Parcelable.Creator<BilheteUnicoSPCredit>() {
-        @Override
-        public BilheteUnicoSPCredit createFromParcel(Parcel source) {
-            int credit = source.readInt();
-            return new BilheteUnicoSPCredit(credit);
-        }
-
-        @Override
-        public BilheteUnicoSPCredit[] newArray(int size) {
-            return new BilheteUnicoSPCredit[size];
-        }
-    };
-
-    private final int mCredit;
-
-    private BilheteUnicoSPCredit(int credit) {
-        mCredit = credit;
-    }
-
-    BilheteUnicoSPCredit(byte[] data) {
+    @NonNull
+    static BilheteUnicoSPCredit create(@Nullable byte[] data) {
         if (data == null) {
             data = new byte[16];
         }
-
-        mCredit = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt(0);
+        return new AutoValue_BilheteUnicoSPCredit(ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt(0));
     }
 
-    public int getCredit() {
-        return mCredit;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mCredit);
-    }
+    public abstract int getCredit();
 }

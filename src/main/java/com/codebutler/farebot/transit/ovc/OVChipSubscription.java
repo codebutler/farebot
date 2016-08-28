@@ -23,28 +23,18 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.util.ImmutableMapBuilder;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.Date;
 import java.util.Map;
 
-class OVChipSubscription extends Subscription {
-
-    public static final Creator<OVChipSubscription> CREATOR = new Creator<OVChipSubscription>() {
-        @Override
-        public OVChipSubscription createFromParcel(Parcel parcel) {
-            return new OVChipSubscription(parcel);
-        }
-
-        @Override
-        public OVChipSubscription[] newArray(int size) {
-            return new OVChipSubscription[size];
-        }
-    };
+@AutoValue
+abstract class OVChipSubscription extends Subscription {
 
     private static final Map<Integer, String> SUBSCRIPTIONS = new ImmutableMapBuilder<Integer, String>()
             /* It seems that all the IDs are unique, so why bother with the companies? */
@@ -79,29 +69,8 @@ class OVChipSubscription extends Subscription {
             .put(0x0BBD, "Fietssupplement")
             .build();
 
-    private final int mId;
-    private final int mUnknown1;
-    private final long mValidFromDate;
-    private final long mValidFromTime;
-    private final long mValidToDate;
-    private final long mValidToTime;
-    private final int mUnknown2;
-    private final int mAgency;
-    private final int mMachineId;
-    private final int mSubscription;
-    private final int mSubscriptionAddress;
-    private final int mType1;
-    private final int mType2;
-    private final int mUsed;
-    private final int mRest;
-
-    OVChipSubscription(int subscriptionAddress, byte[] data, int type1, int type2, int used, int rest) {
-        mSubscriptionAddress = subscriptionAddress;
-        mType1 = type1;
-        mType2 = type2;
-        mUsed = used;
-        mRest = rest;
-
+    @NonNull
+    static OVChipSubscription create(int subscriptionAddress, byte[] data, int type1, int type2, int used, int rest) {
         if (data == null) {
             data = new byte[48];
         }
@@ -184,107 +153,127 @@ class OVChipSubscription extends Subscription {
             throw new IllegalArgumentException("Not valid");
         }
 
-        mId = id;
-        mAgency = company;
-        mSubscription = subscription;
-        mUnknown1 = unknown1;
-        mValidFromDate = validFromDate;
-        mValidFromTime = validFromTime;
-        mValidToDate = validToDate;
-        mValidToTime = validToTime;
-        mUnknown2 = unknown2;
-        mMachineId = machineId;
-    }
-
-    private OVChipSubscription(Parcel parcel) {
-        mId = parcel.readInt();
-        mUnknown1 = parcel.readInt();
-        mValidFromDate = parcel.readLong();
-        mValidFromTime = parcel.readLong();
-        mValidToDate = parcel.readLong();
-        mValidToTime = parcel.readLong();
-        mUnknown2 = parcel.readInt();
-        mAgency = parcel.readInt();
-        mMachineId = parcel.readInt();
-        mSubscription = parcel.readInt();
-
-        mSubscriptionAddress = parcel.readInt();
-        mType1 = parcel.readInt();
-        mType2 = parcel.readInt();
-        mUsed = parcel.readInt();
-        mRest = parcel.readInt();
-    }
-
-    @Override
-    public int getId() {
-        return mId;
+        return new AutoValue_OVChipSubscription.Builder()
+            .subscriptionAddress(subscriptionAddress)
+            .type1(type1)
+            .type2(type2)
+            .used(used)
+            .rest(rest)
+            .id(id)
+            .agency(company)
+            .subscription(subscription)
+            .unknown1(unknown1)
+            .validFromDate(validFromDate)
+            .validFromTime(validFromTime)
+            .validToDate(validToDate)
+            .validToTime(validToTime)
+            .unknown2(unknown2)
+            .machineId(machineId)
+            .build();
     }
 
     @Override
     public Date getValidFrom() {
-        if (mValidFromTime != 0) {
-            return OVChipTransitData.convertDate((int) mValidFromDate, (int) mValidFromTime);
+        if (getValidFromTime() != 0) {
+            return OVChipTransitData.convertDate((int) getValidFromDate(), (int) getValidFromTime());
         } else {
-            return OVChipTransitData.convertDate((int) mValidFromDate);
+            return OVChipTransitData.convertDate((int) getValidFromDate());
         }
     }
 
     @Override
     public Date getValidTo() {
-        if (mValidToTime != 0) {
-            return OVChipTransitData.convertDate((int) mValidToDate, (int) mValidToTime);
+        if (getValidToTime() != 0) {
+            return OVChipTransitData.convertDate((int) getValidToDate(), (int) getValidToTime());
         } else {
-            return OVChipTransitData.convertDate((int) mValidToDate);
+            return OVChipTransitData.convertDate((int) getValidToDate());
         }
     }
 
     @Override
     public String getSubscriptionName() {
-        if (SUBSCRIPTIONS.containsKey(mSubscription)) {
-            return SUBSCRIPTIONS.get(mSubscription);
+        if (SUBSCRIPTIONS.containsKey(getSubscription())) {
+            return SUBSCRIPTIONS.get(getSubscription());
         }
-        return "Unknown Subscription (0x" + Long.toString(mSubscription, 16) + ")";
+        return "Unknown Subscription (0x" + Long.toString(getSubscription(), 16) + ")";
     }
 
     @Override
     public String getActivation() {
-        if (mType1 != 0) {
-            return mUsed != 0 ? "Activated and used" : "Activated but not used";
+        if (getType1() != 0) {
+            return getUsed() != 0 ? "Activated and used" : "Activated but not used";
         }
         return "Deactivated";
     }
 
     @Override
-    public int getMachineId() {
-        return mMachineId;
-    }
-
-    @Override
     public String getAgencyName() {
-        return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
+        return OVChipTransitData.getShortAgencyName(getAgency());    // Nobody uses most of the long names
     }
 
     @Override
     public String getShortAgencyName() {
-        return OVChipTransitData.getShortAgencyName(mAgency);
+        return OVChipTransitData.getShortAgencyName(getAgency());
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mId);
-        parcel.writeInt(mUnknown1);
-        parcel.writeLong(mValidFromDate);
-        parcel.writeLong(mValidFromTime);
-        parcel.writeLong(mValidToDate);
-        parcel.writeLong(mValidToTime);
-        parcel.writeInt(mUnknown2);
-        parcel.writeInt(mAgency);
-        parcel.writeInt(mMachineId);
-        parcel.writeInt(mSubscription);
-        parcel.writeInt(mSubscriptionAddress);
-        parcel.writeInt(mType1);
-        parcel.writeInt(mType2);
-        parcel.writeInt(mUsed);
-        parcel.writeInt(mRest);
+    abstract int getUnknown1();
+
+    abstract long getValidFromDate();
+
+    abstract long getValidFromTime();
+
+    abstract long getValidToDate();
+
+    abstract long getValidToTime();
+
+    abstract int getUnknown2();
+
+    abstract int getAgency();
+
+    abstract int getSubscription();
+
+    abstract int getSubscriptionAddress();
+
+    abstract int getType1();
+
+    abstract int getType2();
+
+    abstract int getUsed();
+
+    abstract int getRest();
+
+    @AutoValue.Builder
+    abstract static class Builder {
+        abstract Builder id(int id);
+
+        abstract Builder unknown1(int unknown1);
+
+        abstract Builder validFromDate(long validFromDate);
+
+        abstract Builder validFromTime(long validFromTime);
+
+        abstract Builder validToDate(long validToDate);
+
+        abstract Builder validToTime(long validToTime);
+
+        abstract Builder unknown2(int unknown2);
+
+        abstract Builder agency(int agency);
+
+        abstract Builder machineId(int machineId);
+
+        abstract Builder subscription(int subscription);
+
+        abstract Builder subscriptionAddress(int subscriptionAddress);
+
+        abstract Builder type1(int type1);
+
+        abstract Builder type2(int type2);
+
+        abstract Builder used(int used);
+
+        abstract Builder rest(int rest);
+
+        abstract OVChipSubscription build();
     }
 }

@@ -23,62 +23,20 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.Calendar;
 import java.util.Date;
 
-class OVChipInfo implements Parcelable {
+@AutoValue
+abstract class OVChipInfo implements Parcelable {
 
-    public static final Parcelable.Creator<OVChipInfo> CREATOR = new Parcelable.Creator<OVChipInfo>() {
-        @Override
-        public OVChipInfo createFromParcel(Parcel source) {
-            int company = source.readInt();
-            int expdate = source.readInt();
-            Date birthdate = new Date(source.readLong());
-            int active = source.readInt();
-            int limit = source.readInt();
-            int charge = source.readInt();
-            int unknown = source.readInt();
-            return new OVChipInfo(company, expdate, birthdate, active, limit, charge, unknown);
-        }
-
-        @Override
-        public OVChipInfo[] newArray(int size) {
-            return new OVChipInfo[size];
-        }
-    };
-
-    private final int mCompany;
-    private final int mExpdate;
-    private final Date mBirthdate;
-    private final int mActive;
-    private final int mLimit;
-    private final int mCharge;
-    private final int mUnknown;
-
-    private OVChipInfo(
-            int company,
-            int expdate,
-            Date birthdate,
-            int active,
-            int limit,
-            int charge,
-            int unknown
-    ) {
-        mCompany = company;
-        mExpdate = expdate;
-        mBirthdate = birthdate;
-        mActive = active;
-        mLimit = limit;
-        mCharge = charge;
-        mUnknown = unknown;
-    }
-
-    OVChipInfo(byte[] data) {
+    @NonNull
+    static OVChipInfo create(byte[] data) {
         if (data == null) {
             data = new byte[48];
         }
@@ -117,56 +75,27 @@ class OVChipInfo implements Parcelable {
                     | (((char) data[28] >> 5) & (char) 0x07);
         }
 
-        mCompany = company;
-        mExpdate = expdate;
-        mBirthdate = birthdate;
-        mActive = active;
-        mLimit = limit;
-        mCharge = charge;
-        mUnknown = unknown;
+        return new AutoValue_OVChipInfo(
+                company,
+                expdate,
+                birthdate,
+                active,
+                limit,
+                charge,
+                unknown);
     }
 
-    public int getCompany() {
-        return mCompany;
-    }
+    public abstract int getCompany();
 
-    public int getExpdate() {
-        return mExpdate;
-    }
+    public abstract int getExpdate();
 
-    public Date getBirthdate() {
-        return mBirthdate;
-    }
+    public abstract Date getBirthdate();
 
-    public int getActive() {
-        return mActive;
-    }
+    public abstract int getActive();
 
-    public int getLimit() {
-        return mLimit;
-    }
+    public abstract int getLimit();
 
-    public int getCharge() {
-        return mCharge;
-    }
+    public abstract int getCharge();
 
-    public int getUnknown() {
-        return mUnknown;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mCompany);
-        parcel.writeInt(mExpdate);
-        parcel.writeLong(mBirthdate.getTime());
-        parcel.writeInt(mActive);
-        parcel.writeInt(mLimit);
-        parcel.writeInt(mCharge);
-        parcel.writeInt(mUnknown);
-    }
+    public abstract int getUnknown();
 }

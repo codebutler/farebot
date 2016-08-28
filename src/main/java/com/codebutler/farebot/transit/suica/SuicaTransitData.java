@@ -32,16 +32,20 @@
 
 package com.codebutler.farebot.transit.suica;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
+import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
 import net.kazzz.felica.lib.FeliCaLib;
 
@@ -49,23 +53,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SuicaTransitData extends TransitData {
+@AutoValue
+public abstract class SuicaTransitData extends TransitData {
 
-    public static final Creator<SuicaTransitData> CREATOR = new Creator<SuicaTransitData>() {
-        @Override
-        public SuicaTransitData createFromParcel(Parcel parcel) {
-            return new SuicaTransitData(parcel);
-        }
-
-        @Override
-        public SuicaTransitData[] newArray(int size) {
-            return new SuicaTransitData[size];
-        }
-    };
-
-    private SuicaTrip[] mTrips;
-
-    public SuicaTransitData(FelicaCard card) {
+    @NonNull
+    public static SuicaTransitData create(@NonNull FelicaCard card) {
         FelicaService service = card.getSystem(FeliCaLib.SYSTEMCODE_SUICA).getService(FeliCaLib.SERVICE_SUICA_HISTORY);
 
         long previousBalance = -1;
@@ -77,7 +69,7 @@ public class SuicaTransitData extends TransitData {
         for (int i = (blocks.size() - 1); i >= 0; i--) {
             FelicaBlock block = blocks.get(i);
 
-            SuicaTrip trip = new SuicaTrip(block, previousBalance);
+            SuicaTrip trip = SuicaTrip.create(block, previousBalance);
             previousBalance = trip.getBalance();
 
             if (trip.getTimestamp() == 0) {
@@ -90,59 +82,55 @@ public class SuicaTransitData extends TransitData {
         // Return trips in descending order.
         Collections.reverse(trips);
 
-        mTrips = trips.toArray(new SuicaTrip[trips.size()]);
+        return new AutoValue_SuicaTransitData(ImmutableList.<Trip>copyOf(trips));
     }
 
-    private SuicaTransitData(Parcel parcel) {
-        mTrips = new SuicaTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, SuicaTrip.CREATOR);
-    }
-
-    public static boolean check(FelicaCard card) {
+    public static boolean check(@NonNull FelicaCard card) {
         return (card.getSystem(FeliCaLib.SYSTEMCODE_SUICA) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
+    @NonNull
+    public static TransitIdentity parseTransitIdentity(@NonNull FelicaCard card) {
         return new TransitIdentity("Suica", null); // FIXME: Could be ICOCA, etc.
     }
 
+    @NonNull
     @Override
     public String getBalanceString() {
-        if (mTrips.length > 0) {
-            return mTrips[0].getBalanceString();
+        if (getTrips().size() > 0) {
+            return getTrips().get(0).getBalanceString();
         }
         return null;
     }
 
+    @NonNull
     @Override
     public String getSerialNumber() {
         // FIXME: Find where this is on the card.
         return null;
     }
 
+    @Nullable
     @Override
-    public Trip[] getTrips() {
-        return mTrips;
-    }
-
-    @Override
-    public Subscription[] getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         return null;
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return "Suica"; // FIXME: Could be ICOCA, etc.
     }
 
+    @Nullable
     @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mTrips.length);
-        parcel.writeTypedArray(mTrips, flags);
+    public List<Refill> getRefills() {
+        return null;
     }
 }

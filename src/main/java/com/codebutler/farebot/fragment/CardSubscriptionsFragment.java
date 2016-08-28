@@ -39,6 +39,8 @@ import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.util.Utils;
 
+import java.util.List;
+
 public class CardSubscriptionsFragment extends ListFragment {
     private Card mCard;
     private TransitData mTransitData;
@@ -57,7 +59,7 @@ public class CardSubscriptionsFragment extends ListFragment {
     }
 
     private class SubscriptionsAdapter extends ArrayAdapter<Subscription> {
-        SubscriptionsAdapter(Context context, Subscription[] subscriptions) {
+        SubscriptionsAdapter(Context context, List<Subscription> subscriptions) {
             super(context, 0, subscriptions);
         }
 

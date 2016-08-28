@@ -25,29 +25,19 @@ package com.codebutler.farebot.transit.ovc;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
+import com.google.auto.value.AutoValue;
 
 import java.util.Date;
 
-class OVChipTrip extends Trip {
-
-    public static final Creator<OVChipTrip> CREATOR = new Creator<OVChipTrip>() {
-        @Override
-        public OVChipTrip createFromParcel(Parcel parcel) {
-            return new OVChipTrip(parcel);
-        }
-
-        @Override
-        public OVChipTrip[] newArray(int size) {
-            return new OVChipTrip[size];
-        }
-    };
+@AutoValue
+abstract class OVChipTrip extends Trip {
 
     static final java.util.Comparator<? super OVChipTrip> ID_ORDER = new java.util.Comparator<OVChipTrip>() {
         @Override
@@ -56,180 +46,96 @@ class OVChipTrip extends Trip {
         }
     };
 
-    private final int mId;
-    private final int mProcessType;
-    private final int mAgency;
-    private final boolean mIsBus;
-    private final boolean mIsTrain;
-    private final boolean mIsMetro;
-    private final boolean mIsFerry;
-    private final boolean mIsOther;
-    private final boolean mIsCharge;
-    private final boolean mIsPurchase;
-    private final boolean mIsBanned;
-    private final Date mTimestamp;
-    private final long mFare;
-    private final Date mExitTimestamp;
-    private final Station mStartStation;
-    private final Station mEndStation;
-    private final int mStartStationId;
-    private final int mEndStationId;
-
-    OVChipTrip(OVChipTransaction transaction) {
-        this(transaction, null);
+    @NonNull
+    static OVChipTrip create(OVChipTransaction transaction) {
+        return create(transaction, null);
     }
 
-    OVChipTrip(OVChipTransaction inTransaction, OVChipTransaction outTransaction) {
-        mId = inTransaction.getId();
+    @NonNull
+    static OVChipTrip create(OVChipTransaction inTransaction, OVChipTransaction outTransaction) {
+        int id = inTransaction.getId();
 
-        mProcessType = inTransaction.getTransfer();
-        mAgency = inTransaction.getCompany();
+        int processType = inTransaction.getTransfer();
+        int agency = inTransaction.getCompany();
 
-        mTimestamp = OVChipTransitData.convertDate(inTransaction.getDate(), inTransaction.getTime());
+        Date timestamp = OVChipTransitData.convertDate(inTransaction.getDate(), inTransaction.getTime());
 
-        mStartStationId = inTransaction.getStation();
-        mStartStation = getStation(mAgency, mStartStationId);
+        int startStationId = inTransaction.getStation();
+        Station startStation = getStation(agency, startStationId);
+
+        int endStationId;
+        Station endStation;
+        Date exitTimestamp;
+        int fare;
 
         if (outTransaction != null) {
-            mEndStationId = outTransaction.getStation();
-            if (getStation(mAgency, outTransaction.getStation()) != null) {
-                mEndStation = getStation(mAgency, outTransaction.getStation());
+            endStationId = outTransaction.getStation();
+            if (getStation(agency, outTransaction.getStation()) != null) {
+                endStation = getStation(agency, outTransaction.getStation());
             } else {
-                mEndStation = new Station(String.format("Unknown (%s)", mEndStationId), null, null);
+                endStation = Station.builder()
+                        .stationName(String.format("Unknown (%s)", endStationId))
+                        .build();
             }
-            mExitTimestamp = OVChipTransitData.convertDate(outTransaction.getDate(), outTransaction.getTime());
-            mFare = outTransaction.getAmount();
+            exitTimestamp = OVChipTransitData.convertDate(outTransaction.getDate(), outTransaction.getTime());
+            fare = outTransaction.getAmount();
         } else {
-            mEndStation = null;
-            mEndStationId = 0;
-            mExitTimestamp = null;
-            mFare = inTransaction.getAmount();
+            endStation = null;
+            endStationId = 0;
+            exitTimestamp = null;
+            fare = inTransaction.getAmount();
         }
 
-        mIsTrain = (mAgency == OVChipTransitData.AGENCY_NS)
-                || ((mAgency == OVChipTransitData.AGENCY_ARRIVA) && (mStartStationId < 800));
+        boolean isTrain = (agency == OVChipTransitData.AGENCY_NS)
+                || ((agency == OVChipTransitData.AGENCY_ARRIVA) && (startStationId < 800));
 
         // TODO: Needs verification!
-        mIsMetro = (mAgency == OVChipTransitData.AGENCY_GVB && mStartStationId < 3000)
-                || (mAgency == OVChipTransitData.AGENCY_RET && mStartStationId < 3000);
+        boolean isMetro = (agency == OVChipTransitData.AGENCY_GVB && startStationId < 3000)
+                || (agency == OVChipTransitData.AGENCY_RET && startStationId < 3000);
 
-        mIsOther = mAgency == OVChipTransitData.AGENCY_TLS || mAgency == OVChipTransitData.AGENCY_DUO
-                || mAgency == OVChipTransitData.AGENCY_STORE;
+        boolean isOther = agency == OVChipTransitData.AGENCY_TLS || agency == OVChipTransitData.AGENCY_DUO
+                || agency == OVChipTransitData.AGENCY_STORE;
 
         // TODO: Needs verification!
-        mIsFerry = mAgency == OVChipTransitData.AGENCY_ARRIVA && (mStartStationId > 4600 && mStartStationId < 4700);
+        boolean isFerry = agency == OVChipTransitData.AGENCY_ARRIVA && (startStationId > 4600 && startStationId < 4700);
 
         // FIXME: Clean this up
-        //mIsBusOrTram = (mAgency == AGENCY_GVB || mAgency == AGENCY_HTM || mAgency == AGENCY_RET && (!mIsMetro));
-        //mIsBusOrTrain = mAgency == AGENCY_VEOLIA || mAgency == AGENCY_SYNTUS;
+        //mIsBusOrTram = (agency == AGENCY_GVB || agency == AGENCY_HTM || agency == AGENCY_RET && (!isMetro));
+        //mIsBusOrTrain = agency == AGENCY_VEOLIA || agency == AGENCY_SYNTUS;
 
         // Everything else will be a bus, although this is not correct.
         // The only way to determine them would be to collect every single 'ovcid' out there :(
-        mIsBus = (!mIsTrain && !mIsMetro && !mIsOther && !mIsFerry);
+        boolean isBus = (!isTrain && !isMetro && !isOther && !isFerry);
 
-        mIsCharge = (mProcessType == OVChipTransitData.PROCESS_CREDIT)
-                || (mProcessType == OVChipTransitData.PROCESS_TRANSFER);
+        boolean isCharge = (processType == OVChipTransitData.PROCESS_CREDIT)
+                || (processType == OVChipTransitData.PROCESS_TRANSFER);
 
         // Not 100% sure about what NODATA is, but looks alright so far
-        mIsPurchase = (mProcessType == OVChipTransitData.PROCESS_PURCHASE)
-                || (mProcessType == OVChipTransitData.PROCESS_NODATA);
+        boolean isPurchase = (processType == OVChipTransitData.PROCESS_PURCHASE)
+                || (processType == OVChipTransitData.PROCESS_NODATA);
 
-        mIsBanned = mProcessType == OVChipTransitData.PROCESS_BANNED;
-    }
+        boolean isBanned = processType == OVChipTransitData.PROCESS_BANNED;
 
-    private OVChipTrip(Parcel parcel) {
-        mId = parcel.readInt();
-
-        // mSame = (parcel.readInt() == 1);
-
-        mProcessType = parcel.readInt();
-        mAgency = parcel.readInt();
-
-        mIsBus = (parcel.readInt() == 1);
-        mIsTrain = (parcel.readInt() == 1);
-        mIsMetro = (parcel.readInt() == 1);
-        mIsFerry = (parcel.readInt() == 1);
-        mIsOther = (parcel.readInt() == 1);
-        mIsCharge = (parcel.readInt() == 1);
-        mIsPurchase = (parcel.readInt() == 1);
-        mIsBanned = (parcel.readInt() == 1);
-
-        mFare = parcel.readLong();
-        mTimestamp = new Date(parcel.readLong());
-
-        if (parcel.readInt() == 1) {
-            mExitTimestamp = new Date(parcel.readLong());
-        } else {
-            mExitTimestamp = null;
-        }
-
-        mStartStationId = parcel.readInt();
-        if (parcel.readInt() == 1) {
-            mStartStation = parcel.readParcelable(Station.class.getClassLoader());
-        } else {
-            mStartStation = null;
-        }
-
-        mEndStationId = parcel.readInt();
-        if (parcel.readInt() == 1) {
-            mEndStation = parcel.readParcelable(Station.class.getClassLoader());
-        } else {
-            mEndStation = null;
-        }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mId);
-
-        // parcel.writeInt(mSame ? 1 : 0);
-
-        parcel.writeInt(mProcessType);
-        parcel.writeInt(mAgency);
-
-        parcel.writeInt(mIsBus ? 1 : 0);
-        parcel.writeInt(mIsTrain ? 1 : 0);
-        parcel.writeInt(mIsMetro ? 1 : 0);
-        parcel.writeInt(mIsFerry ? 1 : 0);
-        parcel.writeInt(mIsOther ? 1 : 0);
-        parcel.writeInt(mIsCharge ? 1 : 0);
-        parcel.writeInt(mIsPurchase ? 1 : 0);
-        parcel.writeInt(mIsBanned ? 1 : 0);
-
-        parcel.writeLong(mFare);
-        parcel.writeLong(mTimestamp.getTime());
-
-        if (mExitTimestamp != null) {
-            parcel.writeInt(1);
-            parcel.writeLong(mExitTimestamp.getTime());
-        } else {
-            parcel.writeInt(0);
-        }
-
-        parcel.writeInt(mStartStationId);
-        if (mStartStation != null) {
-            parcel.writeInt(1);
-            parcel.writeParcelable(mStartStation, flags);
-        } else {
-            parcel.writeInt(0);
-        }
-
-        parcel.writeInt(mEndStationId);
-        if (mEndStation != null) {
-            parcel.writeInt(1);
-            parcel.writeParcelable(mEndStation, flags);
-        } else {
-            parcel.writeInt(0);
-        }
-    }
-
-    private int getId() {
-        return mId;
+        return new AutoValue_OVChipTrip.Builder()
+                .id(id)
+                .processType(processType)
+                .agency(agency)
+                .isBus(isBus)
+                .isTrain(isTrain)
+                .isMetro(isMetro)
+                .isFerry(isFerry)
+                .isOther(isOther)
+                .isCharge(isCharge)
+                .isPurchase(isPurchase)
+                .isBanned(isBanned)
+                .timestampData(timestamp)
+                .fare(fare)
+                .exitTimestampData(exitTimestamp)
+                .startStation(startStation)
+                .endStation(endStation)
+                .startStationId(startStationId)
+                .endStationId(endStationId)
+                .build();
     }
 
     @Override
@@ -239,12 +145,12 @@ class OVChipTrip extends Trip {
 
     @Override
     public String getAgencyName() {
-        return OVChipTransitData.getShortAgencyName(mAgency);    // Nobody uses most of the long names
+        return OVChipTransitData.getShortAgencyName(getAgency());    // Nobody uses most of the long names
     }
 
     @Override
     public String getShortAgencyName() {
-        return OVChipTransitData.getShortAgencyName(mAgency);
+        return OVChipTransitData.getShortAgencyName(getAgency());
     }
 
     @Override
@@ -254,48 +160,41 @@ class OVChipTrip extends Trip {
 
     @Override
     public String getStartStationName() {
-        if (mStartStation != null && !TextUtils.isEmpty(mStartStation.getStationName())) {
-            return mStartStation.getStationName();
+        Station startStation = getStartStation();
+        if (startStation != null && !TextUtils.isEmpty(startStation.getStationName())) {
+            return startStation.getStationName();
         } else {
-            return String.format("Unknown (%s)", mStartStationId);
+            return String.format("Unknown (%s)", getStartStationId());
         }
-    }
-
-    @Override
-    public Station getStartStation() {
-        return mStartStation;
     }
 
     @Override
     public String getEndStationName() {
-        if (mEndStation != null && !TextUtils.isEmpty(mEndStation.getStationName())) {
-            return mEndStation.getStationName();
+        Station endStation = getEndStation();
+        if (endStation != null && !TextUtils.isEmpty(endStation.getStationName())) {
+            return endStation.getStationName();
+        } else {
+            return String.format("Unknown (%s)", getEndStationId());
         }
-        return null;
-    }
-
-    @Override
-    public Station getEndStation() {
-        return mEndStation;
     }
 
     @Override
     public Mode getMode() {
-        if (mIsBanned) {
+        if (getIsBanned()) {
             return Mode.BANNED;
-        } else if (mIsCharge) {
+        } else if (getIsCharge()) {
             return Mode.TICKET_MACHINE;
-        } else if (mIsPurchase) {
+        } else if (getIsPurchase()) {
             return Mode.VENDING_MACHINE;
-        } else if (mIsTrain) {
+        } else if (getIsTrain()) {
             return Mode.TRAIN;
-        } else if (mIsBus) {
+        } else if (getIsBus()) {
             return Mode.BUS;
-        } else if (mIsMetro) {
+        } else if (getIsMetro()) {
             return Mode.METRO;
-        } else if (mIsFerry) {
+        } else if (getIsFerry()) {
             return Mode.FERRY;
-        } else if (mIsOther) {
+        } else if (getIsOther()) {
             return Mode.OTHER;
         } else {
             return Mode.OTHER;
@@ -304,8 +203,8 @@ class OVChipTrip extends Trip {
 
     @Override
     public long getTimestamp() {
-        if (mTimestamp != null) {
-            return mTimestamp.getTime() / 1000;
+        if (getTimestampData() != null) {
+            return getTimestampData().getTime() / 1000;
         } else {
             return 0;
         }
@@ -313,8 +212,8 @@ class OVChipTrip extends Trip {
 
     @Override
     public long getExitTimestamp() {
-        if (mExitTimestamp != null) {
-            return mExitTimestamp.getTime() / 1000;
+        if (getExitTimestampData() != null) {
+            return getExitTimestampData().getTime() / 1000;
         } else {
             return 0;
         }
@@ -322,7 +221,7 @@ class OVChipTrip extends Trip {
 
     @Override
     public boolean hasTime() {
-        return (mTimestamp != null);
+        return (getTimestampData() != null);
     }
 
     @Override
@@ -332,7 +231,7 @@ class OVChipTrip extends Trip {
 
     @Override
     public String getFareString() {
-        return OVChipTransitData.convertAmount((int) mFare);
+        return OVChipTransitData.convertAmount((int) getFare());
     }
 
     private static Station getStation(int companyCode, int stationCode) {
@@ -367,10 +266,92 @@ class OVChipTrip extends Trip {
                 stationName = cityName.concat(", " + stationName);
             }
 
-            return new Station(stationName, latitude, longitude);
+            return Station.builder()
+                    .stationName(stationName)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .build();
         } catch (Exception e) {
             Log.e("OVChipStationProvider", "Error in getStation", e);
             return null;
         }
+    }
+
+    abstract int getId();
+
+    abstract int getProcessType();
+
+    abstract int getAgency();
+
+    abstract boolean getIsBus();
+
+    abstract boolean getIsTrain();
+
+    abstract boolean getIsMetro();
+
+    abstract boolean getIsFerry();
+
+    abstract boolean getIsOther();
+
+    abstract boolean getIsCharge();
+
+    abstract boolean getIsPurchase();
+
+    abstract boolean getIsBanned();
+
+    abstract Date getTimestampData();
+
+    abstract long getFare();
+
+    abstract Date getExitTimestampData();
+
+    public abstract Station getStartStation();
+
+    public abstract Station getEndStation();
+
+    abstract int getStartStationId();
+
+    abstract int getEndStationId();
+
+    @AutoValue.Builder
+    abstract static class Builder {
+
+        abstract Builder id(int id);
+
+        abstract Builder processType(int processType);
+
+        abstract Builder agency(int agency);
+
+        abstract Builder isBus(boolean isBus);
+
+        abstract Builder isTrain(boolean isTrain);
+
+        abstract Builder isMetro(boolean isMetro);
+
+        abstract Builder isFerry(boolean isFerry);
+
+        abstract Builder isOther(boolean isOther);
+
+        abstract Builder isCharge(boolean isCharge);
+
+        abstract Builder isPurchase(boolean isPurchase);
+
+        abstract Builder isBanned(boolean isBanned);
+
+        abstract Builder timestampData(Date timestamp);
+
+        abstract Builder fare(long fare);
+
+        abstract Builder exitTimestampData(Date exitTimestamp);
+
+        abstract Builder startStation(Station startStation);
+
+        abstract Builder endStation(Station endStation);
+
+        abstract Builder startStationId(int startStationId);
+
+        abstract Builder endStationId(int endStationId);
+
+        abstract OVChipTrip build();
     }
 }

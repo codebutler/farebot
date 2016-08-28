@@ -19,7 +19,8 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.UnauthorizedException;
@@ -38,6 +39,7 @@ import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryReco
 import com.codebutler.farebot.ui.HeaderListItem;
 import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -58,19 +60,8 @@ import java.util.Locale;
  * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Manly-Fast-Ferry
  */
-public class ManlyFastFerryTransitData extends TransitData {
-
-    public static final Creator<ManlyFastFerryTransitData> CREATOR = new Creator<ManlyFastFerryTransitData>() {
-        @Override
-        public ManlyFastFerryTransitData createFromParcel(Parcel source) {
-            return new ManlyFastFerryTransitData(source);
-        }
-
-        @Override
-        public ManlyFastFerryTransitData[] newArray(int size) {
-            return new ManlyFastFerryTransitData[size];
-        }
-    };
+@AutoValue
+public abstract class ManlyFastFerryTransitData extends TransitData {
 
     public static final String NAME = "Manly Fast Ferry";
 
@@ -78,23 +69,8 @@ public class ManlyFastFerryTransitData extends TransitData {
             0x32, 0x32, 0x00, 0x00, 0x00, 0x01, 0x01
     };
 
-    private String mSerialNumber;
-    private GregorianCalendar mEpochDate;
-    private int mBalance;
-    private Trip[] mTrips;
-    private Refill[] mRefills;
-
-    // Parcel
-    private ManlyFastFerryTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readString();
-        mEpochDate = new GregorianCalendar();
-        mEpochDate.setTimeInMillis(parcel.readLong());
-        mTrips = parcel.createTypedArray(ManlyFastFerryTrip.CREATOR);
-        mRefills = parcel.createTypedArray(ManlyFastFerryRefill.CREATOR);
-    }
-
-    // Decoder
-    public ManlyFastFerryTransitData(ClassicCard card) {
+    @NonNull
+    public static ManlyFastFerryTransitData create(@NonNull ClassicCard card) {
         ArrayList<ManlyFastFerryRecord> records = new ArrayList<>();
 
         // Iterate through blocks on the card and deserialize all the binary data.
@@ -119,18 +95,23 @@ public class ManlyFastFerryTransitData extends TransitData {
         // Now do a first pass for metadata and balance information.
         ArrayList<ManlyFastFerryBalanceRecord> balances = new ArrayList<>();
 
+        String serialNumber = null;
+        GregorianCalendar epochDate = null;
+
         for (ManlyFastFerryRecord record : records) {
             if (record instanceof ManlyFastFerryMetadataRecord) {
-                mSerialNumber = ((ManlyFastFerryMetadataRecord) record).getCardSerial();
-                mEpochDate = ((ManlyFastFerryMetadataRecord) record).getEpochDate();
+                serialNumber = ((ManlyFastFerryMetadataRecord) record).getCardSerial();
+                epochDate = ((ManlyFastFerryMetadataRecord) record).getEpochDate();
             } else if (record instanceof ManlyFastFerryBalanceRecord) {
                 balances.add((ManlyFastFerryBalanceRecord) record);
             }
         }
 
+        int balance = 0;
+
         if (balances.size() >= 1) {
             Collections.sort(balances);
-            mBalance = balances.get(0).getBalance();
+            balance = balances.get(0).getBalance();
         }
 
         // Now generate a transaction list.
@@ -145,10 +126,10 @@ public class ManlyFastFerryTransitData extends TransitData {
                 // Now convert this.
                 if (purseRecord.getIsCredit()) {
                     // Credit
-                    refills.add(new ManlyFastFerryRefill(purseRecord, mEpochDate));
+                    refills.add(ManlyFastFerryRefill.create(purseRecord, epochDate));
                 } else {
                     // Debit
-                    trips.add(new ManlyFastFerryTrip(purseRecord, mEpochDate));
+                    trips.add(ManlyFastFerryTrip.create(purseRecord, epochDate));
                 }
             }
         }
@@ -156,11 +137,10 @@ public class ManlyFastFerryTransitData extends TransitData {
         Collections.sort(trips, new Trip.Comparator());
         Collections.sort(refills, new Refill.Comparator());
 
-        mTrips = trips.toArray(new Trip[trips.size()]);
-        mRefills = refills.toArray(new Refill[refills.size()]);
+        return new AutoValue_ManlyFastFerryTransitData(serialNumber, trips, refills, epochDate, balance);
     }
 
-    public static boolean check(ClassicCard card) {
+    public static boolean check(@NonNull ClassicCard card) {
         // TODO: Improve this check
         // The card contains two copies of the card's serial number on the card.
         // Lets use this for now to check that this is a Manly Fast Ferry card.
@@ -194,55 +174,37 @@ public class ManlyFastFerryTransitData extends TransitData {
         return new TransitIdentity(NAME, ((ManlyFastFerryMetadataRecord) metadata).getCardSerial());
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mSerialNumber);
-        parcel.writeLong(mEpochDate.getTimeInMillis());
-        parcel.writeTypedArray(mTrips, flags);
-        parcel.writeTypedArray(mRefills, flags);
-    }
-
+    @NonNull
     @Override
     public String getBalanceString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mBalance / 100.);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getBalance() / 100.);
     }
 
-    // Structures
+    @Nullable
     @Override
-    public String getSerialNumber() {
-        return mSerialNumber;
-    }
-
-    @Override
-    public Trip[] getTrips() {
-        return mTrips;
-    }
-
-    @Override
-    public Refill[] getRefills() {
-        return mRefills;
-    }
-
-    @Override
-    public Subscription[] getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         // There is no concept of "subscriptions".
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         ArrayList<ListItem> items = new ArrayList<>();
         items.add(new HeaderListItem(R.string.general));
-        Date cLastTransactionTime = mEpochDate.getTime();
+        Date cLastTransactionTime = getEpochDate().getTime();
         items.add(new ListItem(R.string.card_epoch, Utils.longDateFormat(cLastTransactionTime)));
-
         return items;
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return NAME;
     }
 
+    abstract GregorianCalendar getEpochDate();
+
+    abstract int getBalance();
 
 }

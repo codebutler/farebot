@@ -19,47 +19,40 @@
 
 package com.codebutler.farebot.transit.stub;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.TransitIdentity;
+import com.google.auto.value.AutoValue;
 
 /**
  * Stub implementation for AT HOP (Auckland, NZ).
  * <p>
  * https://github.com/micolous/metrodroid/wiki/AT-HOP
  */
-public class AtHopStubTransitData extends StubTransitData {
+@AutoValue
+public abstract class AtHopStubTransitData extends StubTransitData {
 
-    public static final Creator<AtHopStubTransitData> CREATOR = new Creator<AtHopStubTransitData>() {
-        @Override
-        public AtHopStubTransitData createFromParcel(Parcel source) {
-            return new AtHopStubTransitData();
-        }
+    @NonNull
+    public static AtHopStubTransitData create(@NonNull DesfireCard card) {
+        return new AutoValue_AtHopStubTransitData();
+    }
 
-        @Override
-        public AtHopStubTransitData[] newArray(int size) {
-            return new AtHopStubTransitData[size];
-        }
-    };
-
-    public AtHopStubTransitData(Card card) { }
-
-    private AtHopStubTransitData() { }
-
+    @NonNull
     @Override
     public String getCardName() {
         return "AT HOP";
     }
 
-    public static boolean check(Card card) {
+    public static boolean check(@NonNull Card card) {
         return (card instanceof DesfireCard)
                 && (((DesfireCard) card).getApplication(0x4055) != null)
                 && (((DesfireCard) card).getApplication(0xffffff) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity(Card card) {
+    @NonNull
+    public static TransitIdentity parseTransitIdentity(@NonNull Card card) {
         return new TransitIdentity("AT HOP", null);
     }
 }

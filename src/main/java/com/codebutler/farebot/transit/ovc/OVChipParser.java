@@ -38,7 +38,7 @@ class OVChipParser {
 
     OVChipPreamble getPreamble() {
         byte[] data = mCard.getSector(0).readBlocks(0, 3);
-        return new OVChipPreamble(data);
+        return OVChipPreamble.create(data);
     }
 
     public OVChipInfo getInfo() {
@@ -54,7 +54,7 @@ class OVChipParser {
         startBlock = startBlock - firstBlock;
 
         byte[] data = mCard.getSector(sector).readBlocks(startBlock, 3);
-        return new OVChipInfo(data);
+        return OVChipInfo.create(data);
     }
 
     public OVChipCredit getCredit() {
@@ -65,13 +65,13 @@ class OVChipParser {
         int firstBlock = ClassicUtils.sectorToBlock(sector);
         blockIndex = blockIndex - firstBlock;
 
-        return new OVChipCredit(mCard.getSector(sector).readBlocks(blockIndex, 1));
+        return OVChipCredit.create(mCard.getSector(sector).readBlocks(blockIndex, 1));
     }
 
     public OVChipTransaction[] getTransactions() {
         OVChipTransaction[] ovchipTransactions = new OVChipTransaction[28];
         for (int transactionId = 0; transactionId < ovchipTransactions.length; transactionId++) {
-            ovchipTransactions[transactionId] = new OVChipTransaction(transactionId, readTransaction(transactionId));
+            ovchipTransactions[transactionId] = OVChipTransaction.create(transactionId, readTransaction(transactionId));
         }
         return ovchipTransactions;
     }
@@ -148,7 +148,7 @@ class OVChipParser {
 
     private OVChipSubscription getSubscription(int subscriptionAddress, int type1, int type2, int used, int rest) {
         byte[] data = readSubscription(subscriptionAddress);
-        return new OVChipSubscription(subscriptionAddress, data, type1, type2, used, rest);
+        return OVChipSubscription.create(subscriptionAddress, data, type1, type2, used, rest);
     }
 
     private byte[] readSubscription(int subscriptionAddress) {

@@ -23,13 +23,14 @@
 package com.codebutler.farebot.transit.edy;
 
 import android.app.Application;
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
+import com.google.auto.value.AutoValue;
 
 import net.kazzz.felica.lib.Util;
 
@@ -37,27 +38,11 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
-class EdyTrip extends Trip {
+@AutoValue
+abstract class EdyTrip extends Trip {
 
-    public static final Creator<EdyTrip> CREATOR = new Creator<EdyTrip>() {
-        @Override
-        public EdyTrip createFromParcel(Parcel parcel) {
-            return new EdyTrip(parcel);
-        }
-
-        @Override
-        public EdyTrip[] newArray(int size) {
-            return new EdyTrip[size];
-        }
-    };
-
-    private final int mProcessType;
-    private final int mSequenceNumber;
-    private final Date mTimestamp;
-    private final int mTransactionAmount;
-    private final int mBalance;
-
-    EdyTrip(FelicaBlock block) {
+    @NonNull
+    static EdyTrip create(FelicaBlock block) {
         byte[] data = block.getData().bytes();
 
         // Data Offsets with values
@@ -69,47 +54,33 @@ class EdyTrip extends Trip {
         // 0x08    transaction amount (big-endian)
         // 0x0c    balance (big-endian)
 
-        mProcessType = data[0];
-        mSequenceNumber = Util.toInt(data[1], data[2], data[3]);
-        mTimestamp = EdyUtil.extractDate(data);
-        mTransactionAmount = Util.toInt(data[8], data[9], data[10], data[11]);
-        mBalance = Util.toInt(data[12], data[13], data[14], data[15]);
-    }
+        int processType = data[0];
+        int sequenceNumber = Util.toInt(data[1], data[2], data[3]);
+        Date timestampData = EdyUtil.extractDate(data);
+        int transactionAmount = Util.toInt(data[8], data[9], data[10], data[11]);
+        int balance = Util.toInt(data[12], data[13], data[14], data[15]);
 
-    private EdyTrip(Parcel parcel) {
-        mProcessType = parcel.readInt();
-        mSequenceNumber = parcel.readInt();
-        mTimestamp = new Date(parcel.readLong());
-        mTransactionAmount = parcel.readInt();
-        mBalance = parcel.readInt();
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mProcessType);
-        parcel.writeInt(mSequenceNumber);
-        parcel.writeLong(mTimestamp.getTime());
-        parcel.writeInt(mTransactionAmount);
-        parcel.writeInt(mBalance);
+        return new AutoValue_EdyTrip(processType, sequenceNumber, timestampData, transactionAmount, balance);
     }
 
     @Override
     public Mode getMode() {
-        if (mProcessType == EdyTransitData.FELICA_MODE_EDY_DEBIT) {
-            return Mode.POS;
-        } else if (mProcessType == EdyTransitData.FELICA_MODE_EDY_CHARGE) {
-            return Mode.TICKET_MACHINE;
-        } else if (mProcessType == EdyTransitData.FELICA_MODE_EDY_GIFT) {
-            return Mode.VENDING_MACHINE;
-        } else {
-            return Mode.OTHER;
+        switch (getProcessType()) {
+            case EdyTransitData.FELICA_MODE_EDY_DEBIT:
+                return Mode.POS;
+            case EdyTransitData.FELICA_MODE_EDY_CHARGE:
+                return Mode.TICKET_MACHINE;
+            case EdyTransitData.FELICA_MODE_EDY_GIFT:
+                return Mode.VENDING_MACHINE;
+            default:
+                return Mode.OTHER;
         }
     }
 
     @Override
     public long getTimestamp() {
-        if (mTimestamp != null) {
-            return mTimestamp.getTime() / 1000;
+        if (getTimestampData() != null) {
+            return getTimestampData().getTime() / 1000;
         } else {
             return 0;
         }
@@ -124,20 +95,20 @@ class EdyTrip extends Trip {
     public String getFareString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
-        if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
-            return "+" + format.format(mTransactionAmount);
+        if (getProcessType() != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
+            return "+" + format.format(getTransactionAmount());
         }
-        return format.format(mTransactionAmount);
+        return format.format(getTransactionAmount());
     }
 
     @Override
     public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
-        return format.format(mBalance);
+        return format.format(getBalance());
     }
 
-    // use agency name for the tranaction number
+    // use agency name for the transaction number
     @Override
     public String getShortAgencyName() {
         return getAgencyName();
@@ -150,18 +121,18 @@ class EdyTrip extends Trip {
         format.setGroupingUsed(false);
         Application app = FareBotApplication.getInstance();
         String str;
-        if (mProcessType != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
+        if (getProcessType() != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
             str = app.getString(R.string.felica_process_charge);
         } else {
             str = app.getString(R.string.felica_process_merchandise_purchase);
         }
-        str += " " + app.getString(R.string.transaction_sequence) + format.format(mSequenceNumber);
+        str += " " + app.getString(R.string.transaction_sequence) + format.format(getSequenceNumber());
         return str;
     }
 
     @Override
     public boolean hasTime() {
-        return mTimestamp != null;
+        return getTimestampData() != null;
     }
 
     // unused
@@ -191,12 +162,18 @@ class EdyTrip extends Trip {
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
     public long getExitTimestamp() {
         return 0;
     }
+
+    abstract int getProcessType();
+
+    abstract int getSequenceNumber();
+
+    abstract Date getTimestampData();
+
+    abstract int getTransactionAmount();
+
+    abstract int getBalance();
+
 }

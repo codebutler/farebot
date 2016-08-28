@@ -23,63 +23,19 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.Arrays;
 
-class OVChipIndex implements Parcelable {
+@AutoValue
+abstract class OVChipIndex implements Parcelable {
 
-    public static final Parcelable.Creator<OVChipIndex> CREATOR = new Parcelable.Creator<OVChipIndex>() {
-        @Override
-        public OVChipIndex createFromParcel(Parcel source) {
-            int recentTransactionSlot = source.readInt();
-            int recentInfoSlot = source.readInt();
-            int recentSubscriptionSlot = source.readInt();
-            int recentTravelhistorySlot = source.readInt();
-            int recentCreditSlot = source.readInt();
-
-            int[] subscriptionIndex = new int[source.readInt()];
-            source.readIntArray(subscriptionIndex);
-
-            return new OVChipIndex(recentTransactionSlot,
-                    recentInfoSlot, recentSubscriptionSlot,
-                    recentTravelhistorySlot, recentCreditSlot,
-                    subscriptionIndex);
-        }
-
-        @Override
-        public OVChipIndex[] newArray(int size) {
-            return new OVChipIndex[size];
-        }
-    };
-
-    private int mRecentTransactionSlot;     // Most recent transaction slot (0xFB0 or 0xFD0)
-    private int mRecentInfoSlot;            // Most recent card information index slot (0x5C0 or 0x580)
-    private int mRecentSubscriptionSlot;    // Most recent subscription index slot (0xF10 or 0xF30)
-    private int mRecentTravelhistorySlot;   // Most recent travel history index slot (0xF50 or 0xF70)
-    private int mRecentCreditSlot;          // Most recent credit index slot (0xF90 or 0xFA0)
-    private int[] mSubscriptionIndex;
-
-    private OVChipIndex(
-            int recentTransactionSlot,
-            int recentInfoSlot,
-            int recentSubscriptionSlot,
-            int recentTravelhistorySlot,
-            int recentCreditSlot,
-            int[] subscriptionIndex
-    ) {
-        mRecentTransactionSlot = recentTransactionSlot;
-        mRecentInfoSlot = recentInfoSlot;
-        mRecentSubscriptionSlot = recentSubscriptionSlot;
-        mRecentTravelhistorySlot = recentTravelhistorySlot;
-        mRecentCreditSlot = recentCreditSlot;
-        mSubscriptionIndex = subscriptionIndex;
-    }
-
-    OVChipIndex(byte[] data) {
+    @NonNull
+    static OVChipIndex create(byte[] data) {
         final byte[] firstSlot = Arrays.copyOfRange(data, 0, data.length / 2);
         final byte[] secondSlot = Arrays.copyOfRange(data, data.length / 2, data.length);
 
@@ -110,51 +66,40 @@ class OVChipIndex implements Parcelable {
                     ? ((char) 0xA00 + (bits - 10) * (byte) 0x30) : ((char) 0x900 + (bits - 5) * (byte) 0x30));
         }
 
-        mRecentTransactionSlot = recentTransactionSlot;
-        mRecentInfoSlot = recentInfoSlot;
-        mRecentSubscriptionSlot = recentSubscriptionSlot;
-        mRecentTravelhistorySlot = recentTravelhistorySlot;
-        mRecentCreditSlot = recentCreditSlot;
-        mSubscriptionIndex = subscriptionIndex;
+        return new AutoValue_OVChipIndex(
+                recentTransactionSlot,
+                recentInfoSlot,
+                recentSubscriptionSlot,
+                recentTravelhistorySlot,
+                recentCreditSlot,
+                subscriptionIndex);
     }
 
-    int getRecentTransactionSlot() {
-        return mRecentTransactionSlot;
-    }
+    /**
+     * @return Most recent transaction slot (0xFB0 or 0xFD0)
+     */
+    abstract int getRecentTransactionSlot();
 
-    int getRecentInfoSlot() {
-        return mRecentInfoSlot;
-    }
+    /**
+     * @return Most recent card information index slot (0x5C0 or 0x580)
+     */
+    abstract int getRecentInfoSlot();
 
-    int getRecentSubscriptionSlot() {
-        return mRecentSubscriptionSlot;
-    }
+    /**
+     * @return Most recent subscription index slot (0xF10 or 0xF30)
+     */
+    abstract int getRecentSubscriptionSlot();
 
-    int getRecentTravelhistorySlot() {
-        return mRecentTravelhistorySlot;
-    }
+    /**
+     * @return Most recent travel history index slot (0xF50 or 0xF70)
+     */
+    abstract int getRecentTravelhistorySlot();
 
-    int getRecentCreditSlot() {
-        return mRecentCreditSlot;
-    }
+    /**
+     * @return Most recent credit index slot (0xF90 or 0xFA0)
+     */
+    abstract int getRecentCreditSlot();
 
-    int[] getSubscriptionIndex() {
-        return mSubscriptionIndex;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mRecentTransactionSlot);
-        parcel.writeInt(mRecentInfoSlot);
-        parcel.writeInt(mRecentSubscriptionSlot);
-        parcel.writeInt(mRecentTravelhistorySlot);
-        parcel.writeInt(mRecentCreditSlot);
-        parcel.writeInt(mSubscriptionIndex.length);
-        parcel.writeIntArray(mSubscriptionIndex);
-    }
+    @SuppressWarnings("mutable") // FIXME: Wrap this into immutable type
+    abstract int[] getSubscriptionIndex();
 }

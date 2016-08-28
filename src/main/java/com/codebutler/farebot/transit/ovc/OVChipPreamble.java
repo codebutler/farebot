@@ -23,129 +23,56 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
-class OVChipPreamble implements Parcelable {
+@AutoValue
+abstract class OVChipPreamble implements Parcelable {
 
-    public static final Parcelable.Creator<OVChipPreamble> CREATOR = new Parcelable.Creator<OVChipPreamble>() {
-        @Override
-        public OVChipPreamble createFromParcel(Parcel source) {
-            final String id = source.readString();
-            final int checkbit = source.readInt();
-            final String manufacturer = source.readString();
-            final String publisher = source.readString();
-            final String unknownConstant1 = source.readString();
-            final int expdate = source.readInt();
-            final String unknownConstant2 = source.readString();
-            final int type = source.readInt();
-
-            return new OVChipPreamble(id, checkbit,
-                    manufacturer, publisher,
-                    unknownConstant1, expdate,
-                    unknownConstant2, type);
-        }
-
-        @Override
-        public OVChipPreamble[] newArray(int size) {
-            return new OVChipPreamble[size];
-        }
-    };
-
-    private final String mId;
-    private final int mCheckbit;
-    private final String mManufacturer;
-    private final String mPublisher;
-    private final String mUnknownConstant1;
-    private final int mExpdate;
-    private final String mUnknownConstant2;
-    private final int mType;
-
-    private OVChipPreamble(
-            String id,
-            int checkbit,
-            String manufacturer,
-            String publisher,
-            String unknownConstant1,
-            int expdate,
-            String unknownConstant2,
-            int type
-    ) {
-        mId = id;
-        mCheckbit = checkbit;
-        mManufacturer = manufacturer;
-        mPublisher = publisher;
-        mUnknownConstant1 = unknownConstant1;
-        mExpdate = expdate;
-        mUnknownConstant2 = unknownConstant2;
-        mType = type;
-    }
-
-    OVChipPreamble(byte[] data) {
+    @NonNull
+    static OVChipPreamble create(byte[] data) {
         if (data == null) {
             data = new byte[48];
         }
 
         String hex = Utils.getHexString(data, null);
 
-        mId = hex.substring(0, 8);
-        mCheckbit = Utils.getBitsFromBuffer(data, 32, 8);
-        mManufacturer = hex.substring(10, 20);
-        mPublisher = hex.substring(20, 32);
-        mUnknownConstant1 = hex.substring(32, 54);
-        mExpdate = Utils.getBitsFromBuffer(data, 216, 20);
-        mUnknownConstant2 = hex.substring(59, 68);
-        mType = Utils.getBitsFromBuffer(data, 276, 4);
+        String id = hex.substring(0, 8);
+        int checkbit = Utils.getBitsFromBuffer(data, 32, 8);
+        String manufacturer = hex.substring(10, 20);
+        String publisher = hex.substring(20, 32);
+        String unknownConstant1 = hex.substring(32, 54);
+        int expdate = Utils.getBitsFromBuffer(data, 216, 20);
+        String unknownConstant2 = hex.substring(59, 68);
+        int type = Utils.getBitsFromBuffer(data, 276, 4);
+
+        return new AutoValue_OVChipPreamble(
+                id,
+                checkbit,
+                manufacturer,
+                publisher,
+                unknownConstant1,
+                expdate,
+                unknownConstant2,
+                type);
     }
 
-    public String getId() {
-        return mId;
-    }
+    public abstract String getId();
 
-    public int getCheckbit() {
-        return mCheckbit;
-    }
+    public abstract int getCheckbit();
 
-    public String getManufacturer() {
-        return mManufacturer;
-    }
+    public abstract String getManufacturer();
 
-    public String getPublisher() {
-        return mPublisher;
-    }
+    public abstract String getPublisher();
 
-    public String getUnknownConstant1() {
-        return mUnknownConstant1;
-    }
+    public abstract String getUnknownConstant1();
 
-    public int getExpdate() {
-        return mExpdate;
-    }
+    public abstract int getExpdate();
 
-    public String getUnknownConstant2() {
-        return mUnknownConstant2;
-    }
+    public abstract String getUnknownConstant2();
 
-    public int getType() {
-        return mType;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mId);
-        parcel.writeInt(mCheckbit);
-        parcel.writeString(mManufacturer);
-        parcel.writeString(mPublisher);
-        parcel.writeString(mUnknownConstant1);
-        parcel.writeInt(mExpdate);
-        parcel.writeString(mUnknownConstant2);
-        parcel.writeInt(mType);
-    }
+    public abstract int getType();
 }

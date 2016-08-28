@@ -250,7 +250,10 @@ final class SuicaUtil {
                     : COLUMN_COMPANYNAME_EN));
             String stationName = cursor.getString(cursor.getColumnIndex(isJa ? COLUMN_STATIONNAME
                     : COLUMN_STATIONNAME_EN));
-            return new Station(companyName, null, stationName, null, null, null);
+            return Station.builder()
+                    .companyName(companyName)
+                    .stationName(stationName)
+                    .build();
 
         } catch (Exception e) {
             Log.e("SuicaStationProvider", "getBusStop() error", e);
@@ -305,7 +308,13 @@ final class SuicaUtil {
                     ? COLUMN_STATIONNAME : COLUMN_STATIONNAME_EN));
             String latitude = cursor.getString(cursor.getColumnIndex(COLUMN_LATITUDE));
             String longitude = cursor.getString(cursor.getColumnIndex(COLUMN_LONGITUDE));
-            return new Station(companyName, lineName, stationName, null, latitude, longitude);
+            return Station.builder()
+                    .companyName(companyName)
+                    .lineName(lineName)
+                    .stationName(stationName)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .build();
 
         } catch (Exception e) {
             Log.e("SuicaStationProvider", "Error in getRailStation", e);

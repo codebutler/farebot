@@ -23,7 +23,8 @@
 
 package com.codebutler.farebot.transit.hsl;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
@@ -38,6 +39,8 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -45,55 +48,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class HSLTransitData extends TransitData {
-
-    public static final Creator<HSLTransitData> CREATOR = new Creator<HSLTransitData>() {
-        @Override
-        public HSLTransitData createFromParcel(Parcel source) {
-            return new HSLTransitData(source);
-        }
-
-        @Override
-        public HSLTransitData[] newArray(int size) {
-            return new HSLTransitData[size];
-        }
-    };
+@AutoValue
+public abstract class HSLTransitData extends TransitData {
 
     private static final long EPOCH = 0x32C97ED0;
-
-    private String mSerialNumber;
-    private double mBalance;
-    private List<HSLTrip> mTrips;
-    private boolean mHasKausi;
-    private long mKausiStart;
-    private long mKausiEnd;
-    private long mKausiPrevStart;
-    private long mKausiPrevEnd;
-    private long mKausiPurchasePrice;
-    private long mKausiLastUse;
-    private long mKausiPurchase;
-    private HSLRefill mLastRefill;
-    private boolean mKausiNoData;
-    private long mArvoExit;
-    private long mArvoPurchase;
-    private long mArvoExpire;
-    private long mArvoPax;
-    private long mArvoPurchasePrice;
-    private long mArvoXfer;
-    private long mArvoDiscoGroup;
-    private long mArvoMystery1;
-    private long mArvoDuration;
-    private long mArvoRegional;
-    private long mArvoJOREExt;
-    private long mArvoVehicleNumber;
-    private long mArvoUnknown;
-    private long mArvoLineJORE;
-    private long mKausiVehicleNumber;
-    private long mKausiUnknown;
-    private long mKausiLineJORE;
-    private long mKausiJOREExt;
-    private long mArvoDirection;
-    private long mKausiDirection;
 
     /*
     private static final String[] regionNames = {
@@ -108,177 +66,173 @@ public class HSLTransitData extends TransitData {
     }});
     */
 
-    public HSLTransitData(Card card) {
-        DesfireCard desfireCard = (DesfireCard) card;
-
-        byte[] data;
-
+    @NonNull
+    public static HSLTransitData create(@NonNull Card card) {
         try {
-            data = desfireCard.getApplication(0x1120ef).getFile(0x08).getData().bytes();
-            mSerialNumber = Utils.getHexString(data).substring(2, 20);  //Utils.byteArrayToInt(data, 1, 9);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing HSL serial", ex);
-        }
+            DesfireCard desfireCard = (DesfireCard) card;
 
-        try {
+            byte[] data = desfireCard.getApplication(0x1120ef).getFile(0x08).getData().bytes();
+            String serialNumber = Utils.getHexString(data).substring(2, 20);  //Utils.byteArrayToInt(data, 1, 9);
+
             data = desfireCard.getApplication(0x1120ef).getFile(0x02).getData().bytes();
-            mBalance = bitsToLong(0, 20, data);
-            mLastRefill = new HSLRefill(data);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing HSL refills", ex);
-        }
+            long balance = bitsToLong(0, 20, data);
+            HSLRefill lastRefill = HSLRefill.create(data);
 
-        try {
-            mTrips = parseTrips(desfireCard);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing HSL trips", ex);
-        }
+            List<HSLTrip> trips = parseTrips(desfireCard);
 
-        int balanceIndex = -1;
+            int balanceIndex = -1;
 
-        for (int i = 0; i < mTrips.size(); ++i) {
-            if (mTrips.get(i).mArvo == 1) {
-                balanceIndex = i;
-                break;
+            for (int i = 0; i < trips.size(); ++i) {
+                if (trips.get(i).getArvo() == 1) {
+                    balanceIndex = i;
+                    break;
+                }
             }
-        }
 
-        try {
             data = desfireCard.getApplication(0x1120ef).getFile(0x03).getData().bytes();
-            mArvoMystery1 = bitsToLong(0, 9, data);
-            mArvoDiscoGroup = bitsToLong(9, 5, data);
-            mArvoDuration = bitsToLong(14, 13, data);
-            mArvoRegional = bitsToLong(27, 5, data);
+            long arvoMystery1 = bitsToLong(0, 9, data);
+            long arvoDiscoGroup = bitsToLong(9, 5, data);
+            long arvoDuration = bitsToLong(14, 13, data);
+            long arvoRegional = bitsToLong(27, 5, data);
 
-            mArvoExit = cardDateToTimestamp(bitsToLong(32, 14, data), bitsToLong(46, 11, data));
-            mArvoPurchasePrice = bitsToLong(68, 14, data);
+            long arvoExit = cardDateToTimestamp(bitsToLong(32, 14, data), bitsToLong(46, 11, data));
+            long arvoPurchasePrice = bitsToLong(68, 14, data);
             //mArvoDiscoGroup = bitsToLong(82, 6,data);
 
             //68 price, 82 zone?
-            mArvoPurchase = cardDateToTimestamp(bitsToLong(88, 14, data), bitsToLong(102, 11, data));
+            long arvoPurchase = cardDateToTimestamp(bitsToLong(88, 14, data), bitsToLong(102, 11, data));
 
             //68 price, 82 zone?
-            mArvoExpire = cardDateToTimestamp(bitsToLong(113, 14, data), bitsToLong(127, 11, data));
+            long arvoExpire = cardDateToTimestamp(bitsToLong(113, 14, data), bitsToLong(127, 11, data));
 
-            mArvoPax = bitsToLong(138, 6, data);
+            long arvoPax = bitsToLong(138, 6, data);
 
             //68 price, 82 zone?
-            mArvoXfer = cardDateToTimestamp(bitsToLong(144, 14, data), bitsToLong(158, 11, data));
+            long arvoXfer = cardDateToTimestamp(bitsToLong(144, 14, data), bitsToLong(158, 11, data));
 
-            mArvoVehicleNumber = bitsToLong(169, 14, data);
+            long arvoVehicleNumber = bitsToLong(169, 14, data);
 
-            mArvoUnknown = bitsToLong(183, 2, data);
+            long arvoUnknown = bitsToLong(183, 2, data);
 
-            mArvoLineJORE = bitsToLong(185, 14, data);
-            mArvoJOREExt = bitsToLong(199, 4, data);
-            mArvoDirection = bitsToLong(203, 1, data);
+            long arvoLineJORE = bitsToLong(185, 14, data);
+            long arvoJOREExt = bitsToLong(199, 4, data);
+            long arvoDirection = bitsToLong(203, 1, data);
 
             if (balanceIndex > -1) {
-                mTrips.get(balanceIndex).mLine = Long.toString(mArvoLineJORE);
-                mTrips.get(balanceIndex).mVehicleNumber = mArvoVehicleNumber;
-            } else if (mArvoPurchase > 2) {
-                HSLTrip t = new HSLTrip();
-                t.mArvo = 1;
-                t.mExpireTimestamp = mArvoExpire;
-                t.mFare = mArvoPurchasePrice;
-                t.mPax = mArvoPax;
-                t.mTimestamp = mArvoPurchase;
-                t.mVehicleNumber = mArvoVehicleNumber;
-                t.mLine = Long.toString(mArvoLineJORE);
-                mTrips.add(t);
-                Collections.sort(mTrips, new Trip.Comparator());
+                trips.set(balanceIndex, HSLTrip.builder(trips.get(balanceIndex))
+                        .line(Long.toString(arvoLineJORE))
+                        .vehicleNumber(arvoVehicleNumber)
+                        .build());
+            } else if (arvoPurchase > 2) {
+                trips.add(HSLTrip.builder()
+                        .arvo(1)
+                        .expireTimestamp(arvoExpire)
+                        .fare(arvoPurchasePrice)
+                        .pax(arvoPax)
+                        .timestamp(arvoPurchase)
+                        .vehicleNumber(arvoVehicleNumber)
+                        .line(Long.toString(arvoLineJORE))
+                        .build());
+                Collections.sort(trips, new Trip.Comparator());
             }
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing HSL value data", ex);
-        }
 
-        int seasonIndex = -1;
-        for (int i = 0; i < mTrips.size(); ++i) {
-            if (mTrips.get(i).mArvo == 0) {
-                seasonIndex = i;
-                break;
+            int seasonIndex = -1;
+            for (int i = 0; i < trips.size(); ++i) {
+                if (trips.get(i).getArvo() == 0) {
+                    seasonIndex = i;
+                    break;
+                }
             }
-        }
 
-        try {
             data = desfireCard.getApplication(0x1120ef).getFile(0x01).getData().bytes();
 
+            boolean kausiNoData = false;
             if (bitsToLong(19, 14, data) == 0 && bitsToLong(67, 14, data) == 0) {
-                mKausiNoData = true;
+                kausiNoData = true;
             }
 
-            mKausiStart = cardDateToTimestamp(bitsToLong(19, 14, data), 0);
-            mKausiEnd = cardDateToTimestamp(bitsToLong(33, 14, data), 0);
-            mKausiPrevStart = cardDateToTimestamp(bitsToLong(67, 14, data), 0);
-            mKausiPrevEnd = cardDateToTimestamp(bitsToLong(81, 14, data), 0);
-            if (mKausiPrevStart > mKausiStart) {
-                final long temp = mKausiStart;
-                final long temp2 = mKausiEnd;
-                mKausiStart = mKausiPrevStart;
-                mKausiEnd = mKausiPrevEnd;
-                mKausiPrevStart = temp;
-                mKausiPrevEnd = temp2;
+            long kausiStart = cardDateToTimestamp(bitsToLong(19, 14, data), 0);
+            long kausiEnd = cardDateToTimestamp(bitsToLong(33, 14, data), 0);
+            long kausiPrevStart = cardDateToTimestamp(bitsToLong(67, 14, data), 0);
+            long kausiPrevEnd = cardDateToTimestamp(bitsToLong(81, 14, data), 0);
+            if (kausiPrevStart > kausiStart) {
+                final long temp = kausiStart;
+                final long temp2 = kausiEnd;
+                kausiStart = kausiPrevStart;
+                kausiEnd = kausiPrevEnd;
+                kausiPrevStart = temp;
+                kausiPrevEnd = temp2;
             }
-            mHasKausi = mKausiEnd > (System.currentTimeMillis() / 1000.0);
-            mKausiPurchase = cardDateToTimestamp(bitsToLong(110, 14, data), bitsToLong(124, 11, data));
-            mKausiPurchasePrice = bitsToLong(149, 15, data);
-            mKausiLastUse = cardDateToTimestamp(bitsToLong(192, 14, data), bitsToLong(206, 11, data));
-            mKausiVehicleNumber = bitsToLong(217, 14, data);
+            boolean hasKausi = kausiEnd > (System.currentTimeMillis() / 1000.0);
+            long kausiPurchase = cardDateToTimestamp(bitsToLong(110, 14, data), bitsToLong(124, 11, data));
+            long kausiPurchasePrice = bitsToLong(149, 15, data);
+            long kausiLastUse = cardDateToTimestamp(bitsToLong(192, 14, data), bitsToLong(206, 11, data));
+            long kausiVehicleNumber = bitsToLong(217, 14, data);
             //mTrips[0].mVehicleNumber = mArvoVehicleNumber;
 
-            mKausiUnknown = bitsToLong(231, 2, data);
+            long kausiUnknown = bitsToLong(231, 2, data);
 
-            mKausiLineJORE = bitsToLong(233, 14, data);
+            long kausiLineJORE = bitsToLong(233, 14, data);
             //mTrips[0].mLine = Long.toString(mArvoLineJORE).substring(1);
 
-            mKausiJOREExt = bitsToLong(247, 4, data);
-            mKausiDirection = bitsToLong(241, 1, data);
+            long kausiJOREExt = bitsToLong(247, 4, data);
+            long kausiDirection = bitsToLong(241, 1, data);
             if (seasonIndex > -1) {
-                mTrips.get(seasonIndex).mVehicleNumber = mKausiVehicleNumber;
-                mTrips.get(seasonIndex).mLine = Long.toString(mKausiLineJORE);
-            } else if (mKausiVehicleNumber > 0) {
-                HSLTrip t = new HSLTrip();
-                t.mArvo = 0;
-                t.mExpireTimestamp = mKausiPurchase;
-                t.mFare = mKausiPurchasePrice;
-                t.mPax = 1;
-                t.mTimestamp = mKausiPurchase;
-                t.mVehicleNumber = mKausiVehicleNumber;
-                t.mLine = Long.toString(mKausiLineJORE);
-                mTrips.add(t);
-                Collections.sort(mTrips, new Trip.Comparator());
+                trips.set(seasonIndex, HSLTrip.builder(trips.get(seasonIndex))
+                        .vehicleNumber(kausiVehicleNumber)
+                        .line(Long.toString(kausiLineJORE))
+                        .build());
+            } else if (kausiVehicleNumber > 0) {
+                trips.add(HSLTrip.builder()
+                        .arvo(0)
+                        .expireTimestamp(kausiPurchase)
+                        .fare(kausiPurchasePrice)
+                        .pax(1)
+                        .timestamp(kausiPurchase)
+                        .vehicleNumber(kausiVehicleNumber)
+                        .line(Long.toString(kausiLineJORE))
+                        .build());
+                Collections.sort(trips, new Trip.Comparator());
             }
+
+            return new AutoValue_HSLTransitData.Builder()
+                    .serialNumber(serialNumber)
+                    .trips(ImmutableList.<Trip>copyOf(trips))
+                    .refills(Collections.<Refill>singletonList(lastRefill))
+                    .balance(balance)
+                    .hasKausi(hasKausi)
+                    .kausiStart(kausiStart)
+                    .kausiEnd(kausiEnd)
+                    .kausiPrevStart(kausiPrevStart)
+                    .kausiPrevEnd(kausiPrevEnd)
+                    .kausiPurchasePrice(kausiPurchasePrice)
+                    .kausiLastUse(kausiLastUse)
+                    .kausiPurchase(kausiPurchase)
+                    .kausiNoData(kausiNoData)
+                    .arvoExit(arvoExit)
+                    .arvoPurchase(arvoPurchase)
+                    .arvoExpire(arvoExpire)
+                    .arvoPax(arvoPax)
+                    .arvoPurchasePrice(arvoPurchasePrice)
+                    .arvoXfer(arvoXfer)
+                    .arvoDiscoGroup(arvoDiscoGroup)
+                    .arvoMystery1(arvoMystery1)
+                    .arvoDuration(arvoDuration)
+                    .arvoRegional(arvoRegional)
+                    .arvoJOREExt(arvoJOREExt)
+                    .arvoVehicleNumber(arvoVehicleNumber)
+                    .arvoUnknown(arvoUnknown)
+                    .arvoLineJORE(arvoLineJORE)
+                    .kausiVehicleNumber(kausiVehicleNumber)
+                    .kausiUnknown(kausiUnknown)
+                    .kausiLineJORE(kausiLineJORE)
+                    .kausiJOREExt(kausiJOREExt)
+                    .arvoDirection(arvoDirection)
+                    .kausiDirection(kausiDirection)
+                    .build();
         } catch (Exception ex) {
-            throw new RuntimeException("Error parsing HSL kausi data", ex);
+            throw new RuntimeException("Error parsing HSL data", ex);
         }
-    }
-
-    private HSLTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readString();
-        mBalance = parcel.readDouble();
-        mArvoMystery1 = parcel.readLong();
-        mArvoDuration = parcel.readLong();
-        mArvoRegional = parcel.readLong();
-        mArvoExit = parcel.readLong();
-        mArvoPurchasePrice = parcel.readLong();
-        mArvoDiscoGroup = parcel.readLong();
-        mArvoPurchase = parcel.readLong();
-        mArvoExpire = parcel.readLong();
-        mArvoPax = parcel.readLong();
-        mArvoXfer = parcel.readLong();
-        mArvoVehicleNumber = parcel.readLong();
-        mArvoUnknown = parcel.readLong();
-        mArvoLineJORE = parcel.readLong();
-        mArvoJOREExt = parcel.readLong();
-        mArvoDirection = parcel.readLong();
-        mKausiVehicleNumber = parcel.readLong();
-        mKausiUnknown = parcel.readLong();
-        mKausiLineJORE = parcel.readLong();
-        mKausiJOREExt = parcel.readLong();
-        mKausiDirection = parcel.readLong();
-
-        mTrips = new ArrayList<>();
-        parcel.readTypedList(mTrips, HSLTrip.CREATOR);
     }
 
     public static boolean check(Card card) {
@@ -316,19 +270,21 @@ public class HSLTransitData extends TransitData {
         return (EPOCH) + day * (60 * 60 * 24) + minute * 60;
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return "HSL";
     }
 
+    @NonNull
     @Override
     public String getBalanceString() {
         FareBotApplication app = FareBotApplication.getInstance();
-        String ret = NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mBalance / 100);
-        if (mHasKausi) {
+        String ret = NumberFormat.getCurrencyInstance(Locale.GERMANY).format(getBalance() / 100);
+        if (getHasKausi()) {
             ret += "\n" + app.getString(R.string.hsl_pass_is_valid);
         }
-        if (mArvoExpire * 1000.0 > System.currentTimeMillis()) {
+        if (getArvoExpire() * 1000.0 > System.currentTimeMillis()) {
             ret += "\n" + app.getString(R.string.hsl_value_ticket_is_valid) + "!";
         }
         return ret;
@@ -396,42 +352,26 @@ public class HSLTransitData extends TransitData {
     }
     */
 
+    @Nullable
     @Override
-    public String getSerialNumber() {
-        return mSerialNumber;
-    }
-
-    @Override
-    public Trip[] getTrips() {
-        return mTrips.toArray(new HSLTrip[mTrips.size()]);
-    }
-
-    @Override
-    public Refill[] getRefills() {
-        Refill[] ret = {mLastRefill};
-        return ret;
-    }
-
-    @Override
-    public Subscription[] getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         return null;
     }
 
-    private List<HSLTrip> parseTrips(DesfireCard card) {
+    @NonNull
+    private static List<HSLTrip> parseTrips(@NonNull DesfireCard card) {
         DesfireFile file = card.getApplication(0x1120ef).getFile(0x04);
-
         if (file instanceof RecordDesfireFile) {
             RecordDesfireFile recordFile = (RecordDesfireFile) card.getApplication(0x1120ef).getFile(0x04);
-
-
             List<HSLTrip> useLog = new ArrayList<>();
             for (int i = 0; i < recordFile.getRecords().size(); i++) {
-                useLog.add(new HSLTrip(recordFile.getRecords().get(i)));
+                useLog.add(HSLTrip.create(recordFile.getRecords().get(i)));
             }
             Collections.sort(useLog, new Trip.Comparator());
             return useLog;
@@ -439,36 +379,135 @@ public class HSLTransitData extends TransitData {
         return new ArrayList<>();
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mSerialNumber);
-        parcel.writeDouble(mBalance);
+    abstract double getBalance();
 
-        parcel.writeLong(mArvoMystery1);
-        parcel.writeLong(mArvoDuration);
-        parcel.writeLong(mArvoRegional);
+    abstract boolean getHasKausi();
 
-        parcel.writeLong(mArvoExit);
-        parcel.writeLong(mArvoPurchasePrice);
-        parcel.writeLong(mArvoDiscoGroup);
-        parcel.writeLong(mArvoPurchase);
-        parcel.writeLong(mArvoExpire);
-        parcel.writeLong(mArvoPax);
-        parcel.writeLong(mArvoXfer);
-        parcel.writeLong(mArvoVehicleNumber);
-        parcel.writeLong(mArvoUnknown);
-        parcel.writeLong(mArvoLineJORE);
-        parcel.writeLong(mArvoJOREExt);
-        parcel.writeLong(mArvoDirection);
-        parcel.writeLong(mKausiVehicleNumber);
-        parcel.writeLong(mKausiUnknown);
-        parcel.writeLong(mKausiLineJORE);
-        parcel.writeLong(mKausiJOREExt);
-        parcel.writeLong(mKausiDirection);
-        if (mTrips != null) {
-            parcel.writeTypedList(mTrips);
-        } else {
-            parcel.writeInt(0);
-        }
+    abstract long getKausiStart();
+
+    abstract long getKausiEnd();
+
+    abstract long getKausiPrevStart();
+
+    abstract long getKausiPrevEnd();
+
+    abstract long getKausiPurchasePrice();
+
+    abstract long getKausiLastUse();
+
+    abstract long getKausiPurchase();
+
+    abstract boolean getKausiNoData();
+
+    abstract long getArvoExit();
+
+    abstract long getArvoPurchase();
+
+    abstract long getArvoExpire();
+
+    abstract long getArvoPax();
+
+    abstract long getArvoPurchasePrice();
+
+    abstract long getArvoXfer();
+
+    abstract long getArvoDiscoGroup();
+
+    abstract long getArvoMystery1();
+
+    abstract long getArvoDuration();
+
+    abstract long getArvoRegional();
+
+    abstract long getArvoJOREExt();
+
+    abstract long getArvoVehicleNumber();
+
+    abstract long getArvoUnknown();
+
+    abstract long getArvoLineJORE();
+
+    abstract long getKausiVehicleNumber();
+
+    abstract long getKausiUnknown();
+
+    abstract long getKausiLineJORE();
+
+    abstract long getKausiJOREExt();
+
+    abstract long getArvoDirection();
+
+    abstract long getKausiDirection();
+
+    @AutoValue.Builder
+    abstract static class Builder {
+
+        abstract Builder serialNumber(String serialNumber);
+
+        abstract Builder trips(List<Trip> trips);
+
+        abstract Builder refills(List<Refill> refills);
+
+        abstract Builder balance(double balance);
+
+        abstract Builder hasKausi(boolean hasKausi);
+
+        abstract Builder kausiStart(long kausiStart);
+
+        abstract Builder kausiEnd(long kausiEnd);
+
+        abstract Builder kausiPrevStart(long kausiPrevStart);
+
+        abstract Builder kausiPrevEnd(long kausiPrevEnd);
+
+        abstract Builder kausiPurchasePrice(long kausiPurchasePrice);
+
+        abstract Builder kausiLastUse(long kausiLastUse);
+
+        abstract Builder kausiPurchase(long kausiPurchase);
+
+        abstract Builder kausiNoData(boolean kausiNoData);
+
+        abstract Builder arvoExit(long arvoExit);
+
+        abstract Builder arvoPurchase(long arvoPurchase);
+
+        abstract Builder arvoExpire(long arvoExpire);
+
+        abstract Builder arvoPax(long arvoPax);
+
+        abstract Builder arvoPurchasePrice(long arvoPurchasePrice);
+
+        abstract Builder arvoXfer(long arvoXfer);
+
+        abstract Builder arvoDiscoGroup(long arvoDiscoGroup);
+
+        abstract Builder arvoMystery1(long arvoMystery1);
+
+        abstract Builder arvoDuration(long arvoDuration);
+
+        abstract Builder arvoRegional(long arvoRegional);
+
+        abstract Builder arvoJOREExt(long arvoJOREExt);
+
+        abstract Builder arvoVehicleNumber(long arvoVehicleNumber);
+
+        abstract Builder arvoUnknown(long arvoUnknown);
+
+        abstract Builder arvoLineJORE(long arvoLineJORE);
+
+        abstract Builder kausiVehicleNumber(long kausiVehicleNumber);
+
+        abstract Builder kausiUnknown(long kausiUnknown);
+
+        abstract Builder kausiLineJORE(long kausiLineJORE);
+
+        abstract Builder kausiJOREExt(long kausiJOREExt);
+
+        abstract Builder arvoDirection(long arvoDirection);
+
+        abstract Builder kausiDirection(long kausiDirection);
+
+        abstract HSLTransitData build();
     }
 }

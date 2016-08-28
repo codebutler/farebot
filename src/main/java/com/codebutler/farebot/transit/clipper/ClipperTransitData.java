@@ -26,98 +26,66 @@
 
 package com.codebutler.farebot.transit.clipper;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
+import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class ClipperTransitData extends TransitData {
-
-    public static final Creator<ClipperTransitData> CREATOR = new Creator<ClipperTransitData>() {
-        @Override
-        public ClipperTransitData createFromParcel(Parcel parcel) {
-            return new ClipperTransitData(parcel);
-        }
-
-        @Override
-        public ClipperTransitData[] newArray(int size) {
-            return new ClipperTransitData[size];
-        }
-    };
+@AutoValue
+public abstract class ClipperTransitData extends TransitData {
 
     private static final int RECORD_LENGTH = 32;
     private static final long EPOCH_OFFSET = 0x83aa7f18;
 
-    private final long mSerialNumber;
-    private final short mBalance;
-    private final ClipperTrip[] mTrips;
-    private final ClipperRefill[] mRefills;
-
-    private ClipperTransitData(Parcel parcel) {
-        mSerialNumber = parcel.readLong();
-        mBalance = (short) parcel.readLong();
-
-        mTrips = new ClipperTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, ClipperTrip.CREATOR);
-
-        mRefills = new ClipperRefill[parcel.readInt()];
-        parcel.readTypedArray(mRefills, ClipperRefill.CREATOR);
-    }
-
-    public ClipperTransitData(Card card) {
-        DesfireCard desfireCard = (DesfireCard) card;
-
+    @NonNull
+    public static ClipperTransitData parse(@NonNull DesfireCard desfireCard) {
         byte[] data;
 
         try {
             data = desfireCard.getApplication(0x9011f2).getFile(0x08).getData().bytes();
-            mSerialNumber = Utils.byteArrayToLong(data, 1, 4);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Clipper serial", ex);
-        }
+            long serialNumber = Utils.byteArrayToLong(data, 1, 4);
 
-        try {
             data = desfireCard.getApplication(0x9011f2).getFile(0x02).getData().bytes();
-            mBalance = (short) (((0xFF & data[18]) << 8) | (0xFF & data[19]));
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Clipper balance", ex);
-        }
+            short balance = (short) (((0xFF & data[18]) << 8) | (0xFF & data[19]));
 
-        try {
-            mTrips = parseTrips(desfireCard);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Clipper trips", ex);
-        }
+            List<ClipperRefill> refills = parseRefills(desfireCard);
+            List<ClipperTrip> trips = computeBalances(balance, parseTrips(desfireCard), refills);
 
-        try {
-            mRefills = parseRefills(desfireCard);
+            return new AutoValue_ClipperTransitData(
+                    Long.toString(serialNumber),
+                    ImmutableList.<Trip>copyOf(trips),
+                    ImmutableList.<Refill>copyOf(refills),
+                    balance);
         } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Clipper refills", ex);
+            throw new RuntimeException("Error parsing Clipper data", ex);
         }
-
-        setBalances();
     }
 
-    public static boolean check(Card card) {
+    public static boolean check(@NonNull Card card) {
         return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x9011f2) != null);
     }
 
+    @NonNull
     public static TransitIdentity parseTransitIdentity(Card card) {
         try {
             byte[] data = ((DesfireCard) card).getApplication(0x9011f2).getFile(0x08).getData().bytes();
@@ -127,42 +95,32 @@ public class ClipperTransitData extends TransitData {
         }
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return "Clipper";
     }
 
+    @NonNull
     @Override
     public String getBalanceString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(mBalance / 100.0);
+        return NumberFormat.getCurrencyInstance(Locale.US).format(getBalance() / 100.0);
     }
 
+    @Nullable
     @Override
-    public String getSerialNumber() {
-        return Long.toString(mSerialNumber);
-    }
-
-    @Override
-    public Trip[] getTrips() {
-        return mTrips;
-    }
-
-    @Override
-    public ClipperRefill[] getRefills() {
-        return mRefills;
-    }
-
-    @Override
-    public Subscription[] getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         return null;
     }
 
-    private ClipperTrip[] parseTrips(DesfireCard card) {
+    @NonNull
+    private static List<ClipperTrip> parseTrips(@NonNull DesfireCard card) {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x0e);
 
         /*
@@ -197,15 +155,13 @@ public class ClipperTransitData extends TransitData {
             }
             pos -= RECORD_LENGTH;
         }
-        ClipperTrip[] useLog = new ClipperTrip[result.size()];
-        result.toArray(useLog);
 
-        Arrays.sort(useLog, new Trip.Comparator());
+        Collections.sort(result, new Trip.Comparator());
 
-        return useLog;
+        return result;
     }
 
-    private ClipperTrip createTrip(byte[] useData) {
+    private static ClipperTrip createTrip(byte[] useData) {
         // Use a magic number to offset the timestamp
         final long timestamp = Utils.byteArrayToLong(useData, 0xc, 4) - EPOCH_OFFSET;
         final long exitTimestamp = Utils.byteArrayToLong(useData, 0x10, 4);
@@ -219,10 +175,19 @@ public class ClipperTransitData extends TransitData {
             return null;
         }
 
-        return new ClipperTrip(timestamp, exitTimestamp, fare, agency, from, to, route);
+        return ClipperTrip.builder()
+                .timestamp(timestamp)
+                .exitTimestamp(exitTimestamp)
+                .fare(fare)
+                .agency(agency)
+                .from(from)
+                .to(to)
+                .route(route)
+                .build();
     }
 
-    private ClipperRefill[] parseRefills(DesfireCard card) {
+    @NonNull
+    private static List<ClipperRefill> parseRefills(@NonNull DesfireCard card) {
         DesfireFile file = card.getApplication(0x9011f2).getFile(0x04);
 
         /*
@@ -241,18 +206,16 @@ public class ClipperTransitData extends TransitData {
             }
             pos -= RECORD_LENGTH;
         }
-        ClipperRefill[] useLog = new ClipperRefill[result.size()];
-        useLog = result.toArray(useLog);
-        Arrays.sort(useLog, new Comparator<ClipperRefill>() {
+        Collections.sort(result, new Comparator<ClipperRefill>() {
             @Override
             public int compare(ClipperRefill r, ClipperRefill r1) {
                 return Long.valueOf(r1.getTimestamp()).compareTo(r.getTimestamp());
             }
         });
-        return useLog;
+        return result;
     }
 
-    private ClipperRefill createRefill(byte[] useData) {
+    private static ClipperRefill createRefill(byte[] useData) {
         final long timestamp = Utils.byteArrayToLong(useData, 0x4, 4);
         final long agency = Utils.byteArrayToLong(useData, 0x2, 2);
         final long machineid = Utils.byteArrayToLong(useData, 0x8, 4);
@@ -262,23 +225,30 @@ public class ClipperTransitData extends TransitData {
             return null;
         }
 
-        return new ClipperRefill(timestamp - EPOCH_OFFSET, amount, agency, machineid);
+        return ClipperRefill.create(timestamp - EPOCH_OFFSET, amount, agency, machineid);
     }
 
-    private void setBalances() {
+    @NonNull
+    private static List<ClipperTrip> computeBalances(
+            long balance,
+            @NonNull List<ClipperTrip> trips,
+            @NonNull List<ClipperRefill> refills) {
+        List<ClipperTrip> tripsWithBalance = new ArrayList<>(trips.size());
         int tripIdx = 0;
         int refillIdx = 0;
-        long balance = (long) mBalance;
-
-        while (tripIdx < mTrips.length) {
-            while (refillIdx < mRefills.length && mRefills[refillIdx].getTimestamp() > mTrips[tripIdx].getTimestamp()) {
-                balance -= mRefills[refillIdx].getAmount();
+        while (tripIdx < trips.size()) {
+            while (refillIdx < refills.size()
+                    && refills.get(refillIdx).getTimestamp() > trips.get(tripIdx).getTimestamp()) {
+                balance -= refills.get(refillIdx).getAmount();
                 refillIdx++;
             }
-            mTrips[tripIdx].mBalance = balance;
-            balance += mTrips[tripIdx].mFare;
+            tripsWithBalance.set(tripIdx, ClipperTrip.builder(trips.get(tripIdx))
+                    .balance(balance)
+                    .build());
+            balance += trips.get(tripIdx).getFare();
             tripIdx++;
         }
+        return tripsWithBalance;
     }
 
     public static String getAgencyName(int agency) {
@@ -295,15 +265,5 @@ public class ClipperTransitData extends TransitData {
         return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeLong(mSerialNumber);
-        parcel.writeLong(mBalance);
-
-        parcel.writeInt(mTrips.length);
-        parcel.writeTypedArray(mTrips, flags);
-
-        parcel.writeInt(mRefills.length);
-        parcel.writeTypedArray(mRefills, flags);
-    }
+    abstract short getBalance();
 }

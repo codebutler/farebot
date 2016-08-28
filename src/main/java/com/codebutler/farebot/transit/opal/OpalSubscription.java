@@ -19,11 +19,12 @@
 
 package com.codebutler.farebot.transit.opal;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.Date;
 
@@ -35,19 +36,13 @@ import java.util.Date;
  *
  * Dates given are not valid.
  */
-class OpalSubscription extends Subscription {
+@AutoValue
+abstract class OpalSubscription extends Subscription {
 
-    public static final Creator<OpalSubscription> CREATOR = new Creator<OpalSubscription>() {
-        @Override
-        public OpalSubscription createFromParcel(Parcel source) {
-            return new OpalSubscription();
-        }
-
-        @Override
-        public OpalSubscription[] newArray(int size) {
-            return new OpalSubscription[size];
-        }
-    };
+    @NonNull
+    public static OpalSubscription create() {
+        return new AutoValue_OpalSubscription();
+    }
 
     @Override
     public int getId() {
@@ -90,7 +85,4 @@ class OpalSubscription extends Subscription {
     public String getActivation() {
         return null;
     }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) { }
 }

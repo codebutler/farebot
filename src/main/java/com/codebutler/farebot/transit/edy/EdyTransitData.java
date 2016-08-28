@@ -24,16 +24,20 @@
 
 package com.codebutler.farebot.transit.edy;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
+import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
+import com.google.auto.value.AutoValue;
 
 import net.kazzz.felica.lib.FeliCaLib;
 import net.kazzz.felica.lib.Util;
@@ -43,19 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class EdyTransitData extends TransitData {
-
-    public static final Creator<EdyTransitData> CREATOR = new Creator<EdyTransitData>() {
-        @Override
-        public EdyTransitData createFromParcel(Parcel parcel) {
-            return new EdyTransitData(parcel);
-        }
-
-        @Override
-        public EdyTransitData[] newArray(int size) {
-            return new EdyTransitData[size];
-        }
-    };
+@AutoValue
+public abstract class EdyTransitData extends TransitData {
 
     // defines
     static final int FELICA_MODE_EDY_DEBIT = 0x20;
@@ -66,19 +59,16 @@ public class EdyTransitData extends TransitData {
     private static final int FELICA_SERVICE_EDY_BALANCE = 0x1317;
     private static final int FELICA_SERVICE_EDY_HISTORY = 0x170F;
 
-    // private data
-    private EdyTrip[] mTrips;
-    private byte[] mSerialNumber = new byte[8];
-    private int mCurrentBalance;
-
-    public EdyTransitData(FelicaCard card) {
+    @NonNull
+    public static EdyTransitData create(@NonNull FelicaCard card) {
         // card ID is in block 0, bytes 2-9, big-endian ordering
+        byte[] serialNumber = new byte[8];
         FelicaService serviceID = card.getSystem(FeliCaLib.SYSTEMCODE_EDY).getService(FELICA_SERVICE_EDY_ID);
         List<FelicaBlock> blocksID = serviceID.getBlocks();
         FelicaBlock blockID = blocksID.get(0);
         byte[] dataID = blockID.getData().bytes();
         for (int i = 2; i < 10; i++) {
-            mSerialNumber[i - 2] = dataID[i];
+            serialNumber[i - 2] = dataID[i];
         }
 
         // current balance info in block 0, bytes 0-3, little-endian ordering
@@ -86,49 +76,48 @@ public class EdyTransitData extends TransitData {
         List<FelicaBlock> blocksBalance = serviceBalance.getBlocks();
         FelicaBlock blockBalance = blocksBalance.get(0);
         byte[] dataBalance = blockBalance.getData().bytes();
-        mCurrentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
+        int currentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
 
         // now read the transaction history
         FelicaService serviceHistory = card.getSystem(FeliCaLib.SYSTEMCODE_EDY).getService(FELICA_SERVICE_EDY_HISTORY);
-        List<EdyTrip> trips = new ArrayList<>();
+        List<Trip> trips = new ArrayList<>();
 
         // Read blocks in order
         List<FelicaBlock> blocks = serviceHistory.getBlocks();
         for (int i = 0; i < blocks.size(); i++) {
             FelicaBlock block = blocks.get(i);
-            EdyTrip trip = new EdyTrip(block);
+            EdyTrip trip = EdyTrip.create(block);
             trips.add(trip);
         }
 
-        mTrips = trips.toArray(new EdyTrip[trips.size()]);
+        return new AutoValue_EdyTransitData(trips, ByteArray.create(serialNumber), currentBalance);
     }
 
-    private EdyTransitData(Parcel parcel) {
-        mTrips = new EdyTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, EdyTrip.CREATOR);
-    }
-
-    public static boolean check(FelicaCard card) {
+    public static boolean check(@NonNull FelicaCard card) {
         return (card.getSystem(FeliCaLib.SYSTEMCODE_EDY) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity(FelicaCard card) {
+    @NonNull
+    public static TransitIdentity parseTransitIdentity(@NonNull FelicaCard card) {
         return new TransitIdentity("Edy", null);
     }
 
+    @NonNull
     @Override
     public String getBalanceString() {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
-        return format.format(mCurrentBalance);
+        return format.format(getCurrentBalance());
     }
 
+    @NonNull
     @Override
     public String getSerialNumber() {
+        byte[] serialNumber = getSerialNumberData().bytes();
         StringBuilder str = new StringBuilder(20);
         for (int i = 0; i < 8; i += 2) {
-            str.append(String.format("%02X", mSerialNumber[i]));
-            str.append(String.format("%02X", mSerialNumber[i + 1]));
+            str.append(String.format("%02X", serialNumber[i]));
+            str.append(String.format("%02X", serialNumber[i + 1]));
             if (i < 6) {
                 str.append(" ");
             }
@@ -136,30 +125,33 @@ public class EdyTransitData extends TransitData {
         return str.toString();
     }
 
+    @Nullable
     @Override
-    public Trip[] getTrips() {
-        return mTrips;
-    }
-
-    @Override
-    public Subscription[] getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         return null;
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return "Edy";
     }
 
+    @Nullable
     @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mTrips.length);
-        parcel.writeTypedArray(mTrips, flags);
+    public List<Refill> getRefills() {
+        return null;
     }
+
+    @NonNull
+    abstract ByteArray getSerialNumberData();
+
+    abstract int getCurrentBalance();
 }
 

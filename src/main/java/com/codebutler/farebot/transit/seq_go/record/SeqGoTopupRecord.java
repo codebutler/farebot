@@ -19,11 +19,12 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.transit.seq_go.SeqGoUtil;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.util.GregorianCalendar;
 
@@ -31,91 +32,30 @@ import java.util.GregorianCalendar;
  * Top-up record type
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#top-up-record-type
  */
-public class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
+@AutoValue
+public abstract class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
 
-    public static final Creator<SeqGoTopupRecord> CREATOR = new Creator<SeqGoTopupRecord>() {
-        @Override
-        public SeqGoTopupRecord createFromParcel(Parcel source) {
-            return new SeqGoTopupRecord(source);
-        }
-
-        @Override
-        public SeqGoTopupRecord[] newArray(int size) {
-            return new SeqGoTopupRecord[size];
-        }
-    };
-
-    private GregorianCalendar mTimestamp;
-    private int mCredit;
-    private int mStation;
-    private int mChecksum;
-    private boolean mAutomatic;
-
-    private SeqGoTopupRecord() { }
-
-    public SeqGoTopupRecord(Parcel parcel) {
-        mTimestamp = new GregorianCalendar();
-        mTimestamp.setTimeInMillis(parcel.readLong());
-        mCredit = parcel.readInt();
-        mStation = parcel.readInt();
-        mChecksum = parcel.readInt();
-        mAutomatic = parcel.readInt() == 1;
-    }
-
+    @NonNull
     public static SeqGoTopupRecord recordFromBytes(byte[] input) {
         if ((input[0] != 0x01 && input[0] != 0x31) || input[1] != 0x01) {
             throw new AssertionError("Not a topup record");
         }
 
-        SeqGoTopupRecord record = new SeqGoTopupRecord();
-
-        byte[] ts = Utils.reverseBuffer(input, 2, 4);
-        record.mTimestamp = SeqGoUtil.unpackDate(ts);
-
-        byte[] credit = Utils.reverseBuffer(input, 6, 2);
-        record.mCredit = Utils.byteArrayToInt(credit);
-
-        byte[] station = Utils.reverseBuffer(input, 12, 2);
-        record.mStation = Utils.byteArrayToInt(station);
-
-        byte[] checksum = Utils.reverseBuffer(input, 14, 2);
-        record.mChecksum = Utils.byteArrayToInt(checksum);
-
-        record.mAutomatic = input[0] == 0x31;
-        return record;
+        GregorianCalendar timestamp = SeqGoUtil.unpackDate(Utils.reverseBuffer(input, 2, 4));
+        int credit = Utils.byteArrayToInt(Utils.reverseBuffer(input, 6, 2));
+        int station = Utils.byteArrayToInt(Utils.reverseBuffer(input, 12, 2));
+        int checksum = Utils.byteArrayToInt(Utils.reverseBuffer(input, 14, 2));
+        boolean automatic = input[0] == 0x31;
+        return new AutoValue_SeqGoTopupRecord(timestamp, credit, station, checksum, automatic);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    public abstract GregorianCalendar getTimestamp();
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(mTimestamp.getTimeInMillis());
-        parcel.writeInt(mCredit);
-        parcel.writeInt(mStation);
-        parcel.writeInt(mChecksum);
-        parcel.writeInt(mAutomatic ? 1 : 0);
-    }
+    public abstract int getCredit();
 
-    public GregorianCalendar getTimestamp() {
-        return mTimestamp;
-    }
+    public abstract int getStation();
 
-    public int getCredit() {
-        return mCredit;
-    }
+    public abstract int getChecksum();
 
-    public int getStation() {
-        return mStation;
-    }
-
-    public int getChecksum() {
-        return mChecksum;
-    }
-
-    public boolean getAutomatic() {
-        return mAutomatic;
-    }
+    public abstract boolean getAutomatic();
 }

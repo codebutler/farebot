@@ -39,6 +39,7 @@ import com.codebutler.farebot.transit.TransitData;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class CardRefillsFragment extends ListFragment {
     @Override
@@ -50,7 +51,7 @@ public class CardRefillsFragment extends ListFragment {
     }
 
     private static class RefillsListAdapter extends ArrayAdapter<Refill> {
-        RefillsListAdapter(Context context, Refill[] refills) {
+        RefillsListAdapter(Context context, List<Refill> refills) {
             super(context, 0, refills);
         }
 

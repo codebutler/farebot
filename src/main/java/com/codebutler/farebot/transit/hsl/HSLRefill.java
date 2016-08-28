@@ -22,52 +22,26 @@
 
 package com.codebutler.farebot.transit.hsl;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Refill;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-class HSLRefill extends Refill {
+@AutoValue
+abstract class HSLRefill extends Refill {
 
-    public static final Creator<HSLRefill> CREATOR = new Creator<HSLRefill>() {
-        @Override
-        public HSLRefill createFromParcel(Parcel source) {
-            return new HSLRefill(source);
-        }
-
-        @Override
-        public HSLRefill[] newArray(int size) {
-            return new HSLRefill[size];
-        }
-    };
-
-    private final long mRefillTime;
-    private final long mRefillAmount;
-
-    HSLRefill(byte[] data) {
-        mRefillTime = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(20, 14, data),
+    @NonNull
+    static HSLRefill create(byte[] data) {
+        long timestamp = HSLTransitData.cardDateToTimestamp(
+                HSLTransitData.bitsToLong(20, 14, data),
                 HSLTransitData.bitsToLong(34, 11, data));
-        mRefillAmount = HSLTransitData.bitsToLong(45, 20, data);
-    }
-
-    private HSLRefill(Parcel parcel) {
-        mRefillTime = parcel.readLong();
-        mRefillAmount = parcel.readLong();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(mRefillTime);
-        dest.writeLong(mRefillAmount);
-    }
-
-    @Override
-    public long getTimestamp() {
-        return mRefillTime;
+        long amount = HSLTransitData.bitsToLong(45, 20, data);
+        return new AutoValue_HSLRefill(timestamp, amount);
     }
 
     @Override
@@ -81,12 +55,7 @@ class HSLRefill extends Refill {
     }
 
     @Override
-    public long getAmount() {
-        return mRefillAmount;
-    }
-
-    @Override
     public String getAmountString() {
-        return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mRefillAmount / 100.0);
+        return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(getAmount() / 100.0);
     }
 }

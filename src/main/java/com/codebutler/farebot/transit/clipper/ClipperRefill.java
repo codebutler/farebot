@@ -22,80 +22,38 @@
 
 package com.codebutler.farebot.transit.clipper;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Refill;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-class ClipperRefill extends Refill {
+@AutoValue
+abstract class ClipperRefill extends Refill {
 
-    public static final Creator<ClipperRefill> CREATOR = new Creator<ClipperRefill>() {
-        @Override
-        public ClipperRefill createFromParcel(Parcel parcel) {
-            return new ClipperRefill(parcel);
-        }
-
-        @Override
-        public ClipperRefill[] newArray(int size) {
-            return new ClipperRefill[size];
-        }
-    };
-
-    private final long mTimestamp;
-    private final long mAmount;
-    private final long mMachineID;
-    private final long mAgency;
-
-    ClipperRefill(long timestamp, long amount, long agency, long machineid) {
-        mTimestamp = timestamp;
-        mAmount = amount;
-        mMachineID = machineid;
-        mAgency = agency;
-    }
-
-    private ClipperRefill(Parcel parcel) {
-        mTimestamp = parcel.readLong();
-        mAmount = parcel.readLong();
-        mMachineID = parcel.readLong();
-        mAgency = parcel.readLong();
-    }
-
-    @Override
-    public long getTimestamp() {
-        return mTimestamp;
-    }
-
-    @Override
-    public long getAmount() {
-        return mAmount;
+    @NonNull
+    static ClipperRefill create(long timestamp, long amount, long agency, long machineid) {
+        return new AutoValue_ClipperRefill(timestamp, amount, agency, machineid);
     }
 
     @Override
     public String getAmountString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mAmount / 100.0);
-    }
-
-    public long getMachineID() {
-        return mMachineID;
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getAmount() / 100.0);
     }
 
     @Override
     public String getAgencyName() {
-        return ClipperTransitData.getAgencyName((int) mAgency);
+        return ClipperTransitData.getAgencyName((int) getAgency());
     }
 
     @Override
     public String getShortAgencyName() {
-        return ClipperTransitData.getShortAgencyName((int) mAgency);
+        return ClipperTransitData.getShortAgencyName((int) getAgency());
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeLong(mTimestamp);
-        parcel.writeLong(mAmount);
-        parcel.writeLong(mMachineID);
-        parcel.writeLong(mAgency);
-    }
+    abstract long getAgency();
+
+    abstract long getMachineID();
 }

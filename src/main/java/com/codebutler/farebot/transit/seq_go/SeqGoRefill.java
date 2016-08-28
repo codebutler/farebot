@@ -19,13 +19,13 @@
 
 package com.codebutler.farebot.transit.seq_go;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTopupRecord;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -33,34 +33,17 @@ import java.util.Locale;
 /**
  * Represents a top-up event on the Go card.
  */
-class SeqGoRefill extends Refill {
+@AutoValue
+abstract class SeqGoRefill extends Refill {
 
-    public static final Parcelable.Creator<SeqGoRefill> CREATOR = new Parcelable.Creator<SeqGoRefill>() {
-
-        @Override
-        public SeqGoRefill createFromParcel(Parcel in) {
-            return new SeqGoRefill(in);
-        }
-
-        @Override
-        public SeqGoRefill[] newArray(int size) {
-            return new SeqGoRefill[size];
-        }
-    };
-
-    private SeqGoTopupRecord mTopup;
-
-    SeqGoRefill(SeqGoTopupRecord topup) {
-        mTopup = topup;
-    }
-
-    private SeqGoRefill(Parcel parcel) {
-        mTopup = new SeqGoTopupRecord(parcel);
+    @NonNull
+    static SeqGoRefill create(SeqGoTopupRecord topup) {
+        return new AutoValue_SeqGoRefill(topup);
     }
 
     @Override
     public long getTimestamp() {
-        return mTopup.getTimestamp().getTimeInMillis() / 1000;
+        return getTopup().getTimestamp().getTimeInMillis() / 1000;
     }
 
     @Override
@@ -70,14 +53,14 @@ class SeqGoRefill extends Refill {
 
     @Override
     public String getShortAgencyName() {
-        return Utils.localizeString(mTopup.getAutomatic()
+        return Utils.localizeString(getTopup().getAutomatic()
                 ? R.string.seqgo_refill_automatic
                 : R.string.seqgo_refill_manual);
     }
 
     @Override
     public long getAmount() {
-        return mTopup.getCredit();
+        return getTopup().getCredit();
     }
 
     @Override
@@ -85,8 +68,5 @@ class SeqGoRefill extends Refill {
         return NumberFormat.getCurrencyInstance(Locale.US).format((double) getAmount() / 100);
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        mTopup.writeToParcel(parcel, i);
-    }
+    abstract SeqGoTopupRecord getTopup();
 }

@@ -69,27 +69,27 @@ public abstract class DesfireCard implements Card {
     @Nullable
     public TransitData parseTransitData() {
         if (OrcaTransitData.check(this)) {
-            return new OrcaTransitData(this);
+            return OrcaTransitData.create(this);
         }
         if (ClipperTransitData.check(this)) {
-            return new ClipperTransitData(this);
+            return ClipperTransitData.parse(this);
         }
         if (HSLTransitData.check(this)) {
-            return new HSLTransitData(this);
+            return HSLTransitData.create(this);
         }
         if (OpalTransitData.check(this)) {
-            return new OpalTransitData(this);
+            return OpalTransitData.create(this);
         }
         if (MykiTransitData.check(this)) {
-            return new MykiTransitData(this);
+            return MykiTransitData.create(this);
         }
 
         // Stub card types go last
         if (AdelaideMetrocardStubTransitData.check(this)) {
-            return new AdelaideMetrocardStubTransitData(this);
+            return AdelaideMetrocardStubTransitData.create(this);
         }
         if (AtHopStubTransitData.check(this)) {
-            return new AtHopStubTransitData(this);
+            return AtHopStubTransitData.create(this);
         }
         return null;
     }

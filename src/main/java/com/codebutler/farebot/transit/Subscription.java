@@ -43,9 +43,4 @@ public abstract class Subscription implements Parcelable {
     public abstract String getSubscriptionName();
 
     public abstract String getActivation();
-
-    @Override
-    public final int describeContents() {
-        return 0;
-    }
 }

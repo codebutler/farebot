@@ -19,33 +19,31 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 /**
  * Represents balance records on Go card
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#balance-record-type
  */
-public class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoBalanceRecord> {
+@AutoValue
+public abstract class SeqGoBalanceRecord extends SeqGoRecord implements Parcelable, Comparable<SeqGoBalanceRecord> {
 
-    private int mVersion;
-    private int mBalance;
-
-    private SeqGoBalanceRecord() { }
-
+    @NonNull
     public static SeqGoBalanceRecord recordFromBytes(byte[] input) {
         if (input[0] != 0x01) {
             throw new AssertionError();
         }
 
-
-        SeqGoBalanceRecord record = new SeqGoBalanceRecord();
-        record.mVersion = Utils.byteArrayToInt(input, 13, 1);
-
         // Do some flipping for the balance
-        byte[] balance = Utils.reverseBuffer(input, 2, 2);
-        record.mBalance = Utils.byteArrayToInt(balance, 0, 2);
+        int balance = Utils.byteArrayToInt(Utils.reverseBuffer(input, 2, 2), 0, 2);
 
-        return record;
+        int version = Utils.byteArrayToInt(input, 13, 1);
+
+        return new AutoValue_SeqGoBalanceRecord(balance, version);
     }
 
     /**
@@ -53,17 +51,13 @@ public class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoB
      *
      * @return int number of cents.
      */
-    public int getBalance() {
-        return mBalance;
-    }
+    public abstract int getBalance();
 
-    public int getVersion() {
-        return mVersion;
-    }
+    public abstract int getVersion();
 
     @Override
     public int compareTo(SeqGoBalanceRecord rhs) {
         // So sorting works, we reverse the order so highest number is first.
-        return Integer.valueOf(rhs.mVersion).compareTo(this.mVersion);
+        return Integer.valueOf(rhs.getVersion()).compareTo(this.getVersion());
     }
 }

@@ -92,18 +92,18 @@ public abstract class ClassicCard implements Card {
     @Override
     public TransitData parseTransitData() {
         if (OVChipTransitData.check(this)) {
-            return new OVChipTransitData(this);
+            return OVChipTransitData.create(this);
         } else if (BilheteUnicoSPTransitData.check(this)) {
-            return new BilheteUnicoSPTransitData(this);
+            return BilheteUnicoSPTransitData.create(this);
         } else if (ManlyFastFerryTransitData.check(this)) {
-            return new ManlyFastFerryTransitData(this);
+            return ManlyFastFerryTransitData.create(this);
         } else if (SeqGoTransitData.check(this)) {
-            return new SeqGoTransitData(this);
+            return SeqGoTransitData.create(this);
         } else if (UnauthorizedClassicTransitData.check(this)) {
             // This check must be LAST.
             //
             // This is to throw up a warning whenever there is a card with all locked sectors
-            return new UnauthorizedClassicTransitData();
+            return UnauthorizedClassicTransitData.create();
         }
 
         // The card could not be identified, but has some open sectors.

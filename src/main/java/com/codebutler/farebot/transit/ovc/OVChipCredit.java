@@ -23,42 +23,17 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
-public class OVChipCredit implements Parcelable {
+@AutoValue
+abstract class OVChipCredit implements Parcelable {
 
-    public static final Parcelable.Creator<OVChipCredit> CREATOR = new Parcelable.Creator<OVChipCredit>() {
-        @Override
-        public OVChipCredit createFromParcel(Parcel source) {
-            int id = source.readInt();
-            int creditId = source.readInt();
-            int credit = source.readInt();
-            int banbits = source.readInt();
-            return new OVChipCredit(id, creditId, credit, banbits);
-        }
-
-        @Override
-        public OVChipCredit[] newArray(int size) {
-            return new OVChipCredit[size];
-        }
-    };
-
-    private final int mId;
-    private final int mCreditId;
-    private final int mCredit;
-    private final int mBanbits;
-
-    private OVChipCredit(int id, int creditId, int credit, int banbits) {
-        mId = id;
-        mCreditId = creditId;
-        mCredit = credit;
-        mBanbits = banbits;
-    }
-
-    OVChipCredit(byte[] data) {
+    @NonNull
+    static OVChipCredit create(byte[] data) {
         if (data == null) {
             data = new byte[16];
         }
@@ -73,38 +48,15 @@ public class OVChipCredit implements Parcelable {
             credit = credit * -1;
         }
 
-        mId = id;
-        mCreditId = creditId;
-        mCredit = credit;
-        mBanbits = banbits;
+        return new AutoValue_OVChipCredit(id, creditId, credit, banbits);
     }
 
-    public int getId() {
-        return mId;
-    }
+    public abstract int getId();
 
-    public int getCreditId() {
-        return mCreditId;
-    }
+    public abstract int getCreditId();
 
-    public int getCredit() {
-        return mCredit;
-    }
+    public abstract int getCredit();
 
-    public int getBanbits() {
-        return mBanbits;
-    }
+    public abstract int getBanbits();
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mId);
-        parcel.writeInt(mCreditId);
-        parcel.writeInt(mCredit);
-        parcel.writeInt(mBanbits);
-    }
 }

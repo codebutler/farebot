@@ -22,85 +22,42 @@
 
 package com.codebutler.farebot.transit;
 
-import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 
-public class Station implements Parcelable {
+import com.google.auto.value.AutoValue;
 
-    public static final Creator<Station> CREATOR = new Creator<Station>() {
-        @Override
-        public Station createFromParcel(Parcel parcel) {
-            return new Station(parcel);
-        }
+@AutoValue
+public abstract class Station implements Parcelable {
 
-        @Override
-        public Station[] newArray(int size) {
-            return new Station[size];
-        }
-    };
-
-    private final String mCompanyName;
-    private final String mLineName;
-    private final String mStationName;
-    private final String mShortStationName;
-    private final String mLatitude;
-    private final String mLongitude;
-
-    public Station(String stationName, String latitude, String longitude) {
-        this(stationName, null, latitude, longitude);
+    @NonNull
+    public static Builder builder() {
+        return new AutoValue_Station.Builder();
     }
 
-    public Station(String stationName, String shortStationName, String latitude, String longitude) {
-        this(null, null, stationName, shortStationName, latitude, longitude);
+    @NonNull
+    public static Station create(String stationName, String shortStationName, String latitude, String longitude) {
+        return new AutoValue_Station.Builder()
+                .stationName(stationName)
+                .shortStationName(shortStationName)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 
-    public Station(
-            String companyName,
-            String lineName,
-            String stationName,
-            String shortStationName,
-            String latitude,
-            String longitude) {
-        mCompanyName = companyName;
-        mLineName = lineName;
-        mStationName = stationName;
-        mShortStationName = shortStationName;
-        mLatitude = latitude;
-        mLongitude = longitude;
+    @NonNull
+    public static Station create(String name, String code, String abbreviation, String latitude, String longitude) {
+        return new AutoValue_Station.Builder()
+                .stationName(name)
+                .code(code)
+                .abbreviation(abbreviation)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 
-    protected Station(Parcel parcel) {
-        mCompanyName = parcel.readString();
-        mLineName = parcel.readString();
-        mStationName = parcel.readString();
-        mShortStationName = parcel.readString();
-        mLatitude = parcel.readString();
-        mLongitude = parcel.readString();
-    }
-
-    public String getStationName() {
-        return mStationName;
-    }
-
-    public String getShortStationName() {
-        return (mShortStationName != null) ? mShortStationName : mStationName;
-    }
-
-    public String getCompanyName() {
-        return mCompanyName;
-    }
-
-    public String getLineName() {
-        return mLineName;
-    }
-
-    public String getLatitude() {
-        return mLatitude;
-    }
-
-    public String getLongitude() {
-        return mLongitude;
+    public String getDisplayStationName() {
+        return (getShortStationName() != null) ? getShortStationName() : getStationName();
     }
 
     public boolean hasLocation() {
@@ -108,19 +65,41 @@ public class Station implements Parcelable {
                 && getLongitude() != null && !getLongitude().isEmpty();
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    public abstract String getStationName();
 
-    @Override
-    @CallSuper
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mCompanyName);
-        parcel.writeString(mLineName);
-        parcel.writeString(mStationName);
-        parcel.writeString(mShortStationName);
-        parcel.writeString(mLatitude);
-        parcel.writeString(mLongitude);
+    public abstract String getShortStationName();
+
+    public abstract String getCompanyName();
+
+    public abstract String getLineName();
+
+    public abstract String getLatitude();
+
+    public abstract String getLongitude();
+
+    public abstract String getCode();
+
+    public abstract String getAbbreviation();
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder stationName(String stationName);
+
+        public abstract Builder shortStationName(String shortStationName);
+
+        public abstract Builder companyName(String companyName);
+
+        public abstract Builder lineName(String lineName);
+
+        public abstract Builder latitude(String latitude);
+
+        public abstract Builder longitude(String longitude);
+
+        public abstract Builder code(String code);
+
+        public abstract Builder abbreviation(String abbreviation);
+
+        public abstract Station build();
     }
 }

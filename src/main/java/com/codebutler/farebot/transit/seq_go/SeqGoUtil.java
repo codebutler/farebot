@@ -125,7 +125,11 @@ public final class SeqGoUtil {
             String latitude = cursor.getString(cursor.getColumnIndex(SeqGoDBUtil.COLUMN_ROW_LAT));
             String longitude = cursor.getString(cursor.getColumnIndex(SeqGoDBUtil.COLUMN_ROW_LON));
 
-            return new Station(stationName, latitude, longitude);
+            return Station.builder()
+                    .stationName(stationName)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .build();
         } finally {
             if (cursor != null) {
                 cursor.close();

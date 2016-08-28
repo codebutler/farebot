@@ -73,16 +73,16 @@ public class CardTripsFragment extends ListFragment {
         View view = inflater.inflate(R.layout.fragment_card_trips, null);
 
         List<Trip> trips = new ArrayList<>();
-        if (mTransitData.getTrips() != null && mTransitData.getTrips().length > 0) {
+        if (mTransitData.getTrips() != null && mTransitData.getTrips().size() > 0) {
             for (Trip t : mTransitData.getTrips()) {
                 trips.add(t);
             }
         }
 
         // This is for "legacy" implementations which have a separate list of refills.
-        if (mTransitData.getRefills() != null && mTransitData.getRefills().length > 0) {
+        if (mTransitData.getRefills() != null && mTransitData.getRefills().size() > 0) {
             for (Refill r : mTransitData.getRefills()) {
-                trips.add(new RefillTrip(r));
+                trips.add(RefillTrip.create(r));
             }
         }
 

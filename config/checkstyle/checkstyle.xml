@@ -351,6 +351,7 @@ Description: https://source.android.com/source/code-style.html
         <!-- Forbid interfaces with no methods -->
         <module name="InterfaceIsType"/>
 
+        <module name="VisibilityModifier"/>
     </module>
 
     <!--################################################-->

@@ -23,7 +23,8 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
@@ -38,6 +39,8 @@ import com.codebutler.farebot.ui.HeaderListItem;
 import com.codebutler.farebot.ui.ListItem;
 import com.codebutler.farebot.util.ImmutableMapBuilder;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -52,19 +55,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class OVChipTransitData extends TransitData {
-
-    public static final Creator<OVChipTransitData> CREATOR = new Creator<OVChipTransitData>() {
-        @Override
-        public OVChipTransitData createFromParcel(Parcel parcel) {
-            return new OVChipTransitData(parcel);
-        }
-
-        @Override
-        public OVChipTransitData[] newArray(int size) {
-            return new OVChipTransitData[size];
-        }
-    };
+@AutoValue
+public abstract class OVChipTransitData extends TransitData {
 
     static final int PROCESS_PURCHASE = 0x00;
     static final int PROCESS_CHECKIN = 0x01;
@@ -93,6 +85,7 @@ public class OVChipTransitData extends TransitData {
     private static final byte[] OVC_MANUFACTURER = {
             (byte) 0x98, (byte) 0x02, (byte) 0x00 /*, (byte) 0x64, (byte) 0x8E */
     };
+
     private static final byte[] OVC_HEADER = new byte[11];
 
     static {
@@ -137,33 +130,13 @@ public class OVChipTransitData extends TransitData {
             .put(AGENCY_DUO_ALT, "DUO")
             .build();
 
-    private final OVChipIndex mIndex;
-    private final OVChipPreamble mPreamble;
-    private final OVChipInfo mInfo;
-    private final OVChipCredit mCredit;
-    private final OVChipTrip[] mTrips;
-    private final OVChipSubscription[] mSubscriptions;
-
-    private OVChipTransitData(Parcel parcel) {
-        mTrips = new OVChipTrip[parcel.readInt()];
-        parcel.readTypedArray(mTrips, OVChipTrip.CREATOR);
-
-        mSubscriptions = new OVChipSubscription[parcel.readInt()];
-        parcel.readTypedArray(mSubscriptions, OVChipSubscription.CREATOR);
-
-        mIndex = parcel.readParcelable(OVChipIndex.class.getClassLoader());
-        mPreamble = parcel.readParcelable(OVChipPreamble.class.getClassLoader());
-        mInfo = parcel.readParcelable(OVChipInfo.class.getClassLoader());
-        mCredit = parcel.readParcelable(OVChipCredit.class.getClassLoader());
-    }
-
-    public OVChipTransitData(ClassicCard card) {
-        mIndex = new OVChipIndex(card.getSector(39).readBlocks(11, 4));
-
-        OVChipParser parser = new OVChipParser(card, mIndex);
-        mCredit = parser.getCredit();
-        mPreamble = parser.getPreamble();
-        mInfo = parser.getInfo();
+    @NonNull
+    public static OVChipTransitData create(@NonNull ClassicCard card) {
+        OVChipIndex index = OVChipIndex.create(card.getSector(39).readBlocks(11, 4));
+        OVChipParser parser = new OVChipParser(card, index);
+        OVChipCredit credit = parser.getCredit();
+        OVChipPreamble preamble = parser.getPreamble();
+        OVChipInfo info = parser.getInfo();
 
         List<OVChipTransaction> transactions = new ArrayList<>(Arrays.asList(parser.getTransactions()));
         Collections.sort(transactions, OVChipTransaction.ID_ORDER);
@@ -183,7 +156,7 @@ public class OVChipTransitData extends TransitData {
                     // handle two consecutive (duplicate) logins, skip the first one
                     continue;
                 } else if (transaction.isSameTrip(nextTransaction)) {
-                    trips.add(new OVChipTrip(transaction, nextTransaction));
+                    trips.add(OVChipTrip.create(transaction, nextTransaction));
                     i++;
                     if (i < (transactions.size() - 2)) {
                         // check for two consecutive (duplicate) logouts, skip the second one
@@ -196,14 +169,12 @@ public class OVChipTransitData extends TransitData {
                 }
             }
 
-            trips.add(new OVChipTrip(transaction));
+            trips.add(OVChipTrip.create(transaction));
         }
 
         Collections.sort(trips, OVChipTrip.ID_ORDER);
-        mTrips = trips.toArray(new OVChipTrip[trips.size()]);
 
-        List<OVChipSubscription> subs = new ArrayList<>();
-        subs.addAll(Arrays.asList(parser.getSubscriptions()));
+        List<OVChipSubscription> subs = Arrays.asList(parser.getSubscriptions());
         Collections.sort(subs, new Comparator<OVChipSubscription>() {
             @Override
             public int compare(OVChipSubscription s1, OVChipSubscription s2) {
@@ -211,7 +182,13 @@ public class OVChipTransitData extends TransitData {
             }
         });
 
-        mSubscriptions = subs.toArray(new OVChipSubscription[subs.size()]);
+        return new AutoValue_OVChipTransitData(
+                ImmutableList.<Trip>copyOf(trips),
+                ImmutableList.<Subscription>copyOf(subs),
+                index,
+                preamble,
+                info,
+                credit);
     }
 
     public static boolean check(Card card) {
@@ -265,6 +242,7 @@ public class OVChipTransitData extends TransitData {
         return formatter.format((double) amount / 100.0);
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return "OV-Chipkaart";
@@ -284,84 +262,79 @@ public class OVChipTransitData extends TransitData {
         return FareBotApplication.getInstance().getString(R.string.unknown_format, "0x" + Long.toString(agency, 16));
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(mTrips.length);
-        parcel.writeTypedArray(mTrips, flags);
-        parcel.writeInt(mSubscriptions.length);
-        parcel.writeTypedArray(mSubscriptions, flags);
-        parcel.writeParcelable(mIndex, flags);
-        parcel.writeParcelable(mPreamble, flags);
-        parcel.writeParcelable(mInfo, flags);
-        parcel.writeParcelable(mCredit, flags);
-    }
-
+    @NonNull
     @Override
     public String getBalanceString() {
-        return OVChipTransitData.convertAmount(mCredit.getCredit());
+        return OVChipTransitData.convertAmount(getCredit().getCredit());
     }
 
+    @NonNull
     @Override
     public String getSerialNumber() {
         return null;
     }
 
+    @Nullable
     @Override
-    public Trip[] getTrips() {
-        return mTrips;
-    }
-
-    @Override
-    public Refill[] getRefills() {
+    public List<Refill> getRefills() {
         return null;
     }
 
-    @Override
-    public Subscription[] getSubscriptions() {
-        return mSubscriptions;
-    }
-
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
+        OVChipPreamble preamble = getPreamble();
+        OVChipInfo info = getOVCInfo();
+        OVChipCredit credit = getCredit();
+        OVChipIndex index = getIndex();
+
         ArrayList<ListItem> items = new ArrayList<>();
 
         items.add(new HeaderListItem("Hardware Information"));
-        items.add(new ListItem("Manufacturer ID", mPreamble.getManufacturer()));
-        items.add(new ListItem("Publisher ID", mPreamble.getPublisher()));
+        items.add(new ListItem("Manufacturer ID", preamble.getManufacturer()));
+        items.add(new ListItem("Publisher ID", preamble.getPublisher()));
 
         items.add(new HeaderListItem("General Information"));
-        items.add(new ListItem("Serial Number", mPreamble.getId()));
+        items.add(new ListItem("Serial Number", preamble.getId()));
         items.add(new ListItem("Expiration Date", DateFormat.getDateInstance(DateFormat.LONG)
-                .format(OVChipTransitData.convertDate(mPreamble.getExpdate()))));
-        items.add(new ListItem("Card Type", (mPreamble.getType() == 2 ? "Personal" : "Anonymous")));
-        items.add(new ListItem("Issuer", OVChipTransitData.getShortAgencyName(mInfo.getCompany())));
+                .format(OVChipTransitData.convertDate(preamble.getExpdate()))));
+        items.add(new ListItem("Card Type", (preamble.getType() == 2 ? "Personal" : "Anonymous")));
+        items.add(new ListItem("Issuer", OVChipTransitData.getShortAgencyName(info.getCompany())));
 
-        items.add(new ListItem("Banned", ((mCredit.getBanbits() & (char) 0xC0) == (char) 0xC0) ? "Yes" : "No"));
+        items.add(new ListItem("Banned", ((credit.getBanbits() & (char) 0xC0) == (char) 0xC0) ? "Yes" : "No"));
 
-        if (mPreamble.getType() == 2) {
+        if (preamble.getType() == 2) {
             items.add(new HeaderListItem("Personal Information"));
             items.add(new ListItem("Birthdate", DateFormat.getDateInstance(DateFormat.LONG)
-                    .format(mInfo.getBirthdate())));
+                    .format(info.getBirthdate())));
         }
 
         items.add(new HeaderListItem("Credit Information"));
-        items.add(new ListItem("Credit Slot ID", Integer.toString(mCredit.getId())));
-        items.add(new ListItem("Last Credit ID", Integer.toString(mCredit.getCreditId())));
-        items.add(new ListItem("Credit", OVChipTransitData.convertAmount(mCredit.getCredit())));
-        items.add(new ListItem("Autocharge", (mInfo.getActive() == (byte) 0x05 ? "Yes" : "No")));
-        items.add(new ListItem("Autocharge Limit", OVChipTransitData.convertAmount(mInfo.getLimit())));
-        items.add(new ListItem("Autocharge Charge", OVChipTransitData.convertAmount(mInfo.getCharge())));
+        items.add(new ListItem("Credit Slot ID", Integer.toString(credit.getId())));
+        items.add(new ListItem("Last Credit ID", Integer.toString(credit.getCreditId())));
+        items.add(new ListItem("Credit", OVChipTransitData.convertAmount(credit.getCredit())));
+        items.add(new ListItem("Autocharge", (info.getActive() == (byte) 0x05 ? "Yes" : "No")));
+        items.add(new ListItem("Autocharge Limit", OVChipTransitData.convertAmount(info.getLimit())));
+        items.add(new ListItem("Autocharge Charge", OVChipTransitData.convertAmount(info.getCharge())));
 
         items.add(new HeaderListItem("Recent Slots"));
         items.add(new ListItem("Transaction Slot", "0x"
-                + Integer.toHexString((char) mIndex.getRecentTransactionSlot())));
-        items.add(new ListItem("Info Slot", "0x" + Integer.toHexString((char) mIndex.getRecentInfoSlot())));
+                + Integer.toHexString((char) index.getRecentTransactionSlot())));
+        items.add(new ListItem("Info Slot", "0x" + Integer.toHexString((char) index.getRecentInfoSlot())));
         items.add(new ListItem("Subscription Slot", "0x"
-                + Integer.toHexString((char) mIndex.getRecentSubscriptionSlot())));
+                + Integer.toHexString((char) index.getRecentSubscriptionSlot())));
         items.add(new ListItem("Travelhistory Slot", "0x"
-                + Integer.toHexString((char) mIndex.getRecentTravelhistorySlot())));
-        items.add(new ListItem("Credit Slot", "0x" + Integer.toHexString((char) mIndex.getRecentCreditSlot())));
+                + Integer.toHexString((char) index.getRecentTravelhistorySlot())));
+        items.add(new ListItem("Credit Slot", "0x" + Integer.toHexString((char) index.getRecentCreditSlot())));
 
         return items;
     }
+
+    abstract OVChipIndex getIndex();
+
+    abstract OVChipPreamble getPreamble();
+
+    abstract OVChipInfo getOVCInfo();
+
+    abstract OVChipCredit getCredit();
 }

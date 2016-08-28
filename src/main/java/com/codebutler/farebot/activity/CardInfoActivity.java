@@ -105,7 +105,7 @@ public class CardInfoActivity extends Activity {
 
         new AsyncTask<Void, Void, Void>() {
 
-            boolean mSpeakBalanceEnabled;
+            private boolean mSpeakBalanceEnabled;
 
             private Exception mException;
 

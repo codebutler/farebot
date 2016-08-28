@@ -20,13 +20,14 @@
 package com.codebutler.farebot.transit.myki;
 
 import android.net.Uri;
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.stub.StubTransitData;
 import com.codebutler.farebot.util.Utils;
+import com.google.auto.value.AutoValue;
 
 /**
  * Transit data type for Myki (Melbourne, AU).
@@ -36,65 +37,49 @@ import com.codebutler.farebot.util.Utils;
  * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Myki
  */
-public class MykiTransitData extends StubTransitData {
+@AutoValue
+public abstract class MykiTransitData extends StubTransitData {
 
     public static final String NAME = "Myki";
 
-    public static final Creator<MykiTransitData> CREATOR = new Creator<MykiTransitData>() {
-        @Override
-        public MykiTransitData createFromParcel(Parcel source) {
-            return new MykiTransitData(source);
-        }
-
-        @Override
-        public MykiTransitData[] newArray(int size) {
-            return new MykiTransitData[size];
-        }
-    };
-
-    private long mSerialNumber1;
-    private long mSerialNumber2;
-
-    public MykiTransitData(Card card) {
-        DesfireCard desfireCard = (DesfireCard) card;
-        byte[] metadata = desfireCard.getApplication(4594).getFile(15).getData().bytes();
-        metadata = Utils.reverseBuffer(metadata, 0, 16);
-
+    @NonNull
+    public static MykiTransitData create(@NonNull DesfireCard card) {
         try {
-            mSerialNumber1 = Utils.getBitsFromBuffer(metadata, 96, 32);
-            mSerialNumber2 = Utils.getBitsFromBuffer(metadata, 64, 32);
+            byte[] metadata = Utils.reverseBuffer(card.getApplication(4594).getFile(15).getData().bytes(), 0, 16);
+            int serialNumber1 = Utils.getBitsFromBuffer(metadata, 96, 32);
+            int serialNumber2 = Utils.getBitsFromBuffer(metadata, 64, 32);
+            return new AutoValue_MykiTransitData(serialNumber1, serialNumber2);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Myki data", ex);
         }
     }
 
-    private MykiTransitData(Parcel parcel) {
-        mSerialNumber1 = parcel.readLong();
-        mSerialNumber2 = parcel.readLong();
-    }
-
-    public static boolean check(Card card) {
+    public static boolean check(@NonNull Card card) {
         return (card instanceof DesfireCard)
                 && (((DesfireCard) card).getApplication(4594) != null)
                 && (((DesfireCard) card).getApplication(15732978) != null);
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return NAME;
     }
 
+    @NonNull
     @Override
     public String getSerialNumber() {
-        return formatSerialNumber(mSerialNumber1, mSerialNumber2);
+        return formatSerialNumber(getSerialNumber1(), getSerialNumber2());
     }
 
+    @NonNull
     private static String formatSerialNumber(long serialNumber1, long serialNumber2) {
         String formattedSerial = String.format("%06d%08d", serialNumber1, serialNumber2);
         return formattedSerial + Utils.calculateLuhn(formattedSerial);
     }
 
-    public static TransitIdentity parseTransitIdentity(Card card) {
+    @NonNull
+    public static TransitIdentity parseTransitIdentity(@NonNull Card card) {
         DesfireCard desfireCard = (DesfireCard) card;
         byte[] data = desfireCard.getApplication(4594).getFile(15).getData().bytes();
         data = Utils.reverseBuffer(data, 0, 16);
@@ -105,13 +90,11 @@ public class MykiTransitData extends StubTransitData {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeLong(mSerialNumber1);
-        parcel.writeLong(mSerialNumber2);
-    }
-
-    @Override
     public Uri getMoreInfoPage() {
         return Uri.parse("https://micolous.github.io/metrodroid/myki");
     }
+
+    abstract long getSerialNumber1();
+
+    abstract long getSerialNumber2();
 }

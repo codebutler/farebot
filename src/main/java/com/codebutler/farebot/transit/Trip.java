@@ -23,7 +23,6 @@
 
 package com.codebutler.farebot.transit;
 
-import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,17 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Trip implements Parcelable {
-    public static final Creator<Trip> CREATOR = new Creator<Trip>() {
-        @Override
-        public Trip createFromParcel(Parcel parcel) {
-            return null;
-        }
-
-        @Override
-        public Trip[] newArray(int size) {
-            return new Trip[size];
-        }
-    };
 
     public abstract long getTimestamp();
 

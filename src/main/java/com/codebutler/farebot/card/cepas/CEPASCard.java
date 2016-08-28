@@ -70,7 +70,7 @@ public abstract class CEPASCard implements Card, Parcelable {
     @Override
     public TransitData parseTransitData() {
         if (EZLinkTransitData.check(this)) {
-            return new EZLinkTransitData(this);
+            return EZLinkTransitData.create(this);
         }
         return null;
     }

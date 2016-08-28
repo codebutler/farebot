@@ -19,47 +19,39 @@
 
 package com.codebutler.farebot.transit.stub;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.TransitIdentity;
+import com.google.auto.value.AutoValue;
 
 /**
  * Stub implementation for Adelaide Metrocard (AU).
  * <p>
  * https://github.com/micolous/metrodroid/wiki/Metrocard-%28Adelaide%29
  */
-public class AdelaideMetrocardStubTransitData extends StubTransitData {
+@AutoValue
+public abstract class AdelaideMetrocardStubTransitData extends StubTransitData {
 
-    public static final Creator<AdelaideMetrocardStubTransitData> CREATOR
-            = new Creator<AdelaideMetrocardStubTransitData>() {
-        @Override
-        public AdelaideMetrocardStubTransitData createFromParcel(Parcel source) {
-            return new AdelaideMetrocardStubTransitData();
-        }
-
-        @Override
-        public AdelaideMetrocardStubTransitData[] newArray(int size) {
-            return new AdelaideMetrocardStubTransitData[size];
-        }
-    };
-
-    public AdelaideMetrocardStubTransitData(Card card) { }
-
-    private AdelaideMetrocardStubTransitData() { }
-
-    @Override
-    public String getCardName() {
-        return "Metrocard (Adelaide)";
+    @NonNull
+    public static AdelaideMetrocardStubTransitData create(@NonNull DesfireCard card) {
+        return new AutoValue_AdelaideMetrocardStubTransitData();
     }
 
-    public static boolean check(Card card) {
+    public static boolean check(@NonNull Card card) {
         return (card instanceof DesfireCard)
                 && (((DesfireCard) card).getApplication(0xb006f2) != null);
     }
 
-    public static TransitIdentity parseTransitIdentity(Card card) {
+    @NonNull
+    public static TransitIdentity parseTransitIdentity(@NonNull Card card) {
         return new TransitIdentity("Metrocard (Adelaide)", null);
+    }
+
+    @NonNull
+    @Override
+    public String getCardName() {
+        return "Metrocard (Adelaide)";
     }
 }

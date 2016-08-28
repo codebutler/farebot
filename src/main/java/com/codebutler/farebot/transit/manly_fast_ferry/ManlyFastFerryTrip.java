@@ -19,12 +19,12 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPurseRecord;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -35,42 +35,21 @@ import java.util.Locale;
  * Trips on the card are "purse debits", and it is not possible to tell it apart from non-ticket
  * usage (like cafe purchases).
  */
-class ManlyFastFerryTrip extends Trip {
+@AutoValue
+abstract class ManlyFastFerryTrip extends Trip {
 
-    public static final Parcelable.Creator<ManlyFastFerryTrip> CREATOR = new Parcelable.Creator<ManlyFastFerryTrip>() {
-
-        @Override
-        public ManlyFastFerryTrip createFromParcel(Parcel in) {
-            return new ManlyFastFerryTrip(in);
-        }
-
-        @Override
-        public ManlyFastFerryTrip[] newArray(int size) {
-            return new ManlyFastFerryTrip[size];
-        }
-    };
-
-    private GregorianCalendar mEpoch;
-    private ManlyFastFerryPurseRecord mPurse;
-
-    ManlyFastFerryTrip(ManlyFastFerryPurseRecord purse, GregorianCalendar epoch) {
-        mPurse = purse;
-        mEpoch = epoch;
-    }
-
-    private ManlyFastFerryTrip(Parcel parcel) {
-        mPurse = new ManlyFastFerryPurseRecord(parcel);
-        mEpoch = new GregorianCalendar();
-        mEpoch.setTimeInMillis(parcel.readLong());
+    @NonNull
+    static ManlyFastFerryTrip create(ManlyFastFerryPurseRecord purse, GregorianCalendar epoch) {
+        return new AutoValue_ManlyFastFerryTrip(purse, epoch);
     }
 
     // Implemented functionality.
     @Override
     public long getTimestamp() {
         GregorianCalendar ts = new GregorianCalendar();
-        ts.setTimeInMillis(mEpoch.getTimeInMillis());
-        ts.add(Calendar.DATE, mPurse.getDay());
-        ts.add(Calendar.MINUTE, mPurse.getMinute());
+        ts.setTimeInMillis(getEpoch().getTimeInMillis());
+        ts.add(Calendar.DATE, getPurse().getDay());
+        ts.add(Calendar.MINUTE, getPurse().getMinute());
 
         return ts.getTimeInMillis() / 1000;
     }
@@ -100,7 +79,7 @@ class ManlyFastFerryTrip extends Trip {
 
     @Override
     public String getFareString() {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double) mPurse.getTransactionValue() / 100.);
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getPurse().getTransactionValue() / 100.);
     }
 
     @Override
@@ -145,14 +124,7 @@ class ManlyFastFerryTrip extends Trip {
         return true;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    abstract ManlyFastFerryPurseRecord getPurse();
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        mPurse.writeToParcel(parcel, i);
-        parcel.writeLong(mEpoch.getTimeInMillis());
-    }
+    abstract GregorianCalendar getEpoch();
 }

@@ -23,7 +23,8 @@
 
 package com.codebutler.farebot.transit.bilhete_unico;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.classic.ClassicCard;
@@ -32,27 +33,16 @@ import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
-import com.codebutler.farebot.transit.ovc.OVChipCredit;
 import com.codebutler.farebot.ui.ListItem;
+import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 
-public class BilheteUnicoSPTransitData extends TransitData {
-
-    public static final Creator<BilheteUnicoSPTransitData> CREATOR = new Creator<BilheteUnicoSPTransitData>() {
-        @Override
-        public BilheteUnicoSPTransitData createFromParcel(Parcel parcel) {
-            return new BilheteUnicoSPTransitData(parcel);
-        }
-
-        @Override
-        public BilheteUnicoSPTransitData[] newArray(int size) {
-            return new BilheteUnicoSPTransitData[size];
-        }
-    };
+@AutoValue
+public abstract class BilheteUnicoSPTransitData extends TransitData {
 
     private static final String NAME = "Bilhete Único";
 
@@ -67,17 +57,13 @@ public class BilheteUnicoSPTransitData extends TransitData {
             (byte) 0x69
     };
 
-    private final BilheteUnicoSPCredit mCredit;
-
-    private BilheteUnicoSPTransitData(Parcel parcel) {
-        mCredit = parcel.readParcelable(OVChipCredit.class.getClassLoader());
+    @NonNull
+    public static BilheteUnicoSPTransitData create(@NonNull ClassicCard card) {
+        BilheteUnicoSPCredit credit = BilheteUnicoSPCredit.create(card.getSector(8).getBlock(1).getData().bytes());
+        return new AutoValue_BilheteUnicoSPTransitData(credit);
     }
 
-    public BilheteUnicoSPTransitData(ClassicCard card) {
-        mCredit = new BilheteUnicoSPCredit(card.getSector(8).getBlock(1).getData().bytes());
-    }
-
-    public static boolean check(ClassicCard card) {
+    public static boolean check(@NonNull ClassicCard card) {
         byte[] blockData = card.getSector(0).getBlock(0).getData().bytes();
         return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
     }
@@ -93,43 +79,48 @@ public class BilheteUnicoSPTransitData extends TransitData {
         return formatter.format((double) amount / 100.0);
     }
 
+    @NonNull
     @Override
     public String getCardName() {
         return NAME;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeParcelable(mCredit, flags);
-    }
-
+    @NonNull
     @Override
     public String getBalanceString() {
-        return BilheteUnicoSPTransitData.convertAmount(mCredit.getCredit());
+        return BilheteUnicoSPTransitData.convertAmount(getCredit().getCredit());
     }
 
+    @NonNull
     @Override
     public String getSerialNumber() {
         return null;
     }
 
+    @Nullable
     @Override
-    public Trip[] getTrips() {
+    public List<Trip> getTrips() {
         return null;
     }
 
+    @Nullable
     @Override
-    public Refill[] getRefills() {
+    public List<Refill> getRefills() {
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         return null;
     }
 
+    @Nullable
     @Override
-    public Subscription[] getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return null;
     }
+
+    @NonNull
+    abstract BilheteUnicoSPCredit getCredit();
 }

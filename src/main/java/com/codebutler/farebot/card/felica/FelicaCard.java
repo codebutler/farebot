@@ -108,9 +108,9 @@ public abstract class FelicaCard implements Card {
     @Nullable
     public TransitData parseTransitData() {
         if (SuicaTransitData.check(this)) {
-            return new SuicaTransitData(this);
+            return SuicaTransitData.create(this);
         } else if (EdyTransitData.check(this)) {
-            return new EdyTransitData(this);
+            return EdyTransitData.create(this);
         }
         return null;
     }

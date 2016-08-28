@@ -19,64 +19,29 @@
 
 package com.codebutler.farebot.transit.seq_go;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
+import com.google.auto.value.AutoValue;
 
 import java.util.GregorianCalendar;
 
 /**
  * Represents trip events on Go Card.
  */
-class SeqGoTrip extends Trip {
+@AutoValue
+abstract class SeqGoTrip extends Trip {
 
-    public static final Parcelable.Creator<SeqGoTrip> CREATOR = new Parcelable.Creator<SeqGoTrip>() {
-
-        @Override
-        public SeqGoTrip createFromParcel(Parcel in) {
-            return new SeqGoTrip(in);
-        }
-
-        @Override
-        public SeqGoTrip[] newArray(int size) {
-            return new SeqGoTrip[size];
-        }
-    };
-
-    int mJourneyId;
-    Mode mMode;
-    GregorianCalendar mStartTime;
-    GregorianCalendar mEndTime;
-    int mStartStation;
-    int mEndStation;
-
-    SeqGoTrip() { }
-
-    private SeqGoTrip(Parcel parcel) {
-        mJourneyId = parcel.readInt();
-        long startTime = parcel.readLong();
-        if (startTime != 0) {
-            mStartTime = new GregorianCalendar();
-            mStartTime.setTimeInMillis(startTime);
-        }
-
-        long endTime = parcel.readLong();
-        if (endTime != 0) {
-            mEndTime = new GregorianCalendar();
-            mEndTime.setTimeInMillis(endTime);
-        }
-
-        mMode = Mode.valueOf(parcel.readString());
-        mStartStation = parcel.readInt();
-        mEndStation = parcel.readInt();
+    @NonNull
+    static Builder builder() {
+        return new AutoValue_SeqGoTrip.Builder();
     }
 
     @Override
     public long getTimestamp() {
-        if (mStartTime != null) {
-            return mStartTime.getTimeInMillis() / 1000;
+        if (getStartTime() != null) {
+            return getStartTime().getTimeInMillis() / 1000;
         } else {
             return 0;
         }
@@ -84,8 +49,8 @@ class SeqGoTrip extends Trip {
 
     @Override
     public long getExitTimestamp() {
-        if (mEndTime != null) {
-            return mEndTime.getTimeInMillis() / 1000;
+        if (getEndTime() != null) {
+            return getEndTime().getTimeInMillis() / 1000;
         } else {
             return 0;
         }
@@ -98,12 +63,12 @@ class SeqGoTrip extends Trip {
 
     @Override
     public String getAgencyName() {
-        switch (mMode) {
+        switch (getMode()) {
             case FERRY:
                 return "Transdev Brisbane Ferries";
             case TRAIN:
                 // Domestic Airport == 9
-                if (mStartStation == 9 || mEndStation == 9) {
+                if (getStartStationId() == 9 || getEndStationId() == 9) {
                     // TODO: Detect International Airport station.
                     return "Airtrain";
                 } else {
@@ -131,12 +96,12 @@ class SeqGoTrip extends Trip {
 
     @Override
     public String getStartStationName() {
-        if (mStartStation == 0) {
+        if (getStartStationId() == 0) {
             return null;
         } else {
             Station s = getStartStation();
             if (s == null) {
-                return "Unknown (" + Integer.toString(mStartStation) + ")";
+                return "Unknown (" + Integer.toString(getStartStationId()) + ")";
             } else {
                 return s.getStationName();
             }
@@ -145,17 +110,17 @@ class SeqGoTrip extends Trip {
 
     @Override
     public Station getStartStation() {
-        return SeqGoUtil.getStation(mStartStation);
+        return SeqGoUtil.getStation(getStartStationId());
     }
 
     @Override
     public String getEndStationName() {
-        if (mEndStation == 0) {
+        if (getEndStationId() == 0) {
             return null;
         } else {
             Station s = getEndStation();
             if (s == null) {
-                return "Unknown (" + Integer.toString(mEndStation) + ")";
+                return "Unknown (" + Integer.toString(getEndStationId()) + ")";
             } else {
                 return s.getStationName();
             }
@@ -164,7 +129,7 @@ class SeqGoTrip extends Trip {
 
     @Override
     public Station getEndStation() {
-        return SeqGoUtil.getStation(mEndStation);
+        return SeqGoUtil.getStation(getEndStationId());
     }
 
     @Override
@@ -174,27 +139,37 @@ class SeqGoTrip extends Trip {
     }
 
     @Override
-    public Mode getMode() {
-        return mMode;
-    }
-
-    @Override
     public boolean hasTime() {
-        return mStartTime != null;
+        return getStartTime() != null;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    abstract int getJourneyId();
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(mJourneyId);
-        parcel.writeLong(mStartTime == null ? 0 : mStartTime.getTimeInMillis());
-        parcel.writeLong(mEndTime == null ? 0 : mEndTime.getTimeInMillis());
-        parcel.writeString(mMode.toString());
-        parcel.writeInt(mStartStation);
-        parcel.writeInt(mEndStation);
+    public abstract Mode getMode();
+
+    abstract GregorianCalendar getStartTime();
+
+    abstract GregorianCalendar getEndTime();
+
+    abstract int getStartStationId();
+
+    abstract int getEndStationId();
+
+    @AutoValue.Builder
+    abstract static class Builder {
+
+        abstract Builder journeyId(int journeyId);
+
+        abstract Builder mode(Mode mode);
+
+        abstract Builder startTime(GregorianCalendar startTime);
+
+        abstract Builder endTime(GregorianCalendar endTime);
+
+        abstract Builder startStationId(int startStationId);
+
+        abstract Builder endStationId(int endStationId);
+
+        abstract SeqGoTrip build();
     }
 }

@@ -51,7 +51,7 @@ public class ExportHelper {
         return Collections.unmodifiableList(uris);
     }
 
-    @SuppressWarnings("checkstyle:membername")
+    @SuppressWarnings({"checkstyle:membername", "checkstyle:visibilitymodifier"})
     private static class Export {
         String versionName;
         int versionCode;

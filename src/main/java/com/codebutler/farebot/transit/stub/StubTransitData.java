@@ -20,9 +20,11 @@
 package com.codebutler.farebot.transit.stub;
 
 import android.net.Uri;
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
 import com.codebutler.farebot.transit.Trip;
@@ -42,33 +44,42 @@ public abstract class StubTransitData extends TransitData {
 
     // Stub out elements that we can't support
 
+    @NonNull
     @Override
     public String getSerialNumber() {
         return null;
     }
 
+    @NonNull
     @Override
-    public String getBalanceString() {
+    public final String getBalanceString() {
         return null;
     }
 
+    @Nullable
     @Override
-    public Trip[] getTrips() {
+    public final List<Trip> getTrips() {
         return null;
     }
 
+    @Nullable
     @Override
-    public Subscription[] getSubscriptions() {
+    public final List<Subscription> getSubscriptions() {
         return null;
     }
 
+    @Nullable
     @Override
-    public void writeToParcel(Parcel parcel, int i) { }
+    public final List<Refill> getRefills() {
+        return null;
+    }
 
+    @Nullable
     protected Uri getMoreInfoPage() {
         return null;
     }
 
+    @Nullable
     @Override
     public List<ListItem> getInfo() {
         ArrayList<ListItem> items = new ArrayList<>();

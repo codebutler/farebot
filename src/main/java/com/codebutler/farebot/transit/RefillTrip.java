@@ -19,39 +19,25 @@
 
 package com.codebutler.farebot.transit;
 
-import android.os.Parcel;
+import android.support.annotation.NonNull;
+
+import com.google.auto.value.AutoValue;
 
 /**
  * Wrapper around Refills to make them like Trips, so Trips become like history.  This is similar
  * to what the Japanese cards (Edy, Suica) already had implemented for themselves.
  */
-public class RefillTrip extends Trip {
+@AutoValue
+public abstract class RefillTrip extends Trip {
 
-    public static final Creator<RefillTrip> CREATOR = new Creator<RefillTrip>() {
-        @Override
-        public RefillTrip createFromParcel(Parcel source) {
-            return new RefillTrip(source);
-        }
-
-        @Override
-        public RefillTrip[] newArray(int size) {
-            return new RefillTrip[size];
-        }
-    };
-
-    private final Refill mRefill;
-
-    public RefillTrip(Refill refill) {
-        mRefill = refill;
-    }
-
-    private RefillTrip(Parcel source) {
-        mRefill = source.readParcelable(Refill.class.getClassLoader());
+    @NonNull
+    public static RefillTrip create(@NonNull Refill refill) {
+        return new AutoValue_RefillTrip(refill);
     }
 
     @Override
     public long getTimestamp() {
-        return mRefill.getTimestamp();
+        return getRefill().getTimestamp();
     }
 
     @Override
@@ -66,17 +52,17 @@ public class RefillTrip extends Trip {
 
     @Override
     public String getAgencyName() {
-        return mRefill.getAgencyName();
+        return getRefill().getAgencyName();
     }
 
     @Override
     public String getShortAgencyName() {
-        return mRefill.getShortAgencyName();
+        return getRefill().getShortAgencyName();
     }
 
     @Override
     public String getFareString() {
-        return mRefill.getAmountString();
+        return getRefill().getAmountString();
     }
 
     @Override
@@ -119,14 +105,6 @@ public class RefillTrip extends Trip {
         return true;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        mRefill.writeToParcel(dest, flags);
-    }
-
+    @NonNull
+    abstract Refill getRefill();
 }
