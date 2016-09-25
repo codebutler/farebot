@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit;
 
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 
@@ -65,20 +66,28 @@ public abstract class Station implements Parcelable {
                 && getLongitude() != null && !getLongitude().isEmpty();
     }
 
+    @Nullable
     public abstract String getStationName();
 
+    @Nullable
     public abstract String getShortStationName();
 
+    @Nullable
     public abstract String getCompanyName();
 
+    @Nullable
     public abstract String getLineName();
 
+    @Nullable
     public abstract String getLatitude();
 
+    @Nullable
     public abstract String getLongitude();
 
+    @Nullable
     public abstract String getCode();
 
+    @Nullable
     public abstract String getAbbreviation();
 
     @AutoValue.Builder

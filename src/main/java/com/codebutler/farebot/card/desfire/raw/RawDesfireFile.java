@@ -113,7 +113,7 @@ public abstract class RawDesfireFile {
 
         public abstract int type();
 
-        @NonNull
+        @Nullable
         public abstract String message();
     }
 }

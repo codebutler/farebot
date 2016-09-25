@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.desfire;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.ByteArray;
 import com.google.auto.value.AutoValue;
@@ -38,7 +39,7 @@ public abstract class InvalidDesfireFile implements DesfireFile {
         return new AutoValue_InvalidDesfireFile(id, fileSettings, errorMessage);
     }
 
-    @NonNull
+    @Nullable
     public abstract String getErrorMessage();
 
     @NonNull

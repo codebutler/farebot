@@ -183,6 +183,7 @@ public abstract class ClipperTransitData extends TransitData {
                 .from(from)
                 .to(to)
                 .route(route)
+                .balance(0) // Filled in later
                 .build();
     }
 
@@ -233,7 +234,7 @@ public abstract class ClipperTransitData extends TransitData {
             long balance,
             @NonNull List<ClipperTrip> trips,
             @NonNull List<ClipperRefill> refills) {
-        List<ClipperTrip> tripsWithBalance = new ArrayList<>(trips.size());
+        List<ClipperTrip> tripsWithBalance = new ArrayList<>(Collections.nCopies(trips.size(), (ClipperTrip) null));
         int tripIdx = 0;
         int refillIdx = 0;
         while (tripIdx < trips.size()) {

@@ -33,6 +33,7 @@
 package com.codebutler.farebot.transit.suica;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.transit.Station;
@@ -279,6 +280,7 @@ abstract class SuicaTrip extends Trip {
 
     abstract long getFare();
 
+    @Nullable
     abstract Date getTimestampData();
 
     abstract int getRegionCode();
@@ -295,8 +297,10 @@ abstract class SuicaTrip extends Trip {
 
     abstract int getBusStopCode();
 
+    @Nullable
     public abstract Station getStartStation();
 
+    @Nullable
     public abstract Station getEndStation();
 
     @AutoValue.Builder
