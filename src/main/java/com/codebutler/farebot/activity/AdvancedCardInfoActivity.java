@@ -145,7 +145,7 @@ public class AdvancedCardInfoActivity extends Activity {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, mSerializedRawCard);
-                    startActivity(intent);
+                    startActivity(Intent.createChooser(intent, getString(R.string.share)));
                     return true;
                 case android.R.id.home:
                     finish();

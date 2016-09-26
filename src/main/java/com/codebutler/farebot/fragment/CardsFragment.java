@@ -188,7 +188,7 @@ public class CardsFragment extends ListFragment {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, mExportHelper.exportCards());
-                    startActivity(Intent.createChooser(intent, getString(R.string.share)));
+                    startActivity(intent);
                     return true;
                 case R.id.save:
                     exportToFile();
