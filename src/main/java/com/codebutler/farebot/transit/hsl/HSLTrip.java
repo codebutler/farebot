@@ -27,7 +27,6 @@ import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.card.desfire.DesfireRecord;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
@@ -46,29 +45,6 @@ abstract class HSLTrip extends Trip {
     @NonNull
     static Builder builder(@NonNull HSLTrip trip) {
         return new AutoValue_HSLTrip.Builder(trip);
-    }
-
-    @NonNull
-    static HSLTrip create(@NonNull DesfireRecord record) {
-        byte[] useData = record.getData().bytes();
-        long[] usefulData = new long[useData.length];
-
-        for (int i = 0; i < useData.length; i++) {
-            usefulData[i] = ((long) useData[i]) & 0xFF;
-        }
-
-        long arvo = HSLTransitData.bitsToLong(0, 1, usefulData);
-        long timestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(1, 14, usefulData),
-                HSLTransitData.bitsToLong(15, 11, usefulData));
-        long expireTimestamp = HSLTransitData.cardDateToTimestamp(HSLTransitData.bitsToLong(26, 14, usefulData),
-                HSLTransitData.bitsToLong(40, 11, usefulData));
-        long fare = HSLTransitData.bitsToLong(51, 14, usefulData);
-        long pax = HSLTransitData.bitsToLong(65, 5, usefulData);
-        String line = null;
-        long vehicleNumber = -1;
-        long newBalance = HSLTransitData.bitsToLong(70, 20, usefulData);
-
-        return new AutoValue_HSLTrip(timestamp, line, vehicleNumber, fare, arvo, expireTimestamp, pax, newBalance);
     }
 
     @Override

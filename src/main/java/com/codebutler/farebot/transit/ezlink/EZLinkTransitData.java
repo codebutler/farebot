@@ -27,13 +27,9 @@ package com.codebutler.farebot.transit.ezlink;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.cepas.CEPASCard;
-import com.codebutler.farebot.card.cepas.CEPASTransaction;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
 import com.google.auto.value.AutoValue;
@@ -47,34 +43,14 @@ import java.util.List;
 public abstract class EZLinkTransitData extends TransitData {
 
     @NonNull
-    public static EZLinkTransitData create(@NonNull CEPASCard cepasCard) {
-        String serialNumber = cepasCard.getPurse(3).getCAN().hex();
-        int balance = cepasCard.getPurse(3).getPurseBalance();
-        EZLinkTrip[] trips = parseTrips(serialNumber, cepasCard);
-        return new AutoValue_EZLinkTransitData(serialNumber, ImmutableList.<Trip>copyOf(trips), balance);
-    }
-
-    public static boolean check(@NonNull Card card) {
-        if (card instanceof CEPASCard) {
-            CEPASCard cepasCard = (CEPASCard) card;
-            return cepasCard.getHistory(3) != null
-                    && cepasCard.getHistory(3).isValid()
-                    && cepasCard.getPurse(3) != null
-                    && cepasCard.getPurse(3).isValid();
-        }
-        return false;
-    }
-
-    @NonNull
-    public static TransitIdentity parseTransitIdentity(@NonNull Card card) {
-        String canNo = ((CEPASCard) card).getPurse(3).getCAN().hex();
-        return new TransitIdentity(getCardIssuer(canNo), canNo);
+    static EZLinkTransitData create(@NonNull String serialNumber, @NonNull ImmutableList<Trip> trips, int balance) {
+        return new AutoValue_EZLinkTransitData(serialNumber, trips, balance);
     }
 
     @NonNull
     @Override
     public String getCardName() {
-        return getCardIssuer(getSerialNumber());
+        return EZLinkData.getCardIssuer(getSerialNumber());
     }
 
     @NonNull
@@ -104,30 +80,4 @@ public abstract class EZLinkTransitData extends TransitData {
     }
 
     abstract double getBalance();
-
-    @NonNull
-    private static EZLinkTrip[] parseTrips(@NonNull String serialNumber, @NonNull CEPASCard card) {
-        List<CEPASTransaction> transactions = card.getHistory(3).getTransactions();
-        if (transactions != null) {
-            EZLinkTrip[] trips = new EZLinkTrip[transactions.size()];
-            for (int i = 0; i < trips.length; i++) {
-                trips[i] = EZLinkTrip.create(transactions.get(i), getCardIssuer(serialNumber));
-            }
-            return trips;
-        }
-        return new EZLinkTrip[0];
-    }
-
-    @NonNull
-    private static String getCardIssuer(@NonNull String canNo) {
-        int issuerId = Integer.parseInt(canNo.substring(0, 3));
-        switch (issuerId) {
-            case 100:
-                return "EZ-Link";
-            case 111:
-                return "NETS";
-            default:
-                return "CEPAS";
-        }
-    }
 }

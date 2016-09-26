@@ -30,17 +30,24 @@ import android.support.annotation.NonNull;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.TagReaderFactory;
+import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaDBUtil;
 import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.serialize.CardJsonSerializer;
 import com.codebutler.farebot.serialize.CardSerializer;
+import com.codebutler.farebot.serialize.EpochDateTypeAdapter;
 import com.codebutler.farebot.serialize.FareBotTypeAdapterFactory;
+import com.codebutler.farebot.transit.TransitFactoryRegistry;
+import com.codebutler.farebot.transit.edy.EdyTransitData;
 import com.codebutler.farebot.transit.ovc.OVChipDBUtil;
 import com.codebutler.farebot.transit.seq_go.SeqGoDBUtil;
+import com.codebutler.farebot.transit.suica.SuicaTransitData;
 import com.codebutler.farebot.util.ExportHelper;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.Date;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -59,6 +66,7 @@ public class FareBotApplication extends Application {
     private ExportHelper mExportHelper;
     private CardPersister mCardPersister;
     private TagReaderFactory mTagReaderFactory;
+    private TransitFactoryRegistry mTransitFactoryRegistry;
 
     public FareBotApplication() {
         sInstance = this;
@@ -78,6 +86,7 @@ public class FareBotApplication extends Application {
         mSeqGoDBUtil = new SeqGoDBUtil(this);
 
         Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new EpochDateTypeAdapter())
                 .registerTypeAdapterFactory(FareBotTypeAdapterFactory.create())
                 .registerTypeAdapterFactory(new RawCard.GsonTypeAdapterFactory())
                 .registerTypeAdapter(ByteArray.class, new ByteArray.GsonTypeAdapter())
@@ -92,6 +101,8 @@ public class FareBotApplication extends Application {
         mCardPersister = new CardPersister(this, mCardJsonSerializer);
         mExportHelper = new ExportHelper(this, mCardPersister, gson);
         mTagReaderFactory = new TagReaderFactory();
+
+        mTransitFactoryRegistry = new TransitFactoryRegistry();
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectAll()
@@ -136,6 +147,10 @@ public class FareBotApplication extends Application {
     @NonNull
     public TagReaderFactory getTagReaderFactory() {
         return mTagReaderFactory;
+    }
+
+    public TransitFactoryRegistry getTransitFactoryRegistry() {
+        return mTransitFactoryRegistry;
     }
 
     public boolean getMifareClassicSupport() {

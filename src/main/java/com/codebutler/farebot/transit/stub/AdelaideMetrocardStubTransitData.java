@@ -25,9 +25,6 @@ package com.codebutler.farebot.transit.stub;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.transit.TransitIdentity;
 import com.google.auto.value.AutoValue;
 
 /**
@@ -37,21 +34,6 @@ import com.google.auto.value.AutoValue;
  */
 @AutoValue
 public abstract class AdelaideMetrocardStubTransitData extends StubTransitData {
-
-    @NonNull
-    public static AdelaideMetrocardStubTransitData create(@NonNull DesfireCard card) {
-        return new AutoValue_AdelaideMetrocardStubTransitData();
-    }
-
-    public static boolean check(@NonNull Card card) {
-        return (card instanceof DesfireCard)
-                && (((DesfireCard) card).getApplication(0xb006f2) != null);
-    }
-
-    @NonNull
-    public static TransitIdentity parseTransitIdentity(@NonNull Card card) {
-        return new TransitIdentity("Metrocard (Adelaide)", null);
-    }
 
     @NonNull
     @Override

@@ -51,11 +51,12 @@ import com.codebutler.farebot.fragment.CardInfoFragment;
 import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragment.CardTripsFragment;
 import com.codebutler.farebot.fragment.UnauthorizedCardFragment;
+import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.serialize.CardSerializer;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitFactoryRegistry;
 import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitData;
 import com.codebutler.farebot.ui.TabPagerAdapter;
-import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.util.Utils;
 
 public class CardInfoActivity extends Activity {
@@ -73,6 +74,7 @@ public class CardInfoActivity extends Activity {
     private TextToSpeech mTTS;
     private CardPersister mCardPersister;
     private CardSerializer mCardSerializer;
+    private TransitFactoryRegistry mTransitFactoryRegistry;
 
     private OnInitListener mTTSInitListener = new OnInitListener() {
         @Override
@@ -90,8 +92,10 @@ public class CardInfoActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCardPersister = ((FareBotApplication) getApplication()).getCardPersister();
-        mCardSerializer = ((FareBotApplication) getApplication()).getCardSerializer();
+        FareBotApplication app = (FareBotApplication) getApplication();
+        mCardPersister = app.getCardPersister();
+        mCardSerializer = app.getCardSerializer();
+        mTransitFactoryRegistry = app.getTransitFactoryRegistry();
 
         setContentView(R.layout.activity_card_info);
 
@@ -120,7 +124,7 @@ public class CardInfoActivity extends Activity {
 
                     mRawCard = mCardPersister.readCard(cursor);
                     mCard = mRawCard.parse();
-                    mTransitData = mCard.parseTransitData();
+                    mTransitData = mCard.parseTransitData(mTransitFactoryRegistry);
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CardInfoActivity.this);
                     mSpeakBalanceEnabled = prefs.getBoolean("pref_key_speak_balance", false);

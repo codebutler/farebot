@@ -26,11 +26,7 @@ package com.codebutler.farebot.transit.myki;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.stub.StubTransitData;
-import com.codebutler.farebot.util.Utils;
 import com.google.auto.value.AutoValue;
 
 /**
@@ -47,22 +43,13 @@ public abstract class MykiTransitData extends StubTransitData {
     public static final String NAME = "Myki";
 
     @NonNull
-    public static MykiTransitData create(@NonNull DesfireCard card) {
-        try {
-            byte[] metadata = Utils.reverseBuffer(card.getApplication(4594).getFile(15).getData().bytes(), 0, 16);
-            int serialNumber1 = Utils.getBitsFromBuffer(metadata, 96, 32);
-            int serialNumber2 = Utils.getBitsFromBuffer(metadata, 64, 32);
-            return new AutoValue_MykiTransitData(serialNumber1, serialNumber2);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Myki data", ex);
-        }
+    static MykiTransitData create(@NonNull String serialNumber) {
+        return new AutoValue_MykiTransitData(serialNumber);
     }
 
-    public static boolean check(@NonNull Card card) {
-        return (card instanceof DesfireCard)
-                && (((DesfireCard) card).getApplication(4594) != null)
-                && (((DesfireCard) card).getApplication(15732978) != null);
-    }
+    @NonNull
+    @Override
+    public abstract String getSerialNumber();
 
     @NonNull
     @Override
@@ -70,35 +57,8 @@ public abstract class MykiTransitData extends StubTransitData {
         return NAME;
     }
 
-    @NonNull
-    @Override
-    public String getSerialNumber() {
-        return formatSerialNumber(getSerialNumber1(), getSerialNumber2());
-    }
-
-    @NonNull
-    private static String formatSerialNumber(long serialNumber1, long serialNumber2) {
-        String formattedSerial = String.format("%06d%08d", serialNumber1, serialNumber2);
-        return formattedSerial + Utils.calculateLuhn(formattedSerial);
-    }
-
-    @NonNull
-    public static TransitIdentity parseTransitIdentity(@NonNull Card card) {
-        DesfireCard desfireCard = (DesfireCard) card;
-        byte[] data = desfireCard.getApplication(4594).getFile(15).getData().bytes();
-        data = Utils.reverseBuffer(data, 0, 16);
-
-        long serialNumber1 = Utils.getBitsFromBuffer(data, 96, 32);
-        long serialNumber2 = Utils.getBitsFromBuffer(data, 64, 32);
-        return new TransitIdentity(NAME, formatSerialNumber(serialNumber1, serialNumber2));
-    }
-
     @Override
     public Uri getMoreInfoPage() {
         return Uri.parse("https://micolous.github.io/metrodroid/myki");
     }
-
-    abstract long getSerialNumber1();
-
-    abstract long getSerialNumber2();
 }

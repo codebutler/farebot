@@ -28,24 +28,49 @@ import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitFactory;
+import com.codebutler.farebot.transit.TransitFactoryRegistry;
 import com.codebutler.farebot.transit.TransitIdentity;
 
 import java.util.Date;
 
-public interface Card extends Parcelable {
+public abstract class Card implements Parcelable {
 
     @NonNull
-    CardType getCardType();
+    public abstract CardType getCardType();
 
     @NonNull
-    ByteArray getTagId();
+    public abstract ByteArray getTagId();
 
     @NonNull
-    Date getScannedAt();
+    public abstract Date getScannedAt();
 
     @Nullable
-    TransitIdentity parseTransitIdentity();
+    public TransitIdentity parseTransitIdentity(@NonNull TransitFactoryRegistry registry) {
+        for (TransitFactory factory : registry.getFactories(getParentClass())) {
+            if (factory.check(this)) {
+                return factory.parseIdentity(this);
+            }
+        }
+        return null;
+    }
 
     @Nullable
-    TransitData parseTransitData();
+    public TransitData parseTransitData(@NonNull TransitFactoryRegistry registry) {
+        for (TransitFactory factory : registry.getFactories(getParentClass())) {
+            if (factory.check(this)) {
+                return factory.parseData(this);
+            }
+        }
+        return null;
+    }
+
+    @NonNull
+    private Class<? extends Card> getParentClass() {
+        Class<? extends Card> aClass = getClass();
+        while (aClass.getSuperclass() != Card.class) {
+            aClass = (Class<? extends Card>) aClass.getSuperclass();
+        }
+        return aClass;
+    }
 }

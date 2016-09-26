@@ -36,11 +36,7 @@ import java.util.Locale;
 abstract class HSLRefill extends Refill {
 
     @NonNull
-    static HSLRefill create(byte[] data) {
-        long timestamp = HSLTransitData.cardDateToTimestamp(
-                HSLTransitData.bitsToLong(20, 14, data),
-                HSLTransitData.bitsToLong(34, 11, data));
-        long amount = HSLTransitData.bitsToLong(45, 20, data);
+    static HSLRefill create(long timestamp, long amount) {
         return new AutoValue_HSLRefill(timestamp, amount);
     }
 

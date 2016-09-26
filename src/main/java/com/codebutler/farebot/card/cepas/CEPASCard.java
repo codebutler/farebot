@@ -39,7 +39,7 @@ import java.util.Date;
 import java.util.List;
 
 @AutoValue
-public abstract class CEPASCard implements Card, Parcelable {
+public abstract class CEPASCard extends Card {
 
     @NonNull
     public static CEPASCard create(
@@ -54,24 +54,6 @@ public abstract class CEPASCard implements Card, Parcelable {
     @Override
     public CardType getCardType() {
         return CardType.CEPAS;
-    }
-
-    @Nullable
-    @Override
-    public TransitIdentity parseTransitIdentity() {
-        if (EZLinkTransitData.check(this)) {
-            return EZLinkTransitData.parseTransitIdentity(this);
-        }
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public TransitData parseTransitData() {
-        if (EZLinkTransitData.check(this)) {
-            return EZLinkTransitData.create(this);
-        }
-        return null;
     }
 
     @NonNull

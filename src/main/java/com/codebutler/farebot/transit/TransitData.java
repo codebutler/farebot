@@ -27,6 +27,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.ui.ListItem;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public abstract class TransitData implements Parcelable {
     @NonNull
     public abstract String getBalanceString();
 
-    @NonNull
+    @Nullable
     public abstract String getSerialNumber();
 
     @Nullable
@@ -47,9 +48,6 @@ public abstract class TransitData implements Parcelable {
 
     @Nullable
     public abstract List<Subscription> getSubscriptions();
-
-    @Nullable
-    public abstract List<ListItem> getInfo();
 
     @NonNull
     public abstract String getCardName();
@@ -62,5 +60,10 @@ public abstract class TransitData implements Parcelable {
      */
     public boolean hasUnknownStations() {
         return false;
+    }
+
+    @Nullable
+    public List<ListItem> getInfo() {
+        return null;
     }
 }

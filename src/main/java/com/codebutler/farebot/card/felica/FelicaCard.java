@@ -32,10 +32,6 @@ import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.fragment.FelicaCardRawDataFragment;
-import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.TransitIdentity;
-import com.codebutler.farebot.transit.edy.EdyTransitData;
-import com.codebutler.farebot.transit.suica.SuicaTransitData;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -47,7 +43,7 @@ import java.util.List;
 
 @CardRawDataFragmentClass(FelicaCardRawDataFragment.class)
 @AutoValue
-public abstract class FelicaCard implements Card {
+public abstract class FelicaCard extends Card {
 
     @NonNull
     public static FelicaCard create(
@@ -65,7 +61,6 @@ public abstract class FelicaCard implements Card {
     }
 
     @NonNull
-    @Override
     public CardType getCardType() {
         return CardType.FeliCa;
     }
@@ -90,28 +85,6 @@ public abstract class FelicaCard implements Card {
             if (system.getCode() == systemCode) {
                 return system;
             }
-        }
-        return null;
-    }
-
-    @Override
-    @Nullable
-    public TransitIdentity parseTransitIdentity() {
-        if (SuicaTransitData.check(this)) {
-            return SuicaTransitData.parseTransitIdentity(this);
-        } else if (EdyTransitData.check(this)) {
-            return EdyTransitData.parseTransitIdentity(this);
-        }
-        return null;
-    }
-
-    @Override
-    @Nullable
-    public TransitData parseTransitData() {
-        if (SuicaTransitData.check(this)) {
-            return SuicaTransitData.create(this);
-        } else if (EdyTransitData.check(this)) {
-            return EdyTransitData.create(this);
         }
         return null;
     }

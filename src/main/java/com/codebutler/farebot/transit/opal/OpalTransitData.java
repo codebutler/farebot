@@ -29,12 +29,9 @@ import android.text.format.DateFormat;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.HeaderListItem;
 import com.codebutler.farebot.ui.ListItem;
@@ -66,50 +63,6 @@ public abstract class OpalTransitData extends TransitData {
     private static final OpalSubscription OPAL_AUTOMATIC_TOP_UP = OpalSubscription.create();
 
     @NonNull
-    public static OpalTransitData create(@NonNull DesfireCard desfireCard) {
-        try {
-            byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
-            int iRawBalance;
-
-            data = Utils.reverseBuffer(data, 0, 16);
-
-            int checksum = Utils.getBitsFromBuffer(data, 0, 16);
-            int weeklyTrips = Utils.getBitsFromBuffer(data, 16, 4);
-            boolean autoTopup = Utils.getBitsFromBuffer(data, 20, 1) == 0x01;
-            int actionType = Utils.getBitsFromBuffer(data, 21, 4);
-            int vehicleType = Utils.getBitsFromBuffer(data, 25, 3);
-            int minute = Utils.getBitsFromBuffer(data, 28, 11);
-            int day = Utils.getBitsFromBuffer(data, 39, 15);
-            iRawBalance = Utils.getBitsFromBuffer(data, 54, 21);
-            int transactionNumber = Utils.getBitsFromBuffer(data, 75, 16);
-            // Skip bit here
-            int lastDigit = Utils.getBitsFromBuffer(data, 92, 4);
-            int serialNumber = Utils.getBitsFromBuffer(data, 96, 32);
-
-            int balance = Utils.unsignedToTwoComplement(iRawBalance, 20);
-
-            return new AutoValue_OpalTransitData(
-                    serialNumber,
-                    balance,
-                    checksum,
-                    weeklyTrips,
-                    autoTopup,
-                    actionType,
-                    vehicleType,
-                    minute,
-                    day,
-                    transactionNumber,
-                    lastDigit);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error parsing Opal data", ex);
-        }
-    }
-
-    public static boolean check(Card card) {
-        return (card instanceof DesfireCard) && (((DesfireCard) card).getApplication(0x314553) != null);
-    }
-
-    @NonNull
     @Override
     public String getCardName() {
         return NAME;
@@ -119,24 +72,6 @@ public abstract class OpalTransitData extends TransitData {
     @Override
     public String getBalanceString() {
         return NumberFormat.getCurrencyInstance(Locale.US).format((double) getBalance() / 100.);
-    }
-
-    @NonNull
-    @Override
-    public String getSerialNumber() {
-        return formatSerialNumber(getSerialNumberData(), getLastDigit());
-    }
-
-    private static String formatSerialNumber(int serialNumber, int lastDigit) {
-        return String.format("308522%09d%01d", serialNumber, lastDigit);
-    }
-
-    private Calendar getLastTransactionTime() {
-        Calendar cLastTransaction = GregorianCalendar.getInstance();
-        cLastTransaction.setTimeInMillis(OPAL_EPOCH.getTimeInMillis());
-        cLastTransaction.add(Calendar.DATE, getDay());
-        cLastTransaction.add(Calendar.MINUTE, getMinute());
-        return cLastTransaction;
     }
 
     @Nullable
@@ -158,16 +93,6 @@ public abstract class OpalTransitData extends TransitData {
         return items;
     }
 
-    public static TransitIdentity parseTransitIdentity(Card card) {
-        DesfireCard desfireCard = (DesfireCard) card;
-        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
-        data = Utils.reverseBuffer(data, 0, 5);
-
-        int lastDigit = Utils.getBitsFromBuffer(data, 4, 4);
-        int serialNumber = Utils.getBitsFromBuffer(data, 8, 32);
-        return new TransitIdentity(NAME, formatSerialNumber(serialNumber, lastDigit));
-    }
-
     @Nullable
     @Override
     public List<Subscription> getSubscriptions() {
@@ -178,6 +103,7 @@ public abstract class OpalTransitData extends TransitData {
         return Collections.emptyList();
     }
 
+    @NonNull
     private static String getVehicleTypeName(int vehicleType) {
         if (OpalData.VEHICLES.containsKey(vehicleType)) {
             return Utils.localizeString(OpalData.VEHICLES.get(vehicleType));
@@ -185,12 +111,22 @@ public abstract class OpalTransitData extends TransitData {
         return Utils.localizeString(R.string.unknown_format, "0x" + Long.toString(vehicleType, 16));
     }
 
+    @NonNull
     private static String getActionTypeName(int actionType) {
         if (OpalData.ACTIONS.containsKey(actionType)) {
             return Utils.localizeString(OpalData.ACTIONS.get(actionType));
         }
 
         return Utils.localizeString(R.string.unknown_format, "0x" + Long.toString(actionType, 16));
+    }
+
+    @NonNull
+    private Calendar getLastTransactionTime() {
+        Calendar cLastTransaction = GregorianCalendar.getInstance();
+        cLastTransaction.setTimeInMillis(OPAL_EPOCH.getTimeInMillis());
+        cLastTransaction.add(Calendar.DATE, getDay());
+        cLastTransaction.add(Calendar.MINUTE, getMinute());
+        return cLastTransaction;
     }
 
     // Unsupported elements
@@ -205,8 +141,6 @@ public abstract class OpalTransitData extends TransitData {
     public List<Refill> getRefills() {
         return null;
     }
-
-    abstract int getSerialNumberData();
 
     abstract int getBalance(); // cent
 
@@ -225,6 +159,4 @@ public abstract class OpalTransitData extends TransitData {
     abstract int getDay();
 
     abstract int getTransactionNumber();
-
-    abstract int getLastDigit();
 }

@@ -26,57 +26,25 @@ package com.codebutler.farebot.transit.bilhete_unico;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.ui.ListItem;
 import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 
 @AutoValue
 public abstract class BilheteUnicoSPTransitData extends TransitData {
 
-    private static final String NAME = "Bilhete Único";
-
-    private static final byte[] MANUFACTURER = {
-            (byte) 0x62,
-            (byte) 0x63,
-            (byte) 0x64,
-            (byte) 0x65,
-            (byte) 0x66,
-            (byte) 0x67,
-            (byte) 0x68,
-            (byte) 0x69
-    };
+    static final String NAME = "Bilhete Único";
 
     @NonNull
-    public static BilheteUnicoSPTransitData create(@NonNull ClassicCard card) {
-        BilheteUnicoSPCredit credit = BilheteUnicoSPCredit.create(card.getSector(8).getBlock(1).getData().bytes());
+    static BilheteUnicoSPTransitData create(@NonNull BilheteUnicoSPCredit credit) {
         return new AutoValue_BilheteUnicoSPTransitData(credit);
-    }
-
-    public static boolean check(@NonNull ClassicCard card) {
-        byte[] blockData = card.getSector(0).getBlock(0).getData().bytes();
-        return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
-    }
-
-    public static TransitIdentity parseTransitIdentity(Card card) {
-        return new TransitIdentity(NAME, null);
-    }
-
-    private static String convertAmount(int amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
-        formatter.setCurrency(Currency.getInstance("BRL"));
-
-        return formatter.format((double) amount / 100.0);
     }
 
     @NonNull
@@ -123,4 +91,11 @@ public abstract class BilheteUnicoSPTransitData extends TransitData {
 
     @NonNull
     abstract BilheteUnicoSPCredit getCredit();
+
+    private static String convertAmount(int amount) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        formatter.setCurrency(Currency.getInstance("BRL"));
+
+        return formatter.format((double) amount / 100.0);
+    }
 }

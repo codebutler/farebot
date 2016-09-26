@@ -59,7 +59,7 @@ abstract class OVChipTrip extends Trip {
         int processType = inTransaction.getTransfer();
         int agency = inTransaction.getCompany();
 
-        Date timestamp = OVChipTransitData.convertDate(inTransaction.getDate(), inTransaction.getTime());
+        Date timestamp = OVChipUtil.convertDate(inTransaction.getDate(), inTransaction.getTime());
 
         int startStationId = inTransaction.getStation();
         Station startStation = getStation(agency, startStationId);
@@ -78,7 +78,7 @@ abstract class OVChipTrip extends Trip {
                         .stationName(String.format("Unknown (%s)", endStationId))
                         .build();
             }
-            exitTimestamp = OVChipTransitData.convertDate(outTransaction.getDate(), outTransaction.getTime());
+            exitTimestamp = OVChipUtil.convertDate(outTransaction.getDate(), outTransaction.getTime());
             fare = outTransaction.getAmount();
         } else {
             endStation = null;
@@ -232,7 +232,7 @@ abstract class OVChipTrip extends Trip {
 
     @Override
     public String getFareString() {
-        return OVChipTransitData.convertAmount((int) getFare());
+        return OVChipUtil.convertAmount((int) getFare());
     }
 
     private static Station getStation(int companyCode, int stationCode) {

@@ -24,7 +24,6 @@
 package com.codebutler.farebot.card.ultralight;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.ByteArray;
 import com.codebutler.farebot.card.Card;
@@ -32,8 +31,6 @@ import com.codebutler.farebot.card.CardHasManufacturingInfo;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.fragment.UltralightCardRawDataFragment;
-import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.TransitIdentity;
 import com.google.auto.value.AutoValue;
 
 import java.util.Date;
@@ -45,7 +42,7 @@ import java.util.List;
 @CardRawDataFragmentClass(UltralightCardRawDataFragment.class)
 @CardHasManufacturingInfo(false)
 @AutoValue
-public abstract class UltralightCard implements Card {
+public abstract class UltralightCard extends Card {
 
     static final int ULTRALIGHT_SIZE = 0x0F;
     static final int ULTRALIGHT_C_SIZE = 0x2B;
@@ -64,23 +61,8 @@ public abstract class UltralightCard implements Card {
     }
 
     @NonNull
-    @Override
     public CardType getCardType() {
         return CardType.MifareUltralight;
-    }
-
-    @Nullable
-    @Override
-    public TransitIdentity parseTransitIdentity() {
-        // The card could not be identified.
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public TransitData parseTransitData() {
-        // The card could not be identified.
-        return null;
     }
 
     @NonNull

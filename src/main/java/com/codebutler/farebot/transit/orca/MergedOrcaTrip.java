@@ -30,6 +30,8 @@ import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 
+import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_CANCEL_TRIP;
+
 @AutoValue
 public abstract class MergedOrcaTrip extends Trip {
 
@@ -65,7 +67,7 @@ public abstract class MergedOrcaTrip extends Trip {
 
     @Override
     public String getFareString() {
-        if (getEndTrip().getTransType() == OrcaTransitData.TRANS_TYPE_CANCEL_TRIP) {
+        if (getEndTrip().getTransType() == TRANS_TYPE_CANCEL_TRIP) {
             return FareBotApplication.getInstance()
                     .getString(R.string.fare_cancelled_format, getStartTrip().getFareString());
         }

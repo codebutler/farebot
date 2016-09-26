@@ -22,20 +22,22 @@
 
 package com.codebutler.farebot.transit;
 
-public class TransitIdentity {
-    private final String mName;
-    private final String mSerialNumber;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-    public TransitIdentity(String name, String serialNumber) {
-        mName = name;
-        mSerialNumber = serialNumber;
+import com.google.auto.value.AutoValue;
+
+@AutoValue
+public abstract class TransitIdentity {
+
+    @NonNull
+    public static TransitIdentity create(@NonNull String name, @Nullable String serialNumber) {
+        return new AutoValue_TransitIdentity(name, serialNumber);
     }
 
-    public String getName() {
-        return mName;
-    }
+    @NonNull
+    public abstract String getName();
 
-    public String getSerialNumber() {
-        return mSerialNumber;
-    }
+    @Nullable
+    public abstract String getSerialNumber();
 }

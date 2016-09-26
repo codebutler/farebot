@@ -57,6 +57,7 @@ import com.codebutler.farebot.provider.CardDBHelper;
 import com.codebutler.farebot.provider.CardProvider;
 import com.codebutler.farebot.provider.CardsTableColumns;
 import com.codebutler.farebot.serialize.CardSerializer;
+import com.codebutler.farebot.transit.TransitFactoryRegistry;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.util.ExportHelper;
 import com.codebutler.farebot.util.Utils;
@@ -105,6 +106,7 @@ public class CardsFragment extends ListFragment {
 
     private ExportHelper mExportHelper;
     private CardSerializer mCardSerializer;
+    private TransitFactoryRegistry mTransitFactoryRegistry;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,6 +116,7 @@ public class CardsFragment extends ListFragment {
         FareBotApplication application = (FareBotApplication) getActivity().getApplication();
         mExportHelper = application.getExportHelper();
         mCardSerializer = application.getCardSerializer();
+        mTransitFactoryRegistry = application.getTransitFactoryRegistry();
     }
 
     @Override
@@ -185,7 +188,7 @@ public class CardsFragment extends ListFragment {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, mExportHelper.exportCards());
-                    startActivity(intent);
+                    startActivity(Intent.createChooser(intent, getString(R.string.share)));
                     return true;
                 case R.id.save:
                     exportToFile();
@@ -243,10 +246,13 @@ public class CardsFragment extends ListFragment {
             if (!mDataCache.containsKey(cacheKey)) {
                 String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
                 try {
-                    mDataCache.put(cacheKey, mCardSerializer.deserialize(data).parse().parseTransitIdentity());
+                    mDataCache.put(cacheKey, mCardSerializer
+                            .deserialize(data)
+                            .parse()
+                            .parseTransitIdentity(mTransitFactoryRegistry));
                 } catch (Exception ex) {
                     String error = String.format("Error: %s", Utils.getErrorMessage(ex));
-                    mDataCache.put(cacheKey, new TransitIdentity(error, null));
+                    mDataCache.put(cacheKey, TransitIdentity.create(error, null));
                 }
             }
 

@@ -175,18 +175,18 @@ abstract class OVChipSubscription extends Subscription {
     @Override
     public Date getValidFrom() {
         if (getValidFromTime() != 0) {
-            return OVChipTransitData.convertDate((int) getValidFromDate(), (int) getValidFromTime());
+            return OVChipUtil.convertDate((int) getValidFromDate(), (int) getValidFromTime());
         } else {
-            return OVChipTransitData.convertDate((int) getValidFromDate());
+            return OVChipUtil.convertDate((int) getValidFromDate());
         }
     }
 
     @Override
     public Date getValidTo() {
         if (getValidToTime() != 0) {
-            return OVChipTransitData.convertDate((int) getValidToDate(), (int) getValidToTime());
+            return OVChipUtil.convertDate((int) getValidToDate(), (int) getValidToTime());
         } else {
-            return OVChipTransitData.convertDate((int) getValidToDate());
+            return OVChipUtil.convertDate((int) getValidToDate());
         }
     }
 

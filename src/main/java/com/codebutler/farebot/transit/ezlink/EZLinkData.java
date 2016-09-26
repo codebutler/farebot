@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.ezlink;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.transit.Station;
@@ -440,5 +441,18 @@ final class EZLinkData {
     @Nullable
     static Station getStation(String code) {
         return MRT_STATIONS.get(code);
+    }
+
+    @NonNull
+    static String getCardIssuer(@NonNull String canNo) {
+        int issuerId = Integer.parseInt(canNo.substring(0, 3));
+        switch (issuerId) {
+            case 100:
+                return "EZ-Link";
+            case 111:
+                return "NETS";
+            default:
+                return "CEPAS";
+        }
     }
 }

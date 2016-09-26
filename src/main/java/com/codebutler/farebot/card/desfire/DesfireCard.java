@@ -31,15 +31,6 @@ import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.fragment.DesfireCardRawDataFragment;
-import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.TransitIdentity;
-import com.codebutler.farebot.transit.clipper.ClipperTransitData;
-import com.codebutler.farebot.transit.hsl.HSLTransitData;
-import com.codebutler.farebot.transit.myki.MykiTransitData;
-import com.codebutler.farebot.transit.opal.OpalTransitData;
-import com.codebutler.farebot.transit.orca.OrcaTransitData;
-import com.codebutler.farebot.transit.stub.AdelaideMetrocardStubTransitData;
-import com.codebutler.farebot.transit.stub.AtHopStubTransitData;
 import com.google.auto.value.AutoValue;
 
 import java.util.Date;
@@ -47,7 +38,7 @@ import java.util.List;
 
 @AutoValue
 @CardRawDataFragmentClass(DesfireCardRawDataFragment.class)
-public abstract class DesfireCard implements Card {
+public abstract class DesfireCard extends Card {
 
     @NonNull
     public static DesfireCard create(
@@ -63,38 +54,8 @@ public abstract class DesfireCard implements Card {
     }
 
     @NonNull
-    @Override
     public CardType getCardType() {
         return CardType.MifareDesfire;
-    }
-
-    @Override
-    @Nullable
-    public TransitData parseTransitData() {
-        if (OrcaTransitData.check(this)) {
-            return OrcaTransitData.create(this);
-        }
-        if (ClipperTransitData.check(this)) {
-            return ClipperTransitData.parse(this);
-        }
-        if (HSLTransitData.check(this)) {
-            return HSLTransitData.create(this);
-        }
-        if (OpalTransitData.check(this)) {
-            return OpalTransitData.create(this);
-        }
-        if (MykiTransitData.check(this)) {
-            return MykiTransitData.create(this);
-        }
-
-        // Stub card types go last
-        if (AdelaideMetrocardStubTransitData.check(this)) {
-            return AdelaideMetrocardStubTransitData.create(this);
-        }
-        if (AtHopStubTransitData.check(this)) {
-            return AtHopStubTransitData.create(this);
-        }
-        return null;
     }
 
     @NonNull
@@ -102,34 +63,6 @@ public abstract class DesfireCard implements Card {
 
     @NonNull
     public abstract DesfireManufacturingData getManufacturingData();
-
-    @Override
-    @Nullable
-    public TransitIdentity parseTransitIdentity() {
-        if (OrcaTransitData.check(this)) {
-            return OrcaTransitData.parseTransitIdentity(this);
-        }
-        if (ClipperTransitData.check(this)) {
-            return ClipperTransitData.parseTransitIdentity(this);
-        }
-        if (HSLTransitData.check(this)) {
-            return HSLTransitData.parseTransitIdentity(this);
-        }
-        if (OpalTransitData.check(this)) {
-            return OpalTransitData.parseTransitIdentity(this);
-        }
-        if (MykiTransitData.check(this)) {
-            return MykiTransitData.parseTransitIdentity(this);
-        }
-        // Stub card types go last
-        if (AdelaideMetrocardStubTransitData.check(this)) {
-            return AdelaideMetrocardStubTransitData.parseTransitIdentity(this);
-        }
-        if (AtHopStubTransitData.check(this)) {
-            return AtHopStubTransitData.parseTransitIdentity(this);
-        }
-        return null;
-    }
 
     @Nullable
     public DesfireApplication getApplication(int appId) {

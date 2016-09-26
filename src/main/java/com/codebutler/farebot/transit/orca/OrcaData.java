@@ -1,11 +1,14 @@
 /*
- * AtHopStubTransitData.java
+ * OrcaData.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
- * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+ * Copyright (C) 2014-2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2015 Sean CyberKitsune McClenaghan <cyberkitsune09@gmail.com>
+ *
+ * Thanks to:
+ * Karl Koscher <supersat@cs.washington.edu>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,28 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.stub;
+package com.codebutler.farebot.transit.orca;
 
-import android.support.annotation.NonNull;
+public final class OrcaData {
 
-import com.google.auto.value.AutoValue;
+    private OrcaData() { }
 
-/**
- * Stub implementation for AT HOP (Auckland, NZ).
- * <p>
- * https://github.com/micolous/metrodroid/wiki/AT-HOP
- */
-@AutoValue
-public abstract class AtHopStubTransitData extends StubTransitData {
-
-    @NonNull
-    public static AtHopStubTransitData create() {
-        return new AutoValue_AtHopStubTransitData();
-    }
-
-    @NonNull
-    @Override
-    public String getCardName() {
-        return "AT HOP";
-    }
+    static final int TRANS_TYPE_TAP_IN = 0x03;
+    static final int TRANS_TYPE_TAP_OUT = 0x07;
+    static final int TRANS_TYPE_PURSE_USE = 0x0c;
+    static final int TRANS_TYPE_CANCEL_TRIP = 0x01;
+    static final int TRANS_TYPE_PASS_USE = 0x60;
 }
