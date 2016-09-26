@@ -5,7 +5,7 @@
  * Learn more at: https://codebutler.github.io/farebot/
  *
  * Copyright (C) 2013 Lauri Andler <lauri.andler@gmail.com>
- * Copyright (C) 2014-2015 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2014-2016 Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
-1 * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 

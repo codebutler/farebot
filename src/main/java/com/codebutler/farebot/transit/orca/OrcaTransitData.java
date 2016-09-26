@@ -4,8 +4,7 @@
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2014-2015 Eric Butler <eric@codebutler.com>
- * Copyright (C) 2015 Sean CyberKitsune McClenaghan <cyberkitsune09@gmail.com>
+ * Copyright (C) 2014-2016 Eric Butler <eric@codebutler.com>
  *
  * Thanks to:
  * Karl Koscher <supersat@cs.washington.edu>

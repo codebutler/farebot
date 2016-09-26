@@ -6,6 +6,7 @@
  *
  * Copyright (C) 2011-2012, 2014-2016 Eric Butler <eric@codebutler.com>
  * Copyright (C) 2013 Chris Norden <thisiscnn@gmail.com>
+ * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
