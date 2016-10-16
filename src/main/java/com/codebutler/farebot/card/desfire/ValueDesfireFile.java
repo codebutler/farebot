@@ -31,7 +31,6 @@ import com.google.auto.value.AutoValue;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-
 /**
  * Represents a value file in Desfire
  */

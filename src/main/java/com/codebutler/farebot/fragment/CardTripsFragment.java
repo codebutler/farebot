@@ -57,7 +57,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-
 public class CardTripsFragment extends ListFragment {
     private Card mCard;
     private TransitData mTransitData;

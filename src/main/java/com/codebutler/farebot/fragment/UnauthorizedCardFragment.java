@@ -35,7 +35,6 @@ import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.transit.TransitData;
 
-
 public class UnauthorizedCardFragment extends Fragment {
     private Card mCard;
     private TransitData mTransitData;

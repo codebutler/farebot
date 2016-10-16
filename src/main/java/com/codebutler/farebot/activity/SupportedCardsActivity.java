@@ -131,7 +131,6 @@ public class SupportedCardsActivity extends Activity {
                     R.string.myki_card_note
             ));
 
-
             add(new CardInfo(R.drawable.nets_card, "NETS FlashPay",
                     R.string.location_singapore,
                     CardType.CEPAS
@@ -214,7 +213,6 @@ public class SupportedCardsActivity extends Activity {
             }
 
             ((TextView) convertView.findViewById(R.id.note)).setText(notes);
-
 
             return convertView;
         }

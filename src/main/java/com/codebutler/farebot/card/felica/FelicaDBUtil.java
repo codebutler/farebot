@@ -75,7 +75,6 @@ public class FelicaDBUtil extends DBUtil {
         super(context);
     }
 
-
     @Override
     protected String getDBName() {
         return DB_NAME;

@@ -44,16 +44,6 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
     private final ArrayList<TabInfo> mTabs = new ArrayList<>();
     private FragmentTransaction mCurTransaction = null;
 
-    private static final class TabInfo {
-        private final Class<?> mClass;
-        private final Bundle mArgs;
-
-        TabInfo(Class<?> klass, Bundle args) {
-            mClass = klass;
-            mArgs = args;
-        }
-    }
-
     public TabPagerAdapter(Activity activity, ViewPager pager) {
         mActivity = activity;
         mActionBar = activity.getActionBar();
@@ -159,5 +149,15 @@ public class TabPagerAdapter extends PagerAdapter implements ActionBar.TabListen
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    }
+
+    private static final class TabInfo {
+        private final Class<?> mClass;
+        private final Bundle mArgs;
+
+        TabInfo(Class<?> klass, Bundle args) {
+            mClass = klass;
+            mArgs = args;
+        }
     }
 }

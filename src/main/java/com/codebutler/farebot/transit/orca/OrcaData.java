@@ -28,11 +28,11 @@ package com.codebutler.farebot.transit.orca;
 
 public final class OrcaData {
 
-    private OrcaData() { }
-
     static final int TRANS_TYPE_TAP_IN = 0x03;
     static final int TRANS_TYPE_TAP_OUT = 0x07;
     static final int TRANS_TYPE_PURSE_USE = 0x0c;
     static final int TRANS_TYPE_CANCEL_TRIP = 0x01;
     static final int TRANS_TYPE_PASS_USE = 0x60;
+
+    private OrcaData() { }
 }

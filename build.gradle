@@ -117,5 +117,5 @@ android {
 
 checkstyle {
     ignoreFailures = false
-    toolVersion = "6.11.2"
+    toolVersion = "6.17"
 }

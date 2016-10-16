@@ -41,13 +41,13 @@ public final class SeqGoData {
     private static final int VEHICLE_FERRY = 18;
 
     static {
+        // TODO: Gold Coast Light Rail
         VEHICLES = new ImmutableMapBuilder<Integer, Trip.Mode>()
                 .put(VEHICLE_FARE_MACHINE, Trip.Mode.TICKET_MACHINE)
                 .put(VEHICLE_RAIL, Trip.Mode.TRAIN)
                 .put(VEHICLE_FERRY, Trip.Mode.FERRY)
                 .put(VEHICLE_BUS, Trip.Mode.BUS)
                 .build();
-                // TODO: Gold Coast Light Rail
     }
 
     private SeqGoData() { }

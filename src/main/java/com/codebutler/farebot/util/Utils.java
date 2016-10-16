@@ -42,22 +42,14 @@ import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class Utils {
+
     private static final String TAG = "Utils";
 
     private Utils() { }
-
-    public static <T> List<T> arrayAsList(T... array) {
-        if (array == null) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(array);
-    }
 
     public static void checkNfcEnabled(final Activity activity, NfcAdapter adapter) {
         if (adapter != null && adapter.isEnabled()) {
@@ -256,10 +248,6 @@ public class Utils {
             }
         }
         return null;
-    }
-
-    public interface Matcher<T> {
-        boolean matches(T t);
     }
 
     public static int convertBCDtoInteger(byte data) {
@@ -461,5 +449,9 @@ public class Utils {
      */
     public static boolean validateLuhn(String cardNumber) {
         return luhnChecksum(cardNumber) == 0;
+    }
+
+    public interface Matcher<T> {
+        boolean matches(T t);
     }
 }

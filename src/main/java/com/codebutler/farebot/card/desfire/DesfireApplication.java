@@ -53,5 +53,3 @@ public abstract class DesfireApplication implements Parcelable {
         return null;
     }
 }
-
-

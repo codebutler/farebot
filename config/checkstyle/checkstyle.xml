@@ -317,6 +317,10 @@ Description: https://source.android.com/source/code-style.html
         <!-- some sanity for declaration order -->
         <module name="DeclarationOrder"/>
 
+        <module name="InnerTypeLast"/>
+
+        <module name="RedundantModifier"/>
+
         <!-- Require variables to be declared close to where they are used -->
         <!--<module name="VariableDeclarationUsageDistance"/>-->
 
@@ -374,4 +378,16 @@ Description: https://source.android.com/source/code-style.html
 
     <!-- Require a new line at the end of all files -->
     <module name="NewlineAtEndOfFile"/>
+
+    <!-- Trailing spaces -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <!-- Double blank lines -->
+    <module name="RegexpMultiline">
+        <property name="format" value="\n\n\n"/>
+        <property name="message" value="Double blank lines."/>
+    </module>
 </module>

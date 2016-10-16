@@ -76,6 +76,4 @@ public class OVChipDBUtil extends DBUtil {
     protected int getDesiredVersion() {
         return VERSION;
     }
-
-
 }

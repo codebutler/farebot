@@ -30,7 +30,6 @@ import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.BuildConfig;
 
-
 class KeysDBHelper extends SQLiteOpenHelper {
 
     static final String KEY_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".key";

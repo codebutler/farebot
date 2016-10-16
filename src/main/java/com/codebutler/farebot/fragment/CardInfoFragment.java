@@ -55,7 +55,6 @@ public class CardInfoFragment extends ListFragment {
         setListAdapter(new ListItemAdapter(getActivity(), mTransitData.getInfo()));
     }
 
-
     @Override
     public void onListItemClick(ListView parent, View v, int position, long id) {
         ListItem listItem = (ListItem) getListAdapter().getItem(position);

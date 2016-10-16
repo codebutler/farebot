@@ -58,7 +58,6 @@ public class UnauthorizedClassicTransitFactory implements TransitFactory<Classic
         return TransitIdentity.create(Utils.localizeString(R.string.locked_card), null);
     }
 
-
     @NonNull
     @Override
     public UnauthorizedClassicTransitData parseData(@NonNull ClassicCard card) {

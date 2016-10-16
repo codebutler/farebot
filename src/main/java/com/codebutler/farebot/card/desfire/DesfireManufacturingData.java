@@ -94,6 +94,42 @@ public abstract class DesfireManufacturingData implements Parcelable {
                 .build();
     }
 
+    public abstract int getHwVendorID();
+
+    public abstract int getHwType();
+
+    public abstract int getHwSubType();
+
+    public abstract int getHwMajorVersion();
+
+    public abstract int getHwMinorVersion();
+
+    public abstract int getHwStorageSize();
+
+    public abstract int getHwProtocol();
+
+    public abstract int getSwVendorID();
+
+    public abstract int getSwType();
+
+    public abstract int getSwSubType();
+
+    public abstract int getSwMajorVersion();
+
+    public abstract int getSwMinorVersion();
+
+    public abstract int getSwStorageSize();
+
+    public abstract int getSwProtocol();
+
+    public abstract int getUid();
+
+    public abstract int getBatchNo();
+
+    public abstract int getWeekProd();
+
+    public abstract int getYearProd();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -135,40 +171,4 @@ public abstract class DesfireManufacturingData implements Parcelable {
 
         public abstract DesfireManufacturingData build();
     }
-
-    public abstract int getHwVendorID();
-
-    public abstract int getHwType();
-
-    public abstract int getHwSubType();
-
-    public abstract int getHwMajorVersion();
-
-    public abstract int getHwMinorVersion();
-
-    public abstract int getHwStorageSize();
-
-    public abstract int getHwProtocol();
-
-    public abstract int getSwVendorID();
-
-    public abstract int getSwType();
-
-    public abstract int getSwSubType();
-
-    public abstract int getSwMajorVersion();
-
-    public abstract int getSwMinorVersion();
-
-    public abstract int getSwStorageSize();
-
-    public abstract int getSwProtocol();
-
-    public abstract int getUid();
-
-    public abstract int getBatchNo();
-
-    public abstract int getWeekProd();
-
-    public abstract int getYearProd();
 }
