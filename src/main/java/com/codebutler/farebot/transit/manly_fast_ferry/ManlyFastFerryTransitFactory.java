@@ -32,8 +32,10 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryBalanceRecord;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryMetadataRecord;
+import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPreambleRecord;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPurseRecord;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryRecord;
+import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryRegularRecord;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +78,7 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
     @Override
     public TransitIdentity parseIdentity(@NonNull ClassicCard card) {
         byte[] file2 = card.getSector(0).getBlock(2).getData().bytes();
-        ManlyFastFerryRecord metadata = ManlyFastFerryRecord.recordFromBytes(file2);
+        ManlyFastFerryRecord metadata = recordFromBytes(file2);
         if (!(metadata instanceof ManlyFastFerryMetadataRecord)) {
             throw new AssertionError("Unexpected Manly record type: " + metadata.getClass().toString());
         }
@@ -101,8 +103,7 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
                     continue;
                 }
 
-                ManlyFastFerryRecord record = ManlyFastFerryRecord.recordFromBytes(block.getData().bytes());
-
+                ManlyFastFerryRecord record = recordFromBytes(block.getData().bytes());
                 if (record != null) {
                     records.add(record);
                 }
@@ -155,5 +156,41 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
         Collections.sort(refills, new Refill.Comparator());
 
         return ManlyFastFerryTransitData.create(serialNumber, trips, refills, epochDate, balance);
+    }
+
+    @NonNull
+    private static ManlyFastFerryRecord recordFromBytes(byte[] input) {
+        ManlyFastFerryRecord record = null;
+        switch (input[0]) {
+            case 0x01:
+                // Check if the next bytes are null
+                if (input[1] == 0x00 || input[1] == 0x01) {
+                    if (input[2] != 0x00) {
+                        // Fork off to handle balance
+                        record = ManlyFastFerryBalanceRecord.recordFromBytes(input);
+                    }
+                }
+                break;
+
+            case 0x02:
+                // Regular record
+                record = ManlyFastFerryRegularRecord.recordFromBytes(input);
+                break;
+
+            case 0x32:
+                // Preamble record
+                record = ManlyFastFerryPreambleRecord.recordFromBytes(input);
+                break;
+
+            case 0x00:
+            case 0x06:
+                // Null record / ignorable record
+                break;
+            default:
+                // Unknown record type
+                break;
+        }
+
+        return record;
     }
 }

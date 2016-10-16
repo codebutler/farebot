@@ -100,5 +100,4 @@ public abstract class ManlyFastFerryTransitData extends TransitData {
     abstract GregorianCalendar getEpochDate();
 
     abstract int getBalance();
-
 }

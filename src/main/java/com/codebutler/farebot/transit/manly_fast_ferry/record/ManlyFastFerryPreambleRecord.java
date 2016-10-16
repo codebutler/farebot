@@ -23,7 +23,9 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry.record;
 
-import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitData;
+import android.support.annotation.NonNull;
+
+import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitFactory;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.Arrays;
@@ -31,7 +33,7 @@ import java.util.Arrays;
 /**
  * Represents a "preamble" type record.
  */
-class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
+public class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
 
     private static final byte[] OLD_CARD_ID = {0x00, 0x00, 0x00};
 
@@ -39,6 +41,22 @@ class ManlyFastFerryPreambleRecord extends ManlyFastFerryRecord {
 
     private ManlyFastFerryPreambleRecord() { }
 
+    @NonNull
+    public static ManlyFastFerryPreambleRecord recordFromBytes(@NonNull byte[] input) {
+        ManlyFastFerryPreambleRecord record = new ManlyFastFerryPreambleRecord();
+        // Check that the record is valid for a preamble
+        if (!Arrays.equals(Arrays.copyOfRange(input, 0, ManlyFastFerryTransitFactory.SIGNATURE.length),
+                ManlyFastFerryTransitFactory.SIGNATURE)) {
+            throw new IllegalArgumentException("Preamble signature does not match");
+        }
+        // This is not set on 2012-era cards
+        if (Arrays.equals(Arrays.copyOfRange(input, 10, 13), OLD_CARD_ID)) {
+            record.mCardSerial = null;
+        } else {
+            record.mCardSerial = Utils.getHexString(Arrays.copyOfRange(input, 10, 14));
+        }
+        return record;
+    }
 
     /**
      * Returns the card serial number. Returns null on old cards.
