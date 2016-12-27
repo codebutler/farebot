@@ -50,6 +50,16 @@ View your remaining balance, recent trips, and other information from contactles
 
 FareBot requires an NFC Android phone running 4.0.1 or later.
 
+## Building
+
+```
+git clone https://github.com/codebutler/farebot.git
+cd farebot
+git submodule init
+git submodule update
+./gradlew assembleDebug
+```
+
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/
 [2]: https://en.wikipedia.org/wiki/CEPAS
