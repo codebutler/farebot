@@ -25,6 +25,8 @@ package com.codebutler.farebot.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.view.MenuItem;
 
 import com.codebutler.farebot.R;
@@ -33,6 +35,7 @@ import com.codebutler.farebot.transit.Trip;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -42,15 +45,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TripMapActivity extends Activity {
-    public static final String TRIP_EXTRA = "trip";
 
-    private GoogleMap mMap;
+    public static final String TRIP_EXTRA = "trip";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Trip trip = getIntent().getParcelableExtra(TRIP_EXTRA);
+        final Trip trip = getIntent().getParcelableExtra(TRIP_EXTRA);
         if (trip == null) {
             finish();
             return;
@@ -58,20 +60,36 @@ public class TripMapActivity extends Activity {
 
         setContentView(R.layout.activity_trip_map);
 
-        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        mMap.getUiSettings().setZoomControlsEnabled(false);
-
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(Trip.formatStationNames(trip));
         actionBar.setSubtitle((trip.getRouteName() == null) ? trip.getAgencyName()
                 : String.format("%s %s", trip.getAgencyName(), trip.getRouteName()));
 
-        int startMarkerId = R.drawable.marker_start;
-        int endMarkerId = R.drawable.marker_end;
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                googleMap.getUiSettings().setZoomControlsEnabled(false);
+                populateMap(googleMap, trip);
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return false;
+    }
+
+    private void populateMap(@NonNull GoogleMap map, @NonNull Trip trip) {
+        @DrawableRes int startMarkerId = R.drawable.marker_start;
+        @DrawableRes int endMarkerId = R.drawable.marker_end;
 
         /* FIXME: Need icons...
-
         if (trip.getMode() == Trip.Mode.BUS) {
             startMarkerId = R.drawable.marker_bus_start;
             endMarkerId   = R.drawable.marker_bus_end;
@@ -98,43 +116,32 @@ public class TripMapActivity extends Activity {
         LatLngBounds.Builder builder = LatLngBounds.builder();
 
         if (trip.getStartStation() != null) {
-            LatLng startStationLatLng = addStationMarker(trip.getStartStation(), startMarkerId);
+            LatLng startStationLatLng = addStationMarker(map, trip.getStartStation(), startMarkerId);
             builder.include(startStationLatLng);
             points.add(startStationLatLng);
         }
 
         if (trip.getEndStation() != null) {
-            LatLng endStationLatLng = addStationMarker(trip.getEndStation(), endMarkerId);
+            LatLng endStationLatLng = addStationMarker(map, trip.getEndStation(), endMarkerId);
             builder.include(endStationLatLng);
             points.add(endStationLatLng);
         }
 
         final LatLngBounds bounds = builder.build();
-        findViewById(R.id.map).post(new Runnable() {
-            @Override
-            public void run() {
-                if (points.size() == 1) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(points.get(0), 17));
-                } else {
-                    int padding = getResources().getDimensionPixelSize(R.dimen.map_padding);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
-                }
-            }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
+        if (points.size() == 1) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(points.get(0), 17));
+        } else {
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels;
+            int padding = getResources().getDimensionPixelSize(R.dimen.map_padding);
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
         }
-        return false;
     }
 
-    private LatLng addStationMarker(Station station, int iconId) {
+    @NonNull
+    private LatLng addStationMarker(@NonNull GoogleMap map, @NonNull Station station, @DrawableRes int iconId) {
         LatLng pos = new LatLng(Double.valueOf(station.getLatitude()), Double.valueOf(station.getLongitude()));
-        mMap.addMarker(new MarkerOptions()
+        map.addMarker(new MarkerOptions()
                 .position(pos)
                 .title(station.getStationName())
                 .snippet(station.getCompanyName())
