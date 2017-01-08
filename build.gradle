@@ -81,7 +81,7 @@ android {
     }
 
     defaultConfig {
-        targetSdkVersion 23
+        targetSdkVersion 25
     }
 
     signingConfigs {
