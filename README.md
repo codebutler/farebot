@@ -18,7 +18,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [tbonang](https://github.com/tbonang) (NETS FlashPay)
 * [Marcelo Liberato](https://github.com/mliberato) (Bilhete Único)
 * [Lauri Andler](https://github.com/landler/) (HSL)
-* [Michael Farrell](https://github.com/micolous/) (Opal, Manly Fast Ferry, Go card, Myki)
+* [Michael Farrell](https://github.com/micolous/) (Opal, Manly Fast Ferry, Go card, Myki, Octopus)
 * [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
 * [The Noun Project][15] (Various icons)
 
@@ -40,6 +40,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [Myki][21] - Melbourne (and surrounds), VIC, Australia (Only the card number can be read)
 * [Matkakortti][16], [HSL][17] - Finland
 * [NETS FlashPay](http://www.netsflashpay.com.sg/) - Singapore
+* [Octopus][25] - Hong Kong
 * [Opal][18] - Sydney (and surrounds), NSW, Australia
 * [ORCA][0] - Seattle, WA, USA
 * [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands (Requires encryption keys, not compatible with all devices)
@@ -84,3 +85,4 @@ git submodule update
 [21]: http://ptv.vic.gov.au/
 [23]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic
 [24]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_Ultralight_and_MIFARE_Ultralight_EV1
+[25]: http://www.octopus.com.hk/home/en/index.html

@@ -13,4 +13,5 @@
     <!-- i18n: "SE QLD" is an abbreviation for "South East Queensland".  "Queensland" is a state of Australia. -->
     <string name="location_brisbane_seq_australia">Brisbane &amp; SE QLD, Australia</string>
     <string name="location_victoria_australia">Victoria, Australia</string>
+    <string name="location_hong_kong">Hong Kong</string>
 </resources>

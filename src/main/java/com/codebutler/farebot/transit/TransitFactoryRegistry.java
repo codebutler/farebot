@@ -14,6 +14,7 @@ import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory;
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory;
 import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitFactory;
 import com.codebutler.farebot.transit.myki.MykiTransitFactory;
+import com.codebutler.farebot.transit.octopus.OctopusTransitFactory;
 import com.codebutler.farebot.transit.opal.OpalTransitFactory;
 import com.codebutler.farebot.transit.orca.OrcaTransitFactory;
 import com.codebutler.farebot.transit.ovc.OVChipTransitFactory;
@@ -38,6 +39,7 @@ public class TransitFactoryRegistry {
     public TransitFactoryRegistry() {
         registerFactory(FelicaCard.class, new SuicaTransitFactory());
         registerFactory(FelicaCard.class, new EdyTransitFactory());
+        registerFactory(FelicaCard.class, new OctopusTransitFactory());
 
         registerFactory(DesfireCard.class, new OrcaTransitFactory());
         registerFactory(DesfireCard.class, new ClipperTransitFactory());
