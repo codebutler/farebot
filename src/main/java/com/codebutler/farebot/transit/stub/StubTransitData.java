@@ -48,7 +48,7 @@ public abstract class StubTransitData extends TransitData {
 
     // Stub out elements that we can't support
 
-    @NonNull
+    @Nullable
     @Override
     public String getSerialNumber() {
         return null;

@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.myki;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.transit.stub.StubTransitData;
 import com.google.auto.value.AutoValue;
@@ -47,7 +48,7 @@ public abstract class MykiTransitData extends StubTransitData {
         return new AutoValue_MykiTransitData(serialNumber);
     }
 
-    @NonNull
+    @Nullable
     @Override
     public abstract String getSerialNumber();
 

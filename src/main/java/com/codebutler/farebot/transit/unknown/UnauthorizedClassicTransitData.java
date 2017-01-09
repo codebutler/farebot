@@ -54,7 +54,7 @@ public abstract class UnauthorizedClassicTransitData extends TransitData {
         return null;
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getSerialNumber() {
         return null;

@@ -63,7 +63,7 @@ public abstract class EdyTransitData extends TransitData {
         return format.format(getCurrentBalance());
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getSerialNumber() {
         byte[] serialNumber = getSerialNumberData().bytes();

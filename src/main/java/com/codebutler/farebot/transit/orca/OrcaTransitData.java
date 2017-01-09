@@ -60,7 +60,7 @@ public abstract class OrcaTransitData extends TransitData {
         return NumberFormat.getCurrencyInstance(Locale.US).format(getBalance() / 100);
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getSerialNumber() {
         return Integer.toString(getSerialNumberData());

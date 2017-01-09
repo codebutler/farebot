@@ -59,7 +59,7 @@ public abstract class BilheteUnicoSPTransitData extends TransitData {
         return BilheteUnicoSPTransitData.convertAmount(getCredit().getCredit());
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getSerialNumber() {
         return null;

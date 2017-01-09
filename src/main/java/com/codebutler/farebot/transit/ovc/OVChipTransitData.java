@@ -143,7 +143,7 @@ public abstract class OVChipTransitData extends TransitData {
         return OVChipUtil.convertAmount(getCredit().getCredit());
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getSerialNumber() {
         return null;
