@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    strings.xml
+
+    This file is part of FareBot.
+    Learn more at: https://codebutler.github.io/farebot/
+
+    Copyright (C) 2011-2012, 2016 Eric Butler <eric@codebutler.com>
+    Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+    Copyright (C) 2013 Chris Norden <thisiscnn@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="about">About</string>
+    <string name="accessibility">Accessibility</string>
+    <string name="add_key">Add Key</string>
+    <string name="advanced_info">Advanced Info</string>
+    <string name="app_name">FareBot</string>
+    <string name="balance">Balance</string>
+    <string name="balance_speech">Balance <xliff:g example="$13.37" id="balance">%s</xliff:g></string>
+    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
+    <string name="card_not_supported_on_device">This card is not supported by your device.</string>
+    <string name="card_note_cepas">Not compatible with all devices.</string>
+    <string name="card_preview_reader">Beta version of card reader.</string>
+    <string name="data">Raw Data</string>
+    <string name="delete">Delete</string>
+    <string name="delete_card">Delete Card</string>
+    <string name="directions">Tap a card.</string>
+    <string name="dont_move">Do not move card</string>
+    <string name="error">Error</string>
+    <string name="error_report_sent">Error report sent!</string>
+    <string name="export">Export</string>
+    <string name="export_all">Export All</string>
+    <string name="fully_locked_desc">
+        This card does not have any part of it which is freely readable without a key. You have no keys installed which are valid for this card.\n\n
+        If the card is currently supported by FareBot, you will be able to make this card work once you have installed keys for it. Please consult the online documentation for more information about acquiring keys.\n\n
+        If your card is not currently supported by FareBot, it is unlikely it will ever be supported by this software, unless this key is broken.\n\n
+        Please contact your municipal transport authority in order to allow some level of open data access on issued cards. It is possible to safely allow limited read access to data on public transport smartcards.
+    </string>
+    <string name="fully_locked_title">Card is fully locked!</string>
+    <string name="history">History</string>
+    <string name="hw_detail">Manufacturing Info</string>
+    <string name="import_clipboard">Import from Clipboard</string>
+    <string name="import_file">Import from File</string>
+    <string name="info">Info</string>
+    <string name="keys">Keys</string>
+    <string name="keys_required">Encryption keys are required to read this card.</string>
+    <string name="last_transaction">Last transaction</string>
+    <string name="launch_from_background">Launch from background</string>
+    <string name="load_keys">Load Keys</string>
+    <string name="loading">Loading…</string>
+    <string name="mifare_classic">MIFARE Classic</string>
+    <string name="need_stations">Not all station names are known.</string>
+    <string name="nfc_off_error">NFC is turned off</string>
+    <string name="nfc_unavailable">NFC Unavailable</string>
+    <string name="no_keys">No keys.</string>
+    <string name="no_scanned_cards">You have not scanned any cards.</string>
+    <string name="no_trip_data">No trips found. Has this card been used?</string>
+    <string name="pass_or_transfer">Pass/Xfer</string>
+    <string name="preferences">Preferences</string>
+    <string name="reading_card">Reading Card</string>
+    <string name="report_error">Report Error</string>
+    <string name="report_error_privacy_message">All data contained within this card will be included in your error report.</string>
+    <string name="report_error_privacy_title">Privacy Notice</string>
+    <string name="save_to_file">Save to file</string>
+    <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
+    <string name="scanned_cards">History</string>
+    <string name="share">Share</string>
+    <string name="speak_balance">Speak Balance</string>
+    <string name="speak_balance_summary">Proof of concept</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="supported_cards">Supported Cards</string>
+    <string name="turn_on_nfc">Please enable NFC to read card information.</string>
+    <string name="unknown_card">Unknown Card</string>
+    <string name="valid_format">Valid %1$s to %2$s</string>
+    <string name="wireless_settings">Wireless Settings</string>
+    <string name="saved_to_x">Saved to %s</string>
+    <string name="select_file">Select File</string>
+    <string name="copy">Copy</string>
+    <string name="copied_to_clipboard">Copied to clipboard.</string>
+    <string name="save">Save</string>
+    <string name="_import">Import</string>
+</resources>

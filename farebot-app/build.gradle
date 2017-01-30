@@ -1,0 +1,117 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'checkstyle'
+apply plugin: 'com.neenbedankt.android-apt'
+
+check.dependsOn 'checkstyle'
+
+task checkstyle(type: Checkstyle) {
+    configFile file('../config/checkstyle/checkstyle.xml')
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+}
+
+dependencies {
+    compile project(':farebot-core')
+    compile project(':farebot-card')
+    compile project(':farebot-card-cepas')
+    compile project(':farebot-card-classic')
+    compile project(':farebot-card-desfire')
+    compile project(':farebot-card-desfire')
+    compile project(':farebot-card-felica')
+    compile project(':farebot-card-ultralight')
+    compile project(':farebot-transit')
+    compile project(':farebot-transit-bilhete')
+    compile project(':farebot-transit-clipper')
+    compile project(':farebot-transit-edy')
+    compile project(':farebot-transit-ezlink')
+    compile project(':farebot-transit-hsl')
+    compile project(':farebot-transit-manly')
+    compile project(':farebot-transit-myki')
+    compile project(':farebot-transit-octopus')
+    compile project(':farebot-transit-opal')
+    compile project(':farebot-transit-orca')
+    compile project(':farebot-transit-ovc')
+    compile project(':farebot-transit-seqgo')
+    compile project(':farebot-transit-stub')
+    compile project(':farebot-transit-suica')
+
+    compile libs.playServicesMaps
+    compile libs.autoValueGson
+
+    compile(libs.crashlytics) {
+        transitive = true
+    }
+
+    // https://github.com/rharter/auto-value-gson/issues/80
+    apt files(androidJar(this))
+
+    provided libs.autoValue
+    provided libs.autoValueGson
+    apt libs.autoValue
+    apt libs.autoValueParcel
+    apt libs.autoValueGson
+}
+
+def askPassword() {
+    return 'security -q find-generic-password -w -g -l farebot-release'.execute().text.trim()
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if(taskGraph.hasTask(':assembleProdRelease')) {
+        def password = askPassword()
+        android.signingConfigs.release.storePassword = password
+        android.signingConfigs.release.keyPassword = password
+    }
+}
+
+android {
+    compileSdkVersion vers.compileSdkVersion
+    buildToolsVersion vers.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion vers.minSdkVersion
+        targetSdkVersion vers.targetSdkVersion
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('../debug.keystore')
+        }
+        release {
+            storeFile file('../release.keystore')
+            keyAlias 'ericbutler'
+            storePassword ''
+            keyPassword ''
+        }
+    }
+
+    buildTypes {
+        release {
+            // runProguard true
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    lintOptions {
+        abortOnError true
+        disable 'MissingTranslation', 'InvalidPackage'
+    }
+}
+
+checkstyle {
+    ignoreFailures = false
+    toolVersion = "6.17"
+}

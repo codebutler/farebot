@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Opal (Sydney, AU).
+    These are deliberately separated strings in order to match the terminology of the agency.
+-->
+<resources>
+    <string name="opal_automatic_top_up">Automatic top up</string>
+    <string name="opal_weekly_trips">Weekly trips</string>
+    <string name="opal_vehicle_bus">Bus</string>
+    <string name="opal_vehicle_ferry_lr">Ferry or Light Rail</string>
+    <string name="opal_vehicle_rail">Rail</string>
+    <string name="opal_action_none">None (new, unused card)</string>
+    <string name="opal_action_new_journey">New journey</string>
+    <string name="opal_action_transfer_same_mode">Transfer (from same mode)</string>
+    <string name="opal_action_transfer_diff_mode">Transfer (from different mode)</string>
+    <string name="opal_action_manly_new_journey">New journey (Manly Ferry)</string>
+    <string name="opal_action_manly_transfer_same_mode">Transfer (from other ferry to Manly Ferry)</string>
+    <string name="opal_action_manly_transfer_diff_mode">Transfer (from other mode to Manly Ferry)</string>
+    <string name="opal_action_journey_completed_distance">Journey completed (distance fare)</string>
+    <string name="opal_action_journey_completed_flat_rate">Journey completed (flat-rate fare)</string>
+    <string name="opal_action_journey_completed_auto_off">Journey completed (failure to tap off)</string>
+    <string name="opal_action_journey_completed_auto_on">Journey completed (failure to tap on)</string>
+    <string name="opal_action_tap_on_reversal">Tap on reversal</string>
+
+
+    <string name="opal_general">General</string>
+    <string name="opal_transaction_sequence">#</string>
+    <string name="opal_checksum">Checksum</string>
+    <string name="opal_last_transaction">Last transaction</string>
+    <string name="opal_date">Date</string>
+    <string name="opal_time">Time</string>
+    <string name="opal_vehicle_type">Vehicle type</string>
+    <string name="opal_transaction_type">Transaction type</string>
+    <string name="opal_unknown_format">Unknown (%s)</string>
+</resources>

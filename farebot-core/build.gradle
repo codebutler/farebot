@@ -1,0 +1,35 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+    compile libs.supportV4
+    compile libs.gson
+    compile libs.commonsIO
+    compile libs.commonsLang3
+    compile libs.guava
+    compile libs.autoValueGson
+
+    // https://github.com/rharter/auto-value-gson/issues/80
+    apt files(androidJar(this))
+
+    apt libs.autoValue
+    apt libs.autoValueParcel
+    apt libs.autoValueGson
+
+    provided libs.autoValue
+}
+
+android {
+    compileSdkVersion vers.compileSdkVersion
+    buildToolsVersion vers.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion vers.minSdkVersion
+        targetSdkVersion vers.targetSdkVersion
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}

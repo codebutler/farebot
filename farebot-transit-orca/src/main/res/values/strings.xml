@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    strings.xml
+
+    This file is part of FareBot.
+    Learn more at: https://codebutler.github.io/farebot/
+
+    Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="fare_cancelled_format">%s (Cancelled)</string>
+
+    <string name="transit_orca_agency_ct">Community Transit</string>
+    <string name="transit_orca_agency_kcm">King County Metro Transit</string>
+    <string name="transit_orca_agency_pt">Pierce Transit</string>
+    <string name="transit_orca_agency_st">Sound Transit</string>
+    <string name="transit_orca_agency_wsf">Washington State Ferries</string>
+    <string name="transit_orca_agency_et">Everett Transit</string>
+    <string name="transit_orca_agency_unknown">Unknown Agency: %s</string>
+
+    <string name="transit_orca_route_link">Link Light Rail</string>
+    <string name="transit_orca_route_sounder">Sounder Train</string>
+    <string name="transit_orca_route_express_bus">Express Bus</string>
+    <string name="transit_orca_route_bus">Bus</string>
+
+    <string name="transit_orca_station_coach">Coach #%s</string>
+    <string name="transit_orca_station_unknown_station">Unknown Station #%s</string>
+    <string name="transit_orca_station_unknown_terminal">Unknown Terminal #%s</string>
+</resources>

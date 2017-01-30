@@ -1,0 +1,25 @@
+ext {
+    vers = [
+            compileSdkVersion: 25,
+            targetSdkVersion: 25,
+            minSdkVersion: 21,
+            buildToolsVersion: '25.0.2'
+    ]
+
+    libs = [
+        autoValue:        'com.google.auto.value:auto-value:1.4-rc2',
+        autoValueGson:    'com.ryanharter.auto.value:auto-value-gson:0.4.5',
+        autoValueParcel:  'com.ryanharter.auto.value:auto-value-parcel:0.2.5',
+        commonsIO:        'commons-io:commons-io:2.5',
+        commonsLang3:     'org.apache.commons:commons-lang3:3.5',
+        crashlytics:      'com.crashlytics.sdk.android:crashlytics:2.6.5@aar',
+        gson:             'com.google.code.gson:gson:2.8.0',
+        guava:            'com.google.guava:guava:20.0',
+        playServicesMaps: 'com.google.android.gms:play-services-maps:10.0.1',
+        supportV4:        'com.android.support:support-v4:25.1.0'
+    ]
+
+    androidJar = { c ->
+        "${c.android.getSdkDirectory()}/platforms/android-${vers.compileSdkVersion}/android.jar"
+    }
+}
