@@ -44,8 +44,8 @@ import android.widget.TextView;
 
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.AddKeyActivity;
-import com.codebutler.farebot.provider.CardKeyProvider;
-import com.codebutler.farebot.provider.KeysTableColumns;
+import com.codebutler.farebot.card.provider.CardKeyProvider;
+import com.codebutler.farebot.card.provider.KeysTableColumns;
 import com.codebutler.farebot.util.BetterAsyncTask;
 
 public class KeysFragment extends ListFragment implements AdapterView.OnItemLongClickListener {

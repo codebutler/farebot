@@ -23,8 +23,6 @@
 
 package com.codebutler.farebot.card.classic.key;
 
-import com.codebutler.farebot.core.key.CardKeys;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ClassicCardKeys extends CardKeys {
+public class ClassicCardKeys implements CardKeys {
 
     private static final String KEYS = "keys";
     private static final int KEY_LEN = 6;

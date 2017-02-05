@@ -130,7 +130,7 @@ abstract class ClipperTrip extends Trip {
         } else if (getAgency() == ClipperData.AGENCY_MUNI) {
             return null; // Coach number is not collected
         } else if (getAgency() == ClipperData.AGENCY_GGT || getAgency() == ClipperData.AGENCY_CALTRAIN) {
-            return resources.getString(R.string.transit_clipper_station_zone_id, getFrom());
+            return resources.getString(R.string.transit_clipper_station_zone_id, Long.toString(getFrom()));
         } else {
             return resources.getString(R.string.transit_clipper_station_unknown);
         }

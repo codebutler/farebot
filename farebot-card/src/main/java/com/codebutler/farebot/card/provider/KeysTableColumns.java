@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.provider;
+package com.codebutler.farebot.card.provider;
 
 import android.provider.BaseColumns;
 

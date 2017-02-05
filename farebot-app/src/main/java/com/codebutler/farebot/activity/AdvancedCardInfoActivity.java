@@ -45,6 +45,7 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardHasManufacturingInfo;
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.UnauthorizedException;
 import com.codebutler.farebot.core.UnsupportedCardException;
 import com.codebutler.farebot.fragment.CardHWDetailFragment;
@@ -53,9 +54,6 @@ import com.codebutler.farebot.util.Utils;
 import com.crashlytics.android.Crashlytics;
 
 public class AdvancedCardInfoActivity extends Activity {
-    public static final String EXTRA_CARD = "com.codebutler.farebot.EXTRA_CARD";
-    public static final String EXTRA_RAW_CARD = "com.codebutler.farebot.EXTRA_RAW_CARD";
-    public static final String EXTRA_ERROR = "com.codebutler.farebot.EXTRA_ERROR";
 
     private TabPagerAdapter mTabsAdapter;
     private Card mCard;
@@ -74,8 +72,8 @@ public class AdvancedCardInfoActivity extends Activity {
             }
         });
 
-        mCard = getIntent().getParcelableExtra(EXTRA_CARD);
-        mSerializedRawCard = getIntent().getStringExtra(EXTRA_RAW_CARD);
+        mCard = getIntent().getParcelableExtra(Constants.EXTRA_CARD);
+        mSerializedRawCard = getIntent().getStringExtra(Constants.EXTRA_RAW_CARD);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         mTabsAdapter = new TabPagerAdapter(this, viewPager);
@@ -90,8 +88,8 @@ public class AdvancedCardInfoActivity extends Activity {
             actionBar.setSubtitle(getString(R.string.scanned_at_format, time, date));
         }
 
-        if (getIntent().hasExtra(EXTRA_ERROR)) {
-            mError = (Exception) getIntent().getSerializableExtra(EXTRA_ERROR);
+        if (getIntent().hasExtra(Constants.EXTRA_ERROR)) {
+            mError = (Exception) getIntent().getSerializableExtra(Constants.EXTRA_ERROR);
             if (mError instanceof UnsupportedCardException) {
                 findViewById(R.id.unknown_card).setVisibility(View.VISIBLE);
             } else if (mError instanceof UnauthorizedException) {

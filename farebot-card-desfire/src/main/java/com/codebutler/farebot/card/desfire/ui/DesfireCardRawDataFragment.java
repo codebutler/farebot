@@ -33,6 +33,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import com.codebutler.farebot.card.CardUiDependencies;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings;
 import com.codebutler.farebot.card.desfire.R;
 import com.codebutler.farebot.card.desfire.RecordDesfireFileSettings;
@@ -43,6 +44,7 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireCard;
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFile;
 import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.ui.ExpandableListFragment;
 
 public class DesfireCardRawDataFragment extends ExpandableListFragment {
@@ -59,16 +61,20 @@ public class DesfireCardRawDataFragment extends ExpandableListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // FIXME:
-        //CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
-        //String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
-        //mRawCard = (RawDesfireCard) cardSerializer.deserialize(serializedCard);
+        CardSerializer cardSerializer = ((CardUiDependencies) getActivity().getApplication()).getCardSerializer();
+        String serializedCard = getArguments().getString(Constants.EXTRA_RAW_CARD);
+        mRawCard = (RawDesfireCard) cardSerializer.deserialize(serializedCard);
 
         setListAdapter(new DesfireCardRawDataAdapter());
     }
 
     @Override
-    protected boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    protected boolean onListChildClick(
+            ExpandableListView parent,
+            View v,
+            int groupPosition,
+            int childPosition,
+            long id) {
         RawDesfireFile file = getExpandableListAdapter().getChild(groupPosition, childPosition);
 
         ByteArray data = file.fileData();

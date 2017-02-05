@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.provider;
+package com.codebutler.farebot.card.provider;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -28,7 +28,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.BuildConfig;
+import com.codebutler.farebot.card.BuildConfig;
 
 public class CardDBHelper extends SQLiteOpenHelper {
 

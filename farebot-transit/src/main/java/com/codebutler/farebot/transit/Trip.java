@@ -98,7 +98,6 @@ public abstract class Trip implements Parcelable {
 
     public abstract boolean hasTime();
 
-    // FIXME: Move to TripUtils
     @Nullable
     public static String formatStationNames(@NonNull Context context, @NonNull Trip trip) {
         Resources res = context.getResources();

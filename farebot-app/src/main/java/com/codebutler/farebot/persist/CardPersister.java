@@ -29,8 +29,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.RawCard;
-import com.codebutler.farebot.provider.CardProvider;
-import com.codebutler.farebot.provider.CardsTableColumns;
+import com.codebutler.farebot.card.provider.CardProvider;
+import com.codebutler.farebot.card.provider.CardsTableColumns;
 import com.codebutler.farebot.card.serialize.CardSerializer;
 
 public class CardPersister {

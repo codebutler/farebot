@@ -88,7 +88,6 @@ public final class ByteUtils {
         return ret;
     }
 
-
     public static int convertBCDtoInteger(byte data) {
         return (((data & (char) 0xF0) >> 4) * 10) + ((data & (char) 0x0F));
     }

@@ -22,3 +22,45 @@ allprojects {
 }
 
 apply from: 'dependencies.gradle'
+
+subprojects {
+    apply plugin: 'checkstyle'
+
+    afterEvaluate {project ->
+        if (project.name.contains('farebot')) {
+            check.dependsOn 'checkstyle'
+            task checkstyle(type: Checkstyle) {
+                configFile file('config/checkstyle/checkstyle.xml')
+                source 'src'
+                include '**/*.java'
+                exclude '**/gen/**'
+                classpath = files()
+            }
+            checkstyle {
+                ignoreFailures = false
+                toolVersion = "6.17"
+            }
+        }
+        if (project.hasProperty("android")) {
+            android {
+                compileSdkVersion vers.compileSdkVersion
+                buildToolsVersion vers.buildToolsVersion
+
+                defaultConfig {
+                    minSdkVersion vers.minSdkVersion
+                    targetSdkVersion vers.targetSdkVersion
+                }
+
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_7
+                    targetCompatibility JavaVersion.VERSION_1_7
+                }
+
+                lintOptions {
+                    abortOnError true
+                    disable 'InvalidPackage'
+                }
+            }
+        }
+    }
+}

@@ -31,12 +31,14 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import com.codebutler.farebot.card.CardUiDependencies;
 import com.codebutler.farebot.card.classic.R;
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock;
 import com.codebutler.farebot.card.classic.raw.RawClassicCard;
 import com.codebutler.farebot.card.classic.raw.RawClassicSector;
-import com.codebutler.farebot.core.ui.ExpandableListFragment;
 import com.codebutler.farebot.card.serialize.CardSerializer;
+import com.codebutler.farebot.core.Constants;
+import com.codebutler.farebot.core.ui.ExpandableListFragment;
 
 import java.util.List;
 
@@ -48,11 +50,10 @@ public class ClassicCardRawDataFragment extends ExpandableListFragment {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
 
-        // FIXME:
-//        CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
-//        String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
-//        mRawCard = (RawClassicCard) cardSerializer.deserialize(serializedCard);
-//        setListAdapter(new ClassicRawDataAdapter(getActivity(), mRawCard));
+         CardSerializer cardSerializer = ((CardUiDependencies) getActivity().getApplication()).getCardSerializer();
+         String serializedCard = getArguments().getString(Constants.EXTRA_RAW_CARD);
+         mRawCard = (RawClassicCard) cardSerializer.deserialize(serializedCard);
+         setListAdapter(new ClassicRawDataAdapter(getActivity(), mRawCard));
     }
 
     @Override

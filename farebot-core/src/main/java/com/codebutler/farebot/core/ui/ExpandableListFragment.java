@@ -151,10 +151,14 @@ public abstract class ExpandableListFragment extends Fragment implements OnCreat
      * @param position The position of the view in the list
      * @param id       The row id of the item that was clicked
      */
-    private void onListItemClick(ListView l, View v, int position, long id) {
-    }
+    private void onListItemClick(ListView l, View v, int position, long id) { }
 
-    protected boolean onListChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    protected boolean onListChildClick(
+            ExpandableListView parent,
+            View v,
+            int groupPosition,
+            int childPosition,
+            long id) {
         return false;
     }
 

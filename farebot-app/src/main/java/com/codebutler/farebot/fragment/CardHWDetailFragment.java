@@ -26,7 +26,6 @@ package com.codebutler.farebot.fragment;
 import android.app.ListFragment;
 import android.os.Bundle;
 
-import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.cepas.CEPASCard;
@@ -35,6 +34,7 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireManufacturingData;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.core.ui.HeaderListItem;
 
@@ -52,7 +52,7 @@ public class CardHWDetailFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
 
         List<ListItem> items = new ArrayList<>();
 

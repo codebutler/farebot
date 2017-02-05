@@ -2,6 +2,8 @@ package com.codebutler.farebot.core;
 
 public final class Luhn {
 
+    private Luhn() { }
+
     /**
      * Given a partial card number, calculate the Luhn check digit.
      *
@@ -78,6 +80,4 @@ public final class Luhn {
         }
         return sum;
     }
-
-    private Luhn() { }
 }

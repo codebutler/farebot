@@ -28,6 +28,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.card.CardUiDependencies;
 import com.codebutler.farebot.card.cepas.CEPASTypeAdapterFactory;
 import com.codebutler.farebot.card.classic.ClassicTypeAdapterFactory;
 import com.codebutler.farebot.card.desfire.DesfireTypeAdapterFactory;
@@ -47,7 +48,7 @@ import java.util.Date;
 
 import io.fabric.sdk.android.Fabric;
 
-public class FareBotApplication extends Application {
+public class FareBotApplication extends Application implements CardUiDependencies {
 
     public static final String PREF_LAST_READ_ID = "last_read_id";
     public static final String PREF_LAST_READ_AT = "last_read_at";
@@ -78,7 +79,7 @@ public class FareBotApplication extends Application {
 
         mCardPersister = new CardPersister(this, mCardJsonSerializer);
         mExportHelper = new ExportHelper(this, mCardPersister, gson);
-        mTagReaderFactory = new TagReaderFactory();
+        mTagReaderFactory = new TagReaderFactory(this);
 
         mTransitFactoryRegistry = new TransitFactoryRegistry(this);
 

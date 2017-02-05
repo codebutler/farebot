@@ -136,12 +136,12 @@
             android:theme="@style/FareBotDialog"/>
 
         <provider
-            android:name="com.codebutler.farebot.provider.CardProvider"
+            android:name=".card.provider.CardProvider"
             android:authorities="${applicationId}.cardprovider"
             android:exported="false"/>
 
         <provider
-            android:name="com.codebutler.farebot.provider.CardKeyProvider"
+            android:name=".card.provider.CardKeyProvider"
             android:authorities="${applicationId}.keyprovider"
             android:exported="false"/>
 

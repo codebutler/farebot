@@ -50,9 +50,9 @@ abstract class HSLTrip extends Trip {
     public String getAgencyName(@NonNull Resources resource) {
         if (getArvo() == 1) {
             long mins = (getExpireTimestamp() - getTimestamp()) / 60;
-            return resource.getString(R.string.hsl_balance_ticket, getPax(), mins);
+            return resource.getString(R.string.hsl_balance_ticket, Long.toString(getPax()), Long.toString(mins));
         } else {
-            return resource.getString(R.string.hsl_pass_ticket, getPax());
+            return resource.getString(R.string.hsl_pass_ticket, Long.toString(getPax()));
         }
     }
 
@@ -67,7 +67,7 @@ abstract class HSLTrip extends Trip {
             return null;
         }
         String line = getLine().substring(1);
-        return resources.getString(R.string.hsl_route_line_vehicle, line, getVehicleNumber());
+        return resources.getString(R.string.hsl_route_line_vehicle, line, Long.toString(getVehicleNumber()));
     }
 
     @Override

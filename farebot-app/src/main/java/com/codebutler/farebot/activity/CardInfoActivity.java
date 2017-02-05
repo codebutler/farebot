@@ -45,6 +45,7 @@ import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.RawCard;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.UnsupportedCardException;
 import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.fragment.CardBalanceFragment;
@@ -163,7 +164,7 @@ public class CardInfoActivity extends Activity {
                 actionBar.setTitle(mTransitData.getCardName(getResources()) + " " + titleSerial);
 
                 Bundle args = new Bundle();
-                args.putParcelable(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
+                args.putParcelable(Constants.EXTRA_CARD, mCard);
                 args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
 
                 if (mTransitData instanceof UnauthorizedClassicTransitData) {
@@ -236,10 +237,10 @@ public class CardInfoActivity extends Activity {
 
     private void showAdvancedInfo(@Nullable Exception ex) {
         Intent intent = new Intent(this, AdvancedCardInfoActivity.class);
-        intent.putExtra(AdvancedCardInfoActivity.EXTRA_CARD, mCard);
-        intent.putExtra(AdvancedCardInfoActivity.EXTRA_RAW_CARD, mCardSerializer.serialize(mRawCard));
+        intent.putExtra(Constants.EXTRA_CARD, mCard);
+        intent.putExtra(Constants.EXTRA_RAW_CARD, mCardSerializer.serialize(mRawCard));
         if (ex != null) {
-            intent.putExtra(AdvancedCardInfoActivity.EXTRA_ERROR, ex);
+            intent.putExtra(Constants.EXTRA_ERROR, ex);
         }
         startActivity(intent);
     }

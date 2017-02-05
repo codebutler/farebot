@@ -30,11 +30,13 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import com.codebutler.farebot.card.CardUiDependencies;
 import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.card.ultralight.R;
 import com.codebutler.farebot.card.ultralight.UltralightPage;
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard;
 import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.ui.ExpandableListFragment;
 
 /**
@@ -46,12 +48,11 @@ public class UltralightCardRawDataFragment extends ExpandableListFragment {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
 
-        // FIXME:
-//        CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
-//        String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
-//        RawUltralightCard rawCard = (RawUltralightCard) cardSerializer.deserialize(serializedCard);
-//
-//        setListAdapter(new UltralightRawDataAdapter(getActivity(), rawCard));
+        CardSerializer cardSerializer = ((CardUiDependencies) getActivity().getApplication()).getCardSerializer();
+        String serializedCard = getArguments().getString(Constants.EXTRA_RAW_CARD);
+        RawUltralightCard rawCard = (RawUltralightCard) cardSerializer.deserialize(serializedCard);
+
+        setListAdapter(new UltralightRawDataAdapter(getActivity(), rawCard));
     }
 
     private static class UltralightRawDataAdapter extends BaseExpandableListAdapter {

@@ -23,17 +23,18 @@
 
 package com.codebutler.farebot.card.classic;
 
+import android.content.Context;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.TagReader;
+import com.codebutler.farebot.card.classic.key.CardKeysFactory;
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys;
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey;
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock;
 import com.codebutler.farebot.card.classic.raw.RawClassicCard;
 import com.codebutler.farebot.card.classic.raw.RawClassicSector;
-import com.codebutler.farebot.core.key.CardKeys;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,8 +46,11 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
     private static final byte[] PREAMBLE_KEY = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
             (byte) 0x00};
 
-    public ClassicTagReader(@NonNull byte[] tagId, @NonNull Tag tag) {
+    @NonNull private final CardKeysFactory mCardKeysFactory;
+
+    public ClassicTagReader(@NonNull Context context, @NonNull byte[] tagId, @NonNull Tag tag) {
         super(tagId, tag);
+        mCardKeysFactory = new CardKeysFactory(context);
     }
 
     @NonNull
@@ -61,7 +65,7 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
             @NonNull byte[] tagId,
             @NonNull Tag tag,
             @NonNull MifareClassic tech) throws Exception {
-        ClassicCardKeys keys = null; // FIXME (ClassicCardKeys) CardKeys.forTagId(tagId);
+        ClassicCardKeys keys = (ClassicCardKeys) mCardKeysFactory.forTagId(tagId);
 
         List<RawClassicSector> sectors = new ArrayList<>();
 
@@ -133,7 +137,7 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex));
                 }
             } catch (IOException ex) {
-                // FIXME sectors.add(RawClassicSector.createInvalid(sectorIndex, Utils.getErrorMessage(ex)));
+                sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.getMessage()));
             }
         }
 

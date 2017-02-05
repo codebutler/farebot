@@ -122,7 +122,7 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitData.AGENCY_ET:
                 return resources.getString(R.string.transit_orca_agency_et);
         }
-        return resources.getString(R.string.transit_orca_agency_unknown, getAgency());
+        return resources.getString(R.string.transit_orca_agency_unknown, Long.toString(getAgency()));
     }
 
     @Override
@@ -141,7 +141,7 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitData.AGENCY_ET:
                 return "ET";
         }
-        return resources.getString(R.string.transit_orca_agency_unknown, getAgency());
+        return resources.getString(R.string.transit_orca_agency_unknown, Long.toString(getAgency()));
     }
 
     @Override
@@ -194,24 +194,28 @@ public abstract class OrcaTrip extends Trip {
             if (LINK_STATIONS.containsKey(getCoachNumber())) {
                 return LINK_STATIONS.get(getCoachNumber()).getStationName();
             } else {
-                return resources.getString(R.string.transit_orca_station_unknown_station, getCoachNumber());
+                return resources.getString(R.string.transit_orca_station_unknown_station,
+                        Long.toString(getCoachNumber()));
             }
         } else if (isSounder()) {
             int stationNumber = (int) getCoachNumber();
             if (sSounderStations.containsKey(stationNumber)) {
                 return sSounderStations.get(stationNumber).getStationName();
             } else {
-                return resources.getString(R.string.transit_orca_station_unknown_station, stationNumber);
+                return resources.getString(R.string.transit_orca_station_unknown_station,
+                        Integer.toString(stationNumber));
             }
         } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
             int terminalNumber = (int) getCoachNumber();
             if (sWSFTerminals.containsKey(terminalNumber)) {
                 return sWSFTerminals.get(terminalNumber).getStationName();
             } else {
-                return resources.getString(R.string.transit_orca_station_unknown_terminal, terminalNumber);
+                return resources.getString(R.string.transit_orca_station_unknown_terminal,
+                        Integer.toString(terminalNumber));
             }
         } else {
-            return resources.getString(R.string.transit_orca_station_coach, getCoachNumber());
+            return resources.getString(R.string.transit_orca_station_coach,
+                    Long.toString(getCoachNumber()));
         }
     }
 

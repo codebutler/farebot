@@ -40,12 +40,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codebutler.farebot.card.CardRawDataFragmentClass;
+import com.codebutler.farebot.card.CardUiDependencies;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.card.felica.FelicaSystem;
 import com.codebutler.farebot.card.felica.FelicaUtils;
 import com.codebutler.farebot.card.felica.R;
 import com.codebutler.farebot.card.felica.raw.RawFelicaCard;
+import com.codebutler.farebot.card.serialize.CardSerializer;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.ui.ExpandableListFragment;
 
 import java.util.ArrayList;
@@ -64,10 +67,9 @@ public class FelicaCardRawDataFragment extends ExpandableListFragment {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
 
-        // FIXME:
-//        CardSerializer cardSerializer = ((FareBotApplication) getActivity().getApplication()).getCardSerializer();
-//        String serializedCard = getArguments().getString(AdvancedCardInfoActivity.EXTRA_RAW_CARD);
-//        mRawCard = (RawFelicaCard) cardSerializer.deserialize(serializedCard);
+        CardSerializer cardSerializer = ((CardUiDependencies) getActivity().getApplication()).getCardSerializer();
+        String serializedCard = getArguments().getString(Constants.EXTRA_RAW_CARD);
+        mRawCard = (RawFelicaCard) cardSerializer.deserialize(serializedCard);
 
         setListAdapter(new FelicaRawDataAdapter(getActivity(), mRawCard));
     }

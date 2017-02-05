@@ -73,6 +73,10 @@ public class SupportedCardsActivity extends Activity {
         return false;
     }
 
+    public boolean getMifareClassicSupport() {
+        return getPackageManager().hasSystemFeature("com.nxp.mifare");
+    }
+
     private class CardsAdapter extends ArrayAdapter<CardInfo> {
         CardsAdapter(Context context) {
             super(context, 0, new ArrayList<CardInfo>());
@@ -219,10 +223,6 @@ public class SupportedCardsActivity extends Activity {
 
             return convertView;
         }
-    }
-
-    public boolean getMifareClassicSupport() {
-        return getPackageManager().hasSystemFeature("com.nxp.mifare");
     }
 
     private static class CardInfo {

@@ -44,8 +44,8 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys;
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey;
 import com.codebutler.farebot.core.ByteUtils;
-import com.codebutler.farebot.provider.CardKeyProvider;
-import com.codebutler.farebot.provider.KeysTableColumns;
+import com.codebutler.farebot.card.provider.CardKeyProvider;
+import com.codebutler.farebot.card.provider.KeysTableColumns;
 import com.codebutler.farebot.util.BetterAsyncTask;
 import com.codebutler.farebot.util.Utils;
 

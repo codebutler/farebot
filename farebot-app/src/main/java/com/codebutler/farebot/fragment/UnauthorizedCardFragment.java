@@ -30,9 +30,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.codebutler.farebot.R;
-import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.transit.TransitData;
 
 public class UnauthorizedCardFragment extends Fragment {
@@ -42,7 +42,7 @@ public class UnauthorizedCardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 

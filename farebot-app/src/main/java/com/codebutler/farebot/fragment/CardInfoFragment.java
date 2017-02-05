@@ -30,9 +30,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
-import com.codebutler.farebot.activity.AdvancedCardInfoActivity;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.core.ui.UriListItem;
 import com.codebutler.farebot.transit.TransitData;
@@ -44,7 +44,7 @@ public class CardInfoFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCard = getArguments().getParcelable(AdvancedCardInfoActivity.EXTRA_CARD);
+        mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
         mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
     }
 
@@ -52,7 +52,7 @@ public class CardInfoFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setListAdapter(new ListItemAdapter(getActivity(), mTransitData.getInfo(getContext())));
+        setListAdapter(new ListItemAdapter(getActivity(), mTransitData.getInfo(getActivity())));
     }
 
     @Override
