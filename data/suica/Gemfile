@@ -1,0 +1,7 @@
+source :rubygems
+
+gem 'sqlite3'
+gem 'redis'
+gem 'nestful'
+gem 'graticule'
+gem 'unicode_utils'
