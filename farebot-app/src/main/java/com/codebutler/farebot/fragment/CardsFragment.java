@@ -82,7 +82,7 @@ public class CardsFragment extends ListFragment {
     private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-            return new CursorLoader(getActivity(), CardProvider.getContentUri(getContext()),
+            return new CursorLoader(getActivity(), CardProvider.getContentUri(getActivity()),
                     CardDBHelper.PROJECTION,
                     null,
                     null,
