@@ -75,7 +75,7 @@ import java.util.Map;
 public class CardsFragment extends ListFragment {
 
     private static final int REQUEST_SELECT_FILE = 1;
-    private static final String FILENAME = "farebot-export.jso";
+    private static final String FILENAME = "farebot-export.json";
 
     private final Map<String, TransitIdentity> mDataCache = new HashMap<>();
 
