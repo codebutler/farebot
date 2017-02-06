@@ -28,6 +28,8 @@ import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.core.ByteArray;
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 /**
  * Represents a page of data on a Mifare Ultralight (4 bytes)
@@ -38,6 +40,11 @@ public abstract class UltralightPage implements Parcelable {
     @NonNull
     public static UltralightPage create(int index, @NonNull byte[] data) {
         return new AutoValue_UltralightPage(index, ByteArray.create(data));
+    }
+
+    @NonNull
+    public static TypeAdapter<UltralightPage> typeAdapter(@NonNull Gson gson) {
+        return new AutoValue_UltralightPage.GsonTypeAdapter(gson);
     }
 
     public abstract int getIndex();

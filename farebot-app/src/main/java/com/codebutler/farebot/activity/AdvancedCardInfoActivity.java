@@ -179,9 +179,9 @@ public class AdvancedCardInfoActivity extends Activity {
     }
 
     @NonNull
-    private Class<?> getSupermostClass(Class aClass) {
-        while (aClass.getSuperclass() != Object.class) {
-            aClass = aClass.getSuperclass();
+    private Class<?> getSupermostClass(Class<? extends Card> aClass) {
+        while (aClass.getSuperclass() != Card.class) {
+            aClass = (Class<? extends Card>) aClass.getSuperclass();
         }
         return aClass;
     }

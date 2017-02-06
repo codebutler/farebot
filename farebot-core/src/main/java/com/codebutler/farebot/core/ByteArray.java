@@ -121,12 +121,16 @@ public class ByteArray implements Parcelable {
 
         @Override
         public void write(@NonNull JsonWriter out, @NonNull ByteArray value) throws IOException {
-            out.value(value.base64());
+            out.value(value != null ? value.base64() : null);
         }
 
         @Override
         public ByteArray read(@NonNull JsonReader in) throws IOException {
-            return ByteArray.createFromBase64(in.nextString());
+            String next = in.nextString();
+            if (next != null) {
+                return ByteArray.createFromBase64(next);
+            }
+            return null;
         }
     }
 }
