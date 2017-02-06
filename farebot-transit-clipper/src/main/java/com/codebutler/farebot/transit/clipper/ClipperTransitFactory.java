@@ -44,7 +44,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ClipperTransitFactory implements TransitFactory<DesfireCard, ClipperTransitData> {
+public class ClipperTransitFactory implements TransitFactory<DesfireCard, ClipperTransitInfo> {
 
     private static final int RECORD_LENGTH = 32;
     private static final long EPOCH_OFFSET = 0x83aa7f18;
@@ -67,7 +67,7 @@ public class ClipperTransitFactory implements TransitFactory<DesfireCard, Clippe
 
     @NonNull
     @Override
-    public ClipperTransitData parseData(@NonNull DesfireCard card) {
+    public ClipperTransitInfo parseInfo(@NonNull DesfireCard card) {
         byte[] data;
 
         try {
@@ -80,7 +80,7 @@ public class ClipperTransitFactory implements TransitFactory<DesfireCard, Clippe
             List<ClipperRefill> refills = parseRefills(card);
             List<ClipperTrip> trips = computeBalances(balance, parseTrips(card), refills);
 
-            return ClipperTransitData.create(
+            return ClipperTransitInfo.create(
                     Long.toString(serialNumber),
                     ImmutableList.<Trip>copyOf(trips),
                     ImmutableList.<Refill>copyOf(refills),

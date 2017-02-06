@@ -45,7 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTransitData> {
+public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTransitInfo> {
 
     private static final byte[] MANUFACTURER = {
             0x16, 0x18, 0x1A, 0x1B,
@@ -75,12 +75,12 @@ public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTra
         byte[] serialData = card.getSector(0).getBlock(0).getData().bytes();
         serialData = ByteUtils.reverseBuffer(serialData, 0, 4);
         BigInteger serialNumber = ByteUtils.byteArrayToBigInteger(serialData, 0, 4);
-        return TransitIdentity.create(SeqGoTransitData.NAME, formatSerialNumber(serialNumber));
+        return TransitIdentity.create(SeqGoTransitInfo.NAME, formatSerialNumber(serialNumber));
     }
 
     @NonNull
     @Override
-    public SeqGoTransitData parseData(@NonNull ClassicCard card) {
+    public SeqGoTransitInfo parseInfo(@NonNull ClassicCard card) {
         byte[] serialData = card.getSector(0).getBlock(0).getData().bytes();
         serialData = ByteUtils.reverseBuffer(serialData, 0, 4);
         BigInteger serialNumber = ByteUtils.byteArrayToBigInteger(serialData, 0, 4);
@@ -184,7 +184,7 @@ public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTra
             Collections.sort(refills, new Refill.Comparator());
         }
 
-        return SeqGoTransitData.create(
+        return SeqGoTransitInfo.create(
                 formatSerialNumber(serialNumber),
                 ImmutableList.<Trip>copyOf(trips),
                 ImmutableList.<Refill>copyOf(refills),

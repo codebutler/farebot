@@ -40,11 +40,11 @@ import android.widget.TextView;
 
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.card.CardType;
-import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitData;
-import com.codebutler.farebot.transit.myki.MykiTransitData;
-import com.codebutler.farebot.transit.octopus.OctopusTransitData;
-import com.codebutler.farebot.transit.opal.OpalTransitData;
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitData;
+import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitInfo;
+import com.codebutler.farebot.transit.myki.MykiTransitInfo;
+import com.codebutler.farebot.transit.octopus.OctopusTransitInfo;
+import com.codebutler.farebot.transit.opal.OpalTransitInfo;
+import com.codebutler.farebot.transit.seq_go.SeqGoTransitInfo;
 
 import java.util.ArrayList;
 
@@ -102,7 +102,7 @@ public class SupportedCardsActivity extends Activity {
                     CardType.CEPAS
             ));
 
-            add(new CardInfo(R.drawable.seqgo_card, SeqGoTransitData.NAME,
+            add(new CardInfo(R.drawable.seqgo_card, SeqGoTransitInfo.NAME,
                     R.string.location_brisbane_seq_australia,
                     CardType.MifareClassic,
                     true,
@@ -120,13 +120,13 @@ public class SupportedCardsActivity extends Activity {
                     CardType.FeliCa
             ));
 
-            add(new CardInfo(R.drawable.manly_fast_ferry_card, ManlyFastFerryTransitData.NAME,
+            add(new CardInfo(R.drawable.manly_fast_ferry_card, ManlyFastFerryTransitInfo.NAME,
                     R.string.location_sydney_australia,
                     CardType.MifareClassic,
                     true
             ));
 
-            add(new CardInfo(R.drawable.myki_card, MykiTransitData.NAME,
+            add(new CardInfo(R.drawable.myki_card, MykiTransitInfo.NAME,
                     R.string.location_victoria_australia,
                     CardType.MifareDesfire,
                     false,
@@ -139,12 +139,12 @@ public class SupportedCardsActivity extends Activity {
                     CardType.CEPAS
             ));
 
-            add(new CardInfo(R.drawable.octopus_card, OctopusTransitData.OCTOPUS_NAME,
+            add(new CardInfo(R.drawable.octopus_card, OctopusTransitInfo.OCTOPUS_NAME,
                     R.string.location_hong_kong,
                     CardType.FeliCa
             ));
 
-            add(new CardInfo(R.drawable.opal_card, OpalTransitData.NAME,
+            add(new CardInfo(R.drawable.opal_card, OpalTransitInfo.NAME,
                     R.string.location_sydney_australia,
                     CardType.MifareDesfire
             ));

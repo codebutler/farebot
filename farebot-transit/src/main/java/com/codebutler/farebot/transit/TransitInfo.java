@@ -1,5 +1,5 @@
 /*
- * TransitData.java
+ * TransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -33,7 +33,7 @@ import com.codebutler.farebot.core.ui.ListItem;
 
 import java.util.List;
 
-public abstract class TransitData implements Parcelable {
+public abstract class TransitInfo implements Parcelable {
 
     @NonNull
     public abstract String getBalanceString(@NonNull Resources resources);
@@ -54,7 +54,7 @@ public abstract class TransitData implements Parcelable {
     public abstract String getCardName(@NonNull Resources resources);
 
     /**
-     * If a TransitData provider doesn't know some of the stops / stations on a user's card, then
+     * If a TransitInfo provider doesn't know some of the stops / stations on a user's card, then
      * it may raise a signal to the user to submit the unknown stations to our web service.
      *
      * @return false if all stations are known (default), true if there are unknown stations

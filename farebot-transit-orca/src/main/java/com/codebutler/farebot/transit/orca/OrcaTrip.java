@@ -109,17 +109,17 @@ public abstract class OrcaTrip extends Trip {
     @Override
     public String getAgencyName(@NonNull Resources resources) {
         switch ((int) getAgency()) {
-            case OrcaTransitData.AGENCY_CT:
+            case OrcaTransitInfo.AGENCY_CT:
                 return resources.getString(R.string.transit_orca_agency_ct);
-            case OrcaTransitData.AGENCY_KCM:
+            case OrcaTransitInfo.AGENCY_KCM:
                 return resources.getString(R.string.transit_orca_agency_kcm);
-            case OrcaTransitData.AGENCY_PT:
+            case OrcaTransitInfo.AGENCY_PT:
                 return resources.getString(R.string.transit_orca_agency_pt);
-            case OrcaTransitData.AGENCY_ST:
+            case OrcaTransitInfo.AGENCY_ST:
                 return resources.getString(R.string.transit_orca_agency_st);
-            case OrcaTransitData.AGENCY_WSF:
+            case OrcaTransitInfo.AGENCY_WSF:
                 return resources.getString(R.string.transit_orca_agency_wsf);
-            case OrcaTransitData.AGENCY_ET:
+            case OrcaTransitInfo.AGENCY_ET:
                 return resources.getString(R.string.transit_orca_agency_et);
         }
         return resources.getString(R.string.transit_orca_agency_unknown, Long.toString(getAgency()));
@@ -128,17 +128,17 @@ public abstract class OrcaTrip extends Trip {
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
         switch ((int) getAgency()) {
-            case OrcaTransitData.AGENCY_CT:
+            case OrcaTransitInfo.AGENCY_CT:
                 return "CT";
-            case OrcaTransitData.AGENCY_KCM:
+            case OrcaTransitInfo.AGENCY_KCM:
                 return "KCM";
-            case OrcaTransitData.AGENCY_PT:
+            case OrcaTransitInfo.AGENCY_PT:
                 return "PT";
-            case OrcaTransitData.AGENCY_ST:
+            case OrcaTransitInfo.AGENCY_ST:
                 return "ST";
-            case OrcaTransitData.AGENCY_WSF:
+            case OrcaTransitInfo.AGENCY_WSF:
                 return "WSF";
-            case OrcaTransitData.AGENCY_ET:
+            case OrcaTransitInfo.AGENCY_ET:
                 return "ET";
         }
         return resources.getString(R.string.transit_orca_agency_unknown, Long.toString(getAgency()));
@@ -152,9 +152,9 @@ public abstract class OrcaTrip extends Trip {
             return resources.getString(R.string.transit_orca_route_sounder);
         } else {
             // FIXME: Need to find bus route #s
-            if (getAgency() == OrcaTransitData.AGENCY_ST) {
+            if (getAgency() == OrcaTransitInfo.AGENCY_ST) {
                 return resources.getString(R.string.transit_orca_route_express_bus);
-            } else if (getAgency() == OrcaTransitData.AGENCY_KCM) {
+            } else if (getAgency() == OrcaTransitInfo.AGENCY_KCM) {
                 return resources.getString(R.string.transit_orca_route_bus);
             }
             return null;
@@ -182,7 +182,7 @@ public abstract class OrcaTrip extends Trip {
             return LINK_STATIONS.get(getCoachNumber());
         } else if (isSounder()) {
             return sSounderStations.get((int) getCoachNumber());
-        } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
+        } else if (getAgency() == OrcaTransitInfo.AGENCY_WSF) {
             return sWSFTerminals.get((int) getCoachNumber());
         }
         return null;
@@ -205,7 +205,7 @@ public abstract class OrcaTrip extends Trip {
                 return resources.getString(R.string.transit_orca_station_unknown_station,
                         Integer.toString(stationNumber));
             }
-        } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
+        } else if (getAgency() == OrcaTransitInfo.AGENCY_WSF) {
             int terminalNumber = (int) getCoachNumber();
             if (sWSFTerminals.containsKey(terminalNumber)) {
                 return sWSFTerminals.get(terminalNumber).getStationName();
@@ -237,7 +237,7 @@ public abstract class OrcaTrip extends Trip {
             return Mode.METRO;
         } else if (isSounder()) {
             return Mode.TRAIN;
-        } else if (getAgency() == OrcaTransitData.AGENCY_WSF) {
+        } else if (getAgency() == OrcaTransitInfo.AGENCY_WSF) {
             return Mode.FERRY;
         } else {
             return Mode.BUS;
@@ -250,11 +250,11 @@ public abstract class OrcaTrip extends Trip {
     }
 
     private boolean isLink() {
-        return (getAgency() == OrcaTransitData.AGENCY_ST && getCoachNumber() > 10000);
+        return (getAgency() == OrcaTransitInfo.AGENCY_ST && getCoachNumber() > 10000);
     }
 
     private boolean isSounder() {
-        return (getAgency() == OrcaTransitData.AGENCY_ST && getCoachNumber() < 20);
+        return (getAgency() == OrcaTransitInfo.AGENCY_ST && getCoachNumber() < 20);
     }
 
     abstract long getAgency();

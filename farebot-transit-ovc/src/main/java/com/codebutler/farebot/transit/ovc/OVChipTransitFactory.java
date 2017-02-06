@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipTransitData> {
+public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipTransitInfo> {
 
     private static final byte[] OVC_HEADER = new byte[11];
 
@@ -83,7 +83,7 @@ public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipT
 
     @NonNull
     @Override
-    public OVChipTransitData parseData(@NonNull ClassicCard card) {
+    public OVChipTransitInfo parseInfo(@NonNull ClassicCard card) {
         OVChipIndex index = OVChipIndex.create(card.getSector(39).readBlocks(11, 4));
         OVChipParser parser = new OVChipParser(card, index);
         OVChipCredit credit = parser.getCredit();
@@ -134,7 +134,7 @@ public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipT
             }
         });
 
-        return OVChipTransitData.create(
+        return OVChipTransitInfo.create(
                 ImmutableList.<Trip>copyOf(trips),
                 ImmutableList.<Subscription>copyOf(subs),
                 index,

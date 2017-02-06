@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.Card;
 
-public interface TransitFactory<C extends Card, T extends TransitData> {
+public interface TransitFactory<C extends Card, T extends TransitInfo> {
 
     boolean check(@NonNull C card);
 
@@ -12,5 +12,5 @@ public interface TransitFactory<C extends Card, T extends TransitData> {
     TransitIdentity parseIdentity(@NonNull C card);
 
     @NonNull
-    T parseData(@NonNull C card);
+    T parseInfo(@NonNull C card);
 }

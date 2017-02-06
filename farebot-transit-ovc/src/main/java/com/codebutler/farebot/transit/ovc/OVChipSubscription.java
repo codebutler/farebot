@@ -209,12 +209,12 @@ abstract class OVChipSubscription extends Subscription {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        return OVChipTransitData.getShortAgencyName(resources, getAgency());    // Nobody uses most of the long names
+        return OVChipTransitInfo.getShortAgencyName(resources, getAgency());    // Nobody uses most of the long names
     }
 
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return OVChipTransitData.getShortAgencyName(resources, getAgency());
+        return OVChipTransitInfo.getShortAgencyName(resources, getAgency());
     }
 
     abstract int getUnknown1();

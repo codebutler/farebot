@@ -1,5 +1,5 @@
 /*
- * SuicaTransitData.java
+ * SuicaTransitInfo.java
  *
  * Authors:
  * Eric Butler <eric@codebutler.com>
@@ -38,22 +38,22 @@ import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
 @AutoValue
-public abstract class SuicaTransitData extends TransitData {
+public abstract class SuicaTransitInfo extends TransitInfo {
 
     @NonNull
-    static SuicaTransitData create(
+    static SuicaTransitInfo create(
             @Nullable String serialNumber,
             @NonNull List<Trip> trips,
             @NonNull List<Refill> refills,
             @NonNull List<Subscription> subscriptions) {
-        return new AutoValue_SuicaTransitData(serialNumber, trips, refills, subscriptions);
+        return new AutoValue_SuicaTransitInfo(serialNumber, trips, refills, subscriptions);
     }
 
     @NonNull

@@ -40,7 +40,7 @@ import net.kazzz.felica.lib.Util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EdyTransitFactory implements TransitFactory<FelicaCard, EdyTransitData> {
+public class EdyTransitFactory implements TransitFactory<FelicaCard, EdyTransitInfo> {
 
     private static final int FELICA_SERVICE_EDY_ID = 0x110B;
     private static final int FELICA_SERVICE_EDY_BALANCE = 0x1317;
@@ -59,7 +59,7 @@ public class EdyTransitFactory implements TransitFactory<FelicaCard, EdyTransitD
 
     @NonNull
     @Override
-    public EdyTransitData parseData(@NonNull FelicaCard card) {
+    public EdyTransitInfo parseInfo(@NonNull FelicaCard card) {
         // card ID is in block 0, bytes 2-9, big-endian ordering
         byte[] serialNumber = new byte[8];
         FelicaService serviceID = card.getSystem(FeliCaLib.SYSTEMCODE_EDY).getService(FELICA_SERVICE_EDY_ID);
@@ -89,6 +89,6 @@ public class EdyTransitFactory implements TransitFactory<FelicaCard, EdyTransitD
             trips.add(trip);
         }
 
-        return EdyTransitData.create(trips, ByteArray.create(serialNumber), currentBalance);
+        return EdyTransitInfo.create(trips, ByteArray.create(serialNumber), currentBalance);
     }
 }

@@ -42,7 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 
-public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard, ManlyFastFerryTransitData> {
+public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard, ManlyFastFerryTransitInfo> {
 
     public static final byte[] SIGNATURE = {
             0x32, 0x32, 0x00, 0x00, 0x00, 0x01, 0x01
@@ -83,13 +83,13 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
             throw new AssertionError("Unexpected Manly record type: " + metadata.getClass().toString());
         }
         return TransitIdentity.create(
-                ManlyFastFerryTransitData.NAME,
+                ManlyFastFerryTransitInfo.NAME,
                 ((ManlyFastFerryMetadataRecord) metadata).getCardSerial());
     }
 
     @NonNull
     @Override
-    public ManlyFastFerryTransitData parseData(@NonNull ClassicCard card) {
+    public ManlyFastFerryTransitInfo parseInfo(@NonNull ClassicCard card) {
         ArrayList<ManlyFastFerryRecord> records = new ArrayList<>();
 
         // Iterate through blocks on the card and deserialize all the binary data.
@@ -155,7 +155,7 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
         Collections.sort(trips, new Trip.Comparator());
         Collections.sort(refills, new Refill.Comparator());
 
-        return ManlyFastFerryTransitData.create(serialNumber, trips, refills, epochDate, balance);
+        return ManlyFastFerryTransitInfo.create(serialNumber, trips, refills, epochDate, balance);
     }
 
     @NonNull

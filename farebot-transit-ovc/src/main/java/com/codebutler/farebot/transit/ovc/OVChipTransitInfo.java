@@ -1,5 +1,5 @@
 /*
- * OVChipTransitData.java
+ * OVChipTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -31,7 +31,7 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.core.ui.HeaderListItem;
 import com.google.auto.value.AutoValue;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 @AutoValue
-public abstract class OVChipTransitData extends TransitData {
+public abstract class OVChipTransitInfo extends TransitInfo {
 
     static final int PROCESS_PURCHASE = 0x00;
     static final int PROCESS_CHECKIN = 0x01;
@@ -107,14 +107,14 @@ public abstract class OVChipTransitData extends TransitData {
             .build();
 
     @NonNull
-    static OVChipTransitData create(
+    static OVChipTransitInfo create(
             @NonNull ImmutableList<Trip> trips,
             @NonNull ImmutableList<Subscription> subscriptions,
             @NonNull OVChipIndex index,
             @NonNull OVChipPreamble preamble,
             @NonNull OVChipInfo info,
             @NonNull OVChipCredit credit) {
-        return new AutoValue_OVChipTransitData(trips, subscriptions, index, preamble, info, credit);
+        return new AutoValue_OVChipTransitInfo(trips, subscriptions, index, preamble, info, credit);
     }
 
     @NonNull
@@ -174,7 +174,7 @@ public abstract class OVChipTransitData extends TransitData {
         items.add(new ListItem("Expiration Date", DateFormat.getDateInstance(DateFormat.LONG)
                 .format(OVChipUtil.convertDate(preamble.getExpdate()))));
         items.add(new ListItem("Card Type", (preamble.getType() == 2 ? "Personal" : "Anonymous")));
-        items.add(new ListItem("Issuer", OVChipTransitData.getShortAgencyName(
+        items.add(new ListItem("Issuer", OVChipTransitInfo.getShortAgencyName(
                 context.getResources(), info.getCompany())));
 
         items.add(new ListItem("Banned", ((credit.getBanbits() & (char) 0xC0) == (char) 0xC0) ? "Yes" : "No"));

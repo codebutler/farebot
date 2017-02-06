@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-public class EZLinkTransitFactory implements TransitFactory<CEPASCard, EZLinkTransitData> {
+public class EZLinkTransitFactory implements TransitFactory<CEPASCard, EZLinkTransitInfo> {
 
     @Override
     public boolean check(@NonNull CEPASCard cepasCard) {
@@ -55,11 +55,11 @@ public class EZLinkTransitFactory implements TransitFactory<CEPASCard, EZLinkTra
 
     @NonNull
     @Override
-    public EZLinkTransitData parseData(@NonNull CEPASCard cepasCard) {
+    public EZLinkTransitInfo parseInfo(@NonNull CEPASCard cepasCard) {
         String serialNumber = cepasCard.getPurse(3).getCAN().hex();
         int balance = cepasCard.getPurse(3).getPurseBalance();
         EZLinkTrip[] trips = parseTrips(serialNumber, cepasCard);
-        return EZLinkTransitData.create(serialNumber, ImmutableList.<Trip>copyOf(trips), balance);
+        return EZLinkTransitInfo.create(serialNumber, ImmutableList.<Trip>copyOf(trips), balance);
     }
 
     @NonNull

@@ -33,23 +33,23 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.core.Constants;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 
 public class CardBalanceFragment extends Fragment {
     private Card mCard;
-    private TransitData mTransitData;
+    private TransitInfo mTransitInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
-        mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
+        mTransitInfo = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_INFO);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_card_balance, container, false);
-        ((TextView) view.findViewById(R.id.balance)).setText(mTransitData.getBalanceString(getResources()));
+        ((TextView) view.findViewById(R.id.balance)).setText(mTransitInfo.getBalanceString(getResources()));
         return view;
     }
 }

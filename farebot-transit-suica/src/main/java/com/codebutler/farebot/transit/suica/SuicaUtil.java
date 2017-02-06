@@ -287,7 +287,7 @@ final class SuicaUtil {
                     COLUMN_ID);
 
             if (!cursor.moveToFirst()) {
-                Log.w("SuicaTransitData", String.format("FAILED get rail company: r: 0x%s a: 0x%s l: 0x%s s: 0x%s",
+                Log.w("SuicaTransitInfo", String.format("FAILED get rail company: r: 0x%s a: 0x%s l: 0x%s s: 0x%s",
                         Integer.toHexString(regionCode),
                         Integer.toHexString(areaCode),
                         Integer.toHexString(lineCode),

@@ -1,5 +1,5 @@
 /*
- * ClipperTransitData.java
+ * OrcaTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -7,8 +7,7 @@
  * Copyright (C) 2014-2016 Eric Butler <eric@codebutler.com>
  *
  * Thanks to:
- * An anonymous contributor for reverse engineering Clipper data and providing
- * most of the code here.
+ * Karl Koscher <supersat@cs.washington.edu>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.clipper;
+package com.codebutler.farebot.transit.orca;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -34,8 +33,7 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
-import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
@@ -43,27 +41,31 @@ import java.util.List;
 import java.util.Locale;
 
 @AutoValue
-public abstract class ClipperTransitData extends TransitData {
+public abstract class OrcaTransitInfo extends TransitInfo {
 
-    @NonNull
-    static ClipperTransitData create(
-            @NonNull String serialNumber,
-            @NonNull List<Trip> trips,
-            @NonNull List<Refill> refills,
-            short balance) {
-        return new AutoValue_ClipperTransitData(serialNumber, trips, refills, balance);
-    }
+    static final int AGENCY_KCM = 0x04;
+    static final int AGENCY_PT = 0x06;
+    static final int AGENCY_ST = 0x07;
+    static final int AGENCY_CT = 0x02;
+    static final int AGENCY_WSF = 0x08;
+    static final int AGENCY_ET = 0x03;
 
     @NonNull
     @Override
     public String getCardName(@NonNull Resources resources) {
-        return resources.getString(R.string.transit_clipper_card_name);
+        return "ORCA";
     }
 
     @NonNull
     @Override
     public String getBalanceString(@NonNull Resources resources) {
-        return NumberFormat.getCurrencyInstance(Locale.US).format(getBalance() / 100.0);
+        return NumberFormat.getCurrencyInstance(Locale.US).format(getBalance() / 100);
+    }
+
+    @Nullable
+    @Override
+    public String getSerialNumber() {
+        return Integer.toString(getSerialNumberData());
     }
 
     @Nullable
@@ -74,25 +76,17 @@ public abstract class ClipperTransitData extends TransitData {
 
     @Nullable
     @Override
+    public List<Refill> getRefills() {
+        return null;
+    }
+
+    @Nullable
+    @Override
     public List<ListItem> getInfo(@NonNull Context context) {
         return null;
     }
 
-    @NonNull
-    public static String getAgencyName(int agency) {
-        if (ClipperData.AGENCIES.containsKey(agency)) {
-            return ClipperData.AGENCIES.get(agency);
-        }
-        return "0x" + Long.toString(agency, 16);
-    }
+    abstract int getSerialNumberData();
 
-    @NonNull
-    public static String getShortAgencyName(int agency) {
-        if (ClipperData.SHORT_AGENCIES.containsKey(agency)) {
-            return ClipperData.SHORT_AGENCIES.get(agency);
-        }
-        return "0x" + Long.toString(agency, 16);
-    }
-
-    abstract short getBalance();
+    abstract double getBalance();
 }

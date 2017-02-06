@@ -1,5 +1,5 @@
 /*
- * OpalTransitData.java
+ * OpalTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -33,7 +33,7 @@ import com.codebutler.farebot.core.ui.HeaderListItem;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
@@ -54,7 +54,7 @@ import java.util.Locale;
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Opal
  */
 @AutoValue
-public abstract class OpalTransitData extends TransitData {
+public abstract class OpalTransitInfo extends TransitInfo {
 
     public static final String NAME = "Opal";
 

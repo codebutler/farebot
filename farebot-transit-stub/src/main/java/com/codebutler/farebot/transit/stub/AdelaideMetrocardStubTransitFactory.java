@@ -27,7 +27,7 @@ import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
 public class AdelaideMetrocardStubTransitFactory
-        implements TransitFactory<DesfireCard, AdelaideMetrocardStubTransitData> {
+        implements TransitFactory<DesfireCard, AdelaideMetrocardStubTransitInfo> {
 
     @Override
     public boolean check(@NonNull DesfireCard card) {
@@ -42,7 +42,7 @@ public class AdelaideMetrocardStubTransitFactory
 
     @NonNull
     @Override
-    public AdelaideMetrocardStubTransitData parseData(@NonNull DesfireCard card) {
-        return new AutoValue_AdelaideMetrocardStubTransitData();
+    public AdelaideMetrocardStubTransitInfo parseInfo(@NonNull DesfireCard card) {
+        return new AutoValue_AdelaideMetrocardStubTransitInfo();
     }
 }

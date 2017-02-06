@@ -1,5 +1,5 @@
 /*
- * EdyTransitData.java
+ * EdyTransitInfo.java
  *
  * Authors:
  * Chris Norden
@@ -33,7 +33,7 @@ import com.codebutler.farebot.core.ByteArray;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 
@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 
 @AutoValue
-public abstract class EdyTransitData extends TransitData {
+public abstract class EdyTransitInfo extends TransitInfo {
 
     // defines
     static final int FELICA_MODE_EDY_DEBIT = 0x20;
@@ -50,11 +50,11 @@ public abstract class EdyTransitData extends TransitData {
     static final int FELICA_MODE_EDY_GIFT = 0x04;
 
     @NonNull
-    public static EdyTransitData create(
+    public static EdyTransitInfo create(
             @NonNull List<Trip> trips,
             @NonNull ByteArray serialNumberData,
             int currentBalance) {
-        return new AutoValue_EdyTransitData(trips, serialNumberData, currentBalance);
+        return new AutoValue_EdyTransitInfo(trips, serialNumberData, currentBalance);
     }
 
     @NonNull

@@ -1,11 +1,12 @@
 /*
- * BilheteUnicoSPTransitData.java
+ * EZLinkTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2013-2016 Eric Butler <eric@codebutler.com>
- * Copyright (C) 2013 Marcelo Liberato <mliberato@gmail.com>
+ * Copyright (C) 2011-2012, 2014-2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2011 Sean Cross <sean@chumby.com>
+ * Copyright (C) 2012 tbonang <bonang@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.bilhete_unico;
+package com.codebutler.farebot.transit.ezlink;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -31,46 +32,35 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
 import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.List;
 
 @AutoValue
-public abstract class BilheteUnicoSPTransitData extends TransitData {
-
-    static final String NAME = "Bilhete Único";
+public abstract class EZLinkTransitInfo extends TransitInfo {
 
     @NonNull
-    static BilheteUnicoSPTransitData create(@NonNull BilheteUnicoSPCredit credit) {
-        return new AutoValue_BilheteUnicoSPTransitData(credit);
+    static EZLinkTransitInfo create(@NonNull String serialNumber, @NonNull ImmutableList<Trip> trips, int balance) {
+        return new AutoValue_EZLinkTransitInfo(serialNumber, trips, balance);
     }
 
     @NonNull
     @Override
     public String getCardName(@NonNull Resources resources) {
-        return NAME;
+        return EZLinkData.getCardIssuer(getSerialNumber());
     }
 
     @NonNull
     @Override
     public String getBalanceString(@NonNull Resources resources) {
-        return BilheteUnicoSPTransitData.convertAmount(getCredit().getCredit());
-    }
-
-    @Nullable
-    @Override
-    public String getSerialNumber() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public List<Trip> getTrips() {
-        return null;
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+        numberFormat.setCurrency(Currency.getInstance("SGD"));
+        return numberFormat.format(getBalance() / 100);
     }
 
     @Nullable
@@ -81,23 +71,15 @@ public abstract class BilheteUnicoSPTransitData extends TransitData {
 
     @Nullable
     @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
+    public List<Subscription> getSubscriptions() {
         return null;
     }
 
     @Nullable
     @Override
-    public List<Subscription> getSubscriptions() {
+    public List<ListItem> getInfo(@NonNull Context context) {
         return null;
     }
 
-    @NonNull
-    abstract BilheteUnicoSPCredit getCredit();
-
-    private static String convertAmount(int amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
-        formatter.setCurrency(Currency.getInstance("BRL"));
-
-        return formatter.format((double) amount / 100.0);
-    }
+    abstract double getBalance();
 }

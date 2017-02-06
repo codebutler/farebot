@@ -1,5 +1,5 @@
 /*
- * OctopusTransitData.java
+ * OctopusTransitInfo.java
  *
  * Copyright 2016 Michael Farrell <micolous+git@gmail.com>
  *
@@ -32,7 +32,7 @@ import com.codebutler.farebot.core.ui.HeaderListItem;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
@@ -46,21 +46,21 @@ import java.util.Locale;
  * https://github.com/micolous/metrodroid/wiki/Octopus
  */
 @AutoValue
-public abstract class OctopusTransitData extends TransitData {
+public abstract class OctopusTransitInfo extends TransitInfo {
 
     public static final String OCTOPUS_NAME = "Octopus";
     public static final String SZT_NAME = "Shenzhen Tong";
     public static final String DUAL_NAME = "Hu Tong Xing";
 
-    private static final String TAG = "OctopusTransitData";
+    private static final String TAG = "OctopusTransitInfo";
 
     @NonNull
-    public static OctopusTransitData create(
+    public static OctopusTransitInfo create(
             int octopusBalance,
             int shenzenBalance,
             boolean hasOctopus,
             boolean hasShenzen) {
-        return new AutoValue_OctopusTransitData(
+        return new AutoValue_OctopusTransitInfo(
                 octopusBalance,
                 shenzenBalance,
                 hasOctopus,

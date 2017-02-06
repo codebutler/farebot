@@ -1,5 +1,5 @@
 /*
- * UnauthorizedClassicTransitData.java
+ * SeqGoTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.stub;
+package com.codebutler.farebot.transit.seq_go;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -31,45 +31,41 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Handle MiFare Classic with no open sectors
+ * Transit data type for Go card (Brisbane / South-East Queensland, AU), used by Translink.
+ * <p>
+ * Documentation of format: https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29
+ *
+ * @author Michael Farrell
  */
 @AutoValue
-public abstract class UnauthorizedClassicTransitData extends TransitData {
+public abstract class SeqGoTransitInfo extends TransitInfo {
+
+    public static final String NAME = "Go card";
 
     @NonNull
-    public static UnauthorizedClassicTransitData create() {
-        return new AutoValue_UnauthorizedClassicTransitData();
+    static SeqGoTransitInfo create(
+            @NonNull String serialNumber,
+            @NonNull ImmutableList<Trip> trips,
+            @NonNull ImmutableList<Refill> refills,
+            boolean hasUnknownStations,
+            int balance) {
+        return new AutoValue_SeqGoTransitInfo(serialNumber, trips, refills, hasUnknownStations, balance);
     }
 
     @NonNull
     @Override
     public String getBalanceString(@NonNull Resources resources) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public String getSerialNumber() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public List<Trip> getTrips() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public List<Subscription> getSubscriptions() {
-        return null;
+        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getBalance() / 100.);
     }
 
     @Nullable
@@ -78,15 +74,20 @@ public abstract class UnauthorizedClassicTransitData extends TransitData {
         return null;
     }
 
-    @Nullable
-    @Override
-    public List<Refill> getRefills() {
-        return null;
-    }
-
     @NonNull
     @Override
     public String getCardName(@NonNull Resources resources) {
-        return resources.getString(R.string.locked_card);
+        return NAME;
     }
+
+    @Nullable
+    @Override
+    public List<Subscription> getSubscriptions() {
+        return null;
+    }
+
+    @Override
+    public abstract boolean hasUnknownStations();
+
+    abstract int getBalance();
 }

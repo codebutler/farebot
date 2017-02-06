@@ -1,5 +1,5 @@
 /*
- * MykiTransitData.java
+ * MykiTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -28,7 +28,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.transit.stub.StubTransitData;
+import com.codebutler.farebot.transit.stub.StubTransitInfo;
 import com.google.auto.value.AutoValue;
 
 /**
@@ -40,13 +40,13 @@ import com.google.auto.value.AutoValue;
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Myki
  */
 @AutoValue
-public abstract class MykiTransitData extends StubTransitData {
+public abstract class MykiTransitInfo extends StubTransitInfo {
 
     public static final String NAME = "Myki";
 
     @NonNull
-    static MykiTransitData create(@NonNull String serialNumber) {
-        return new AutoValue_MykiTransitData(serialNumber);
+    static MykiTransitInfo create(@NonNull String serialNumber) {
+        return new AutoValue_MykiTransitInfo(serialNumber);
     }
 
     @Nullable

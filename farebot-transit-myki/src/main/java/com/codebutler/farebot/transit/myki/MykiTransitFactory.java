@@ -28,7 +28,7 @@ import com.codebutler.farebot.core.Luhn;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
-public class MykiTransitFactory implements TransitFactory<DesfireCard, MykiTransitData> {
+public class MykiTransitFactory implements TransitFactory<DesfireCard, MykiTransitInfo> {
 
     @Override
     public boolean check(@NonNull DesfireCard card) {
@@ -43,17 +43,17 @@ public class MykiTransitFactory implements TransitFactory<DesfireCard, MykiTrans
 
         long serialNumber1 = ByteUtils.getBitsFromBuffer(data, 96, 32);
         long serialNumber2 = ByteUtils.getBitsFromBuffer(data, 64, 32);
-        return TransitIdentity.create(MykiTransitData.NAME, formatSerialNumber(serialNumber1, serialNumber2));
+        return TransitIdentity.create(MykiTransitInfo.NAME, formatSerialNumber(serialNumber1, serialNumber2));
     }
 
     @NonNull
     @Override
-    public MykiTransitData parseData(@NonNull DesfireCard card) {
+    public MykiTransitInfo parseInfo(@NonNull DesfireCard card) {
         try {
             byte[] metadata = ByteUtils.reverseBuffer(card.getApplication(4594).getFile(15).getData().bytes(), 0, 16);
             int serialNumber1 = ByteUtils.getBitsFromBuffer(metadata, 96, 32);
             int serialNumber2 = ByteUtils.getBitsFromBuffer(metadata, 64, 32);
-            return MykiTransitData.create(formatSerialNumber(serialNumber1, serialNumber2));
+            return MykiTransitInfo.create(formatSerialNumber(serialNumber1, serialNumber2));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Myki data", ex);
         }

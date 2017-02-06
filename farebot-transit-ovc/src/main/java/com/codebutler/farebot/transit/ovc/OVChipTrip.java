@@ -87,18 +87,18 @@ abstract class OVChipTrip extends Trip {
             fare = inTransaction.getAmount();
         }
 
-        boolean isTrain = (agency == OVChipTransitData.AGENCY_NS)
-                || ((agency == OVChipTransitData.AGENCY_ARRIVA) && (startStationId < 800));
+        boolean isTrain = (agency == OVChipTransitInfo.AGENCY_NS)
+                || ((agency == OVChipTransitInfo.AGENCY_ARRIVA) && (startStationId < 800));
 
         // TODO: Needs verification!
-        boolean isMetro = (agency == OVChipTransitData.AGENCY_GVB && startStationId < 3000)
-                || (agency == OVChipTransitData.AGENCY_RET && startStationId < 3000);
+        boolean isMetro = (agency == OVChipTransitInfo.AGENCY_GVB && startStationId < 3000)
+                || (agency == OVChipTransitInfo.AGENCY_RET && startStationId < 3000);
 
-        boolean isOther = agency == OVChipTransitData.AGENCY_TLS || agency == OVChipTransitData.AGENCY_DUO
-                || agency == OVChipTransitData.AGENCY_STORE;
+        boolean isOther = agency == OVChipTransitInfo.AGENCY_TLS || agency == OVChipTransitInfo.AGENCY_DUO
+                || agency == OVChipTransitInfo.AGENCY_STORE;
 
         // TODO: Needs verification!
-        boolean isFerry = agency == OVChipTransitData.AGENCY_ARRIVA && (startStationId > 4600 && startStationId < 4700);
+        boolean isFerry = agency == OVChipTransitInfo.AGENCY_ARRIVA && (startStationId > 4600 && startStationId < 4700);
 
         // FIXME: Clean this up
         //mIsBusOrTram = (agency == AGENCY_GVB || agency == AGENCY_HTM || agency == AGENCY_RET && (!isMetro));
@@ -108,14 +108,14 @@ abstract class OVChipTrip extends Trip {
         // The only way to determine them would be to collect every single 'ovcid' out there :(
         boolean isBus = (!isTrain && !isMetro && !isOther && !isFerry);
 
-        boolean isCharge = (processType == OVChipTransitData.PROCESS_CREDIT)
-                || (processType == OVChipTransitData.PROCESS_TRANSFER);
+        boolean isCharge = (processType == OVChipTransitInfo.PROCESS_CREDIT)
+                || (processType == OVChipTransitInfo.PROCESS_TRANSFER);
 
         // Not 100% sure about what NODATA is, but looks alright so far
-        boolean isPurchase = (processType == OVChipTransitData.PROCESS_PURCHASE)
-                || (processType == OVChipTransitData.PROCESS_NODATA);
+        boolean isPurchase = (processType == OVChipTransitInfo.PROCESS_PURCHASE)
+                || (processType == OVChipTransitInfo.PROCESS_NODATA);
 
-        boolean isBanned = processType == OVChipTransitData.PROCESS_BANNED;
+        boolean isBanned = processType == OVChipTransitInfo.PROCESS_BANNED;
 
         return new AutoValue_OVChipTrip.Builder()
                 .id(id)
@@ -146,12 +146,12 @@ abstract class OVChipTrip extends Trip {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        return OVChipTransitData.getShortAgencyName(resources, getAgency());    // Nobody uses most of the long names
+        return OVChipTransitInfo.getShortAgencyName(resources, getAgency());    // Nobody uses most of the long names
     }
 
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return OVChipTransitData.getShortAgencyName(resources, getAgency());
+        return OVChipTransitInfo.getShortAgencyName(resources, getAgency());
     }
 
     @Override
@@ -251,7 +251,7 @@ abstract class OVChipTrip extends Trip {
                     OVChipDBUtil.COLUMN_ROW_OVCID);
 
             if (!cursor.moveToFirst()) {
-                Log.w("OVChipTransitData", String.format("FAILED get rail company: c: 0x%s s: 0x%s",
+                Log.w("OVChipTransitInfo", String.format("FAILED get rail company: c: 0x%s s: 0x%s",
                         Integer.toHexString(companyCode),
                         Integer.toHexString(stationCode)));
 

@@ -33,7 +33,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
  * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Opal
  */
-public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTransitData> {
+public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTransitInfo> {
 
     @Override
     public boolean check(@NonNull DesfireCard card) {
@@ -48,12 +48,12 @@ public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTrans
 
         int lastDigit = ByteUtils.getBitsFromBuffer(data, 4, 4);
         int serialNumber = ByteUtils.getBitsFromBuffer(data, 8, 32);
-        return TransitIdentity.create(OpalTransitData.NAME, formatSerialNumber(serialNumber, lastDigit));
+        return TransitIdentity.create(OpalTransitInfo.NAME, formatSerialNumber(serialNumber, lastDigit));
     }
 
     @NonNull
     @Override
-    public OpalTransitData parseData(@NonNull DesfireCard desfireCard) {
+    public OpalTransitInfo parseInfo(@NonNull DesfireCard desfireCard) {
         try {
             byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
             int iRawBalance;
@@ -75,7 +75,7 @@ public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTrans
 
             int balance = ByteUtils.unsignedToTwoComplement(iRawBalance, 20);
 
-            return new AutoValue_OpalTransitData(
+            return new AutoValue_OpalTransitInfo(
                     formatSerialNumber(serialNumber, lastDigit),
                     balance,
                     checksum,

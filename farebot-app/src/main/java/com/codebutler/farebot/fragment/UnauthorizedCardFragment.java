@@ -33,17 +33,17 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.core.Constants;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 
 public class UnauthorizedCardFragment extends Fragment {
     private Card mCard;
-    private TransitData mTransitData;
+    private TransitInfo mTransitInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
-        mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
+        mTransitInfo = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_INFO);
     }
 
     @Override

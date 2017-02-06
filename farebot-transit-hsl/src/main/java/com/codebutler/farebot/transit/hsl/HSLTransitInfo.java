@@ -1,5 +1,5 @@
 /*
- * HSLTransitData.java
+ * HSLTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -31,7 +31,7 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 
@@ -40,11 +40,11 @@ import java.util.List;
 import java.util.Locale;
 
 @AutoValue
-public abstract class HSLTransitData extends TransitData {
+public abstract class HSLTransitInfo extends TransitInfo {
 
     @NonNull
     static Builder builder() {
-        return AutoValue_HSLTransitData.builder();
+        return AutoValue_HSLTransitInfo.builder();
     }
 
     /*
@@ -282,6 +282,6 @@ public abstract class HSLTransitData extends TransitData {
 
         abstract Builder kausiDirection(long kausiDirection);
 
-        abstract HSLTransitData build();
+        abstract HSLTransitInfo build();
     }
 }

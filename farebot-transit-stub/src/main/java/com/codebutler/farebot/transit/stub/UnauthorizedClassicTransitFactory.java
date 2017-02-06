@@ -29,7 +29,7 @@ import com.codebutler.farebot.card.classic.UnauthorizedClassicSector;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
-public class UnauthorizedClassicTransitFactory implements TransitFactory<ClassicCard, UnauthorizedClassicTransitData> {
+public class UnauthorizedClassicTransitFactory implements TransitFactory<ClassicCard, UnauthorizedClassicTransitInfo> {
 
     @NonNull private final Resources mResources;
 
@@ -65,7 +65,7 @@ public class UnauthorizedClassicTransitFactory implements TransitFactory<Classic
 
     @NonNull
     @Override
-    public UnauthorizedClassicTransitData parseData(@NonNull ClassicCard card) {
-        return UnauthorizedClassicTransitData.create();
+    public UnauthorizedClassicTransitInfo parseInfo(@NonNull ClassicCard card) {
+        return UnauthorizedClassicTransitInfo.create();
     }
 }

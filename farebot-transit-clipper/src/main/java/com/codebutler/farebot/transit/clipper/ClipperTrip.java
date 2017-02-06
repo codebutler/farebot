@@ -44,12 +44,12 @@ abstract class ClipperTrip extends Trip {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        return ClipperTransitData.getAgencyName((int) getAgency());
+        return ClipperTransitInfo.getAgencyName((int) getAgency());
     }
 
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return ClipperTransitData.getShortAgencyName((int) getAgency());
+        return ClipperTransitInfo.getShortAgencyName((int) getAgency());
     }
 
     @Override

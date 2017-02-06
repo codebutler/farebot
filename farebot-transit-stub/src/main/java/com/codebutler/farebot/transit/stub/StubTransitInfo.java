@@ -1,5 +1,5 @@
 /*
- * StubTransitData.java
+ * StubTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -34,7 +34,7 @@ import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.core.ui.UriListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import java.util.List;
  * <p>
  * This allows the cards to be identified by name but will not attempt to read the content.
  */
-public abstract class StubTransitData extends TransitData {
+public abstract class StubTransitInfo extends TransitInfo {
 
     // Stub out elements that we can't support
 

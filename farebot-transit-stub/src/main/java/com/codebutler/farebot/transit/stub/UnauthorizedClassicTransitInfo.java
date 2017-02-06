@@ -1,12 +1,11 @@
 /*
- * EZLinkTransitData.java
+ * UnauthorizedClassicTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2011-2012, 2014-2016 Eric Butler <eric@codebutler.com>
- * Copyright (C) 2011 Sean Cross <sean@chumby.com>
- * Copyright (C) 2012 tbonang <bonang@gmail.com>
+ * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.ezlink;
+package com.codebutler.farebot.transit.stub;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -32,40 +31,38 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 
-import java.text.NumberFormat;
-import java.util.Currency;
 import java.util.List;
 
+/**
+ * Handle MiFare Classic with no open sectors
+ */
 @AutoValue
-public abstract class EZLinkTransitData extends TransitData {
+public abstract class UnauthorizedClassicTransitInfo extends TransitInfo {
 
     @NonNull
-    static EZLinkTransitData create(@NonNull String serialNumber, @NonNull ImmutableList<Trip> trips, int balance) {
-        return new AutoValue_EZLinkTransitData(serialNumber, trips, balance);
-    }
-
-    @NonNull
-    @Override
-    public String getCardName(@NonNull Resources resources) {
-        return EZLinkData.getCardIssuer(getSerialNumber());
+    public static UnauthorizedClassicTransitInfo create() {
+        return new AutoValue_UnauthorizedClassicTransitInfo();
     }
 
     @NonNull
     @Override
     public String getBalanceString(@NonNull Resources resources) {
-        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
-        numberFormat.setCurrency(Currency.getInstance("SGD"));
-        return numberFormat.format(getBalance() / 100);
+        return null;
     }
 
     @Nullable
     @Override
-    public List<Refill> getRefills() {
+    public String getSerialNumber() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public List<Trip> getTrips() {
         return null;
     }
 
@@ -81,5 +78,15 @@ public abstract class EZLinkTransitData extends TransitData {
         return null;
     }
 
-    abstract double getBalance();
+    @Nullable
+    @Override
+    public List<Refill> getRefills() {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public String getCardName(@NonNull Resources resources) {
+        return resources.getString(R.string.locked_card);
+    }
 }

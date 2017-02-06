@@ -47,7 +47,7 @@ import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.RefillTrip;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.orca.OrcaTrip;
 import com.codebutler.farebot.util.Utils;
@@ -61,13 +61,13 @@ import java.util.List;
 
 public class CardTripsFragment extends ListFragment {
     private Card mCard;
-    private TransitData mTransitData;
+    private TransitInfo mTransitInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
-        mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
+        mTransitInfo = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_INFO);
     }
 
     @Override
@@ -75,15 +75,15 @@ public class CardTripsFragment extends ListFragment {
         View view = inflater.inflate(R.layout.fragment_card_trips, null);
 
         List<Trip> trips = new ArrayList<>();
-        if (mTransitData.getTrips() != null && mTransitData.getTrips().size() > 0) {
-            for (Trip t : mTransitData.getTrips()) {
+        if (mTransitInfo.getTrips() != null && mTransitInfo.getTrips().size() > 0) {
+            for (Trip t : mTransitInfo.getTrips()) {
                 trips.add(t);
             }
         }
 
         // This is for "legacy" implementations which have a separate list of refills.
-        if (mTransitData.getRefills() != null && mTransitData.getRefills().size() > 0) {
-            for (Refill r : mTransitData.getRefills()) {
+        if (mTransitInfo.getRefills() != null && mTransitInfo.getRefills().size() > 0) {
+            for (Refill r : mTransitInfo.getRefills()) {
                 trips.add(RefillTrip.create(r));
             }
         }

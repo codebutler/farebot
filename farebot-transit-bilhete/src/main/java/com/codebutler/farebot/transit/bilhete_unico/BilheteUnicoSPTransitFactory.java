@@ -31,7 +31,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
 
 import java.util.Arrays;
 
-public class BilheteUnicoSPTransitFactory implements TransitFactory<ClassicCard, BilheteUnicoSPTransitData> {
+public class BilheteUnicoSPTransitFactory implements TransitFactory<ClassicCard, BilheteUnicoSPTransitInfo> {
 
     private static final byte[] MANUFACTURER = {
             (byte) 0x62,
@@ -53,13 +53,13 @@ public class BilheteUnicoSPTransitFactory implements TransitFactory<ClassicCard,
     @NonNull
     @Override
     public TransitIdentity parseIdentity(@NonNull ClassicCard card) {
-        return TransitIdentity.create(BilheteUnicoSPTransitData.NAME, null);
+        return TransitIdentity.create(BilheteUnicoSPTransitInfo.NAME, null);
     }
 
     @NonNull
     @Override
-    public BilheteUnicoSPTransitData parseData(@NonNull ClassicCard card) {
+    public BilheteUnicoSPTransitInfo parseInfo(@NonNull ClassicCard card) {
         BilheteUnicoSPCredit credit = BilheteUnicoSPCredit.create(card.getSector(8).getBlock(1).getData().bytes());
-        return BilheteUnicoSPTransitData.create(credit);
+        return BilheteUnicoSPTransitInfo.create(credit);
     }
 }

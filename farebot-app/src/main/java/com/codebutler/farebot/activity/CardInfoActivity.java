@@ -54,15 +54,15 @@ import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
 import com.codebutler.farebot.fragment.CardTripsFragment;
 import com.codebutler.farebot.fragment.UnauthorizedCardFragment;
 import com.codebutler.farebot.persist.CardPersister;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.TransitFactoryRegistry;
-import com.codebutler.farebot.transit.stub.UnauthorizedClassicTransitData;
+import com.codebutler.farebot.transit.stub.UnauthorizedClassicTransitInfo;
 import com.codebutler.farebot.ui.TabPagerAdapter;
 import com.codebutler.farebot.util.Utils;
 
 public class CardInfoActivity extends Activity {
 
-    public static final String EXTRA_TRANSIT_DATA = "transit_data";
+    public static final String EXTRA_TRANSIT_INFO = "transit_info";
 
     static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
 
@@ -70,7 +70,7 @@ public class CardInfoActivity extends Activity {
 
     private RawCard mRawCard;
     private Card mCard;
-    private TransitData mTransitData;
+    private TransitInfo mTransitInfo;
     private TabPagerAdapter mTabsAdapter;
     private TextToSpeech mTTS;
     private CardPersister mCardPersister;
@@ -80,10 +80,10 @@ public class CardInfoActivity extends Activity {
     private OnInitListener mTTSInitListener = new OnInitListener() {
         @Override
         public void onInit(int status) {
-            String balance = mTransitData.getBalanceString(getResources());
+            String balance = mTransitInfo.getBalanceString(getResources());
             if (status == TextToSpeech.SUCCESS && balance != null) {
                 mTTS.speak(getString(R.string.balance_speech,
-                        mTransitData.getBalanceString(getResources())),
+                        mTransitInfo.getBalanceString(getResources())),
                         TextToSpeech.QUEUE_FLUSH, null);
             }
         }
@@ -125,7 +125,7 @@ public class CardInfoActivity extends Activity {
 
                     mRawCard = mCardPersister.readCard(cursor);
                     mCard = mRawCard.parse();
-                    mTransitData = mTransitFactoryRegistry.parseTransitData(mCard);
+                    mTransitInfo = mTransitFactoryRegistry.parseTransitInfo(mCard);
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CardInfoActivity.this);
                     mSpeakBalanceEnabled = prefs.getBoolean("pref_key_speak_balance", false);
@@ -152,41 +152,41 @@ public class CardInfoActivity extends Activity {
                     return;
                 }
 
-                if (mTransitData == null) {
+                if (mTransitInfo == null) {
                     showAdvancedInfo(new UnsupportedCardException());
                     finish();
                     return;
                 }
 
-                String titleSerial = (mTransitData.getSerialNumber() != null)
-                        ? mTransitData.getSerialNumber()
+                String titleSerial = (mTransitInfo.getSerialNumber() != null)
+                        ? mTransitInfo.getSerialNumber()
                         : mCard.getTagId().hex();
-                actionBar.setTitle(mTransitData.getCardName(getResources()) + " " + titleSerial);
+                actionBar.setTitle(mTransitInfo.getCardName(getResources()) + " " + titleSerial);
 
                 Bundle args = new Bundle();
                 args.putParcelable(Constants.EXTRA_CARD, mCard);
-                args.putParcelable(EXTRA_TRANSIT_DATA, mTransitData);
+                args.putParcelable(EXTRA_TRANSIT_INFO, mTransitInfo);
 
-                if (mTransitData instanceof UnauthorizedClassicTransitData) {
+                if (mTransitInfo instanceof UnauthorizedClassicTransitInfo) {
                     mTabsAdapter.addTab(actionBar.newTab(), UnauthorizedCardFragment.class, args);
                     return;
                 }
 
-                if (mTransitData.getBalanceString(getResources()) != null) {
+                if (mTransitInfo.getBalanceString(getResources()) != null) {
                     mTabsAdapter.addTab(actionBar.newTab().setText(R.string.balance), CardBalanceFragment.class, args);
                 }
 
-                if (mTransitData.getTrips() != null || mTransitData.getRefills() != null) {
+                if (mTransitInfo.getTrips() != null || mTransitInfo.getRefills() != null) {
                     mTabsAdapter.addTab(actionBar.newTab().setText(R.string.history), CardTripsFragment.class, args);
                 }
 
-                if (mTransitData.getSubscriptions() != null) {
+                if (mTransitInfo.getSubscriptions() != null) {
                     mTabsAdapter.addTab(actionBar.newTab().setText(R.string.subscriptions),
                             CardSubscriptionsFragment.class,
                             args);
                 }
 
-                if (mTransitData.getInfo(getApplicationContext()) != null) {
+                if (mTransitInfo.getInfo(getApplicationContext()) != null) {
                     mTabsAdapter.addTab(actionBar.newTab().setText(R.string.info), CardInfoFragment.class, args);
                 }
 
@@ -194,7 +194,7 @@ public class CardInfoActivity extends Activity {
                     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                 }
 
-                if (mTransitData.hasUnknownStations()) {
+                if (mTransitInfo.hasUnknownStations()) {
                     findViewById(R.id.need_stations).setVisibility(View.VISIBLE);
                 }
 

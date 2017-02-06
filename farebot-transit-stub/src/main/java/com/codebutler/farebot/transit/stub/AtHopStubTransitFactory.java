@@ -26,7 +26,7 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
-public class AtHopStubTransitFactory implements TransitFactory<DesfireCard, AtHopStubTransitData> {
+public class AtHopStubTransitFactory implements TransitFactory<DesfireCard, AtHopStubTransitInfo> {
 
     @Override
     public boolean check(@NonNull DesfireCard card) {
@@ -41,7 +41,7 @@ public class AtHopStubTransitFactory implements TransitFactory<DesfireCard, AtHo
 
     @NonNull
     @Override
-    public AtHopStubTransitData parseData(@NonNull DesfireCard card) {
-        return AtHopStubTransitData.create();
+    public AtHopStubTransitInfo parseInfo(@NonNull DesfireCard card) {
+        return AtHopStubTransitInfo.create();
     }
 }

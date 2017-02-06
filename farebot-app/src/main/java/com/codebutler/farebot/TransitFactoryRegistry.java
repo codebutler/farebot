@@ -9,7 +9,7 @@ import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.felica.FelicaCard;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitFactory;
@@ -75,10 +75,10 @@ public class TransitFactoryRegistry {
     }
 
     @Nullable
-    public TransitData parseTransitData(@NonNull Card card) {
+    public TransitInfo parseTransitInfo(@NonNull Card card) {
         for (TransitFactory factory : getFactories(card.getParentClass())) {
             if (factory.check(card)) {
-                return factory.parseData(card);
+                return factory.parseInfo(card);
             }
         }
         return null;

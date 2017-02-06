@@ -34,11 +34,11 @@ import com.codebutler.farebot.transit.TransitIdentity;
 
 import net.kazzz.felica.lib.FeliCaLib;
 
-import static com.codebutler.farebot.transit.octopus.OctopusTransitData.DUAL_NAME;
-import static com.codebutler.farebot.transit.octopus.OctopusTransitData.OCTOPUS_NAME;
-import static com.codebutler.farebot.transit.octopus.OctopusTransitData.SZT_NAME;
+import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.DUAL_NAME;
+import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.OCTOPUS_NAME;
+import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.SZT_NAME;
 
-public class OctopusTransitFactory implements TransitFactory<FelicaCard,OctopusTransitData> {
+public class OctopusTransitFactory implements TransitFactory<FelicaCard,OctopusTransitInfo> {
 
     @Override
     public boolean check(@NonNull FelicaCard card) {
@@ -65,7 +65,7 @@ public class OctopusTransitFactory implements TransitFactory<FelicaCard,OctopusT
 
     @NonNull
     @Override
-    public OctopusTransitData parseData(@NonNull FelicaCard card) {
+    public OctopusTransitInfo parseInfo(@NonNull FelicaCard card) {
         int octopusBalance = 0;
         int shenzhenBalance = 0;
         boolean hasOctopus = false;
@@ -91,6 +91,6 @@ public class OctopusTransitFactory implements TransitFactory<FelicaCard,OctopusT
             }
         }
 
-        return OctopusTransitData.create(octopusBalance, shenzhenBalance, hasOctopus, hasShenzhen);
+        return OctopusTransitInfo.create(octopusBalance, shenzhenBalance, hasOctopus, hasShenzhen);
     }
 }

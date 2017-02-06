@@ -47,7 +47,7 @@ import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_CANCEL_TRI
 import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_IN;
 import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_OUT;
 
-public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTransitData> {
+public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTransitInfo> {
 
     @Override
     public boolean check(@NonNull DesfireCard card) {
@@ -67,7 +67,7 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
 
     @NonNull
     @Override
-    public OrcaTransitData parseData(@NonNull DesfireCard card) {
+    public OrcaTransitInfo parseInfo(@NonNull DesfireCard card) {
         byte[] data;
         int serialNumber;
         int balance;
@@ -93,7 +93,7 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
             throw new RuntimeException("Error parsing ORCA trips", ex);
         }
 
-        return new AutoValue_OrcaTransitData(trips, serialNumber, balance);
+        return new AutoValue_OrcaTransitInfo(trips, serialNumber, balance);
     }
 
     @NonNull

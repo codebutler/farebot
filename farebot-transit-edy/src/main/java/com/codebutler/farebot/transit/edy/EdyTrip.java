@@ -65,11 +65,11 @@ abstract class EdyTrip extends Trip {
     @Override
     public Mode getMode() {
         switch (getProcessType()) {
-            case EdyTransitData.FELICA_MODE_EDY_DEBIT:
+            case EdyTransitInfo.FELICA_MODE_EDY_DEBIT:
                 return Mode.POS;
-            case EdyTransitData.FELICA_MODE_EDY_CHARGE:
+            case EdyTransitInfo.FELICA_MODE_EDY_CHARGE:
                 return Mode.TICKET_MACHINE;
-            case EdyTransitData.FELICA_MODE_EDY_GIFT:
+            case EdyTransitInfo.FELICA_MODE_EDY_GIFT:
                 return Mode.VENDING_MACHINE;
             default:
                 return Mode.OTHER;
@@ -94,7 +94,7 @@ abstract class EdyTrip extends Trip {
     public String getFareString(@NonNull Resources resources) {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
         format.setMaximumFractionDigits(0);
-        if (getProcessType() != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
+        if (getProcessType() != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
             return "+" + format.format(getTransactionAmount());
         }
         return format.format(getTransactionAmount());
@@ -119,7 +119,7 @@ abstract class EdyTrip extends Trip {
         format.setMinimumIntegerDigits(8);
         format.setGroupingUsed(false);
         String str;
-        if (getProcessType() != EdyTransitData.FELICA_MODE_EDY_DEBIT) {
+        if (getProcessType() != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
             str = resources.getString(R.string.felica_process_charge);
         } else {
             str = resources.getString(R.string.felica_process_merchandise_purchase);

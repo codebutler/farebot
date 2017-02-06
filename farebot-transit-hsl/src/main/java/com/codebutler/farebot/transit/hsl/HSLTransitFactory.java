@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransitData> {
+public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransitInfo> {
 
     private static final long EPOCH = 0x32C97ED0;
 
@@ -62,7 +62,7 @@ public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransit
 
     @NonNull
     @Override
-    public HSLTransitData parseData(@NonNull DesfireCard desfireCard) {
+    public HSLTransitInfo parseInfo(@NonNull DesfireCard desfireCard) {
         try {
             byte[] data = desfireCard.getApplication(0x1120ef).getFile(0x08).getData().bytes();
             String serialNumber = ByteUtils.getHexString(data).substring(2, 20);  //Utils.byteArrayToInt(data, 1, 9);
@@ -188,7 +188,7 @@ public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransit
                 Collections.sort(trips, new Trip.Comparator());
             }
 
-            return HSLTransitData.builder()
+            return HSLTransitInfo.builder()
                     .serialNumber(serialNumber)
                     .trips(ImmutableList.<Trip>copyOf(trips))
                     .refills(Collections.<Refill>singletonList(lastRefill))

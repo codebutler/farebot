@@ -1,5 +1,5 @@
 /*
- * AtHopStubTransitData.java
+ * AtHopStubTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -34,11 +34,11 @@ import com.google.auto.value.AutoValue;
  * https://github.com/micolous/metrodroid/wiki/AT-HOP
  */
 @AutoValue
-public abstract class AtHopStubTransitData extends StubTransitData {
+public abstract class AtHopStubTransitInfo extends StubTransitInfo {
 
     @NonNull
-    public static AtHopStubTransitData create() {
-        return new AutoValue_AtHopStubTransitData();
+    public static AtHopStubTransitInfo create() {
+        return new AutoValue_AtHopStubTransitInfo();
     }
 
     @NonNull

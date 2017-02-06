@@ -35,7 +35,7 @@ import android.widget.TextView;
 import com.codebutler.farebot.R;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.transit.Refill;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -46,8 +46,8 @@ public class CardRefillsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TransitData transitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
-        setListAdapter(new RefillsListAdapter(getActivity(), transitData.getRefills()));
+        TransitInfo transitInfo = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_INFO);
+        setListAdapter(new RefillsListAdapter(getActivity(), transitInfo.getRefills()));
     }
 
     private static class RefillsListAdapter extends ArrayAdapter<Refill> {

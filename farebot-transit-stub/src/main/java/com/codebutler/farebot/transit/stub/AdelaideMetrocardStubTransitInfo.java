@@ -1,5 +1,5 @@
 /*
- * AdelaideMetrocardStubTransitData.java
+ * AdelaideMetrocardStubTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -34,7 +34,7 @@ import com.google.auto.value.AutoValue;
  * https://github.com/micolous/metrodroid/wiki/Metrocard-%28Adelaide%29
  */
 @AutoValue
-public abstract class AdelaideMetrocardStubTransitData extends StubTransitData {
+public abstract class AdelaideMetrocardStubTransitInfo extends StubTransitInfo {
 
     @NonNull
     @Override

@@ -1,11 +1,11 @@
 /*
- * SeqGoTransitData.java
+ * BilheteUnicoSPTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
- * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+ * Copyright (C) 2013-2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2013 Marcelo Liberato <mliberato@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.seq_go;
+package com.codebutler.farebot.transit.bilhete_unico;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -31,47 +31,22 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 
 import java.text.NumberFormat;
+import java.util.Currency;
 import java.util.List;
-import java.util.Locale;
 
-/**
- * Transit data type for Go card (Brisbane / South-East Queensland, AU), used by Translink.
- * <p>
- * Documentation of format: https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29
- *
- * @author Michael Farrell
- */
 @AutoValue
-public abstract class SeqGoTransitData extends TransitData {
+public abstract class BilheteUnicoSPTransitInfo extends TransitInfo {
 
-    public static final String NAME = "Go card";
-
-    @NonNull
-    static SeqGoTransitData create(
-            @NonNull String serialNumber,
-            @NonNull ImmutableList<Trip> trips,
-            @NonNull ImmutableList<Refill> refills,
-            boolean hasUnknownStations,
-            int balance) {
-        return new AutoValue_SeqGoTransitData(serialNumber, trips, refills, hasUnknownStations, balance);
-    }
+    static final String NAME = "Bilhete Único";
 
     @NonNull
-    @Override
-    public String getBalanceString(@NonNull Resources resources) {
-        return NumberFormat.getCurrencyInstance(Locale.US).format((double) getBalance() / 100.);
-    }
-
-    @Nullable
-    @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
-        return null;
+    static BilheteUnicoSPTransitInfo create(@NonNull BilheteUnicoSPCredit credit) {
+        return new AutoValue_BilheteUnicoSPTransitInfo(credit);
     }
 
     @NonNull
@@ -80,14 +55,49 @@ public abstract class SeqGoTransitData extends TransitData {
         return NAME;
     }
 
+    @NonNull
+    @Override
+    public String getBalanceString(@NonNull Resources resources) {
+        return BilheteUnicoSPTransitInfo.convertAmount(getCredit().getCredit());
+    }
+
+    @Nullable
+    @Override
+    public String getSerialNumber() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public List<Trip> getTrips() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public List<Refill> getRefills() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public List<ListItem> getInfo(@NonNull Context context) {
+        return null;
+    }
+
     @Nullable
     @Override
     public List<Subscription> getSubscriptions() {
         return null;
     }
 
-    @Override
-    public abstract boolean hasUnknownStations();
+    @NonNull
+    abstract BilheteUnicoSPCredit getCredit();
 
-    abstract int getBalance();
+    private static String convertAmount(int amount) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        formatter.setCurrency(Currency.getInstance("BRL"));
+
+        return formatter.format((double) amount / 100.0);
+    }
 }

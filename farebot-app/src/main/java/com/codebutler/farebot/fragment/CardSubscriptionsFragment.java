@@ -37,26 +37,26 @@ import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.List;
 
 public class CardSubscriptionsFragment extends ListFragment {
     private Card mCard;
-    private TransitData mTransitData;
+    private TransitInfo mTransitInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCard = getArguments().getParcelable(Constants.EXTRA_CARD);
-        mTransitData = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_DATA);
+        mTransitInfo = getArguments().getParcelable(CardInfoActivity.EXTRA_TRANSIT_INFO);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setListAdapter(new SubscriptionsAdapter(getActivity(), mTransitData.getSubscriptions()));
+        setListAdapter(new SubscriptionsAdapter(getActivity(), mTransitInfo.getSubscriptions()));
     }
 
     private class SubscriptionsAdapter extends ArrayAdapter<Subscription> {

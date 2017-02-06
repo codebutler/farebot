@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SuicaTransitFactory implements TransitFactory<FelicaCard, SuicaTransitData> {
+public class SuicaTransitFactory implements TransitFactory<FelicaCard, SuicaTransitInfo> {
 
     @NonNull private final FelicaDBUtil mDBUtil;
 
@@ -70,7 +70,7 @@ public class SuicaTransitFactory implements TransitFactory<FelicaCard, SuicaTran
     }
 
     @Override
-    public SuicaTransitData parseData(@NonNull FelicaCard card) {
+    public SuicaTransitInfo parseInfo(@NonNull FelicaCard card) {
         FelicaService service = card.getSystem(FeliCaLib.SYSTEMCODE_SUICA).getService(FeliCaLib.SERVICE_SUICA_HISTORY);
 
         long previousBalance = -1;
@@ -95,7 +95,7 @@ public class SuicaTransitFactory implements TransitFactory<FelicaCard, SuicaTran
         // Return trips in descending order.
         Collections.reverse(trips);
 
-        return SuicaTransitData.create(
+        return SuicaTransitInfo.create(
                 null, // FIXME: Find where this is on the card.
                 ImmutableList.<Trip>copyOf(trips),
                 null,

@@ -234,13 +234,13 @@ abstract class OVChipTransaction implements Parcelable {
          * http://www.chipinfo.nl/inchecken/
          */
 
-        if (getCompany() == nextTransaction.getCompany() && getTransfer() == OVChipTransitData.PROCESS_CHECKIN
-                && nextTransaction.getTransfer() == OVChipTransitData.PROCESS_CHECKOUT) {
+        if (getCompany() == nextTransaction.getCompany() && getTransfer() == OVChipTransitInfo.PROCESS_CHECKIN
+                && nextTransaction.getTransfer() == OVChipTransitInfo.PROCESS_CHECKOUT) {
             if (getDate() == nextTransaction.getDate()) {
                 return true;
             } else if (getDate() == nextTransaction.getDate() - 1) {
                 // All NS trips get reset at 4 AM (except if it's a night train, but that's out of our scope).
-                if (getCompany() == OVChipTransitData.AGENCY_NS && nextTransaction.getTime() < 240) {
+                if (getCompany() == OVChipTransitInfo.AGENCY_NS && nextTransaction.getTime() < 240) {
                     return true;
                 }
 
@@ -250,7 +250,7 @@ abstract class OVChipTransaction implements Parcelable {
                  * But it's hard to determine the length of every single trip there is, so for now let's just assume a
                  * checkout at the next day is still from the same trip. Better solutions are always welcome ;)
                  */
-                if (getCompany() != OVChipTransitData.AGENCY_NS) {
+                if (getCompany() != OVChipTransitInfo.AGENCY_NS) {
                     return true;
                 }
             }

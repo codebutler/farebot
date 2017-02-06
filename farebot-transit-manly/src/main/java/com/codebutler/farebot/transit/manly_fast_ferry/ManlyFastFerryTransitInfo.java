@@ -1,5 +1,5 @@
 /*
- * ManlyFastFerryTransitData.java
+ * ManlyFastFerryTransitInfo.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -33,7 +33,7 @@ import com.codebutler.farebot.core.ui.HeaderListItem;
 import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
-import com.codebutler.farebot.transit.TransitData;
+import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
 
@@ -55,18 +55,18 @@ import java.util.Locale;
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Manly-Fast-Ferry
  */
 @AutoValue
-public abstract class ManlyFastFerryTransitData extends TransitData {
+public abstract class ManlyFastFerryTransitInfo extends TransitInfo {
 
     public static final String NAME = "Manly Fast Ferry";
 
     @NonNull
-    static ManlyFastFerryTransitData create(
+    static ManlyFastFerryTransitInfo create(
             @NonNull String serialNumber,
             @NonNull ArrayList<Trip> trips,
             @NonNull ArrayList<Refill> refills,
             @NonNull GregorianCalendar epochDate,
             int balance) {
-        return new AutoValue_ManlyFastFerryTransitData(serialNumber, trips, refills, epochDate, balance);
+        return new AutoValue_ManlyFastFerryTransitInfo(serialNumber, trips, refills, epochDate, balance);
     }
 
     @NonNull
