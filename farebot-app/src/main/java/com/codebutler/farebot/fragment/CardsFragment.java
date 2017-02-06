@@ -51,13 +51,13 @@ import android.widget.Toast;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.TransitFactoryRegistry;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.CardType;
-import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.card.provider.CardDBHelper;
 import com.codebutler.farebot.card.provider.CardProvider;
 import com.codebutler.farebot.card.provider.CardsTableColumns;
-import com.codebutler.farebot.TransitFactoryRegistry;
+import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.util.ExportHelper;
 import com.codebutler.farebot.util.Utils;
@@ -130,7 +130,7 @@ public class CardsFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getContext()), id);
+        Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getActivity()), id);
         Intent intent = new Intent(getActivity(), CardInfoActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(uri);
@@ -151,7 +151,7 @@ public class CardsFragment extends ListFragment {
     public boolean onContextItemSelected(android.view.MenuItem item) {
         if (item.getItemId() == R.id.delete_card) {
             long id = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id;
-            Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getContext()), id);
+            Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getActivity()), id);
             getActivity().getContentResolver().delete(uri, null, null);
             return true;
         }
