@@ -72,7 +72,7 @@ public class KeysFragment extends ListFragment implements AdapterView.OnItemLong
                 new BetterAsyncTask<Void>(getActivity(), false, false) {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        Uri uri = ContentUris.withAppendedId(CardKeyProvider.CONTENT_URI, mActionKeyId);
+                        Uri uri = ContentUris.withAppendedId(CardKeyProvider.getContentUri(getContext()), mActionKeyId);
                         getActivity().getContentResolver().delete(uri, null, null);
                         return null;
                     }
@@ -99,7 +99,7 @@ public class KeysFragment extends ListFragment implements AdapterView.OnItemLong
             = new LoaderManager.LoaderCallbacks<android.database.Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            return new CursorLoader(getActivity(), CardKeyProvider.CONTENT_URI,
+            return new CursorLoader(getActivity(), CardKeyProvider.getContentUri(getContext()),
                     null,
                     null,
                     null,

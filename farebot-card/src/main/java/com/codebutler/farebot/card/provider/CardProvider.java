@@ -25,6 +25,7 @@ package com.codebutler.farebot.card.provider;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -33,28 +34,31 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.codebutler.farebot.card.BuildConfig;
-
 public class CardProvider extends ContentProvider {
 
-    public static final Uri CONTENT_URI_CARD;
-
-    private static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".cardprovider";
-    private static final UriMatcher URI_MATCHER;
-
     private CardDBHelper mDbHelper;
+    private UriMatcher mUriMatcher;
 
-    static {
-        CONTENT_URI_CARD = Uri.parse("content://" + AUTHORITY + "/cards");
+    @NonNull
+    public static String getAuthority(@NonNull Context context) {
+        return context.getPackageName() + ".cardprovider";
+    }
 
-        URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER.addURI(AUTHORITY, "cards", CardDBHelper.CARD_COLLECTION_URI_INDICATOR);
-        URI_MATCHER.addURI(AUTHORITY, "cards/#", CardDBHelper.SINGLE_CARD_URI_INDICATOR);
+    @NonNull
+    public static Uri getContentUri(@NonNull Context context) {
+        return Uri.parse("content://" + getAuthority(context) + "/cards");
     }
 
     @Override
     public boolean onCreate() {
         mDbHelper = new CardDBHelper(getContext());
+
+        String authority = getAuthority(getContext());
+
+        mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        mUriMatcher.addURI(authority, "cards", CardDBHelper.CARD_COLLECTION_URI_INDICATOR);
+        mUriMatcher.addURI(authority, "cards/#", CardDBHelper.SINGLE_CARD_URI_INDICATOR);
+
         return true;
     }
 
@@ -66,7 +70,7 @@ public class CardProvider extends ContentProvider {
             String[] selectionArgs,
             String sortOrder) {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-        switch (URI_MATCHER.match(uri)) {
+        switch (mUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
                 builder.setTables(CardsTableColumns.TABLE_NAME);
                 //builder.setProjectionMap();
@@ -88,11 +92,12 @@ public class CardProvider extends ContentProvider {
 
     @Override
     public String getType(@NonNull Uri uri) {
-        switch (URI_MATCHER.match(uri)) {
+        String packageName = getContext().getPackageName();
+        switch (mUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
-                return CardDBHelper.CARD_DIR_TYPE;
+                return "vnd.android.cursor.dir/" + packageName + ".card";
             case CardDBHelper.SINGLE_CARD_URI_INDICATOR:
-                return CardDBHelper.CARD_ITEM_TYPE;
+                return "vnd.android.cursor.item/" + packageName + ".card";
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -100,14 +105,14 @@ public class CardProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        if (URI_MATCHER.match(uri) != CardDBHelper.CARD_COLLECTION_URI_INDICATOR) {
+        if (mUriMatcher.match(uri) != CardDBHelper.CARD_COLLECTION_URI_INDICATOR) {
             throw new IllegalArgumentException("Incorrect URI: " + uri);
         }
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long rowId = db.insertOrThrow(CardsTableColumns.TABLE_NAME, null, values);
 
-        Uri cardUri = ContentUris.withAppendedId(CONTENT_URI_CARD, rowId);
+        Uri cardUri = ContentUris.withAppendedId(getContentUri(getContext()), rowId);
         getContext().getContentResolver().notifyChange(cardUri, null);
 
         return cardUri;
@@ -117,7 +122,7 @@ public class CardProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int count = 0;
-        switch (URI_MATCHER.match(uri)) {
+        switch (mUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
                 count = db.delete(CardsTableColumns.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -137,7 +142,7 @@ public class CardProvider extends ContentProvider {
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int count;
-        switch (URI_MATCHER.match(uri)) {
+        switch (mUriMatcher.match(uri)) {
             case CardDBHelper.CARD_COLLECTION_URI_INDICATOR:
                 count = db.update(CardsTableColumns.TABLE_NAME, values, selection, selectionArgs);
                 break;

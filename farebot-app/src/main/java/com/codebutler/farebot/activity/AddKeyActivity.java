@@ -104,7 +104,7 @@ public class AddKeyActivity extends Activity {
                         values.put(KeysTableColumns.CARD_TYPE, mCardType);
                         values.put(KeysTableColumns.KEY_DATA, keys.toJSON().toString());
 
-                        getContentResolver().insert(CardKeyProvider.CONTENT_URI, values);
+                        getContentResolver().insert(CardKeyProvider.getContentUri(AddKeyActivity.this), values);
 
                         return null;
                     }

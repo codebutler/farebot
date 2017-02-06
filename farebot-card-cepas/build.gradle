@@ -8,6 +8,8 @@ dependencies {
     apt files(androidJar(this))
 
     provided libs.autoValue
+    provided libs.autoValueGson
+
     apt libs.autoValue
     apt libs.autoValueParcel
     apt libs.autoValueGson

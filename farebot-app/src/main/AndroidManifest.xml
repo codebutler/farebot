@@ -23,9 +23,7 @@
 
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.codebutler.farebot"
-    android:versionCode="21"
-    android:versionName="2.9.0">
+    package="com.codebutler.farebot">
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

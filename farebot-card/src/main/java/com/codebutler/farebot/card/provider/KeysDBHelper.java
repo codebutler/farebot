@@ -26,19 +26,13 @@ package com.codebutler.farebot.card.provider;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
-
-import com.codebutler.farebot.card.BuildConfig;
 
 class KeysDBHelper extends SQLiteOpenHelper {
-
-    static final String KEY_DIR_TYPE = "vnd.android.cursor.dir/" + BuildConfig.APPLICATION_ID + ".key";
-    static final String KEY_ITEM_TYPE = "vnd.android.cursor.item/" + BuildConfig.APPLICATION_ID + ".key";
 
     private static final String DATABASE_NAME = "keys.db";
     private static final int DATABASE_VERSION = 3;
 
-    private KeysDBHelper(Context context) {
+    KeysDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -55,13 +49,5 @@ class KeysDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Not Implemented...
-    }
-
-    static class Creator implements BetterContentProvider.SQLiteOpenHelperCreator {
-
-        @Override
-        public SQLiteOpenHelper create(@NonNull Context context) {
-            return new KeysDBHelper(context);
-        }
     }
 }

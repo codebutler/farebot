@@ -56,6 +56,6 @@ public class CardPersister {
         values.put(CardsTableColumns.TAG_SERIAL, card.tagId().hex());
         values.put(CardsTableColumns.DATA, mCardSerializer.serialize(card));
         values.put(CardsTableColumns.SCANNED_AT, card.scannedAt().getTime());
-        return mContext.getContentResolver().insert(CardProvider.CONTENT_URI_CARD, values);
+        return mContext.getContentResolver().insert(CardProvider.getContentUri(mContext), values);
     }
 }

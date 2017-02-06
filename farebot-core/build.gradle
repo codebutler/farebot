@@ -7,7 +7,6 @@ dependencies {
     compile libs.commonsIO
     compile libs.commonsLang3
     compile libs.guava
-    compile libs.autoValueGson
 
     // https://github.com/rharter/auto-value-gson/issues/80
     apt files(androidJar(this))
@@ -17,6 +16,7 @@ dependencies {
     apt libs.autoValueGson
 
     provided libs.autoValue
+    provided libs.autoValueGson
 }
 
 android { }

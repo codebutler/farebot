@@ -25,7 +25,7 @@ public class CardKeysFactory {
     public CardKeys forTagId(@NonNull byte[] tagId) throws Exception {
         String tagIdString = ByteUtils.getHexString(tagId);
         Cursor cursor = mContext.getContentResolver().query(
-                Uri.withAppendedPath(CardKeyProvider.CONTENT_URI, tagIdString),
+                Uri.withAppendedPath(CardKeyProvider.getContentUri(mContext), tagIdString),
                 null,
                 null,
                 null,

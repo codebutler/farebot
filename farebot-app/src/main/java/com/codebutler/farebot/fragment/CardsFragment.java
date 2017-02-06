@@ -82,7 +82,7 @@ public class CardsFragment extends ListFragment {
     private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-            return new CursorLoader(getActivity(), CardProvider.CONTENT_URI_CARD,
+            return new CursorLoader(getActivity(), CardProvider.getContentUri(getContext()),
                     CardDBHelper.PROJECTION,
                     null,
                     null,
@@ -130,7 +130,7 @@ public class CardsFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
+        Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getContext()), id);
         Intent intent = new Intent(getActivity(), CardInfoActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(uri);
@@ -151,7 +151,7 @@ public class CardsFragment extends ListFragment {
     public boolean onContextItemSelected(android.view.MenuItem item) {
         if (item.getItemId() == R.id.delete_card) {
             long id = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id;
-            Uri uri = ContentUris.withAppendedId(CardProvider.CONTENT_URI_CARD, id);
+            Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getContext()), id);
             getActivity().getContentResolver().delete(uri, null, null);
             return true;
         }

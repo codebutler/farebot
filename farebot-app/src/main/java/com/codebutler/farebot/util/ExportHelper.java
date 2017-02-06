@@ -29,8 +29,8 @@ import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.BuildConfig;
 import com.codebutler.farebot.card.RawCard;
-import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.card.provider.CardDBHelper;
+import com.codebutler.farebot.persist.CardPersister;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;

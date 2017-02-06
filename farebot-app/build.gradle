@@ -56,6 +56,11 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 android {
+    defaultConfig {
+        versionCode 21
+        versionName '2.9.0'
+    }
+
     signingConfigs {
         debug {
             storeFile file('../debug.keystore')
@@ -70,7 +75,9 @@ android {
 
     buildTypes {
         release {
-            // runProguard true
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), '../config/proguard/proguard-rules.pro'
             signingConfig signingConfigs.release
         }
     }
