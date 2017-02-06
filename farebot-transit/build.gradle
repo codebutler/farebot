@@ -1,0 +1,13 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+    compile project(':farebot-card')
+
+    provided libs.autoValue
+    apt libs.autoValue
+    apt libs.autoValueParcel
+    apt libs.autoValueGson
+}
+
+android { }

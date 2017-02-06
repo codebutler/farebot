@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AndroidManifest.xml
+
+  Copyright (C) 2011-2013 Eric Butler
+
+  Authors:
+  Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.codebutler.farebot">
+
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <uses-feature android:name="android.hardware.nfc" />
+
+    <!-- Google Maps V2 -->
+    <permission
+        android:name="${applicationId}.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="${applicationId}.permission.MAPS_RECEIVE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@drawable/launcher_icon"
+        android:name=".FareBotApplication"
+        android:allowBackup="true"
+        android:theme="@android:style/Theme.Material">
+
+        <activity
+            android:name=".activity.MainActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/${applicationId}.card" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.ReadingTagActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait"
+            android:noHistory="true"
+            android:launchMode="singleTop"/>
+
+        <activity
+            android:name=".activity.BackgroundTagActivity"
+            android:enabled="false"
+            android:noHistory="true"
+            android:configChanges="keyboardHidden|orientation"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/filter_nfc" />
+        </activity>
+
+        <activity
+            android:name=".activity.CardInfoActivity"
+            android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/${applicationId}.card" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.AdvancedCardInfoActivity"
+            android:configChanges="keyboardHidden|orientation" />
+
+        <activity
+            android:name=".activity.FareBotPreferenceActivity"
+            android:label="@string/preferences" />
+
+        <activity
+            android:name=".activity.TripMapActivity"
+            android:configChanges="keyboardHidden|orientation"/>
+
+        <activity
+            android:name=".activity.SupportedCardsActivity"
+            android:label="@string/supported_cards"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.CardsActivity"
+            android:label="@string/scanned_cards"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.KeysActivity"
+            android:label="@string/keys" />
+
+        <activity
+            android:name=".activity.AddKeyActivity"
+            android:label="@string/add_key"
+            android:theme="@style/FareBotDialog"/>
+
+        <provider
+            android:name=".card.provider.CardProvider"
+            android:authorities="${applicationId}.cardprovider"
+            android:exported="false"/>
+
+        <provider
+            android:name=".card.provider.CardKeyProvider"
+            android:authorities="${applicationId}.keyprovider"
+            android:exported="false"/>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBUUm1_1cyaCLkIvcE60gF4xO3pyb6SyP4"/>
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="77d8c3509e581fb753f705c476fe3b022dda0287" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+    </application>
+</manifest>

@@ -4,7 +4,7 @@ addons:
     debug: true
     s3_region: "us-west-1"
     paths:
-      - $TRAVIS_BUILD_DIR/build/outputs/lint-results-devDebug.html
+      - $(ls $TRAVIS_BUILD_DIR/*/build/outputs/lint-results-debug.html)
 jdk:
   - oraclejdk8
 android:

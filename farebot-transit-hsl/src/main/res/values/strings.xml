@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hsl_pass_is_valid">Valid season ticket</string>
+    <string name="hsl_balance_refill">Balance refill</string>
+    <string name="hsl_balance_ticket">Value ticket, %1$s person, %2$s mins</string>
+    <string name="hsl_value_ticket_is_valid">Valid value ticket</string>
+    <string name="hsl_pass_ticket">Season ticket, %s person</string>
+    <string name="hsl_route_line_vehicle">Line %1$s, Vehicle %2$s</string>
+</resources>
