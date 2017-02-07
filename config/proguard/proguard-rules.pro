@@ -23,6 +23,10 @@
 
 # FareBot
 -keep class com.codebutler.farebot.card.provider.BetterContentProvider**
+-keep class com.codebutler.farebot.card.desfire.ui.DesfireCardRawDataFragment
+-keep class com.codebutler.farebot.card.ultralight.ui.UltralightCardRawDataFragment
+-keep class com.codebutler.farebot.card.classic.ui.ClassicCardRawDataFragment
+-keep class com.codebutler.farebot.card.felica.ui.FelicaCardRawDataFragment
 
 # AutoValue
 -keep class **.AutoParcelGson_*

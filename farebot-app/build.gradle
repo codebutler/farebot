@@ -48,7 +48,7 @@ def askPassword() {
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-    if(taskGraph.hasTask(':assembleProdRelease')) {
+    if(taskGraph.hasTask(':farebot-app:packageRelease')) {
         def password = askPassword()
         android.signingConfigs.release.storePassword = password
         android.signingConfigs.release.keyPassword = password
@@ -80,11 +80,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), '../config/proguard/proguard-rules.pro'
             signingConfig signingConfigs.release
         }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     packagingOptions {
