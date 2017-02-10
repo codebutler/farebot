@@ -1,0 +1,26 @@
+import com.codebutler.farebot.card.CardType;
+import java.util.Date;
+
+CREATE TABLE keys (
+    _id        INTEGER PRIMARY KEY,
+    card_id    TEXT NOT NULL,
+    card_type  TEXT AS CardType NOT NULL,
+    key_data   TEXT NOT NULL,
+    created_at INTEGER AS Date NOT NULL
+);
+
+select_all:
+SELECT * FROM keys;
+
+select_by_card_id:
+SELECT *
+FROM keys
+WHERE card_id = ?;
+
+insert_row:
+INSERT INTO keys(card_id, card_type, key_data, created_at)
+VALUES (?, ?, ?, ?);
+
+delete_by_id:
+DELETE FROM keys
+WHERE _id = ?;

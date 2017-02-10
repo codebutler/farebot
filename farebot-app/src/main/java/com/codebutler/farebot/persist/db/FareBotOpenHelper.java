@@ -1,11 +1,10 @@
 /*
- * KeysDBHelper.java
+ * FareBotOpenHelper.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
- * Copyright (C) 2012, 2015-2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2011-2017, 2015-2016 Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.card.provider;
+package com.codebutler.farebot.persist.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
-class KeysDBHelper extends SQLiteOpenHelper {
+import com.codebutler.farebot.persist.model.SavedCard;
+import com.codebutler.farebot.persist.model.SavedKey;
 
-    private static final String DATABASE_NAME = "keys.db";
-    private static final int DATABASE_VERSION = 3;
+public class FareBotOpenHelper extends SQLiteOpenHelper {
 
-    KeysDBHelper(Context context) {
+    private static final String DATABASE_NAME = "farebot.db";
+    private static final int DATABASE_VERSION = 1;
+
+    public FareBotOpenHelper(@NonNull Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + KeysTableColumns.TABLE_NAME + " ("
-                + KeysTableColumns._ID + " INTEGER PRIMARY KEY, "
-                + KeysTableColumns.CARD_ID + " TEXT NOT NULL, "
-                + KeysTableColumns.CARD_TYPE + " TEXT NOT NULL, "
-                + KeysTableColumns.KEY_DATA + " BLOB NOT NULL, "
-                + KeysTableColumns.CREATED_AT + " LONG NOT NULL)");
+        db.execSQL(SavedCard.CREATE_TABLE);
+        db.execSQL(SavedKey.CREATE_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Not Implemented...
-    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { }
 }

@@ -25,27 +25,27 @@ package com.codebutler.farebot.fragment;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentUris;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,10 +54,10 @@ import com.codebutler.farebot.R;
 import com.codebutler.farebot.TransitFactoryRegistry;
 import com.codebutler.farebot.activity.CardInfoActivity;
 import com.codebutler.farebot.card.CardType;
-import com.codebutler.farebot.card.provider.CardDBHelper;
-import com.codebutler.farebot.card.provider.CardProvider;
-import com.codebutler.farebot.card.provider.CardsTableColumns;
+import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.serialize.CardSerializer;
+import com.codebutler.farebot.persist.CardPersister;
+import com.codebutler.farebot.persist.model.SavedCard;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.util.ExportHelper;
 import com.codebutler.farebot.util.Utils;
@@ -77,34 +77,36 @@ public class CardsFragment extends ListFragment {
     private static final int REQUEST_SELECT_FILE = 1;
     private static final String FILENAME = "farebot-export.json";
 
-    private final Map<String, TransitIdentity> mDataCache = new HashMap<>();
-
-    private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+    private final LoaderManager.LoaderCallbacks<List<SavedCard>> mLoaderCallbacks
+            = new LoaderManager.LoaderCallbacks<List<SavedCard>>() {
         @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-            return new CursorLoader(getActivity(), CardProvider.getContentUri(getActivity()),
-                    CardDBHelper.PROJECTION,
-                    null,
-                    null,
-                    CardsTableColumns.SCANNED_AT + " DESC, " + CardsTableColumns._ID + " DESC");
+        public Loader<List<SavedCard>> onCreateLoader(int id, Bundle bundle) {
+            return new AsyncTaskLoader<List<SavedCard>>(getActivity()) {
+                @Override
+                public List<SavedCard> loadInBackground() {
+                    return mCardPersister.getCards();
+                }
+
+                @Override
+                protected void onStartLoading() {
+                    forceLoad();
+                }
+            };
         }
 
         @Override
-        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-            if (getListAdapter() == null) {
-                setListAdapter(new CardsAdapter());
-                setListShown(true);
-                setEmptyText(getString(R.string.no_scanned_cards));
-            }
-
-            ((CursorAdapter) getListAdapter()).swapCursor(cursor);
+        public void onLoadFinished(Loader<List<SavedCard>> loader, List<SavedCard> list) {
+            setListAdapter(new CardsAdapter(list));
+            setListShown(true);
+            setEmptyText(getString(R.string.no_scanned_cards));
         }
 
         @Override
-        public void onLoaderReset(Loader<Cursor> cursorLoader) { }
+        public void onLoaderReset(Loader<List<SavedCard>> cursorLoader) { }
     };
 
     private ExportHelper mExportHelper;
+    private CardPersister mCardPersister;
     private CardSerializer mCardSerializer;
     private TransitFactoryRegistry mTransitFactoryRegistry;
 
@@ -115,6 +117,7 @@ public class CardsFragment extends ListFragment {
 
         FareBotApplication application = (FareBotApplication) getActivity().getApplication();
         mExportHelper = application.getExportHelper();
+        mCardPersister = application.getCardPersister();
         mCardSerializer = application.getCardSerializer();
         mTransitFactoryRegistry = application.getTransitFactoryRegistry();
     }
@@ -130,11 +133,7 @@ public class CardsFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getActivity()), id);
-        Intent intent = new Intent(getActivity(), CardInfoActivity.class);
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setData(uri);
-        startActivity(intent);
+        startActivity(CardInfoActivity.newIntent(getActivity(), id));
     }
 
     @Override
@@ -150,9 +149,10 @@ public class CardsFragment extends ListFragment {
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
         if (item.getItemId() == R.id.delete_card) {
-            long id = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id;
-            Uri uri = ContentUris.withAppendedId(CardProvider.getContentUri(getActivity()), id);
-            getActivity().getContentResolver().delete(uri, null, null);
+            int position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+            SavedCard savedCard = (SavedCard) getListView().getItemAtPosition(position);
+            mCardPersister.deleteCard(savedCard);
+            getLoaderManager().restartLoader(0, null, mLoaderCallbacks);
             return true;
         }
         return false;
@@ -213,11 +213,14 @@ public class CardsFragment extends ListFragment {
         }
     }
 
-    private void onCardsImported(@NonNull List<Uri> uris) {
-        ((CursorAdapter) getListAdapter()).notifyDataSetChanged();
-        getResources().getQuantityString(R.plurals.cards_imported, uris.size());
-        if (uris.size() == 1) {
-            startActivity(new Intent(Intent.ACTION_VIEW, uris.get(0)));
+    private void onCardsImported(@NonNull List<Long> cardIds) {
+        getLoaderManager().restartLoader(0, null, mLoaderCallbacks);
+
+        String text = getResources().getQuantityString(R.plurals.cards_imported, cardIds.size());
+        Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+
+        if (cardIds.size() == 1) {
+            startActivity(CardInfoActivity.newIntent(getActivity(), cardIds.get(0)));
         }
     }
 
@@ -230,35 +233,47 @@ public class CardsFragment extends ListFragment {
         }
     }
 
-    private class CardsAdapter extends ResourceCursorAdapter {
-        CardsAdapter() {
-            super(getActivity(), android.R.layout.simple_list_item_2, null, false);
+    private class CardsAdapter extends ArrayAdapter<SavedCard> {
+
+        private final Map<String, TransitIdentity> mDataCache = new HashMap<>();
+
+        CardsAdapter(List<SavedCard> savedCards) {
+            super(getActivity(), 0, savedCards);
         }
 
+        @NonNull
         @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            int type = cursor.getInt(cursor.getColumnIndex(CardsTableColumns.TYPE));
-            String serial = cursor.getString(cursor.getColumnIndex(CardsTableColumns.TAG_SERIAL));
-            Date scannedAt = new Date(cursor.getLong(cursor.getColumnIndex(CardsTableColumns.SCANNED_AT)));
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                convertView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
+            }
+
+            SavedCard savedCard = getItem(position);
+
+            CardType type = savedCard.type();
+            String serial = savedCard.serial();
+            Date scannedAt = savedCard.scanned_at();
 
             String cacheKey = serial + scannedAt.getTime();
 
             if (!mDataCache.containsKey(cacheKey)) {
-                String data = cursor.getString(cursor.getColumnIndex(CardsTableColumns.DATA));
+                String data = savedCard.data();
                 try {
-                    mDataCache.put(cacheKey, mTransitFactoryRegistry.parseTransitIdentity(
-                            mCardSerializer.deserialize(data).parse()));
+                    RawCard rawCard = mCardSerializer.deserialize(data);
+                    TransitIdentity transitIdentity = mTransitFactoryRegistry.parseTransitIdentity(rawCard.parse());
+                    mDataCache.put(cacheKey, transitIdentity);
                 } catch (Exception ex) {
+                    Log.e("CardsFragment", "Parse error", ex);
                     String error = String.format("Error: %s", Utils.getErrorMessage(ex));
                     mDataCache.put(cacheKey, TransitIdentity.create(error, null));
                 }
             }
 
+            TextView textView1 = (TextView) convertView.findViewById(android.R.id.text1);
+            TextView textView2 = (TextView) convertView.findViewById(android.R.id.text2);
+
             TransitIdentity identity = mDataCache.get(cacheKey);
-
-            TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
-            TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
-
             if (identity != null) {
                 if (identity.getSerialNumber() != null) {
                     textView1.setText(String.format("%s: %s", identity.getName(), identity.getSerialNumber()));
@@ -271,14 +286,15 @@ public class CardsFragment extends ListFragment {
                         dateInstance.format(scannedAt)));
             } else {
                 textView1.setText(getString(R.string.unknown_card));
-                textView2.setText(String.format("%s - %s", CardType.values()[type].toString(), serial));
+                textView2.setText(String.format("%s - %s", type.toString(), serial));
             }
+
+            return convertView;
         }
 
         @Override
-        protected void onContentChanged() {
-            super.onContentChanged();
-            mDataCache.clear();
+        public long getItemId(int position) {
+            return getItem(position)._id();
         }
     }
 }

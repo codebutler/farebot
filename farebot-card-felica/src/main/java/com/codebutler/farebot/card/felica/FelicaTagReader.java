@@ -27,11 +27,13 @@ import android.nfc.Tag;
 import android.nfc.tech.NfcF;
 import android.nfc.tech.TagTechnology;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.felica.raw.RawFelicaCard;
 import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.key.CardKeys;
 
 import net.kazzz.felica.FeliCaTag;
 import net.kazzz.felica.command.ReadResponse;
@@ -45,12 +47,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class FelicaTagReader extends TagReader<FelicaTagReader.FelicaTech, RawFelicaCard> {
+public class FelicaTagReader extends TagReader<FelicaTagReader.FelicaTech, RawFelicaCard, CardKeys> {
 
     private static final String TAG = "FelicaTagReader";
 
     public FelicaTagReader(@NonNull byte[] tagId, @NonNull Tag tag) {
-        super(tagId, tag);
+        super(tagId, tag, null);
     }
 
     @NonNull
@@ -66,7 +68,8 @@ public class FelicaTagReader extends TagReader<FelicaTagReader.FelicaTech, RawFe
     protected RawFelicaCard readTag(
             @NonNull byte[] tagId,
             @NonNull Tag tag,
-            @NonNull FelicaTech tech) throws Exception {
+            @NonNull FelicaTech tech,
+            @Nullable CardKeys cardKeys) throws Exception {
         NfcF nfcF = NfcF.get(tag);
         Log.d(TAG, "Default system code: " + ByteUtils.getHexString(nfcF.getSystemCode()));
 

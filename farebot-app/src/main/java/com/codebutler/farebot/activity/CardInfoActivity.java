@@ -25,15 +25,15 @@ package com.codebutler.farebot.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -43,11 +43,12 @@ import android.view.View;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.TransitFactoryRegistry;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.RawCard;
+import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.core.Constants;
 import com.codebutler.farebot.core.UnsupportedCardException;
-import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.fragment.CardBalanceFragment;
 import com.codebutler.farebot.fragment.CardInfoFragment;
 import com.codebutler.farebot.fragment.CardSubscriptionsFragment;
@@ -55,13 +56,13 @@ import com.codebutler.farebot.fragment.CardTripsFragment;
 import com.codebutler.farebot.fragment.UnauthorizedCardFragment;
 import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.transit.TransitInfo;
-import com.codebutler.farebot.TransitFactoryRegistry;
 import com.codebutler.farebot.transit.stub.UnauthorizedClassicTransitInfo;
 import com.codebutler.farebot.ui.TabPagerAdapter;
 import com.codebutler.farebot.util.Utils;
 
 public class CardInfoActivity extends Activity {
 
+    public static final String EXTRA_CARD_ID = "card_id";
     public static final String EXTRA_TRANSIT_INFO = "transit_info";
 
     static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
@@ -88,6 +89,13 @@ public class CardInfoActivity extends Activity {
             }
         }
     };
+
+    @NonNull
+    public static Intent newIntent(@NonNull Context context, long cardId) {
+        Intent intent = new Intent(context, CardInfoActivity.class);
+        intent.putExtra(EXTRA_CARD_ID, cardId);
+        return intent;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -118,12 +126,8 @@ public class CardInfoActivity extends Activity {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    Uri uri = getIntent().getData();
-                    Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-                    startManagingCursor(cursor);
-                    cursor.moveToFirst();
-
-                    mRawCard = mCardPersister.readCard(cursor);
+                    long cardId = getIntent().getLongExtra(EXTRA_CARD_ID, -1);
+                    mRawCard = mCardSerializer.deserialize(mCardPersister.getCard(cardId).data());
                     mCard = mRawCard.parse();
                     mTransitInfo = mTransitFactoryRegistry.parseTransitInfo(mCard);
 

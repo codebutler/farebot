@@ -22,55 +22,63 @@
 
 package com.codebutler.farebot.util;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.BuildConfig;
 import com.codebutler.farebot.card.RawCard;
-import com.codebutler.farebot.card.provider.CardDBHelper;
+import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.persist.CardPersister;
+import com.codebutler.farebot.persist.model.SavedCard;
+import com.google.common.base.Function;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 public class ExportHelper {
 
-    @NonNull private final Context mContext;
     @NonNull private final CardPersister mCardPersister;
+    @NonNull private final CardSerializer mCardSerializer;
     @NonNull private final Gson mGson;
 
-    public ExportHelper(@NonNull Context context, @NonNull CardPersister cardPersister, @NonNull Gson gson) {
-        mContext = context;
+    public ExportHelper(
+            @NonNull CardPersister cardPersister,
+            @NonNull CardSerializer cardSerializer,
+            @NonNull Gson gson) {
         mCardPersister = cardPersister;
+        mCardSerializer = cardSerializer;
         mGson = gson;
     }
 
     @NonNull
     public String exportCards() {
-        List<RawCard> cards = new ArrayList<>();
-        Cursor cursor = CardDBHelper.createCursor(mContext);
-        while (cursor.moveToNext()) {
-            cards.add(mCardPersister.readCard(cursor));
-        }
         Export export = new Export();
         export.versionName = BuildConfig.VERSION_NAME;
         export.versionCode = BuildConfig.VERSION_CODE;
-        export.cards = cards;
+        export.cards = newArrayList(transform(mCardPersister.getCards(), new Function<SavedCard, RawCard>() {
+            @Override
+            public RawCard apply(SavedCard savedCard) {
+                return mCardSerializer.deserialize(savedCard.data());
+            }
+        }));
         return mGson.toJson(export);
     }
 
     @NonNull
-    public List<Uri> importCards(@NonNull String exportJsonString) {
-        List<Uri> uris = new ArrayList<>();
+    public List<Long> importCards(@NonNull String exportJsonString) {
+        List<Long> ids = new ArrayList<>();
         Export export = mGson.fromJson(exportJsonString, Export.class);
         for (RawCard card : export.cards) {
-            uris.add(mCardPersister.saveCard(card));
+            ids.add(mCardPersister.insertCard(SavedCard.create(
+                    card.cardType(),
+                    card.tagId().hex(),
+                    mCardSerializer.serialize(card))));
         }
-        return Collections.unmodifiableList(uris);
+        return Collections.unmodifiableList(ids);
     }
 
     @SuppressWarnings({"checkstyle:membername", "checkstyle:visibilitymodifier"})

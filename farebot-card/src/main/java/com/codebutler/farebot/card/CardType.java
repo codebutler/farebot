@@ -41,14 +41,6 @@ public enum CardType {
         mValue = value;
     }
 
-    public static CardType parseValue(String value) {
-        return CardType.class.getEnumConstants()[Integer.parseInt(value)];
-    }
-
-    public int toInteger() {
-        return mValue;
-    }
-
     public String toString() {
         switch (mValue) {
             case 0:
@@ -66,16 +58,4 @@ public enum CardType {
         }
     }
 
-    public static class GsonTypeAdapter extends TypeAdapter<CardType> {
-
-        @Override
-        public void write(JsonWriter out, CardType value) throws IOException {
-            out.value(value.name());
-        }
-
-        @Override
-        public CardType read(JsonReader in) throws IOException {
-            return CardType.parseValue(in.nextString());
-        }
-    }
 }

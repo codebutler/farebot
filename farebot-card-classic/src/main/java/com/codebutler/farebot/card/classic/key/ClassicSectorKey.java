@@ -22,47 +22,23 @@
 
 package com.codebutler.farebot.card.classic.key;
 
-import com.codebutler.farebot.core.ByteUtils;
+import android.support.annotation.NonNull;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.codebutler.farebot.core.ByteArray;
+import com.google.auto.value.AutoValue;
 
-public class ClassicSectorKey {
+@AutoValue
+public abstract class ClassicSectorKey {
 
     public static final String TYPE_KEYA = "KeyA";
     public static final String TYPE_KEYB = "KeyB";
 
-    private static final String TYPE = "type";
-    private static final String KEY = "key";
-
-    private String mType;
-    private byte[] mKey;
-
-    ClassicSectorKey(String type, byte[] key) {
-        mType = type;
-        mKey = key;
+    @NonNull
+    public static ClassicSectorKey create(@NonNull String keyType, @NonNull byte[] key) {
+        return new AutoValue_ClassicSectorKey(keyType, ByteArray.create(key));
     }
 
-    static ClassicSectorKey fromJSON(JSONObject json) throws JSONException {
-        return new ClassicSectorKey(json.getString(TYPE), ByteUtils.hexStringToByteArray(json.getString(KEY)));
-    }
+    public abstract String getType();
 
-    public String getType() {
-        return mType;
-    }
-
-    public byte[] getKey() {
-        return mKey;
-    }
-
-    JSONObject toJSON() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put(TYPE, mType);
-            json.put(KEY, ByteUtils.getHexString(mKey));
-            return json;
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+    public abstract ByteArray getKey();
 }

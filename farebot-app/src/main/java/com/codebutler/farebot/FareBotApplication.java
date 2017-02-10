@@ -33,12 +33,21 @@ import com.codebutler.farebot.card.cepas.CEPASTypeAdapterFactory;
 import com.codebutler.farebot.card.classic.ClassicTypeAdapterFactory;
 import com.codebutler.farebot.card.desfire.DesfireTypeAdapterFactory;
 import com.codebutler.farebot.card.felica.FelicaTypeAdapterFactory;
-import com.codebutler.farebot.card.serialize.CardJsonSerializer;
 import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.card.ultralight.UltralightTypeAdapterFactory;
 import com.codebutler.farebot.core.ByteArray;
 import com.codebutler.farebot.core.gson.EpochDateTypeAdapter;
+import com.codebutler.farebot.serialize.CardKeysSerializer;
+import com.codebutler.farebot.persist.CardKeysPersister;
 import com.codebutler.farebot.persist.CardPersister;
+import com.codebutler.farebot.persist.db.DbCardKeysPersister;
+import com.codebutler.farebot.persist.db.DbCardPersister;
+import com.codebutler.farebot.persist.db.FareBotOpenHelper;
+import com.codebutler.farebot.serialize.gson.CardKeysGsonTypeAdapterFactory;
+import com.codebutler.farebot.serialize.gson.CardTypeGsonTypeAdapter;
+import com.codebutler.farebot.serialize.gson.GsonCardKeysSerializer;
+import com.codebutler.farebot.serialize.gson.GsonCardSerializer;
+import com.codebutler.farebot.serialize.gson.RawCardGsonTypeAdapterFactory;
 import com.codebutler.farebot.util.ExportHelper;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
@@ -53,9 +62,11 @@ public class FareBotApplication extends Application implements CardUiDependencie
     public static final String PREF_LAST_READ_ID = "last_read_id";
     public static final String PREF_LAST_READ_AT = "last_read_at";
 
-    private CardJsonSerializer mCardJsonSerializer;
-    private ExportHelper mExportHelper;
     private CardPersister mCardPersister;
+    private CardSerializer mCardSerializer;
+    private CardKeysPersister mCardKeysPersister;
+    private CardKeysSerializer mCardKeysSerializer;
+    private ExportHelper mExportHelper;
     private TagReaderFactory mTagReaderFactory;
     private TransitFactoryRegistry mTransitFactoryRegistry;
 
@@ -70,16 +81,21 @@ public class FareBotApplication extends Application implements CardUiDependencie
                 .registerTypeAdapterFactory(DesfireTypeAdapterFactory.create())
                 .registerTypeAdapterFactory(FelicaTypeAdapterFactory.create())
                 .registerTypeAdapterFactory(UltralightTypeAdapterFactory.create())
-                .registerTypeAdapterFactory(new RawCardTypeAdapterFactory())
+                .registerTypeAdapterFactory(new RawCardGsonTypeAdapterFactory())
+                .registerTypeAdapterFactory(new CardKeysGsonTypeAdapterFactory())
                 .registerTypeAdapter(ByteArray.class, new ByteArray.GsonTypeAdapter())
-                .registerTypeAdapter(CardType.class, new CardType.GsonTypeAdapter())
+                .registerTypeAdapter(CardType.class, new CardTypeGsonTypeAdapter())
                 .create();
 
-        mCardJsonSerializer = new CardJsonSerializer(gson);
+        mCardSerializer = new GsonCardSerializer(gson);
+        mCardKeysSerializer = new GsonCardKeysSerializer(gson);
 
-        mCardPersister = new CardPersister(this, mCardJsonSerializer);
-        mExportHelper = new ExportHelper(this, mCardPersister, gson);
-        mTagReaderFactory = new TagReaderFactory(this);
+        FareBotOpenHelper openHelper = new FareBotOpenHelper(this);
+        mCardPersister = new DbCardPersister(openHelper);
+        mCardKeysPersister = new DbCardKeysPersister(openHelper);
+
+        mExportHelper = new ExportHelper(mCardPersister, mCardSerializer, gson);
+        mTagReaderFactory = new TagReaderFactory();
 
         mTransitFactoryRegistry = new TransitFactoryRegistry(this);
 
@@ -99,13 +115,23 @@ public class FareBotApplication extends Application implements CardUiDependencie
     }
 
     @NonNull
-    public CardSerializer getCardSerializer() {
-        return mCardJsonSerializer;
+    public CardPersister getCardPersister() {
+        return mCardPersister;
     }
 
     @NonNull
-    public CardPersister getCardPersister() {
-        return mCardPersister;
+    public CardSerializer getCardSerializer() {
+        return mCardSerializer;
+    }
+
+    @NonNull
+    public CardKeysPersister getCardKeysPersister() {
+        return mCardKeysPersister;
+    }
+
+    @NonNull
+    public CardKeysSerializer getCardKeysSerializer() {
+        return mCardKeysSerializer;
     }
 
     @NonNull

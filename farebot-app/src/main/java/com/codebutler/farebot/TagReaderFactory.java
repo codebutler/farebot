@@ -22,31 +22,30 @@
 
 package com.codebutler.farebot;
 
-import android.content.Context;
 import android.nfc.Tag;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.UnsupportedTagException;
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.cepas.CEPASTagReader;
 import com.codebutler.farebot.card.classic.ClassicTagReader;
+import com.codebutler.farebot.card.classic.key.ClassicCardKeys;
 import com.codebutler.farebot.card.desfire.DesfireTagReader;
 import com.codebutler.farebot.card.felica.FelicaTagReader;
 import com.codebutler.farebot.card.ultralight.UltralightTagReader;
 import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.core.UnsupportedTagException;
+import com.codebutler.farebot.key.CardKeys;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 public class TagReaderFactory {
 
-    @NonNull private final Context mContext;
-
-    public TagReaderFactory(@NonNull Context context) {
-        mContext = context;
-    }
-
     @NonNull
-    public TagReader getTagReader(@NonNull byte[] tagId, @NonNull Tag tag) throws UnsupportedTagException {
+    public TagReader getTagReader(
+            @NonNull byte[] tagId,
+            @NonNull Tag tag,
+            @Nullable CardKeys cardKeys) throws UnsupportedTagException {
         String[] techs = tag.getTechList();
         if (ArrayUtils.contains(techs, "android.nfc.tech.IsoDep")) {
             return new DesfireTagReader(tagId, tag);
@@ -55,7 +54,7 @@ public class TagReaderFactory {
         } else if (ArrayUtils.contains(techs, "android.nfc.tech.NfcF")) {
             return new FelicaTagReader(tagId, tag);
         } else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareClassic")) {
-            return new ClassicTagReader(mContext, tagId, tag);
+            return new ClassicTagReader(tagId, tag, (ClassicCardKeys) cardKeys);
         } else if (ArrayUtils.contains(techs, "android.nfc.tech.MifareUltralight")) {
             return new UltralightTagReader(tagId, tag);
         } else {

@@ -25,6 +25,7 @@ package com.codebutler.farebot.card.desfire;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.desfire.raw.RawDesfireApplication;
@@ -32,6 +33,7 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireCard;
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFile;
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData;
+import com.codebutler.farebot.key.CardKeys;
 
 import java.io.IOException;
 import java.security.AccessControlException;
@@ -45,10 +47,10 @@ import static com.codebutler.farebot.card.desfire.DesfireFileSettings.LINEAR_REC
 import static com.codebutler.farebot.card.desfire.DesfireFileSettings.STANDARD_DATA_FILE;
 import static com.codebutler.farebot.card.desfire.DesfireFileSettings.VALUE_FILE;
 
-public class DesfireTagReader extends TagReader<IsoDep, RawDesfireCard> {
+public class DesfireTagReader extends TagReader<IsoDep, RawDesfireCard, CardKeys> {
 
     public DesfireTagReader(@NonNull byte[] tagId, @NonNull Tag tag) {
-        super(tagId, tag);
+        super(tagId, tag, null);
     }
 
     @NonNull
@@ -59,7 +61,11 @@ public class DesfireTagReader extends TagReader<IsoDep, RawDesfireCard> {
 
     @Override
     @NonNull
-    protected RawDesfireCard readTag(@NonNull byte[] tagId, @NonNull Tag tag, @NonNull IsoDep tech) throws Exception {
+    protected RawDesfireCard readTag(
+            @NonNull byte[] tagId,
+            @NonNull Tag tag,
+            @NonNull IsoDep tech,
+            @Nullable CardKeys cardKeys) throws Exception {
         DesfireProtocol desfireProtocol = new DesfireProtocol(tech);
         List<RawDesfireApplication> apps = readApplications(desfireProtocol);
         RawDesfireManufacturingData manufData = desfireProtocol.getManufacturingData();

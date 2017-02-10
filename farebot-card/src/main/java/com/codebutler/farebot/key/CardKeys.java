@@ -1,10 +1,10 @@
 /*
- * CardJsonSerializer.java
+ * CardKeys.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2012, 2014, 2016 Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,30 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.card.serialize;
+package com.codebutler.farebot.key;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.RawCard;
-import com.google.gson.Gson;
+import com.codebutler.farebot.card.CardType;
 
-public class CardJsonSerializer implements CardSerializer {
+public interface CardKeys {
 
-    @NonNull private final Gson mGson;
-
-    public CardJsonSerializer(@NonNull Gson gson) {
-        mGson = gson;
-    }
-
-    @Override
     @NonNull
-    public String serialize(@NonNull RawCard card) {
-        return mGson.toJson(card);
-    }
-
-    @Override
-    @NonNull
-    public RawCard deserialize(@NonNull String json) {
-        return mGson.fromJson(json, RawCard.class);
-    }
+    CardType cardType();
 }

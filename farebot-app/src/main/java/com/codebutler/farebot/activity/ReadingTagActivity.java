@@ -27,7 +27,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.AsyncTask;
@@ -36,12 +35,18 @@ import android.preference.PreferenceManager;
 
 import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.TagReaderFactory;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.TagReader;
-import com.codebutler.farebot.TagReaderFactory;
-import com.codebutler.farebot.core.UnsupportedTagException;
+import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.core.UnsupportedTagException;
+import com.codebutler.farebot.key.CardKeys;
+import com.codebutler.farebot.serialize.CardKeysSerializer;
+import com.codebutler.farebot.persist.CardKeysPersister;
 import com.codebutler.farebot.persist.CardPersister;
+import com.codebutler.farebot.persist.model.SavedCard;
+import com.codebutler.farebot.persist.model.SavedKey;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.Date;
@@ -49,6 +54,9 @@ import java.util.Date;
 public class ReadingTagActivity extends Activity {
 
     private CardPersister mCardPersister;
+    private CardSerializer mCardSerializer;
+    private CardKeysPersister mCardKeysPersister;
+    private CardKeysSerializer mCardKeysSerializer;
     private TagReaderFactory mTagReaderFactory;
 
     @Override
@@ -58,6 +66,9 @@ public class ReadingTagActivity extends Activity {
 
         FareBotApplication app = (FareBotApplication) getApplication();
         mCardPersister = app.getCardPersister();
+        mCardSerializer = app.getCardSerializer();
+        mCardKeysPersister = app.getCardKeysPersister();
+        mCardKeysSerializer = app.getCardKeysSerializer();
         mTagReaderFactory = app.getTagReaderFactory();
 
         resolveIntent(getIntent());
@@ -84,13 +95,16 @@ public class ReadingTagActivity extends Activity {
                 return;
             }
 
-            new AsyncTask<Void, String, Uri>() {
+            new AsyncTask<Void, String, Long>() {
                 private Exception mException;
 
                 @Override
-                protected Uri doInBackground(Void... params) {
+                protected Long doInBackground(Void... params) {
                     try {
-                        TagReader tagReader = mTagReaderFactory.getTagReader(tagId, tag);
+                        SavedKey savedKey = mCardKeysPersister.getForTagId(ByteUtils.getHexString(tagId));
+                        CardKeys cardKeys = savedKey != null ? mCardKeysSerializer.deserialize(savedKey.key_data()) : null;
+
+                        TagReader tagReader = mTagReaderFactory.getTagReader(tagId, tag, cardKeys);
 
                         RawCard card = tagReader.readTag();
 
@@ -102,7 +116,10 @@ public class ReadingTagActivity extends Activity {
                         prefs.putLong(FareBotApplication.PREF_LAST_READ_AT, new Date().getTime());
                         prefs.apply();
 
-                        return mCardPersister.saveCard(card);
+                        return mCardPersister.insertCard(SavedCard.create(
+                                card.cardType(),
+                                card.tagId().hex(),
+                                mCardSerializer.serialize(card)));
                     } catch (Exception ex) {
                         mException = ex;
                         return null;
@@ -110,11 +127,9 @@ public class ReadingTagActivity extends Activity {
                 }
 
                 @Override
-                protected void onPostExecute(Uri cardUri) {
+                protected void onPostExecute(Long cardId) {
                     if (mException == null) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, cardUri);
-                        intent.putExtra(CardInfoActivity.SPEAK_BALANCE_EXTRA, true);
-                        startActivity(intent);
+                        startActivity(CardInfoActivity.newIntent(ReadingTagActivity.this, cardId));
                         finish();
                         return;
                     }

@@ -25,17 +25,25 @@ package com.codebutler.farebot.card;
 import android.nfc.Tag;
 import android.nfc.tech.TagTechnology;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.codebutler.farebot.key.CardKeys;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class TagReader<T extends TagTechnology, C extends RawCard> {
+public abstract class TagReader<
+        T extends TagTechnology,
+        C extends RawCard,
+        K extends CardKeys> {
 
     @NonNull private final byte[] mTagId;
     @NonNull private final Tag mTag;
+    @Nullable private final K mCardKeys;
 
-    public TagReader(@NonNull byte[] tagId, @NonNull Tag tag) {
+    public TagReader(@NonNull byte[] tagId, @NonNull Tag tag, @Nullable K cardKeys) {
         mTagId = tagId;
         mTag = tag;
+        mCardKeys = cardKeys;
     }
 
     @NonNull
@@ -43,7 +51,7 @@ public abstract class TagReader<T extends TagTechnology, C extends RawCard> {
         T tech = getTech(mTag);
         try {
             tech.connect();
-            return readTag(mTagId, mTag, tech);
+            return readTag(mTagId, mTag, tech, mCardKeys);
         } finally {
             if (tech.isConnected()) {
                 IOUtils.closeQuietly(tech);
@@ -55,7 +63,8 @@ public abstract class TagReader<T extends TagTechnology, C extends RawCard> {
     protected abstract C readTag(
             @NonNull byte[] tagId,
             @NonNull Tag tag,
-            @NonNull T tech)
+            @NonNull T tech,
+            @Nullable K cardKeys)
     throws Exception;
 
     @NonNull

@@ -1,10 +1,10 @@
 /*
- * CardsTableColumns.java
+ * CardJsonSerializer.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2011-2012, 2015-2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,18 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.card.provider;
+package com.codebutler.farebot.serialize.gson;
 
-import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 
-public class CardsTableColumns implements BaseColumns {
+import com.codebutler.farebot.card.RawCard;
+import com.codebutler.farebot.card.serialize.CardSerializer;
+import com.google.gson.Gson;
 
-    public static final String TYPE = "type";
-    public static final String TAG_SERIAL = "serial";
-    public static final String DATA = "data";
-    public static final String SCANNED_AT = "scanned_at";
+public class GsonCardSerializer implements CardSerializer {
 
-    static final String TABLE_NAME = "cards";
+    @NonNull private final Gson mGson;
 
-    private CardsTableColumns() { }
+    public GsonCardSerializer(@NonNull Gson gson) {
+        mGson = gson;
+    }
+
+    @Override
+    @NonNull
+    public String serialize(@NonNull RawCard card) {
+        return mGson.toJson(card);
+    }
+
+    @Override
+    @NonNull
+    public RawCard deserialize(@NonNull String json) {
+        return mGson.fromJson(json, RawCard.class);
+    }
 }

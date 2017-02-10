@@ -25,7 +25,6 @@ package com.codebutler.farebot.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
@@ -40,12 +39,15 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.codebutler.farebot.FareBotApplication;
 import com.codebutler.farebot.R;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys;
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey;
 import com.codebutler.farebot.core.ByteUtils;
-import com.codebutler.farebot.card.provider.CardKeyProvider;
-import com.codebutler.farebot.card.provider.KeysTableColumns;
+import com.codebutler.farebot.serialize.CardKeysSerializer;
+import com.codebutler.farebot.persist.CardKeysPersister;
+import com.codebutler.farebot.persist.model.SavedKey;
 import com.codebutler.farebot.util.BetterAsyncTask;
 import com.codebutler.farebot.util.Utils;
 
@@ -70,15 +72,22 @@ public class AddKeyActivity extends Activity {
             new String[]{NfcF.class.getName()}
     };
 
+    private CardKeysPersister mCardKeysPersister;
+    private CardKeysSerializer mCardKeysSerializer;
+
     private byte[] mKeyData;
     private String mTagId;
-    private String mCardType;
+    private CardType mCardType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_key);
         getWindow().setLayout(WRAP_CONTENT, MATCH_PARENT);
+
+        FareBotApplication app = (FareBotApplication) getApplication();
+        mCardKeysPersister = app.getCardKeysPersister();
+        mCardKeysSerializer = app.getCardKeysSerializer();
 
         findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,23 +103,16 @@ public class AddKeyActivity extends Activity {
                 final String keyType = ((RadioButton) findViewById(R.id.is_key_a)).isChecked()
                         ? ClassicSectorKey.TYPE_KEYA : ClassicSectorKey.TYPE_KEYB;
 
-                new BetterAsyncTask<Void>(AddKeyActivity.this, true, false) {
+                new BetterAsyncTask<Long>(AddKeyActivity.this, true, false) {
                     @Override
-                    protected Void doInBackground() throws Exception {
+                    protected Long doInBackground() throws Exception {
                         ClassicCardKeys keys = ClassicCardKeys.fromDump(keyType, mKeyData);
-
-                        ContentValues values = new ContentValues();
-                        values.put(KeysTableColumns.CARD_ID, mTagId);
-                        values.put(KeysTableColumns.CARD_TYPE, mCardType);
-                        values.put(KeysTableColumns.KEY_DATA, keys.toJSON().toString());
-
-                        getContentResolver().insert(CardKeyProvider.getContentUri(AddKeyActivity.this), values);
-
-                        return null;
+                        SavedKey savedKey = SavedKey.create(mTagId, mCardType, mCardKeysSerializer.serialize(keys));
+                        return mCardKeysPersister.insert(savedKey);
                     }
 
                     @Override
-                    protected void onResult(Void unused) {
+                    protected void onResult(Long id) {
                         Intent intent = new Intent(AddKeyActivity.this, KeysActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
@@ -158,7 +160,7 @@ public class AddKeyActivity extends Activity {
         mTagId = ByteUtils.getHexString(tag.getId(), "");
 
         if (ArrayUtils.contains(tag.getTechList(), "android.nfc.tech.MifareClassic")) {
-            mCardType = "MifareClassic";
+            mCardType = CardType.MifareClassic;
             ((TextView) findViewById(R.id.card_type)).setText(R.string.mifare_classic);
             ((TextView) findViewById(R.id.card_id)).setText(mTagId);
             ((TextView) findViewById(R.id.key_data)).setText(ByteUtils.getHexString(mKeyData, "").toUpperCase());

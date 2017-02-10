@@ -25,20 +25,22 @@ package com.codebutler.farebot.card.cepas;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.cepas.raw.RawCEPASCard;
 import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory;
 import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse;
+import com.codebutler.farebot.key.CardKeys;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CEPASTagReader extends TagReader<IsoDep, RawCEPASCard> {
+public class CEPASTagReader extends TagReader<IsoDep, RawCEPASCard, CardKeys> {
 
     public CEPASTagReader(@NonNull byte[] tagId, @NonNull Tag tag) {
-        super(tagId, tag);
+        super(tagId, tag, null);
     }
 
     @NonNull
@@ -49,7 +51,11 @@ public class CEPASTagReader extends TagReader<IsoDep, RawCEPASCard> {
 
     @NonNull
     @Override
-    protected RawCEPASCard readTag(@NonNull byte[] tagId, @NonNull Tag tag, @NonNull IsoDep tech) throws Exception {
+    protected RawCEPASCard readTag(
+            @NonNull byte[] tagId,
+            @NonNull Tag tag,
+            @NonNull IsoDep tech,
+            @Nullable CardKeys cardKeys) throws Exception {
         List<RawCEPASPurse> purses = new ArrayList<>(16);
         List<RawCEPASHistory> histories = new ArrayList<>(16);
 

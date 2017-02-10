@@ -1,4 +1,4 @@
-package com.codebutler.farebot;
+package com.codebutler.farebot.serialize.gson;
 
 import android.support.annotation.NonNull;
 
@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RawCardTypeAdapterFactory implements TypeAdapterFactory {
+public class RawCardGsonTypeAdapterFactory implements TypeAdapterFactory {
 
-    static final Map<CardType, Class<? extends RawCard>> CLASSES
+    private static final Map<CardType, Class<? extends RawCard>> CLASSES
             = ImmutableMap.<CardType, Class<? extends RawCard>>builder()
             .put(CardType.MifareDesfire, RawDesfireCard.class)
             .put(CardType.MifareClassic, RawClassicCard.class)
@@ -35,8 +35,6 @@ public class RawCardTypeAdapterFactory implements TypeAdapterFactory {
             .put(CardType.CEPAS, RawCEPASCard.class)
             .put(CardType.FeliCa, RawFelicaCard.class)
             .build();
-
-    static final String KEY_CARD_TYPE = "cardType";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -54,6 +52,8 @@ public class RawCardTypeAdapterFactory implements TypeAdapterFactory {
     }
 
     private static class RawCardTypeAdapter extends TypeAdapter<RawCard> {
+
+        private static final String KEY_CARD_TYPE = "cardType";
 
         @NonNull private final Map<CardType, TypeAdapter<RawCard>> mDelegates;
 
@@ -73,7 +73,7 @@ public class RawCardTypeAdapterFactory implements TypeAdapterFactory {
         public RawCard read(JsonReader in) throws IOException {
             JsonElement rootElement = Streams.parse(in);
             JsonElement typeElement = rootElement.getAsJsonObject().remove(KEY_CARD_TYPE);
-            CardType cardType = Enum.valueOf(CardType.class, typeElement.getAsString());
+            CardType cardType = CardType.valueOf(typeElement.getAsString());
             TypeAdapter<RawCard> delegateAdapter = mDelegates.get(cardType);
             return delegateAdapter.fromJsonTree(rootElement);
         }

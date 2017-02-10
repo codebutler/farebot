@@ -25,20 +25,22 @@ package com.codebutler.farebot.card.ultralight;
 import android.nfc.Tag;
 import android.nfc.tech.MifareUltralight;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard;
 import com.codebutler.farebot.core.UnsupportedTagException;
+import com.codebutler.farebot.key.CardKeys;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class UltralightTagReader extends TagReader<MifareUltralight, RawUltralightCard> {
+public class UltralightTagReader extends TagReader<MifareUltralight, RawUltralightCard, CardKeys> {
 
     public UltralightTagReader(@NonNull byte[] tagId, @NonNull Tag tag) {
-        super(tagId, tag);
+        super(tagId, tag, null);
     }
 
     @NonNull
@@ -52,7 +54,8 @@ public class UltralightTagReader extends TagReader<MifareUltralight, RawUltralig
     protected RawUltralightCard readTag(
             @NonNull byte[] tagId,
             @NonNull Tag tag,
-            @NonNull MifareUltralight tech) throws Exception {
+            @NonNull MifareUltralight tech,
+            @Nullable CardKeys cardKeys) throws Exception {
         int size;
         switch (tech.getType()) {
             case MifareUltralight.TYPE_ULTRALIGHT:

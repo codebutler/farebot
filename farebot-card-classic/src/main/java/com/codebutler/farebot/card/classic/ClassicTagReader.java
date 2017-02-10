@@ -23,13 +23,12 @@
 
 package com.codebutler.farebot.card.classic;
 
-import android.content.Context;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.TagReader;
-import com.codebutler.farebot.card.classic.key.CardKeysFactory;
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys;
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey;
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock;
@@ -41,16 +40,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
+public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard, ClassicCardKeys> {
 
-    private static final byte[] PREAMBLE_KEY = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00};
+    private static final byte[] PREAMBLE_KEY = {
+            (byte) 0x00,
+            (byte) 0x00,
+            (byte) 0x00,
+            (byte) 0x00,
+            (byte) 0x00,
+            (byte) 0x00
+    };
 
-    @NonNull private final CardKeysFactory mCardKeysFactory;
-
-    public ClassicTagReader(@NonNull Context context, @NonNull byte[] tagId, @NonNull Tag tag) {
-        super(tagId, tag);
-        mCardKeysFactory = new CardKeysFactory(context);
+    public ClassicTagReader(@NonNull byte[] tagId, @NonNull Tag tag, @Nullable ClassicCardKeys cardKeys) {
+        super(tagId, tag, cardKeys);
     }
 
     @NonNull
@@ -64,9 +66,8 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
     protected RawClassicCard readTag(
             @NonNull byte[] tagId,
             @NonNull Tag tag,
-            @NonNull MifareClassic tech) throws Exception {
-        ClassicCardKeys keys = (ClassicCardKeys) mCardKeysFactory.forTagId(tagId);
-
+            @NonNull MifareClassic tech,
+            @Nullable ClassicCardKeys keys) throws Exception {
         List<RawClassicSector> sectors = new ArrayList<>();
 
         for (int sectorIndex = 0; sectorIndex < tech.getSectorCount(); sectorIndex++) {
@@ -88,9 +89,9 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
                         ClassicSectorKey sectorKey = keys.keyForSector(sectorIndex);
                         if (sectorKey != null) {
                             if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey());
+                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey().bytes());
                             } else {
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey());
+                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey().bytes());
                             }
                         }
                     }
@@ -100,20 +101,20 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard> {
                         //
                         // This takes longer, of course, but means that users aren't scratching
                         // their heads when we don't get the right key straight away.
-                        ClassicSectorKey[] cardKeys = keys.keys();
+                        List<ClassicSectorKey> cardKeys = keys.getKeys();
 
-                        for (int keyIndex = 0; keyIndex < cardKeys.length; keyIndex++) {
+                        for (int keyIndex = 0; keyIndex < cardKeys.size(); keyIndex++) {
                             if (keyIndex == sectorIndex) {
                                 // We tried this before
                                 continue;
                             }
 
-                            if (cardKeys[keyIndex].getType().equals(ClassicSectorKey.TYPE_KEYA)) {
+                            if (cardKeys.get(keyIndex).getType().equals(ClassicSectorKey.TYPE_KEYA)) {
                                 authSuccess = tech.authenticateSectorWithKeyA(sectorIndex,
-                                        cardKeys[keyIndex].getKey());
+                                        cardKeys.get(keyIndex).getKey().bytes());
                             } else {
                                 authSuccess = tech.authenticateSectorWithKeyB(sectorIndex,
-                                        cardKeys[keyIndex].getKey());
+                                        cardKeys.get(keyIndex).getKey().bytes());
                             }
 
                             if (authSuccess) {

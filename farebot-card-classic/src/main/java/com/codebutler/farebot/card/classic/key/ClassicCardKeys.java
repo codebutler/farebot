@@ -23,44 +23,36 @@
 
 package com.codebutler.farebot.card.classic.key;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.key.CardKeys;
+import com.google.auto.value.AutoValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ClassicCardKeys implements CardKeys {
+@AutoValue
+public abstract class ClassicCardKeys implements CardKeys {
 
-    private static final String KEYS = "keys";
     private static final int KEY_LEN = 6;
 
-    private ClassicSectorKey[] mSectorKeys;
-
-    private ClassicCardKeys(ClassicSectorKey[] sectorKeys) {
-        mSectorKeys = sectorKeys;
-    }
-
+    @NonNull
     public static ClassicCardKeys fromDump(String keyType, byte[] keyData) {
         List<ClassicSectorKey> keys = new ArrayList<>();
-
         int numSectors = keyData.length / KEY_LEN;
         for (int i = 0; i < numSectors; i++) {
             int start = i * KEY_LEN;
-            keys.add(new ClassicSectorKey(keyType, Arrays.copyOfRange(keyData, start, start + KEY_LEN)));
+            keys.add(ClassicSectorKey.create(keyType, Arrays.copyOfRange(keyData, start, start + KEY_LEN)));
         }
-
-        return new ClassicCardKeys(keys.toArray(new ClassicSectorKey[keys.size()]));
+        return ClassicCardKeys.create(keys);
     }
 
-    public static ClassicCardKeys fromJSON(JSONObject json) throws JSONException {
-        JSONArray keysJson = json.getJSONArray(KEYS);
-        ClassicSectorKey[] sectorKeys = new ClassicSectorKey[keysJson.length()];
-        for (int i = 0; i < keysJson.length(); i++) {
-            sectorKeys[i] = ClassicSectorKey.fromJSON(keysJson.getJSONObject(i));
-        }
-        return new ClassicCardKeys(sectorKeys);
+    @NonNull
+    public static ClassicCardKeys create(@NonNull List<ClassicSectorKey> keys) {
+        return new AutoValue_ClassicCardKeys(CardType.MifareClassic, keys);
     }
 
     /**
@@ -70,30 +62,14 @@ public class ClassicCardKeys implements CardKeys {
      * @return A ClassicSectorKey for that sector, or null if there is no known key or the value is
      * out of range.
      */
+    @Nullable
     public ClassicSectorKey keyForSector(int sectorNumber) {
-        if (sectorNumber >= mSectorKeys.length) {
+        List<ClassicSectorKey> keys = getKeys();
+        if (sectorNumber >= keys.size()) {
             return null;
         }
-        return mSectorKeys[sectorNumber];
+        return keys.get(sectorNumber);
     }
 
-    public ClassicSectorKey[] keys() {
-        return mSectorKeys.clone();
-    }
-
-    @Override
-    public JSONObject toJSON() {
-        try {
-            JSONArray keysJson = new JSONArray();
-            for (ClassicSectorKey key : mSectorKeys) {
-                keysJson.put(key.toJSON());
-            }
-
-            JSONObject json = new JSONObject();
-            json.put(KEYS, keysJson);
-            return json;
-        } catch (JSONException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+    public abstract List<ClassicSectorKey> getKeys();
 }

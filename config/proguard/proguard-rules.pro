@@ -22,7 +22,6 @@
 -dontnote com.google.common.collect.MapMakerInternalMap$ReferenceEntry
 
 # FareBot
--keep class com.codebutler.farebot.card.provider.BetterContentProvider**
 -keep class com.codebutler.farebot.card.desfire.ui.DesfireCardRawDataFragment
 -keep class com.codebutler.farebot.card.ultralight.ui.UltralightCardRawDataFragment
 -keep class com.codebutler.farebot.card.classic.ui.ClassicCardRawDataFragment

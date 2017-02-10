@@ -93,14 +93,7 @@
 
         <activity
             android:name=".activity.CardInfoActivity"
-            android:configChanges="keyboardHidden|orientation">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.EDIT" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/${applicationId}.card" />
-            </intent-filter>
-        </activity>
+            android:configChanges="keyboardHidden|orientation"/>
 
         <activity
             android:name=".activity.AdvancedCardInfoActivity"
@@ -132,16 +125,6 @@
             android:name=".activity.AddKeyActivity"
             android:label="@string/add_key"
             android:theme="@style/FareBotDialog"/>
-
-        <provider
-            android:name=".card.provider.CardProvider"
-            android:authorities="${applicationId}.cardprovider"
-            android:exported="false"/>
-
-        <provider
-            android:name=".card.provider.CardKeyProvider"
-            android:authorities="${applicationId}.keyprovider"
-            android:exported="false"/>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
