@@ -36,7 +36,7 @@ import com.codebutler.farebot.card.felica.FelicaTypeAdapterFactory;
 import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.card.ultralight.UltralightTypeAdapterFactory;
 import com.codebutler.farebot.core.ByteArray;
-import com.codebutler.farebot.core.gson.EpochDateTypeAdapter;
+import com.codebutler.farebot.serialize.gson.EpochDateTypeAdapter;
 import com.codebutler.farebot.serialize.CardKeysSerializer;
 import com.codebutler.farebot.persist.CardKeysPersister;
 import com.codebutler.farebot.persist.CardPersister;

@@ -184,5 +184,5 @@ public class KeysFragment extends ListFragment implements AdapterView.OnItemLong
 
         @Override
         public void onDestroyActionMode(ActionMode mode) { }
-    };
+    }
 }

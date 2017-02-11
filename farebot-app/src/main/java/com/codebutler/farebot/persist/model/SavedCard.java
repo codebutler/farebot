@@ -14,17 +14,16 @@ import java.util.Date;
 @AutoValue
 public abstract class SavedCard implements SavedCardModel {
 
-
     @NonNull
     public static final Factory<SavedCard> FACTORY = new Factory<>(new Creator<SavedCard>() {
         @Override
         public SavedCard create(
-                @Nullable Long _id,
+                @Nullable Long id,
                 @NonNull CardType type,
                 @NonNull String serial,
                 @NonNull String data,
                 @Nullable Date scanned_at) {
-            return new AutoValue_SavedCard(_id, type, serial, data, scanned_at);
+            return new AutoValue_SavedCard(id, type, serial, data, scanned_at);
         }
     }, Adapters.CARD_TYPE_ADAPTER, Adapters.DATE_ADAPTER);
 

@@ -31,4 +31,9 @@ public class CardsActivity extends FragmentWrapperActivity {
     protected Fragment createFragment() {
         return new CardsFragment();
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        getFragment().onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 }

@@ -66,7 +66,7 @@ public abstract class FragmentWrapperActivity extends Activity {
 
     protected abstract Fragment createFragment();
 
-    private Fragment getFragment() {
+    Fragment getFragment() {
         return getFragmentManager().findFragmentByTag("fragment");
     }
 }

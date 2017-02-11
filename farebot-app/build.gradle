@@ -29,6 +29,7 @@ dependencies {
     compile project(':farebot-transit-suica')
 
     compile libs.playServicesMaps
+    compile libs.gson
 
     compile(libs.crashlytics) {
         transitive = true

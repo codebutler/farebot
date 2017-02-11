@@ -43,9 +43,9 @@ public class CardKeysGsonTypeAdapterFactory implements TypeAdapterFactory {
 
     private class CardKeysTypeAdapter extends TypeAdapter<CardKeys> {
 
-        @NonNull private final Map<CardType, TypeAdapter<CardKeys>> mDelegates;
-
         private static final String KEY_CARD_TYPE = "cardType";
+
+        @NonNull private final Map<CardType, TypeAdapter<CardKeys>> mDelegates;
 
         CardKeysTypeAdapter(Map<CardType, TypeAdapter<CardKeys>> delegates) {
             mDelegates = delegates;

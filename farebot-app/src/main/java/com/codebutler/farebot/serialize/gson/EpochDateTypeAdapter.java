@@ -1,4 +1,4 @@
-package com.codebutler.farebot.core.gson;
+package com.codebutler.farebot.serialize.gson;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

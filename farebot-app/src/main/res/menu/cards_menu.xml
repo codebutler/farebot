@@ -28,12 +28,12 @@
         <menu>
             <item android:id="@+id/import_file"
                   android:title="@string/import_file" />
+            <item android:id="@+id/import_clipboard"
+                android:title="@string/import_clipboard" />
         </menu>
     </item>
     <item android:title="@string/export_all">
         <menu>
-            <item android:id="@+id/import_clipboard"
-                android:title="@string/import_clipboard" />
             <item android:id="@+id/copy"
                   android:title="@string/copy" />
             <item android:id="@+id/share"

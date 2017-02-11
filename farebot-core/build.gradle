@@ -3,7 +3,6 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
     compile libs.supportV4
-    compile libs.gson
     compile libs.commonsIO
     compile libs.commonsLang3
     compile libs.guava

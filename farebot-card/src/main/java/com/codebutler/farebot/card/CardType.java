@@ -22,12 +22,6 @@
 
 package com.codebutler.farebot.card;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
-import java.io.IOException;
-
 public enum CardType {
     MifareClassic(0),
     MifareUltralight(1),

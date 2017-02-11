@@ -18,12 +18,12 @@ public abstract class SavedKey implements SavedKeyModel {
     public static final Factory<SavedKey> FACTORY = new Factory<>(new Creator<SavedKey>() {
         @Override
         public SavedKey create(
-                @Nullable Long _id,
+                @Nullable Long id,
                 @NonNull String card_id,
                 @NonNull CardType card_type,
                 @NonNull String key_data,
                 Date created_at) {
-            return new AutoValue_SavedKey(_id, card_id, card_type, key_data, created_at);
+            return new AutoValue_SavedKey(id, card_id, card_type, key_data, created_at);
         }
     }, Adapters.CARD_TYPE_ADAPTER, Adapters.DATE_ADAPTER);
 

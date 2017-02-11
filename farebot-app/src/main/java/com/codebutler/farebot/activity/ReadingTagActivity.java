@@ -42,11 +42,11 @@ import com.codebutler.farebot.card.serialize.CardSerializer;
 import com.codebutler.farebot.core.ByteUtils;
 import com.codebutler.farebot.core.UnsupportedTagException;
 import com.codebutler.farebot.key.CardKeys;
-import com.codebutler.farebot.serialize.CardKeysSerializer;
 import com.codebutler.farebot.persist.CardKeysPersister;
 import com.codebutler.farebot.persist.CardPersister;
 import com.codebutler.farebot.persist.model.SavedCard;
 import com.codebutler.farebot.persist.model.SavedKey;
+import com.codebutler.farebot.serialize.CardKeysSerializer;
 import com.codebutler.farebot.util.Utils;
 
 import java.util.Date;
@@ -102,7 +102,9 @@ public class ReadingTagActivity extends Activity {
                 protected Long doInBackground(Void... params) {
                     try {
                         SavedKey savedKey = mCardKeysPersister.getForTagId(ByteUtils.getHexString(tagId));
-                        CardKeys cardKeys = savedKey != null ? mCardKeysSerializer.deserialize(savedKey.key_data()) : null;
+                        CardKeys cardKeys = savedKey != null
+                                ? mCardKeysSerializer.deserialize(savedKey.key_data())
+                                : null;
 
                         TagReader tagReader = mTagReaderFactory.getTagReader(tagId, tag, cardKeys);
 

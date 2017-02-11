@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
@@ -31,10 +32,13 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -63,6 +67,7 @@ import com.codebutler.farebot.util.ExportHelper;
 import com.codebutler.farebot.util.Utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -75,6 +80,7 @@ import java.util.Map;
 public class CardsFragment extends ListFragment {
 
     private static final int REQUEST_SELECT_FILE = 1;
+    private static final int REQUEST_PERMISSION_STORAGE = 2;
     private static final String FILENAME = "farebot-export.json";
 
     private final LoaderManager.LoaderCallbacks<List<SavedCard>> mLoaderCallbacks
@@ -166,10 +172,9 @@ public class CardsFragment extends ListFragment {
             int itemId = item.getItemId();
             switch (itemId) {
                 case R.id.import_file:
-                    Uri uri = Uri.fromFile(Environment.getExternalStorageDirectory());
                     Intent target = new Intent(Intent.ACTION_GET_CONTENT);
-                    target.putExtra(Intent.EXTRA_STREAM, uri);
-                    target.setType("application/json");
+                    target.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(Environment.getExternalStorageDirectory()));
+                    target.setType("*/*");
                     startActivityForResult(Intent.createChooser(target, getString(R.string.select_file)),
                             REQUEST_SELECT_FILE);
                     return true;
@@ -205,7 +210,7 @@ public class CardsFragment extends ListFragment {
         try {
             if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_SELECT_FILE) {
                 Uri uri = data.getData();
-                String json = FileUtils.readFileToString(new File(uri.getPath()));
+                String json = IOUtils.toString(getActivity().getContentResolver().openInputStream(uri));
                 onCardsImported(mExportHelper.importCards(json));
             }
         } catch (Exception ex) {
@@ -224,12 +229,40 @@ public class CardsFragment extends ListFragment {
         }
     }
 
+    /*
+    public void checkPermissionReadStorage(Context context, Activity      activity){
+}
+
+     */
     private void exportToFile() {
+        int permission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSION_STORAGE);
+        } else {
+            exportToFileWithPermission();
+        }
+    }
+
+    private void exportToFileWithPermission() {
         try {
-            FileUtils.writeStringToFile(new File(FILENAME), mExportHelper.exportCards(), "UTF-8");
+            File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+            FileUtils.writeStringToFile(file, mExportHelper.exportCards(), "UTF-8");
             Toast.makeText(getActivity(), getString(R.string.saved_to_x, FILENAME), Toast.LENGTH_SHORT).show();
         } catch (Exception ex) {
             Utils.showError(getActivity(), ex);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    exportToFileWithPermission();
+                }
+                break;
         }
     }
 
