@@ -168,6 +168,8 @@ abstract class ClipperTrip extends Trip {
                 return Mode.METRO;
             case ClipperData.AGENCY_CALTRAIN:
                 return Mode.TRAIN;
+            case ClipperData.AGENCY_CCTA:
+                return Mode.BUS;
             case ClipperData.AGENCY_GGT:
                 return Mode.BUS;
             case ClipperData.AGENCY_SAMTRANS:
