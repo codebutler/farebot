@@ -22,6 +22,21 @@ View your remaining balance, recent trips, and other information from contactles
 * [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
 * [The Noun Project][15] (Various icons)
 
+## License
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ## Supported Protocols
 
 * [CEPAS][2] (Not compatible with all devices)
@@ -46,20 +61,27 @@ View your remaining balance, recent trips, and other information from contactles
 * [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands (Requires encryption keys, not compatible with all devices)
 * [Suica][9], [ICOCA][10], [PASMO][11], [Edy][12] - Japan
 
-
 ## Supported Phones
 
 FareBot requires an NFC Android phone running 4.0.1 or later.
 
 ## Building
 
-```
-git clone https://github.com/codebutler/farebot.git
-cd farebot
-git submodule init
-git submodule update
-./gradlew assembleDebug
-```
+    $ git clone https://github.com/codebutler/farebot.git
+    $ cd farebot
+    $ git submodule update --init
+    $ ./gradlew assembleDebug
+
+## Open Source Libraries
+
+FareBot uses the following open-source libraries:
+
+* [AutoValue](https://github.com/google/auto/tree/master/value)
+* [AutoValue Gson](https://github.com/rharter/auto-value-gson)
+* [AutoValue Parcel](https://github.com/rharter/auto-value-parcel)
+* [Apache Commons](https://commons.apache.org/)
+* [Gson](https://github.com/google/gson)
+* [Guava](https://github.com/google/guava)
 
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/
