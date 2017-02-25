@@ -30,10 +30,4 @@
             android:persistent="false"
             android:key="pref_launch_from_background"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/accessibility">
-        <CheckBoxPreference
-            android:title="@string/speak_balance"
-            android:summary="@string/speak_balance_summary"
-            android:key="pref_key_speak_balance" />
-    </PreferenceCategory>
 </PreferenceScreen>

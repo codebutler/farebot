@@ -27,12 +27,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -65,30 +61,15 @@ public class CardInfoActivity extends Activity {
     public static final String EXTRA_CARD_ID = "card_id";
     public static final String EXTRA_TRANSIT_INFO = "transit_info";
 
-    static final String SPEAK_BALANCE_EXTRA = "com.codebutler.farebot.speak_balance";
-
     private static final String KEY_SELECTED_TAB = "selected_tab";
 
     private RawCard mRawCard;
     private Card mCard;
     private TransitInfo mTransitInfo;
     private TabPagerAdapter mTabsAdapter;
-    private TextToSpeech mTTS;
     private CardPersister mCardPersister;
     private CardSerializer mCardSerializer;
     private TransitFactoryRegistry mTransitFactoryRegistry;
-
-    private OnInitListener mTTSInitListener = new OnInitListener() {
-        @Override
-        public void onInit(int status) {
-            String balance = mTransitInfo.getBalanceString(getResources());
-            if (status == TextToSpeech.SUCCESS && balance != null) {
-                mTTS.speak(getString(R.string.balance_speech,
-                        mTransitInfo.getBalanceString(getResources())),
-                        TextToSpeech.QUEUE_FLUSH, null);
-            }
-        }
-    };
 
     @NonNull
     public static Intent newIntent(@NonNull Context context, long cardId) {
@@ -119,8 +100,6 @@ public class CardInfoActivity extends Activity {
 
         new AsyncTask<Void, Void, Void>() {
 
-            private boolean mSpeakBalanceEnabled;
-
             private Exception mException;
 
             @Override
@@ -130,9 +109,6 @@ public class CardInfoActivity extends Activity {
                     mRawCard = mCardSerializer.deserialize(mCardPersister.getCard(cardId).data());
                     mCard = mRawCard.parse();
                     mTransitInfo = mTransitFactoryRegistry.parseTransitInfo(mCard);
-
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CardInfoActivity.this);
-                    mSpeakBalanceEnabled = prefs.getBoolean("pref_key_speak_balance", false);
                 } catch (Exception ex) {
                     Log.e("CardInfoActivity", "Failed to read", ex);
                     mException = ex;
@@ -200,11 +176,6 @@ public class CardInfoActivity extends Activity {
 
                 if (mTransitInfo.hasUnknownStations()) {
                     findViewById(R.id.need_stations).setVisibility(View.VISIBLE);
-                }
-
-                boolean speakBalanceRequested = getIntent().getBooleanExtra(SPEAK_BALANCE_EXTRA, false);
-                if (mSpeakBalanceEnabled && speakBalanceRequested) {
-                    mTTS = new TextToSpeech(CardInfoActivity.this, mTTSInitListener);
                 }
 
                 if (savedInstanceState != null) {

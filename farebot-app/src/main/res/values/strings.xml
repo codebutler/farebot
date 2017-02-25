@@ -76,8 +76,6 @@
     <string name="scanned_at_format">Scanned at %1$s on %2$s</string>
     <string name="scanned_cards">History</string>
     <string name="share">Share</string>
-    <string name="speak_balance">Speak Balance</string>
-    <string name="speak_balance_summary">Proof of concept</string>
     <string name="subscriptions">Subscriptions</string>
     <string name="supported_cards">Supported Cards</string>
     <string name="turn_on_nfc">Please enable NFC to read card information.</string>
