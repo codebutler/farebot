@@ -23,14 +23,13 @@
 
 package com.codebutler.farebot.card.classic;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class ClassicBlock implements Parcelable {
+public abstract class ClassicBlock {
 
     public static final String TYPE_DATA = "data";
     public static final String TYPE_MANUFACTURER = "manufacturer";

@@ -23,14 +23,13 @@
 
 package com.codebutler.farebot.card.ultralight;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.ultralight.ui.UltralightCardRawDataFragment;
-import com.codebutler.farebot.core.ByteArray;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.CardHasManufacturingInfo;
-import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 import java.util.Date;
@@ -39,8 +38,6 @@ import java.util.List;
 /**
  * Utility class for reading Mifare Ultralight / Ultralight C
  */
-@CardRawDataFragmentClass(UltralightCardRawDataFragment.class)
-@CardHasManufacturingInfo(false)
 @AutoValue
 public abstract class UltralightCard extends Card {
 
@@ -71,6 +68,20 @@ public abstract class UltralightCard extends Card {
     @NonNull
     public UltralightPage getPage(int index) {
         return getPages().get(index);
+    }
+
+    @NonNull
+    @Override
+    public FareBotUiTree getAdvancedUi(Context context) {
+        FareBotUiTree.Builder builder = FareBotUiTree.builder(context);
+        FareBotUiTree.Item.Builder pagesBuilder = builder.item()
+                .title(R.string.pages);
+        for (UltralightPage page : getPages()) {
+            pagesBuilder.item()
+                    .title(context.getString(R.string.page_title_format, String.valueOf(page.getIndex())))
+                    .value(page.getData());
+        }
+        return builder.build();
     }
 
     /**

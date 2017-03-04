@@ -1,8 +1,16 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-    compile project(':farebot-core')
+    api project(':farebot-base')
+
+    api libs.supportV4
+    api libs.gson
+
+    implementation libs.guava
+
+    compileOnly libs.autoValueAnnotations
+
+    annotationProcessor libs.autoValue
 }
 
 android { }

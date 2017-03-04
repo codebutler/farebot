@@ -27,7 +27,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.classic.ClassicCard;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.card.classic.DataClassicSector;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -68,15 +68,17 @@ public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipT
         // Starting at 0×010, 8400 0000 0603 a000 13ae e401 xxxx 0e80 80e8 seems to exist on all OVC's
         // (with xxxx different).
         // http://www.ov-chipkaart.de/back-up/3-8-11/www.ov-chipkaart.me/blog/index7e09.html?page_id=132
-        byte[] blockData = classicCard.getSector(0).readBlocks(1, 1);
-        return Arrays.equals(Arrays.copyOfRange(blockData, 0, 11), OVC_HEADER);
-
+        if (classicCard.getSector(0) instanceof DataClassicSector) {
+            byte[] blockData = ((DataClassicSector) classicCard.getSector(0)).readBlocks(1, 1);
+            return Arrays.equals(Arrays.copyOfRange(blockData, 0, 11), OVC_HEADER);
+        }
+        return false;
     }
 
     @NonNull
     @Override
     public TransitIdentity parseIdentity(@NonNull ClassicCard card) {
-        String hex = ByteUtils.getHexString(card.getSector(0).getBlock(0).getData().bytes(), null);
+        String hex = ((DataClassicSector) card.getSector(0)).getBlock(0).getData().hex();
         String id = hex.substring(0, 8);
         return TransitIdentity.create("OV-chipkaart", id);
     }
@@ -84,7 +86,7 @@ public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipT
     @NonNull
     @Override
     public OVChipTransitInfo parseInfo(@NonNull ClassicCard card) {
-        OVChipIndex index = OVChipIndex.create(card.getSector(39).readBlocks(11, 4));
+        OVChipIndex index = OVChipIndex.create(((DataClassicSector) card.getSector(39)).readBlocks(11, 4));
         OVChipParser parser = new OVChipParser(card, index);
         OVChipCredit credit = parser.getCredit();
         OVChipPreamble preamble = parser.getPreamble();

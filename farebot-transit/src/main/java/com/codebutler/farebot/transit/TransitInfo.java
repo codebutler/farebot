@@ -25,15 +25,14 @@ package com.codebutler.farebot.transit;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ui.ListItem;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
 
 import java.util.List;
 
-public abstract class TransitInfo implements Parcelable {
+public abstract class TransitInfo {
 
     @NonNull
     public abstract String getBalanceString(@NonNull Resources resources);
@@ -64,7 +63,7 @@ public abstract class TransitInfo implements Parcelable {
     }
 
     @Nullable
-    public List<ListItem> getInfo(@NonNull Context context) {
+    public FareBotUiTree getAdvancedUi(@NonNull Context context) {
         return null;
     }
 }

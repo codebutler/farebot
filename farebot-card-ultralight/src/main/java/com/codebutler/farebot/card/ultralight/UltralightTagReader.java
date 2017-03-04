@@ -29,7 +29,6 @@ import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard;
-import com.codebutler.farebot.core.UnsupportedTagException;
 import com.codebutler.farebot.key.CardKeys;
 
 import java.util.ArrayList;
@@ -67,8 +66,7 @@ public class UltralightTagReader extends TagReader<MifareUltralight, RawUltralig
 
             // unknown
             default:
-                throw new UnsupportedTagException(new String[]{"Ultralight"},
-                        "Unknown Ultralight type " + tech.getType());
+                throw new IllegalArgumentException("Unknown Ultralight type " + tech.getType());
         }
 
         // Now iterate through the pages and grab all the datas

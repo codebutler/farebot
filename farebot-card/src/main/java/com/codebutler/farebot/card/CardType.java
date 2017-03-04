@@ -23,33 +23,29 @@
 package com.codebutler.farebot.card;
 
 public enum CardType {
-    MifareClassic(0),
-    MifareUltralight(1),
-    MifareDesfire(2),
-    CEPAS(3),
-    FeliCa(4);
-
-    private int mValue;
-
-    CardType(int value) {
-        mValue = value;
-    }
+    MifareClassic,
+    MifareUltralight,
+    MifareDesfire,
+    CEPAS,
+    FeliCa,
+    Sample;
 
     public String toString() {
-        switch (mValue) {
-            case 0:
+        switch (this) {
+            case MifareClassic:
                 return "MIFARE Classic";
-            case 1:
+            case MifareUltralight:
                 return "MIFARE Ultralight";
-            case 2:
+            case MifareDesfire:
                 return "MIFARE DESFire";
-            case 3:
+            case CEPAS:
                 return "CEPAS";
-            case 4:
+            case FeliCa:
                 return "FeliCa";
+            case Sample:
+                return "Sample Card";
             default:
                 return "Unknown";
         }
     }
-
 }

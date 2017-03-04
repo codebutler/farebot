@@ -1,0 +1,39 @@
+<!--
+  ic_transaction_ferry_32dp.xml
+
+  This file is part of FareBot.
+  Learn more at: https://codebutler.github.io/farebot/
+
+  Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="32dp"
+        android:height="32dp"
+        android:viewportWidth="32.0"
+        android:viewportHeight="32.0">
+    <path
+        android:pathData="M32,16C32,24.84 24.84,32 16,32C7.16,32 0,24.84 0,16C0,7.16 7.16,0 16,0C24.84,0 32,7.16 32,16Z"
+        android:strokeColor="#00000000"
+        android:fillAlpha="0.54"
+        android:fillColor="#000000"
+        android:strokeWidth="1"/>
+    <path
+        android:pathData="M24,24C22.61,24 21.22,23.53 20,22.68C17.56,24.39 14.44,24.39 12,22.68C10.78,23.53 9.39,24 8,24L6,24L6,26L8,26C9.38,26 10.74,25.65 12,25.01C14.52,26.3 17.48,26.3 20,25.01C21.26,25.66 22.62,26 24,26L26,26L26,24L24,24ZM7.95,22L8,22C9.6,22 11.02,21.12 12,20C12.98,21.12 14.4,22 16,22C17.6,22 19.02,21.12 20,20C20.98,21.12 22.4,22 24,22L24.05,22L25.94,15.32C26.02,15.06 26,14.78 25.88,14.54C25.76,14.3 25.54,14.12 25.28,14.04L24,13.62L24,9C24,7.9 23.1,7 22,7L19,7L19,4L13,4L13,7L10,7C8.9,7 8,7.9 8,9L8,13.62L6.71,14.04C6.45,14.12 6.23,14.3 6.11,14.54C5.99,14.78 5.96,15.06 6.05,15.32L7.95,22ZM10,9L22,9L22,12.97L16,11L10,12.97L10,9Z"
+        android:strokeColor="#00000000"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"/>
+</vector>

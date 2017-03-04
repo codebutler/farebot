@@ -22,9 +22,10 @@ package com.codebutler.farebot.transit.myki;
 
 import android.support.annotation.NonNull;
 
+import com.codebutler.farebot.base.util.ByteUtils;
+import com.codebutler.farebot.base.util.Luhn;
 import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.core.ByteUtils;
-import com.codebutler.farebot.core.Luhn;
+import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
@@ -38,7 +39,7 @@ public class MykiTransitFactory implements TransitFactory<DesfireCard, MykiTrans
     @NonNull
     @Override
     public TransitIdentity parseIdentity(@NonNull DesfireCard desfireCard) {
-        byte[] data = desfireCard.getApplication(4594).getFile(15).getData().bytes();
+        byte[] data = ((StandardDesfireFile) desfireCard.getApplication(4594).getFile(15)).getData().bytes();
         data = ByteUtils.reverseBuffer(data, 0, 16);
 
         long serialNumber1 = ByteUtils.getBitsFromBuffer(data, 96, 32);
@@ -50,7 +51,8 @@ public class MykiTransitFactory implements TransitFactory<DesfireCard, MykiTrans
     @Override
     public MykiTransitInfo parseInfo(@NonNull DesfireCard card) {
         try {
-            byte[] metadata = ByteUtils.reverseBuffer(card.getApplication(4594).getFile(15).getData().bytes(), 0, 16);
+            byte[] data = ((StandardDesfireFile) card.getApplication(4594).getFile(15)).getData().bytes();
+            byte[] metadata = ByteUtils.reverseBuffer(data, 0, 16);
             int serialNumber1 = ByteUtils.getBitsFromBuffer(metadata, 96, 32);
             int serialNumber2 = ByteUtils.getBitsFromBuffer(metadata, 64, 32);
             return MykiTransitInfo.create(formatSerialNumber(serialNumber1, serialNumber2));

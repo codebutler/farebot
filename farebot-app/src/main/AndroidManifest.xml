@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  AndroidManifest.xml
-
-  Copyright (C) 2011-2013 Eric Butler
-
-  Authors:
-  Eric Butler <eric@codebutler.com>
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ AndroidManifest.xml
+  ~
+  ~ This file is part of FareBot.
+  ~ Learn more at: https://codebutler.github.io/farebot/
+  ~
+  ~ Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <manifest
@@ -44,37 +44,30 @@
 
     <application
         android:label="@string/app_name"
-        android:icon="@drawable/launcher_icon"
-        android:name=".FareBotApplication"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:name="com.codebutler.farebot.app.core.app.FareBotApplication"
         android:allowBackup="true"
-        android:theme="@android:style/Theme.Material">
+        android:theme="@style/FareBot.Theme">
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.codebutler.farebot.app.feature.main.MainActivity"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/FareBot.Theme.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.EDIT" />
-                <action android:name="android.intent.action.PICK" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.dir/${applicationId}.card" />
-            </intent-filter>
         </activity>
 
         <activity
-            android:name=".activity.ReadingTagActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait"
-            android:noHistory="true"
-            android:launchMode="singleTop"/>
+            android:name="com.codebutler.farebot.app.feature.prefs.FareBotPreferenceActivity"
+            android:label="@string/preferences"
+            android:theme="@style/FareBot.Theme.Prefs"/>
 
         <activity
-            android:name=".activity.BackgroundTagActivity"
+            android:name=".app.feature.bg.BackgroundTagActivity"
             android:enabled="false"
             android:noHistory="true"
             android:configChanges="keyboardHidden|orientation"
@@ -91,47 +84,12 @@
                 android:resource="@xml/filter_nfc" />
         </activity>
 
-        <activity
-            android:name=".activity.CardInfoActivity"
-            android:configChanges="keyboardHidden|orientation"/>
-
-        <activity
-            android:name=".activity.AdvancedCardInfoActivity"
-            android:configChanges="keyboardHidden|orientation" />
-
-        <activity
-            android:name=".activity.FareBotPreferenceActivity"
-            android:label="@string/preferences" />
-
-        <activity
-            android:name=".activity.TripMapActivity"
-            android:configChanges="keyboardHidden|orientation"/>
-
-        <activity
-            android:name=".activity.SupportedCardsActivity"
-            android:label="@string/supported_cards"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".activity.CardsActivity"
-            android:label="@string/scanned_cards"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".activity.KeysActivity"
-            android:label="@string/keys" />
-
-        <activity
-            android:name=".activity.AddKeyActivity"
-            android:label="@string/add_key"
-            android:theme="@style/FareBotDialog"/>
-
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBUUm1_1cyaCLkIvcE60gF4xO3pyb6SyP4"/>
 
         <meta-data
-            android:name="com.crashlytics.ApiKey"
+            android:name="io.fabric.ApiKey"
             android:value="77d8c3509e581fb753f705c476fe3b022dda0287" />
 
         <meta-data

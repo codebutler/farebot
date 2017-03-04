@@ -25,12 +25,10 @@
 
 package com.codebutler.farebot.transit.orca;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
@@ -77,12 +75,6 @@ public abstract class OrcaTransitInfo extends TransitInfo {
     @Nullable
     @Override
     public List<Refill> getRefills() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
         return null;
     }
 

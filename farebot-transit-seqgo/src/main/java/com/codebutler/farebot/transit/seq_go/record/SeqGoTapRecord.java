@@ -23,10 +23,9 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.seq_go.SeqGoData;
 import com.codebutler.farebot.transit.seq_go.SeqGoUtil;
@@ -39,7 +38,7 @@ import java.util.GregorianCalendar;
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#tap-record-type
  */
 @AutoValue
-public abstract class SeqGoTapRecord extends SeqGoRecord implements Parcelable, Comparable<SeqGoTapRecord> {
+public abstract class SeqGoTapRecord extends SeqGoRecord implements Comparable<SeqGoTapRecord> {
 
     @NonNull
     public static SeqGoTapRecord recordFromBytes(byte[] input) {

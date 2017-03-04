@@ -24,7 +24,7 @@ package com.codebutler.farebot.card.desfire.raw;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.desfire.DesfireManufacturingData;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;

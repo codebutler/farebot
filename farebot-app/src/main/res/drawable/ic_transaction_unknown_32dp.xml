@@ -1,0 +1,38 @@
+<!--
+  ic_transaction_unknown_32dp.xml
+
+  This file is part of FareBot.
+  Learn more at: https://codebutler.github.io/farebot/
+
+  Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="32dp"
+        android:height="32dp"
+        android:viewportWidth="32.0"
+        android:viewportHeight="32.0">
+    <path
+        android:pathData="M32,16C32,24.84 24.84,32 16,32C7.16,32 0,24.84 0,16C0,7.16 7.16,0 16,0C24.84,0 32,7.16 32,16Z"
+        android:strokeColor="#00000000"
+        android:fillColor="#FFB74D"
+        android:strokeWidth="1"/>
+    <path
+        android:pathData="M15,22L17,22L17,20L15,20L15,22ZM16,6C10.48,6 6,10.48 6,16C6,21.52 10.48,26 16,26C21.52,26 26,21.52 26,16C26,10.48 21.52,6 16,6ZM16,24C11.59,24 8,20.41 8,16C8,11.59 11.59,8 16,8C20.41,8 24,11.59 24,16C24,20.41 20.41,24 16,24ZM16,10C13.79,10 12,11.79 12,14L14,14C14,12.9 14.9,12 16,12C17.1,12 18,12.9 18,14C18,16 15,15.75 15,19L17,19C17,16.75 20,16.5 20,14C20,11.79 18.21,10 16,10Z"
+        android:strokeColor="#00000000"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"/>
+</vector>

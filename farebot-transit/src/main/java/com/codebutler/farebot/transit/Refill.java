@@ -24,10 +24,9 @@
 package com.codebutler.farebot.transit;
 
 import android.content.res.Resources;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-public abstract class Refill implements Parcelable {
+public abstract class Refill {
 
     public abstract long getTimestamp();
 

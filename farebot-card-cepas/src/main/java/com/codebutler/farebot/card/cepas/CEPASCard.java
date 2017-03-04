@@ -23,16 +23,21 @@
 
 package com.codebutler.farebot.card.cepas;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteArray;
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @AutoValue
 public abstract class CEPASCard extends Card {
@@ -66,5 +71,42 @@ public abstract class CEPASCard extends Card {
     @Nullable
     public CEPASHistory getHistory(int purse) {
         return getHistories().get(purse);
+    }
+
+    @NonNull
+    @Override
+    public FareBotUiTree getAdvancedUi(Context context) {
+        FareBotUiTree.Builder cardUiBuilder = FareBotUiTree.builder(context);
+
+        FareBotUiTree.Item.Builder pursesUiBuilder = cardUiBuilder.item().title("Purses");
+        for (CEPASPurse purse : getPurses()) {
+            FareBotUiTree.Item.Builder purseUiBuilder = pursesUiBuilder.item()
+                    .title(String.format("Purse ID %s", purse.getId()));
+            purseUiBuilder.item().title("CEPAS Version").value(purse.getCepasVersion());
+            purseUiBuilder.item().title("Purse Status").value(purse.getPurseStatus());
+            purseUiBuilder.item().title("Purse Balance")
+                    .value(NumberFormat.getCurrencyInstance(Locale.US).format(purse.getPurseBalance() / 100.0));
+            purseUiBuilder.item().title("Purse Creation Date")
+                    .value(DateFormat.getDateInstance(DateFormat.LONG).format(purse.getPurseCreationDate() * 1000L));
+            purseUiBuilder.item().title("Purse Expiry Date")
+                    .value(DateFormat.getDateInstance(DateFormat.LONG).format(purse.getPurseExpiryDate() * 1000L));
+            purseUiBuilder.item().title("Autoload Amount").value(purse.getAutoLoadAmount());
+            purseUiBuilder.item().title("CAN").value(purse.getCAN());
+            purseUiBuilder.item().title("CSN").value(purse.getCSN());
+
+            FareBotUiTree.Item.Builder transactionUiBuilder
+                    = cardUiBuilder.item().title("Last Transaction Information");
+            transactionUiBuilder.item().title("TRP").value(purse.getLastTransactionTRP());
+            transactionUiBuilder.item().title("Credit TRP").value(purse.getLastCreditTransactionTRP());
+            transactionUiBuilder.item().title("Credit Header").value(purse.getLastCreditTransactionHeader());
+            transactionUiBuilder.item().title("Debit Options").value(purse.getLastTransactionDebitOptionsByte());
+
+            FareBotUiTree.Item.Builder otherUiBuilder = cardUiBuilder.item().title("Other Purse Information");
+            otherUiBuilder.item().title("Logfile Record Count").value(purse.getLogfileRecordCount());
+            otherUiBuilder.item().title("Issuer Data Length").value(purse.getIssuerDataLength());
+            otherUiBuilder.item().title("Issuer-specific Data").value(purse.getIssuerSpecificData());
+        }
+
+        return cardUiBuilder.build();
     }
 }

@@ -1,19 +1,15 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-    compile project(':nfc-felica-lib')
-    compile project(':farebot-card')
+    api project(':nfc-felica-lib')
 
-    // https://github.com/rharter/auto-value-gson/issues/80
-    apt files(androidJar(this))
+    implementation project(':farebot-card')
 
-    provided libs.autoValue
-    provided libs.autoValueGson
+    compileOnly libs.autoValueAnnotations
+    compileOnly libs.autoValueGsonAnnotations
 
-    apt libs.autoValue
-    apt libs.autoValueParcel
-    apt libs.autoValueGson
+    annotationProcessor libs.autoValue
+    annotationProcessor libs.autoValueGson
 }
 
 android { }

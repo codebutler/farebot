@@ -41,10 +41,9 @@ import com.codebutler.farebot.card.felica.FelicaDBUtil;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
+import com.google.common.primitives.Ints;
 
 import net.kazzz.felica.lib.Util;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.text.NumberFormat;
 import java.util.Date;
@@ -267,7 +266,7 @@ abstract class SuicaTrip extends Trip {
     private boolean isTVM() {
         int consoleType = getConsoleType() & 0xFF;
         int[] tvmConsoleTypes = {0x03, 0x07, 0x08, 0x12, 0x13, 0x14, 0x15};
-        return ArrayUtils.contains(tvmConsoleTypes, consoleType);
+        return Ints.contains(tvmConsoleTypes, consoleType);
     }
 
     abstract long getBalance();

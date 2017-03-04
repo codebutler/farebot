@@ -23,14 +23,13 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-abstract class OVChipPreamble implements Parcelable {
+abstract class OVChipPreamble {
 
     @NonNull
     static OVChipPreamble create(byte[] data) {

@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit.seq_go;
 
 import android.content.Context;
 
-import com.codebutler.farebot.core.DBUtil;
+import com.codebutler.farebot.base.util.DBUtil;
 
 /**
  * Database functionality for SEQ Go Cards

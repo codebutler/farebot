@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.card.felica;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
@@ -32,7 +31,7 @@ import com.google.gson.TypeAdapter;
 import java.util.List;
 
 @AutoValue
-public abstract class FelicaService implements Parcelable {
+public abstract class FelicaService {
 
     @NonNull
     public static FelicaService create(int serviceCode, @NonNull List<FelicaBlock> blocks) {

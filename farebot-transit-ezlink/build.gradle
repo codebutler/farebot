@@ -1,14 +1,16 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
+
 
 dependencies {
-    compile project(':farebot-transit')
-    compile project(':farebot-card-cepas')
+    implementation project(':farebot-transit')
+    implementation project(':farebot-card-cepas')
 
-    provided libs.autoValue
-    apt libs.autoValue
-    apt libs.autoValueParcel
-    apt libs.autoValueGson
+    implementation libs.guava
+
+    compileOnly libs.autoValueAnnotations
+
+    annotationProcessor libs.autoValue
+    annotationProcessor libs.autoValueGson
 }
 
 android { }

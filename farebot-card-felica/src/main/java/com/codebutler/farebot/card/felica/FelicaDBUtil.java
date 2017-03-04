@@ -24,7 +24,7 @@ package com.codebutler.farebot.card.felica;
 
 import android.content.Context;
 
-import com.codebutler.farebot.core.DBUtil;
+import com.codebutler.farebot.base.util.DBUtil;
 
 public class FelicaDBUtil extends DBUtil {
     public static final String COLUMN_ID = "_id";

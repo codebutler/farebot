@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+dependencies {
+    implementation libs.gson
+}
+
+checkstyle {
+    configFile file('../../config/checkstyle/checkstyle.xml')
+}

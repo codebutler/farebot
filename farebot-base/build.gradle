@@ -1,0 +1,13 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    implementation libs.guava
+    implementation libs.supportV4
+
+    compileOnly libs.autoValueAnnotations
+
+    annotationProcessor libs.autoValue
+
+}
+
+android { }

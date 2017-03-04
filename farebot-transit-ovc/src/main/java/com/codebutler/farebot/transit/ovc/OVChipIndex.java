@@ -23,16 +23,15 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 import java.util.Arrays;
 
 @AutoValue
-abstract class OVChipIndex implements Parcelable {
+abstract class OVChipIndex {
 
     @NonNull
     static OVChipIndex create(byte[] data) {

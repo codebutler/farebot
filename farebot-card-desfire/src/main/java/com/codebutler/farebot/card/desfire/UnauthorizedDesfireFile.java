@@ -25,7 +25,6 @@ package com.codebutler.farebot.card.desfire;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
 import com.google.auto.value.AutoValue;
 
 /**
@@ -45,10 +44,4 @@ public abstract class UnauthorizedDesfireFile implements DesfireFile {
 
     @NonNull
     public abstract String getErrorMessage();
-
-    @NonNull
-    @Override
-    public ByteArray getData() {
-        throw new IllegalStateException(String.format("Unauthorized access to file: %s", getErrorMessage()));
-    }
 }

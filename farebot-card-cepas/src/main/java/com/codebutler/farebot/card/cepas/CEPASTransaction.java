@@ -24,13 +24,12 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class CEPASTransaction implements Parcelable {
+public abstract class CEPASTransaction {
 
     public enum TransactionType {
         MRT,

@@ -32,14 +32,13 @@ import android.util.Log;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.felica.raw.RawFelicaCard;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ArrayUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.key.CardKeys;
 
 import net.kazzz.felica.FeliCaTag;
 import net.kazzz.felica.command.ReadResponse;
 import net.kazzz.felica.lib.FeliCaLib;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

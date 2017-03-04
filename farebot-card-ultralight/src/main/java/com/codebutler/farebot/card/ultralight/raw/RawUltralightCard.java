@@ -24,7 +24,7 @@ package com.codebutler.farebot.card.ultralight.raw;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.ultralight.UltralightCard;

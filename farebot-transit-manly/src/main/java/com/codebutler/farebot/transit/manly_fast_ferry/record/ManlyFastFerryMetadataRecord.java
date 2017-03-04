@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry.record;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 
 import java.util.Arrays;
 import java.util.Calendar;

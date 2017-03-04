@@ -26,7 +26,7 @@ package com.codebutler.farebot.transit.ovc;
 
 import android.content.Context;
 
-import com.codebutler.farebot.core.DBUtil;
+import com.codebutler.farebot.base.util.DBUtil;
 
 public class OVChipDBUtil extends DBUtil {
 

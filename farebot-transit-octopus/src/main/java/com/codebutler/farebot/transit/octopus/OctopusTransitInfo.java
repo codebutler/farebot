@@ -28,14 +28,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.codebutler.farebot.core.ui.HeaderListItem;
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -126,12 +124,17 @@ public abstract class OctopusTransitInfo extends TransitInfo {
 
     @Nullable
     @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
+    public FareBotUiTree getAdvancedUi(@NonNull Context context) {
+        // Dual-mode card, show the CNY balance here.
         if (hasOctopus() && hasShenzhen()) {
-            // Dual-mode card, show the CNY balance here.
-            return ImmutableList.of(
-                    new HeaderListItem(context.getString(R.string.octopus_alternate_purse_balances)),
-                    new ListItem(context.getString(R.string.octopus_szt), getSztBalanceString()));
+            FareBotUiTree.Builder uiBuilder = FareBotUiTree.builder(context);
+
+            FareBotUiTree.Item.Builder apbUiBuilder = uiBuilder.item()
+                    .title(R.string.octopus_alternate_purse_balances);
+
+            apbUiBuilder.item(R.string.octopus_szt, getSztBalanceString());
+
+            return uiBuilder.build();
         }
         return null;
     }

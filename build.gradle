@@ -1,22 +1,27 @@
 buildscript {
     repositories {
+        mavenLocal()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'io.fabric.tools:gradle:1.22.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'com.squareup.sqldelight:gradle-plugin:0.5.1'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha3'
+        classpath 'io.fabric.tools:gradle:1.22.1'
+        classpath 'com.squareup.sqldelight:gradle-plugin:0.6.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-5"
+        classpath "gradle.plugin.org.jmailen.gradle:kotlinter-gradle:0.9.3"
     }
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.13.0'
+    id 'com.github.ben-manes.versions' version '0.14.0'
 }
+
 
 allprojects {
     repositories {
+        mavenLocal()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
@@ -35,6 +40,8 @@ subprojects {
                 source 'src'
                 include '**/*.java'
                 exclude '**/gen/**'
+                exclude '**/IOUtils.java'
+                exclude '**/Charsets.java'
                 classpath = files()
             }
             checkstyle {
@@ -60,6 +67,10 @@ subprojects {
                 lintOptions {
                     abortOnError true
                     disable 'InvalidPackage'
+                }
+
+                dexOptions {
+                    dexInProcess = true
                 }
             }
         }

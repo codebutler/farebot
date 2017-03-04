@@ -28,9 +28,10 @@ package com.codebutler.farebot.transit.clipper;
 
 import android.support.annotation.NonNull;
 
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.card.desfire.DesfireFile;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.card.desfire.RecordDesfireFile;
+import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -58,7 +59,7 @@ public class ClipperTransitFactory implements TransitFactory<DesfireCard, Clippe
     @Override
     public TransitIdentity parseIdentity(@NonNull DesfireCard card) {
         try {
-            byte[] data = card.getApplication(0x9011f2).getFile(0x08).getData().bytes();
+            byte[] data = ((StandardDesfireFile) card.getApplication(0x9011f2).getFile(0x08)).getData().bytes();
             return TransitIdentity.create("Clipper", String.valueOf(ByteUtils.byteArrayToLong(data, 1, 4)));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing Clipper serial", ex);
@@ -71,10 +72,10 @@ public class ClipperTransitFactory implements TransitFactory<DesfireCard, Clippe
         byte[] data;
 
         try {
-            data = card.getApplication(0x9011f2).getFile(0x08).getData().bytes();
+            data = ((StandardDesfireFile) card.getApplication(0x9011f2).getFile(0x08)).getData().bytes();
             long serialNumber = ByteUtils.byteArrayToLong(data, 1, 4);
 
-            data = card.getApplication(0x9011f2).getFile(0x02).getData().bytes();
+            data = ((StandardDesfireFile) card.getApplication(0x9011f2).getFile(0x02)).getData().bytes();
             short balance = (short) (((0xFF & data[18]) << 8) | (0xFF & data[19]));
 
             List<ClipperRefill> refills = parseRefills(card);
@@ -115,7 +116,7 @@ public class ClipperTransitFactory implements TransitFactory<DesfireCard, Clippe
 
     @NonNull
     private static List<ClipperTrip> parseTrips(@NonNull DesfireCard card) {
-        DesfireFile file = card.getApplication(0x9011f2).getFile(0x0e);
+        StandardDesfireFile file = (StandardDesfireFile) card.getApplication(0x9011f2).getFile(0x0e);
         /*
          *  This file reads very much like a record file but it professes to
          *  be only a regular file.  As such, we'll need to extract the records
@@ -182,7 +183,7 @@ public class ClipperTransitFactory implements TransitFactory<DesfireCard, Clippe
 
     @NonNull
     private static List<ClipperRefill> parseRefills(@NonNull DesfireCard card) {
-        DesfireFile file = card.getApplication(0x9011f2).getFile(0x04);
+        RecordDesfireFile file = (RecordDesfireFile) card.getApplication(0x9011f2).getFile(0x04);
 
         /*
          *  This file reads very much like a record file but it professes to

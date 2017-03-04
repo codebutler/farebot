@@ -23,7 +23,6 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -34,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 @AutoValue
-public abstract class CEPASHistory implements Parcelable {
+public abstract class CEPASHistory {
 
     @NonNull
     public static CEPASHistory create(int id, @NonNull List<CEPASTransaction> transactions) {

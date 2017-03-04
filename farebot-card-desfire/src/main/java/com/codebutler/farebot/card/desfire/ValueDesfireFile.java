@@ -25,11 +25,9 @@ package com.codebutler.farebot.card.desfire;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ArrayUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Represents a value file in Desfire
@@ -45,7 +43,7 @@ public abstract class ValueDesfireFile implements DesfireFile {
         byte[] myData = ArrayUtils.clone(fileData);
         ArrayUtils.reverse(myData);
         int value = ByteUtils.byteArrayToInt(myData);
-        return new AutoValue_ValueDesfireFile(fileId, fileSettings, ByteArray.create(fileData), value);
+        return new AutoValue_ValueDesfireFile(fileId, fileSettings, value);
     }
 
     public abstract int getValue();

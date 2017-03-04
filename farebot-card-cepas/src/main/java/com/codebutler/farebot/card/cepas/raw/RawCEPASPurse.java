@@ -25,7 +25,7 @@ package com.codebutler.farebot.card.cepas.raw;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.cepas.CEPASPurse;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;

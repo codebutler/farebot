@@ -24,4 +24,6 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codebutler.farebot.card.desfire">
+
+    <uses-permission android:name="android.permission.NFC" />
 </manifest>

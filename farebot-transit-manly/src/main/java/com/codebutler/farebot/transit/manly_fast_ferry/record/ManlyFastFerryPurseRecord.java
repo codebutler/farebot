@@ -23,17 +23,16 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry.record;
 
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 /**
  * Represents a "purse" type record.
  */
 @AutoValue
-public abstract class ManlyFastFerryPurseRecord extends ManlyFastFerryRegularRecord implements Parcelable {
+public abstract class ManlyFastFerryPurseRecord extends ManlyFastFerryRegularRecord {
 
     @Nullable
     public static ManlyFastFerryPurseRecord recordFromBytes(byte[] input) {

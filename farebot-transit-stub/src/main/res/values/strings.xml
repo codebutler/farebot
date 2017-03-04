@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="locked_card">Locked Card</string>
-    <string name="card_type">Card type</string>
-    <string name="general">General</string>
-    <string name="unknown_card_description">This card is not yet supported. Only raw data can be displayed.</string>
-    <string name="unknown_card_header">Unknown card format</string>
-    <string name="unknown_more_info">More information</string>
-    <string name="unknown_more_info_desc" comment="This is used on a list item, which will direct users to FareBot's website when touched.">Touch here for more information about FareBot\'s support of this card.</string>
 </resources>

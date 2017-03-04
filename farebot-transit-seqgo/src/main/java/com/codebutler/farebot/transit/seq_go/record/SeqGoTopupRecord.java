@@ -23,10 +23,9 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.transit.seq_go.SeqGoUtil;
 import com.google.auto.value.AutoValue;
 
@@ -37,7 +36,7 @@ import java.util.GregorianCalendar;
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#top-up-record-type
  */
 @AutoValue
-public abstract class SeqGoTopupRecord extends SeqGoRecord implements Parcelable {
+public abstract class SeqGoTopupRecord extends SeqGoRecord {
 
     @NonNull
     public static SeqGoTopupRecord recordFromBytes(byte[] input) {

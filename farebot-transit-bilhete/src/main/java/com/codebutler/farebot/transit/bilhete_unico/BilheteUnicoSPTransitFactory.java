@@ -26,6 +26,7 @@ package com.codebutler.farebot.transit.bilhete_unico;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.classic.ClassicCard;
+import com.codebutler.farebot.card.classic.DataClassicSector;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
@@ -46,8 +47,11 @@ public class BilheteUnicoSPTransitFactory implements TransitFactory<ClassicCard,
 
     @Override
     public boolean check(@NonNull ClassicCard card) {
-        byte[] blockData = card.getSector(0).getBlock(0).getData().bytes();
-        return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
+        if (card.getSector(0) instanceof DataClassicSector) {
+            byte[] blockData = ((DataClassicSector) card.getSector(0)).getBlock(0).getData().bytes();
+            return Arrays.equals(Arrays.copyOfRange(blockData, 8, 16), MANUFACTURER);
+        }
+        return false;
     }
 
     @NonNull
@@ -59,7 +63,8 @@ public class BilheteUnicoSPTransitFactory implements TransitFactory<ClassicCard,
     @NonNull
     @Override
     public BilheteUnicoSPTransitInfo parseInfo(@NonNull ClassicCard card) {
-        BilheteUnicoSPCredit credit = BilheteUnicoSPCredit.create(card.getSector(8).getBlock(1).getData().bytes());
+        byte[] data = ((DataClassicSector) card.getSector(8)).getBlock(1).getData().bytes();
+        BilheteUnicoSPCredit credit = BilheteUnicoSPCredit.create(data);
         return BilheteUnicoSPTransitInfo.create(credit);
     }
 }
