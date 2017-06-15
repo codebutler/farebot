@@ -26,4 +26,4 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-script: ./gradlew assembleDebug check
+script: ./gradlew assembleDebug checkstyle lintDebug lintKotlin checkDebug
