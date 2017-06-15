@@ -3,10 +3,10 @@
 <!--
   activity_main.xml
 
-  Copyright (C) 2011 Eric Butler
+  This file is part of FareBot.
+  Learn more at: https://codebutler.github.io/farebot/
 
-  Authors:
-  Eric Butler <eric@codebutler.com>
+  Copyright (C) 2017 Eric Butler <eric@codebutler.com>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,50 +24,22 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <RelativeLayout
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_centerInParent="true"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/directions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableTop="@drawable/logo"
-                android:drawablePadding="16dp"
-                android:text="@string/directions"
-                android:textSize="45dp"
-                android:gravity="center" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_gravity="center"
-                android:gravity="center">
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/supported_cards"
-                    android:onClick="onSupportedCardsClick" />
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/scanned_cards"
-                    android:onClick="onHistoryClick" />
-            </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/toolbar_elevation"
+        app:layout_scrollFlags="scroll|enterAlways"/>
+
+    <com.wealthfront.magellan.ScreenContainer
+        android:id="@id/magellan_container"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

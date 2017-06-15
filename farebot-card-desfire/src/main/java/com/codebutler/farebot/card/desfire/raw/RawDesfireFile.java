@@ -25,7 +25,7 @@ package com.codebutler.farebot.card.desfire.raw;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings;
 import com.codebutler.farebot.card.desfire.InvalidDesfireFile;

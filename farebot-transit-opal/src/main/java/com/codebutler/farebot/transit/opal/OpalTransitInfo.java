@@ -29,14 +29,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateFormat;
 
-import com.codebutler.farebot.core.ui.HeaderListItem;
-import com.codebutler.farebot.core.ui.ListItem;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -71,34 +69,6 @@ public abstract class OpalTransitInfo extends TransitInfo {
     @Override
     public String getBalanceString(@NonNull Resources resources) {
         return NumberFormat.getCurrencyInstance(Locale.US).format((double) getBalance() / 100.);
-    }
-
-    @Nullable
-    @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
-        Resources resources = context.getResources();
-        Date cLastTransactionTime = getLastTransactionTime().getTime();
-        return new ImmutableList.Builder<ListItem>()
-                .add(new HeaderListItem(context.getString(R.string.opal_general)))
-                .add(new ListItem(context.getString(R.string.opal_weekly_trips), Integer.toString(getWeeklyTrips())))
-                .add(new ListItem(context.getString(R.string.opal_checksum), Integer.toString(getChecksum())))
-                .add(new HeaderListItem(context.getString(R.string.opal_last_transaction)))
-                .add(new ListItem(
-                        context.getString(R.string.opal_transaction_sequence),
-                        Integer.toString(getTransactionNumber())))
-                .add(new ListItem(
-                        context.getString(R.string.opal_date),
-                        DateFormat.getLongDateFormat(context).format(cLastTransactionTime)))
-                .add(new ListItem(
-                        context.getString(R.string.opal_time),
-                        DateFormat.getTimeFormat(context).format(cLastTransactionTime)))
-                .add(new ListItem(
-                        context.getString(R.string.opal_vehicle_type),
-                        getVehicleTypeName(resources, getVehicleType())))
-                .add(new ListItem(
-                        context.getString(R.string.opal_transaction_type),
-                        getActionTypeName(resources, getActionType())))
-                .build();
     }
 
     @Nullable
@@ -147,6 +117,34 @@ public abstract class OpalTransitInfo extends TransitInfo {
     @Override
     public List<Refill> getRefills() {
         return null;
+    }
+
+    @Nullable
+    @Override
+    public FareBotUiTree getAdvancedUi(@NonNull Context context) {
+        Date cLastTransactionTime = getLastTransactionTime().getTime();
+
+        FareBotUiTree.Builder uiBuilder = FareBotUiTree.builder(context);
+
+        FareBotUiTree.Item.Builder generalBuilder = uiBuilder.item()
+                .title(R.string.opal_general);
+        generalBuilder.item(R.string.opal_weekly_trips, getWeeklyTrips());
+        generalBuilder.item(R.string.opal_checksum, Integer.toString(getChecksum()));
+
+        FareBotUiTree.Item.Builder transactionUiBuilder = uiBuilder.item()
+                .title(R.string.opal_last_transaction);
+
+        transactionUiBuilder.item(R.string.opal_transaction_sequence, getTransactionNumber());
+        transactionUiBuilder.item(R.string.opal_date,
+                DateFormat.getLongDateFormat(context).format(cLastTransactionTime));
+        transactionUiBuilder.item(R.string.opal_time,
+                DateFormat.getTimeFormat(context).format(cLastTransactionTime));
+        transactionUiBuilder.item(R.string.opal_vehicle_type,
+                getVehicleTypeName(context.getResources(), getVehicleType()));
+        transactionUiBuilder.item(R.string.opal_transaction_type,
+                getActionTypeName(context.getResources(), getActionType()));
+
+        return uiBuilder.build();
     }
 
     abstract int getBalance(); // cent

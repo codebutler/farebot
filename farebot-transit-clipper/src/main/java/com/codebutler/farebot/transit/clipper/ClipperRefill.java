@@ -47,12 +47,12 @@ abstract class ClipperRefill extends Refill {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        return ClipperTransitInfo.getAgencyName((int) getAgency());
+        return ClipperData.getAgencyName((int) getAgency());
     }
 
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return ClipperTransitInfo.getShortAgencyName((int) getAgency());
+        return ClipperData.getShortAgencyName((int) getAgency());
     }
 
     abstract long getAgency();

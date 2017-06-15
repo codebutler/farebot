@@ -23,17 +23,16 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 import java.util.Calendar;
 import java.util.Date;
 
 @AutoValue
-abstract class OVChipInfo implements Parcelable {
+abstract class OVChipInfo {
 
     @NonNull
     static OVChipInfo create(byte[] data) {

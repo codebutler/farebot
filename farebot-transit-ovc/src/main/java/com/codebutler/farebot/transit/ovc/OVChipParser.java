@@ -25,7 +25,8 @@ package com.codebutler.farebot.transit.ovc;
 
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicUtils;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
+import com.codebutler.farebot.card.classic.DataClassicSector;
 
 class OVChipParser {
     private final ClassicCard mCard;
@@ -37,7 +38,7 @@ class OVChipParser {
     }
 
     OVChipPreamble getPreamble() {
-        byte[] data = mCard.getSector(0).readBlocks(0, 3);
+        byte[] data = ((DataClassicSector) mCard.getSector(0)).readBlocks(0, 3);
         return OVChipPreamble.create(data);
     }
 
@@ -53,7 +54,7 @@ class OVChipParser {
         int firstBlock = ClassicUtils.sectorToBlock(blockSector);
         startBlock = startBlock - firstBlock;
 
-        byte[] data = mCard.getSector(sector).readBlocks(startBlock, 3);
+        byte[] data = ((DataClassicSector) mCard.getSector(sector)).readBlocks(startBlock, 3);
         return OVChipInfo.create(data);
     }
 
@@ -65,7 +66,7 @@ class OVChipParser {
         int firstBlock = ClassicUtils.sectorToBlock(sector);
         blockIndex = blockIndex - firstBlock;
 
-        return OVChipCredit.create(mCard.getSector(sector).readBlocks(blockIndex, 1));
+        return OVChipCredit.create(((DataClassicSector) mCard.getSector(sector)).readBlocks(blockIndex, 1));
     }
 
     public OVChipTransaction[] getTransactions() {
@@ -79,13 +80,13 @@ class OVChipParser {
     private byte[] readTransaction(int transactionId) {
         int blockIndex = (transactionId % 7) * 2;
         if (transactionId <= 6) {
-            return mCard.getSector(35).readBlocks(blockIndex, 2);
+            return ((DataClassicSector) mCard.getSector(35)).readBlocks(blockIndex, 2);
         } else if (transactionId >= 7 && transactionId <= 13) {
-            return mCard.getSector(36).readBlocks(blockIndex, 2);
+            return ((DataClassicSector) mCard.getSector(36)).readBlocks(blockIndex, 2);
         } else if (transactionId >= 14 && transactionId <= 20) {
-            return mCard.getSector(37).readBlocks(blockIndex, 2);
+            return ((DataClassicSector) mCard.getSector(37)).readBlocks(blockIndex, 2);
         } else if (transactionId >= 21 && transactionId <= 27) {
-            return mCard.getSector(38).readBlocks(blockIndex, 2);
+            return ((DataClassicSector) mCard.getSector(38)).readBlocks(blockIndex, 2);
         } else {
             throw new IllegalArgumentException("Invalid transactionId: " + transactionId);
         }
@@ -143,7 +144,7 @@ class OVChipParser {
         int firstBlock = ClassicUtils.sectorToBlock(sector);
         blockIndex = blockIndex - firstBlock;
 
-        return mCard.getSector(sector).readBlocks(blockIndex, 2);
+        return ((DataClassicSector) mCard.getSector(sector)).readBlocks(blockIndex, 2);
     }
 
     private OVChipSubscription getSubscription(int subscriptionAddress, int type1, int type2, int used, int rest) {
@@ -159,6 +160,6 @@ class OVChipParser {
         int firstBlock = ClassicUtils.sectorToBlock(sector);
         blockIndex = blockIndex - firstBlock;
 
-        return mCard.getSector(sector).readBlocks(blockIndex, 3);
+        return ((DataClassicSector) mCard.getSector(sector)).readBlocks(blockIndex, 3);
     }
 }

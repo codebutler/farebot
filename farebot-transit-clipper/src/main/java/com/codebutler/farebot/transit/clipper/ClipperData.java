@@ -23,6 +23,8 @@
 
 package com.codebutler.farebot.transit.clipper;
 
+import android.support.annotation.NonNull;
+
 import com.codebutler.farebot.transit.Station;
 import com.google.common.collect.ImmutableMap;
 
@@ -51,7 +53,7 @@ final class ClipperData {
             .put(AGENCY_GGT, "Golden Gate Transit")
             .put(AGENCY_SAMTRANS, "San Mateo County Transit District")
             .put(AGENCY_VTA, "Santa Clara Valley Transportation Authority")
-            .put(AGENCY_MUNI, "San Francisco Municipal")
+            .put(AGENCY_MUNI, "San Francisco Muni")
             .put(AGENCY_GG_FERRY, "Golden Gate Ferry")
             .put(AGENCY_SF_BAY_FERRY, "San Francisco Bay Ferry")
             .put(AGENCY_CALTRAIN_8RIDE, "Caltrain 8-Rides")
@@ -129,4 +131,20 @@ final class ClipperData {
             .build();
 
     private ClipperData() { }
+
+    @NonNull
+    static String getAgencyName(int agency) {
+        if (ClipperData.AGENCIES.containsKey(agency)) {
+            return ClipperData.AGENCIES.get(agency);
+        }
+        return "0x" + Long.toString(agency, 16);
+    }
+
+    @NonNull
+    static String getShortAgencyName(int agency) {
+        if (ClipperData.SHORT_AGENCIES.containsKey(agency)) {
+            return ClipperData.SHORT_AGENCIES.get(agency);
+        }
+        return "0x" + Long.toString(agency, 16);
+    }
 }

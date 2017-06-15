@@ -24,14 +24,14 @@
 
 package com.codebutler.farebot.card.felica;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.card.felica.ui.FelicaCardRawDataFragment;
-import com.codebutler.farebot.core.ByteArray;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -40,8 +40,8 @@ import net.kazzz.felica.lib.FeliCaLib;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-@CardRawDataFragmentClass(FelicaCardRawDataFragment.class)
 @AutoValue
 public abstract class FelicaCard extends Card {
 
@@ -87,5 +87,31 @@ public abstract class FelicaCard extends Card {
             }
         }
         return null;
+    }
+
+    @NonNull
+    @Override
+    public FareBotUiTree getAdvancedUi(Context context) {
+        FareBotUiTree.Builder cardUiBuilder = FareBotUiTree.builder(context);
+        cardUiBuilder.item().title("IDm").value(getIDm());
+        cardUiBuilder.item().title("PMm").value(getPMm());
+        FareBotUiTree.Item.Builder systemsUiBuilder = cardUiBuilder.item().title("Systems");
+        for (FelicaSystem system : getSystems()) {
+            FareBotUiTree.Item.Builder systemUiBuilder = systemsUiBuilder.item()
+                    .title(String.format("System: %s", Integer.toHexString(system.getCode())));
+            for (FelicaService service : system.getServices()) {
+                FareBotUiTree.Item.Builder serviceUiBuilder = systemUiBuilder.item()
+                        .title((String.format(
+                                "Service: 0x%s (%s)",
+                                Integer.toHexString(service.getServiceCode()),
+                                FelicaUtils.getFriendlyServiceName(system.getCode(), service.getServiceCode()))));
+                for (FelicaBlock block : service.getBlocks()) {
+                    serviceUiBuilder.item()
+                            .title(String.format(Locale.US, "Block %02d", block.getAddress()))
+                            .value(block.getData());
+                }
+            }
+        }
+        return cardUiBuilder.build();
     }
 }

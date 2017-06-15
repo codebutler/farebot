@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  item_supported_card.xml
+
+  This file is part of FareBot.
+  Learn more at: https://codebutler.github.io/farebot/
+
+  Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/grid_unit_2x"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="false">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/grid_unit_2x"
+            android:paddingRight="@dimen/grid_unit_2x"
+            android:paddingLeft="@dimen/grid_unit_2x"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/card_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    tools:text="Card Name"/>
+                <TextView
+                    android:id="@+id/card_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="Location"/>
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/card_secure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/grid_unit_2x"
+                android:contentDescription="@string/keys_required"
+                android:src="@drawable/ic_lock_black_24dp"/>
+        </LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/card_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/card_photo"
+                android:src="@drawable/orca_card"
+                android:layout_marginTop="@dimen/grid_unit_5x"
+                android:layout_marginBottom="@dimen/grid_unit_5x"/>
+            <TextView
+                android:id="@+id/card_not_supported"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/card_not_supported"
+                android:textAllCaps="true"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@color/card_unsupported"
+                android:layout_gravity="center"
+                android:padding="4dp"/>
+        </FrameLayout>
+        <TextView
+            android:id="@+id/card_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/grid_unit_2x"
+            android:paddingRight="@dimen/grid_unit_2x"
+            android:paddingLeft="@dimen/grid_unit_2x"
+            android:textSize="16sp"
+            android:textColor="@android:color/darker_gray"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="The quick brown fox jumps over the lazy dog."/>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

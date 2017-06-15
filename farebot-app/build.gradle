@@ -1,51 +1,81 @@
+/*
+ * build.gradle
+ *
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
+ *
+ * Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'com.squareup.sqldelight'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'org.jmailen.kotlinter'
 
 dependencies {
-    compile project(':farebot-core')
-    compile project(':farebot-card')
-    compile project(':farebot-card-cepas')
-    compile project(':farebot-card-classic')
-    compile project(':farebot-card-desfire')
-    compile project(':farebot-card-desfire')
-    compile project(':farebot-card-felica')
-    compile project(':farebot-card-ultralight')
-    compile project(':farebot-transit')
-    compile project(':farebot-transit-bilhete')
-    compile project(':farebot-transit-clipper')
-    compile project(':farebot-transit-edy')
-    compile project(':farebot-transit-ezlink')
-    compile project(':farebot-transit-hsl')
-    compile project(':farebot-transit-manly')
-    compile project(':farebot-transit-myki')
-    compile project(':farebot-transit-octopus')
-    compile project(':farebot-transit-opal')
-    compile project(':farebot-transit-orca')
-    compile project(':farebot-transit-ovc')
-    compile project(':farebot-transit-seqgo')
-    compile project(':farebot-transit-stub')
-    compile project(':farebot-transit-suica')
+    implementation project(':farebot-base')
+    compile project(':farebot-app-persist')
+    implementation project(':farebot-card')
+    implementation project(':farebot-card-cepas')
+    implementation project(':farebot-card-classic')
+    implementation project(':farebot-card-desfire')
+    implementation project(':farebot-card-desfire')
+    implementation project(':farebot-card-felica')
+    implementation project(':farebot-card-ultralight')
+    implementation project(':farebot-transit')
+    implementation project(':farebot-transit-bilhete')
+    implementation project(':farebot-transit-clipper')
+    implementation project(':farebot-transit-edy')
+    implementation project(':farebot-transit-ezlink')
+    implementation project(':farebot-transit-hsl')
+    implementation project(':farebot-transit-manly')
+    implementation project(':farebot-transit-myki')
+    implementation project(':farebot-transit-octopus')
+    implementation project(':farebot-transit-opal')
+    implementation project(':farebot-transit-orca')
+    implementation project(':farebot-transit-ovc')
+    implementation project(':farebot-transit-seqgo')
+    implementation project(':farebot-transit-stub')
+    implementation project(':farebot-transit-suica')
 
-    compile libs.playServicesMaps
-    compile libs.gson
+    implementation libs.autoDispose
+    implementation libs.autoDisposeAndroid
+    implementation libs.supportDesign
+    implementation libs.supportV4
+    implementation libs.supportV7CardView
+    implementation libs.supportV7RecyclerView
+    implementation libs.playServicesMaps
+    implementation libs.gson
+    implementation libs.kotlinStdlib
+    implementation libs.magellan
+    implementation libs.rxBroadcast
+    implementation libs.rxJava2
+    implementation libs.rxRelay2
 
-    compile(libs.crashlytics) {
+    implementation(libs.crashlytics) {
         transitive = true
     }
 
-    // https://github.com/rharter/auto-value-gson/issues/80
-    apt files(androidJar(this))
-
-    provided libs.autoValue
-    provided libs.autoValueGson
-    apt libs.autoValue
-    apt libs.autoValueParcel
-    apt libs.autoValueGson
+    implementation libs.dagger
+    annotationProcessor libs.daggerCompiler
+    kapt libs.daggerCompiler
 }
 
-def askPassword() {
+static def askPassword() {
     return 'security -q find-generic-password -w -g -l farebot-release'.execute().text.trim()
 }
 
@@ -59,8 +89,9 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 android {
     defaultConfig {
-        versionCode 21
-        versionName '2.9.0'
+        versionCode 22
+        versionName '3.0.0'
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -76,8 +107,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            ext.enableCrashlytics = false
+        }
         release {
-            shrinkResources true
+            shrinkResources false
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), '../config/proguard/proguard-rules.pro'
             signingConfig signingConfigs.release

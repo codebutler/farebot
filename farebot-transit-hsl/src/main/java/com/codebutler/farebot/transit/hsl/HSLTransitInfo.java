@@ -28,37 +28,40 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.google.auto.value.AutoValue;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
 @AutoValue
 public abstract class HSLTransitInfo extends TransitInfo {
 
-    @NonNull
-    static Builder builder() {
-        return AutoValue_HSLTransitInfo.builder();
-    }
-
-    /*
-    private static final String[] regionNames = {
+    private static final String[] REGION_NAMES = {
         "N/A", "Helsinki", "Espoo", "Vantaa", "Koko alue", "Seutu", "", "", "", "",  // 0-9
         "", "", "", "", "", "", "", "", "", "", // 10-19
         "", "", "", "", "", "", "", "", "", "", // 20-29
         "", "", "", "", "", "", "", "", "", ""}; // 30-39
+
+    /*
     private static final Map<Long,String> vehicleNames =  Collections.unmodifiableMap(new HashMap<Long, String>() {{
         put(1L, "Metro");
         put(18L, "Bus");
         put(16L, "Tram");
     }});
     */
+
+    @NonNull
+    static Builder builder() {
+        return new AutoValue_HSLTransitInfo.Builder();
+    }
 
     @NonNull
     @Override
@@ -79,68 +82,6 @@ public abstract class HSLTransitInfo extends TransitInfo {
         return ret;
     }
 
-    /*
-    public String getCustomString() {
-        DateFormat shortDateTimeFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-        DateFormat shortDateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
-
-        StringBuilder ret = new StringBuilder();
-        if (!mKausiNoData) {
-            ret.append(GR(R.string.hsl_season_ticket)).append(":\n");
-            ret.append(GR(R.string.hsl_value_ticket_vehicle_number)).append(": ")
-            .append(mKausiVehicleNumber).append("\n");
-            ret.append(GR(R.string.hsl_value_ticket_line_number)).append(": ")
-            .append(Long.toString(mKausiLineJORE).substring(1)).append("\n");
-            ret.append("JORE extension").append(": ").append(mKausiJOREExt).append("\n");
-            ret.append("Direction").append(": ").append(mKausiDirection).append("\n");
-
-            ret.append(GR(R.string.hsl_season_ticket_starts)).append(": ")
-            .append(shortDateFormat.format(mKausiStart * 1000.0));
-            ret.append("\n");
-            ret.append(GR(R.string.hsl_season_ticket_ends)).append(": ")
-            .append(shortDateFormat.format(mKausiEnd * 1000.0));
-            ret.append("\n\n");
-            ret.append(GR(R.string.hsl_season_ticket_bought_on)).append(": ")
-            .append(shortDateTimeFormat.format(mKausiPurchase * 1000.0));
-            ret.append("\n");
-            ret.append(GR(R.string.hsl_season_ticket_price_was)).append(": ")
-            .append(NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mKausiPurchasePrice / 100.0));
-            ret.append("\n");
-            ret.append(GR(R.string.hsl_you_last_used_this_ticket)).append(": ")
-            .append(shortDateTimeFormat.format(mKausiLastUse * 1000.0));
-            ret.append("\n");
-            ret.append(GR(R.string.hsl_previous_season_ticket)).append(": ")
-            .append(shortDateFormat.format(mKausiPrevStart * 1000.0));
-            ret.append(" - ").append(shortDateFormat.format(mKausiPrevEnd * 1000.0));
-            ret.append("\n\n");
-        }
-
-        ret.append(GR(R.string.hsl_value_ticket)).append(":\n");
-        ret.append(GR(R.string.hsl_value_ticket_bought_on)).append(": ")
-        .append(shortDateTimeFormat.format(mArvoPurchase * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_expires_on)).append(": ")
-        .append(shortDateTimeFormat.format(mArvoExpire * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_last_transfer)).append(": ")
-        .append(shortDateTimeFormat.format(mArvoXfer * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_last_sign)).append(": ")
-        .append(shortDateTimeFormat.format(mArvoExit * 1000.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_price)).append(": ")
-        .append(NumberFormat.getCurrencyInstance(Locale.GERMANY).format(mArvoPurchasePrice / 100.0)).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_disco_group)).append(": ").append(mArvoDiscoGroup).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_pax)).append(": ").append(mArvoPax).append("\n");
-        ret.append("Mystery1").append(": ").append(mArvoMystery1).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_duration)).append(": ").append(mArvoDuration).append(" min\n");
-        ret.append(GR(R.string.hsl_value_ticket_vehicle_number)).append(": ").append(mArvoVehicleNumber).append("\n");
-        ret.append("Region").append(": ").append(regionNames[(int) mArvoRegional]).append("\n");
-        ret.append(GR(R.string.hsl_value_ticket_line_number)).append(": ")
-        .append(Long.toString(mArvoLineJORE).substring(1)).append("\n");
-        ret.append("JORE extension").append(": ").append(mArvoJOREExt).append("\n");
-        ret.append("Direction").append(": ").append(mArvoDirection).append("\n");
-
-        return ret.toString();
-    }
-    */
-
     @Nullable
     @Override
     public List<Subscription> getSubscriptions() {
@@ -149,8 +90,50 @@ public abstract class HSLTransitInfo extends TransitInfo {
 
     @Nullable
     @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
-        return null;
+    public FareBotUiTree getAdvancedUi(@NonNull Context context) {
+        DateFormat shortDateTimeFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+        DateFormat shortDateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+
+        FareBotUiTree.Builder uiBuilder = FareBotUiTree.builder(context);
+
+        if (!getKausiNoData()) {
+            FareBotUiTree.Item.Builder seasonUiBuilder = uiBuilder.item().title(R.string.hsl_season_ticket);
+            seasonUiBuilder.item(R.string.hsl_value_ticket_vehicle_number, getKausiVehicleNumber());
+            seasonUiBuilder.item(R.string.hsl_value_ticket_line_number, Long.toString(getKausiLineJORE()).substring(1));
+            seasonUiBuilder.item("JORE extension", getKausiJOREExt());
+            seasonUiBuilder.item("Direction", getKausiDirection());
+            seasonUiBuilder.item(R.string.hsl_season_ticket_starts, shortDateFormat.format(getKausiStart() * 1000.0));
+            seasonUiBuilder.item(R.string.hsl_season_ticket_ends, shortDateFormat.format(getKausiEnd() * 1000.0));
+            seasonUiBuilder.item(R.string.hsl_season_ticket_bought_on,
+                    shortDateTimeFormat.format(getKausiPurchase() * 1000.0));
+            seasonUiBuilder.item(R.string.hsl_season_ticket_price_was,
+                    currencyFormat.format(getKausiPurchasePrice() / 100.0));
+            seasonUiBuilder.item(R.string.hsl_you_last_used_this_ticket,
+                    shortDateTimeFormat.format(getKausiLastUse() * 1000.0));
+            seasonUiBuilder.item(R.string.hsl_previous_season_ticket, String.format("%s - %s",
+                    shortDateFormat.format(getKausiPrevStart() * 1000.0),
+                    shortDateFormat.format(getKausiPrevEnd() * 1000.0)));
+        }
+
+        FareBotUiTree.Item.Builder valueUiBuilder = uiBuilder.item().title(R.string.hsl_value_ticket);
+        valueUiBuilder.item(R.string.hsl_value_ticket_bought_on, getArvoPurchase() * 1000.0);
+        valueUiBuilder.item(R.string.hsl_value_ticket_expires_on, shortDateTimeFormat.format(getArvoExpire() * 1000.0));
+        valueUiBuilder.item(R.string.hsl_value_ticket_last_transfer,
+                shortDateTimeFormat.format(getArvoXfer() * 1000.0));
+        valueUiBuilder.item(R.string.hsl_value_ticket_last_sign, shortDateTimeFormat.format(getArvoExit() * 1000.0));
+        valueUiBuilder.item(R.string.hsl_value_ticket_price, currencyFormat.format(getArvoPurchasePrice() / 100.0));
+        valueUiBuilder.item(R.string.hsl_value_ticket_disco_group, getArvoDiscoGroup());
+        valueUiBuilder.item(R.string.hsl_value_ticket_pax, getArvoPax());
+        valueUiBuilder.item("Mystery1", getArvoMystery1());
+        valueUiBuilder.item(R.string.hsl_value_ticket_duration, String.format("%s min", getArvoDuration()));
+        valueUiBuilder.item(R.string.hsl_value_ticket_vehicle_number, getArvoVehicleNumber());
+        valueUiBuilder.item("Region", REGION_NAMES[(int) getArvoRegional()]);
+        valueUiBuilder.item(R.string.hsl_value_ticket_line_number, Long.toString(getArvoLineJORE()).substring(1));
+        valueUiBuilder.item("JORE extension", getArvoJOREExt());
+        valueUiBuilder.item("Direction", getArvoDirection());
+
+        return uiBuilder.build();
     }
 
     abstract double getBalance();

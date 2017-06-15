@@ -27,10 +27,8 @@ import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
 
-import java.util.List;
-
 @AutoValue
-public abstract class InvalidClassicSector extends ClassicSector {
+public abstract class InvalidClassicSector implements ClassicSector {
 
     @NonNull
     public static InvalidClassicSector create(int index, String error) {
@@ -39,22 +37,4 @@ public abstract class InvalidClassicSector extends ClassicSector {
 
     @NonNull
     public abstract String getError();
-
-    @NonNull
-    @Override
-    public byte[] readBlocks(int startBlock, int blockCount) {
-        throw new IllegalStateException(getError());
-    }
-
-    @NonNull
-    @Override
-    public List<ClassicBlock> getBlocks() {
-        throw new IllegalStateException(getError());
-    }
-
-    @NonNull
-    @Override
-    public ClassicBlock getBlock(int index) {
-        throw new IllegalStateException(getError());
-    }
 }

@@ -27,9 +27,8 @@ import android.nfc.tech.TagTechnology;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.codebutler.farebot.base.util.IOUtils;
 import com.codebutler.farebot.key.CardKeys;
-
-import org.apache.commons.io.IOUtils;
 
 public abstract class TagReader<
         T extends TagTechnology,

@@ -22,16 +22,15 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 import java.io.ByteArrayInputStream;
 
 @AutoValue
-public abstract class DesfireManufacturingData implements Parcelable {
+public abstract class DesfireManufacturingData {
 
     @NonNull
     public static DesfireManufacturingData.Builder builder() {

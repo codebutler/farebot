@@ -29,7 +29,8 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.DesfireRecord;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
+import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -53,7 +54,7 @@ public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransit
     @Override
     public TransitIdentity parseIdentity(@NonNull DesfireCard card) {
         try {
-            byte[] data = ((DesfireCard) card).getApplication(0x1120ef).getFile(0x08).getData().bytes();
+            byte[] data = ((StandardDesfireFile) card.getApplication(0x1120ef).getFile(0x08)).getData().bytes();
             return TransitIdentity.create("HSL", ByteUtils.getHexString(data).substring(2, 20));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing HSL serial", ex);
@@ -64,10 +65,10 @@ public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransit
     @Override
     public HSLTransitInfo parseInfo(@NonNull DesfireCard desfireCard) {
         try {
-            byte[] data = desfireCard.getApplication(0x1120ef).getFile(0x08).getData().bytes();
+            byte[] data = ((StandardDesfireFile) desfireCard.getApplication(0x1120ef).getFile(0x08)).getData().bytes();
             String serialNumber = ByteUtils.getHexString(data).substring(2, 20);  //Utils.byteArrayToInt(data, 1, 9);
 
-            data = desfireCard.getApplication(0x1120ef).getFile(0x02).getData().bytes();
+            data = ((StandardDesfireFile) desfireCard.getApplication(0x1120ef).getFile(0x02)).getData().bytes();
             long balance = bitsToLong(0, 20, data);
             HSLRefill lastRefill = createRefill(data);
 
@@ -82,7 +83,7 @@ public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransit
                 }
             }
 
-            data = desfireCard.getApplication(0x1120ef).getFile(0x03).getData().bytes();
+            data = ((StandardDesfireFile) desfireCard.getApplication(0x1120ef).getFile(0x03)).getData().bytes();
             long arvoMystery1 = bitsToLong(0, 9, data);
             long arvoDiscoGroup = bitsToLong(9, 5, data);
             long arvoDuration = bitsToLong(14, 13, data);
@@ -137,7 +138,7 @@ public class HSLTransitFactory implements TransitFactory<DesfireCard, HSLTransit
                 }
             }
 
-            data = desfireCard.getApplication(0x1120ef).getFile(0x01).getData().bytes();
+            data = ((StandardDesfireFile) desfireCard.getApplication(0x1120ef).getFile(0x01)).getData().bytes();
 
             boolean kausiNoData = false;
             if (bitsToLong(19, 14, data) == 0 && bitsToLong(67, 14, data) == 0) {

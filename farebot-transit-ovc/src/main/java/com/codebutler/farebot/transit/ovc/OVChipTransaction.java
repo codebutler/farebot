@@ -23,16 +23,15 @@
 
 package com.codebutler.farebot.transit.ovc;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 import java.util.Comparator;
 
 @AutoValue
-abstract class OVChipTransaction implements Parcelable {
+abstract class OVChipTransaction {
 
     static final Comparator<OVChipTransaction> ID_ORDER = new Comparator<OVChipTransaction>() {
         @Override

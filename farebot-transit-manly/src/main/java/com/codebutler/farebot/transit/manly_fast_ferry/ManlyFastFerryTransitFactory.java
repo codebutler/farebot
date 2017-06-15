@@ -22,10 +22,11 @@ package com.codebutler.farebot.transit.manly_fast_ferry;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.UnauthorizedException;
+import com.codebutler.farebot.card.UnauthorizedException;
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicSector;
+import com.codebutler.farebot.card.classic.DataClassicSector;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -55,8 +56,12 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
         // Lets use this for now to check that this is a Manly Fast Ferry card.
         byte[] file1; //, file2;
 
+        if (!(card.getSector(0) instanceof DataClassicSector)) {
+            return false;
+        }
+
         try {
-            file1 = card.getSector(0).getBlock(1).getData().bytes();
+            file1 = ((DataClassicSector) card.getSector(0)).getBlock(1).getData().bytes();
             //file2 = card.getSector(0).getBlock(2).bytes();
         } catch (UnauthorizedException ex) {
             // These blocks of the card are not protected.
@@ -77,7 +82,7 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
     @NonNull
     @Override
     public TransitIdentity parseIdentity(@NonNull ClassicCard card) {
-        byte[] file2 = card.getSector(0).getBlock(2).getData().bytes();
+        byte[] file2 = ((DataClassicSector) card.getSector(0)).getBlock(2).getData().bytes();
         ManlyFastFerryRecord metadata = recordFromBytes(file2);
         if (!(metadata instanceof ManlyFastFerryMetadataRecord)) {
             throw new AssertionError("Unexpected Manly record type: " + metadata.getClass().toString());
@@ -94,7 +99,10 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
 
         // Iterate through blocks on the card and deserialize all the binary data.
         for (ClassicSector sector : card.getSectors()) {
-            for (ClassicBlock block : sector.getBlocks()) {
+            if (!(sector instanceof DataClassicSector)) {
+                continue;
+            }
+            for (ClassicBlock block : ((DataClassicSector) sector).getBlocks()) {
                 if (sector.getIndex() == 0 && block.getIndex() == 0) {
                     continue;
                 }

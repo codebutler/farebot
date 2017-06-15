@@ -25,32 +25,13 @@ package com.codebutler.farebot.card.classic;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.UnauthorizedException;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class UnauthorizedClassicSector extends ClassicSector {
+public abstract class UnauthorizedClassicSector implements ClassicSector {
 
     @NonNull
     public static UnauthorizedClassicSector create(int sectorIndex) {
         return new AutoValue_UnauthorizedClassicSector(sectorIndex);
-    }
-
-    @NonNull
-    @Override
-    public byte[] readBlocks(int startBlock, int blockCount) {
-        throw new UnauthorizedException();
-    }
-
-    @NonNull
-    @Override
-    public java.util.List<ClassicBlock> getBlocks() {
-        throw new UnauthorizedException();
-    }
-
-    @NonNull
-    @Override
-    public ClassicBlock getBlock(int index) {
-        throw new UnauthorizedException();
     }
 }

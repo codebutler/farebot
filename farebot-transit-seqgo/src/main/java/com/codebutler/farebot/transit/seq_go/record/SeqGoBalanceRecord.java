@@ -23,10 +23,9 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 
 /**
@@ -34,7 +33,7 @@ import com.google.auto.value.AutoValue;
  * https://github.com/micolous/metrodroid/wiki/Go-%28SEQ%29#balance-record-type
  */
 @AutoValue
-public abstract class SeqGoBalanceRecord extends SeqGoRecord implements Parcelable, Comparable<SeqGoBalanceRecord> {
+public abstract class SeqGoBalanceRecord extends SeqGoRecord implements Comparable<SeqGoBalanceRecord> {
 
     @NonNull
     public static SeqGoBalanceRecord recordFromBytes(byte[] input) {

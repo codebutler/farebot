@@ -23,10 +23,9 @@
 
 package com.codebutler.farebot.card.ultralight;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -35,7 +34,7 @@ import com.google.gson.TypeAdapter;
  * Represents a page of data on a Mifare Ultralight (4 bytes)
  */
 @AutoValue
-public abstract class UltralightPage implements Parcelable {
+public abstract class UltralightPage {
 
     @NonNull
     public static UltralightPage create(int index, @NonNull byte[] data) {

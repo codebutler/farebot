@@ -22,14 +22,15 @@
 
 package com.codebutler.farebot.card;
 
-import android.os.Parcelable;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
+import com.codebutler.farebot.base.util.ByteArray;
 
 import java.util.Date;
 
-public abstract class Card implements Parcelable {
+public abstract class Card {
 
     @NonNull
     public abstract CardType getCardType();
@@ -39,6 +40,9 @@ public abstract class Card implements Parcelable {
 
     @NonNull
     public abstract Date getScannedAt();
+
+    @NonNull
+    public abstract FareBotUiTree getAdvancedUi(Context context);
 
     @NonNull
     public Class<? extends Card> getParentClass() {

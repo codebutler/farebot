@@ -28,7 +28,7 @@ import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.desfire.DesfireApplication;
 import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Function;
 import com.google.gson.Gson;

@@ -26,16 +26,14 @@ package com.codebutler.farebot.transit;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.google.common.base.Joiner;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Trip implements Parcelable {
+public abstract class Trip {
 
     public abstract long getTimestamp();
 
@@ -99,18 +97,20 @@ public abstract class Trip implements Parcelable {
     public abstract boolean hasTime();
 
     @Nullable
-    public static String formatStationNames(@NonNull Context context, @NonNull Trip trip) {
-        Resources res = context.getResources();
+    public String getFormattedStations(Context context) {
+        String startStationName = getStartStationName(context.getResources());
+        String endStationName = getEndStationName(context.getResources());
+
         List<String> stationText = new ArrayList<>();
-        if (trip.getStartStationName(res) != null) {
-            stationText.add(trip.getStartStationName(res));
+
+        if (startStationName != null) {
+            stationText.add(startStationName);
         }
-        if (trip.getEndStationName(res) != null
-                && (!trip.getEndStationName(res).equals(trip.getStartStationName(res)))) {
-            stationText.add(trip.getEndStationName(res));
+        if (endStationName != null && !endStationName.equals(startStationName)) {
+            stationText.add(endStationName);
         }
         if (stationText.size() > 0) {
-            return Joiner.on(" → ").join(stationText);
+            return TextUtils.join(" → ", stationText);
         }
         return null;
     }

@@ -24,10 +24,9 @@ package com.codebutler.farebot.card.desfire;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ArrayUtils;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,18 +40,27 @@ public abstract class RecordDesfireFile implements DesfireFile {
             int fileId,
             @NonNull DesfireFileSettings fileSettings,
             @NonNull byte[] fileData) {
-        return new AutoValue_RecordDesfireFile(fileId, fileSettings, ByteArray.create(fileData));
-    }
-
-    @NonNull
-    public List<DesfireRecord> getRecords() {
-        RecordDesfireFileSettings settings = (RecordDesfireFileSettings) getFileSettings();
+        RecordDesfireFileSettings settings = (RecordDesfireFileSettings) fileSettings;
         List<DesfireRecord> records = new ArrayList<>(settings.getCurRecords());
         for (int i = 0; i < settings.getCurRecords(); i++) {
             int start = settings.getRecordSize() * i;
             int end = start + settings.getRecordSize();
-            records.add(DesfireRecord.create(ArrayUtils.subarray(getData().bytes(), start, end)));
+            records.add(DesfireRecord.create(ArrayUtils.subarray(fileData, start, end)));
         }
-        return Collections.unmodifiableList(records);
+        return new AutoValue_RecordDesfireFile(
+                fileId,
+                fileSettings,
+                Collections.unmodifiableList(records),
+                ByteArray.create(fileData));
     }
+
+    @NonNull
+    public abstract List<DesfireRecord> getRecords();
+
+    /**
+     * @deprecated Use {@link #getRecords()} instead.
+     */
+    @NonNull
+    @Deprecated
+    public abstract ByteArray getData();
 }

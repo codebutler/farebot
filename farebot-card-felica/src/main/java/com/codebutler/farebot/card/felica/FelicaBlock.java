@@ -22,16 +22,15 @@
 
 package com.codebutler.farebot.card.felica;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 
 @AutoValue
-public abstract class FelicaBlock implements Parcelable {
+public abstract class FelicaBlock {
 
     @NonNull
     public static FelicaBlock create(byte addr, @NonNull byte[] data) {

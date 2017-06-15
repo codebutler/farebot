@@ -44,12 +44,12 @@ abstract class ClipperTrip extends Trip {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        return ClipperTransitInfo.getAgencyName((int) getAgency());
+        return ClipperData.getAgencyName((int) getAgency());
     }
 
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return ClipperTransitInfo.getShortAgencyName((int) getAgency());
+        return ClipperData.getShortAgencyName((int) getAgency());
     }
 
     @Override
@@ -59,7 +59,7 @@ abstract class ClipperTrip extends Trip {
         } else {
             // FIXME: Need to find bus route #s
             // return "(Route 0x" + Long.toString(getRoute(), 16) + ")";
-            return null;
+            return "Bus/Train";
         }
     }
 

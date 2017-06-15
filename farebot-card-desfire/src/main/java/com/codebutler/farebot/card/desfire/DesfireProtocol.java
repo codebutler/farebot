@@ -27,7 +27,7 @@ import android.nfc.tech.IsoDep;
 
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.security.AccessControlException;

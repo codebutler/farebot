@@ -24,17 +24,15 @@
 
 package com.codebutler.farebot.transit.edy;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteArray;
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
@@ -83,12 +81,6 @@ public abstract class EdyTransitInfo extends TransitInfo {
     @Nullable
     @Override
     public List<Subscription> getSubscriptions() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
         return null;
     }
 

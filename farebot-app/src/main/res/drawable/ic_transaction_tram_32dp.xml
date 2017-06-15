@@ -1,0 +1,39 @@
+<!--
+  ic_transaction_tram_32dp.xml
+
+  This file is part of FareBot.
+  Learn more at: https://codebutler.github.io/farebot/
+
+  Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="32dp"
+        android:height="32dp"
+        android:viewportWidth="32.0"
+        android:viewportHeight="32.0">
+    <path
+        android:pathData="M32,16C32,24.84 24.84,32 16,32C7.16,32 0,24.84 0,16C0,7.16 7.16,0 16,0C24.84,0 32,7.16 32,16Z"
+        android:strokeColor="#00000000"
+        android:fillAlpha="0.54"
+        android:fillColor="#000000"
+        android:strokeWidth="1"/>
+    <path
+        android:pathData="M23,20.94L23,12.5C23,9.71 20.39,9.1 16.99,9.01L17.75,7.5L21,7.5L21,6L11,6L11,7.5L15.75,7.5L14.99,9.02C11.86,9.11 9,9.73 9,12.5L9,20.94C9,22.39 10.19,23.6 11.59,23.91L10,25.5L10,26L12.23,26L14.23,24L18,24L20,26L22,26L22,25.5L20.5,24L20.42,24C22.11,24 23,22.63 23,20.94ZM16,22.5C15.17,22.5 14.5,21.83 14.5,21C14.5,20.17 15.17,19.5 16,19.5C16.83,19.5 17.5,20.17 17.5,21C17.5,21.83 16.83,22.5 16,22.5ZM21,18L11,18L11,13L21,13L21,18Z"
+        android:strokeColor="#00000000"
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"/>
+</vector>

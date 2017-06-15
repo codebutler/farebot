@@ -24,17 +24,16 @@ package com.codebutler.farebot.card.desfire.raw;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ArrayUtils;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.desfire.DesfireFileSettings;
 import com.codebutler.farebot.card.desfire.RecordDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.StandardDesfireFileSettings;
 import com.codebutler.farebot.card.desfire.ValueDesfireFileSettings;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.ByteArrayInputStream;
 

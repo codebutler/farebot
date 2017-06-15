@@ -27,8 +27,8 @@ import android.support.annotation.NonNull;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.card.felica.FelicaSystem;
-import com.codebutler.farebot.core.ByteArray;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteArray;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 

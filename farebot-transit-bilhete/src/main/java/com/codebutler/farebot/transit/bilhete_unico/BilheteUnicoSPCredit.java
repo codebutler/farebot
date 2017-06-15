@@ -23,7 +23,6 @@
 
 package com.codebutler.farebot.transit.bilhete_unico;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -33,7 +32,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 @AutoValue
-abstract class BilheteUnicoSPCredit implements Parcelable {
+abstract class BilheteUnicoSPCredit {
 
     @NonNull
     static BilheteUnicoSPCredit create(@Nullable byte[] data) {

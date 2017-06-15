@@ -23,12 +23,12 @@ package com.codebutler.farebot.transit.seq_go;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.codebutler.farebot.base.util.ByteUtils;
+import com.codebutler.farebot.base.util.Luhn;
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicSector;
-import com.codebutler.farebot.core.ByteUtils;
-import com.codebutler.farebot.core.Luhn;
-import com.codebutler.farebot.core.UnauthorizedException;
+import com.codebutler.farebot.card.classic.DataClassicSector;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
@@ -60,19 +60,17 @@ public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTra
 
     @Override
     public boolean check(@NonNull ClassicCard card) {
-        try {
-            byte[] blockData = card.getSector(0).getBlock(1).getData().bytes();
+        if (card.getSector(0) instanceof DataClassicSector) {
+            byte[] blockData = ((DataClassicSector) card.getSector(0)).getBlock(1).getData().bytes();
             return Arrays.equals(Arrays.copyOfRange(blockData, 1, 9), MANUFACTURER);
-        } catch (UnauthorizedException ex) {
-            // It is not possible to identify the card without a key
-            return false;
         }
+        return false;
     }
 
     @NonNull
     @Override
     public TransitIdentity parseIdentity(@NonNull ClassicCard card) {
-        byte[] serialData = card.getSector(0).getBlock(0).getData().bytes();
+        byte[] serialData = ((DataClassicSector) card.getSector(0)).getBlock(0).getData().bytes();
         serialData = ByteUtils.reverseBuffer(serialData, 0, 4);
         BigInteger serialNumber = ByteUtils.byteArrayToBigInteger(serialData, 0, 4);
         return TransitIdentity.create(SeqGoTransitInfo.NAME, formatSerialNumber(serialNumber));
@@ -81,14 +79,17 @@ public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTra
     @NonNull
     @Override
     public SeqGoTransitInfo parseInfo(@NonNull ClassicCard card) {
-        byte[] serialData = card.getSector(0).getBlock(0).getData().bytes();
+        byte[] serialData = ((DataClassicSector) card.getSector(0)).getBlock(0).getData().bytes();
         serialData = ByteUtils.reverseBuffer(serialData, 0, 4);
         BigInteger serialNumber = ByteUtils.byteArrayToBigInteger(serialData, 0, 4);
 
         ArrayList<SeqGoRecord> records = new ArrayList<>();
 
         for (ClassicSector sector : card.getSectors()) {
-            for (ClassicBlock block : sector.getBlocks()) {
+            if (!(sector instanceof DataClassicSector)) {
+                continue;
+            }
+            for (ClassicBlock block : ((DataClassicSector) sector).getBlocks()) {
                 if (sector.getIndex() == 0 && block.getIndex() == 0) {
                     continue;
                 }

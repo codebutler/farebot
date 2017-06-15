@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit.manly_fast_ferry.record;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitFactory;
 
 import java.util.Arrays;

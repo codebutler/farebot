@@ -28,18 +28,16 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
-import com.codebutler.farebot.core.ui.HeaderListItem;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -157,53 +155,54 @@ public abstract class OVChipTransitInfo extends TransitInfo {
 
     @Nullable
     @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
+    public FareBotUiTree getAdvancedUi(@NonNull Context context) {
         OVChipPreamble preamble = getPreamble();
         OVChipInfo info = getOVCInfo();
         OVChipCredit credit = getCredit();
         OVChipIndex index = getIndex();
 
-        ArrayList<ListItem> items = new ArrayList<>();
+        FareBotUiTree.Builder uiBuilder = FareBotUiTree.builder(context);
 
-        items.add(new HeaderListItem("Hardware Information"));
-        items.add(new ListItem("Manufacturer ID", preamble.getManufacturer()));
-        items.add(new ListItem("Publisher ID", preamble.getPublisher()));
+        FareBotUiTree.Item.Builder hwUiBuilder = uiBuilder.item()
+                .title("Hardware Information");
+        hwUiBuilder.item("Manufacturer ID", preamble.getManufacturer());
+        hwUiBuilder.item("Publisher ID", preamble.getPublisher());
 
-        items.add(new HeaderListItem("General Information"));
-        items.add(new ListItem("Serial Number", preamble.getId()));
-        items.add(new ListItem("Expiration Date", DateFormat.getDateInstance(DateFormat.LONG)
-                .format(OVChipUtil.convertDate(preamble.getExpdate()))));
-        items.add(new ListItem("Card Type", (preamble.getType() == 2 ? "Personal" : "Anonymous")));
-        items.add(new ListItem("Issuer", OVChipTransitInfo.getShortAgencyName(
-                context.getResources(), info.getCompany())));
-
-        items.add(new ListItem("Banned", ((credit.getBanbits() & (char) 0xC0) == (char) 0xC0) ? "Yes" : "No"));
+        FareBotUiTree.Item.Builder generalUiBuilder = uiBuilder.item()
+                .title("General Information");
+        generalUiBuilder.item("Serial Number", preamble.getId());
+        generalUiBuilder.item(
+                "Expiration Date",
+                DateFormat.getDateInstance(DateFormat.LONG).format(OVChipUtil.convertDate(preamble.getExpdate())));
+        generalUiBuilder.item("Card Type", (preamble.getType() == 2 ? "Personal" : "Anonymous"));
+        generalUiBuilder.item("Issuer",
+                OVChipTransitInfo.getShortAgencyName(context.getResources(), info.getCompany()));
+        generalUiBuilder.item("Banned", ((credit.getBanbits() & (char) 0xC0) == (char) 0xC0) ? "Yes" : "No");
 
         if (preamble.getType() == 2) {
-            items.add(new HeaderListItem("Personal Information"));
-            items.add(new ListItem("Birthdate", DateFormat.getDateInstance(DateFormat.LONG)
-                    .format(info.getBirthdate())));
+            FareBotUiTree.Item.Builder personalUiBuilder = generalUiBuilder.item().title("Personal Information");
+            personalUiBuilder.item("Birthdate", DateFormat.getDateInstance(DateFormat.LONG)
+                    .format(info.getBirthdate()));
         }
 
-        items.add(new HeaderListItem("Credit Information"));
-        items.add(new ListItem("Credit Slot ID", Integer.toString(credit.getId())));
-        items.add(new ListItem("Last Credit ID", Integer.toString(credit.getCreditId())));
-        items.add(new ListItem("Credit", OVChipUtil.convertAmount(credit.getCredit())));
-        items.add(new ListItem("Autocharge", (info.getActive() == (byte) 0x05 ? "Yes" : "No")));
-        items.add(new ListItem("Autocharge Limit", OVChipUtil.convertAmount(info.getLimit())));
-        items.add(new ListItem("Autocharge Charge", OVChipUtil.convertAmount(info.getCharge())));
+        FareBotUiTree.Item.Builder creditUiBuilder = uiBuilder.item().title("Credit Information");
+        creditUiBuilder.item("Credit Slot ID", Integer.toString(credit.getId()));
+        creditUiBuilder.item("Last Credit ID", Integer.toString(credit.getCreditId()));
+        creditUiBuilder.item("Credit", OVChipUtil.convertAmount(credit.getCredit()));
+        creditUiBuilder.item("Autocharge", (info.getActive() == (byte) 0x05 ? "Yes" : "No"));
+        creditUiBuilder.item("Autocharge Limit", OVChipUtil.convertAmount(info.getLimit()));
+        creditUiBuilder.item("Autocharge Charge", OVChipUtil.convertAmount(info.getCharge()));
 
-        items.add(new HeaderListItem("Recent Slots"));
-        items.add(new ListItem("Transaction Slot", "0x"
-                + Integer.toHexString((char) index.getRecentTransactionSlot())));
-        items.add(new ListItem("Info Slot", "0x" + Integer.toHexString((char) index.getRecentInfoSlot())));
-        items.add(new ListItem("Subscription Slot", "0x"
-                + Integer.toHexString((char) index.getRecentSubscriptionSlot())));
-        items.add(new ListItem("Travelhistory Slot", "0x"
-                + Integer.toHexString((char) index.getRecentTravelhistorySlot())));
-        items.add(new ListItem("Credit Slot", "0x" + Integer.toHexString((char) index.getRecentCreditSlot())));
+        FareBotUiTree.Item.Builder slotsUiBuilder = uiBuilder.item().title("Recent Slots");
+        slotsUiBuilder.item("Transaction Slot", "0x" + Integer.toHexString((char) index.getRecentTransactionSlot()));
+        slotsUiBuilder.item("Info Slot", "0x" + Integer.toHexString((char) index.getRecentInfoSlot()));
+        slotsUiBuilder.item("Subscription Slot",
+                "0x" + Integer.toHexString((char) index.getRecentSubscriptionSlot()));
+        slotsUiBuilder.item("Travelhistory Slot",
+                "0x" + Integer.toHexString((char) index.getRecentTravelhistorySlot()));
+        slotsUiBuilder.item("Credit Slot", "0x" + Integer.toHexString((char) index.getRecentCreditSlot()));
 
-        return items;
+        return uiBuilder.build();
     }
 
     abstract OVChipIndex getIndex();

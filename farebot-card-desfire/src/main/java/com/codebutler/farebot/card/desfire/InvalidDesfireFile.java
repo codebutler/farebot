@@ -25,7 +25,6 @@ package com.codebutler.farebot.card.desfire;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteArray;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
@@ -41,10 +40,4 @@ public abstract class InvalidDesfireFile implements DesfireFile {
 
     @Nullable
     public abstract String getErrorMessage();
-
-    @NonNull
-    @Override
-    public ByteArray getData() {
-        throw new IllegalStateException(String.format("Invalid file: %s", getErrorMessage()));
-    }
 }

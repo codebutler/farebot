@@ -23,14 +23,13 @@
 
 package com.codebutler.farebot.transit;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class Station implements Parcelable {
+public abstract class Station {
 
     @NonNull
     public static Builder builder() {

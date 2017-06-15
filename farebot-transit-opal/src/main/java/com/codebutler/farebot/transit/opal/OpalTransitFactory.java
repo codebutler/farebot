@@ -22,7 +22,8 @@ package com.codebutler.farebot.transit.opal;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
+import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 
@@ -43,7 +44,7 @@ public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTrans
     @NonNull
     @Override
     public TransitIdentity parseIdentity(@NonNull DesfireCard desfireCard) {
-        byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
+        byte[] data = ((StandardDesfireFile) desfireCard.getApplication(0x314553).getFile(0x07)).getData().bytes();
         data = ByteUtils.reverseBuffer(data, 0, 5);
 
         int lastDigit = ByteUtils.getBitsFromBuffer(data, 4, 4);
@@ -55,7 +56,7 @@ public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTrans
     @Override
     public OpalTransitInfo parseInfo(@NonNull DesfireCard desfireCard) {
         try {
-            byte[] data = desfireCard.getApplication(0x314553).getFile(0x07).getData().bytes();
+            byte[] data = ((StandardDesfireFile) desfireCard.getApplication(0x314553).getFile(0x07)).getData().bytes();
             int iRawBalance;
 
             data = ByteUtils.reverseBuffer(data, 0, 16);

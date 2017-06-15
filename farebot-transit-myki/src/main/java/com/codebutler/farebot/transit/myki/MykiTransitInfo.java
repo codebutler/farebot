@@ -24,7 +24,6 @@
 package com.codebutler.farebot.transit.myki;
 
 import android.content.res.Resources;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -57,10 +56,5 @@ public abstract class MykiTransitInfo extends StubTransitInfo {
     @Override
     public String getCardName(@NonNull Resources resources) {
         return NAME;
-    }
-
-    @Override
-    public Uri getMoreInfoPage() {
-        return Uri.parse("https://micolous.github.io/metrodroid/myki");
     }
 }

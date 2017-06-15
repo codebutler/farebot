@@ -24,7 +24,7 @@ package com.codebutler.farebot.card.classic.key;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 @AutoValue

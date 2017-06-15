@@ -24,7 +24,7 @@ package com.codebutler.farebot.card.desfire;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
@@ -34,4 +34,7 @@ public abstract class StandardDesfireFile implements DesfireFile {
     public static DesfireFile create(int fileId, @NonNull DesfireFileSettings fileSettings, @NonNull byte[] fileData) {
         return new AutoValue_StandardDesfireFile(fileId, fileSettings, ByteArray.create(fileData));
     }
+
+    @NonNull
+    public abstract ByteArray getData();
 }

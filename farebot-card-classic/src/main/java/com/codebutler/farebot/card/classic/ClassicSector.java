@@ -23,32 +23,7 @@
 
 package com.codebutler.farebot.card.classic;
 
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
+public interface ClassicSector {
 
-import java.util.List;
-
-public abstract class ClassicSector implements Parcelable {
-
-    public abstract int getIndex();
-
-    @NonNull
-    public abstract List<ClassicBlock> getBlocks();
-
-    @NonNull
-    public ClassicBlock getBlock(int index) {
-        return getBlocks().get(index);
-    }
-
-    @NonNull
-    public byte[] readBlocks(int startBlock, int blockCount) {
-        int readBlocks = 0;
-        byte[] data = new byte[blockCount * 16];
-        for (int index = startBlock; index < (startBlock + blockCount); index++) {
-            byte[] blockData = getBlock(index).getData().bytes();
-            System.arraycopy(blockData, 0, data, readBlocks * 16, blockData.length);
-            readBlocks++;
-        }
-        return data;
-    }
+    int getIndex();
 }

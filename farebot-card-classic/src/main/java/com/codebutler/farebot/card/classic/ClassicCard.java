@@ -24,21 +24,18 @@
 
 package com.codebutler.farebot.card.classic;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.classic.ui.ClassicCardRawDataFragment;
-import com.codebutler.farebot.core.ByteArray;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.card.CardHasManufacturingInfo;
-import com.codebutler.farebot.card.CardRawDataFragmentClass;
 import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 import java.util.Date;
 import java.util.List;
 
-@CardRawDataFragmentClass(ClassicCardRawDataFragment.class)
-@CardHasManufacturingInfo(false)
 @AutoValue
 public abstract class ClassicCard extends Card {
 
@@ -60,5 +57,32 @@ public abstract class ClassicCard extends Card {
 
     public ClassicSector getSector(int index) {
         return getSectors().get(index);
+    }
+
+    @NonNull
+    @Override
+    public FareBotUiTree getAdvancedUi(Context context) {
+        FareBotUiTree.Builder cardUiBuilder = FareBotUiTree.builder(context);
+        for (ClassicSector sector : getSectors()) {
+            String sectorIndexString = Integer.toHexString(sector.getIndex());
+            FareBotUiTree.Item.Builder sectorUiBuilder = cardUiBuilder.item();
+            if (sector instanceof UnauthorizedClassicSector) {
+                sectorUiBuilder.title(context.getString(
+                        R.string.unauthorized_sector_title_format, sectorIndexString));
+            } else if (sector instanceof InvalidClassicSector) {
+                InvalidClassicSector errorSector = (InvalidClassicSector) sector;
+                sectorUiBuilder.title(context.getString(
+                        R.string.invalid_sector_title_format, sectorIndexString, errorSector.getError()));
+            } else {
+                DataClassicSector dataClassicSector = (DataClassicSector) sector;
+                sectorUiBuilder.title(context.getString(R.string.sector_title_format, sectorIndexString));
+                for (ClassicBlock block : dataClassicSector.getBlocks()) {
+                    sectorUiBuilder.item()
+                            .title(context.getString(R.string.block_title_format, String.valueOf(block.getIndex())))
+                            .value(block.getData());
+                }
+            }
+        }
+        return cardUiBuilder.build();
     }
 }

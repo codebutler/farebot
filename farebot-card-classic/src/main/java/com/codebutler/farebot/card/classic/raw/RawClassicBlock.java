@@ -25,7 +25,7 @@ package com.codebutler.farebot.card.classic.raw;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;

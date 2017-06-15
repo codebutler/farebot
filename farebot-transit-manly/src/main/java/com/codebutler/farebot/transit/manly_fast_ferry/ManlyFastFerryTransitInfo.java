@@ -29,17 +29,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateFormat;
 
-import com.codebutler.farebot.core.ui.HeaderListItem;
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.google.auto.value.AutoValue;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -84,14 +82,13 @@ public abstract class ManlyFastFerryTransitInfo extends TransitInfo {
 
     @Nullable
     @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
-        ArrayList<ListItem> items = new ArrayList<>();
-        items.add(new HeaderListItem(context.getString(R.string.general)));
-        Date cLastTransactionTime = getEpochDate().getTime();
-        items.add(new ListItem(
-                context.getString(R.string.card_epoch),
-                DateFormat.getLongDateFormat(context).format(cLastTransactionTime)));
-        return items;
+    public FareBotUiTree getAdvancedUi(@NonNull Context context) {
+        FareBotUiTree.Builder uiBuilder = FareBotUiTree.builder(context);
+
+        String epochFormatted = DateFormat.getLongDateFormat(context).format(getEpochDate().getTime());
+        uiBuilder.item().title(R.string.card_epoch).value(epochFormatted);
+
+        return uiBuilder.build();
     }
 
     @NonNull

@@ -31,12 +31,12 @@ import android.support.annotation.NonNull;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
-import com.codebutler.farebot.core.ByteUtils;
+import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
-
-import org.apache.commons.lang3.ArrayUtils;
+import com.codebutler.farebot.base.util.ArrayUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +58,7 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
     @Override
     public TransitIdentity parseIdentity(@NonNull DesfireCard card) {
         try {
-            byte[] data = card.getApplication(0xffffff).getFile(0x0f).getData().bytes();
+            byte[] data = ((StandardDesfireFile) card.getApplication(0xffffff).getFile(0x0f)).getData().bytes();
             return TransitIdentity.create("ORCA", String.valueOf(ByteUtils.byteArrayToInt(data, 4, 4)));
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA serial", ex);
@@ -74,14 +74,14 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
         List<Trip> trips;
 
         try {
-            data = card.getApplication(0xffffff).getFile(0x0f).getData().bytes();
+            data = ((StandardDesfireFile) card.getApplication(0xffffff).getFile(0x0f)).getData().bytes();
             serialNumber = ByteUtils.byteArrayToInt(data, 5, 3);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA serial", ex);
         }
 
         try {
-            data = card.getApplication(0x3010f2).getFile(0x04).getData().bytes();
+            data = ((StandardDesfireFile) card.getApplication(0x3010f2).getFile(0x04)).getData().bytes();
             balance = ByteUtils.byteArrayToInt(data, 41, 2);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA balance", ex);

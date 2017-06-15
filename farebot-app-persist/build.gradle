@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.squareup.sqldelight'
+
+dependencies {
+    implementation libs.supportV4
+    implementation libs.guava
+    implementation libs.gson
+
+    implementation project(path: ':farebot-card')
+
+    compileOnly libs.autoValueAnnotations
+    compileOnly libs.autoValueGsonAnnotations
+
+    annotationProcessor libs.autoValue
+    annotationProcessor libs.autoValueGson
+}
+
+android { }

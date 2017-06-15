@@ -24,12 +24,11 @@
 package com.codebutler.farebot.transit;
 
 import android.content.res.Resources;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
 
-public abstract class Subscription implements Parcelable {
+public abstract class Subscription {
     public abstract int getId();
 
     public abstract Date getValidFrom();

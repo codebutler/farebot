@@ -23,15 +23,14 @@
 
 package com.codebutler.farebot.card.cepas;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class CEPASPurse implements Parcelable {
+public abstract class CEPASPurse {
 
     @NonNull
     public static CEPASPurse create(

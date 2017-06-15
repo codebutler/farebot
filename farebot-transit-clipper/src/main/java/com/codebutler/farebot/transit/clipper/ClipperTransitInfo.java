@@ -26,12 +26,10 @@
 
 package com.codebutler.farebot.transit.clipper;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.core.ui.ListItem;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
@@ -70,28 +68,6 @@ public abstract class ClipperTransitInfo extends TransitInfo {
     @Override
     public List<Subscription> getSubscriptions() {
         return null;
-    }
-
-    @Nullable
-    @Override
-    public List<ListItem> getInfo(@NonNull Context context) {
-        return null;
-    }
-
-    @NonNull
-    public static String getAgencyName(int agency) {
-        if (ClipperData.AGENCIES.containsKey(agency)) {
-            return ClipperData.AGENCIES.get(agency);
-        }
-        return "0x" + Long.toString(agency, 16);
-    }
-
-    @NonNull
-    public static String getShortAgencyName(int agency) {
-        if (ClipperData.SHORT_AGENCIES.containsKey(agency)) {
-            return ClipperData.SHORT_AGENCIES.get(agency);
-        }
-        return "0x" + Long.toString(agency, 16);
     }
 
     abstract short getBalance();

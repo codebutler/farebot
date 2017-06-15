@@ -22,12 +22,11 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.core.ByteArray;
+import com.codebutler.farebot.base.util.ByteArray;
 
-public abstract class DesfireFileSettings implements Parcelable {
+public abstract class DesfireFileSettings {
 
     /* DesfireFile Types */
     public static final byte STANDARD_DATA_FILE = (byte) 0x00;
