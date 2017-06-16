@@ -34,6 +34,7 @@ object ErrorUtils {
         Log.e(activity.javaClass.name, ex.message, ex)
         AlertDialog.Builder(activity)
                 .setMessage(getErrorMessage(ex))
+                .setPositiveButton(android.R.string.ok, null)
                 .show()
     }
 

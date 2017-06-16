@@ -138,6 +138,8 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard, C
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex));
                 }
             } catch (IOException ex) {
+                throw ex;
+            } catch (Exception ex) {
                 sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.getMessage()));
             }
         }

@@ -3,6 +3,7 @@ out/
 dist/
 bin/
 gen/
+captures/
 classes/
 .DS_Store
 .idea
