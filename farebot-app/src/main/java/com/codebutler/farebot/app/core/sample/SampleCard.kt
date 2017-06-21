@@ -23,6 +23,7 @@
 package com.codebutler.farebot.app.core.sample
 
 import android.content.Context
+import com.codebutler.farebot.app.core.kotlin.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.ByteArray
 import com.codebutler.farebot.card.Card
@@ -37,25 +38,26 @@ class SampleCard(val rawCard: RawSampleCard) : Card() {
 
     override fun getScannedAt(): Date = rawCard.scannedAt()
 
-    override fun getAdvancedUi(context: Context?): FareBotUiTree {
-        val uiBuilder = FareBotUiTree.builder(context)
-
-        val section1Builder = uiBuilder.item().title("Sample Transit Section 1")
-
-        section1Builder.item()
-                .title("Example Item 1")
-                .value("Value")
-
-        section1Builder.item()
-                .title("Example Item 2")
-                .value("Value")
-
-        val section2Builder = uiBuilder.item().title("Sample Transit Section 1")
-
-        section2Builder.item()
-                .title("Example Item 1")
-                .value("Value")
-
-        return uiBuilder.build()
+    override fun getAdvancedUi(context: Context): FareBotUiTree = uiTree(context) {
+        item {
+            title { "Sample Transit Section 1" }
+            item {
+                title { "Example Item 1" }
+                value { "Value 1" }
+            }
+            item {
+                title { "Example Item 2" }
+                value { "Value 2" }
+            }
+        }
+        item {
+            title { "Sample Transit Section 2" }
+            for (i in 1..10) {
+                item {
+                    title { "Example Item $i" }
+                    value { "Value $i" }
+                }
+            }
+        }
     }
 }

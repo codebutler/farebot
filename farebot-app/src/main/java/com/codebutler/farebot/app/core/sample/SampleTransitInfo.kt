@@ -25,6 +25,7 @@ package com.codebutler.farebot.app.core.sample
 import android.content.Context
 import android.content.res.Resources
 import com.codebutler.farebot.app.core.kotlin.date
+import com.codebutler.farebot.app.core.kotlin.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.Subscription
@@ -53,26 +54,25 @@ class SampleTransitInfo : TransitInfo() {
 
     override fun getCardName(resources: Resources): String = "Sample Transit"
 
-    override fun getAdvancedUi(context: Context): FareBotUiTree {
-        val uiBuilder = FareBotUiTree.builder(context)
-
-        val section1Builder = uiBuilder.item().title("Sample Card Section 1")
-
-        section1Builder.item()
-                .title("Example Item 1")
-                .value("Value")
-
-        section1Builder.item()
-                .title("Example Item 2")
-                .value("Value")
-
-        val section2Builder = section1Builder.item().title("Sample Card Section 2")
-
-        section2Builder.item()
-                .title("Example Item 1")
-                .value("Value")
-
-        return uiBuilder.build()
+    override fun getAdvancedUi(context: Context): FareBotUiTree = uiTree(context) {
+        item {
+            title { "Sample Card Section 1" }
+            item {
+                title { "Example Item 1" }
+                value { "Value" }
+            }
+            item {
+                title { "Example Item 2" }
+                value { "Value" }
+            }
+        }
+        item {
+            title { "Sample Card Section 2" }
+            item {
+                title { "Example Item 3" }
+                value { "Value" }
+            }
+        }
     }
 }
 
