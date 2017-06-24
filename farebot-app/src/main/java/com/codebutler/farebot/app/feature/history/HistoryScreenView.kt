@@ -29,6 +29,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.kotlin.bindView
@@ -49,6 +50,7 @@ class HistoryScreenView(
     private val selectionRelay = PublishRelay.create<List<HistoryViewModel>>()
 
     private val recyclerView: RecyclerView by bindView(R.id.recycler)
+    private val emptyView: View by bindView(R.id.empty)
 
     private var actionMode : ActionMode? = null
 
@@ -106,6 +108,7 @@ class HistoryScreenView(
 
     internal fun setViewModels(viewModels: List<HistoryViewModel>) {
         recyclerView.adapter = HistoryAdapter(viewModels, clicksRelay, selectionRelay)
+        emptyView.visibility = if (viewModels.isEmpty()) View.VISIBLE else View.GONE
     }
 
     interface Listener {

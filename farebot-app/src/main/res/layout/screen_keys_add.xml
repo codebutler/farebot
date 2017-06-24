@@ -38,8 +38,6 @@
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="?android:listDividerAlertDialog"
-        android:showDividers="middle"
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
@@ -58,6 +56,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_secondary"
                     android:text="@string/card_id"/>
 
                 <TextView
@@ -66,12 +65,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/grid_unit_2x"
                     android:textColor="#000000"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_primary"
                     tools:text="0123456789"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_secondary"
                     android:text="@string/card_type"/>
 
                 <TextView
@@ -80,12 +80,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/grid_unit_2x"
                     android:textColor="#000000"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_primary"
                     tools:text="Mifare Classic"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_secondary"
                     android:text="@string/key_type"/>
 
                 <Spinner
@@ -93,11 +94,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/grid_unit_2x"
-                    android:textSize="18sp"/>
+                    android:textSize="@dimen/text_primary"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_secondary"
                     android:text="@string/key_data"/>
 
                 <Button
@@ -116,12 +118,17 @@
                     android:id="@+id/key_data"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_primary"
                     android:textColor="#000000"
                     android:fontFamily="monospace"
                     tools:text="AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99 00"/>
             </LinearLayout>
         </ScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CACACA"/>
 
         <Button
             style="@style/Widget.AppCompat.Button.Borderless"

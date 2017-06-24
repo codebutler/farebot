@@ -53,13 +53,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/text_primary"
                     tools:text="Card Name"/>
                 <TextView
                     android:id="@+id/card_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/text_secondary"
                     tools:text="Location"/>
             </LinearLayout>
             <ImageView
@@ -69,7 +69,8 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/grid_unit_2x"
                 android:contentDescription="@string/keys_required"
-                android:src="@drawable/ic_lock_black_24dp"/>
+                android:src="@drawable/ic_lock_black_24dp"
+                android:alpha="0.54"/>
         </LinearLayout>
         <FrameLayout
             android:layout_width="match_parent"
@@ -103,7 +104,7 @@
             android:paddingBottom="@dimen/grid_unit_2x"
             android:paddingRight="@dimen/grid_unit_2x"
             android:paddingLeft="@dimen/grid_unit_2x"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_primary"
             android:textColor="@android:color/darker_gray"
             android:gravity="center"
             android:visibility="gone"

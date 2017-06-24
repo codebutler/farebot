@@ -38,7 +38,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/grid_unit_2x"
-        android:layout_gravity="center"
         tools:src="@drawable/ic_transaction_bus_32dp"/>
 
     <LinearLayout
@@ -53,14 +52,16 @@
             android:id="@+id/route"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_primary"
             android:textColor="#424242"
+            android:includeFontPadding="false"
             tools:text="Yurikamome"/>
 
         <TextView
             android:id="@+id/agency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_secondary"
             tools:text="Tokyo Waterfront New Transit" />
 
         <TextView
@@ -69,6 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/grid_unit_1x"
             android:textColor="#000000"
+            android:textSize="@dimen/text_secondary"
             tools:text="Shinbashi -> Oumi" />
     </LinearLayout>
 
@@ -85,13 +87,17 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="#000000"
+            android:textSize="@dimen/text_primary"
             android:fontFamily="sans-serif-medium"
+            android:alpha="0.87"
+            android:includeFontPadding="false"
             tools:text="¥300"/>
 
         <TextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_secondary"
             tools:text="8:00 AM"/>
     </LinearLayout>
 </LinearLayout>

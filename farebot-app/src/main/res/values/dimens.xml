@@ -31,4 +31,7 @@
     <dimen name="grid_unit_4x">32dp</dimen>
     <dimen name="grid_unit_5x">40dp</dimen>
     <dimen name="grid_unit_9x">72dp</dimen>
+
+    <dimen name="text_primary">16sp</dimen>
+    <dimen name="text_secondary">14sp</dimen>
 </resources>

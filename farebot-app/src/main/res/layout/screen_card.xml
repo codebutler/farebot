@@ -55,13 +55,14 @@
             android:id="@+id/balance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="80sp"
+            android:textSize="54sp"
             android:textColor="#FFFFFF"
             android:includeFontPadding="false"
             tools:text="¥300"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_secondary"
             android:textColor="#004F59"
             android:text="@string/balance"/>
     </LinearLayout>

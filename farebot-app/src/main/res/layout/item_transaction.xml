@@ -26,19 +26,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="@dimen/grid_unit_2x"
-    android:layout_marginRight="@dimen/grid_unit_2x">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/header"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/grid_unit_1x"
+        android:layout_marginTop="@dimen/grid_unit_2x"
         android:layout_marginBottom="@dimen/grid_unit_1x"
         android:layout_marginStart="@dimen/grid_unit_2x"
         android:textColor="#006D8F"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_primary"
         android:textStyle="bold"
         tools:text="June 3rd, 2017"/>
 

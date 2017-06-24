@@ -221,7 +221,7 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                 notes.add(context.getString(extraNoteResId))
             }
             if (supportedCard.preview) {
-                notes.add(context.getString(R.string.card_preview_reader))
+                notes.add(context.getString(R.string.card_experimental))
             }
             if (supportedCard.cardType == CardType.CEPAS) {
                 notes.add(context.getString(R.string.card_not_compatible))

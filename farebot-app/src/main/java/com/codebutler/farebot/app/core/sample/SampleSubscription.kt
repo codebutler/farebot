@@ -37,7 +37,7 @@ class SampleSubscription : Subscription() {
 
     override fun getAgencyName(resources: Resources): String = "Municipal Robot Railway"
 
-    override fun getShortAgencyName(resources: Resources): String = "Robots on Rails"
+    override fun getShortAgencyName(resources: Resources): String = "Muni"
 
     override fun getMachineId(): Int = 1
 
