@@ -237,9 +237,15 @@ class MainActivity : AppCompatActivity(),
 
         fun cardSerializer() : CardSerializer
 
+        fun cardKeysPersister(): CardKeysPersister
+
+        fun cardKeysSerializer(): CardKeysSerializer
+
         fun cardStream() : CardStream
 
         fun exportHelper() : ExportHelper
+
+        fun nfcStream(): NfcStream
 
         fun sharedPreferences(): SharedPreferences
 

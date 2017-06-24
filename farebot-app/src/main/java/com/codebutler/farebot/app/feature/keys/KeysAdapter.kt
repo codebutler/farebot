@@ -1,5 +1,5 @@
 /*
- * HistoryAdapter.kt
+ * KeysAdapter.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -20,9 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.app.feature.history
+package com.codebutler.farebot.app.feature.keys
 
-import android.annotation.SuppressLint
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -31,27 +30,22 @@ import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.inflate
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.jakewharton.rxrelay2.PublishRelay
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
-internal class HistoryAdapter(
-        private val viewModels: List<HistoryViewModel>,
-        private val clicksRelay: PublishRelay<HistoryViewModel>,
-        private val selectionRelay: PublishRelay<List<HistoryViewModel>>)
-    : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
+class KeysAdapter(
+        private val viewModels: List<KeyViewModel>,
+        private val selectionRelay: PublishRelay<List<KeyViewModel>>)
+    : RecyclerView.Adapter<KeysAdapter.KeyViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder
-            = HistoryViewHolder(parent.inflate(R.layout.item_history))
+    override fun onCreateViewHolder(parent: ViewGroup, position: Int): KeyViewHolder
+            = KeyViewHolder(parent.inflate(R.layout.item_key))
 
-    override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: KeyViewHolder, position: Int) {
         val viewModel = viewModels[position]
         holder.update(viewModel)
         holder.itemView.setOnClickListener {
             if (hasSelectedItems()) {
                 viewModel.isSelected = !viewModel.isSelected
                 notifySelectionChanged()
-            } else {
-                clicksRelay.accept(viewModel)
             }
         }
         holder.itemView.setOnLongClickListener {
@@ -81,33 +75,13 @@ internal class HistoryAdapter(
         notifySelectionChanged()
     }
 
-    internal class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textViewCardName: TextView by bindView(R.id.card_name)
-        val textViewCardSerial: TextView by bindView(R.id.card_serial)
-        val textViewCardTime: TextView by bindView(R.id.card_time)
-        val textViewCardDate: TextView by bindView(R.id.card_date)
+    class KeyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textView1 : TextView by bindView(android.R.id.text1)
+        val textView2 : TextView by bindView(android.R.id.text2)
 
-        @SuppressLint("SetTextI18n")
-        fun update(viewModel: HistoryViewModel) {
-            val scannedAt = viewModel.savedCard.scanned_at()
-            val identity = viewModel.transitIdentity
-            val savedCard = viewModel.savedCard
-
-            val timeInstance = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
-            val dateInstance = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
-
-            textViewCardDate.text = dateInstance.format(scannedAt)
-            textViewCardTime.text = timeInstance.format(scannedAt)
-
-            if (identity != null) {
-                val serial = identity.serialNumber ?: savedCard.serial()
-                textViewCardName.text = identity.name
-                textViewCardSerial.text = serial
-            } else {
-                textViewCardName.text = itemView.resources.getString(R.string.unknown_card)
-                textViewCardSerial.text = "${savedCard.type()} - ${savedCard.serial()}"
-            }
-
+        internal fun update(viewModel: KeyViewModel) {
+            textView1.text = viewModel.savedKey.card_id()
+            textView2.text = viewModel.savedKey.card_type().toString()
             itemView.isSelected = viewModel.isSelected
         }
     }

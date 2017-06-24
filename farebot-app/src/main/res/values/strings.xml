@@ -23,13 +23,18 @@
 
 <resources>
     <string name="about">About</string>
+    <string name="add">Add</string>
+    <string name="add_key">Add Key</string>
     <string name="advanced">Advanced</string>
     <string name="app_name">FareBot</string>
     <string name="balance">Balance</string>
+    <string name="card_id">Card ID</string>
+    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
     <string name="card_not_compatible">Not compatible with some devices</string>
     <string name="card_not_supported">Not supported by this device</string>
     <string name="card_photo">Card Photo</string>
     <string name="card_preview_reader">Beta version of card reader.</string>
+    <string name="card_type">Card Type</string>
     <string name="coming_soon">Coming Soon</string>
     <string name="copied_to_clipboard">Copied to clipboard.</string>
     <string name="copy">Copy</string>
@@ -58,4 +63,6 @@
     <string name="unknown_card_desc">This card is not supported by FareBot</string>
     <string name="wireless_settings">Wireless Settings</string>
     <string name="delete">Delete</string>
+    <string name="key_type">Key Type</string>
+    <string name="key_data">Key Data</string>
 </resources>
