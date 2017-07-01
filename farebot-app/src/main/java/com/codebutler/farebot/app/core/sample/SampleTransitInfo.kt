@@ -25,7 +25,7 @@ package com.codebutler.farebot.app.core.sample
 import android.content.Context
 import android.content.res.Resources
 import com.codebutler.farebot.app.core.kotlin.date
-import com.codebutler.farebot.app.core.kotlin.uiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.Subscription

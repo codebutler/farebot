@@ -1,8 +1,10 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 dependencies {
     implementation libs.guava
     implementation libs.supportV4
+    implementation libs.kotlinStdlib
 
     compileOnly libs.autoValueAnnotations
 

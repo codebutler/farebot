@@ -20,10 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.app.core.kotlin
+package com.codebutler.farebot.base.ui
 
 import android.content.Context
-import com.codebutler.farebot.base.ui.FareBotUiTree
 
 @DslMarker
 private annotation class UiTreeBuilderMarker

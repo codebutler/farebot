@@ -20,6 +20,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [Lauri Andler](https://github.com/landler/) (HSL)
 * [Michael Farrell](https://github.com/micolous/) (Opal, Manly Fast Ferry, Go card, Myki, Octopus)
 * [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
+* [b33f](http://www.fuzzysecurity.com/tutorials/rfid/4.html) (EasyCard)
 
 ## License
 
@@ -64,6 +65,7 @@ These cards require that you crack the encryption key (using [mfcuk](https://git
 * [Go card][20] (Translink) - Brisbane and South East Queensland, Australia
 * [Manly Fast Ferry][19] - Sydney, Australia 
 * [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands
+* [EasyCard](http://www.easycard.com.tw/english/index.asp) - Taipei (Older insecure cards only)
 
 ## Supported Phones
 

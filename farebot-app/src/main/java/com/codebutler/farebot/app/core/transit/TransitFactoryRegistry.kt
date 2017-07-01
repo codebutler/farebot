@@ -35,6 +35,7 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitFactory
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
+import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
 import com.codebutler.farebot.transit.edy.EdyTransitFactory
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
@@ -70,6 +71,7 @@ class TransitFactoryRegistry(val context: Context) {
         registerFactory(ClassicCard::class.java, BilheteUnicoSPTransitFactory())
         registerFactory(ClassicCard::class.java, ManlyFastFerryTransitFactory())
         registerFactory(ClassicCard::class.java, SeqGoTransitFactory(context))
+        registerFactory(ClassicCard::class.java, EasyCardTransitFactory(context))
 
         registerFactory(CEPASCard::class.java, EZLinkTransitFactory())
 

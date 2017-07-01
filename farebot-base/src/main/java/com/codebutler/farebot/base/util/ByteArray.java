@@ -110,4 +110,9 @@ public class ByteArray implements Parcelable {
     public int hashCode() {
         return Arrays.hashCode(mData);
     }
+
+    @Override
+    public String toString() {
+        return "ByteArray{" + hex() + "}";
+    }
 }

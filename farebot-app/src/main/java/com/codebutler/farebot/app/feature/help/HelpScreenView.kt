@@ -153,6 +153,14 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         locationResId = R.string.location_the_netherlands,
                         cardType = CardType.MifareClassic,
                         keysRequired = true
+                ),
+                SupportedCard(
+                        imageResId = R.drawable.easycard,
+                        name = "EasyCard",
+                        locationResId = R.string.easycard_card_location,
+                        cardType = CardType.MifareClassic,
+                        keysRequired = true,
+                        extraNoteResId = R.string.easycard_card_note
                 )
         )
     }
