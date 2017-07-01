@@ -40,22 +40,22 @@ class SampleCard(val rawCard: RawSampleCard) : Card() {
 
     override fun getAdvancedUi(context: Context): FareBotUiTree = uiTree(context) {
         item {
-            title { "Sample Transit Section 1" }
+            title = "Sample Transit Section 1"
             item {
-                title { "Example Item 1" }
-                value { "Value 1" }
+                title = "Example Item 1"
+                value = "Value 1"
             }
             item {
-                title { "Example Item 2" }
-                value { "Value 2" }
+                title = "Example Item 2"
+                value = "Value 2"
             }
         }
         item {
-            title { "Sample Transit Section 2" }
+            title = "Sample Transit Section 2"
             for (i in 1..10) {
                 item {
-                    title { "Example Item $i" }
-                    value { "Value $i" }
+                    title = "Example Item $i"
+                    value = "Value $i"
                 }
             }
         }

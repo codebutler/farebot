@@ -56,21 +56,21 @@ class SampleTransitInfo : TransitInfo() {
 
     override fun getAdvancedUi(context: Context): FareBotUiTree = uiTree(context) {
         item {
-            title { "Sample Card Section 1" }
+            title = "Sample Card Section 1"
             item {
-                title { "Example Item 1" }
-                value { "Value" }
+                title = "Example Item 1"
+                value = "Value"
             }
             item {
-                title { "Example Item 2" }
-                value { "Value" }
+                title = "Example Item 2"
+                value = "Value"
             }
         }
         item {
-            title { "Sample Card Section 2" }
+            title = "Sample Card Section 2"
             item {
-                title { "Example Item 3" }
-                value { "Value" }
+                title = "Example Item 3"
+                value = "Value"
             }
         }
     }

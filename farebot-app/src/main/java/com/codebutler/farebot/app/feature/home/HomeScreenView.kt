@@ -24,9 +24,11 @@ package com.codebutler.farebot.app.feature.home
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewPropertyAnimator
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -34,6 +36,7 @@ import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.wealthfront.magellan.BaseScreenView
 
+@SuppressLint("ViewConstructor")
 class HomeScreenView internal constructor(ctx: Context, val listener: Listener)
     : BaseScreenView<HomeScreen>(ctx) {
 
@@ -46,6 +49,9 @@ class HomeScreenView internal constructor(ctx: Context, val listener: Listener)
 
     private val shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
+    private var fadeInAnim: ViewPropertyAnimator? = null
+    private var fadeOutAnim: ViewPropertyAnimator? = null
+
     init {
         inflate(context, R.layout.screen_home, this)
         errorButton.setOnClickListener { listener.onNfcErrorButtonClicked() }
@@ -53,18 +59,21 @@ class HomeScreenView internal constructor(ctx: Context, val listener: Listener)
     }
 
     fun showLoading(show: Boolean) {
+        fadeInAnim?.cancel()
+        fadeOutAnim?.cancel()
+
         val viewFadeIn = if (show) progressBar else contentViewGroup
         val viewFadeOut = if (show) contentViewGroup else progressBar
 
         viewFadeIn.alpha = 0f
         viewFadeIn.visibility = View.VISIBLE
 
-        viewFadeIn.animate()
+        fadeInAnim = viewFadeIn.animate()
                 .alpha(1f)
                 .setDuration(shortAnimationDuration)
                 .setListener(null)
 
-        viewFadeOut.animate()
+        fadeOutAnim = viewFadeOut.animate()
                 .alpha(0f)
                 .setDuration(shortAnimationDuration)
                 .setListener(object : AnimatorListenerAdapter() {
