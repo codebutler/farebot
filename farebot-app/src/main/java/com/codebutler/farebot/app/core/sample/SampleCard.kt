@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.core.sample
 
 import android.content.Context
-import com.codebutler.farebot.app.core.kotlin.uiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.ByteArray
 import com.codebutler.farebot.card.Card

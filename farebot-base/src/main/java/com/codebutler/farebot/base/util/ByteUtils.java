@@ -56,6 +56,10 @@ public final class ByteUtils {
         return (int) byteArrayToLong(b, offset, length);
     }
 
+    public static long byteArrayToLong(byte[] b) {
+        return byteArrayToLong(b, 0, b.length);
+    }
+
     public static long byteArrayToLong(byte[] b, int offset, int length) {
         if (b.length < offset + length) {
             throw new IllegalArgumentException("offset + length must be less than or equal to b.length");

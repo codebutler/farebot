@@ -1,0 +1,14 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+dependencies {
+    implementation project(':farebot-transit')
+    implementation project(':farebot-card-classic')
+
+    implementation libs.kotlinStdlib
+    implementation libs.guava
+}
+
+android {
+    resourcePrefix 'easycard_'
+}

@@ -23,14 +23,11 @@
 package com.codebutler.farebot.card.classic.key;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-
-import javax.annotation.Nonnegative;
 
 @AutoValue
 public abstract class ClassicSectorKey {
