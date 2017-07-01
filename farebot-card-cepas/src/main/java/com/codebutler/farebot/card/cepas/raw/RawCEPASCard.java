@@ -64,6 +64,11 @@ public abstract class RawCEPASCard implements RawCard<CEPASCard> {
         return CardType.CEPAS;
     }
 
+    @Override
+    public boolean isUnauthorized() {
+        return false;
+    }
+
     @NonNull
     @Override
     public CEPASCard parse() {

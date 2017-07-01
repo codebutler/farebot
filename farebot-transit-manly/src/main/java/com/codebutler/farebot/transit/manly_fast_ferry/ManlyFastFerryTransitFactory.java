@@ -22,7 +22,6 @@ package com.codebutler.farebot.transit.manly_fast_ferry;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.UnauthorizedException;
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicSector;
@@ -57,17 +56,13 @@ public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard,
         byte[] file1; //, file2;
 
         if (!(card.getSector(0) instanceof DataClassicSector)) {
-            return false;
-        }
-
-        try {
-            file1 = ((DataClassicSector) card.getSector(0)).getBlock(1).getData().bytes();
-            //file2 = card.getSector(0).getBlock(2).bytes();
-        } catch (UnauthorizedException ex) {
             // These blocks of the card are not protected.
             // This must not be a Manly Fast Ferry smartcard.
             return false;
         }
+
+        file1 = ((DataClassicSector) card.getSector(0)).getBlock(1).getData().bytes();
+        //file2 = card.getSector(0).getBlock(2).bytes();
 
         // Serial number is from byte 10 in file 1 and byte 7 of file 2, for 4 bytes.
         // DISABLED: This check fails on 2012-era cards.

@@ -31,7 +31,6 @@ import android.widget.TextView
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.transit.TransitInfo
-import com.codebutler.farebot.transit.stub.UnauthorizedTransitInfo
 import com.jakewharton.rxrelay2.PublishRelay
 import com.wealthfront.magellan.BaseScreenView
 import io.reactivex.Observable
@@ -53,10 +52,6 @@ class CardScreenView(context: Context) : BaseScreenView<CardScreen>(context) {
     internal fun observeItemClicks(): Observable<TransactionViewModel> = clicksRelay.hide()
 
     fun setTransitInfo(transitInfo: TransitInfo, viewModels: List<TransactionViewModel>) {
-        if (transitInfo is UnauthorizedTransitInfo) {
-            setError(resources.getString(R.string.keys_required))
-            return
-        }
         val balance = transitInfo.getBalanceString(resources)
         if (balance.isNullOrEmpty()) {
             setError(resources.getString(R.string.no_information))

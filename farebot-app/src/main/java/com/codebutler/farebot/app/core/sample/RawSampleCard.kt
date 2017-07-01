@@ -36,5 +36,7 @@ class RawSampleCard : RawCard<SampleCard> {
 
     override fun scannedAt(): Date = Date()
 
+    override fun isUnauthorized(): Boolean = false
+
     override fun parse(): SampleCard = SampleCard(this)
 }

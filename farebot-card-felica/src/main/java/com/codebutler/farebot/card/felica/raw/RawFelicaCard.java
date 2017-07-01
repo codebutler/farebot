@@ -63,6 +63,11 @@ public abstract class RawFelicaCard implements RawCard {
         return new AutoValue_RawFelicaCard.GsonTypeAdapter(gson);
     }
 
+    @Override
+    public boolean isUnauthorized() {
+        return false;
+    }
+
     @NonNull
     @Override
     public Card parse() {

@@ -27,6 +27,7 @@ import com.crashlytics.android.answers.CustomEvent
 
 enum class AnalyticsEventName(val value: String) {
     SCAN_CARD("Scan Card"),
+    SCAN_CARD_ERROR("Scan Card Error"),
     VIEW_CARD("View Card"),
     VIEW_SCREEN("View Screen"),
     VIEW_TRANSIT("View Transit"),

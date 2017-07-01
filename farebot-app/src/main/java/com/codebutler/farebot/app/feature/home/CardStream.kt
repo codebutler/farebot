@@ -62,7 +62,11 @@ class CardStream(
                 .map { tag -> Optional(
                     try {
                         val cardKeys = getCardKeys(ByteUtils.getHexString(tag.id))
-                        tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
+                        val rawCard = tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
+                        if (rawCard.isUnauthorized) {
+                            throw CardUnauthorizedException()
+                        }
+                        rawCard
                     } catch (error: Throwable) {
                         errorRelay.accept(error)
                         loadingRelay.accept(false)
@@ -99,4 +103,9 @@ class CardStream(
         val savedKey = cardKeysPersister.getForTagId(tagId) ?: return null
         return cardKeysSerializer.deserialize(savedKey.key_data())
     }
+}
+
+class CardUnauthorizedException : Throwable() {
+    override val message: String?
+        get() = "Unauthorized"
 }

@@ -47,6 +47,7 @@
     <string name="keys">Keys</string>
     <string name="keys_required">Encryption keys are required to read this card.</string>
     <string name="launch_from_background">Launch from background</string>
+    <string name="locked_card">Locked Card</string>
     <string name="map">Map</string>
     <string name="nfc_off_error">NFC is turned off</string>
     <string name="nfc_unavailable">NFC Unavailable</string>

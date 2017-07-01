@@ -62,6 +62,16 @@ public abstract class RawClassicCard implements RawCard<ClassicCard> {
         return CardType.MifareClassic;
     }
 
+    @Override
+    public boolean isUnauthorized() {
+        for (RawClassicSector sector : sectors()) {
+            if (!sector.type().equals(RawClassicSector.TYPE_UNAUTHORIZED)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @NonNull
     @Override
     public ClassicCard parse() {

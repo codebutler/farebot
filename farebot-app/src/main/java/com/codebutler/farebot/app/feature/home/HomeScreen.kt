@@ -27,6 +27,7 @@ import android.content.Intent
 import android.net.Uri
 import android.nfc.NfcAdapter
 import android.provider.Settings
+import android.support.v7.app.AlertDialog
 import android.view.Menu
 import android.view.MenuItem
 import com.codebutler.farebot.R
@@ -105,7 +106,17 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
         cardStream.observeErrors()
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(ObservableScoper(this))
-                .subscribe { ex -> ErrorUtils.showErrorAlert(activity, ex) }
+                .subscribe { ex ->
+                    logAnalyticsEvent(AnalyticsEventName.SCAN_CARD_ERROR, ErrorUtils.getErrorMessage(ex))
+                    when (ex) {
+                        is CardUnauthorizedException -> AlertDialog.Builder(activity)
+                                .setTitle(R.string.locked_card)
+                                .setMessage(R.string.keys_required)
+                                .setPositiveButton(android.R.string.ok, null)
+                                .show()
+                        else -> ErrorUtils.showErrorAlert(activity, ex)
+                    }
+                }
     }
 
     override fun onUpdateMenu(menu: Menu) {

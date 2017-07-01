@@ -59,6 +59,11 @@ public abstract class RawUltralightCard implements RawCard<UltralightCard> {
         return CardType.MifareUltralight;
     }
 
+    @Override
+    public boolean isUnauthorized() {
+        return false;
+    }
+
     @NonNull
     @Override
     public UltralightCard parse() {

@@ -39,6 +39,8 @@ public interface RawCard<T extends Card> {
     @NonNull
     Date scannedAt();
 
+    boolean isUnauthorized();
+
     @NonNull
     T parse();
 }

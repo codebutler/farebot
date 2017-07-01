@@ -47,7 +47,6 @@ import com.codebutler.farebot.transit.ovc.OVChipTransitFactory
 import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
 import com.codebutler.farebot.transit.stub.AdelaideMetrocardStubTransitFactory
 import com.codebutler.farebot.transit.stub.AtHopStubTransitFactory
-import com.codebutler.farebot.transit.stub.UnauthorizedTransitInfoFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
 
 class TransitFactoryRegistry(val context: Context) {
@@ -91,9 +90,6 @@ class TransitFactoryRegistry(val context: Context) {
         factories.add(factory as TransitFactory<Card, TransitInfo>)
     }
 
-    private fun findFactory(card: Card): TransitFactory<Card, out TransitInfo>? {
-        val factories: List<TransitFactory<Card, TransitInfo>> = registry[card.parentClass] ?: listOf()
-        val specialFactories = listOf(UnauthorizedTransitInfoFactory(context.resources))
-        return (factories + specialFactories).find { it.check(card) }
-    }
+    private fun findFactory(card: Card): TransitFactory<Card, out TransitInfo>?
+            = registry[card.parentClass]?.find { it.check(card) }
 }
