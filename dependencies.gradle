@@ -25,7 +25,7 @@ ext {
         guava:                    'com.google.guava:guava:20.0',
         kotlinStdlib:             "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
         magellan:                 "com.wealthfront:magellan:${magellanVersion}",
-        playServicesMaps:         'com.google.android.gms:play-services-maps:10.2.4',
+        playServicesMaps:         'com.google.android.gms:play-services-maps:11.0.1',
         rxBroadcast:              'com.cantrowitz:rxbroadcast:2.0.0',
         rxJava2:                  'io.reactivex.rxjava2:rxjava:2.1.0',
         rxRelay2:                 'com.jakewharton.rxrelay2:rxrelay:2.0.0',

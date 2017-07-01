@@ -25,6 +25,8 @@ package com.codebutler.farebot.app.core.ui
 import android.content.Context
 import android.support.annotation.CallSuper
 import android.view.ViewGroup
+import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
+import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
 import com.codebutler.farebot.app.feature.main.MainActivity
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.uber.autodispose.LifecycleScopeProvider
@@ -41,7 +43,8 @@ abstract class FareBotScreen<C, V> : Screen<V>(), LifecycleScopeProvider<ScreenL
     private val lifecycleRelay = BehaviorRelay.create<ScreenLifecycleEvent>()
 
     override fun createView(context: Context): V {
-        inject(createComponent((activity as MainActivity).component))
+        val parentComponent = (activity as MainActivity).component
+        inject(createComponent(parentComponent))
         return onCreateView(context)
     }
 
@@ -71,6 +74,7 @@ abstract class FareBotScreen<C, V> : Screen<V>(), LifecycleScopeProvider<ScreenL
     @CallSuper
     override fun onShow(context: Context) {
         super.onShow(context)
+        logAnalyticsEvent(AnalyticsEventName.VIEW_SCREEN, getTitle(activity))
         lifecycleRelay.accept(ScreenLifecycleEvent.SHOW)
     }
 

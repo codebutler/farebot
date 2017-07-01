@@ -161,4 +161,3 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
         fun inject(screen: AddKeyScreen)
     }
 }
-

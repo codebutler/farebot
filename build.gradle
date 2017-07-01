@@ -2,14 +2,14 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://maven.google.com' }
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha4'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha5'
         classpath 'io.fabric.tools:gradle:1.22.1'
         classpath 'com.squareup.sqldelight:gradle-plugin:0.6.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-5"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.3"
         classpath "gradle.plugin.org.jmailen.gradle:kotlinter-gradle:0.9.3"
     }
 }

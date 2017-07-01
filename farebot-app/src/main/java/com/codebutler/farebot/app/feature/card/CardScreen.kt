@@ -27,6 +27,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
+import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
+import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.transit.TransitFactoryRegistry
 import com.codebutler.farebot.app.core.ui.ActionBarOptions
@@ -67,6 +69,8 @@ class CardScreen(val rawCard : RawCard<*>) : FareBotScreen<CardScreen.Component,
     override fun onShow(context: Context) {
         super.onShow(context)
 
+        logAnalyticsEvent(AnalyticsEventName.VIEW_CARD, rawCard.cardType().toString())
+
         activityOperations.menuItemClick
                 .to(ObservableScoper(this))
                 .subscribe({ menuItem ->
@@ -98,6 +102,9 @@ class CardScreen(val rawCard : RawCard<*>) : FareBotScreen<CardScreen.Component,
                         view.setError(context.getString(R.string.unknown_card_desc))
                     }
                     activity.invalidateOptionsMenu()
+
+                    val type = content.transitInfo?.getCardName(activity.resources) ?: "Unknown"
+                    logAnalyticsEvent(AnalyticsEventName.VIEW_TRANSIT, type)
                 })
 
         view.observeItemClicks()

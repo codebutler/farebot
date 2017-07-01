@@ -27,6 +27,7 @@ import android.content.SharedPreferences
 import android.os.StrictMode
 import com.codebutler.farebot.BuildConfig
 import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.answers.Answers
 import io.fabric.sdk.android.Fabric
 import java.util.Date
 import javax.inject.Inject
@@ -58,7 +59,9 @@ class FareBotApplication : Application() {
         component.inject(this)
 
         if (!BuildConfig.DEBUG) {
-            Fabric.with(this, Crashlytics())
+            Fabric.with(this, Answers(), Crashlytics())
+        } else {
+            Fabric.with(this, Answers())
         }
     }
 

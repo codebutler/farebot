@@ -31,6 +31,8 @@ import android.view.Menu
 import android.view.MenuItem
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
+import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
+import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.core.util.ErrorUtils
@@ -71,7 +73,9 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
                         R.id.help -> navigator.goTo(HelpScreen())
                         R.id.prefs -> activity.startActivity(FareBotPreferenceActivity.newIntent(activity))
                         R.id.keys -> navigator.goTo(KeysScreen())
-                        R.id.about -> activity.startActivity(Intent(Intent.ACTION_VIEW, URL_ABOUT))
+                        R.id.about -> {
+                            activity.startActivity(Intent(Intent.ACTION_VIEW, URL_ABOUT))
+                        }
                     }
                 })
 
@@ -88,7 +92,10 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(ObservableScoper(this))
-                .subscribe { card -> navigator.goTo(CardScreen(card)) }
+                .subscribe { card ->
+                    logAnalyticsEvent(AnalyticsEventName.SCAN_CARD, card.cardType().toString())
+                    navigator.goTo(CardScreen(card))
+                }
 
         cardStream.observeLoading()
                 .observeOn(AndroidSchedulers.mainThread())
