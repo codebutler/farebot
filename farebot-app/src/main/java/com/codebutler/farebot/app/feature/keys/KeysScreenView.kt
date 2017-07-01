@@ -31,7 +31,6 @@ import android.view.MenuItem
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.kotlin.bindView
-import com.codebutler.farebot.persist.db.model.SavedKey
 import com.jakewharton.rxrelay2.PublishRelay
 import com.uber.autodispose.ObservableScoper
 import com.uber.autodispose.android.ViewScopeProvider
