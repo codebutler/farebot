@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="@dimen/grid_unit_2x"
+                android:layout_marginStart="@dimen/grid_unit_2x"
                 android:contentDescription="@string/keys_required"
                 android:src="@drawable/ic_lock_black_24dp"
                 android:alpha="0.54"/>

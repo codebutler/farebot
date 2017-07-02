@@ -12,4 +12,6 @@ dependencies {
     annotationProcessor libs.autoValueGson
 }
 
-android { }
+android {
+    resourcePrefix 'desfire_'
+}

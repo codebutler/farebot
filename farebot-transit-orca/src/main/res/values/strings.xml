@@ -20,8 +20,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="fare_cancelled_format">%s (Cancelled)</string>
+<resources>
+    <string name="transit_orca_fare_cancelled_format">%s (Cancelled)</string>
 
     <string name="transit_orca_agency_ct">Community Transit</string>
     <string name="transit_orca_agency_kcm">King County Metro Transit</string>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pages">Pages</string>
-    <string name="page_title_format">Page: 0x%s</string>
+    <string name="ultralight_pages">Pages</string>
+    <string name="ultralight_page_title_format">Page: 0x%s</string>
 </resources>

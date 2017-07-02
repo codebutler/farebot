@@ -70,8 +70,8 @@ class KeysScreen : FareBotScreen<KeysScreen.KeysComponent, KeysScreenView>(), Ke
     }
 
     override fun onDeleteSelectedItems(items: List<KeyViewModel>) {
-        for (item in items) {
-            keysPersister.delete(item.savedKey)
+        for ((savedKey) in items) {
+            keysPersister.delete(savedKey)
         }
         loadKeys()
     }

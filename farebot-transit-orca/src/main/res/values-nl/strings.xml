@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="fare_cancelled_format">%s (geannuleerd)</string>
+  <string name="transit_orca_fare_cancelled_format">%s (geannuleerd)</string>
 </resources>

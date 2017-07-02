@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.app.feature.keys
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v7.view.ActionMode
 import android.support.v7.widget.LinearLayoutManager
@@ -36,6 +37,7 @@ import com.uber.autodispose.ObservableScoper
 import com.uber.autodispose.android.ViewScopeProvider
 import com.wealthfront.magellan.BaseScreenView
 
+@SuppressLint("ViewConstructor")
 class KeysScreenView(
         context: Context,
         val activityOperations: ActivityOperations,

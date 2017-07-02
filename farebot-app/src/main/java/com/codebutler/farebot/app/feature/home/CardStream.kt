@@ -103,9 +103,9 @@ class CardStream(
         val savedKey = cardKeysPersister.getForTagId(tagId) ?: return null
         return cardKeysSerializer.deserialize(savedKey.key_data())
     }
-}
 
-class CardUnauthorizedException : Throwable() {
-    override val message: String?
-        get() = "Unauthorized"
+    class CardUnauthorizedException : Throwable() {
+        override val message: String?
+            get() = "Unauthorized"
+    }
 }

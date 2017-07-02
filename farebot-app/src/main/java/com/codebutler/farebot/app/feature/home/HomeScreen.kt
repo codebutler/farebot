@@ -109,7 +109,7 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
                 .subscribe { ex ->
                     logAnalyticsEvent(AnalyticsEventName.SCAN_CARD_ERROR, ErrorUtils.getErrorMessage(ex))
                     when (ex) {
-                        is CardUnauthorizedException -> AlertDialog.Builder(activity)
+                        is CardStream.CardUnauthorizedException -> AlertDialog.Builder(activity)
                                 .setTitle(R.string.locked_card)
                                 .setMessage(R.string.keys_required)
                                 .setPositiveButton(android.R.string.ok, null)

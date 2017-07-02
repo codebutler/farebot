@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.app.feature.card.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.DrawableRes
@@ -39,6 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.wealthfront.magellan.BaseScreenView
 import java.util.ArrayList
 
+@SuppressLint("ViewConstructor")
 class TripMapScreenView(
         context: Context,
         val trip : Trip)

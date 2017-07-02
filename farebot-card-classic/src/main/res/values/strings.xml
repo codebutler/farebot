@@ -20,9 +20,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="block_title_format">Block: %s</string>
-    <string name="unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>
-    <string name="sector_title_format">Sector: 0x%s</string>
-    <string name="invalid_sector_title_format">Sector: 0x%1$s (Invalid: %2$s)</string>
+<resources>
+    <string name="classic_block_title_format">Block: %s</string>
+    <string name="classic_unauthorized_sector_title_format">Sector: 0x%s (Unauthorized)</string>
+    <string name="classic_sector_title_format">Sector: 0x%s</string>
+    <string name="classic_invalid_sector_title_format">Sector: 0x%1$s (Invalid: %2$s)</string>
 </resources>

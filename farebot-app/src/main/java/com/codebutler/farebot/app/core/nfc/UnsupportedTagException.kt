@@ -27,6 +27,6 @@ class UnsupportedTagException(val techList: Array<String>, val tagId: String) : 
     override val message: String?
         get() {
             val techs = techList.map { tech -> tech.replace("android.nfc.tech.", "") }.joinToString { "\n " }
-            return "Identifier: ${tagId}\n\nTechnologies:${techs}"
+            return "Identifier: $tagId\n\nTechnologies:$techs"
         }
 }

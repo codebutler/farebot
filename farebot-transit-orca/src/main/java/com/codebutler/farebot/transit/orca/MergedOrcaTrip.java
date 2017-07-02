@@ -67,7 +67,9 @@ public abstract class MergedOrcaTrip extends Trip {
     @Override
     public String getFareString(@NonNull Resources resources) {
         if (getEndTrip().getTransType() == TRANS_TYPE_CANCEL_TRIP) {
-            return resources.getString(R.string.fare_cancelled_format, getStartTrip().getFareString(resources));
+            return resources.getString(
+                    R.string.transit_orca_fare_cancelled_format,
+                    getStartTrip().getFareString(resources));
         }
         return getStartTrip().getFareString(resources);
     }

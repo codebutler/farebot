@@ -164,7 +164,10 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
         recyclerView.adapter = SupportedCardsAdapter(context, SUPPORTED_CARDS)
     }
 
-    internal class SupportedCardsAdapter(private val mContext: Context, private val mSupportedCards: List<SupportedCard>) : RecyclerView.Adapter<SupportedCardViewHolder>() {
+    internal class SupportedCardsAdapter(
+            private val mContext: Context,
+            private val mSupportedCards: List<SupportedCard>)
+        : RecyclerView.Adapter<SupportedCardViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SupportedCardViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)

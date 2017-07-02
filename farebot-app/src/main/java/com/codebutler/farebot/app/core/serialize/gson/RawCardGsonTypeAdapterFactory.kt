@@ -71,9 +71,7 @@ class RawCardGsonTypeAdapterFactory : TypeAdapterFactory {
 
         override fun write(out: JsonWriter, value: RawCard<*>) {
             val delegateAdapter = delegates[value.cardType()]
-            if (delegateAdapter == null) {
-                throw IllegalArgumentException("Unknown type: ${value.cardType()}")
-            }
+                    ?: throw IllegalArgumentException("Unknown type: ${value.cardType()}")
             val jsonObject = delegateAdapter.toJsonTree(value).asJsonObject
             jsonObject.add(KEY_CARD_TYPE, JsonPrimitive(value.cardType().name))
             Streams.write(jsonObject, out)
@@ -84,9 +82,7 @@ class RawCardGsonTypeAdapterFactory : TypeAdapterFactory {
             val typeElement = rootElement.asJsonObject.remove(KEY_CARD_TYPE)
             val cardType = CardType.valueOf(typeElement.asString)
             val delegateAdapter = delegates[cardType]
-            if (delegateAdapter == null) {
-                throw IllegalArgumentException("Unknown type: ${cardType}")
-            }
+                    ?: throw IllegalArgumentException("Unknown type: $cardType")
             return delegateAdapter.fromJsonTree(rootElement)
         }
     }

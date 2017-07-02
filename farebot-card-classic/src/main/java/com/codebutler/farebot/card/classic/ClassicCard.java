@@ -68,17 +68,19 @@ public abstract class ClassicCard extends Card {
             FareBotUiTree.Item.Builder sectorUiBuilder = cardUiBuilder.item();
             if (sector instanceof UnauthorizedClassicSector) {
                 sectorUiBuilder.title(context.getString(
-                        R.string.unauthorized_sector_title_format, sectorIndexString));
+                        R.string.classic_unauthorized_sector_title_format, sectorIndexString));
             } else if (sector instanceof InvalidClassicSector) {
                 InvalidClassicSector errorSector = (InvalidClassicSector) sector;
                 sectorUiBuilder.title(context.getString(
-                        R.string.invalid_sector_title_format, sectorIndexString, errorSector.getError()));
+                        R.string.classic_invalid_sector_title_format, sectorIndexString, errorSector.getError()));
             } else {
                 DataClassicSector dataClassicSector = (DataClassicSector) sector;
-                sectorUiBuilder.title(context.getString(R.string.sector_title_format, sectorIndexString));
+                sectorUiBuilder.title(context.getString(R.string.classic_sector_title_format, sectorIndexString));
                 for (ClassicBlock block : dataClassicSector.getBlocks()) {
                     sectorUiBuilder.item()
-                            .title(context.getString(R.string.block_title_format, String.valueOf(block.getIndex())))
+                            .title(context.getString(
+                                    R.string.classic_block_title_format,
+                                    String.valueOf(block.getIndex())))
                             .value(block.getData());
                 }
             }

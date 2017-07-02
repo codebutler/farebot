@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public abstract class Refill {
 
@@ -32,6 +33,7 @@ public abstract class Refill {
 
     public abstract String getAgencyName(@NonNull Resources resources);
 
+    @Nullable
     public abstract String getShortAgencyName(@NonNull Resources resources);
 
     public abstract long getAmount();

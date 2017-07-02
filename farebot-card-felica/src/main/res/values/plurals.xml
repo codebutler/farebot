@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <plurals name="block_count">
+    <plurals name="felica_block_count">
         <item quantity="one">%d block</item>
         <item quantity="other">%d blocks</item>
     </plurals>

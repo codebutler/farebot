@@ -75,10 +75,10 @@ public abstract class UltralightCard extends Card {
     public FareBotUiTree getAdvancedUi(Context context) {
         FareBotUiTree.Builder builder = FareBotUiTree.builder(context);
         FareBotUiTree.Item.Builder pagesBuilder = builder.item()
-                .title(R.string.pages);
+                .title(R.string.ultralight_pages);
         for (UltralightPage page : getPages()) {
             pagesBuilder.item()
-                    .title(context.getString(R.string.page_title_format, String.valueOf(page.getIndex())))
+                    .title(context.getString(R.string.ultralight_page_title_format, String.valueOf(page.getIndex())))
                     .value(page.getData());
         }
         return builder.build();

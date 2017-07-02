@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="page_title_format">Pagina: 0x%s</string>
+  <string name="ultralight_page_title_format">Pagina: 0x%s</string>
 </resources>

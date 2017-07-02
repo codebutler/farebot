@@ -38,7 +38,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/grid_unit_2x"
-        tools:src="@drawable/ic_transaction_bus_32dp"/>
+        tools:src="@drawable/ic_transaction_bus_32dp"
+        tools:ignore="ContentDescription" />
 
     <LinearLayout
         android:layout_width="0dp"

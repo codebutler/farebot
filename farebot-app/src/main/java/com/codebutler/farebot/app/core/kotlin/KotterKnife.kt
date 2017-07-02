@@ -1,6 +1,8 @@
 
 // from https://github.com/JakeWharton/kotterknife
 
+@file:Suppress("RedundantVisibilityModifier", "unused", "UNUSED_ANONYMOUS_PARAMETER", "AddVarianceModifier")
+
 package com.codebutler.farebot.app.core.kotlin
 
 import android.app.Activity

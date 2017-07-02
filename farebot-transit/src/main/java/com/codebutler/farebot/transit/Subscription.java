@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.Date;
 
@@ -37,11 +38,14 @@ public abstract class Subscription {
 
     public abstract String getAgencyName(@NonNull Resources resources);
 
+    @Nullable
     public abstract String getShortAgencyName(@NonNull Resources resources);
 
     public abstract int getMachineId();
 
+    @Nullable
     public abstract String getSubscriptionName(@NonNull Resources resources);
 
+    @Nullable
     public abstract String getActivation();
 }

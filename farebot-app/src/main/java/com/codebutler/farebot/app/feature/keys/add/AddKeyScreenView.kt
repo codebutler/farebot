@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.app.feature.keys.add
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.widget.Button
@@ -34,6 +35,7 @@ import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey
 import com.wealthfront.magellan.BaseScreenView
 
+@SuppressLint("ViewConstructor")
 class AddKeyScreenView(context: Context, val listener: Listener)
     : BaseScreenView<AddKeyScreen>(context) {
 

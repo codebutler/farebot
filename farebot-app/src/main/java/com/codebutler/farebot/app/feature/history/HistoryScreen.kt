@@ -134,10 +134,10 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
 
         activityOperations.permissionResult
                 .to(ObservableScoper<RequestPermissionsResult>(this))
-                .subscribe { result ->
-                    when (result.requestCode) {
+                .subscribe { (requestCode, _, grantResults) ->
+                    when (requestCode) {
                         REQUEST_PERMISSION_STORAGE -> {
-                            if (result.grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED) {
+                            if (grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED) {
                                 exportToFileWithPermission()
                             }
                         }
@@ -146,11 +146,11 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
 
         activityOperations.activityResult
                 .to(ObservableScoper<ActivityResult>(this))
-                .subscribe { result ->
-                    when (result.requestCode) {
+                .subscribe { (requestCode, resultCode, data) ->
+                    when (requestCode) {
                         REQUEST_SELECT_FILE -> {
-                            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-                                val uri = result.data.data
+                            if (resultCode == Activity.RESULT_OK && data != null) {
+                                val uri = data.data
                                 val json = activity.contentResolver.openInputStream(uri)
                                         .bufferedReader()
                                         .use { it.readText() }
@@ -168,8 +168,8 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
     }
 
     override fun onDeleteSelectedItems(items: List<HistoryViewModel>) {
-        for (item in items) {
-            cardPersister.deleteCard(item.savedCard)
+        for ((savedCard) in items) {
+            cardPersister.deleteCard(savedCard)
         }
         loadCards()
     }

@@ -28,7 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.codebutler.farebot.R
-import com.codebutler.farebot.app.core.inflate
+import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.jakewharton.rxrelay2.PublishRelay
 import java.text.DateFormat

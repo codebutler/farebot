@@ -13,4 +13,6 @@ dependencies {
     annotationProcessor libs.autoValueGson
 }
 
-android { }
+android {
+    resourcePrefix 'transit_orca_'
+}

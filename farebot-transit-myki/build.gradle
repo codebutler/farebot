@@ -11,4 +11,6 @@ dependencies {
     annotationProcessor libs.autoValueGson
 }
 
-android { }
+android {
+    resourcePrefix 'myki_'
+}

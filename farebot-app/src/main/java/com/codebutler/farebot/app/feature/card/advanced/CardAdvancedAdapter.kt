@@ -27,14 +27,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.codebutler.farebot.R
-import com.codebutler.farebot.app.core.inflate
+import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.ByteArray
 import java.util.Locale
 
 // This is not very efficient.️
-class CardAdvancedAdapter(val fareBotUiTree: FareBotUiTree)
+class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
     : RecyclerView.Adapter<CardAdvancedAdapter.ViewHolder>() {
 
     private var viewModels : List<ViewModel>

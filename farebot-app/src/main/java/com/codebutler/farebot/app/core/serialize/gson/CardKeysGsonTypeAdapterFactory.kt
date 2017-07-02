@@ -62,9 +62,7 @@ class CardKeysGsonTypeAdapterFactory : TypeAdapterFactory {
 
         override fun write(out: JsonWriter, value: CardKeys) {
             val delegateAdapter = delegates[value.cardType()]
-            if (delegateAdapter == null) {
-                throw IllegalArgumentException("Unknown type: ${value.cardType()}")
-            }
+                    ?: throw IllegalArgumentException("Unknown type: ${value.cardType()}")
             val jsonObject = delegateAdapter.toJsonTree(value).asJsonObject
             Streams.write(jsonObject, out)
         }
@@ -74,9 +72,7 @@ class CardKeysGsonTypeAdapterFactory : TypeAdapterFactory {
             val typeElement = rootElement.asJsonObject.remove(KEY_CARD_TYPE)
             val cardType = CardType.valueOf(typeElement.asString)
             val delegateAdapter = delegates[cardType]
-            if (delegateAdapter == null) {
-                throw IllegalArgumentException("Unknown type: ${cardType}")
-            }
+                    ?: throw IllegalArgumentException("Unknown type: $cardType")
             return delegateAdapter.fromJsonTree(rootElement)
         }
     }

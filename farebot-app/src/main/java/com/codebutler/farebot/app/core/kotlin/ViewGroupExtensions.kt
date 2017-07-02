@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.app.core
+package com.codebutler.farebot.app.core.kotlin
 
 import android.support.annotation.LayoutRes
 import android.view.LayoutInflater

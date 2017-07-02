@@ -30,7 +30,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.codebutler.farebot.R
-import com.codebutler.farebot.app.core.inflate
+import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.RefillViewHolder
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.SubscriptionViewHolder
@@ -60,7 +60,7 @@ class TransactionAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: TransactionViewHolder, position: Int) {
-        val viewModel = viewModels.get(position)
+        val viewModel = viewModels[position]
         viewHolder.updateHeader(viewModel, isFirstInSection(position))
         when (viewHolder) {
             is TripViewHolder -> viewHolder.update(viewModel as TransactionViewModel.TripViewModel, relayClicks)
@@ -69,7 +69,7 @@ class TransactionAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int = when (viewModels.get(position)) {
+    override fun getItemViewType(position: Int): Int = when (viewModels[position]) {
         is TransactionViewModel.TripViewModel -> TYPE_TRIP
         is TransactionViewModel.RefillViewModel -> TYPE_REFILL
         is TransactionViewModel.SubscriptionViewModel -> TYPE_SUBSCRIPTION
@@ -111,6 +111,7 @@ class TransactionAdapter(
 
             fun update(viewModel: TransactionViewModel.TripViewModel, relayClicks: PublishRelay<TransactionViewModel>) {
                 image.setImageResource(viewModel.imageResId)
+                image.contentDescription = viewModel.trip.mode.toString()
 
                 route.text = viewModel.route
                 agency.text = viewModel.agency

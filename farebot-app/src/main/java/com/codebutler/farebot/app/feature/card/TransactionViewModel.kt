@@ -66,7 +66,7 @@ sealed class TransactionViewModel(val context : Context) {
         }
     }
 
-    class RefillViewModel(context : Context, val refill: com.codebutler.farebot.transit.Refill)
+    class RefillViewModel(context : Context, refill: com.codebutler.farebot.transit.Refill)
         : TransactionViewModel(context) {
 
         override val date: Date = Date(refill.timestamp * 1000)

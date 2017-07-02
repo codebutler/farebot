@@ -36,7 +36,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/grid_unit_2x"
         android:layout_gravity="center"
-        android:src="@drawable/ic_transaction_tvm_32dp"/>
+        android:src="@drawable/ic_transaction_tvm_32dp"
+        android:contentDescription="@string/refill"/>
 
     <TextView
         android:id="@+id/agency"

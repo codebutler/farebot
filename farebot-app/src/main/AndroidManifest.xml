@@ -48,7 +48,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:name="com.codebutler.farebot.app.core.app.FareBotApplication"
         android:allowBackup="true"
-        android:theme="@style/FareBot.Theme">
+        android:theme="@style/FareBot.Theme"
+        android:supportsRtl="true">
 
         <activity
             android:name="com.codebutler.farebot.app.feature.main.MainActivity"
