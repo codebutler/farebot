@@ -20,7 +20,6 @@ View your remaining balance, recent trips, and other information from contactles
 * [Lauri Andler](https://github.com/landler/) (HSL)
 * [Michael Farrell](https://github.com/micolous/) (Opal, Manly Fast Ferry, Go card, Myki, Octopus)
 * [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
-* [The Noun Project][15] (Various icons)
 
 ## License
 
@@ -47,23 +46,28 @@ View your remaining balance, recent trips, and other information from contactles
 
 ## Supported Cards
 
-* [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil (Requires encryption keys, not compatible with all devices)
 * [Clipper][1] - San Francisco, CA, USA
 * [EZ-Link][7] - Singapore (Not compatible with all devices)
-* [Go card][20] (Translink) - Brisbane and South East Queensland, Australia (requires encryption keys, not compatible with all devices, not all stations known)
-* [Manly Fast Ferry][19] - Sydney, Australia (requires encryption keys, not compatible with all devices)
 * [Myki][21] - Melbourne (and surrounds), VIC, Australia (Only the card number can be read)
 * [Matkakortti][16], [HSL][17] - Finland
 * [NETS FlashPay](http://www.netsflashpay.com.sg/) - Singapore
 * [Octopus][25] - Hong Kong
 * [Opal][18] - Sydney (and surrounds), NSW, Australia
 * [ORCA][0] - Seattle, WA, USA
-* [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands (Requires encryption keys, not compatible with all devices)
 * [Suica][9], [ICOCA][10], [PASMO][11], [Edy][12] - Japan
+
+## Supported Cards (Keys Required)
+
+These cards require that you crack the encryption key (using [mfcuk](https://github.com/nfc-tools/mfcuk)/[mfoc](https://github.com/nfc-tools/mfoc)) and are not compatible with all devices.
+
+* [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil
+* [Go card][20] (Translink) - Brisbane and South East Queensland, Australia
+* [Manly Fast Ferry][19] - Sydney, Australia 
+* [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands
 
 ## Supported Phones
 
-FareBot requires an NFC Android phone running 4.0.1 or later.
+FareBot requires an NFC Android phone running 5.0 or later.
 
 ## Building
 
@@ -76,12 +80,17 @@ FareBot requires an NFC Android phone running 4.0.1 or later.
 
 FareBot uses the following open-source libraries:
 
+* [AutoDispose](https://github.com/uber/AutoDispose)
 * [AutoValue](https://github.com/google/auto/tree/master/value)
 * [AutoValue Gson](https://github.com/rharter/auto-value-gson)
-* [AutoValue Parcel](https://github.com/rharter/auto-value-parcel)
-* [Apache Commons](https://commons.apache.org/)
+* [Dagger](https://google.github.io/dagger/)
 * [Gson](https://github.com/google/gson)
 * [Guava](https://github.com/google/guava)
+* [Kotlin](https://kotlinlang.org/)
+* [Magellan](https://github.com/wealthfront/magellan/)
+* [RxBroadcast](https://github.com/cantrowitz/RxBroadcast)
+* [RxJava](https://github.com/ReactiveX/RxJava)
+* [RxRelay](https://github.com/JakeWharton/RxRelay)
 
 [0]: http://www.orcacard.com/
 [1]: https://www.clippercard.com/
@@ -98,7 +107,6 @@ FareBot uses the following open-source libraries:
 [12]: https://en.wikipedia.org/wiki/Edy
 [13]: http://code.google.com/p/nfc-felica/
 [14]: http://www014.upp.so-net.ne.jp/SFCardFan/
-[15]: http://www.thenounproject.com/
 [16]: http://www.hsl.fi/EN/passengersguide/travelcard/Pages/default.aspx
 [17]: http://www.hsl.fi/EN/
 [18]: http://www.opal.com.au/
