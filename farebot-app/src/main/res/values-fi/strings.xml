@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="about">Tietoja</string>
+  <string name="balance">Saldo</string>
+  <string name="copy">Kopioi</string>
+  <string name="export_all">Exporttaa kaikki</string>
+  <string name="history">Historia</string>
+  <string name="import_">Import</string>
+  <string name="import_clipboard">Importtaa leikepöydältä</string>
+  <string name="import_file">Importtaa tiedostosta</string>
+  <string name="nfc_off_error">NFC on pois päältä</string>
+  <string name="preferences">Asetukset</string>
+  <string name="share">Jaa</string>
+  <string name="supported_cards">Tuetut kortit</string>
+  <string name="unknown_card">Tuntematon kortti</string>
+  <string name="wireless_settings">Tiedonsiirtoasetukset</string>
+</resources>

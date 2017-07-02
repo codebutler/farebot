@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="about">について</string>
+  <string name="add_key">鍵を追加</string>
+  <string name="balance">残高</string>
+  <string name="copy">コピー</string>
+  <string name="delete">削除</string>
+  <string name="export_all">すべてエクスポートする</string>
+  <string name="general">全般</string>
+  <string name="history">ヒストリー</string>
+  <string name="import_">インポート</string>
+  <string name="import_clipboard">クリップボードからインポート</string>
+  <string name="import_file">ファイルからインポート</string>
+  <string name="keys">鍵</string>
+  <string name="keys_required">このカードを読み取るために、暗号化鍵が必要です。</string>
+  <string name="launch_from_background">バックグラウンドで起動</string>
+  <string name="locked_card">ロックされたカード</string>
+  <string name="nfc_off_error">NFCは無効です</string>
+  <string name="nfc_unavailable">NFC が利用不可</string>
+  <string name="no_scanned_cards">カードがまだスキャンされていません。</string>
+  <string name="preferences">環境設定</string>
+  <string name="share">共有</string>
+  <string name="subscription_valid_format">有効な %1$s %2$s へ</string>
+  <string name="subscriptions">サブスクリプション</string>
+  <string name="supported_cards">利用できるカード</string>
+  <string name="unknown_card">未知のカード</string>
+  <string name="wireless_settings">無線設定</string>
+</resources>

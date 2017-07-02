@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="opal_action_journey_completed_auto_off">Reis voltooid (niet uitgecheckt)</string>
+  <string name="opal_action_journey_completed_auto_on">Reis voltooid (niet ingecheckt)</string>
+  <string name="opal_action_journey_completed_distance">Reis voltooid (afstandstarief)</string>
+  <string name="opal_action_journey_completed_flat_rate">Reis voltooid (tariefeenheden)</string>
+  <string name="opal_action_manly_new_journey">Nieuwe reis (Manly-veerboot)</string>
+  <string name="opal_action_manly_transfer_diff_mode">Overstap (van andere vervoerssoort naar Manly-veerboot)</string>
+  <string name="opal_action_manly_transfer_same_mode">Overstap (van andere veerboot naar Manly-veerboot)</string>
+  <string name="opal_action_new_journey">Nieuwe reis</string>
+  <string name="opal_action_none">Geen (nieuwe, ongebruikte kaart)</string>
+  <string name="opal_action_tap_on_reversal">Omgekeerd inchecken</string>
+  <string name="opal_action_transfer_diff_mode">Overstap (uit andere vervoerssoort)</string>
+  <string name="opal_action_transfer_same_mode">Overstap (binnen dezelfde vervoerssoort)</string>
+  <string name="opal_automatic_top_up">Automatisch opladen</string>
+  <string name="opal_checksum">Controlesom</string>
+  <string name="opal_date">Datum</string>
+  <string name="opal_last_transaction">Laatste transactie</string>
+  <string name="opal_time">Tijd</string>
+  <string name="opal_transaction_type">Transactietype</string>
+  <string name="opal_unknown_format">Onbekend (%s)</string>
+  <string name="opal_vehicle_bus">Bus</string>
+  <string name="opal_vehicle_ferry_lr">Veerboot of lightrail</string>
+  <string name="opal_vehicle_rail">Trein</string>
+  <string name="opal_weekly_trips">Wekelijkse reizen</string>
+</resources>

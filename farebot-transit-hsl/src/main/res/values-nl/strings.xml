@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="hsl_1zone_ticket">Interne kaart</string>
+  <string name="hsl_2zone_ticket">Regionale kaart</string>
+  <string name="hsl_balance_refill">Saldo-oplading</string>
+  <string name="hsl_mins_format">%s minuten</string>
+  <string name="hsl_pass_is_valid">Geldige seizoenskaart</string>
+  <string name="hsl_person_format">%s persoon</string>
+  <string name="hsl_previous_season_ticket">Vorige seizoenskaart was</string>
+  <string name="hsl_season_ticket">Seizoenskaart</string>
+  <string name="hsl_season_ticket_bought_on">Seizoenskaart is gekocht op</string>
+  <string name="hsl_season_ticket_ends">Seizoenskaart eindigt op</string>
+  <string name="hsl_season_ticket_price_was">De seizoenskaartprijs was</string>
+  <string name="hsl_season_ticket_starts">Seizoenskaart gaat in op</string>
+  <string name="hsl_value_ticket">Voordeelkaart</string>
+  <string name="hsl_value_ticket_bought_on">Kaart gekocht</string>
+  <string name="hsl_value_ticket_disco_group">Groepskorting</string>
+  <string name="hsl_value_ticket_duration">Kaartgeldigheid</string>
+  <string name="hsl_value_ticket_expires_on">Kaart verloopt op</string>
+  <string name="hsl_value_ticket_last_sign">Laatste teken</string>
+  <string name="hsl_value_ticket_last_transfer">Laatste overstap</string>
+  <string name="hsl_value_ticket_line_number">Rijnummer</string>
+  <string name="hsl_value_ticket_pax">Groepsgrootte</string>
+  <string name="hsl_value_ticket_price">Voordeelkaartprijs</string>
+  <string name="hsl_value_ticket_vehicle_number">Voertuignummer</string>
+  <string name="hsl_value_ticket_vehicle_type">Voertuigtype</string>
+  <string name="hsl_you_last_used_this_ticket">U heeft deze kaart voor het laatst gebruikt op</string>
+</resources>

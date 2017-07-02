@@ -64,7 +64,7 @@ subprojects {
 
                 lintOptions {
                     abortOnError true
-                    disable 'InvalidPackage'
+                    disable 'InvalidPackage','MissingTranslation'
                 }
 
                 dexOptions {

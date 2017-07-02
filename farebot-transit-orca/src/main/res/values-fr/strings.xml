@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="fare_cancelled_format">%s (Annulé)</string>
+</resources>

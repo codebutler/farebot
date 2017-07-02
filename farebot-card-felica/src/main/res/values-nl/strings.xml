@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="felica_process_admission_payment">Toelatingsbetaling</string>
+  <string name="felica_process_admission_thirdparty">Toelatingsbetaling (derde partij)</string>
+  <string name="felica_process_bonus_charge">Bonus bij opladen</string>
+  <string name="felica_process_booth_deduction">Balie-aftrek</string>
+  <string name="felica_process_booth_exit">Stationschefbalie-uitgang</string>
+  <string name="felica_process_bus_iruca">Bus (IruCa)</string>
+  <string name="felica_process_bus_pitapa">Bus (PiTaPa)</string>
+  <string name="felica_process_charge">Kosten</string>
+  <string name="felica_process_deposit_bus">Busstorting</string>
+  <string name="felica_process_entry_a_autocharge">Ingang A (automatisch opladen)</string>
+  <string name="felica_process_exit_a_autocharge">Uitgang A (automatisch opladen)</string>
+  <string name="felica_process_fare_adjustment">Tariefaanpassing</string>
+  <string name="felica_process_fare_exit_gate">Draaihek</string>
+  <string name="felica_process_issue_new">Nieuwe uitgifte</string>
+  <string name="felica_process_merchandise_admission">Handelswaar/Toelating</string>
+  <string name="felica_process_merchandise_admission_cash">Handelswaar/Toelating (deels met contant geld)</string>
+  <string name="felica_process_merchandise_cancel">Handelswaar annuleren</string>
+  <string name="felica_process_merchandise_purchase">Handelswaar</string>
+  <string name="felica_process_merchandise_purchase_cash">Handelswaar (deels met contant geld)</string>
+  <string name="felica_process_payment_shinkansen">Shinkansen-betaling</string>
+  <string name="felica_process_payment_thirdparty">Betaling (derde partij)</string>
+  <string name="felica_process_purchase_magnetic">Magnetische kaart</string>
+  <string name="felica_process_purchase_special_ticket">Kaart (speciale bus/tram)</string>
+  <string name="felica_process_register_deposit">Storting registreren</string>
+  <string name="felica_process_reissue">Heruitgave</string>
+  <string name="felica_terminal_booth">Balie</string>
+  <string name="felica_terminal_booth_green">Balie (groen)</string>
+  <string name="felica_terminal_connection_adjustment">Verbindingaanpassingsautomaat</string>
+  <string name="felica_terminal_deposit_quick_charge">Snelle oplaadautomaat</string>
+  <string name="felica_terminal_fare_adjustment">Tariefaanpassingsautomaat</string>
+  <string name="felica_terminal_mobile_phone">Mobiele telefoon</string>
+  <string name="felica_terminal_portable">Draagbare terminal</string>
+  <string name="felica_terminal_pos">Verkoopbalie</string>
+  <string name="felica_terminal_simple_deposit">Eenvoudige stortingsautomaat</string>
+  <string name="felica_terminal_simple_ticket_gate">Eenvoudige tourniquet</string>
+  <string name="felica_terminal_ticket">Kaartautomaat</string>
+  <string name="felica_terminal_ticket_gate">Tourniquet</string>
+  <string name="felica_terminal_ticket_gate_terminal">Tourniquet-terminal</string>
+  <string name="felica_terminal_transfer_adjustment">Overstapaanpassingsautomaat</string>
+  <string name="felica_terminal_tvm_etc">Kaartautomaat, etc.</string>
+  <string name="felica_terminal_tvm_tokyo_monorail">Tokio Monorail-kaartautomaat</string>
+  <string name="felica_terminal_vehicle">Voertuigterminal (in de bus)</string>
+  <string name="felica_terminal_vending">Automaat</string>
+</resources>

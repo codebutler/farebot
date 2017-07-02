@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="opal_action_journey_completed_auto_off">Voyage terminé (défaut de sortie)</string>
+  <string name="opal_action_journey_completed_auto_on">Voyage terminé (défaut d\'entrée)</string>
+  <string name="opal_action_journey_completed_distance">Voyage terminé (tarif de distance)</string>
+  <string name="opal_action_journey_completed_flat_rate">Voyage terminé (tarif forfaitaire)</string>
+  <string name="opal_action_manly_new_journey">Nouveau voyage (Manly Ferry)</string>
+  <string name="opal_action_manly_transfer_diff_mode">Transfert (d’un autre mode de transport vers Manly Ferry)</string>
+  <string name="opal_action_manly_transfer_same_mode">Transfer (d’un autre ferry vers Manly Ferry)</string>
+  <string name="opal_action_new_journey">Nouveau voyage</string>
+  <string name="opal_action_none">Aucun (carte neuve, non utilisée)</string>
+  <string name="opal_action_tap_on_reversal">Insérer dans l\'autre sens</string>
+  <string name="opal_action_transfer_diff_mode">Transfert (d\'un mode différent)</string>
+  <string name="opal_action_transfer_same_mode">Transfert (depuis le même mode)</string>
+  <string name="opal_automatic_top_up">Recharge automatique</string>
+  <string name="opal_checksum">Somme de contrôle</string>
+  <string name="opal_date">Date</string>
+  <string name="opal_last_transaction">Dernière transaction</string>
+  <string name="opal_time">Heure</string>
+  <string name="opal_transaction_type">Type de transaction</string>
+  <string name="opal_unknown_format">Inconnu (%s)</string>
+  <string name="opal_vehicle_bus">Bus</string>
+  <string name="opal_vehicle_ferry_lr">Ferry ou train léger sur Rail</string>
+  <string name="opal_vehicle_rail">Chemin de fer</string>
+  <string name="opal_weekly_trips">Déplacements hebdomadaires</string>
+</resources>

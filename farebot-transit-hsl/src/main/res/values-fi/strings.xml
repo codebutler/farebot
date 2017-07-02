@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="hsl_1zone_ticket">Sisäinen lippu</string>
+  <string name="hsl_2zone_ticket">Seutulippu</string>
+  <string name="hsl_balance_refill">Arvon lataus</string>
+  <string name="hsl_pass_is_valid">Kausi voimassa</string>
+  <string name="hsl_person_format">%s henkilö</string>
+  <string name="hsl_previous_season_ticket">Viime kausilippu</string>
+  <string name="hsl_season_ticket">Kausilippu</string>
+  <string name="hsl_season_ticket_bought_on">Kausilippu ostettu</string>
+  <string name="hsl_season_ticket_ends">Kausi loppuu</string>
+  <string name="hsl_season_ticket_price_was">Kausilipun hinta oli</string>
+  <string name="hsl_season_ticket_starts">Kausi alkaa</string>
+  <string name="hsl_value_ticket">Arvolippu</string>
+  <string name="hsl_value_ticket_bought_on">Arvolippu ostettu</string>
+  <string name="hsl_value_ticket_disco_group">Alennusryhmä</string>
+  <string name="hsl_value_ticket_duration">Vaihtoaika</string>
+  <string name="hsl_value_ticket_expires_on">Lippu vanhenee</string>
+  <string name="hsl_value_ticket_last_sign">Viimeinen merkki</string>
+  <string name="hsl_value_ticket_last_transfer">Viime vaihto</string>
+  <string name="hsl_value_ticket_line_number">Reittinumero</string>
+  <string name="hsl_value_ticket_pax">Ryhmän koko</string>
+  <string name="hsl_value_ticket_price">Arvolipun hinta</string>
+  <string name="hsl_value_ticket_vehicle_number">Kulkuneuvon numero</string>
+  <string name="hsl_value_ticket_vehicle_type">Liikenneväline</string>
+  <string name="hsl_you_last_used_this_ticket">Viimeksi käytit tätä kausilippua</string>
+</resources>

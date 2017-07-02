@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="about">A propos</string>
+  <string name="add_key">Ajouter clé</string>
+  <string name="balance">Solde</string>
+  <string name="copy">Copier</string>
+  <string name="delete">Supprimer</string>
+  <string name="export_all">Tout exporter</string>
+  <string name="general">Général</string>
+  <string name="history">Historique</string>
+  <string name="import_">Importer</string>
+  <string name="import_clipboard">Importer depuis le presse-papier</string>
+  <string name="import_file">Importer depuis un fichier</string>
+  <string name="keys">Clés</string>
+  <string name="keys_required">Des clés de chiffrement sont requises pour lire cette carte.</string>
+  <string name="launch_from_background">Démarrer depuis l\'arrière plan</string>
+  <string name="locked_card">Carte bloquée</string>
+  <string name="nfc_off_error">Le NFC est désactivé</string>
+  <string name="nfc_unavailable">NFC non disponible</string>
+  <string name="no_scanned_cards">Vous n\'avez scanné aucune carte.</string>
+  <string name="preferences">Préférences</string>
+  <string name="share">Partager</string>
+  <string name="subscription_valid_format">Valide %1$s à %2$s</string>
+  <string name="subscriptions">Souscriptions</string>
+  <string name="supported_cards">Cartes supportées</string>
+  <string name="unknown_card">Carte inconnue</string>
+  <string name="wireless_settings">Paramètres sans fil</string>
+</resources>

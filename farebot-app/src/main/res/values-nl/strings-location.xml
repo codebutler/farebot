@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="location_brisbane_seq_australia">Brisbane &amp; ZO QLD, Australië</string>
+  <string name="location_helsinki_finland">Helsinki, Finland</string>
+  <string name="location_hong_kong">Hongkong</string>
+  <string name="location_kansai">Kansai, Japan</string>
+  <string name="location_san_francisco">San Francisco, CA, VS</string>
+  <string name="location_sao_paulo">São Paulo, Brazilië</string>
+  <string name="location_seattle">Seattle, WA, VS</string>
+  <string name="location_singapore">Singapore</string>
+  <string name="location_sydney_australia">Sydney, Australië</string>
+  <string name="location_the_netherlands">Nederland</string>
+  <string name="location_tokyo">Tokio, Japan</string>
+  <string name="location_victoria_australia">Victoria, Australië</string>
+</resources>

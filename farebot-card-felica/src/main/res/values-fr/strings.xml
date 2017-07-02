@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="felica_process_admission_payment">Paiement de l’admission</string>
+  <string name="felica_process_admission_thirdparty">Frais d\'admission (entreprise tierce)</string>
+  <string name="felica_process_bonus_charge">Bonus de charge</string>
+  <string name="felica_process_booth_deduction">Réduction de guichet</string>
+  <string name="felica_process_booth_exit">Sortie du guichet principal de la station</string>
+  <string name="felica_process_bus_iruca">Bus (IruCa)</string>
+  <string name="felica_process_bus_pitapa">Bus (PiTaPa)</string>
+  <string name="felica_process_charge">Frais</string>
+  <string name="felica_process_deposit_bus">Dépôt de bus</string>
+  <string name="felica_process_entry_a_autocharge">Entrée A (Paiement auto)</string>
+  <string name="felica_process_exit_a_autocharge">Sortie A (Paiement auto)</string>
+  <string name="felica_process_fare_adjustment">Ajustement des tarifs</string>
+  <string name="felica_process_fare_exit_gate">Grille de tarifs</string>
+  <string name="felica_process_issue_new">Nouvelle parution</string>
+  <string name="felica_process_merchandise_admission">Marchandises/Admission</string>
+  <string name="felica_process_merchandise_admission_cash">Marchandises/Admission (partiellement en cash)</string>
+  <string name="felica_process_merchandise_cancel">Annuler la marchandise</string>
+  <string name="felica_process_merchandise_purchase">Marchandise</string>
+  <string name="felica_process_merchandise_purchase_cash">Marchandises (partiellement en cash)</string>
+  <string name="felica_process_payment_shinkansen">Paiement Shinkansen</string>
+  <string name="felica_process_payment_thirdparty">Paiement (tier)</string>
+  <string name="felica_process_purchase_magnetic">Billet magnétique</string>
+  <string name="felica_process_purchase_special_ticket">Billet (spécial Bus/tramway)</string>
+  <string name="felica_process_register_deposit">Registre des dépôts</string>
+  <string name="felica_process_reissue">Ré-édition</string>
+  <string name="felica_terminal_booth">Stand</string>
+  <string name="felica_terminal_booth_green">Stand (Green)</string>
+  <string name="felica_terminal_connection_adjustment">Machine d\'ajustement de commutation</string>
+  <string name="felica_terminal_deposit_quick_charge">Machine de recharge rapide</string>
+  <string name="felica_terminal_fare_adjustment">Machine d\'ajustement de tarif</string>
+  <string name="felica_terminal_mobile_phone">Téléphone mobile</string>
+  <string name="felica_terminal_portable">Terminal portable</string>
+  <string name="felica_terminal_pos">Terminal point de vente</string>
+  <string name="felica_terminal_simple_deposit">Machine de dépôt simple</string>
+  <string name="felica_terminal_simple_ticket_gate">Portail de tiquet simple</string>
+  <string name="felica_terminal_ticket">Horodateur</string>
+  <string name="felica_terminal_ticket_gate">Portique</string>
+  <string name="felica_terminal_ticket_gate_terminal">Portique terminal</string>
+  <string name="felica_terminal_transfer_adjustment">Machine d\'ajustement de transfert</string>
+  <string name="felica_terminal_tvm_etc">Horodateur, etc..</string>
+  <string name="felica_terminal_tvm_tokyo_monorail">Horodateur du Tokyo Monorail</string>
+  <string name="felica_terminal_vehicle">Terminal de véhicule (en bus)</string>
+  <string name="felica_terminal_vending">Distributeur automatique</string>
+</resources>

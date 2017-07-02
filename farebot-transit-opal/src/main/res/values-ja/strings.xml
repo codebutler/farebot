@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="opal_action_journey_completed_auto_off">旅を完了しました (取り出しに失敗)</string>
+  <string name="opal_action_journey_completed_auto_on">旅を完了しました (挿入に失敗)</string>
+  <string name="opal_action_journey_completed_distance">旅を完了しました (距離運賃)</string>
+  <string name="opal_action_journey_completed_flat_rate">旅を完了しました (定額制運賃)</string>
+  <string name="opal_action_manly_new_journey">新しい旅 (マンリー フェリー)</string>
+  <string name="opal_action_manly_transfer_diff_mode">乗換 (他の形態からマンリー フェリーへ)</string>
+  <string name="opal_action_manly_transfer_same_mode">乗換 (他のフェリーからマンリー フェリー)</string>
+  <string name="opal_action_new_journey">新しい旅</string>
+  <string name="opal_action_none">なし (新規、未使用カード)</string>
+  <string name="opal_action_tap_on_reversal">反対に挿入</string>
+  <string name="opal_action_transfer_diff_mode">乗換 (異なる形態から)</string>
+  <string name="opal_action_transfer_same_mode">乗換 (同じ形態から)</string>
+  <string name="opal_automatic_top_up">自動チャージ</string>
+  <string name="opal_checksum">チェックサム</string>
+  <string name="opal_date">日付</string>
+  <string name="opal_last_transaction">最後のトランザクション</string>
+  <string name="opal_time">時刻</string>
+  <string name="opal_transaction_type">トランザクションの種類</string>
+  <string name="opal_unknown_format">不明 (%s)</string>
+  <string name="opal_vehicle_bus">バス</string>
+  <string name="opal_vehicle_ferry_lr">フェリーや路面電車</string>
+  <string name="opal_vehicle_rail">鉄道</string>
+  <string name="opal_weekly_trips">毎週の旅行</string>
+</resources>

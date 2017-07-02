@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="location_brisbane_seq_australia">オーストラリア クイーンズランド州 ブリスベン &amp; SE</string>
+  <string name="location_helsinki_finland">フィンランド ヘルシンキ</string>
+  <string name="location_hong_kong">香港</string>
+  <string name="location_kansai">関西</string>
+  <string name="location_san_francisco">米国 カリフォルニア州 サンフランシスコ</string>
+  <string name="location_sao_paulo">ブラジル サンパウロ</string>
+  <string name="location_seattle">米国 ワシントン州 シアトル</string>
+  <string name="location_singapore">シンガポール</string>
+  <string name="location_sydney_australia">オーストラリア シドニー</string>
+  <string name="location_the_netherlands">オランダ</string>
+  <string name="location_tokyo">東京</string>
+  <string name="location_victoria_australia">オーストラリア ビクトリア州</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="seqgo_card_note">Go Access, Explore または SEEQ カードはサポートしません。</string>
+  <string name="seqgo_refill_automatic">自動チャージ</string>
+  <string name="seqgo_refill_manual">手動チャージ</string>
+</resources>

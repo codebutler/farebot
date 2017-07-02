@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="hsl_1zone_ticket">内部チケット</string>
+  <string name="hsl_2zone_ticket">地域チケット</string>
+  <string name="hsl_balance_refill">残高チャージ</string>
+  <string name="hsl_mins_format">%s 分</string>
+  <string name="hsl_pass_is_valid">有効なシーズン チケット</string>
+  <string name="hsl_person_format">%s 人</string>
+  <string name="hsl_previous_season_ticket">前のシーズン チケットは</string>
+  <string name="hsl_season_ticket">シーズン チケット</string>
+  <string name="hsl_season_ticket_bought_on">シーズン チケット購入</string>
+  <string name="hsl_season_ticket_ends">シーズン チケット終了</string>
+  <string name="hsl_season_ticket_price_was">シーズン チケットの値段は</string>
+  <string name="hsl_season_ticket_starts">シーズン チケット開始</string>
+  <string name="hsl_value_ticket">バリュー チケット</string>
+  <string name="hsl_value_ticket_bought_on">チケット購入</string>
+  <string name="hsl_value_ticket_disco_group">割引グループ</string>
+  <string name="hsl_value_ticket_duration">チケット有効期間</string>
+  <string name="hsl_value_ticket_expires_on">チケットの有効期限</string>
+  <string name="hsl_value_ticket_last_sign">最後の署名</string>
+  <string name="hsl_value_ticket_last_transfer">最後の乗換</string>
+  <string name="hsl_value_ticket_line_number">路線番号</string>
+  <string name="hsl_value_ticket_pax">グループ サイズ</string>
+  <string name="hsl_value_ticket_price">バリュー チケットの値段</string>
+  <string name="hsl_value_ticket_vehicle_number">乗り物番号</string>
+  <string name="hsl_value_ticket_vehicle_type">乗り物の種類</string>
+  <string name="hsl_you_last_used_this_ticket">最後にこのチケットを使用したのは</string>
+</resources>
