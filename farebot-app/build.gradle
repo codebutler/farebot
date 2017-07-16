@@ -27,7 +27,7 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     implementation project(':farebot-base')
-    compile project(':farebot-app-persist')
+    implementation project(':farebot-app-persist')
     implementation project(':farebot-card')
     implementation project(':farebot-card-cepas')
     implementation project(':farebot-card-classic')

@@ -6,28 +6,28 @@ ext {
         buildToolsVersion: '25.0.2'
     ]
 
-    def daggerVersion   = '2.10'
+    def daggerVersion   = '2.11'
     def magellanVersion = '1.0.0'
-    def supportVersion  = '25.3.1'
-    def kotlinVersion   = '1.1.2-5'
+    def supportVersion  = '25.4.0'
+    def kotlinVersion   = '1.1.3-2'
 
     libs = [
         autoDispose:              'com.uber.autodispose:autodispose:0.2.0',
         autoDisposeAndroid:       'com.uber.autodispose:autodispose-android:0.2.0',
         autoValue:                'com.google.auto.value:auto-value:1.4.1',
         autoValueAnnotations:     'com.jakewharton.auto.value:auto-value-annotations:1.4',
-        autoValueGson:            'com.ryanharter.auto.value:auto-value-gson:0.4.6',
+        autoValueGson:            'com.ryanharter.auto.value:auto-value-gson:0.5.0',
         autoValueGsonAnnotations: project(':third_party:auto-value-gson-annotations'),
         crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.6.8@aar',
         dagger:                   "com.google.dagger:dagger:${daggerVersion}",
         daggerCompiler:           "com.google.dagger:dagger-compiler:${daggerVersion}",
-        gson:                     'com.google.code.gson:gson:2.8.0',
-        guava:                    'com.google.guava:guava:20.0',
+        gson:                     'com.google.code.gson:gson:2.8.1',
+        guava:                    'com.google.guava:guava:22.0-android',
         kotlinStdlib:             "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
         magellan:                 "com.wealthfront:magellan:${magellanVersion}",
-        playServicesMaps:         'com.google.android.gms:play-services-maps:11.0.1',
+        playServicesMaps:         'com.google.android.gms:play-services-maps:11.0.2',
         rxBroadcast:              'com.cantrowitz:rxbroadcast:2.0.0',
-        rxJava2:                  'io.reactivex.rxjava2:rxjava:2.1.0',
+        rxJava2:                  'io.reactivex.rxjava2:rxjava:2.1.1',
         rxRelay2:                 'com.jakewharton.rxrelay2:rxrelay:2.0.0',
         supportDesign:            "com.android.support:design:${supportVersion}",
         supportV4:                "com.android.support:support-v4:${supportVersion}",
