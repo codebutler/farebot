@@ -88,7 +88,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 android {
     defaultConfig {
-        versionCode 22
+        versionCode 23
         versionName '3.0.0'
         multiDexEnabled true
     }

@@ -40,7 +40,6 @@ import com.wealthfront.magellan.BaseScreenView
 class HomeScreenView internal constructor(ctx: Context, val listener: Listener)
     : BaseScreenView<HomeScreen>(ctx) {
 
-    private val contentViewGroup: ViewGroup by bindView(R.id.content)
     private val splashImageView: ImageView by bindView(R.id.splash)
     private val progressBar: ProgressBar by bindView(R.id.progress)
     private val errorViewGroup: ViewGroup by bindView(R.id.nfc_error_viewgroup)
@@ -62,8 +61,8 @@ class HomeScreenView internal constructor(ctx: Context, val listener: Listener)
         fadeInAnim?.cancel()
         fadeOutAnim?.cancel()
 
-        val viewFadeIn = if (show) progressBar else contentViewGroup
-        val viewFadeOut = if (show) contentViewGroup else progressBar
+        val viewFadeIn = if (show) progressBar else splashImageView
+        val viewFadeOut = if (show) splashImageView else progressBar
 
         viewFadeIn.alpha = 0f
         viewFadeIn.visibility = View.VISIBLE

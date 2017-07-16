@@ -22,14 +22,14 @@
 
 package com.codebutler.farebot.app.feature.main
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.view.ViewCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -43,7 +43,9 @@ import com.codebutler.farebot.app.core.activity.RequestPermissionsResult
 import com.codebutler.farebot.app.core.app.FareBotApplication
 import com.codebutler.farebot.app.core.app.FareBotApplicationComponent
 import com.codebutler.farebot.app.core.inject.ActivityScope
+import com.codebutler.farebot.app.core.kotlin.adjustAlpha
 import com.codebutler.farebot.app.core.kotlin.bindView
+import com.codebutler.farebot.app.core.kotlin.getColor
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
@@ -82,7 +84,10 @@ class MainActivity : AppCompatActivity(),
     private val menuItemClickRelay = PublishRelay.create<MenuItem>()
     private val permissionsResultRelay = PublishRelay.create<RequestPermissionsResult>()
 
+    private val shortAnimationDuration: Long by lazy { resources.getInteger(android.R.integer.config_shortAnimTime).toLong() }
     private val toolbarElevation: Float by lazy { resources.getDimensionPixelSize(R.dimen.toolbar_elevation).toFloat() }
+
+    private var animToolbarBg: ObjectAnimator? = null
 
     val component: MainActivityComponent by lazy {
         DaggerMainActivity_MainActivityComponent.builder()
@@ -169,18 +174,28 @@ class MainActivity : AppCompatActivity(),
         toolbar.visibility = if (actionBarConfig.visible()) View.VISIBLE else View.GONE
     }
 
+    @SuppressLint("ResourceType") // Lint bug?
     override fun onShow(screen: Screen<*>) {
-        @ColorInt
-        fun getColor(@ColorRes colorRes: Int?, @ColorInt defaultColor: Int)
-                = if (colorRes == null) defaultColor else ResourcesCompat.getColor(resources, colorRes, theme)
+        val options = (screen as FareBotScreen<*, *>).getActionBarOptions()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(!navigator.atRoot())
 
-        val options = (screen as FareBotScreen<*, *>).getActionBarOptions()
         toolbar.setTitleTextColor(getColor(options.textColorRes, Color.BLACK))
-        toolbar.setBackgroundColor(getColor(options.backgroundColorRes, Color.TRANSPARENT))
         toolbar.title = screen.getTitle(this)
         toolbar.subtitle = null
+
+        val newColor = getColor(options.backgroundColorRes, Color.TRANSPARENT)
+        val curColor = (toolbar.background as? ColorDrawable)?.color ?: Color.TRANSPARENT
+
+        val curColorForAnim = if (curColor == Color.TRANSPARENT) adjustAlpha(newColor) else curColor
+        val newColorForAnim = if (newColor == Color.TRANSPARENT) adjustAlpha(curColor) else newColor
+
+        animToolbarBg?.cancel()
+        animToolbarBg = ObjectAnimator.ofArgb(toolbar, "backgroundColor", curColorForAnim, newColorForAnim).apply {
+            duration = shortAnimationDuration
+            start()
+        }
+
         ViewCompat.setElevation(toolbar, if (options.shadow) toolbarElevation else 0f)
     }
 
