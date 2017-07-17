@@ -20,6 +20,4 @@
 -dontnote com.google.common.util.concurrent.MoreExecutors
 -dontnote com.google.api.client.util.Key
 -dontnote com.google.common.collect.MapMakerInternalMap$ReferenceEntry
-
-# AutoValue
--keep class **.AutoParcelGson_*
+-dontwarn javax.lang.model.element.Modifier
