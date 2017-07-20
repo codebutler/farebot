@@ -67,6 +67,7 @@ public abstract class OrcaTrip extends Trip {
     private static Map<Integer, Station> sWSFTerminals = ImmutableMap.<Integer, Station>builder()
             .put(10101, Station.create("Seattle Terminal", "Seattle", "47.602722", "-122.338512"))
             .put(10103, Station.create("Bainbridge Island Terminal", "Bainbridge", "47.62362", "-122.51082"))
+            .put(10104, Station.create("Fauntleroy Terminal", "Seattle", "47.5231", "-122.39602"))
             .build();
 
     @NonNull
