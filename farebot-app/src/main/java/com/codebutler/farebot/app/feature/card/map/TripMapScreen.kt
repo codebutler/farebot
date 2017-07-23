@@ -27,6 +27,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.inject.ScreenScope
+import com.codebutler.farebot.app.core.kotlin.compact
 import com.codebutler.farebot.app.core.ui.ActionBarOptions
 import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.feature.main.MainActivity
@@ -46,15 +47,17 @@ class TripMapScreen(val trip: Trip) : FareBotScreen<TripMapScreen.Component, Tri
     override fun onShow(context: Context) {
         super.onShow(context)
 
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            val resources = context.resources
-            setDisplayHomeAsUpEnabled(true)
-            title = trip.getFormattedStations(context)
-            subtitle =
-                    if (trip.getRouteName(resources) == null)
-                        trip.getAgencyName(resources)
-                    else
-                        "${trip.getAgencyName(resources)} ${trip.getRouteName(resources)}"
+        view.post {
+            (activity as AppCompatActivity).supportActionBar?.apply {
+                val resources = context.resources
+                setDisplayHomeAsUpEnabled(true)
+                title = arrayOf(trip.startStation?.shortStationName, trip.endStation?.shortStationName)
+                        .compact()
+                        .joinToString(" → ")
+                subtitle = arrayOf(trip.getAgencyName(resources), trip.getRouteName(resources))
+                        .compact()
+                        .joinToString(" ")
+            }
         }
 
         view.onCreate(Bundle())
@@ -100,3 +103,4 @@ class TripMapScreen(val trip: Trip) : FareBotScreen<TripMapScreen.Component, Tri
         fun inject(screen: TripMapScreen)
     }
 }
+

@@ -36,6 +36,7 @@ import com.codebutler.farebot.app.core.activity.ActivityResult
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
+import com.codebutler.farebot.app.core.ui.ActionBarOptions
 import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.core.util.ErrorUtils
 import com.codebutler.farebot.app.feature.main.MainActivity
@@ -63,6 +64,11 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
     private var tagInfo : TagInfo = TagInfo()
 
     override fun getTitle(context: Context): String = context.getString(R.string.add_key)
+
+    override fun getActionBarOptions(): ActionBarOptions = ActionBarOptions(
+            backgroundColorRes = R.color.accent,
+            textColorRes = R.color.white
+    )
 
     override fun onShow(context: Context) {
         super.onShow(context)

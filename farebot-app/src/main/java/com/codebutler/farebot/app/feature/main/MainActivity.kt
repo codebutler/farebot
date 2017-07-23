@@ -84,8 +84,13 @@ class MainActivity : AppCompatActivity(),
     private val menuItemClickRelay = PublishRelay.create<MenuItem>()
     private val permissionsResultRelay = PublishRelay.create<RequestPermissionsResult>()
 
-    private val shortAnimationDuration: Long by lazy { resources.getInteger(android.R.integer.config_shortAnimTime).toLong() }
-    private val toolbarElevation: Float by lazy { resources.getDimensionPixelSize(R.dimen.toolbar_elevation).toFloat() }
+    private val shortAnimationDuration: Long by lazy {
+        resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+    }
+
+    private val toolbarElevation: Float by lazy {
+        resources.getDimensionPixelSize(R.dimen.toolbar_elevation).toFloat()
+    }
 
     private var animToolbarBg: ObjectAnimator? = null
 

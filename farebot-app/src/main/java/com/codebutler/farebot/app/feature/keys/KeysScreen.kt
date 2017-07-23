@@ -28,6 +28,7 @@ import android.view.MenuItem
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.inject.ScreenScope
+import com.codebutler.farebot.app.core.ui.ActionBarOptions
 import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.core.util.ErrorUtils
 import com.codebutler.farebot.app.feature.keys.add.AddKeyScreen
@@ -48,6 +49,11 @@ class KeysScreen : FareBotScreen<KeysScreen.KeysComponent, KeysScreenView>(), Ke
     @Inject lateinit var keysPersister: CardKeysPersister
 
     override fun getTitle(context: Context): String = context.getString(R.string.keys)
+
+    override fun getActionBarOptions(): ActionBarOptions = ActionBarOptions(
+            backgroundColorRes = R.color.accent,
+            textColorRes = R.color.white
+    )
 
     override fun onCreateView(context: Context): KeysScreenView = KeysScreenView(context, activityOperations, this)
 
