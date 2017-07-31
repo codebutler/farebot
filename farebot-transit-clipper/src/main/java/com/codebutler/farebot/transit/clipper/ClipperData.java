@@ -107,6 +107,7 @@ final class ClipperData {
             .put(0x24L, Station.create("Union City Station", "Union City", "37.591203", "-122.017854"))
             .put(0x25L, Station.create("Fremont Station", "Fremont", "37.557727", "-121.976395"))
             .put(0x26L, Station.create("Daly City Station", "Daly City", "37.7066", "-122.4696"))
+            .put(0x27L, Station.create("Dublin/Pleasanton Station", "Dublin/Pleasanton", "37.7017", "-121.9013"))
             .put(0x28L, Station.create("South San Francisco Station", "South SF", "37.6744", "-122.442"))
             .put(0x29L, Station.create("San Bruno Station", "San Bruno", "37.63714", "-122.415622"))
             .put(0x2aL, Station.create("San Francisco Int'l Airport Station", "SFO", "37.61590", "-122.39263"))
