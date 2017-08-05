@@ -89,7 +89,8 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         imageResId = R.drawable.ezlink_card,
                         name = "EZ-Link",
                         locationResId = R.string.location_singapore,
-                        cardType = CardType.CEPAS
+                        cardType = CardType.CEPAS,
+                        extraNoteResId = R.string.ezlink_card_note
                 ),
                 SupportedCard(
                         imageResId = R.drawable.octopus_card,
