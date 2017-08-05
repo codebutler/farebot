@@ -29,6 +29,8 @@ import android.support.annotation.Nullable;
 import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.key.CardKeys;
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,21 +39,33 @@ import java.util.List;
 @AutoValue
 public abstract class ClassicCardKeys implements CardKeys {
 
+    /**
+     * Mifare Classic uses 48-bit keys.
+     */
     private static final int KEY_LEN = 6;
 
+    /**
+     * Reads keys from a binary bin dump created by proxmark3.
+     */
     @NonNull
-    public static ClassicCardKeys fromDump(String keyType, byte[] keyData) {
+    public static ClassicCardKeys fromProxmark3(byte[] keysDump) {
         List<ClassicSectorKey> keys = new ArrayList<>();
-        int numSectors = keyData.length / KEY_LEN;
+        int numSectors = keysDump.length / KEY_LEN / 2;
         for (int i = 0; i < numSectors; i++) {
-            int start = i * KEY_LEN;
-            keys.add(ClassicSectorKey.create(keyType, Arrays.copyOfRange(keyData, start, start + KEY_LEN)));
+            int keyAOffset = (i * KEY_LEN);
+            int keyBOffset = (i * KEY_LEN) + (KEY_LEN * numSectors);
+            keys.add(ClassicSectorKey.create(readKey(keysDump, keyAOffset), readKey(keysDump, keyBOffset)));
         }
         return ClassicCardKeys.create(keys);
     }
 
     @NonNull
-    public static ClassicCardKeys create(@NonNull List<ClassicSectorKey> keys) {
+    public static TypeAdapter<ClassicCardKeys> typeAdapter(@NonNull Gson gson) {
+        return new AutoValue_ClassicCardKeys.GsonTypeAdapter(gson);
+    }
+
+    @NonNull
+    private static ClassicCardKeys create(@NonNull List<ClassicSectorKey> keys) {
         return new AutoValue_ClassicCardKeys(CardType.MifareClassic, keys);
     }
 
@@ -64,12 +78,16 @@ public abstract class ClassicCardKeys implements CardKeys {
      */
     @Nullable
     public ClassicSectorKey keyForSector(int sectorNumber) {
-        List<ClassicSectorKey> keys = getKeys();
+        List<ClassicSectorKey> keys = keys();
         if (sectorNumber >= keys.size()) {
             return null;
         }
         return keys.get(sectorNumber);
     }
 
-    public abstract List<ClassicSectorKey> getKeys();
+    public abstract List<ClassicSectorKey> keys();
+
+    private static byte[] readKey(byte[] data, int offset) {
+        return Arrays.copyOfRange(data, offset, offset + KEY_LEN);
+    }
 }

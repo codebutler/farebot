@@ -88,10 +88,9 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard, C
                     if (!authSuccess) {
                         ClassicSectorKey sectorKey = keys.keyForSector(sectorIndex);
                         if (sectorKey != null) {
-                            if (sectorKey.getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKey().bytes());
-                            } else {
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKey().bytes());
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.getKeyA().bytes());
+                            if (!authSuccess) {
+                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.getKeyB().bytes());
                             }
                         }
                     }
@@ -101,7 +100,7 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard, C
                         //
                         // This takes longer, of course, but means that users aren't scratching
                         // their heads when we don't get the right key straight away.
-                        List<ClassicSectorKey> cardKeys = keys.getKeys();
+                        List<ClassicSectorKey> cardKeys = keys.keys();
 
                         for (int keyIndex = 0; keyIndex < cardKeys.size(); keyIndex++) {
                             if (keyIndex == sectorIndex) {
@@ -109,12 +108,12 @@ public class ClassicTagReader extends TagReader<MifareClassic, RawClassicCard, C
                                 continue;
                             }
 
-                            if (cardKeys.get(keyIndex).getType().equals(ClassicSectorKey.TYPE_KEYA)) {
-                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex,
-                                        cardKeys.get(keyIndex).getKey().bytes());
-                            } else {
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex,
+                                    cardKeys.get(keyIndex).getKeyA().bytes());
+
+                            if (!authSuccess) {
                                 authSuccess = tech.authenticateSectorWithKeyB(sectorIndex,
-                                        cardKeys.get(keyIndex).getKey().bytes());
+                                        cardKeys.get(keyIndex).getKeyB().bytes());
                             }
 
                             if (authSuccess) {

@@ -23,7 +23,6 @@
 package com.codebutler.farebot.app.feature.keys.add
 
 import android.app.Activity
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -38,7 +37,6 @@ import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
 import com.codebutler.farebot.app.core.ui.ActionBarOptions
 import com.codebutler.farebot.app.core.ui.FareBotScreen
-import com.codebutler.farebot.app.core.util.ErrorUtils
 import com.codebutler.farebot.app.feature.main.MainActivity
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.card.CardType
@@ -115,25 +113,12 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
                 REQUEST_SELECT_FILE)
     }
 
-    override fun onImportClipboard() {
-        val clipboardManager = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val importClip = clipboardManager.primaryClip
-        if (importClip != null && importClip.itemCount > 0) {
-            val text = importClip.getItemAt(0).coerceToText(activity).toString()
-            try {
-                setKey(ByteUtils.hexStringToByteArray(text))
-            } catch (e: Throwable) {
-                ErrorUtils.showErrorAlert(activity, e)
-            }
-        }
-    }
-
     override fun onSave() {
         val tagId = tagInfo.tagId
         val keyData = tagInfo.keyData
         val cardType = tagInfo.cardType
         if (tagId != null && keyData != null && cardType != null) {
-            val serializedKey = cardKeysSerializer.serialize(ClassicCardKeys.fromDump(view.keyType, keyData))
+            val serializedKey = cardKeysSerializer.serialize(ClassicCardKeys.fromProxmark3(keyData))
             cardKeysPersister.insert(SavedKey.create(ByteUtils.getHexString(tagId), cardType, serializedKey))
             navigator.goBack()
         }

@@ -66,6 +66,6 @@
     <string name="unknown_card_desc">This card is not supported by FareBot</string>
     <string name="wireless_settings">Wireless Settings</string>
     <string name="delete">Delete</string>
-    <string name="key_type">Key Type</string>
     <string name="key_data">Key Data</string>
+    <string name="import_keys_proxmark">Import proxmark3 key dump</string>
 </resources>

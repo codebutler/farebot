@@ -26,13 +26,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.widget.Button
-import android.widget.SimpleAdapter
-import android.widget.Spinner
 import android.widget.TextView
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.card.classic.key.ClassicSectorKey
 import com.wealthfront.magellan.BaseScreenView
 
 @SuppressLint("ViewConstructor")
@@ -42,9 +39,7 @@ class AddKeyScreenView(context: Context, val listener: Listener)
     val cardTypeTextView: TextView by bindView(R.id.card_type)
     val contentView: View by bindView(R.id.content)
     val importFileButton: Button by bindView(R.id.import_file)
-    val importClipboardButton: Button by bindView(R.id.import_clipboard)
     val keyDataTextView: TextView by bindView(R.id.key_data)
-    val keyTypeSpinner: Spinner by bindView(R.id.key_type)
     val saveButton: Button by bindView(R.id.save)
     val splashView: View by bindView(R.id.splash)
     val tagIdTextView: TextView by bindView(R.id.tag_id)
@@ -53,17 +48,7 @@ class AddKeyScreenView(context: Context, val listener: Listener)
         inflate(context, R.layout.screen_keys_add, this)
 
         importFileButton.setOnClickListener { listener.onImportFile() }
-        importClipboardButton.setOnClickListener { listener.onImportClipboard() }
         saveButton.setOnClickListener { listener.onSave() }
-
-        val adapter = SimpleAdapter(
-                context,
-                listOf(mapOf("name" to ClassicSectorKey.TYPE_KEYA), mapOf("name" to ClassicSectorKey.TYPE_KEYB)),
-                android.R.layout.simple_spinner_item, arrayOf("name"),
-                intArrayOf(android.R.id.text1))
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        keyTypeSpinner.adapter = adapter
-        keyTypeSpinner.setSelection(1)
     }
 
     fun update(tagInfo: AddKeyScreen.TagInfo) {
@@ -76,12 +61,8 @@ class AddKeyScreenView(context: Context, val listener: Listener)
         saveButton.isEnabled = tagInfo.tagId != null && tagInfo.cardType != null && tagInfo.keyData != null
     }
 
-    @Suppress("UNCHECKED_CAST")
-    val keyType: String
-        get() = (keyTypeSpinner.selectedItem as Map<String, String>)["name"]!!
     interface Listener {
         fun onImportFile()
-        fun onImportClipboard()
         fun onSave()
     }
 }

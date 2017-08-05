@@ -50,9 +50,8 @@ class CardKeysGsonTypeAdapterFactory : TypeAdapterFactory {
             return null
         }
         val delegates = HashMap<CardType, TypeAdapter<CardKeys>>()
-        for ((key, _) in CLASSES) {
-            val cardKeysType = object : TypeToken<CardKeys>() {}
-            delegates.put(key, gson.getDelegateAdapter(this, cardKeysType))
+        for ((key, value) in CLASSES) {
+            delegates.put(key, gson.getDelegateAdapter(this, TypeToken.get(value) as TypeToken<CardKeys>))
         }
         return CardKeysTypeAdapter(delegates) as TypeAdapter<T>
     }
@@ -69,7 +68,7 @@ class CardKeysGsonTypeAdapterFactory : TypeAdapterFactory {
 
         override fun read(inJsonReader: JsonReader): CardKeys {
             val rootElement = Streams.parse(inJsonReader)
-            val typeElement = rootElement.asJsonObject.remove(KEY_CARD_TYPE)
+            val typeElement = rootElement.asJsonObject.get(KEY_CARD_TYPE)
             val cardType = CardType.valueOf(typeElement.asString)
             val delegateAdapter = delegates[cardType]
                     ?: throw IllegalArgumentException("Unknown type: $cardType")

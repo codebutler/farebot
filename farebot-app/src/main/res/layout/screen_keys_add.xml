@@ -84,18 +84,6 @@
                     android:textSize="@dimen/text_primary"
                     tools:text="Mifare Classic"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/text_secondary"
-                    android:text="@string/key_type"/>
-
-                <Spinner
-                    android:id="@+id/key_type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/grid_unit_2x"
-                    android:textSize="@dimen/text_primary"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -107,13 +95,7 @@
                     android:id="@+id/import_file"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/import_file"/>
-
-                <Button
-                    android:id="@+id/import_clipboard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/import_clipboard"/>
+                    android:text="@string/import_keys_proxmark"/>
 
                 <TextView
                     android:id="@+id/key_data"
