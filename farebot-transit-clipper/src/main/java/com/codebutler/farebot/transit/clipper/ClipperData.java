@@ -89,6 +89,7 @@ final class ClipperData {
             .put(0x0dL, Station.create("19th Street Oakland Station", "19th St.", "37.80762", "-122.26886"))
             .put(0x0eL, Station.create("MacArthur Station", "MacArthur", "37.82928", "-122.26661"))
             .put(0x0fL, Station.create("Rockridge Station", "Rockridge", "37.84463", "-122.251825"))
+            .put(0x11L, Station.create("Lafayette Station", "Lafayette", "37.89318", "-122.1246409"))
             .put(0x12L, Station.create("Walnut Creek Station", "Walnut Creek", "37.90563", "-122.06744"))
             .put(0x14L, Station.create("Concord Station", "Concord", "37.97376", "-122.02903"))
             .put(0x15L, Station.create("North Concord/Martinez Station", "N. Concord/Martinez", "38.00318", "-122.02463"))
