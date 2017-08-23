@@ -198,8 +198,10 @@ public abstract class CEPASPurse {
 
     public abstract int getAutoLoadAmount();
 
+    @Nullable
     public abstract ByteArray getCAN();
 
+    @Nullable
     public abstract ByteArray getCSN();
 
     public abstract int getPurseExpiryDate();
@@ -208,6 +210,7 @@ public abstract class CEPASPurse {
 
     public abstract int getLastCreditTransactionTRP();
 
+    @Nullable
     public abstract ByteArray getLastCreditTransactionHeader();
 
     public abstract byte getLogfileRecordCount();
@@ -216,8 +219,10 @@ public abstract class CEPASPurse {
 
     public abstract int getLastTransactionTRP();
 
+    @Nullable
     public abstract CEPASTransaction getLastTransactionRecord();
 
+    @Nullable
     public abstract ByteArray getIssuerSpecificData();
 
     public abstract byte getLastTransactionDebitOptionsByte();

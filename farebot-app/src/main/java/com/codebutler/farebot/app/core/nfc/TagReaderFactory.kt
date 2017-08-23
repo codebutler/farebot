@@ -39,8 +39,8 @@ class TagReaderFactory {
             tagId: ByteArray,
             tag: Tag,
             cardKeys: CardKeys?): TagReader<*, *, *> = when {
-        "android.nfc.tech.IsoDep" in tag.techList -> DesfireTagReader(tagId, tag)
         "android.nfc.tech.NfcB" in tag.techList -> CEPASTagReader(tagId, tag)
+        "android.nfc.tech.IsoDep" in tag.techList -> DesfireTagReader(tagId, tag)
         "android.nfc.tech.NfcF" in tag.techList -> FelicaTagReader(tagId, tag)
         "android.nfc.tech.MifareClassic" in tag.techList -> ClassicTagReader(tagId, tag, cardKeys as ClassicCardKeys?)
         "android.nfc.tech.MifareUltralight" in tag.techList -> UltralightTagReader(tagId, tag)

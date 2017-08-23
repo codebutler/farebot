@@ -34,6 +34,7 @@ import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse;
 import com.codebutler.farebot.key.CardKeys;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -56,25 +57,25 @@ public class CEPASTagReader extends TagReader<IsoDep, RawCEPASCard, CardKeys> {
             @NonNull Tag tag,
             @NonNull IsoDep tech,
             @Nullable CardKeys cardKeys) throws Exception {
-        List<RawCEPASPurse> purses = new ArrayList<>(16);
-        List<RawCEPASHistory> histories = new ArrayList<>(16);
+        RawCEPASPurse[] purses = new RawCEPASPurse[16];
+        RawCEPASHistory[] histories = new RawCEPASHistory[16];
 
         CEPASProtocol protocol = new CEPASProtocol(tech);
 
-        for (int purseId = 0; purseId < purses.size(); purseId++) {
-            purses.set(purseId, protocol.getPurse(purseId));
+        for (int purseId = 0; purseId < purses.length; purseId++) {
+            purses[purseId] = protocol.getPurse(purseId);
         }
 
-        for (int historyId = 0; historyId < histories.size(); historyId++) {
-            RawCEPASPurse rawCEPASPurse = purses.get(historyId);
+        for (int historyId = 0; historyId < histories.length; historyId++) {
+            RawCEPASPurse rawCEPASPurse = purses[historyId];
             if (rawCEPASPurse.isValid()) {
                 int recordCount = Integer.parseInt(Byte.toString(rawCEPASPurse.logfileRecordCount()));
-                histories.set(historyId, protocol.getHistory(historyId, recordCount));
+                histories[historyId] = protocol.getHistory(historyId, recordCount);
             } else {
-                histories.set(historyId, RawCEPASHistory.create(historyId, "Invalid Purse"));
+                histories[historyId] = RawCEPASHistory.create(historyId, "Invalid Purse");
             }
         }
 
-        return RawCEPASCard.create(tag.getId(), new Date(), purses, histories);
+        return RawCEPASCard.create(tag.getId(), new Date(), Arrays.asList(purses), Arrays.asList(histories));
     }
 }
