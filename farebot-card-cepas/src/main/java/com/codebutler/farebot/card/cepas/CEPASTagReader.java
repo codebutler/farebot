@@ -33,10 +33,8 @@ import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory;
 import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse;
 import com.codebutler.farebot.key.CardKeys;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class CEPASTagReader extends TagReader<IsoDep, RawCEPASCard, CardKeys> {
 
