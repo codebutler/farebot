@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.app.core.nfc
 
-class UnsupportedTagException(val techList: Array<String>, val tagId: String) : Exception() {
+class UnsupportedTagException(private val techList: Array<String>, val tagId: String) : Exception() {
 
     override val message: String?
         get() {

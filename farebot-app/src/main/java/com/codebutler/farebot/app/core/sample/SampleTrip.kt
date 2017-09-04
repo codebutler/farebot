@@ -27,7 +27,7 @@ import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 import java.util.Date
 
-class SampleTrip(val date : Date) : Trip() {
+class SampleTrip(private val date : Date) : Trip() {
 
     override fun getTimestamp(): Long = date.time / 1000
 

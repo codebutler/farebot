@@ -46,7 +46,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CardScreen(val rawCard : RawCard<*>) : FareBotScreen<CardScreen.Component, CardScreenView>() {
+class CardScreen(private val rawCard : RawCard<*>) : FareBotScreen<CardScreen.Component, CardScreenView>() {
 
     data class Content(
             val card: Card,

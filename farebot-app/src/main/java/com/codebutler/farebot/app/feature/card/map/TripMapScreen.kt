@@ -33,7 +33,7 @@ import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.feature.main.MainActivity
 import com.codebutler.farebot.transit.Trip
 
-class TripMapScreen(val trip: Trip) : FareBotScreen<TripMapScreen.Component, TripMapScreenView>() {
+class TripMapScreen(private val trip: Trip) : FareBotScreen<TripMapScreen.Component, TripMapScreenView>() {
 
     override fun getTitle(context: Context): String = context.getString(R.string.map)
 

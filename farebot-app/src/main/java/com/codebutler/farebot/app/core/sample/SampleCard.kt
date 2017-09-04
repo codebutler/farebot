@@ -30,7 +30,7 @@ import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import java.util.Date
 
-class SampleCard(val rawCard: RawSampleCard) : Card() {
+class SampleCard(private val rawCard: RawSampleCard) : Card() {
 
     override fun getCardType(): CardType = rawCard.cardType()
 

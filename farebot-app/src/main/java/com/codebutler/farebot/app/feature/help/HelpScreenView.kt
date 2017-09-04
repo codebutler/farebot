@@ -174,8 +174,8 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
     }
 
     internal class SupportedCardsAdapter(
-            private val mContext: Context,
-            private val mSupportedCards: List<SupportedCard>)
+            private val context: Context,
+            private val supportedCards: List<SupportedCard>)
         : RecyclerView.Adapter<SupportedCardViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SupportedCardViewHolder {
@@ -184,12 +184,10 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
         }
 
         override fun onBindViewHolder(holder: SupportedCardViewHolder, position: Int) {
-            holder.bind(mContext, mSupportedCards[position])
+            holder.bind(context, supportedCards[position])
         }
 
-        override fun getItemCount(): Int {
-            return mSupportedCards.size
-        }
+        override fun getItemCount(): Int = supportedCards.size
     }
 
     internal class SupportedCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

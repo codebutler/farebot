@@ -34,14 +34,14 @@ fun uiTree(context: Context, init: TreeScope.() -> Unit): FareBotUiTree {
 }
 
 @UiTreeBuilderMarker
-class TreeScope(val context: Context, val uiBuilder: FareBotUiTree.Builder) {
+class TreeScope(private val context: Context, private val uiBuilder: FareBotUiTree.Builder) {
     fun item(init: ItemScope.() -> Unit) {
         ItemScope(context, uiBuilder.item()).init()
     }
 }
 
 @UiTreeBuilderMarker
-class ItemScope(val context: Context, val item: FareBotUiTree.Item.Builder) {
+class ItemScope(private val context: Context, private val item: FareBotUiTree.Item.Builder) {
 
     var title: Any? = null
         set(value) { item.title(if (value is Int) context.getString(value) else value.toString()) }

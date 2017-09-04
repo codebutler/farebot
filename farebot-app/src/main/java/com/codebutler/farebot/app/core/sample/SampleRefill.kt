@@ -26,7 +26,7 @@ import android.content.res.Resources
 import com.codebutler.farebot.transit.Refill
 import java.util.Date
 
-class SampleRefill(val date: Date) : Refill() {
+class SampleRefill(private val date: Date) : Refill() {
 
     override fun getTimestamp(): Long = date.time / 1000
 

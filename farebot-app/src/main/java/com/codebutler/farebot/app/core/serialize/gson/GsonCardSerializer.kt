@@ -26,13 +26,13 @@ import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.google.gson.Gson
 
-class GsonCardSerializer(private val mGson: Gson) : CardSerializer {
+class GsonCardSerializer(private val gson: Gson) : CardSerializer {
 
     override fun serialize(card: RawCard<*>): String {
-        return mGson.toJson(card)
+        return gson.toJson(card)
     }
 
     override fun deserialize(json: String): RawCard<*> {
-        return mGson.fromJson(json, RawCard::class.java)
+        return gson.fromJson(json, RawCard::class.java)
     }
 }
