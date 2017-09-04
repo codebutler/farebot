@@ -9,7 +9,7 @@ ext {
     def daggerVersion   = '2.11'
     def magellanVersion = '1.0.0'
     def supportVersion  = '25.4.0'
-    def kotlinVersion   = '1.1.3-2'
+    def kotlinVersion   = '1.1.4'
 
     libs = [
         autoDispose:              'com.uber.autodispose:autodispose:0.2.0',
