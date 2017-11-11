@@ -103,6 +103,7 @@ final class ClipperData {
             .put(0x1dL, Station.create("Lake Merritt Station", "Lake Merritt", "37.79761", "-122.26564"))
             .put(0x1eL, Station.create("Fruitvale Station", "Fruitvale", "37.77495", "-122.22425"))
             .put(0x1fL, Station.create("Coliseum Station", "Coliseum", "37.75256", "-122.19806"))
+            .put(0x21L, Station.create("San Leandro Station", "San Leandro", "37.7219502", "-122.1608553"))
             .put(0x22L, Station.create("Hayward Station", "Hayward", "37.670387", "-122.088002"))
             .put(0x23L, Station.create("South Hayward Station", "South Hayward", "37.634800", "-122.057551"))
             .put(0x24L, Station.create("Union City Station", "Union City", "37.591203", "-122.017854"))
