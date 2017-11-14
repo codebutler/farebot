@@ -76,8 +76,8 @@ class KeysAdapter(
     }
 
     class KeyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textView1 : TextView by bindView(android.R.id.text1)
-        val textView2 : TextView by bindView(android.R.id.text2)
+        val textView1: TextView by bindView(android.R.id.text1)
+        val textView2: TextView by bindView(android.R.id.text2)
 
         internal fun update(viewModel: KeyViewModel) {
             textView1.text = viewModel.savedKey.card_id()

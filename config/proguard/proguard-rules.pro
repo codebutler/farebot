@@ -13,6 +13,8 @@
 
 # Dependencies
 -keep class com.google.android.gms.**
+-keep class com.wealthfront.magellan.Screen
+-dontwarn com.google.auto.value.**
 -dontwarn com.google.common.**
 -dontnote android.net.http.**
 -dontnote org.apache.http.**
@@ -21,3 +23,6 @@
 -dontnote com.google.api.client.util.Key
 -dontnote com.google.common.collect.MapMakerInternalMap$ReferenceEntry
 -dontwarn javax.lang.model.element.Modifier
+
+# FareBot
+-keep class com.codebutler.farebot.base.ui.FareBotUiTree

@@ -32,12 +32,12 @@ import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
 
-sealed class TransactionViewModel(val context : Context) {
+sealed class TransactionViewModel(val context: Context) {
 
-    abstract val date : Date?
+    abstract val date: Date?
         get
 
-    val time : String?
+    val time: String?
         get() = if (date != null) DateFormat.getTimeInstance(DateFormat.SHORT).format(date) else null
 
     class TripViewModel(context: Context, val trip: Trip) : TransactionViewModel(context) {
@@ -50,10 +50,10 @@ sealed class TransactionViewModel(val context : Context) {
 
         val fare = trip.getFareString(context.resources)
 
-        val stations : CharSequence? = trip.getFormattedStations(context)
+        val stations: CharSequence? = trip.getFormattedStations(context)
 
         @DrawableRes
-        val imageResId : Int = when (trip.mode) {
+        val imageResId: Int = when (trip.mode) {
                 Trip.Mode.BUS -> R.drawable.ic_transaction_bus_32dp
                 Trip.Mode.TRAIN -> R.drawable.ic_transaction_train_32dp
                 Trip.Mode.TRAM -> R.drawable.ic_transaction_tram_32dp
@@ -87,7 +87,7 @@ sealed class TransactionViewModel(val context : Context) {
 
         val name = subscription.getSubscriptionName(context.resources)
 
-        val valid : CharSequence
+        val valid: CharSequence
             get() {
                 val format = DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK)
                 val validFrom = format.format(subscription.validFrom)

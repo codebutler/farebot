@@ -99,7 +99,7 @@ class CardStream(
         sampleRelay.accept(RawSampleCard())
     }
 
-    private fun getCardKeys(tagId: String) : CardKeys? {
+    private fun getCardKeys(tagId: String): CardKeys? {
         val savedKey = cardKeysPersister.getForTagId(tagId) ?: return null
         return cardKeysSerializer.deserialize(savedKey.key_data())
     }

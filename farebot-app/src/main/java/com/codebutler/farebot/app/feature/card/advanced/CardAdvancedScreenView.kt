@@ -33,8 +33,8 @@ import com.wealthfront.magellan.BaseScreenView
 
 class CardAdvancedScreenView(context: Context) : BaseScreenView<CardAdvancedScreen>(context) {
 
-    private val tabHost : TabHost by bindView(android.R.id.tabhost)
-    private val tabContent : ViewGroup by bindView(android.R.id.tabcontent)
+    private val tabHost: TabHost by bindView(android.R.id.tabhost)
+    private val tabContent: ViewGroup by bindView(android.R.id.tabcontent)
 
     private var tabCount = 0
 

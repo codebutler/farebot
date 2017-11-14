@@ -102,7 +102,7 @@ class KeysScreen : FareBotScreen<KeysScreen.KeysComponent, KeysScreenView>(), Ke
                 )
     }
 
-    private fun observeKeys() : Single<List<KeyViewModel>> {
+    private fun observeKeys(): Single<List<KeyViewModel>> {
         return Single.create<List<SavedKey>> { e ->
             try {
                 e.onSuccess(keysPersister.savedKeys)

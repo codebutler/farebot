@@ -35,7 +35,7 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 
 class CardAdvancedTabView : FrameLayout {
 
-    private val recyclerView : RecyclerView by bindView(R.id.recycler)
+    private val recyclerView: RecyclerView by bindView(R.id.recycler)
 
     constructor(context: Context?)
             : super(context)
@@ -53,7 +53,7 @@ class CardAdvancedTabView : FrameLayout {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = CardAdvancedAdapter(fareBotUiTree)
         recyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
-            val divider : Drawable
+            val divider: Drawable
 
             init {
                 val attrs = intArrayOf(android.R.attr.listDivider)

@@ -103,9 +103,9 @@ class EasyCardTransitFactory(private val context: Context) : TransitFactory<Clas
     }
 
     private data class EasyCardRefill(
-            private val timestamp : Long,
-            private val location : String,
-            private val amount : Long) : Refill() {
+            private val timestamp: Long,
+            private val location: String,
+            private val amount: Long) : Refill() {
 
         override fun getTimestamp(): Long = timestamp
 
@@ -123,7 +123,7 @@ class EasyCardTransitFactory(private val context: Context) : TransitFactory<Clas
     }
 
     private data class EasyCardTrip(
-            private val timestamp : Long,
+            private val timestamp: Long,
             private val fare: Long,
             private val balance: Long,
             private val transactionType: Int) : Trip() {

@@ -40,7 +40,7 @@ class CardScreenView(context: Context) : BaseScreenView<CardScreen>(context) {
     private val clicksRelay = PublishRelay.create<TransactionViewModel>()
 
     private val balanceLayout: LinearLayout by bindView(R.id.balance_layout)
-    private val balanceTextView : TextView by bindView(R.id.balance)
+    private val balanceTextView: TextView by bindView(R.id.balance)
     private val errorTextView: TextView by bindView(R.id.error)
     private val recycler: RecyclerView by bindView(R.id.recycler)
 

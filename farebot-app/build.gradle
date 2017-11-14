@@ -71,7 +71,6 @@ dependencies {
     }
 
     implementation libs.dagger
-    annotationProcessor libs.daggerCompiler
     kapt libs.daggerCompiler
 }
 

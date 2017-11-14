@@ -25,7 +25,7 @@ package com.codebutler.farebot.app.core.kotlin
 import java.util.Calendar
 import java.util.Date
 
-fun date(year: Int, month: Int, day: Int = 1, hour: Int = 0, minute: Int = 0) : Date =
+fun date(year: Int, month: Int, day: Int = 1, hour: Int = 0, minute: Int = 0): Date =
         Calendar.getInstance().apply {
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month)

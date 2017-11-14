@@ -37,7 +37,7 @@ import java.util.Locale
 class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
     : RecyclerView.Adapter<CardAdvancedAdapter.ViewHolder>() {
 
-    private var viewModels : List<ViewModel>
+    private var viewModels: List<ViewModel>
     private var visibleViewModels: List<ViewModel> = listOf()
 
     init {
@@ -54,7 +54,7 @@ class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
         viewHolder.bind(visibleViewModels[position])
     }
 
-    private fun flatten(items: List<FareBotUiTree.Item>, parent: ViewModel? = null, depth: Int = 0) : List<ViewModel> {
+    private fun flatten(items: List<FareBotUiTree.Item>, parent: ViewModel? = null, depth: Int = 0): List<ViewModel> {
         val viewModels = mutableListOf<ViewModel>()
         for (item in items) {
             val viewModel = ViewModel(
@@ -75,21 +75,21 @@ class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
     }
 
     data class ViewModel(
-            var title : String,
-            var value : Any?,
-            var parent : ViewModel?,
-            var canExpand : Boolean,
-            var expanded : Boolean = false,
-            var depth : Int) {
+            var title: String,
+            var value: Any?,
+            var parent: ViewModel?,
+            var canExpand: Boolean,
+            var expanded: Boolean = false,
+            var depth: Int) {
 
-        val visible : Boolean
+        val visible: Boolean
             get() = parent?.let { it.visible && (if (it.canExpand) it.expanded else true) } ?: true
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val title : TextView by bindView(R.id.title)
-        val value : TextView by bindView(R.id.value)
+        val title: TextView by bindView(R.id.title)
+        val value: TextView by bindView(R.id.value)
 
         val padding = itemView.resources.getDimensionPixelSize(R.dimen.grid_unit_2x)
 

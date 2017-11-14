@@ -40,7 +40,7 @@ import com.codebutler.farebot.app.feature.bg.BackgroundTagActivity
 class FareBotPreferenceActivity : PreferenceActivity(), Preference.OnPreferenceChangeListener {
 
     companion object {
-        fun newIntent(context: Context) : Intent = Intent(context, FareBotPreferenceActivity::class.java)
+        fun newIntent(context: Context): Intent = Intent(context, FareBotPreferenceActivity::class.java)
     }
 
     private lateinit var preferenceLaunchFromBackground: CheckBoxPreference

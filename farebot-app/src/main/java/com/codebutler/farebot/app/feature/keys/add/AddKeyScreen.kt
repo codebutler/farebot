@@ -59,7 +59,7 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
     @Inject lateinit var cardKeysSerializer: CardKeysSerializer
     @Inject lateinit var nfcStream: NfcStream
 
-    private var tagInfo : TagInfo = TagInfo()
+    private var tagInfo: TagInfo = TagInfo()
 
     override fun getTitle(context: Context): String = context.getString(R.string.add_key)
 

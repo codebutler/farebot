@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 dependencies {
     implementation libs.guava
@@ -8,7 +9,7 @@ dependencies {
 
     compileOnly libs.autoValueAnnotations
 
-    annotationProcessor libs.autoValue
+    kapt libs.autoValue
 
 }
 

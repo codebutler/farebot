@@ -36,7 +36,7 @@ import dagger.Component
 @Component(modules = arrayOf(FareBotApplicationModule::class))
 interface FareBotApplicationComponent {
 
-    fun application() : FareBotApplication
+    fun application(): FareBotApplication
 
     fun cardPersister(): CardPersister
 
@@ -59,7 +59,7 @@ interface FareBotApplicationComponent {
     @Component.Builder
     interface Builder {
 
-        fun module(module: FareBotApplicationModule) : Builder
+        fun module(module: FareBotApplicationModule): Builder
 
         @BindsInstance
         fun application(application: FareBotApplication): Builder

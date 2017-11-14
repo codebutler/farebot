@@ -40,7 +40,7 @@ import java.util.Calendar
 import java.util.Date
 
 class TransactionAdapter(
-        val viewModels : List<TransactionViewModel>,
+        val viewModels: List<TransactionViewModel>,
         private val relayClicks: PublishRelay<TransactionViewModel>)
     : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
@@ -80,13 +80,13 @@ class TransactionAdapter(
         companion object {
             fun wrapLayout(parent: ViewGroup, @LayoutRes layoutId: Int): View
                     = parent.inflate(R.layout.item_transaction).apply {
-                (findViewById(R.id.container) as ViewGroup).inflate(layoutId, true)
+                findViewById<ViewGroup>(R.id.container).inflate(layoutId, true)
             }
         }
 
         val header: TextView by bindView(R.id.header)
 
-        fun updateHeader(item : TransactionViewModel, isFirstInSection: Boolean) {
+        fun updateHeader(item: TransactionViewModel, isFirstInSection: Boolean) {
             val showHeader = isFirstInSection
             header.visibility = if (showHeader) View.VISIBLE else View.GONE
             if (showHeader) {
@@ -101,13 +101,13 @@ class TransactionAdapter(
         class TripViewHolder(parent: ViewGroup)
             : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_trip)) {
 
-            val item : View by bindView(R.id.item)
-            val image : ImageView by bindView(R.id.image)
-            val route : TextView by bindView(R.id.route)
-            val agency : TextView by bindView(R.id.agency)
-            val stations : TextView by bindView(R.id.stations)
-            val fare : TextView by bindView(R.id.fare)
-            val time : TextView by bindView(R.id.time)
+            val item: View by bindView(R.id.item)
+            val image: ImageView by bindView(R.id.image)
+            val route: TextView by bindView(R.id.route)
+            val agency: TextView by bindView(R.id.agency)
+            val stations: TextView by bindView(R.id.stations)
+            val fare: TextView by bindView(R.id.fare)
+            val time: TextView by bindView(R.id.time)
 
             fun update(viewModel: TransactionViewModel.TripViewModel, relayClicks: PublishRelay<TransactionViewModel>) {
                 image.setImageResource(viewModel.imageResId)
@@ -136,9 +136,9 @@ class TransactionAdapter(
         class RefillViewHolder(parent: ViewGroup)
             : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_refill)) {
 
-            val agency : TextView by bindView(R.id.agency)
-            val amount : TextView by bindView(R.id.amount)
-            val time : TextView by bindView(R.id.time)
+            val agency: TextView by bindView(R.id.agency)
+            val amount: TextView by bindView(R.id.amount)
+            val time: TextView by bindView(R.id.time)
 
             fun update(viewModel: TransactionViewModel.RefillViewModel) {
                 agency.text = viewModel.agency
@@ -150,10 +150,10 @@ class TransactionAdapter(
         class SubscriptionViewHolder(parent: ViewGroup)
             : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_subscription)) {
 
-            val agency : TextView by bindView(R.id.agency)
-            val name : TextView by bindView(R.id.name)
-            val valid : TextView by bindView(R.id.valid)
-            val used : TextView by bindView(R.id.used)
+            val agency: TextView by bindView(R.id.agency)
+            val name: TextView by bindView(R.id.name)
+            val valid: TextView by bindView(R.id.valid)
+            val used: TextView by bindView(R.id.used)
 
             fun update(viewModel: TransactionViewModel.SubscriptionViewModel) {
                 agency.text = viewModel.agency
@@ -166,7 +166,7 @@ class TransactionAdapter(
     }
 
     private fun isFirstInSection(position: Int): Boolean {
-        fun createCalendar(date : Date?) : Calendar? {
+        fun createCalendar(date: Date?): Calendar? {
             if (date != null) {
                 val cal = Calendar.getInstance()
                 cal.time = date

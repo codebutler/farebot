@@ -52,7 +52,7 @@ class HistoryScreenView(
     private val recyclerView: RecyclerView by bindView(R.id.recycler)
     private val emptyView: View by bindView(R.id.empty)
 
-    private var actionMode : ActionMode? = null
+    private var actionMode: ActionMode? = null
 
     init {
         inflate(context, R.layout.screen_history, this)

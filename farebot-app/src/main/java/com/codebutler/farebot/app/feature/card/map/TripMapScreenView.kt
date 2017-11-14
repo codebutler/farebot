@@ -43,7 +43,7 @@ import java.util.ArrayList
 @SuppressLint("ViewConstructor")
 class TripMapScreenView(
         context: Context,
-        val trip : Trip)
+        val trip: Trip)
     : BaseScreenView<TripMapScreen>(context) {
 
     private val mapView: MapView by bindView(R.id.map)

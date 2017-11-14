@@ -48,7 +48,7 @@ class KeysScreenView(
 
     private val recyclerView: RecyclerView by bindView(R.id.recycler)
 
-    private var actionMode : ActionMode? = null
+    private var actionMode: ActionMode? = null
 
     init {
         inflate(context, R.layout.screen_keys, this)

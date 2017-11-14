@@ -46,7 +46,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CardScreen(private val rawCard : RawCard<*>) : FareBotScreen<CardScreen.Component, CardScreenView>() {
+class CardScreen(private val rawCard: RawCard<*>) : FareBotScreen<CardScreen.Component, CardScreenView>() {
 
     data class Content(
             val card: Card,
@@ -127,18 +127,18 @@ class CardScreen(private val rawCard : RawCard<*>) : FareBotScreen<CardScreen.Co
         menu?.findItem(R.id.card_advanced)?.isVisible = content != null
     }
 
-    private fun loadContent() : Single<Content> = Single.create<Content> { e ->
+    private fun loadContent(): Single<Content> = Single.create<Content> { e ->
         try {
             val card = rawCard.parse()
             val transitInfo = transitFactoryRegistry.parseTransitInfo(card)
             val viewModels = createViewModels(transitInfo)
             e.onSuccess(Content(card, transitInfo, viewModels))
-        } catch (ex : Exception) {
+        } catch (ex: Exception) {
             e.onError(ex)
         }
     }
 
-    private fun createViewModels(transitInfo : TransitInfo?) : List<TransactionViewModel> {
+    private fun createViewModels(transitInfo: TransitInfo?): List<TransactionViewModel> {
         val subscriptions = transitInfo?.subscriptions?.map { TransactionViewModel.SubscriptionViewModel(activity, it) } ?: listOf()
         val trips = transitInfo?.trips?.map { TransactionViewModel.TripViewModel(activity, it) } ?: listOf()
         val refills = transitInfo?.refills?.map { TransactionViewModel.RefillViewModel(activity, it) } ?: listOf()

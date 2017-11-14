@@ -35,9 +35,9 @@ fun <T> Single<Optional<T>>.filterAndGetOptional(): Maybe<T> = this
         .map { it.get }
 
 data class Optional<out T>(val value: T?) {
-    val isPresent : Boolean
+    val isPresent: Boolean
         get() = value != null
 
-    val get : T
+    val get: T
         get() = value!!
 }

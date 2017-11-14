@@ -249,21 +249,21 @@ class MainActivity : AppCompatActivity(),
     @Component(dependencies = arrayOf(FareBotApplicationComponent::class), modules = arrayOf(MainActivityModule::class))
     interface MainActivityComponent {
 
-        fun activityOperations() : ActivityOperations
+        fun activityOperations(): ActivityOperations
 
-        fun application() : FareBotApplication
+        fun application(): FareBotApplication
 
-        fun cardPersister() : CardPersister
+        fun cardPersister(): CardPersister
 
-        fun cardSerializer() : CardSerializer
+        fun cardSerializer(): CardSerializer
 
         fun cardKeysPersister(): CardKeysPersister
 
         fun cardKeysSerializer(): CardKeysSerializer
 
-        fun cardStream() : CardStream
+        fun cardStream(): CardStream
 
-        fun exportHelper() : ExportHelper
+        fun exportHelper(): ExportHelper
 
         fun nfcStream(): NfcStream
 
@@ -271,9 +271,9 @@ class MainActivity : AppCompatActivity(),
 
         fun tagReaderFactory(): TagReaderFactory
 
-        fun transitFactoryRegistry() : TransitFactoryRegistry
+        fun transitFactoryRegistry(): TransitFactoryRegistry
 
-        fun inject(mainActivity : MainActivity)
+        fun inject(mainActivity: MainActivity)
 
         @Component.Builder
         interface Builder {
