@@ -62,6 +62,8 @@
     <string name="subscriptions">Subscriptions</string>
     <string name="subscription_valid_format">Valid %1$s to %2$s</string>
     <string name="supported_cards">Supported Cards</string>
+    <string name="tag_lost">Card Connection Lost</string>
+    <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
     <string name="unknown_card">Unknown Card</string>
     <string name="unknown_card_desc">This card is not supported by FareBot</string>
     <string name="wireless_settings">Wireless Settings</string>
