@@ -27,6 +27,7 @@
     <style name="FareBot.Theme" parent="Theme.AppCompat.Light"/>
 
     <style name="FareBot.Theme.Main">
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowBackground">@color/window_bg</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

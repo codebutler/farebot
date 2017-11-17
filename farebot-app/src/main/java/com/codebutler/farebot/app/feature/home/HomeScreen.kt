@@ -36,6 +36,7 @@ import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
 import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
 import com.codebutler.farebot.app.core.inject.ScreenScope
+import com.codebutler.farebot.app.core.ui.ActionBarOptions
 import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.core.util.ErrorUtils
 import com.codebutler.farebot.app.feature.card.CardScreen
@@ -64,6 +65,8 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
     override fun onCreateView(context: Context): HomeScreenView = HomeScreenView(context, this)
 
     override fun getTitle(context: Context): String = context.getString(R.string.app_name)
+
+    override fun getActionBarOptions(): ActionBarOptions = ActionBarOptions(shadow = false)
 
     override fun onShow(context: Context) {
         super.onShow(context)

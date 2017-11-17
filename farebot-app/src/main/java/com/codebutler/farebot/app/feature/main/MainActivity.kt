@@ -30,6 +30,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.AppBarLayout
 import android.support.v4.view.ViewCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -77,7 +78,8 @@ class MainActivity : AppCompatActivity(),
     @Inject internal lateinit var navigator: Navigator
     @Inject internal lateinit var nfcStream: NfcStream
 
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
+    private val appBarLayout by bindView<AppBarLayout>(R.id.appBarLayout)
+    private val toolbar by bindView<Toolbar>(R.id.toolbar)
 
     private val activityResultRelay = PublishRelay.create<ActivityResult>()
     private val handler = Handler()
@@ -201,7 +203,7 @@ class MainActivity : AppCompatActivity(),
             start()
         }
 
-        ViewCompat.setElevation(toolbar, if (options.shadow) toolbarElevation else 0f)
+        ViewCompat.setElevation(appBarLayout, if (options.shadow) toolbarElevation else 0f)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
