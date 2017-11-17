@@ -59,7 +59,8 @@ View your remaining balance, recent trips, and other information from contactles
 
 ## Supported Cards (Keys Required)
 
-These cards require that you crack the encryption key (using [mfcuk](https://github.com/nfc-tools/mfcuk)/[mfoc](https://github.com/nfc-tools/mfoc)) and are not compatible with all devices.
+These cards require that you crack the encryption key (using a [proxmark3](https://github.com/Proxmark/proxmark3/wiki/Mifare-HowTo#how-can-i-break-a-card) 
+or [mfcuk](https://github.com/nfc-tools/mfcuk)+[mfoc](https://github.com/nfc-tools/mfoc)) and are not compatible with all devices.
 
 * [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil
 * [Go card][20] (Translink) - Brisbane and South East Queensland, Australia
