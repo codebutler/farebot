@@ -32,6 +32,7 @@ import android.view.ViewPropertyAnimator
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.codebutler.farebot.BuildConfig
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.wealthfront.magellan.BaseScreenView
@@ -54,7 +55,10 @@ class HomeScreenView internal constructor(ctx: Context, val listener: Listener)
     init {
         inflate(context, R.layout.screen_home, this)
         errorButton.setOnClickListener { listener.onNfcErrorButtonClicked() }
-        splashImageView.setOnLongClickListener { listener.onSampleButtonClicked(); true }
+
+        if (BuildConfig.DEBUG) {
+            splashImageView.setOnLongClickListener { listener.onSampleButtonClicked(); true }
+        }
     }
 
     fun showLoading(show: Boolean) {
