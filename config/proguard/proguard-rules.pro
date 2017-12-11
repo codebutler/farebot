@@ -23,6 +23,8 @@
 -dontnote com.google.api.client.util.Key
 -dontnote com.google.common.collect.MapMakerInternalMap$ReferenceEntry
 -dontwarn javax.lang.model.element.Modifier
+-dontwarn afu.org.checkerframework.**
+-dontwarn org.checkerframework.**
 
 # FareBot
 -keep class com.codebutler.farebot.base.ui.FareBotUiTree
