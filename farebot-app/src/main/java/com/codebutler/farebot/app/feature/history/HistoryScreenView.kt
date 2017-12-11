@@ -34,8 +34,8 @@ import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.jakewharton.rxrelay2.PublishRelay
-import com.uber.autodispose.ObservableScoper
 import com.uber.autodispose.android.ViewScopeProvider
+import com.uber.autodispose.kotlin.autoDisposable
 import com.wealthfront.magellan.BaseScreenView
 import io.reactivex.Observable
 
@@ -62,7 +62,7 @@ class HistoryScreenView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         selectionRelay
-                .to(ObservableScoper(ViewScopeProvider.from(this)))
+                .autoDisposable(ViewScopeProvider.from(this))
                 .subscribe { items ->
                     if (items.isNotEmpty()) {
                         if (actionMode == null) {

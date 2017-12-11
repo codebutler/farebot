@@ -31,7 +31,6 @@ import android.os.Environment
 import android.support.v7.app.AlertDialog
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
-import com.codebutler.farebot.app.core.activity.ActivityResult
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
@@ -43,7 +42,7 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.db.model.SavedKey
-import com.uber.autodispose.ObservableScoper
+import com.uber.autodispose.kotlin.autoDisposable
 import dagger.Component
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
@@ -73,7 +72,7 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
 
         nfcStream.observe()
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(ObservableScoper<Tag>(this))
+                .autoDisposable(this)
                 .subscribe { tag -> tag.id
                     val cardType = getCardType(tag)
                     if (cardType == null) {
@@ -89,7 +88,7 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
                 }
 
         activityOperations.activityResult
-                .to(ObservableScoper<ActivityResult>(this))
+                .autoDisposable(this)
                 .subscribe { (requestCode, resultCode, dataIntent) ->
                     when (requestCode) {
                         REQUEST_SELECT_FILE -> {

@@ -39,8 +39,7 @@ import com.codebutler.farebot.app.feature.main.MainActivity
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.transit.TransitInfo
-import com.uber.autodispose.ObservableScoper
-import com.uber.autodispose.SingleScoper
+import com.uber.autodispose.kotlin.autoDisposable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -72,7 +71,7 @@ class CardScreen(private val rawCard: RawCard<*>) : FareBotScreen<CardScreen.Com
         logAnalyticsEvent(AnalyticsEventName.VIEW_CARD, rawCard.cardType().toString())
 
         activityOperations.menuItemClick
-                .to(ObservableScoper(this))
+                .autoDisposable(this)
                 .subscribe({ menuItem ->
                     when (menuItem.itemId) {
                         R.id.card_advanced -> {
@@ -86,7 +85,7 @@ class CardScreen(private val rawCard: RawCard<*>) : FareBotScreen<CardScreen.Com
         loadContent()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(SingleScoper(this))
+                .autoDisposable(this)
                 .subscribe({ content ->
                     this.content = content
                     if (content.transitInfo != null) {
@@ -108,12 +107,12 @@ class CardScreen(private val rawCard: RawCard<*>) : FareBotScreen<CardScreen.Com
                 })
 
         view.observeItemClicks()
-                .to(ObservableScoper<TransactionViewModel>(this))
+                .autoDisposable(this)
                 .subscribe { viewModel ->
                     when (viewModel) {
                         is TransactionViewModel.TripViewModel -> {
                             val trip = viewModel.trip
-                            if (trip.startStation?.hasLocation() ?: false || trip.endStation?.hasLocation() ?: false) {
+                            if (trip.startStation?.hasLocation() == true || trip.endStation?.hasLocation() == true) {
                                 navigator.goTo(TripMapScreen(trip))
                             }
                         }

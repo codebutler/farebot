@@ -30,7 +30,6 @@ import android.nfc.TagLostException
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.view.Menu
-import android.view.MenuItem
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
@@ -46,7 +45,7 @@ import com.codebutler.farebot.app.feature.keys.KeysScreen
 import com.codebutler.farebot.app.feature.main.MainActivity.MainActivityComponent
 import com.codebutler.farebot.app.feature.prefs.FareBotPreferenceActivity
 import com.crashlytics.android.Crashlytics
-import com.uber.autodispose.ObservableScoper
+import com.uber.autodispose.kotlin.autoDisposable
 import dagger.Component
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -72,7 +71,7 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
         super.onShow(context)
 
         activityOperations.menuItemClick
-                .to(ObservableScoper<MenuItem>(this))
+                .autoDisposable(this)
                 .subscribe({ menuItem ->
                     when (menuItem.itemId) {
                         R.id.history -> navigator.goTo(HistoryScreen())
@@ -97,7 +96,7 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
         cardStream.observeCards()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(ObservableScoper(this))
+                .autoDisposable(this)
                 .subscribe { card ->
                     logAnalyticsEvent(AnalyticsEventName.SCAN_CARD, card.cardType().toString())
                     navigator.goTo(CardScreen(card))
@@ -105,12 +104,12 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
 
         cardStream.observeLoading()
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(ObservableScoper(this))
+                .autoDisposable(this)
                 .subscribe { loading -> view.showLoading(loading) }
 
         cardStream.observeErrors()
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(ObservableScoper(this))
+                .autoDisposable(this)
                 .subscribe { ex ->
                     logAnalyticsEvent(AnalyticsEventName.SCAN_CARD_ERROR, ErrorUtils.getErrorMessage(ex))
                     when (ex) {

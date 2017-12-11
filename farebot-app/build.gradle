@@ -53,7 +53,9 @@ dependencies {
     implementation project(':farebot-transit-suica')
 
     implementation libs.autoDispose
+    implementation libs.autoDisposeKotlin
     implementation libs.autoDisposeAndroid
+    implementation libs.autoDisposeAndroidKotlin
     implementation libs.supportDesign
     implementation libs.supportV4
     implementation libs.supportV7CardView

@@ -36,12 +36,9 @@ import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
-import com.codebutler.farebot.app.core.activity.ActivityResult
-import com.codebutler.farebot.app.core.activity.RequestPermissionsResult
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.kotlin.Optional
 import com.codebutler.farebot.app.core.kotlin.filterAndGetOptional
@@ -56,8 +53,7 @@ import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
 import com.codebutler.farebot.transit.TransitIdentity
-import com.uber.autodispose.ObservableScoper
-import com.uber.autodispose.SingleScoper
+import com.uber.autodispose.kotlin.autoDisposable
 import dagger.Component
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -97,7 +93,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
         super.onShow(context)
 
         activityOperations.menuItemClick
-                .to(ObservableScoper<MenuItem>(this))
+                .autoDisposable(this)
                 .subscribe { menuItem ->
                     val clipboardManager = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     when (menuItem.itemId) {
@@ -133,7 +129,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
                 }
 
         activityOperations.permissionResult
-                .to(ObservableScoper<RequestPermissionsResult>(this))
+                .autoDisposable(this)
                 .subscribe { (requestCode, _, grantResults) ->
                     when (requestCode) {
                         REQUEST_PERMISSION_STORAGE -> {
@@ -145,7 +141,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
                 }
 
         activityOperations.activityResult
-                .to(ObservableScoper<ActivityResult>(this))
+                .autoDisposable(this)
                 .subscribe { (requestCode, resultCode, data) ->
                     when (requestCode) {
                         REQUEST_SELECT_FILE -> {
@@ -163,7 +159,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
         loadCards()
 
         view.observeItemClicks()
-                .to(ObservableScoper<HistoryViewModel>(this))
+                .autoDisposable(this)
                 .subscribe { viewModel -> navigator.goTo(CardScreen(viewModel.rawCard)) }
     }
 
@@ -187,7 +183,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
         observeCards()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(SingleScoper<List<HistoryViewModel>>(this))
+                .autoDisposable(this)
                 .subscribe(
                         { viewModels -> view.setViewModels(viewModels) },
                         { e -> ErrorUtils.showErrorToast(activity, e) })

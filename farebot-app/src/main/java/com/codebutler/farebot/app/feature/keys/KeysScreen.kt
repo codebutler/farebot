@@ -24,7 +24,6 @@ package com.codebutler.farebot.app.feature.keys
 
 import android.content.Context
 import android.view.Menu
-import android.view.MenuItem
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.inject.ScreenScope
@@ -35,8 +34,7 @@ import com.codebutler.farebot.app.feature.keys.add.AddKeyScreen
 import com.codebutler.farebot.app.feature.main.MainActivity
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.db.model.SavedKey
-import com.uber.autodispose.ObservableScoper
-import com.uber.autodispose.SingleScoper
+import com.uber.autodispose.kotlin.autoDisposable
 import dagger.Component
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -61,7 +59,7 @@ class KeysScreen : FareBotScreen<KeysScreen.KeysComponent, KeysScreenView>(), Ke
         super.onShow(context)
 
         activityOperations.menuItemClick
-                .to(ObservableScoper<MenuItem>(this))
+                .autoDisposable(this)
                 .subscribe({ menuItem ->
                     when (menuItem.itemId) {
                         R.id.add -> navigator.goTo(AddKeyScreen())
@@ -95,7 +93,7 @@ class KeysScreen : FareBotScreen<KeysScreen.KeysComponent, KeysScreenView>(), Ke
         observeKeys()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(SingleScoper<List<KeyViewModel>>(this))
+                .autoDisposable(this)
                 .subscribe(
                         { keys -> view.setViewModels(keys) },
                         { e -> ErrorUtils.showErrorToast(activity, e) }
