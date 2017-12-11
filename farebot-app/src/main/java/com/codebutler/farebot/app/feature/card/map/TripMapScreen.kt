@@ -88,8 +88,8 @@ class TripMapScreen(private val trip: Trip) : FareBotScreen<TripMapScreen.Compon
         super.onRestore(savedInstanceState)
     }
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): Component
-            = DaggerTripMapScreen_Component.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): Component =
+            DaggerTripMapScreen_Component.builder()
             .mainActivityComponent(parentComponent)
             .build()
 
@@ -103,4 +103,3 @@ class TripMapScreen(private val trip: Trip) : FareBotScreen<TripMapScreen.Compon
         fun inject(screen: TripMapScreen)
     }
 }
-

@@ -41,8 +41,8 @@ class HelpScreen : FareBotScreen<HelpScreen.HelpComponent, HelpScreenView>() {
 
     override fun onCreateView(context: Context): HelpScreenView = HelpScreenView(context)
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): HelpComponent
-            = DaggerHelpScreen_HelpComponent.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): HelpComponent =
+            DaggerHelpScreen_HelpComponent.builder()
             .mainActivityComponent(parentComponent)
             .build()
 
@@ -56,4 +56,3 @@ class HelpScreen : FareBotScreen<HelpScreen.HelpComponent, HelpScreenView>() {
         fun inject(helpScreen: HelpScreen)
     }
 }
-

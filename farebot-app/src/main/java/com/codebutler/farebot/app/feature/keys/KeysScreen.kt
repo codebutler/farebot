@@ -80,8 +80,8 @@ class KeysScreen : FareBotScreen<KeysScreen.KeysComponent, KeysScreenView>(), Ke
         loadKeys()
     }
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): KeysScreen.KeysComponent
-            = DaggerKeysScreen_KeysComponent.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): KeysScreen.KeysComponent =
+            DaggerKeysScreen_KeysComponent.builder()
             .mainActivityComponent(parentComponent)
             .build()
 

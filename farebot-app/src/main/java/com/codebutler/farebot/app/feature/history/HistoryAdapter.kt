@@ -40,8 +40,8 @@ internal class HistoryAdapter(
         private val selectionRelay: PublishRelay<List<HistoryViewModel>>)
     : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder
-            = HistoryViewHolder(parent.inflate(R.layout.item_history))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder =
+            HistoryViewHolder(parent.inflate(R.layout.item_history))
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val viewModel = viewModels[position]

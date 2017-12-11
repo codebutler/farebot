@@ -36,8 +36,8 @@ class KeysAdapter(
         private val selectionRelay: PublishRelay<List<KeyViewModel>>)
     : RecyclerView.Adapter<KeysAdapter.KeyViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, position: Int): KeyViewHolder
-            = KeyViewHolder(parent.inflate(R.layout.item_key))
+    override fun onCreateViewHolder(parent: ViewGroup, position: Int): KeyViewHolder =
+            KeyViewHolder(parent.inflate(R.layout.item_key))
 
     override fun onBindViewHolder(holder: KeyViewHolder, position: Int) {
         val viewModel = viewModels[position]

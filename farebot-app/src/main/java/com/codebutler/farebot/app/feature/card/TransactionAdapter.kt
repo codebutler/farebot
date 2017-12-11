@@ -78,8 +78,8 @@ class TransactionAdapter(
     sealed class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         companion object {
-            fun wrapLayout(parent: ViewGroup, @LayoutRes layoutId: Int): View
-                    = parent.inflate(R.layout.item_transaction).apply {
+            fun wrapLayout(parent: ViewGroup, @LayoutRes layoutId: Int): View =
+                    parent.inflate(R.layout.item_transaction).apply {
                 findViewById<ViewGroup>(R.id.container).inflate(layoutId, true)
             }
         }

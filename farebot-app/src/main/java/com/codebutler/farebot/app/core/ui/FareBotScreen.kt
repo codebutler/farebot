@@ -92,8 +92,8 @@ abstract class FareBotScreen<C, V> : Screen<V>(), LifecycleScopeProvider<ScreenL
 
     final override fun lifecycle(): Observable<ScreenLifecycleEvent> = lifecycleRelay.hide()
 
-    final override fun correspondingEvents(): Function<ScreenLifecycleEvent, ScreenLifecycleEvent>
-            = CORRESPONDING_EVENTS
+    final override fun correspondingEvents(): Function<ScreenLifecycleEvent, ScreenLifecycleEvent> =
+            CORRESPONDING_EVENTS
 
     final override fun peekLifecycle(): ScreenLifecycleEvent = lifecycleRelay.value
 

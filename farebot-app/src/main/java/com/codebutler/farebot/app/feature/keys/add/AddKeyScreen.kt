@@ -123,8 +123,8 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
         }
     }
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): AddKeyComponent
-            = DaggerAddKeyScreen_AddKeyComponent.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): AddKeyComponent =
+            DaggerAddKeyScreen_AddKeyComponent.builder()
             .mainActivityComponent(parentComponent)
             .build()
 

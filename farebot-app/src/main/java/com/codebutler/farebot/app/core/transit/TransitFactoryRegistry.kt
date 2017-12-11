@@ -92,6 +92,6 @@ class TransitFactoryRegistry(context: Context) {
         factories.add(factory as TransitFactory<Card, TransitInfo>)
     }
 
-    private fun findFactory(card: Card): TransitFactory<Card, out TransitInfo>?
-            = registry[card.parentClass]?.find { it.check(card) }
+    private fun findFactory(card: Card): TransitFactory<Card, out TransitInfo>? =
+            registry[card.parentClass]?.find { it.check(card) }
 }

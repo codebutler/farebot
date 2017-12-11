@@ -82,8 +82,8 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
             textColorRes = R.color.white
     )
 
-    override fun onCreateView(context: Context): HistoryScreenView
-            = HistoryScreenView(context, activityOperations, this)
+    override fun onCreateView(context: Context): HistoryScreenView =
+            HistoryScreenView(context, activityOperations, this)
 
     override fun onUpdateMenu(menu: Menu) {
         activity.menuInflater.inflate(R.menu.screen_history, menu)
@@ -170,8 +170,8 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
         loadCards()
     }
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): HistoryComponent
-            = DaggerHistoryScreen_HistoryComponent.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): HistoryComponent =
+            DaggerHistoryScreen_HistoryComponent.builder()
             .mainActivityComponent(parentComponent)
             .build()
 
@@ -254,4 +254,3 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
         fun inject(historyScreen: HistoryScreen)
     }
 }
-

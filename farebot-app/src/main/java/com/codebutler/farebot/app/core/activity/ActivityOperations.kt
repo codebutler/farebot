@@ -40,4 +40,3 @@ class ActivityOperations(
         return activity.startSupportActionMode(callback)
     }
 }
-

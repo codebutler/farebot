@@ -44,8 +44,8 @@ data class EasyCardTransitInfo(
         private val trips: List<Trip>,
         private val refill: Refill) : TransitInfo() {
 
-    override fun getCardName(resources: Resources): String
-            = resources.getString(R.string.easycard_card_name)
+    override fun getCardName(resources: Resources): String =
+            resources.getString(R.string.easycard_card_name)
 
     override fun getSerialNumber(): String? = serialNumber
 

@@ -47,8 +47,8 @@ class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
 
     override fun getItemCount(): Int = visibleViewModels.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, position: Int)
-            = ViewHolder(parent.inflate(R.layout.item_card_advanced))
+    override fun onCreateViewHolder(parent: ViewGroup, position: Int) =
+            ViewHolder(parent.inflate(R.layout.item_card_advanced))
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.bind(visibleViewModels[position])

@@ -91,8 +91,8 @@ class FareBotApplicationModule {
     fun provideCardKeysPersister(openHelper: FareBotOpenHelper): CardKeysPersister = DbCardKeysPersister(openHelper)
 
     @Provides
-    fun provideExportHelper(cardPersister: CardPersister, cardSerializer: CardSerializer, gson: Gson): ExportHelper
-            = ExportHelper(cardPersister, cardSerializer, gson)
+    fun provideExportHelper(cardPersister: CardPersister, cardSerializer: CardSerializer, gson: Gson): ExportHelper =
+            ExportHelper(cardPersister, cardSerializer, gson)
 
     @Provides
     fun provideTagReaderFactory(): TagReaderFactory {
@@ -100,6 +100,6 @@ class FareBotApplicationModule {
     }
 
     @Provides
-    fun provideTransitFactoryRegistry(application: FareBotApplication): TransitFactoryRegistry
-            = TransitFactoryRegistry(application)
+    fun provideTransitFactoryRegistry(application: FareBotApplication): TransitFactoryRegistry =
+            TransitFactoryRegistry(application)
 }

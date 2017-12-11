@@ -144,8 +144,8 @@ class CardScreen(private val rawCard: RawCard<*>) : FareBotScreen<CardScreen.Com
         return subscriptions + (trips + refills).sortedByDescending { it.date }
     }
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): Component
-            = DaggerCardScreen_Component.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): Component =
+            DaggerCardScreen_Component.builder()
             .mainActivityComponent(parentComponent)
             .build()
 

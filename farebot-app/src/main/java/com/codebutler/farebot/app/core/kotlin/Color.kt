@@ -29,8 +29,8 @@ import android.support.annotation.ColorRes
 import android.support.v4.content.res.ResourcesCompat
 
 @ColorInt
-fun Context.getColor(@ColorRes colorRes: Int?, @ColorInt defaultColor: Int)
-        = if (colorRes == null) defaultColor else ResourcesCompat.getColor(resources, colorRes, theme)
+fun Context.getColor(@ColorRes colorRes: Int?, @ColorInt defaultColor: Int) =
+        if (colorRes == null) defaultColor else ResourcesCompat.getColor(resources, colorRes, theme)
 
 @ColorInt
 fun adjustAlpha(@ColorInt color: Int, alpha: Int = 0): Int =

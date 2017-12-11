@@ -103,4 +103,3 @@ class KeysScreenView(
         fun onDeleteSelectedItems(items: List<KeyViewModel>)
     }
 }
-

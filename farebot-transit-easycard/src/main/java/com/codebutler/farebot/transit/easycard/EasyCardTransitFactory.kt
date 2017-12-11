@@ -169,4 +169,3 @@ class EasyCardTransitFactory(private val context: Context) : TransitFactory<Clas
         override fun hasTime(): Boolean = true
     }
 }
-

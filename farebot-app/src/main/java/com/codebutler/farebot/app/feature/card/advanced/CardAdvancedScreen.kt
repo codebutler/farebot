@@ -54,8 +54,8 @@ class CardAdvancedScreen(private val card: Card, private val transitInfo: Transi
         view.addTab(card.cardType.toString(), card.getAdvancedUi(activity))
     }
 
-    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): Component
-            = DaggerCardAdvancedScreen_Component.builder()
+    override fun createComponent(parentComponent: MainActivity.MainActivityComponent): Component =
+            DaggerCardAdvancedScreen_Component.builder()
             .mainActivityComponent(parentComponent)
             .build()
 
@@ -69,4 +69,3 @@ class CardAdvancedScreen(private val card: Card, private val transitInfo: Transi
         fun inject(screen: CardAdvancedScreen)
     }
 }
-

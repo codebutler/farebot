@@ -143,8 +143,8 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
         cardStream.emitSample()
     }
 
-    override fun createComponent(parentComponent: MainActivityComponent): HomeComponent
-            = DaggerHomeScreen_HomeComponent.builder()
+    override fun createComponent(parentComponent: MainActivityComponent): HomeComponent =
+            DaggerHomeScreen_HomeComponent.builder()
             .mainActivityComponent(parentComponent)
             .build()
 

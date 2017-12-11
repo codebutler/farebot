@@ -29,8 +29,8 @@ class SampleTransitFactory : TransitFactory<SampleCard, SampleTransitInfo> {
 
     override fun check(card: SampleCard): Boolean = true
 
-    override fun parseIdentity(card: SampleCard): TransitIdentity
-            = TransitIdentity.create(card.cardType.toString(), card.tagId.hex())
+    override fun parseIdentity(card: SampleCard): TransitIdentity =
+            TransitIdentity.create(card.cardType.toString(), card.tagId.hex())
 
     override fun parseInfo(card: SampleCard): SampleTransitInfo = SampleTransitInfo()
 }
