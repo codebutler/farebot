@@ -45,6 +45,7 @@ public abstract class Card {
     public abstract FareBotUiTree getAdvancedUi(Context context);
 
     @NonNull
+    @SuppressWarnings("unchecked")
     public Class<? extends Card> getParentClass() {
         Class<? extends Card> aClass = getClass();
         while (aClass.getSuperclass() != Card.class) {

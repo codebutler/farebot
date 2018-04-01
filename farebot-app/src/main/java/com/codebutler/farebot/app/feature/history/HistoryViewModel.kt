@@ -27,8 +27,9 @@ import com.codebutler.farebot.persist.db.model.SavedCard
 import com.codebutler.farebot.transit.TransitIdentity
 
 data class HistoryViewModel(
-        val savedCard: SavedCard,
-        val rawCard: RawCard<*>,
-        val transitIdentity: TransitIdentity? = null,
-        val parseException: Exception? = null,
-        var isSelected: Boolean = false)
+    val savedCard: SavedCard,
+    val rawCard: RawCard<*>,
+    val transitIdentity: TransitIdentity? = null,
+    val parseException: Exception? = null,
+    var isSelected: Boolean = false
+)

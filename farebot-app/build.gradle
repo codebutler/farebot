@@ -23,6 +23,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 dependencies {
@@ -53,20 +54,22 @@ dependencies {
     implementation project(':farebot-transit-suica')
 
     implementation libs.autoDispose
-    implementation libs.autoDisposeKotlin
     implementation libs.autoDisposeAndroid
     implementation libs.autoDisposeAndroidKotlin
+    implementation libs.autoDisposeKotlin
+    implementation libs.groupie
+    implementation libs.groupieDatabinding
+    implementation libs.gson
+    implementation libs.kotlinStdlib
+    implementation libs.magellan
+    implementation libs.playServicesMaps
+    implementation libs.rxBroadcast
+    implementation libs.rxJava2
+    implementation libs.rxRelay2
     implementation libs.supportDesign
     implementation libs.supportV4
     implementation libs.supportV7CardView
     implementation libs.supportV7RecyclerView
-    implementation libs.playServicesMaps
-    implementation libs.gson
-    implementation libs.kotlinStdlib
-    implementation libs.magellan
-    implementation libs.rxBroadcast
-    implementation libs.rxJava2
-    implementation libs.rxRelay2
 
     implementation(libs.crashlytics) {
         transitive = true
@@ -86,6 +89,11 @@ gradle.taskGraph.whenReady { taskGraph ->
         android.signingConfigs.release.storePassword = password
         android.signingConfigs.release.keyPassword = password
     }
+}
+
+kapt {
+    useBuildCache = true
+    mapDiagnosticLocations = true
 }
 
 android {

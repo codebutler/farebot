@@ -75,12 +75,13 @@ class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
     }
 
     data class ViewModel(
-            var title: String,
-            var value: Any?,
-            var parent: ViewModel?,
-            var canExpand: Boolean,
-            var expanded: Boolean = false,
-            var depth: Int) {
+        var title: String,
+        var value: Any?,
+        var parent: ViewModel?,
+        var canExpand: Boolean,
+        var expanded: Boolean = false,
+        var depth: Int
+    ) {
 
         val visible: Boolean
             get() = parent?.let { it.visible && (if (it.canExpand) it.expanded else true) } ?: true

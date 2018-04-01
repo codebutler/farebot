@@ -38,11 +38,12 @@ import java.util.Currency
 import java.util.Date
 
 data class EasyCardTransitInfo(
-        private val serialNumber: String,
-        private val manufacturingDate: Date,
-        private val balance: Long,
-        private val trips: List<Trip>,
-        private val refill: Refill) : TransitInfo() {
+    private val serialNumber: String,
+    private val manufacturingDate: Date,
+    private val balance: Long,
+    private val trips: List<Trip>,
+    private val refill: Refill
+) : TransitInfo() {
 
     override fun getCardName(resources: Resources): String =
             resources.getString(R.string.easycard_card_name)

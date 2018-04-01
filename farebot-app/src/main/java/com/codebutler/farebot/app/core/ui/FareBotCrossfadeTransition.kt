@@ -35,11 +35,12 @@ class FareBotCrossfadeTransition(context: Context) : Transition {
     private val shortAnimationDuration = context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
     override fun animate(
-            viewFrom: View,
-            viewTo: View,
-            navType: NavigationType,
-            direction: Direction,
-            callback: Transition.Callback) {
+        viewFrom: View,
+        viewTo: View,
+        navType: NavigationType,
+        direction: Direction,
+        callback: Transition.Callback
+    ) {
 
         viewTo.alpha = 0f
         viewTo.visibility = View.VISIBLE

@@ -35,7 +35,6 @@ import java.util.Locale
 sealed class TransactionViewModel(val context: Context) {
 
     abstract val date: Date?
-        get
 
     val time: String?
         get() = if (date != null) DateFormat.getTimeInstance(DateFormat.SHORT).format(date) else null
@@ -78,7 +77,7 @@ sealed class TransactionViewModel(val context: Context) {
         val amount = "+ ${refill.getAmountString(context.resources)}"
     }
 
-    class SubscriptionViewModel(context: Context, val subscription: Subscription)
+    class SubscriptionViewModel(context: Context, private val subscription: Subscription)
         : TransactionViewModel(context) {
 
         override val date = null

@@ -36,9 +36,10 @@ import com.codebutler.farebot.key.CardKeys
 class TagReaderFactory {
 
     fun getTagReader(
-            tagId: ByteArray,
-            tag: Tag,
-            cardKeys: CardKeys?): TagReader<*, *, *> = when {
+        tagId: ByteArray,
+        tag: Tag,
+        cardKeys: CardKeys?
+    ): TagReader<*, *, *> = when {
         "android.nfc.tech.NfcB" in tag.techList -> CEPASTagReader(tagId, tag)
         "android.nfc.tech.IsoDep" in tag.techList -> DesfireTagReader(tagId, tag)
         "android.nfc.tech.NfcF" in tag.techList -> FelicaTagReader(tagId, tag)

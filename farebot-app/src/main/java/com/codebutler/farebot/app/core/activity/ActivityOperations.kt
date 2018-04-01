@@ -31,10 +31,11 @@ import io.reactivex.Observable
  * interface for screens to interact with parent activity.
  */
 class ActivityOperations(
-        private val activity: AppCompatActivity,
-        val activityResult: Observable<ActivityResult>,
-        val menuItemClick: Observable<MenuItem>,
-        val permissionResult: Observable<RequestPermissionsResult>) {
+    private val activity: AppCompatActivity,
+    val activityResult: Observable<ActivityResult>,
+    val menuItemClick: Observable<MenuItem>,
+    val permissionResult: Observable<RequestPermissionsResult>
+) {
 
     fun startActionMode(callback: ActionMode.Callback): ActionMode? {
         return activity.startSupportActionMode(callback)

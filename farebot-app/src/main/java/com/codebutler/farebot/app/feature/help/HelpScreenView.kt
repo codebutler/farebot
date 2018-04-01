@@ -174,8 +174,9 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
     }
 
     internal class SupportedCardsAdapter(
-            private val context: Context,
-            private val supportedCards: List<SupportedCard>)
+        private val context: Context,
+        private val supportedCards: List<SupportedCard>
+    )
         : RecyclerView.Adapter<SupportedCardViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SupportedCardViewHolder {
@@ -192,12 +193,12 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
 
     internal class SupportedCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val textViewName: TextView by bindView(R.id.card_name)
-        val textViewLocation: TextView by bindView(R.id.card_location)
-        val textViewNote: TextView by bindView(R.id.card_note)
-        val imageView: ImageView by bindView(R.id.card_image)
-        val imageViewSecure: ImageView by bindView(R.id.card_secure)
-        val viewNotSupported: View by bindView(R.id.card_not_supported)
+        private val textViewName: TextView by bindView(R.id.card_name)
+        private val textViewLocation: TextView by bindView(R.id.card_location)
+        private val textViewNote: TextView by bindView(R.id.card_note)
+        private val imageView: ImageView by bindView(R.id.card_image)
+        private val imageViewSecure: ImageView by bindView(R.id.card_secure)
+        private val viewNotSupported: View by bindView(R.id.card_not_supported)
 
         init {
             imageViewSecure.setOnClickListener {
@@ -255,11 +256,12 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
     }
 
     data class SupportedCard(
-            @get:DrawableRes val imageResId: Int,
-            val name: String,
-            @get:StringRes val locationResId: Int,
-            val cardType: CardType,
-            val keysRequired: Boolean = false,
-            val preview: Boolean = false,
-            @get:StringRes val extraNoteResId: Int? = null)
+        @get:DrawableRes val imageResId: Int,
+        val name: String,
+        @get:StringRes val locationResId: Int,
+        val cardType: CardType,
+        val keysRequired: Boolean = false,
+        val preview: Boolean = false,
+        @get:StringRes val extraNoteResId: Int? = null
+    )
 }

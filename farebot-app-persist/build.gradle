@@ -11,6 +11,9 @@ dependencies {
     compileOnly libs.autoValueAnnotations
     compileOnly libs.autoValueGsonAnnotations
 
+    annotationProcessor libs.autoValueAnnotations
+    annotationProcessor libs.autoValueGsonAnnotations
+
     annotationProcessor libs.autoValue
     annotationProcessor libs.autoValueGson
 }

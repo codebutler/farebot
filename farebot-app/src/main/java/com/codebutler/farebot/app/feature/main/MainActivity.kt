@@ -223,13 +223,14 @@ class MainActivity : AppCompatActivity(),
         @Provides
         @ActivityScope
         fun provideCardStream(
-                application: FareBotApplication,
-                cardPersister: CardPersister,
-                cardSerializer: CardSerializer,
-                cardKeysPersister: CardKeysPersister,
-                cardKeysSerializer: CardKeysSerializer,
-                nfcStream: NfcStream,
-                tagReaderFactory: TagReaderFactory): CardStream {
+            application: FareBotApplication,
+            cardPersister: CardPersister,
+            cardSerializer: CardSerializer,
+            cardKeysPersister: CardKeysPersister,
+            cardKeysSerializer: CardKeysSerializer,
+            nfcStream: NfcStream,
+            tagReaderFactory: TagReaderFactory
+        ): CardStream {
             return CardStream(
                     application,
                     cardPersister,

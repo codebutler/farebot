@@ -23,6 +23,7 @@
 package com.codebutler.farebot.app.core.activity
 
 data class RequestPermissionsResult(
-        val requestCode: Int,
-        val permissions: Array<out String>,
-        val grantResults: IntArray)
+    val requestCode: Int,
+    val permissions: Array<out String>,
+    val grantResults: IntArray
+)

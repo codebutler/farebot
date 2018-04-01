@@ -57,7 +57,8 @@ class CardKeysGsonTypeAdapterFactory : TypeAdapterFactory {
     }
 
     private inner class CardKeysTypeAdapter internal constructor(
-            private val delegates: Map<CardType, TypeAdapter<CardKeys>>) : TypeAdapter<CardKeys>() {
+        private val delegates: Map<CardType, TypeAdapter<CardKeys>>
+    ) : TypeAdapter<CardKeys>() {
 
         override fun write(out: JsonWriter, value: CardKeys) {
             val delegateAdapter = delegates[value.cardType()]

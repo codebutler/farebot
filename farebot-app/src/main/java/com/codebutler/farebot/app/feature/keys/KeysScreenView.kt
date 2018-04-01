@@ -33,15 +33,16 @@ import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.jakewharton.rxrelay2.PublishRelay
-import com.uber.autodispose.android.ViewScopeProvider
+import com.uber.autodispose.android.scope
 import com.uber.autodispose.kotlin.autoDisposable
 import com.wealthfront.magellan.BaseScreenView
 
 @SuppressLint("ViewConstructor")
 class KeysScreenView(
-        context: Context,
-        val activityOperations: ActivityOperations,
-        val listener: KeysScreenView.Listener)
+    context: Context,
+    val activityOperations: ActivityOperations,
+    val listener: KeysScreenView.Listener
+)
     : BaseScreenView<KeysScreen>(context) {
 
     private val selectionRelay = PublishRelay.create<List<KeyViewModel>>()
@@ -58,7 +59,7 @@ class KeysScreenView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         selectionRelay
-                .autoDisposable(ViewScopeProvider.from(this))
+                .autoDisposable(scope())
                 .subscribe { items ->
                     if (items.isNotEmpty()) {
                         if (actionMode == null) {

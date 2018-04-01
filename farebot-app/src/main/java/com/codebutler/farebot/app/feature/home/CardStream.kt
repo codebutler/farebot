@@ -43,13 +43,14 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class CardStream(
-        val application: FareBotApplication,
-        val cardPersister: CardPersister,
-        val cardSerializer: CardSerializer,
-        val cardKeysPersister: CardKeysPersister,
-        val cardKeysSerializer: CardKeysSerializer,
-        val nfcStream: NfcStream,
-        val tagReaderFactory: TagReaderFactory) {
+    val application: FareBotApplication,
+    val cardPersister: CardPersister,
+    val cardSerializer: CardSerializer,
+    val cardKeysPersister: CardKeysPersister,
+    val cardKeysSerializer: CardKeysSerializer,
+    val nfcStream: NfcStream,
+    private val tagReaderFactory: TagReaderFactory
+) {
 
     private val loadingRelay: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
     private val errorRelay: PublishRelay<Throwable> = PublishRelay.create()
@@ -60,18 +61,18 @@ class CardStream(
                 .observeOn(Schedulers.io())
                 .doOnNext { loadingRelay.accept(true) }
                 .map { tag -> Optional(
-                    try {
-                        val cardKeys = getCardKeys(ByteUtils.getHexString(tag.id))
-                        val rawCard = tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
-                        if (rawCard.isUnauthorized) {
-                            throw CardUnauthorizedException()
-                        }
-                        rawCard
-                    } catch (error: Throwable) {
-                        errorRelay.accept(error)
-                        loadingRelay.accept(false)
-                        null
-                    })
+                        try {
+                            val cardKeys = getCardKeys(ByteUtils.getHexString(tag.id))
+                            val rawCard = tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
+                            if (rawCard.isUnauthorized) {
+                                throw CardUnauthorizedException()
+                            }
+                            rawCard
+                        } catch (error: Throwable) {
+                            errorRelay.accept(error)
+                            loadingRelay.accept(false)
+                            null
+                        })
                 }
                 .filterAndGetOptional()
 

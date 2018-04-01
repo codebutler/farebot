@@ -34,16 +34,17 @@ import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.jakewharton.rxrelay2.PublishRelay
-import com.uber.autodispose.android.ViewScopeProvider
+import com.uber.autodispose.android.scope
 import com.uber.autodispose.kotlin.autoDisposable
 import com.wealthfront.magellan.BaseScreenView
 import io.reactivex.Observable
 
 @SuppressLint("ViewConstructor")
 class HistoryScreenView(
-        context: Context,
-        val activityOperations: ActivityOperations,
-        val listener: Listener)
+    context: Context,
+    val activityOperations: ActivityOperations,
+    val listener: Listener
+)
     : BaseScreenView<HistoryScreen>(context) {
 
     private val clicksRelay = PublishRelay.create<HistoryViewModel>()
@@ -62,7 +63,7 @@ class HistoryScreenView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         selectionRelay
-                .autoDisposable(ViewScopeProvider.from(this))
+                .autoDisposable(scope())
                 .subscribe { items ->
                     if (items.isNotEmpty()) {
                         if (actionMode == null) {
