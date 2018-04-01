@@ -30,9 +30,10 @@ import com.codebutler.farebot.persist.db.model.SavedCard
 import com.google.gson.Gson
 
 class ExportHelper(
-        private val cardPersister: CardPersister,
-        private val cardSerializer: CardSerializer,
-        private val gson: Gson) {
+    private val cardPersister: CardPersister,
+    private val cardSerializer: CardSerializer,
+    private val gson: Gson
+) {
 
     fun exportCards(): String = gson.toJson(Export(
             versionName = BuildConfig.VERSION_NAME,
@@ -42,13 +43,14 @@ class ExportHelper(
 
     fun importCards(exportJsonString: String): List<Long> = gson.fromJson(exportJsonString, Export::class.java)
             .cards.map { cardPersister.insertCard(SavedCard.create(
-                it.cardType(),
-                it.tagId().hex(),
-                cardSerializer.serialize(it) ))
-            }
+            it.cardType(),
+            it.tagId().hex(),
+            cardSerializer.serialize(it) ))
+    }
 
     private data class Export(
-            internal val versionName: String,
-            internal val versionCode: Int,
-            internal val cards: List<RawCard<*>>)
+        internal val versionName: String,
+        internal val versionCode: Int,
+        internal val cards: List<RawCard<*>>
+    )
 }

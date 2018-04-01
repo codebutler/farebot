@@ -32,8 +32,9 @@ import com.codebutler.farebot.app.core.kotlin.bindView
 import com.jakewharton.rxrelay2.PublishRelay
 
 class KeysAdapter(
-        private val viewModels: List<KeyViewModel>,
-        private val selectionRelay: PublishRelay<List<KeyViewModel>>)
+    private val viewModels: List<KeyViewModel>,
+    private val selectionRelay: PublishRelay<List<KeyViewModel>>
+)
     : RecyclerView.Adapter<KeysAdapter.KeyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): KeyViewHolder =
@@ -76,8 +77,8 @@ class KeysAdapter(
     }
 
     class KeyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textView1: TextView by bindView(android.R.id.text1)
-        val textView2: TextView by bindView(android.R.id.text2)
+        private val textView1: TextView by bindView(android.R.id.text1)
+        private val textView2: TextView by bindView(android.R.id.text2)
 
         internal fun update(viewModel: KeyViewModel) {
             textView1.text = viewModel.savedKey.card_id()

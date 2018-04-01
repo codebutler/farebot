@@ -3,42 +3,43 @@ ext {
         compileSdkVersion: 26,
         targetSdkVersion: 26,
         minSdkVersion: 21,
-        buildToolsVersion: '26.0.2'
+        buildToolsVersion: '27.0.3'
     ]
 
-    def autoDisposeVersion = '0.5.1'
-    def daggerVersion      = '2.13'
-    def kotlinVersion      = '1.2.0'
-    def magellanVersion    = '1.0.0'
-    def supportVersion     = '27.0.2'
+    def autoDisposeVersion   = '0.7.0'
+    def autoValueVersion     = '1.6'
+    def autoValueGsonVersion = '0.7.0'
+    def daggerVersion        = '2.15'
+    def groupieVersion       = '2.0.3'
+    def kotlinVersion        = '1.2.31'
+    def magellanVersion      = '1.0.0'
+    def supportVersion       = '27.1.0'
 
     libs = [
         autoDispose:              "com.uber.autodispose:autodispose:${autoDisposeVersion}",
-        autoDisposeKotlin:        "com.uber.autodispose:autodispose-kotlin:${autoDisposeVersion}",
         autoDisposeAndroid:       "com.uber.autodispose:autodispose-android:${autoDisposeVersion}",
         autoDisposeAndroidKotlin: "com.uber.autodispose:autodispose-android-kotlin:${autoDisposeVersion}",
-        autoValue:                'com.google.auto.value:auto-value:1.5.2',
-        autoValueAnnotations:     'com.jakewharton.auto.value:auto-value-annotations:1.5',
-        autoValueGson:            'com.ryanharter.auto.value:auto-value-gson:0.6.0',
-        autoValueGsonAnnotations: project(':third_party:auto-value-gson-annotations'),
-        crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.8.0@aar',
+        autoDisposeKotlin:        "com.uber.autodispose:autodispose-kotlin:${autoDisposeVersion}",
+        autoValue:                "com.google.auto.value:auto-value:${autoValueVersion}",
+        autoValueAnnotations:     "com.google.auto.value:auto-value-annotations:${autoValueVersion}",
+        autoValueGson:            "com.ryanharter.auto.value:auto-value-gson:${autoValueGsonVersion}",
+        autoValueGsonAnnotations: "com.ryanharter.auto.value:auto-value-gson-annotations:${autoValueGsonVersion}",
+        crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.9.1',
         dagger:                   "com.google.dagger:dagger:${daggerVersion}",
         daggerCompiler:           "com.google.dagger:dagger-compiler:${daggerVersion}",
+        groupie:                  "com.xwray:groupie:${groupieVersion}",
+        groupieDatabinding:       "com.xwray:groupie-databinding:${groupieVersion}",
         gson:                     'com.google.code.gson:gson:2.8.2',
-        guava:                    'com.google.guava:guava:23.5-android',
+        guava:                    'com.google.guava:guava:24.1-android',
         kotlinStdlib:             "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
         magellan:                 "com.wealthfront:magellan:${magellanVersion}",
-        playServicesMaps:         'com.google.android.gms:play-services-maps:11.6.2',
+        playServicesMaps:         'com.google.android.gms:play-services-maps:12.0.1',
         rxBroadcast:              'com.cantrowitz:rxbroadcast:2.0.0',
-        rxJava2:                  'io.reactivex.rxjava2:rxjava:2.1.7',
+        rxJava2:                  'io.reactivex.rxjava2:rxjava:2.1.12',
         rxRelay2:                 'com.jakewharton.rxrelay2:rxrelay:2.0.0',
         supportDesign:            "com.android.support:design:${supportVersion}",
         supportV4:                "com.android.support:support-v4:${supportVersion}",
         supportV7CardView:        "com.android.support:cardview-v7:${supportVersion}",
         supportV7RecyclerView:    "com.android.support:recyclerview-v7:${supportVersion}"
     ]
-
-    androidJar = { c ->
-        "${c.android.getSdkDirectory()}/platforms/android-${vers.compileSdkVersion}/android.jar"
-    }
 }

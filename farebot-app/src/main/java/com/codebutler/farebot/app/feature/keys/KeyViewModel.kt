@@ -25,5 +25,6 @@ package com.codebutler.farebot.app.feature.keys
 import com.codebutler.farebot.persist.db.model.SavedKey
 
 data class KeyViewModel(
-        val savedKey: SavedKey,
-        var isSelected: Boolean = false)
+    val savedKey: SavedKey,
+    var isSelected: Boolean = false
+)

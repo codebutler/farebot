@@ -67,7 +67,8 @@ class RawCardGsonTypeAdapterFactory : TypeAdapterFactory {
     }
 
     private class RawCardTypeAdapter internal constructor(
-            private val delegates: Map<CardType, TypeAdapter<RawCard<*>>>) : TypeAdapter<RawCard<*>>() {
+        private val delegates: Map<CardType, TypeAdapter<RawCard<*>>>
+    ) : TypeAdapter<RawCard<*>>() {
 
         override fun write(out: JsonWriter, value: RawCard<*>) {
             val delegateAdapter = delegates[value.cardType()]

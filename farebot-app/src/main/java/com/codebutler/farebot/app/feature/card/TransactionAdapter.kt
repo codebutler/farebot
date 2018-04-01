@@ -30,18 +30,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.codebutler.farebot.R
-import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.core.kotlin.bindView
+import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.RefillViewHolder
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.SubscriptionViewHolder
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.TripViewHolder
 import com.jakewharton.rxrelay2.PublishRelay
+import com.xwray.groupie.ViewHolder
 import java.util.Calendar
 import java.util.Date
 
 class TransactionAdapter(
-        val viewModels: List<TransactionViewModel>,
-        private val relayClicks: PublishRelay<TransactionViewModel>)
+    private val viewModels: List<TransactionViewModel>,
+    private val relayClicks: PublishRelay<TransactionViewModel>
+)
     : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     companion object {
@@ -75,7 +77,7 @@ class TransactionAdapter(
         is TransactionViewModel.SubscriptionViewModel -> TYPE_SUBSCRIPTION
     }
 
-    sealed class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    sealed class TransactionViewHolder(itemView: View) : ViewHolder(itemView) {
 
         companion object {
             fun wrapLayout(parent: ViewGroup, @LayoutRes layoutId: Int): View =
@@ -84,7 +86,7 @@ class TransactionAdapter(
             }
         }
 
-        val header: TextView by bindView(R.id.header)
+        private val header: TextView by bindView(R.id.header)
 
         fun updateHeader(item: TransactionViewModel, isFirstInSection: Boolean) {
             val showHeader = isFirstInSection
@@ -103,10 +105,10 @@ class TransactionAdapter(
 
             val item: View by bindView(R.id.item)
             val image: ImageView by bindView(R.id.image)
-            val route: TextView by bindView(R.id.route)
-            val agency: TextView by bindView(R.id.agency)
-            val stations: TextView by bindView(R.id.stations)
-            val fare: TextView by bindView(R.id.fare)
+            private val route: TextView by bindView(R.id.route)
+            private val agency: TextView by bindView(R.id.agency)
+            private val stations: TextView by bindView(R.id.stations)
+            private val fare: TextView by bindView(R.id.fare)
             val time: TextView by bindView(R.id.time)
 
             fun update(viewModel: TransactionViewModel.TripViewModel, relayClicks: PublishRelay<TransactionViewModel>) {
@@ -136,8 +138,8 @@ class TransactionAdapter(
         class RefillViewHolder(parent: ViewGroup)
             : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_refill)) {
 
-            val agency: TextView by bindView(R.id.agency)
-            val amount: TextView by bindView(R.id.amount)
+            private val agency: TextView by bindView(R.id.agency)
+            private val amount: TextView by bindView(R.id.amount)
             val time: TextView by bindView(R.id.time)
 
             fun update(viewModel: TransactionViewModel.RefillViewModel) {
@@ -150,10 +152,10 @@ class TransactionAdapter(
         class SubscriptionViewHolder(parent: ViewGroup)
             : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_subscription)) {
 
-            val agency: TextView by bindView(R.id.agency)
+            private val agency: TextView by bindView(R.id.agency)
             val name: TextView by bindView(R.id.name)
-            val valid: TextView by bindView(R.id.valid)
-            val used: TextView by bindView(R.id.used)
+            private val valid: TextView by bindView(R.id.valid)
+            private val used: TextView by bindView(R.id.used)
 
             fun update(viewModel: TransactionViewModel.SubscriptionViewModel) {
                 agency.text = viewModel.agency
@@ -182,8 +184,8 @@ class TransactionAdapter(
         val cal1 = createCalendar(viewModels[position].date) ?: return false
         val cal2 = createCalendar(viewModels[position - 1].date) ?: return true
 
-        return cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)
-                || cal1.get(Calendar.MONTH) != cal2.get(Calendar.MONTH)
-                || cal1.get(Calendar.DAY_OF_MONTH) != cal2.get(Calendar.DAY_OF_MONTH)
+        return cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR) ||
+                cal1.get(Calendar.MONTH) != cal2.get(Calendar.MONTH) ||
+                cal1.get(Calendar.DAY_OF_MONTH) != cal2.get(Calendar.DAY_OF_MONTH)
     }
 }

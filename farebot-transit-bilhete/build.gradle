@@ -6,6 +6,10 @@ dependencies {
     implementation project(':farebot-card-classic')
 
     compileOnly libs.autoValueAnnotations
+
+    annotationProcessor libs.autoValueAnnotations
+    annotationProcessor libs.autoValueGsonAnnotations
+
     annotationProcessor libs.autoValue
     annotationProcessor libs.autoValueGson
 }

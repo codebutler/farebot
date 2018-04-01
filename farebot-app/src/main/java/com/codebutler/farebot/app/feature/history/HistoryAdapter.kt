@@ -35,9 +35,10 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 internal class HistoryAdapter(
-        private val viewModels: List<HistoryViewModel>,
-        private val clicksRelay: PublishRelay<HistoryViewModel>,
-        private val selectionRelay: PublishRelay<List<HistoryViewModel>>)
+    private val viewModels: List<HistoryViewModel>,
+    private val clicksRelay: PublishRelay<HistoryViewModel>,
+    private val selectionRelay: PublishRelay<List<HistoryViewModel>>
+)
     : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder =
@@ -82,10 +83,10 @@ internal class HistoryAdapter(
     }
 
     internal class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textViewCardName: TextView by bindView(R.id.card_name)
-        val textViewCardSerial: TextView by bindView(R.id.card_serial)
-        val textViewCardTime: TextView by bindView(R.id.card_time)
-        val textViewCardDate: TextView by bindView(R.id.card_date)
+        private val textViewCardName: TextView by bindView(R.id.card_name)
+        private val textViewCardSerial: TextView by bindView(R.id.card_serial)
+        private val textViewCardTime: TextView by bindView(R.id.card_time)
+        private val textViewCardDate: TextView by bindView(R.id.card_date)
 
         @SuppressLint("SetTextI18n")
         fun update(viewModel: HistoryViewModel) {

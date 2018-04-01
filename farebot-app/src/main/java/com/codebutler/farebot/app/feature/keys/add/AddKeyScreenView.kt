@@ -33,16 +33,16 @@ import com.codebutler.farebot.base.util.ByteUtils
 import com.wealthfront.magellan.BaseScreenView
 
 @SuppressLint("ViewConstructor")
-class AddKeyScreenView(context: Context, val listener: Listener)
+class AddKeyScreenView(context: Context, private val listener: Listener)
     : BaseScreenView<AddKeyScreen>(context) {
 
-    val cardTypeTextView: TextView by bindView(R.id.card_type)
-    val contentView: View by bindView(R.id.content)
-    val importFileButton: Button by bindView(R.id.import_file)
-    val keyDataTextView: TextView by bindView(R.id.key_data)
-    val saveButton: Button by bindView(R.id.save)
-    val splashView: View by bindView(R.id.splash)
-    val tagIdTextView: TextView by bindView(R.id.tag_id)
+    private val cardTypeTextView: TextView by bindView(R.id.card_type)
+    private val contentView: View by bindView(R.id.content)
+    private val importFileButton: Button by bindView(R.id.import_file)
+    private val keyDataTextView: TextView by bindView(R.id.key_data)
+    private val saveButton: Button by bindView(R.id.save)
+    private val splashView: View by bindView(R.id.splash)
+    private val tagIdTextView: TextView by bindView(R.id.tag_id)
 
     init {
         inflate(context, R.layout.screen_keys_add, this)
