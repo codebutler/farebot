@@ -45,7 +45,7 @@ public abstract class OrcaTrip extends Trip {
             .put(10352L, Station.create("Capitol Hill Station", "Capitol Hill", "47.6192", "-122.3202"))
             .put(10351L, Station.create("University of Washington Station", "UW Station", "47.6496", "-122.3037"))
             .put(13193L, Station.create("Westlake Station", "Westlake", "47.6113968", "-122.337502"))
-            .put(13194L, Station.create("University Station", "University", "47.6072502", "-122.335754"))
+            .put(13194L, Station.create("University Street Station", "University Street", "47.6072502", "-122.335754"))
             .put(13195L, Station.create("Pioneer Square Station", "Pioneer Sq", "47.6021461", "-122.33107"))
             .put(13196L, Station.create("International District Station", "ID", "47.5976601", "-122.328217"))
             .put(13197L, Station.create("Stadium Station", "Stadium", "47.5918121", "-122.327354"))
@@ -57,6 +57,7 @@ public abstract class OrcaTrip extends Trip {
             .put(13203L, Station.create("Rainier Beach Station", "Rainier Beach", "47.5222626", "-122.279579"))
             .put(13204L, Station.create("Tukwila International Blvd Station", "Tukwila", "47.4642754", "-122.288391"))
             .put(13205L, Station.create("Seatac Airport Station", "Sea-Tac", "47.4445305", "-122.297012"))
+            .put(10353L, Station.create("Angle Lake Station", "Angle Lake", "47.4227143", "-122.2978669"))
             .build();
 
     private static Map<Integer, Station> sSounderStations = ImmutableMap.<Integer, Station>builder()
