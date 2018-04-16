@@ -1,7 +1,7 @@
 ext {
     vers = [
-        compileSdkVersion: 26,
-        targetSdkVersion: 26,
+        compileSdkVersion: 27,
+        targetSdkVersion: 27,
         minSdkVersion: 21,
         buildToolsVersion: '27.0.3'
     ]
@@ -13,7 +13,7 @@ ext {
     def groupieVersion       = '2.0.3'
     def kotlinVersion        = '1.2.31'
     def magellanVersion      = '1.0.0'
-    def supportVersion       = '27.1.0'
+    def supportVersion       = '27.1.1'
 
     libs = [
         autoDispose:              "com.uber.autodispose:autodispose:${autoDisposeVersion}",
@@ -24,6 +24,7 @@ ext {
         autoValueAnnotations:     "com.google.auto.value:auto-value-annotations:${autoValueVersion}",
         autoValueGson:            "com.ryanharter.auto.value:auto-value-gson:${autoValueGsonVersion}",
         autoValueGsonAnnotations: "com.ryanharter.auto.value:auto-value-gson-annotations:${autoValueGsonVersion}",
+        checkstyle:               'com.puppycrawl.tools:checkstyle:8.9',
         crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.9.1',
         dagger:                   "com.google.dagger:dagger:${daggerVersion}",
         daggerCompiler:           "com.google.dagger:dagger-compiler:${daggerVersion}",
@@ -33,7 +34,7 @@ ext {
         guava:                    'com.google.guava:guava:24.1-android',
         kotlinStdlib:             "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
         magellan:                 "com.wealthfront:magellan:${magellanVersion}",
-        playServicesMaps:         'com.google.android.gms:play-services-maps:12.0.1',
+        playServicesMaps:         'com.google.android.gms:play-services-maps:15.0.0',
         rxBroadcast:              'com.cantrowitz:rxbroadcast:2.0.0',
         rxJava2:                  'io.reactivex.rxjava2:rxjava:2.1.12',
         rxRelay2:                 'com.jakewharton.rxrelay2:rxrelay:2.0.0',
