@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.core.serialize.gson
 
 import com.codebutler.farebot.app.core.sample.RawSampleCard
-import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.transit.registry.annotations.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.raw.RawCEPASCard
 import com.codebutler.farebot.card.classic.raw.RawClassicCard

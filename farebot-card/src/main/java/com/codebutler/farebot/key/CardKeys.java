@@ -24,7 +24,7 @@ package com.codebutler.farebot.key;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.transit.registry.annotations.CardType;
 
 public interface CardKeys {
 

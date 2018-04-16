@@ -3,7 +3,7 @@ package com.codebutler.farebot.persist.db.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.transit.registry.annotations.CardType;
 import com.codebutler.farebot.persist.db.Adapters;
 import com.google.auto.value.AutoValue;
 import com.squareup.sqldelight.RowMapper;

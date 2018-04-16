@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.core.sample
 
 import com.codebutler.farebot.base.util.ByteArray
-import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.transit.registry.annotations.CardType
 import com.codebutler.farebot.card.RawCard
 
 import java.util.Date

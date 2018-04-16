@@ -26,12 +26,12 @@ import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.base.util.ByteArray;
 
+import com.codebutler.farebot.transit.registry.annotations.CardType;
 import java.util.Date;
 
 public interface RawCard<T extends Card> {
 
-    @NonNull
-    CardType cardType();
+    @NonNull CardType cardType();
 
     @NonNull
     ByteArray tagId();

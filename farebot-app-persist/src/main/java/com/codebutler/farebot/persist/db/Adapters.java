@@ -2,7 +2,7 @@ package com.codebutler.farebot.persist.db;
 
 import android.support.annotation.NonNull;
 
-import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.transit.registry.annotations.CardType;
 import com.squareup.sqldelight.ColumnAdapter;
 
 import java.util.Date;

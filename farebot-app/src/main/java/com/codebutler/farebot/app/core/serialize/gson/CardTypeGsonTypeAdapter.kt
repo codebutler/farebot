@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.app.core.serialize.gson
 
-import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.transit.registry.annotations.CardType
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter

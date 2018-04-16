@@ -25,7 +25,7 @@ package com.codebutler.farebot.card.cepas.raw;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.base.util.ByteArray;
-import com.codebutler.farebot.card.CardType;
+import com.codebutler.farebot.transit.registry.annotations.CardType;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.cepas.CEPASHistory;

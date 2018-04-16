@@ -38,7 +38,7 @@ import com.codebutler.farebot.app.core.ui.ActionBarOptions
 import com.codebutler.farebot.app.core.ui.FareBotScreen
 import com.codebutler.farebot.app.feature.main.MainActivity
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.transit.registry.annotations.CardType
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.db.model.SavedKey
