@@ -10,14 +10,7 @@ jdk:
 android:
   components:
     - tools
-    - android-26
-    - build-tools-26.0.2
     - platform-tools
-    - android-25
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - addon-google_apis-google-19
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -25,4 +18,13 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-script: ./gradlew assembleDebug checkstyle lintDebug lintKotlin checkDebug
+before_install:
+  # Install SDK license so Android Gradle plugin can install deps.
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
+  # Run checkstyle before main script to fail fast on style issues
+  - ./gradlew checkstyle
+
+install: ./gradlew assembleDebug --stacktrace
+script: ./gradlew lintDebug lintKotlin checkDebug
