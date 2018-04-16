@@ -12,14 +12,15 @@ ext {
     def kotlinVersion      = '1.2.31'
     def magellanVersion    = '1.0.0'
     def supportVersion     = '27.1.1'
+    def autoValueAnnotations =  "com.google.auto.value:auto-value-annotations:${autoValueVersion}"
 
     libs = [
         autoDispose:              "com.uber.autodispose:autodispose:${autoDisposeVersion}",
         autoDisposeKotlin:        "com.uber.autodispose:autodispose-kotlin:${autoDisposeVersion}",
         autoDisposeAndroid:       "com.uber.autodispose:autodispose-android:${autoDisposeVersion}",
         autoDisposeAndroidKotlin: "com.uber.autodispose:autodispose-android-kotlin:${autoDisposeVersion}",
-        autoValue:                "com.google.auto.value:auto-value:${autoValueVersion}",
-        autoValueAnnotations:     "com.google.auto.value:auto-value-annotations:${autoValueVersion}",
+        autoValue:                ["com.google.auto.value:auto-value:${autoValueVersion}", autoValueAnnotations],
+        autoValueAnnotations:     autoValueAnnotations,
         autoValueGson:            'com.ryanharter.auto.value:auto-value-gson:0.7.0',
         autoValueGsonAnnotations: project(':third_party:auto-value-gson-annotations'),
         crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.9.1',
