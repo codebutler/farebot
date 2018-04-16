@@ -6,6 +6,7 @@ dependencies {
     compileOnly libs.autoService
 
     implementation project(':farebot-transit-registry-annotations')
+    implementation libs.autoCommon
     implementation libs.crumbAnnotations
     implementation libs.crumbCompilerApi
     implementation libs.javapoet

@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 
 dependencies {
     api project(':farebot-card')
+    api project(':farebot-transit-registry-annotations')
 
     implementation libs.supportV4
 

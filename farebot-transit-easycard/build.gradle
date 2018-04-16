@@ -1,7 +1,11 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.kapt'
 
 dependencies {
+    kapt project(':farebot-transit-registry-compiler')
+    kapt libs.crumbCompiler
+
     implementation project(':farebot-transit')
     implementation project(':farebot-card-classic')
 

@@ -7,6 +7,9 @@ dependencies {
 
     compileOnly libs.autoValueAnnotations
 
+    annotationProcessor project(':farebot-transit-registry-compiler')
+    annotationProcessor libs.crumbCompiler
+
     annotationProcessor libs.autoValueAnnotations
     annotationProcessor libs.autoValueGsonAnnotations
 
