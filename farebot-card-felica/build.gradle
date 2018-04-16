@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    api project(':nfc-felica-lib')
-
     implementation project(':farebot-card')
 
     compileOnly libs.autoValueAnnotations
