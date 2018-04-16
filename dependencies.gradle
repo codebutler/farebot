@@ -17,6 +17,7 @@ ext {
     def supportVersion       = '27.1.1'
 
     libs = [
+        autoCommon:               'com.google.auto:auto-common:0.10',
         autoDispose:              "com.uber.autodispose:autodispose:${autoDisposeVersion}",
         autoDisposeAndroid:       "com.uber.autodispose:autodispose-android:${autoDisposeVersion}",
         autoDisposeAndroidKotlin: "com.uber.autodispose:autodispose-android-kotlin:${autoDisposeVersion}",
