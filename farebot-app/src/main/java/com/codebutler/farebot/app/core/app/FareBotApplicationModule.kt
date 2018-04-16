@@ -36,7 +36,7 @@ import com.codebutler.farebot.app.core.serialize.gson.RawCardGsonTypeAdapterFact
 import com.codebutler.farebot.app.core.transit.TransitFactoryRegistry
 import com.codebutler.farebot.app.core.util.ExportHelper
 import com.codebutler.farebot.base.util.ByteArray
-import com.codebutler.farebot.transit.registry.annotations.CardType
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.cepas.CEPASTypeAdapterFactory
 import com.codebutler.farebot.card.classic.ClassicTypeAdapterFactory
 import com.codebutler.farebot.card.desfire.DesfireTypeAdapterFactory

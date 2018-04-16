@@ -27,7 +27,6 @@
 package com.codebutler.farebot.transit.clipper;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
@@ -36,15 +35,16 @@ import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+@TransitCard
 public class ClipperTransitFactory implements TransitFactory<DesfireCard, ClipperTransitInfo> {
 
     private static final int RECORD_LENGTH = 32;

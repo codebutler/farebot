@@ -25,7 +25,6 @@
 package com.codebutler.farebot.transit.edy;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
@@ -33,13 +32,13 @@ import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
-
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
+import java.util.ArrayList;
+import java.util.List;
 import net.kazzz.felica.lib.FeliCaLib;
 import net.kazzz.felica.lib.Util;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@TransitCard
 public class EdyTransitFactory implements TransitFactory<FelicaCard, EdyTransitInfo> {
 
     private static final int FELICA_SERVICE_EDY_ID = 0x110B;

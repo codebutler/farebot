@@ -23,11 +23,11 @@
 package com.codebutler.farebot.app.core.sample
 
 import android.content.Context
-import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.ByteArray
 import com.codebutler.farebot.card.Card
-import com.codebutler.farebot.transit.registry.annotations.CardType
+import com.codebutler.farebot.card.CardType
 import java.util.Date
 
 class SampleCard(private val rawCard: RawSampleCard) : Card() {

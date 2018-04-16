@@ -23,10 +23,7 @@
 package com.codebutler.farebot.card;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.util.ByteArray;
-
-import com.codebutler.farebot.transit.registry.annotations.CardType;
 import java.util.Date;
 
 public interface RawCard<T extends Card> {

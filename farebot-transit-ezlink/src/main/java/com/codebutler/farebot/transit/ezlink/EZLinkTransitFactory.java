@@ -26,16 +26,16 @@
 package com.codebutler.farebot.transit.ezlink;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.card.cepas.CEPASCard;
 import com.codebutler.farebot.card.cepas.CEPASTransaction;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 
+@TransitCard
 public class EZLinkTransitFactory implements TransitFactory<CEPASCard, EZLinkTransitInfo> {
 
     @Override

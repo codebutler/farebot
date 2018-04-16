@@ -11,5 +11,4 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Retention(CLASS)
 @CrumbProducer
 public @interface TransitCard {
-  CardType value();
 }

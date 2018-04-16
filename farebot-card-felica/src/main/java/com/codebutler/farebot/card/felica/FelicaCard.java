@@ -27,20 +27,17 @@ package com.codebutler.farebot.card.felica;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.transit.registry.annotations.CardType;
 import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.codebutler.farebot.base.util.ByteArray;
+import com.codebutler.farebot.card.Card;
+import com.codebutler.farebot.card.CardType;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-
-import net.kazzz.felica.lib.FeliCaLib;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import net.kazzz.felica.lib.FeliCaLib;
 
 @AutoValue
 public abstract class FelicaCard extends Card {

@@ -23,9 +23,8 @@
 package com.codebutler.farebot.card.desfire.raw;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.util.ByteArray;
-import com.codebutler.farebot.transit.registry.annotations.CardType;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.desfire.DesfireApplication;
 import com.codebutler.farebot.card.desfire.DesfireCard;
@@ -33,7 +32,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Function;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-
 import java.util.Date;
 import java.util.List;
 

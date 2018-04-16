@@ -35,10 +35,12 @@ import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.transit.registry.annotations.TransitCard
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Date
 
+@TransitCard
 class EasyCardTransitFactory(private val context: Context) : TransitFactory<ClassicCard, EasyCardTransitInfo> {
 
     override fun check(card: ClassicCard): Boolean {

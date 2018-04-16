@@ -22,7 +22,6 @@ package com.codebutler.farebot.transit.seq_go;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.base.util.Luhn;
 import com.codebutler.farebot.card.classic.ClassicBlock;
@@ -33,18 +32,19 @@ import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoBalanceRecord;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoRecord;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTapRecord;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTopupRecord;
 import com.google.common.collect.ImmutableList;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@TransitCard
 public class SeqGoTransitFactory implements TransitFactory<ClassicCard, SeqGoTransitInfo> {
 
     private static final byte[] MANUFACTURER = {

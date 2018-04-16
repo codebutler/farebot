@@ -24,11 +24,8 @@ package com.codebutler.farebot.card;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.codebutler.farebot.base.util.ByteArray;
-
-import com.codebutler.farebot.transit.registry.annotations.CardType;
 import java.util.Date;
 
 public abstract class Card {

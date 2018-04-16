@@ -20,12 +20,12 @@
 package com.codebutler.farebot.transit.opal;
 
 import android.support.annotation.NonNull;
-
-import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.base.util.ByteUtils;
+import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 
 /**
  * Transit data type for Opal (Sydney, AU).
@@ -34,6 +34,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
  * <p>
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Opal
  */
+@TransitCard
 public class OpalTransitFactory implements TransitFactory<DesfireCard, OpalTransitInfo> {
 
     @Override

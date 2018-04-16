@@ -25,13 +25,11 @@ package com.codebutler.farebot.card.classic.key;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.codebutler.farebot.transit.registry.annotations.CardType;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.key.CardKeys;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -21,11 +21,12 @@
 package com.codebutler.farebot.transit.stub;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 
+@TransitCard
 public class AdelaideMetrocardStubTransitFactory
         implements TransitFactory<DesfireCard, AdelaideMetrocardStubTransitInfo> {
 

@@ -23,21 +23,21 @@
 package com.codebutler.farebot.transit.octopus;
 
 import android.support.annotation.NonNull;
-
+import com.codebutler.farebot.base.util.ByteArray;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.card.felica.FelicaSystem;
-import com.codebutler.farebot.base.util.ByteArray;
-import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
-
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import net.kazzz.felica.lib.FeliCaLib;
 
 import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.DUAL_NAME;
 import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.OCTOPUS_NAME;
 import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.SZT_NAME;
 
+@TransitCard
 public class OctopusTransitFactory implements TransitFactory<FelicaCard,OctopusTransitInfo> {
 
     @Override

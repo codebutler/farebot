@@ -36,7 +36,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
-import com.codebutler.farebot.transit.registry.annotations.CardType
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitInfo
 import com.codebutler.farebot.transit.myki.MykiTransitInfo
 import com.codebutler.farebot.transit.octopus.OctopusTransitInfo

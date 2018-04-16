@@ -23,21 +23,18 @@
 package com.codebutler.farebot.card.felica.raw;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.transit.registry.annotations.CardType;
+import com.codebutler.farebot.card.CardType;
 import com.codebutler.farebot.card.RawCard;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaSystem;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-
-import net.kazzz.felica.lib.FeliCaLib;
-
 import java.util.Date;
 import java.util.List;
+import net.kazzz.felica.lib.FeliCaLib;
 
 @AutoValue
 public abstract class RawFelicaCard implements RawCard {

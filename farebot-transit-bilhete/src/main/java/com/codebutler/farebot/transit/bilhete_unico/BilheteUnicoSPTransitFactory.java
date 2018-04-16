@@ -24,14 +24,14 @@
 package com.codebutler.farebot.transit.bilhete_unico;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.DataClassicSector;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
-
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import java.util.Arrays;
 
+@TransitCard
 public class BilheteUnicoSPTransitFactory implements TransitFactory<ClassicCard, BilheteUnicoSPTransitInfo> {
 
     private static final byte[] MANUFACTURER = {

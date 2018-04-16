@@ -26,13 +26,11 @@ package com.codebutler.farebot.card.desfire;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.codebutler.farebot.base.ui.FareBotUiTree;
 import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.Card;
-import com.codebutler.farebot.transit.registry.annotations.CardType;
+import com.codebutler.farebot.card.CardType;
 import com.google.auto.value.AutoValue;
-
 import java.util.Date;
 import java.util.List;
 

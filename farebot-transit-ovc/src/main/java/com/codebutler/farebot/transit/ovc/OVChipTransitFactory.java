@@ -25,21 +25,21 @@ package com.codebutler.farebot.transit.ovc;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.DataClassicSector;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+@TransitCard
 public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipTransitInfo> {
 
     private static final byte[] OVC_HEADER = new byte[11];

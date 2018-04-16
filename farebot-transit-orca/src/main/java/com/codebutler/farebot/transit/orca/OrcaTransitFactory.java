@@ -27,7 +27,8 @@
 package com.codebutler.farebot.transit.orca;
 
 import android.support.annotation.NonNull;
-
+import com.codebutler.farebot.base.util.ArrayUtils;
+import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
@@ -35,9 +36,7 @@ import com.codebutler.farebot.card.desfire.StandardDesfireFile;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
-import com.codebutler.farebot.base.util.ArrayUtils;
-import com.codebutler.farebot.base.util.ByteUtils;
-
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,6 +46,7 @@ import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_CANCEL_TRI
 import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_IN;
 import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_OUT;
 
+@TransitCard
 public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTransitInfo> {
 
     @Override

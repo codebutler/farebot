@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.registry.annotations;
+package com.codebutler.farebot.card;
 
 public enum CardType {
     MifareClassic,

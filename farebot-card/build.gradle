@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 
 dependencies {
     api project(':farebot-base')
-    api project(':farebot-transit-registry-annotations')
 
     api libs.supportV4
     api libs.gson

@@ -21,7 +21,6 @@
 package com.codebutler.farebot.transit.manly_fast_ferry;
 
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.card.classic.ClassicBlock;
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.ClassicSector;
@@ -36,12 +35,13 @@ import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPrea
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPurseRecord;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryRecord;
 import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryRegularRecord;
-
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 
+@TransitCard
 public class ManlyFastFerryTransitFactory implements TransitFactory<ClassicCard, ManlyFastFerryTransitInfo> {
 
     public static final byte[] SIGNATURE = {

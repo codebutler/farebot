@@ -34,7 +34,6 @@ package com.codebutler.farebot.transit.suica;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
 import com.codebutler.farebot.card.felica.FelicaDBUtil;
@@ -42,14 +41,14 @@ import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
+import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
-
-import net.kazzz.felica.lib.FeliCaLib;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.kazzz.felica.lib.FeliCaLib;
 
+@TransitCard
 public class SuicaTransitFactory implements TransitFactory<FelicaCard, SuicaTransitInfo> {
 
     @NonNull private final FelicaDBUtil mDBUtil;

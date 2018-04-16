@@ -24,7 +24,9 @@ package com.codebutler.farebot.app.core.sample
 
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.registry.annotations.TransitCard
 
+@TransitCard
 class SampleTransitFactory : TransitFactory<SampleCard, SampleTransitInfo> {
 
     override fun check(card: SampleCard): Boolean = true
