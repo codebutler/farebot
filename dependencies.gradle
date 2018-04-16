@@ -9,6 +9,7 @@ ext {
     def autoDisposeVersion   = '0.7.0'
     def autoValueVersion     = '1.6'
     def autoValueGsonVersion = '0.7.0'
+    def crumbVersion         = '0.0.1'
     def daggerVersion        = '2.15'
     def groupieVersion       = '2.0.3'
     def kotlinVersion        = '1.2.31'
@@ -20,18 +21,23 @@ ext {
         autoDisposeAndroid:       "com.uber.autodispose:autodispose-android:${autoDisposeVersion}",
         autoDisposeAndroidKotlin: "com.uber.autodispose:autodispose-android-kotlin:${autoDisposeVersion}",
         autoDisposeKotlin:        "com.uber.autodispose:autodispose-kotlin:${autoDisposeVersion}",
+        autoService:              'com.google.auto.service:auto-service:1.0-rc4',
         autoValue:                "com.google.auto.value:auto-value:${autoValueVersion}",
         autoValueAnnotations:     "com.google.auto.value:auto-value-annotations:${autoValueVersion}",
         autoValueGson:            "com.ryanharter.auto.value:auto-value-gson:${autoValueGsonVersion}",
         autoValueGsonAnnotations: "com.ryanharter.auto.value:auto-value-gson-annotations:${autoValueGsonVersion}",
         checkstyle:               'com.puppycrawl.tools:checkstyle:8.9',
         crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.9.1',
+        crumbAnnotations:         "com.uber.crumb:crumb-annotations:${crumbVersion}",
+        crumbCompiler:            "com.uber.crumb:crumb-compiler:${crumbVersion}",
+        crumbCompilerApi:         "com.uber.crumb:crumb-compiler-api:${crumbVersion}",
         dagger:                   "com.google.dagger:dagger:${daggerVersion}",
         daggerCompiler:           "com.google.dagger:dagger-compiler:${daggerVersion}",
         groupie:                  "com.xwray:groupie:${groupieVersion}",
         groupieDatabinding:       "com.xwray:groupie-databinding:${groupieVersion}",
         gson:                     'com.google.code.gson:gson:2.8.2',
         guava:                    'com.google.guava:guava:24.1-android',
+        javapoet:                 'com.squareup:javapoet:1.10.0',
         kotlinStdlib:             "org.jetbrains.kotlin:kotlin-stdlib-jre7:${kotlinVersion}",
         magellan:                 "com.wealthfront:magellan:${magellanVersion}",
         playServicesMaps:         'com.google.android.gms:play-services-maps:15.0.0',

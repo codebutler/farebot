@@ -1,0 +1,12 @@
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
+dependencies {
+    kapt libs.autoService
+    compileOnly libs.autoService
+
+    implementation project(':farebot-transit-registry-annotations')
+    implementation libs.crumbAnnotations
+    implementation libs.crumbCompilerApi
+    implementation libs.javapoet
+}
