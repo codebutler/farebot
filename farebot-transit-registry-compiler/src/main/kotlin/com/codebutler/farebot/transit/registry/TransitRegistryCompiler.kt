@@ -8,33 +8,39 @@ import com.codebutler.farebot.transit.registry.annotations.TransitCardRegistry
 import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.service.AutoService
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
-import com.squareup.javapoet.ParameterizedTypeName
-import com.squareup.javapoet.TypeName
-import com.squareup.javapoet.TypeSpec
-import com.squareup.javapoet.WildcardTypeName
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.WildcardTypeName
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.asTypeName
 import com.uber.crumb.compiler.api.ConsumerMetadata
 import com.uber.crumb.compiler.api.CrumbConsumerExtension
 import com.uber.crumb.compiler.api.CrumbContext
 import com.uber.crumb.compiler.api.CrumbProducerExtension
 import com.uber.crumb.compiler.api.ProducerMetadata
+import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
+import me.eugeniomarletti.kotlin.metadata.classKind
+import me.eugeniomarletti.kotlin.metadata.kaptGeneratedOption
+import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import org.jetbrains.kotlin.serialization.ProtoBuf.Class.Kind
+import java.io.File
 import java.io.IOException
-import java.util.Arrays
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ElementKind.CLASS
 import javax.lang.model.element.Modifier.ABSTRACT
-import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
-import javax.lang.model.element.Modifier.STATIC
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.util.ElementFilter
 import javax.tools.Diagnostic
-
+import javax.tools.Diagnostic.Kind.ERROR
 
 @AutoService(CrumbProducerExtension::class, CrumbConsumerExtension::class)
 class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
@@ -49,21 +55,27 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
 
     override fun supportedConsumerAnnotations() = setOf(TransitCardRegistry::class.java)
 
-    override fun isProducerApplicable(context: CrumbContext,
-            type: TypeElement,
-            annotations: Collection<AnnotationMirror>): Boolean {
+    override fun isProducerApplicable(
+        context: CrumbContext,
+        type: TypeElement,
+        annotations: Collection<AnnotationMirror>
+    ): Boolean {
         return isAnnotationPresent(type, TransitCard::class.java)
     }
 
-    override fun isConsumerApplicable(context: CrumbContext,
-            type: TypeElement,
-            annotations: Collection<AnnotationMirror>): Boolean {
+    override fun isConsumerApplicable(
+        context: CrumbContext,
+        type: TypeElement,
+        annotations: Collection<AnnotationMirror>
+    ): Boolean {
         return isAnnotationPresent(type, TransitCardRegistry::class.java)
     }
 
-    override fun produce(context: CrumbContext,
-            type: TypeElement,
-            annotations: Collection<AnnotationMirror>): ProducerMetadata {
+    override fun produce(
+        context: CrumbContext,
+        type: TypeElement,
+        annotations: Collection<AnnotationMirror>
+    ): ProducerMetadata {
         // Must be a class
         if (type.kind !== ElementKind.CLASS) {
             context.processingEnv
@@ -92,7 +104,8 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
                     .messager
                     .printMessage(
                             Diagnostic.Kind.ERROR,
-                            "Must have a public default constructor or single Context parameter constructor to be usable in transit registries.",
+                            "Must have a public default constructor or single Context parameter constructor to be " +
+                                    "usable in transit registries.",
                             type)
             return mapOf()
         }
@@ -111,23 +124,47 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
         return mapOf(METADATA_KEY to type.qualifiedName.toString())
     }
 
-    override fun consume(context: CrumbContext,
-            type: TypeElement,
-            annotations: Collection<AnnotationMirror>,
-            metadata: Set<ConsumerMetadata>) {
-        // Must be an abstract class because we're generating the backing implementation.
-        if (type.kind != ElementKind.CLASS) {
+    override fun consume(
+        context: CrumbContext,
+        type: TypeElement,
+        annotations: Collection<AnnotationMirror>,
+        metadata: Set<ConsumerMetadata>
+    ) {
+        // Must be a type that supports extension functions
+        if (type.kind != CLASS) {
             context.processingEnv
                     .messager
-                    .printMessage(
-                            Diagnostic.Kind.ERROR,
-                            "@${TransitCardRegistry::class.java.simpleName} is only applicable on classes when consuming!",
+                    .printMessage(ERROR,
+                            "@${TransitCardRegistry::class.java.simpleName} is only applicable on classes " +
+                                    "when consuming!",
                             type)
             return
-        } else if (ABSTRACT !in type.modifiers) {
+        }
+
+        // Pull out the kotlin data
+        val kmetadata = type.kotlinMetadata
+
+        if (kmetadata !is KotlinClassMetadata) {
             context.processingEnv
                     .messager
-                    .printMessage(Diagnostic.Kind.ERROR, "Must be abstract!", type)
+                    .printMessage(ERROR,
+                            "@${TransitCardRegistry::class.java.simpleName} can't be applied to $type: " +
+                                    "must be a class.]",
+                            type)
+            return
+        }
+
+        val classData = kmetadata.data
+        val (_, classProto) = classData
+
+        // Must be an object class.
+        if (classProto.classKind != Kind.OBJECT) {
+            context.processingEnv
+                    .messager
+                    .printMessage(ERROR,
+                            "@${TransitCardRegistry::class.java.simpleName} can't be applied to $type: must be a " +
+                                    "Kotlin object class",
+                            type)
             return
         }
 
@@ -158,85 +195,84 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
                 .filterNotNull()
                 .groupBy { it.cardType }
 
-        val cardCn = ClassName.get("com.codebutler.farebot.card", "Card")
-        val cardMapInitializer = CodeBlock.of("new \$T<>()", LinkedHashMap::class.java)
-        val transitFactoryListType = ParameterizedTypeName.get(
-                ClassName.bestGuess(FQCN_TRANSIT_FACTORY),
-                WildcardTypeName.subtypeOf(cardCn),
-                WildcardTypeName.subtypeOf(ClassName.get("com.codebutler.farebot.transit",
-                        "TransitInfo"))
-        )
+        val cardCn = ClassName("com.codebutler.farebot.card", "Card")
+        val transitFactoryListType = ParameterizedTypeName.get(List::class.asClassName(),
+                ParameterizedTypeName.get(
+                        ClassName.bestGuess(FQCN_TRANSIT_FACTORY),
+                        cardCn,
+                        ClassName("com.codebutler.farebot.transit", "TransitInfo")
+                ))
         val cardsMapType = ParameterizedTypeName.get(
-                ClassName.get(Map::class.java),
-                ParameterizedTypeName.get(ClassName.get(Class::class.java),
+                Map::class.asClassName(),
+                ParameterizedTypeName.get(Class::class.asClassName(),
                         WildcardTypeName.subtypeOf(cardCn)),
-                ParameterizedTypeName.get(ClassName.get(List::class.java), transitFactoryListType))
-
+                transitFactoryListType)
 
         val requiresContext = cardClasses
                 .values
-                .flatMap { it }.any { it.constructorType == CONTEXT }
-        val contextParam = ParameterSpec.builder(ClassName.bestGuess(CONTEXT_FQCN),
-                "context").build()
-        val createMethod = MethodSpec.methodBuilder("create")
-                .addModifiers(STATIC)
+                .flatMap { it }
+                .any { it.constructorType == CONTEXT }
+        val contextParam = ParameterSpec.builder("context",
+                ClassName.bestGuess(CONTEXT_FQCN)).build()
+        // List of code blocks
+        val cardClassesCodeBlocks = cardClasses
+                .map { (cardType, metas) ->
+                    val elementsListTypes = metas.joinToString {
+                        if (it.constructorType == DEFAULT) {
+                            "%T()"
+                        } else {
+                            "%T(%N)"
+                        }
+                    }
+                    val elementsList = metas
+                            .flatMap {
+                                val target = it.element.asClassName()
+                                if (it.constructorType == DEFAULT) {
+                                    setOf(target)
+                                } else {
+                                    setOf(target, contextParam)
+                                }
+                            }
+                            .toTypedArray()
+                    val elementsCodeBlock = CodeBlock.of(elementsListTypes, *elementsList)
+                    return@map CodeBlock.of("%T::class.java to listOf(%L) as %T",
+                            cardType,
+                            elementsCodeBlock,
+                            transitFactoryListType)
+                }
+        val createFun = FunSpec.builder("create")
+                .addAnnotation(AnnotationSpec.builder(Suppress::class)
+                        .addMember("%S", "UNCHECKED_CAST")
+                        .build())
+                .receiver(type.asClassName())
                 .returns(cardsMapType)
                 .apply {
                     if (requiresContext) {
                         addParameter(contextParam)
                     }
                 }
-                .addStatement("\$T registry = \$L", cardsMapType, cardMapInitializer)
-                .apply {
-                    cardClasses.forEach { (cardType, metas) ->
-                        val elementsListTypes = metas.joinToString {
-                            if (it.constructorType == DEFAULT) {
-                                "new \$T()"
-                            } else {
-                                "new \$T(\$N)"
-                            }
-                        }
-                        val elementsList = metas
-                                .flatMap {
-                                    val target = ClassName.get(it.element)
-                                    if (it.constructorType == DEFAULT) {
-                                        setOf(target)
-                                    } else {
-                                        setOf(target, contextParam)
-                                    }
-                                }
-                                .toTypedArray()
-                        val elementsCodeBlock = CodeBlock.of(elementsListTypes, *elementsList)
-                        addStatement("registry.put(\$T.class, \$T.<\$T>asList(\$L))",
-                                cardType,
-                                ClassName.get(Arrays::class.java),
-                                transitFactoryListType,
-                                elementsCodeBlock
-                        )
-                    }
-                }
-                .addStatement("return registry")
-                .build()
-
-        val generatedClass = TypeSpec.classBuilder("CardsRegistry_" + type.simpleName.toString())
-                .addModifiers(FINAL)
-                .superclass(TypeName.get(type.asType()))
-                .addMethod(createMethod)
+                .addStatement("return mapOf(\n${cardClassesCodeBlocks.joinToString(
+                        ",\n") { "    %L" }}\n)",
+                        *cardClassesCodeBlocks.toTypedArray())
                 .build()
 
         try {
-            JavaFile.builder(MoreElements.getPackage(type).qualifiedName.toString(), generatedClass)
+            // Generate the file
+            val generatedDir = context.processingEnv.options[kaptGeneratedOption]?.let(::File)
+                    ?: throw IllegalStateException("Could not resolve kotlin generated directory!")
+            FileSpec.builder(MoreElements.getPackage(type).qualifiedName.toString(),
+                    "Generated${type.simpleName}")
+                    .addFunction(createFun)
                     .build()
-                    .writeTo(context.processingEnv.filer)
+                    .writeTo(generatedDir)
         } catch (e: IOException) {
             context.processingEnv
                     .messager
                     .printMessage(
                             Diagnostic.Kind.ERROR,
-                            "Failed to write generated plugins mapping! ${e.message}",
+                            "Failed to write generated registry! ${e.message}",
                             type)
         }
-
     }
 }
 
@@ -249,13 +285,14 @@ private enum class CardConstructorType {
 
 /**
  * Shallow interfaces check. If you want something more complex, do like here:
- * https://github.com/rharter/auto-value-moshi/blob/c397632e87f65bd53ff890542b0ae9c0a93b8e3c/auto-value-moshi/src/main/java/com/ryanharter/auto/value/moshi/AutoValueMoshiAdapterFactoryProcessor.java#L255
+ * https://github.com/rharter/auto-value-moshi/blob/c397632e87f65bd53ff890542b0ae9c0a93b8e3c/auto-value-moshi/src
+ * /main/java/com/ryanharter/auto/value/moshi/AutoValueMoshiAdapterFactoryProcessor.java#L255
  */
 private fun TypeElement.transitFactoryInterface(): ParameterizedTypeName? {
     val targetTypeName = ClassName.bestGuess(FQCN_TRANSIT_FACTORY)
     for (iface in interfaces) {
         if (iface is DeclaredType) {
-            val typename = TypeName.get(iface)
+            val typename = iface.asTypeName()
             if (typename is ParameterizedTypeName && targetTypeName == typename.rawType) {
                 return typename
             }
@@ -270,9 +307,9 @@ private val TypeElement.constructorType: CardConstructorType
                 .forEach {
                     if (it.isDefault && PUBLIC !in it.modifiers) {
                         return INVALID
-                    } else if (PUBLIC in it.modifiers
-                            && it.parameters.size == 1
-                            && it.parameters[0].asType().toString() == CONTEXT_FQCN) {
+                    } else if (PUBLIC in it.modifiers &&
+                            it.parameters.size == 1 &&
+                            it.parameters[0].asType().toString() == CONTEXT_FQCN) {
                         return CONTEXT
                     }
                 }

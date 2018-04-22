@@ -1,8 +1,21 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
+android {
+    sourceSets {
+        // For kotlin code gen during kapt
+        main.java.srcDirs += [file("$buildDir/generated/source/kaptKotlin/main")]
+        debug.java.srcDirs += [file("$buildDir/generated/source/kaptKotlin/debug")]
+        release.java.srcDirs += [file("$buildDir/generated/source/kaptKotlin/release")]
+        test.java.srcDirs += [file("$buildDir/generated/source/kaptKotlin/test")]
+    }
+}
 
 dependencies {
-    annotationProcessor libs.crumbCompiler
-    annotationProcessor project(':farebot-transit-registry-compiler')
+    kapt libs.crumbCompiler
+    kapt project(':farebot-transit-registry-compiler')
+    implementation libs.kotlinStdlib
     implementation project(':farebot-transit-registry-annotations')
 
     // Cards
@@ -13,6 +26,7 @@ dependencies {
     implementation project(':farebot-card-desfire')
     implementation project(':farebot-card-felica')
 
+    // Transit
     api project(':farebot-transit')
     implementation project(':farebot-transit-bilhete')
     implementation project(':farebot-transit-clipper')

@@ -37,6 +37,7 @@ dependencies {
     implementation project(':farebot-card-felica')
     implementation project(':farebot-card-ultralight')
     implementation project(':farebot-transit')
+    implementation project(':farebot-transit-registry')
     implementation project(':farebot-transit-bilhete')
     implementation project(':farebot-transit-clipper')
     implementation project(':farebot-transit-easycard')

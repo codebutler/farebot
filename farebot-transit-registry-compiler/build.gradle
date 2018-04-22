@@ -1,6 +1,13 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.kapt'
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = ['-Xjsr305=strict']
+    }
+}
+
 dependencies {
     kapt libs.autoService
     compileOnly libs.autoService
@@ -9,5 +16,7 @@ dependencies {
     implementation libs.autoCommon
     implementation libs.crumbAnnotations
     implementation libs.crumbCompilerApi
-    implementation libs.javapoet
+    implementation libs.kotlinMetadata
+    implementation libs.kotlinpoet
+    implementation libs.kotlinStdlib
 }
