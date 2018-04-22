@@ -128,6 +128,7 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
             context.processingEnv
                     .messager
                     .printMessage(Diagnostic.Kind.ERROR, "Must be abstract!", type)
+            return
         }
 
         // List of card TypeElements by type
@@ -161,9 +162,9 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
         val cardMapInitializer = CodeBlock.of("new \$T<>()", LinkedHashMap::class.java)
         val transitFactoryListType = ParameterizedTypeName.get(
                 ClassName.bestGuess(FQCN_TRANSIT_FACTORY),
-                cardCn,
-                ClassName.get("com.codebutler.farebot.transit",
-                        "TransitInfo")
+                WildcardTypeName.subtypeOf(cardCn),
+                WildcardTypeName.subtypeOf(ClassName.get("com.codebutler.farebot.transit",
+                        "TransitInfo"))
         )
         val cardsMapType = ParameterizedTypeName.get(
                 ClassName.get(Map::class.java),
@@ -190,9 +191,9 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
                     cardClasses.forEach { (cardType, metas) ->
                         val elementsListTypes = metas.joinToString {
                             if (it.constructorType == DEFAULT) {
-                                "\$T"
+                                "new \$T()"
                             } else {
-                                "\$T(\$N)"
+                                "new \$T(\$N)"
                             }
                         }
                         val elementsList = metas
@@ -206,9 +207,10 @@ class TransitRegistryCompiler : CrumbProducerExtension, CrumbConsumerExtension {
                                 }
                                 .toTypedArray()
                         val elementsCodeBlock = CodeBlock.of(elementsListTypes, *elementsList)
-                        addStatement("registry.put(\$T.class, \$T.asList(\$L))",
+                        addStatement("registry.put(\$T.class, \$T.<\$T>asList(\$L))",
                                 cardType,
                                 ClassName.get(Arrays::class.java),
+                                transitFactoryListType,
                                 elementsCodeBlock
                         )
                     }

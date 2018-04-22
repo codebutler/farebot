@@ -10,7 +10,7 @@ import java.util.Map;
 
 @TransitCardRegistry
 public abstract class FarebotTransitRegistry {
-  public static Map<Class<? extends Card>, List<TransitFactory<Card, TransitInfo>>> get(Context context) {
-    return CardsRegistry_FarebotTransitRegistry.create();
+  public static Map<Class<? extends Card>, List<TransitFactory<? extends Card, ? extends TransitInfo>>> get(Context context) {
+    return CardsRegistry_FarebotTransitRegistry.create(context);
   }
 }

@@ -5,6 +5,15 @@ dependencies {
     annotationProcessor project(':farebot-transit-registry-compiler')
     implementation project(':farebot-transit-registry-annotations')
 
+    // Cards
+    api project(':farebot-card')
+    implementation project(':farebot-card-cepas')
+    implementation project(':farebot-card-classic')
+    implementation project(':farebot-card-desfire')
+    implementation project(':farebot-card-desfire')
+    implementation project(':farebot-card-felica')
+
+    api project(':farebot-transit')
     implementation project(':farebot-transit-bilhete')
     implementation project(':farebot-transit-clipper')
     implementation project(':farebot-transit-easycard')
