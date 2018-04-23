@@ -33,7 +33,9 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import net.kazzz.felica.lib.FeliCaLib;
 
-import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.*;
+import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.DUAL_NAME;
+import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.OCTOPUS_NAME;
+import static com.codebutler.farebot.transit.octopus.OctopusTransitInfo.SZT_NAME;
 
 @TransitCard
 public class OctopusTransitFactory implements TransitFactory<FelicaCard, OctopusTransitInfo> {

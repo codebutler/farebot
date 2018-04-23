@@ -43,7 +43,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.codebutler.farebot.transit.orca.OrcaData.*;
+import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_CANCEL_TRIP;
+import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_IN;
+import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_OUT;
 
 @TransitCard
 public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTransitInfo> {

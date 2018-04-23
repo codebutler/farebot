@@ -34,7 +34,11 @@ import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @TransitCard
 public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipTransitInfo> {
@@ -51,7 +55,8 @@ public class OVChipTransitFactory implements TransitFactory<ClassicCard, OVChipT
         OVC_HEADER[10] = -28;
     }
 
-    @NonNull private final OVChipDBUtil mOVChipDBUtil;
+    @NonNull
+    private final OVChipDBUtil mOVChipDBUtil;
 
     public OVChipTransitFactory(@NonNull Context context) {
         mOVChipDBUtil = new OVChipDBUtil(context);
