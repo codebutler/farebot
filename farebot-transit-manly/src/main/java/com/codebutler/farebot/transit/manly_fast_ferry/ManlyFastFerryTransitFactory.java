@@ -29,13 +29,9 @@ import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryBalanceRecord;
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryMetadataRecord;
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPreambleRecord;
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPurseRecord;
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryRecord;
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryRegularRecord;
+import com.codebutler.farebot.transit.manly_fast_ferry.record.*;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

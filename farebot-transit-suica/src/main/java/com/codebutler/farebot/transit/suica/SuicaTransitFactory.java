@@ -43,10 +43,11 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
+import net.kazzz.felica.lib.FeliCaLib;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.kazzz.felica.lib.FeliCaLib;
 
 @TransitCard
 public class SuicaTransitFactory implements TransitFactory<FelicaCard, SuicaTransitInfo> {

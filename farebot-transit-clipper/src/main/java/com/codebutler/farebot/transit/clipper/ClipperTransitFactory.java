@@ -39,6 +39,7 @@ import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

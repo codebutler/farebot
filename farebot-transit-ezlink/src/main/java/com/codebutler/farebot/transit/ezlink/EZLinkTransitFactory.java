@@ -33,6 +33,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 @TransitCard

@@ -33,10 +33,11 @@ import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
-import java.util.ArrayList;
-import java.util.List;
 import net.kazzz.felica.lib.FeliCaLib;
 import net.kazzz.felica.lib.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @TransitCard
 public class EdyTransitFactory implements TransitFactory<FelicaCard, EdyTransitInfo> {

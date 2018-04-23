@@ -25,17 +25,14 @@ package com.codebutler.farebot.transit.hsl;
 
 import android.support.annotation.NonNull;
 import com.codebutler.farebot.base.util.ByteUtils;
-import com.codebutler.farebot.card.desfire.DesfireCard;
-import com.codebutler.farebot.card.desfire.DesfireFile;
-import com.codebutler.farebot.card.desfire.DesfireRecord;
-import com.codebutler.farebot.card.desfire.RecordDesfireFile;
-import com.codebutler.farebot.card.desfire.StandardDesfireFile;
+import com.codebutler.farebot.card.desfire.*;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
 import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

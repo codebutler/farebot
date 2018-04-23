@@ -85,8 +85,8 @@ class EasyCardTransitFactory(private val context: Context) : TransitFactory<Clas
     private fun parseTrips(card: ClassicCard): List<Trip> {
         val blocks = (
                 (card.getSector(3) as DataClassicSector).blocks.subList(1, 3) +
-                (card.getSector(4) as DataClassicSector).blocks.subList(0, 3) +
-                (card.getSector(5) as DataClassicSector).blocks.subList(0, 3))
+                        (card.getSector(4) as DataClassicSector).blocks.subList(0, 3) +
+                        (card.getSector(5) as DataClassicSector).blocks.subList(0, 3))
                 .filter { !it.data.bytes().all { it == 0x0.toByte() } }
 
         return blocks.map { block ->

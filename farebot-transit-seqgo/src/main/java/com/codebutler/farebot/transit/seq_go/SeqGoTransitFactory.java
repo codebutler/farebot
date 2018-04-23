@@ -38,6 +38,7 @@ import com.codebutler.farebot.transit.seq_go.record.SeqGoRecord;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTapRecord;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTopupRecord;
 import com.google.common.collect.ImmutableList;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -37,14 +37,13 @@ import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 import com.codebutler.farebot.transit.registry.annotations.TransitCard;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_CANCEL_TRIP;
-import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_IN;
-import static com.codebutler.farebot.transit.orca.OrcaData.TRANS_TYPE_TAP_OUT;
+import static com.codebutler.farebot.transit.orca.OrcaData.*;
 
 @TransitCard
 public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTransitInfo> {
@@ -133,7 +132,7 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
                 && secondTrip != null
                 && firstTrip.getTransType() == TRANS_TYPE_TAP_IN
                 && (secondTrip.getTransType() == TRANS_TYPE_TAP_OUT
-                    || secondTrip.getTransType() == TRANS_TYPE_CANCEL_TRIP)
+                || secondTrip.getTransType() == TRANS_TYPE_CANCEL_TRIP)
                 && firstTrip.getAgency() == secondTrip.getAgency();
     }
 
