@@ -161,7 +161,16 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         cardType = CardType.MifareClassic,
                         keysRequired = true,
                         extraNoteResId = R.string.easycard_card_note
+                ),
+                SupportedCard(
+                        imageResId = R.drawable.kmt_card,
+                        name = "Kartu Multi Trip",
+                        locationResId = R.string.location_jakarta,
+                        cardType = CardType.FeliCa,
+                        keysRequired = false,
+                        extraNoteResId = R.string.kmt_notes
                 )
+
         )
     }
 

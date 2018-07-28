@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">KMT</string>
+    <string name="kmt_notes">For new FeliCa cards only.</string>
+
 </resources>
