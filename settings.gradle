@@ -1,7 +1,7 @@
 include 'nfc-felica-lib'
 project(':nfc-felica-lib').projectDir = new File('third_party/nfc-felica-lib')
 
-include ':farebot-base'
+include ':farebot-base', ':farebot-transit-kmt'
 include ':farebot-card'
 include ':farebot-card-cepas'
 include ':farebot-card-classic'

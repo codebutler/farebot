@@ -1,5 +1,5 @@
 /*
- * EdyTrip.java
+ * KMTTrip.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.edy;
+package com.codebutler.farebot.transit.kmt;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
@@ -38,10 +38,10 @@ import java.util.Date;
 import java.util.Locale;
 
 @AutoValue
-abstract class EdyTrip extends Trip {
+abstract class KMTTrip extends Trip {
 
     @NonNull
-    static EdyTrip create(FelicaBlock block) {
+    static KMTTrip create(FelicaBlock block) {
         byte[] data = block.getData().bytes();
 
         // Data Offsets with values
@@ -55,22 +55,16 @@ abstract class EdyTrip extends Trip {
 
         int processType = data[0];
         int sequenceNumber = Util.toInt(data[1], data[2], data[3]);
-        Date timestampData = EdyUtil.extractDate(data);
+        Date timestampData = KMTUtil.extractDate(data);
         int transactionAmount = Util.toInt(data[8], data[9], data[10], data[11]);
         int balance = Util.toInt(data[12], data[13], data[14], data[15]);
 
-        return new AutoValue_EdyTrip(processType, sequenceNumber, timestampData, transactionAmount, balance);
+        return new AutoValue_KMTTrip(processType, sequenceNumber, timestampData, transactionAmount, balance);
     }
 
     @Override
     public Mode getMode() {
         switch (getProcessType()) {
-            case EdyTransitInfo.FELICA_MODE_EDY_DEBIT:
-                return Mode.POS;
-            case EdyTransitInfo.FELICA_MODE_EDY_CHARGE:
-                return Mode.TICKET_MACHINE;
-            case EdyTransitInfo.FELICA_MODE_EDY_GIFT:
-                return Mode.VENDING_MACHINE;
             default:
                 return Mode.OTHER;
         }
@@ -92,17 +86,15 @@ abstract class EdyTrip extends Trip {
 
     @Override
     public String getFareString(@NonNull Resources resources) {
-        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
-        format.setMaximumFractionDigits(0);
-        if (getProcessType() != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
-            return "+" + format.format(getTransactionAmount());
-        }
+        Locale localeID=new Locale("in","ID");
+        NumberFormat format = NumberFormat.getCurrencyInstance(localeID);
         return format.format(getTransactionAmount());
     }
 
     @Override
     public String getBalanceString() {
-        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.JAPAN);
+        Locale localeID=new Locale("in","ID");
+        NumberFormat format = NumberFormat.getCurrencyInstance(localeID);
         format.setMaximumFractionDigits(0);
         return format.format(getBalance());
     }
@@ -115,16 +107,16 @@ abstract class EdyTrip extends Trip {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        NumberFormat format = NumberFormat.getIntegerInstance();
-        format.setMinimumIntegerDigits(8);
-        format.setGroupingUsed(false);
-        String str;
-        if (getProcessType() != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
-            str = resources.getString(R.string.felica_process_charge);
-        } else {
-            str = resources.getString(R.string.felica_process_merchandise_purchase);
-        }
-        str += " " + resources.getString(R.string.edy_transaction_sequence) + format.format(getSequenceNumber());
+//        NumberFormat format = NumberFormat.getIntegerInstance();
+//        format.setMinimumIntegerDigits(8);
+//        format.setGroupingUsed(false);
+        String str="-";
+//        if (getProcessType() != KMTTransitInfo.FELICA_MODE_EDY_DEBIT) {
+//            str = resources.getString(R.string.felica_process_charge);
+//        } else {
+//            str = resources.getString(R.string.felica_process_merchandise_purchase);
+//        }
+//        str += " " + resources.getString(R.string.edy_transaction_sequence) + format.format(getSequenceNumber());
         return str;
     }
 

@@ -20,16 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.edy;
+package com.codebutler.farebot.transit.kmt;
 
 import net.kazzz.felica.lib.Util;
 
 import java.util.Calendar;
 import java.util.Date;
 
-final class EdyUtil {
+final class KMTUtil {
 
-    private EdyUtil() { }
+    private KMTUtil() { }
 
     static Date extractDate(byte[] data) {
         int fulloffset = Util.toInt(data[4], data[5], data[6], data[7]);
