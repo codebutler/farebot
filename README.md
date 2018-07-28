@@ -56,6 +56,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [Opal][18] - Sydney (and surrounds), NSW, Australia
 * [ORCA][0] - Seattle, WA, USA
 * [Suica][9], [ICOCA][10], [PASMO][11], [Edy][12] - Japan
+* [KMT][26] - Jakarta, Indonesia
 
 ## Supported Cards (Keys Required)
 
@@ -119,3 +120,4 @@ FareBot uses the following open-source libraries:
 [23]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic
 [24]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_Ultralight_and_MIFARE_Ultralight_EV1
 [25]: http://www.octopus.com.hk/home/en/index.html
+[26]: https://en.wikipedia.org/wiki/Kereta_Commuter_Indonesia
