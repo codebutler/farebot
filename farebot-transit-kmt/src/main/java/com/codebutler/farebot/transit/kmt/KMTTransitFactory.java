@@ -30,11 +30,7 @@ import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 
-import net.kazzz.felica.lib.FeliCaLib;
 import net.kazzz.felica.lib.Util;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,28 +54,41 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
     @Override
     public TransitIdentity parseIdentity(@NonNull FelicaCard card) {
         FelicaService serviceID = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_ID);
-        return TransitIdentity.create("Kartu Multi Trip", new String(serviceID.getBlocks().get(0).getData().bytes()));
+        String serialNumber = "-";
+        if (serviceID != null) {
+            serialNumber = new String(serviceID.getBlocks().get(0).getData().bytes());
+        }
+
+        return TransitIdentity.create("Kartu Multi Trip", serialNumber);
     }
 
     @NonNull
     @Override
     public KMTTransitInfo parseInfo(@NonNull FelicaCard card) {
-        FelicaService serviceID = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_ID);
-        ByteArray serialNumber = new ByteArray(serviceID.getBlocks().get(0).getData().bytes());
 
+        FelicaService serviceID = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_ID);
+        ByteArray serialNumber;
+        if (serviceID != null) {
+            serialNumber = new ByteArray(serviceID.getBlocks().get(0).getData().bytes());
+        } else {
+            serialNumber=new ByteArray("000000000000000".getBytes());
+        }
         // current balance info in block 0, bytes 0-3, little-endian ordering
         FelicaService serviceBalance = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_BALANCE);
-        List<FelicaBlock> blocksBalance = serviceBalance.getBlocks();
-        FelicaBlock blockBalance = blocksBalance.get(0);
-        byte[] dataBalance = blockBalance.getData().bytes();
-        int currentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
+        int currentBalance = 0;
+        if (serviceBalance != null) {
+            List<FelicaBlock> blocksBalance = serviceBalance.getBlocks();
+            FelicaBlock blockBalance = blocksBalance.get(0);
+            byte[] dataBalance = blockBalance.getData().bytes();
+            currentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
+        }
 
-        // now read the transaction history
-        FelicaService serviceHistory = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_HISTORY);
+//        --- need to figure out how to decode history data block
+//
+//        FelicaService serviceHistory = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_HISTORY);
         List<Trip> trips = new ArrayList<>();
 
 //        Read blocks in order
-//        --- need to figure out how to decode history data block
 //        List<FelicaBlock> blocks = serviceHistory.getBlocks();
 //        for (int i = 0; i < blocks.size(); i++) {
 //            FelicaBlock block = blocks.get(i);
