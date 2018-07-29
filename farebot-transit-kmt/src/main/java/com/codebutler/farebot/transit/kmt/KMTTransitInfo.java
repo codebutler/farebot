@@ -53,7 +53,7 @@ public abstract class KMTTransitInfo extends TransitInfo {
     @NonNull
     @Override
     public String getBalanceString(@NonNull Resources resources) {
-        Locale localeID=new Locale("in","ID");
+        Locale localeID = new Locale("in", "ID");
         NumberFormat format = NumberFormat.getCurrencyInstance(localeID);
         format.setMaximumFractionDigits(0);
         return format.format(getCurrentBalance());
@@ -62,12 +62,7 @@ public abstract class KMTTransitInfo extends TransitInfo {
     @Nullable
     @Override
     public String getSerialNumber() {
-        String serial=new String(getSerialNumberData().bytes());
-//        byte[] serialNumber = getSerialNumberData().bytes();
-//
-//        StringBuilder str = new StringBuilder(20);
-//
-        return serial;
+        return new String(getSerialNumberData().bytes());
     }
 
     @Nullable
