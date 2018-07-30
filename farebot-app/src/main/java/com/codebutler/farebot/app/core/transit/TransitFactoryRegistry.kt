@@ -51,7 +51,6 @@ import com.codebutler.farebot.transit.stub.AtHopStubTransitFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
 import com.codebutler.farebot.transit.kmt.KMTTransitFactory
 
-
 class TransitFactoryRegistry(context: Context) {
 
     private val registry = mutableMapOf<Class<out Card>, MutableList<TransitFactory<Card, TransitInfo>>>()
