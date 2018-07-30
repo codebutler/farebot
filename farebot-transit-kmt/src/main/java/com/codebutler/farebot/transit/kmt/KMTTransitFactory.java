@@ -83,8 +83,6 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
             byte[] dataBalance = blockBalance.getData().bytes();
             currentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
         }
-//        --- need to figure out how to decode history data block
-//        FelicaService serviceHistory = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_HISTORY);
         List<Trip> trips = new ArrayList<>();
         return KMTTransitInfo.create(trips, serialNumber, currentBalance);
     }
