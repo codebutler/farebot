@@ -56,7 +56,7 @@ View your remaining balance, recent trips, and other information from contactles
 * [Opal][18] - Sydney (and surrounds), NSW, Australia
 * [ORCA][0] - Seattle, WA, USA
 * [Suica][9], [ICOCA][10], [PASMO][11], [Edy][12] - Japan
-* [KMT][26] - Jakarta, Indonesia
+* [Kartu Multi Trip][26] - Jakarta, Indonesia (Only for new FeliCa cards)
 
 ## Supported Cards (Keys Required)
 
