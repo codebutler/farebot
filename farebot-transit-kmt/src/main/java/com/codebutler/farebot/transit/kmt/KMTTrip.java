@@ -43,22 +43,11 @@ abstract class KMTTrip extends Trip {
     @NonNull
     static KMTTrip create(FelicaBlock block) {
         byte[] data = block.getData().bytes();
-
-        // Data Offsets with values
-        // ------------------------
-        // 0x00    type (0x20 = payment, 0x02 = charge, 0x04 = gift)
-        // 0x01    sequence number (3 bytes, big-endian)
-        // 0x04    date/time (upper 15 bits - added as day offset,
-        //         lower 17 bits - added as second offset to Jan 1, 2000 00:00:00)
-        // 0x08    transaction amount (big-endian)
-        // 0x0c    balance (big-endian)
-
         int processType = data[0];
         int sequenceNumber = Util.toInt(data[1], data[2], data[3]);
         Date timestampData = KMTUtil.extractDate(data);
         int transactionAmount = Util.toInt(data[8], data[9], data[10], data[11]);
         int balance = Util.toInt(data[12], data[13], data[14], data[15]);
-
         return new AutoValue_KMTTrip(processType, sequenceNumber, timestampData, transactionAmount, balance);
     }
 
@@ -86,14 +75,14 @@ abstract class KMTTrip extends Trip {
 
     @Override
     public String getFareString(@NonNull Resources resources) {
-        Locale localeID=new Locale("in","ID");
+        Locale localeID = new Locale("in", "ID");
         NumberFormat format = NumberFormat.getCurrencyInstance(localeID);
         return format.format(getTransactionAmount());
     }
 
     @Override
     public String getBalanceString() {
-        Locale localeID=new Locale("in","ID");
+        Locale localeID = new Locale("in", "ID");
         NumberFormat format = NumberFormat.getCurrencyInstance(localeID);
         format.setMaximumFractionDigits(0);
         return format.format(getBalance());
@@ -107,17 +96,7 @@ abstract class KMTTrip extends Trip {
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-//        NumberFormat format = NumberFormat.getIntegerInstance();
-//        format.setMinimumIntegerDigits(8);
-//        format.setGroupingUsed(false);
-        String str="-";
-//        if (getProcessType() != KMTTransitInfo.FELICA_MODE_EDY_DEBIT) {
-//            str = resources.getString(R.string.felica_process_charge);
-//        } else {
-//            str = resources.getString(R.string.felica_process_merchandise_purchase);
-//        }
-//        str += " " + resources.getString(R.string.edy_transaction_sequence) + format.format(getSequenceNumber());
-        return str;
+        return "-";
     }
 
     @Override
@@ -125,7 +104,6 @@ abstract class KMTTrip extends Trip {
         return getTimestampData() != null;
     }
 
-    // unused
     @Override
     public String getRouteName(@NonNull Resources resources) {
         return null;

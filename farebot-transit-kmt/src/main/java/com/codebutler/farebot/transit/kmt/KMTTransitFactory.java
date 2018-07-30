@@ -31,6 +31,7 @@ import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
 
 import net.kazzz.felica.lib.Util;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
         if (serviceID != null) {
             serialNumber = new ByteArray(serviceID.getBlocks().get(0).getData().bytes());
         } else {
-            serialNumber=new ByteArray("000000000000000".getBytes());
+            serialNumber = new ByteArray("000000000000000".getBytes());
         }
         // current balance info in block 0, bytes 0-3, little-endian ordering
         FelicaService serviceBalance = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_BALANCE);
@@ -82,19 +83,9 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
             byte[] dataBalance = blockBalance.getData().bytes();
             currentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
         }
-
 //        --- need to figure out how to decode history data block
-//
 //        FelicaService serviceHistory = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_HISTORY);
         List<Trip> trips = new ArrayList<>();
-
-//        Read blocks in order
-//        List<FelicaBlock> blocks = serviceHistory.getBlocks();
-//        for (int i = 0; i < blocks.size(); i++) {
-//            FelicaBlock block = blocks.get(i);
-//            KMTTrip trip = KMTTrip.create(block);
-//            trips.add(trip);
-//        }
         return KMTTransitInfo.create(trips, serialNumber, currentBalance);
     }
 

@@ -41,7 +41,6 @@ import java.util.Locale;
 @AutoValue
 public abstract class KMTTransitInfo extends TransitInfo {
 
-
     @NonNull
     public static KMTTransitInfo create(
             @NonNull List<Trip> trips,

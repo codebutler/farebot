@@ -1,5 +1,5 @@
 /*
- * EdyUtil.java
+ * KMTUtil.java
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
