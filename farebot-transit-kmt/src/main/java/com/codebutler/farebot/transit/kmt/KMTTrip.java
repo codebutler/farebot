@@ -43,17 +43,22 @@ abstract class KMTTrip extends Trip {
     @NonNull
     static KMTTrip create(FelicaBlock block) {
         byte[] data = block.getData().bytes();
-        int processType = data[0];
-        int sequenceNumber = Util.toInt(data[1], data[2], data[3]);
+        int processType = data[12];
+        int sequenceNumber = Util.toInt(data[13], data[14], data[15]);
         Date timestampData = KMTUtil.extractDate(data);
-        int transactionAmount = Util.toInt(data[8], data[9], data[10], data[11]);
-        int balance = Util.toInt(data[12], data[13], data[14], data[15]);
-        return new AutoValue_KMTTrip(processType, sequenceNumber, timestampData, transactionAmount, balance);
+        int transactionAmount = Util.toInt(data[4], data[5], data[6], data[7]);
+        return new AutoValue_KMTTrip(processType, sequenceNumber, timestampData, transactionAmount);
     }
 
     @Override
     public Mode getMode() {
         switch (getProcessType()) {
+            case 0:
+                return Mode.POS;
+            case 1:
+                return Mode.TRAIN;
+            case 2:
+                return Mode.TICKET_MACHINE;
             default:
                 return Mode.OTHER;
         }
@@ -82,21 +87,22 @@ abstract class KMTTrip extends Trip {
 
     @Override
     public String getBalanceString() {
-        Locale localeID = new Locale("in", "ID");
-        NumberFormat format = NumberFormat.getCurrencyInstance(localeID);
-        format.setMaximumFractionDigits(0);
-        return format.format(getBalance());
+        return "n/a";
     }
 
-    // use agency name for the transaction number
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return getAgencyName(resources);
+        return "KCI";
     }
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
-        return "-";
+        switch (getProcessType()) {
+            case 1:
+                return "Debit / Gate";
+            default:
+                return "Credit / Top Up";
+        }
     }
 
     @Override
@@ -106,7 +112,7 @@ abstract class KMTTrip extends Trip {
 
     @Override
     public String getRouteName(@NonNull Resources resources) {
-        return null;
+        return "JABODETABEK";
     }
 
     @Override
@@ -141,7 +147,5 @@ abstract class KMTTrip extends Trip {
     abstract Date getTimestampData();
 
     abstract int getTransactionAmount();
-
-    abstract int getBalance();
 
 }

@@ -21,6 +21,7 @@
 package com.codebutler.farebot.transit.kmt;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.felica.FelicaBlock;
@@ -32,6 +33,8 @@ import com.codebutler.farebot.transit.Trip;
 
 import net.kazzz.felica.lib.Util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +43,7 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
     //Taken from NXP TagInfo reader data
 
     //This should be in the FeliCaLib from Klazz
-    public static final int SYSTEMCODE_KMT = 0x90b7;
+    private static final int SYSTEMCODE_KMT = 0x90b7;
 
     private static final int FELICA_SERVICE_KMT_ID = 0x300B;
     private static final int FELICA_SERVICE_KMT_BALANCE = 0x1017;
@@ -66,7 +69,6 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
     @NonNull
     @Override
     public KMTTransitInfo parseInfo(@NonNull FelicaCard card) {
-
         FelicaService serviceID = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_ID);
         ByteArray serialNumber;
         if (serviceID != null) {
@@ -74,7 +76,6 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
         } else {
             serialNumber = new ByteArray("000000000000000".getBytes());
         }
-        // current balance info in block 0, bytes 0-3, little-endian ordering
         FelicaService serviceBalance = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_BALANCE);
         int currentBalance = 0;
         if (serviceBalance != null) {
@@ -83,7 +84,16 @@ public class KMTTransitFactory implements TransitFactory<FelicaCard, KMTTransitI
             byte[] dataBalance = blockBalance.getData().bytes();
             currentBalance = Util.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0]);
         }
+        FelicaService serviceHistory = card.getSystem(SYSTEMCODE_KMT).getService(FELICA_SERVICE_KMT_HISTORY);
         List<Trip> trips = new ArrayList<>();
+        List<FelicaBlock> blocks = serviceHistory.getBlocks();
+        for (int i = 0; i < blocks.size(); i++) {
+            FelicaBlock block = blocks.get(i);
+            if (block.getData().bytes()[0] != 0) {
+                KMTTrip trip = KMTTrip.create(block);
+                trips.add(trip);
+            }
+        }
         return KMTTransitInfo.create(trips, serialNumber, currentBalance);
     }
 
