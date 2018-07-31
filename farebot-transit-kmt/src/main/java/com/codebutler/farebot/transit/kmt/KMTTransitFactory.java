@@ -21,8 +21,6 @@
 package com.codebutler.farebot.transit.kmt;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-
 import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;
@@ -30,11 +28,7 @@ import com.codebutler.farebot.card.felica.FelicaService;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
-
 import net.kazzz.felica.lib.Util;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 

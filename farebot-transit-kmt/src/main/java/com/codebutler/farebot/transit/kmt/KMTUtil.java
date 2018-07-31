@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.kmt;
 
 import net.kazzz.felica.lib.Util;
 
-import java.util.Calendar;
 import java.util.Date;
 
 final class KMTUtil {
