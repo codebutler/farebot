@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import com.codebutler.farebot.card.felica.FelicaBlock;
+import com.codebutler.farebot.kmt.R;
 import com.codebutler.farebot.transit.Station;
 import com.codebutler.farebot.transit.Trip;
 import com.google.auto.value.AutoValue;
@@ -87,21 +88,21 @@ abstract class KMTTrip extends Trip {
 
     @Override
     public String getBalanceString() {
-        return "n/a";
+        return "-";
     }
 
     @Override
     public String getShortAgencyName(@NonNull Resources resources) {
-        return "KCI";
+        return getAgencyName(resources);
     }
 
     @Override
     public String getAgencyName(@NonNull Resources resources) {
         switch (getProcessType()) {
             case 1:
-                return "Debit / Gate";
+                return resources.getString(R.string.kmt_debit_desc);
             default:
-                return "Credit / Top Up";
+                return resources.getString(R.string.kmt_credit_desc);
         }
     }
 
@@ -112,7 +113,7 @@ abstract class KMTTrip extends Trip {
 
     @Override
     public String getRouteName(@NonNull Resources resources) {
-        return "JABODETABEK";
+        return resources.getString(R.string.kmt_defroute);
     }
 
     @Override

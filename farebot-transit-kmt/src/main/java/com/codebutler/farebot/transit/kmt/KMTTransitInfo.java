@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.codebutler.farebot.base.util.ByteArray;
+import com.codebutler.farebot.kmt.R;
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.Subscription;
 import com.codebutler.farebot.transit.TransitInfo;
@@ -73,7 +74,7 @@ public abstract class KMTTransitInfo extends TransitInfo {
     @NonNull
     @Override
     public String getCardName(@NonNull Resources resources) {
-        return "Kartu Multi Trip";
+        return resources.getString(R.string.kmt_longname);
     }
 
     @Nullable
