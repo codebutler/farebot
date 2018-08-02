@@ -55,11 +55,11 @@ abstract class KMTTrip extends Trip {
     public Mode getMode() {
         switch (getProcessType()) {
             case 0:
-                return Mode.POS;
+                return Mode.TICKET_MACHINE;
             case 1:
                 return Mode.TRAIN;
             case 2:
-                return Mode.TICKET_MACHINE;
+                return Mode.POS;
             default:
                 return Mode.OTHER;
         }
