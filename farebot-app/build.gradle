@@ -41,6 +41,7 @@ dependencies {
     implementation project(':farebot-transit-clipper')
     implementation project(':farebot-transit-easycard')
     implementation project(':farebot-transit-edy')
+    implementation project(':farebot-transit-kmt')
     implementation project(':farebot-transit-ezlink')
     implementation project(':farebot-transit-hsl')
     implementation project(':farebot-transit-manly')

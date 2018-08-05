@@ -49,6 +49,7 @@ import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
 import com.codebutler.farebot.transit.stub.AdelaideMetrocardStubTransitFactory
 import com.codebutler.farebot.transit.stub.AtHopStubTransitFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
+import com.codebutler.farebot.transit.kmt.KMTTransitFactory
 
 class TransitFactoryRegistry(context: Context) {
 
@@ -58,6 +59,7 @@ class TransitFactoryRegistry(context: Context) {
         registerFactory(FelicaCard::class.java, SuicaTransitFactory(context))
         registerFactory(FelicaCard::class.java, EdyTransitFactory())
         registerFactory(FelicaCard::class.java, OctopusTransitFactory())
+        registerFactory(FelicaCard::class.java, KMTTransitFactory())
 
         registerFactory(DesfireCard::class.java, OrcaTransitFactory())
         registerFactory(DesfireCard::class.java, ClipperTransitFactory())
