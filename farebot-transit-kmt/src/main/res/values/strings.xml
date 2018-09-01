@@ -1,8 +1,7 @@
 <resources>
     <string name="kmt_longname" translatable="false">Kartu Multi Trip</string>
     <string name="kmt_notes">For new FeliCa cards only.</string>
-    <string name="kmt_debit_desc">Debit / Gate</string>
-    <string name="kmt_credit_desc">Credit / Top Up</string>
     <string name="kmt_defroute" translatable="false">JABODETABEK</string>
-
+    <string name="kmt_agency" translatable="false">Kereta Commuter Indonesia</string>
+    <string name="kmt_agency_short" translatable="false">KCI</string>
 </resources>
