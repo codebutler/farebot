@@ -18,7 +18,6 @@
  *
  */
 
-
 package com.codebutler.farebot.transit.kmt;
 
 import android.support.annotation.Nullable;
@@ -66,6 +65,7 @@ public final class KMTData {
             put(0x129, Station.create("Buaran", "Buaran", "-6.21615092", "106.9283069"));
             put(0x130, Station.create("Klender", "Klender", "-6.21335877", "106.8998889"));
             put(0x131, Station.create("Jatinegara", "Jatinegara", "-6.21513342", "106.8703259"));
+            put(0x139, Station.create("Tangerang", "Tangerang", "-6.17679787", "106.63272688"));
             put(0x147, Station.create("Karet", "Karet", "-6.2008165", "106.8159002"));
             put(0x148, Station.create("Sudirman", "Sudirman", "-6.202438", "106.8234505"));
             put(0x149, Station.create("Tanah Abang", "Tanah Abang", "-6.18574476", "106.8108382"));
@@ -86,8 +86,8 @@ public final class KMTData {
             put(0x164, Station.create("Maja", "Maja", "-6.33230387", "106.3965692"));
             put(0x165, Station.create("Citeras", "Citeras", "-6.33492764", "106.3327125"));
             put(0x166, Station.create("Rangkasbitung", "Rangkasbitung", "-6.3526711", "106.251502"));
-            put(0x176, Station.create("Bekasi Timur", "Bekasitimur", "-6.3526711", "106.251502"));
-            put(0x178, Station.create("Cikarang", "Cikarang", "-6.3526711", "106.251502"));
+            put(0x176, Station.create("Bekasi Timur", "Bekasitimur", "-6.246845", "107.0181248"));
+            put(0x178, Station.create("Cikarang", "Cikarang", "-6.2553926", "107.1451293"));
         }
     };
 
