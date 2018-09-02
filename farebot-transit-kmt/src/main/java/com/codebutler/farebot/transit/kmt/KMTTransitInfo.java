@@ -4,9 +4,6 @@
  * Authors:
  * Bondan Sumbodo <sybond@gmail.com>
  *
- * Based on code from http://code.google.com/p/nfc-felica/
- * nfc-felica by Kazzz. See project URL for complete author information.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
