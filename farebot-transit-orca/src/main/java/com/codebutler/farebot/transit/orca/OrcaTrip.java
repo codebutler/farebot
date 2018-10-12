@@ -97,7 +97,8 @@ public abstract class OrcaTrip extends Trip {
                 | (usefulData[6] << 4)
                 | (usefulData[7] >> 4);
 
-        long coachNumber = ((usefulData[9] & 0xf) << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
+        long ftpType = ((usefulData[7] & 0xf) << 4) | ((usefulData[8] & 0xf0) >> 4);
+        long coachNumber = ((usefulData[8] & 0xf) << 20) | (usefulData[9] << 12) | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
 
         long fare;
         if (usefulData[15] == 0x00 || usefulData[15] == 0xFF) {
@@ -111,7 +112,7 @@ public abstract class OrcaTrip extends Trip {
         long agency = usefulData[3] >> 4;
         long transType = (usefulData[17]);
 
-        return new AutoValue_OrcaTrip(timestamp, agency, transType, coachNumber, fare, newBalance);
+        return new AutoValue_OrcaTrip(timestamp, agency, transType, ftpType, coachNumber, fare, newBalance);
     }
 
     @Override
@@ -263,16 +264,20 @@ public abstract class OrcaTrip extends Trip {
     }
 
     private boolean isLink() {
-        return (getAgency() == OrcaTransitInfo.AGENCY_ST && getCoachNumber() > 10000);
+        return (getAgency() == OrcaTransitInfo.AGENCY_ST &&
+                getFTPType() == OrcaTransitInfo.FTP_TYPE_LINK);
     }
 
     private boolean isSounder() {
-        return (getAgency() == OrcaTransitInfo.AGENCY_ST && getCoachNumber() < 20);
+        return (getAgency() == OrcaTransitInfo.AGENCY_ST &&
+                getFTPType() == OrcaTransitInfo.FTP_TYPE_SOUNDER);
     }
 
     abstract long getAgency();
 
     abstract long getTransType();
+
+    abstract long getFTPType();
 
     abstract long getCoachNumber();
 
