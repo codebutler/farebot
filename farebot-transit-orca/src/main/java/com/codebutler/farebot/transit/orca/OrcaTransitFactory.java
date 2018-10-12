@@ -75,7 +75,7 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
 
         try {
             data = ((StandardDesfireFile) card.getApplication(0xffffff).getFile(0x0f)).getData().bytes();
-            serialNumber = ByteUtils.byteArrayToInt(data, 5, 3);
+            serialNumber = ByteUtils.byteArrayToInt(data, 4, 4);
         } catch (Exception ex) {
             throw new RuntimeException("Error parsing ORCA serial", ex);
         }
