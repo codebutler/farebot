@@ -61,14 +61,25 @@ public abstract class OrcaTrip extends Trip {
             .build();
 
     private static Map<Integer, Station> sSounderStations = ImmutableMap.<Integer, Station>builder()
+            .put(1, Station.create("Everett Station", "Everett", "47.9747155", "-122.1996922"))
+            .put(2, Station.create("Edmonds Station", "Edmonds", "47.8109946","-122.3864407"))
             .put(3, Station.create("King Street Station", "King Street", "47.598445", "-122.330161"))
+            .put(4, Station.create("Tuwkila Station", "Tukwila", "47.4603283", "-122.2421456"))
             .put(5, Station.create("Kent Station", "Kent", "47.384257", "-122.233151"))
+            .put(6, Station.create("Auburn Station", "Auburn", "47.3065191", "-122.2343063"))
+            .put(7, Station.create("Sumner Station", "Sumner", "47.2016577", "-122.2467547"))
+            .put(8, Station.create("Puyallup Station", "Puyallup", "47.1926213", "-122.2977392"))
+            .put(9, Station.create("Tacoma Dome Station", "Tacoma Dome", "47.2408695", "-122.4278904"))
+            .put(0x1e01, Station.create("Mukilteo Station", "Mukilteo", "47.9491683", "-122.3010919"))
+            .put(0x1e02, Station.create("Lakewood Station", "Lakewood", "47.1529884", "-122.5015344"))
+            .put(0x37e5, Station.create("South Tacoma Station", "South Tacoma", "47.2038608", "-122.4877278"))
             .build();
 
     private static Map<Integer, Station> sWSFTerminals = ImmutableMap.<Integer, Station>builder()
             .put(10101, Station.create("Seattle Terminal", "Seattle", "47.602722", "-122.338512"))
             .put(10103, Station.create("Bainbridge Island Terminal", "Bainbridge", "47.62362", "-122.51082"))
             .put(10104, Station.create("Fauntleroy Terminal", "Seattle", "47.5231", "-122.39602"))
+            .put(10115, Station.create("Anacortes Terminal", "Anacortes", "48.5065077", "-122.680434"))
             .build();
 
     @NonNull
