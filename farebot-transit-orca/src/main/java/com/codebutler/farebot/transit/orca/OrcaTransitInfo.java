@@ -47,6 +47,7 @@ public abstract class OrcaTransitInfo extends TransitInfo {
     static final int AGENCY_CT = 0x02;
     static final int AGENCY_WSF = 0x08;
     static final int AGENCY_ET = 0x03;
+    static final int AGENCY_KT = 0x05;
 
     @NonNull
     @Override

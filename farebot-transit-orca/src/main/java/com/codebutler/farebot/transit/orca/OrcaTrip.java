@@ -123,6 +123,8 @@ public abstract class OrcaTrip extends Trip {
                 return resources.getString(R.string.transit_orca_agency_wsf);
             case OrcaTransitInfo.AGENCY_ET:
                 return resources.getString(R.string.transit_orca_agency_et);
+            case OrcaTransitInfo.AGENCY_KT:
+                return resources.getString(R.string.transit_orca_agency_kt);
         }
         return resources.getString(R.string.transit_orca_agency_unknown, Long.toString(getAgency()));
     }
@@ -142,6 +144,8 @@ public abstract class OrcaTrip extends Trip {
                 return "WSF";
             case OrcaTransitInfo.AGENCY_ET:
                 return "ET";
+            case OrcaTransitInfo.AGENCY_KT:
+                return "KT";
         }
         return resources.getString(R.string.transit_orca_agency_unknown, Long.toString(getAgency()));
     }

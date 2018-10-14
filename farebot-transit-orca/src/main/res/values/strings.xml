@@ -29,6 +29,7 @@
     <string name="transit_orca_agency_st">Sound Transit</string>
     <string name="transit_orca_agency_wsf">Washington State Ferries</string>
     <string name="transit_orca_agency_et">Everett Transit</string>
+    <string name="transit_orca_agency_kt">Kitsap Transit</string>
     <string name="transit_orca_agency_unknown">Unknown Agency: %s</string>
 
     <string name="transit_orca_route_link">Link Light Rail</string>
