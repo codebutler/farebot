@@ -49,6 +49,11 @@ public abstract class OrcaTransitInfo extends TransitInfo {
     static final int AGENCY_ET = 0x03;
     static final int AGENCY_KT = 0x05;
 
+    static final int FTP_TYPE_WSF = 0x08;
+    static final int FTP_TYPE_SOUNDER = 0x09;
+    static final int FTP_TYPE_BUS = 0x80;
+    static final int FTP_TYPE_LINK = 0xFB;
+
     @NonNull
     @Override
     public String getCardName(@NonNull Resources resources) {
