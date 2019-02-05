@@ -39,8 +39,6 @@ final class EZLinkData {
         {
             add("CT18");
             add("CT8");
-            add("CT18");
-            add("CT8");
             add("1N");
             add("2");
             add("2N");
@@ -244,16 +242,21 @@ final class EZLinkData {
             add("291");
             add("292");
             add("293");
+            add("298");
             add("315");
             add("317");
+            add("324");
             add("325");
+            add("329");
             add("333");
             add("334");
             add("335");
             add("354");
             add("358");
             add("359");
+            add("371");
             add("372");
+            add("374");
             add("400");
             add("401");
             add("402");
@@ -298,6 +301,17 @@ final class EZLinkData {
             add("569");
             add("585");
             add("761");
+            add("800");
+            add("803");
+            add("804");
+            add("805");
+            add("806");
+            add("807");
+            add("811");
+            add("812");
+            add("851");
+            add("852");
+            add("860");
         }
     };
 
@@ -328,6 +342,7 @@ final class EZLinkData {
             put("BGK", Station.create("Buangkok", "NE15", "BGK", "1.382728", "103.892789"));
             put("SKG", Station.create("Sengkang", "NE16 / STC", "SKG", "1.391653", "103.895133"));
             put("PGL", Station.create("Punggol", "NE17 / PTC", "PGL", "1.405264", "103.902097"));
+            put("PGC", Station.create("Punggol Coast", "NE18", "PGC", "1.414600", "103.910900"));
 
             // Circle Line (CCL)
             put("DBG", Station.create("Dhoby Ghaut", "CC1 / NS24 / NE6", "DBG", "1.299156", "103.845736"));
