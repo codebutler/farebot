@@ -34,7 +34,7 @@ import java.util.TreeMap;
 final class EZLinkData {
 
     static final HashSet<String> SBS_BUSES = new HashSet<String>() {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         {
             add("CT18");
@@ -276,31 +276,24 @@ final class EZLinkData {
             add("535");
             add("536");
             add("538");
-            add("539");
             add("542");
             add("543");
             add("544");
             add("545");
             add("548");
-            add("549");
             add("550");
             add("552");
             add("553");
             add("554");
             add("555");
             add("556");
-            add("557");
             add("558");
-            add("559");
-            add("560");
             add("561");
             add("563");
             add("564");
             add("565");
-            add("566");
             add("569");
             add("585");
-            add("761");
             add("800");
             add("803");
             add("804");
@@ -312,6 +305,27 @@ final class EZLinkData {
             add("851");
             add("852");
             add("860");
+        }
+    };
+
+    static final HashSet<String> CS_BUSES = new HashSet<String>() {
+        private static final long serialVersionUID = 1L;
+
+        {
+            add("531");
+            add("539");
+            add("549");
+            add("557");
+            add("559");
+            add("560");
+            add("566");
+            add("588");
+            add("590");
+            add("735");
+            add("750");
+            add("761");
+            add("763");
+            add("765");
         }
     };
 
@@ -448,6 +462,7 @@ final class EZLinkData {
             put("CTH", Station.create("City Hall", "NS25 / EW13", "CTH", "1.293239", "103.852219"));
             put("RFP", Station.create("Raffles Place", "NS26 / EW14", "RFP", "1.283881", "103.851533"));
             put("MRB", Station.create("Marina Bay", "NS27 / CE2", "MRB", "1.276097", "103.854675"));
+            put("MSP", Station.create("Marina South Pier", "NE28", "MSP", "1.270958", "103.863242"));
         }
     };
 
