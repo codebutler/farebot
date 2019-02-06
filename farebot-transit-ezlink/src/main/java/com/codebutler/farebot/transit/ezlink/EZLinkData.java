@@ -463,6 +463,11 @@ final class EZLinkData {
             put("BNL", Station.create("Boon Lay", "EW27", "BNL", "1.338883", "103.706208"));
             put("PNR", Station.create("Pioneer", "EW28", "PNR", "1.337578", "103.697217"));
             put("JKN", Station.create("Joo Koon", "EW29", "JKN", "1.327739", "103.678486"));
+            // Tuas West Extension (EWL)
+            put("GCL", Station.create("Gul Circle", "EW30", "GCL", "1.319867", "103.661069"));
+            put("TCR", Station.create("Tuas Crescent", "EW31", "TCR", "1.320812", "103.648374"));
+            put("TWR", Station.create("Tuas West Road", "EW32", "TWR", "1.329568", "103.640132"));
+            put("TLK", Station.create("Tuas Link", "EW33", "TLK", "1.340231", "103.636669"));
 
             // North-South Line (NSL)
             put("JUR", Station.create("Jurong East", "NS1 / EW24", "JUR", "1.333415", "103.742119"));
