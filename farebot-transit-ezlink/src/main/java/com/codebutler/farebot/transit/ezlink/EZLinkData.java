@@ -498,6 +498,22 @@ final class EZLinkData {
             put("RFP", Station.create("Raffles Place", "NS26 / EW14", "RFP", "1.283881", "103.851533"));
             put("MRB", Station.create("Marina Bay", "NS27 / CE2", "MRB", "1.276097", "103.854675"));
             put("MSP", Station.create("Marina South Pier", "NE28", "MSP", "1.270958", "103.863242"));
+
+            // Sengkang LRT (East Loop)
+            put("SE1", Station.create("Compassvale", "SE1", "SE1", "1.39455", "103.900183"));
+            put("SE2", Station.create("Rumbia", "SE2", "SE2", "1.391094", "103.906306"));
+            put("SE3", Station.create("Bakau", "SE3", "SE3", "1.387853", "103.905267"));
+            put("SE4", Station.create("Kangkar", "SE4", "SE4", "1.383739", "103.902194"));
+            put("SE5", Station.create("Ranggung", "SE5", "SE5", "1.383619", "103.897736"));
+            // Sengkang LRT (West Loop)
+            put("SW1", Station.create("Cheng Lim", "SW1", "SW1", "1.39634", "103.893757"));
+            put("SW2", Station.create("Farmway", "SW2", "SW2", "1.397272", "103.888953"));
+            put("SW3", Station.create("Kupang", "SW3", "SW3", "1.398538", "103.881365"));
+            put("SW4", Station.create("Thanggam", "SW4", "SW4", "1.397371", "103.87542"));
+            put("SW5", Station.create("Fernvale", "SW5", "SW5", "1.391935", "103.876142"));
+            put("SW6", Station.create("Layar", "SW6", "SW6", "1.392180", "103.879895"));
+            put("SW7", Station.create("Tongkang", "SW7", "SW7", "1.389286", "103.886145"));
+            put("SW8", Station.create("Renjong", "SW8", "SW8", "1.386614", "103.890425"));
         }
     };
 
