@@ -58,6 +58,8 @@ abstract class EZLinkTrip extends Trip {
             String routeString = getTransaction().getUserData().substring(3, 7).replace(" ", "");
             if (EZLinkData.SBS_BUSES.contains(routeString)) {
                 return "SBS";
+            } else if (EZLinkData.CS_BUSES.contains(routeString)) {
+                return "Commute Solutions";
             }
             return "SMRT";
         }
@@ -79,6 +81,8 @@ abstract class EZLinkTrip extends Trip {
             String routeString = getTransaction().getUserData().substring(3, 7).replace(" ", "");
             if (EZLinkData.SBS_BUSES.contains(routeString)) {
                 return "SBS";
+            } else if (EZLinkData.CS_BUSES.contains(routeString)) {
+                return "CS";
             }
             return "SMRT";
         }
