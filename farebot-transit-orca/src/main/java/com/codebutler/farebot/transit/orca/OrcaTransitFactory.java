@@ -32,6 +32,7 @@ import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;
 import com.codebutler.farebot.card.desfire.RecordDesfireFile;
 import com.codebutler.farebot.card.desfire.StandardDesfireFile;
+import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.TransitFactory;
 import com.codebutler.farebot.transit.TransitIdentity;
 import com.codebutler.farebot.transit.Trip;
@@ -72,6 +73,7 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
         int serialNumber;
         int balance;
         List<Trip> trips;
+        List<Refill> refills;
 
         try {
             data = ((StandardDesfireFile) card.getApplication(0xffffff).getFile(0x0f)).getData().bytes();
@@ -93,7 +95,13 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
             throw new RuntimeException("Error parsing ORCA trips", ex);
         }
 
-        return new AutoValue_OrcaTransitInfo(trips, serialNumber, balance);
+        try {
+            refills = parseRefills(card);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error parsing ORCA refills", ex);
+        }
+
+        return new AutoValue_OrcaTransitInfo(trips, refills, serialNumber, balance);
     }
 
     @NonNull
@@ -131,10 +139,25 @@ public class OrcaTransitFactory implements TransitFactory<DesfireCard, OrcaTrans
     private static boolean isSameTrip(@NonNull OrcaTrip firstTrip, @NonNull OrcaTrip secondTrip) {
         return firstTrip != null
                 && secondTrip != null
-                && firstTrip.getTransType() == TRANS_TYPE_TAP_IN
                 && (secondTrip.getTransType() == TRANS_TYPE_TAP_OUT
                     || secondTrip.getTransType() == TRANS_TYPE_CANCEL_TRIP)
                 && firstTrip.getAgency() == secondTrip.getAgency();
     }
 
+    @NonNull
+    private static List<Refill> parseRefills(@NonNull DesfireCard card) {
+        List<Refill> refills = new ArrayList<>();
+
+        DesfireFile file = card.getApplication(0x3010f2).getFile(0x03);
+        if (file instanceof RecordDesfireFile) {
+            RecordDesfireFile recordFile = (RecordDesfireFile) card.getApplication(0x3010f2).getFile(0x03);
+
+            for (int i = 0; i < recordFile.getRecords().size(); i++) {
+                refills.add(OrcaRefill.create(recordFile.getRecords().get(i)));
+            }
+
+        }
+        Collections.sort(refills, new Refill.Comparator());
+        return refills;
+    }
 }

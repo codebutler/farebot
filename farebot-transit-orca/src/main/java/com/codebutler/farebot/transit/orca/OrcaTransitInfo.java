@@ -49,10 +49,13 @@ public abstract class OrcaTransitInfo extends TransitInfo {
     static final int AGENCY_ET = 0x03;
     static final int AGENCY_KT = 0x05;
 
-    static final int FTP_TYPE_WSF = 0x08;
+    static final int FTP_TYPE_FERRY = 0x08;
     static final int FTP_TYPE_SOUNDER = 0x09;
+    static final int FTP_TYPE_CUSTOMER_SERVICE = 0x0B;
     static final int FTP_TYPE_BUS = 0x80;
+    static final int FTP_TYPE_RAPIDRIDE = 0xFA;
     static final int FTP_TYPE_LINK = 0xFB;
+    static final int FTP_TYPE_WATER_TAXI = 0xFE;
 
     @NonNull
     @Override
@@ -78,11 +81,8 @@ public abstract class OrcaTransitInfo extends TransitInfo {
         return null;
     }
 
-    @Nullable
     @Override
-    public List<Refill> getRefills() {
-        return null;
-    }
+    public boolean hasUnknownStations() { return true; }
 
     abstract int getSerialNumberData();
 
