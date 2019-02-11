@@ -497,7 +497,7 @@ final class EZLinkData {
             put("CTH", Station.create("City Hall", "NS25 / EW13", "CTH", "1.293239", "103.852219"));
             put("RFP", Station.create("Raffles Place", "NS26 / EW14", "RFP", "1.283881", "103.851533"));
             put("MRB", Station.create("Marina Bay", "NS27 / CE2", "MRB", "1.276097", "103.854675"));
-            put("MSP", Station.create("Marina South Pier", "NE28", "MSP", "1.270958", "103.863242"));
+            put("MSP", Station.create("Marina South Pier", "NS28", "MSP", "1.270958", "103.863242"));
 
             // Sengkang LRT (East Loop)
             put("SE1", Station.create("Compassvale", "SE1", "SE1", "1.39455", "103.900183"));
