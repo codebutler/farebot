@@ -38,7 +38,7 @@
     <string name="transit_orca_route_express_bus">Express Bus</string>
     <string name="transit_orca_route_bus">Bus</string>
     <string name="transit_orca_route_water_taxi">Water Taxi</string>
-    <string name="transit_orca_route_rapidride">RapidRide Bus</string>
+    <string name="transit_orca_route_brt">Bus Rapid Transit</string>
 
     <string name="transit_orca_station_coach">Coach #%s</string>
     <string name="transit_orca_station_unknown_location">Unknown Location #%s</string>

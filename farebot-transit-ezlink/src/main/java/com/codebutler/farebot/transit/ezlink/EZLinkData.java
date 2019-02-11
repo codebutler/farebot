@@ -34,11 +34,9 @@ import java.util.TreeMap;
 final class EZLinkData {
 
     static final HashSet<String> SBS_BUSES = new HashSet<String>() {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         {
-            add("CT18");
-            add("CT8");
             add("CT18");
             add("CT8");
             add("1N");
@@ -244,16 +242,21 @@ final class EZLinkData {
             add("291");
             add("292");
             add("293");
+            add("298");
             add("315");
             add("317");
+            add("324");
             add("325");
+            add("329");
             add("333");
             add("334");
             add("335");
             add("354");
             add("358");
             add("359");
+            add("371");
             add("372");
+            add("374");
             add("400");
             add("401");
             add("402");
@@ -273,31 +276,56 @@ final class EZLinkData {
             add("535");
             add("536");
             add("538");
-            add("539");
             add("542");
             add("543");
             add("544");
             add("545");
             add("548");
-            add("549");
             add("550");
             add("552");
             add("553");
             add("554");
             add("555");
             add("556");
-            add("557");
             add("558");
-            add("559");
-            add("560");
             add("561");
             add("563");
             add("564");
             add("565");
-            add("566");
             add("569");
             add("585");
+            add("800");
+            add("803");
+            add("804");
+            add("805");
+            add("806");
+            add("807");
+            add("811");
+            add("812");
+            add("851");
+            add("852");
+            add("860");
+        }
+    };
+
+    static final HashSet<String> CS_BUSES = new HashSet<String>() {
+        private static final long serialVersionUID = 1L;
+
+        {
+            add("531");
+            add("539");
+            add("549");
+            add("557");
+            add("559");
+            add("560");
+            add("566");
+            add("588");
+            add("590");
+            add("735");
+            add("750");
             add("761");
+            add("763");
+            add("765");
         }
     };
 
@@ -328,6 +356,33 @@ final class EZLinkData {
             put("BGK", Station.create("Buangkok", "NE15", "BGK", "1.382728", "103.892789"));
             put("SKG", Station.create("Sengkang", "NE16 / STC", "SKG", "1.391653", "103.895133"));
             put("PGL", Station.create("Punggol", "NE17 / PTC", "PGL", "1.405264", "103.902097"));
+            put("PGC", Station.create("Punggol Coast", "NE18", "PGC", "1.414600", "103.910900"));
+
+            // Downtown Line (DTL)
+            put("BPJ", Station.create("Bukit Panjang", "DT1 / BP6", "BPJ", "1.377926", "103.763077"));
+            put("CSW", Station.create("Cashew", "DT2", "CSW", "1.368972", "103.764442"));
+            put("HVW", Station.create("Hillview", "DT3", "HVW", "1.362734", "103.767473"));
+            put("BTW", Station.create("Beauty World", "DT5", "BTW", "1.340935", "103.775691"));
+            put("KAP", Station.create("King Albert Park", "DT6", "KAP", "1.335502", "103.783739"));
+            put("SAV", Station.create("Sixth Avenue", "DT7", "SAV", "1.330670", "103.797372"));
+            put("TKK", Station.create("Tan Kah Kee", "DT8", "TKK", "1.325963", "103.807280"));
+            put("STV", Station.create("Stevens", "DT10", "STV", "1.320009", "103.825868"));
+            put("RCR", Station.create("Rochor", "DT13", "RCR", "1.304045", "103.852392"));
+            put("DTN", Station.create("Downtown", "DT17", "DTN", "1.279458", "103.852931"));
+            put("TLA", Station.create("Telok Ayer", "DT18", "TLA", "1.282050", "103.848472"));
+            put("FCN", Station.create("Fort Canning", "DT20", "FCN", "1.292402", "103.844313"));
+            put("BCL", Station.create("Bencoolen", "DT21", "BCL", "1.298422", "103.849911"));
+            put("JLB", Station.create("Jalan Besar", "DT22", "JLB", "1.305449", "103.855527"));
+            put("BDM", Station.create("Bendemeer", "DT23", "BDM", "1.313778", "103.863039"));
+            put("GLB", Station.create("Geylang Bahru", "DT24", "GLB", "1.321377", "103.871765"));
+            put("MTR", Station.create("Mattar", "DT25", "MTR", "1.327038", "103.882993"));
+            put("UBI", Station.create("Ubi", "DT27", "UBI", "1.329956", "103.899208"));
+            put("KKB", Station.create("Kaki Bukit", "DT28", "KKB", "1.334955", "103.907810"));
+            put("BDN", Station.create("Bedok North", "DT29", "BDN", "1.334766", "103.918125"));
+            put("BDR", Station.create("Bedok Reservoir", "DT30", "BDR", "1.336631", "103.932036"));
+            put("TPW", Station.create("Tampines West", "DT31", "TPW", "1.346246", "103.938321"));
+            put("TPE", Station.create("Tampines East", "DT33", "TPE", "1.356055", "103.954381"));
+            put("UPC", Station.create("Upper Changi", "DT34", "UPC", "1.341632", "103.961420"));
 
             // Circle Line (CCL)
             put("DBG", Station.create("Dhoby Ghaut", "CC1 / NS24 / NE6", "DBG", "1.299156", "103.845736"));
@@ -341,7 +396,7 @@ final class EZLinkData {
             put("MBT", Station.create("Mountbatten", "CC7", "MBT", "1.306306", "103.882531"));
             put("DKT", Station.create("Dakota", "CC8", "DKT", "1.308289", "103.888253"));
             put("PYL", Station.create("Paya Lebar", "CC9 / EW8", "PYL", "1.317767", "103.892381"));
-            put("MPS", Station.create("MacPherson", "CC10 / DT?", "MPS", "1.32665", "103.890019"));
+            put("MPS", Station.create("MacPherson", "CC10 / DT26", "MPS", "1.32665", "103.890019"));
             put("TAS", Station.create("Tai Seng", "CC11", "TAS", "1.335833", "103.887942"));
             put("BLY", Station.create("Bartley", "CC12", "BLY", "1.342756", "103.879697"));
             put("SER", Station.create("Serangoon", "CC13 / NE12", "SER", "1.349944", "103.873092"));
@@ -387,6 +442,8 @@ final class EZLinkData {
             put("KAL", Station.create("Kallang", "EW10", "KAL", "1.311469", "103.8714"));
             put("LVR", Station.create("Lavender", "EW11", "LVR", "1.307167", "103.863008"));
             put("BGS", Station.create("Bugis", "EW12 / DT14", "BGS", "1.300194", "103.85615"));
+            // Alternate name (Downtown line entrance)
+            put("BGD", Station.create("Bugis", "EW12 / DT14", "BGD", "1.300194", "103.85615"));
             put("CTH", Station.create("City Hall", "EW13 / NS25", "CTH", "1.293239", "103.852219"));
             put("RFP", Station.create("Raffles Place", "EW14 / NS26", "RFP", "1.283881", "103.851533"));
             put("TPG", Station.create("Tanjong Pagar", "EW15", "TPG", "1.276439", "103.845711"));
@@ -406,6 +463,11 @@ final class EZLinkData {
             put("BNL", Station.create("Boon Lay", "EW27", "BNL", "1.338883", "103.706208"));
             put("PNR", Station.create("Pioneer", "EW28", "PNR", "1.337578", "103.697217"));
             put("JKN", Station.create("Joo Koon", "EW29", "JKN", "1.327739", "103.678486"));
+            // Tuas West Extension (EWL)
+            put("GCL", Station.create("Gul Circle", "EW30", "GCL", "1.319867", "103.661069"));
+            put("TCR", Station.create("Tuas Crescent", "EW31", "TCR", "1.320812", "103.648374"));
+            put("TWR", Station.create("Tuas West Road", "EW32", "TWR", "1.329568", "103.640132"));
+            put("TLK", Station.create("Tuas Link", "EW33", "TLK", "1.340231", "103.636669"));
 
             // North-South Line (NSL)
             put("JUR", Station.create("Jurong East", "NS1 / EW24", "JUR", "1.333415", "103.742119"));
@@ -427,12 +489,31 @@ final class EZLinkData {
             put("TAP", Station.create("Toa Payoh", "NS19", "TAP", "1.332703", "103.847808"));
             put("NOV", Station.create("Novena", "NS20", "NOV", "1.320394", "103.843689"));
             put("NEW", Station.create("Newton", "NS21 / DT11", "NEW", "1.312956", "103.838442"));
+            // Alternate name (Downtown line entrance)
+            put("NTD", Station.create("Newton", "NS21 / DT11", "NTD", "1.312956", "103.838442"));
             put("ORC", Station.create("Orchard", "NS22", "ORC", "1.304314", "103.831939"));
             put("SOM", Station.create("Somerset", "NS23", "SOM", "1.300514", "103.839028"));
             put("DBG", Station.create("Dhoby Ghaut", "NS24 / NE6 / CC1", "DBG", "1.299156", "103.845736"));
             put("CTH", Station.create("City Hall", "NS25 / EW13", "CTH", "1.293239", "103.852219"));
             put("RFP", Station.create("Raffles Place", "NS26 / EW14", "RFP", "1.283881", "103.851533"));
             put("MRB", Station.create("Marina Bay", "NS27 / CE2", "MRB", "1.276097", "103.854675"));
+            put("MSP", Station.create("Marina South Pier", "NS28", "MSP", "1.270958", "103.863242"));
+
+            // Sengkang LRT (East Loop)
+            put("SE1", Station.create("Compassvale", "SE1", "SE1", "1.39455", "103.900183"));
+            put("SE2", Station.create("Rumbia", "SE2", "SE2", "1.391094", "103.906306"));
+            put("SE3", Station.create("Bakau", "SE3", "SE3", "1.387853", "103.905267"));
+            put("SE4", Station.create("Kangkar", "SE4", "SE4", "1.383739", "103.902194"));
+            put("SE5", Station.create("Ranggung", "SE5", "SE5", "1.383619", "103.897736"));
+            // Sengkang LRT (West Loop)
+            put("SW1", Station.create("Cheng Lim", "SW1", "SW1", "1.39634", "103.893757"));
+            put("SW2", Station.create("Farmway", "SW2", "SW2", "1.397272", "103.888953"));
+            put("SW3", Station.create("Kupang", "SW3", "SW3", "1.398538", "103.881365"));
+            put("SW4", Station.create("Thanggam", "SW4", "SW4", "1.397371", "103.87542"));
+            put("SW5", Station.create("Fernvale", "SW5", "SW5", "1.391935", "103.876142"));
+            put("SW6", Station.create("Layar", "SW6", "SW6", "1.392180", "103.879895"));
+            put("SW7", Station.create("Tongkang", "SW7", "SW7", "1.389286", "103.886145"));
+            put("SW8", Station.create("Renjong", "SW8", "SW8", "1.386614", "103.890425"));
         }
     };
 
