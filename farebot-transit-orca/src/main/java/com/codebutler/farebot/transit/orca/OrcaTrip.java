@@ -465,10 +465,11 @@ public abstract class OrcaTrip extends Trip {
                 return resources.getString(R.string.transit_orca_agency_ct);
             case OrcaTransitInfo.AGENCY_KCM:
                 // The King County Water Taxi is now a separate agency but uses KCM's agency ID
-                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI)
+                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
                     return resources.getString(R.string.transit_orca_agency_kcwt);
-                else
+                } else {
                     return resources.getString(R.string.transit_orca_agency_kcm);
+                }
             case OrcaTransitInfo.AGENCY_PT:
                 return resources.getString(R.string.transit_orca_agency_pt);
             case OrcaTransitInfo.AGENCY_ST:
@@ -489,10 +490,11 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitInfo.AGENCY_CT:
                 return "CT";
             case OrcaTransitInfo.AGENCY_KCM:
-                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI)
+                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
                     return "KCWT";
-                else
+                } else {
                     return "KCM";
+                }
             case OrcaTransitInfo.AGENCY_PT:
                 return "PT";
             case OrcaTransitInfo.AGENCY_ST:
@@ -603,7 +605,7 @@ public abstract class OrcaTrip extends Trip {
                 return resources.getString(R.string.transit_orca_station_unknown_station,
                         Integer.toString(stationNumber));
             }
-        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_BUS){
+        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_BUS) {
             return resources.getString(R.string.transit_orca_station_coach,
                     Long.toString(getCoachNumber()));
         } else {
