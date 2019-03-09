@@ -8,6 +8,7 @@
  * Copyright (C) 2014 Kramer Campbell <kramer@kramerc.com>
  * Copyright (C) 2015 Sean CyberKitsune McClenaghan <cyberkitsune09@gmail.com>
  * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+ * Copyright (C) 2018 Karl Koscher <supersat@cs.washington.edu>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -428,7 +429,7 @@ public abstract class OrcaTrip extends Trip {
                 | (usefulData[10] << 4) | ((usefulData[11] & 0xf0) >> 4);
 
         long fare;
-        if (usefulData[15] == 0x00 || usefulData[15] == 0xFF) {
+        if (usefulData[15] == 0xFF || usefulData[16] == 0x02) {
             // FIXME: This appears to be some sort of special case for transfers and passes.
             fare = 0;
         } else {
@@ -438,6 +439,16 @@ public abstract class OrcaTrip extends Trip {
         long newBalance = (usefulData[34] << 8) | usefulData[35];
         long agency = usefulData[3] >> 4;
         long transType = (usefulData[17]);
+
+        // For tap outs, fare is the amount refunded to the card
+        if (transType == OrcaData.TRANS_TYPE_TAP_OUT) {
+            fare = -fare;
+        }
+
+        // Check to see if a pass use is also a tap off so that the trips can be combined
+        if (transType == OrcaData.TRANS_TYPE_PASS_USE && usefulData[25] == 0x0F) {
+            transType = OrcaData.TRANS_TYPE_TAP_OUT;
+        }
 
         return new AutoValue_OrcaTrip(timestamp, agency, transType, ftpType, coachNumber, fare, newBalance);
     }
@@ -453,7 +464,12 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitInfo.AGENCY_CT:
                 return resources.getString(R.string.transit_orca_agency_ct);
             case OrcaTransitInfo.AGENCY_KCM:
-                return resources.getString(R.string.transit_orca_agency_kcm);
+                // The King County Water Taxi is now a separate agency but uses KCM's agency ID
+                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
+                    return resources.getString(R.string.transit_orca_agency_kcwt);
+                } else {
+                    return resources.getString(R.string.transit_orca_agency_kcm);
+                }
             case OrcaTransitInfo.AGENCY_PT:
                 return resources.getString(R.string.transit_orca_agency_pt);
             case OrcaTransitInfo.AGENCY_ST:
@@ -474,7 +490,11 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitInfo.AGENCY_CT:
                 return "CT";
             case OrcaTransitInfo.AGENCY_KCM:
-                return "KCM";
+                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
+                    return "KCWT";
+                } else {
+                    return "KCM";
+                }
             case OrcaTransitInfo.AGENCY_PT:
                 return "PT";
             case OrcaTransitInfo.AGENCY_ST:
@@ -500,7 +520,14 @@ public abstract class OrcaTrip extends Trip {
             if (getAgency() == OrcaTransitInfo.AGENCY_ST) {
                 return resources.getString(R.string.transit_orca_route_express_bus);
             } else if (getAgency() == OrcaTransitInfo.AGENCY_KCM) {
-                return resources.getString(R.string.transit_orca_route_bus);
+                switch ((int)getFTPType()) {
+                    case OrcaTransitInfo.FTP_TYPE_BUS:
+                        return resources.getString(R.string.transit_orca_route_bus);
+                    case OrcaTransitInfo.FTP_TYPE_WATER_TAXI:
+                        return resources.getString(R.string.transit_orca_route_water_taxi);
+                    case OrcaTransitInfo.FTP_TYPE_BRT:
+                        return resources.getString(R.string.transit_orca_route_brt);
+                }
             }
             return null;
         }
@@ -578,8 +605,11 @@ public abstract class OrcaTrip extends Trip {
                 return resources.getString(R.string.transit_orca_station_unknown_station,
                         Integer.toString(stationNumber));
             }
-        } else {
+        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_BUS) {
             return resources.getString(R.string.transit_orca_station_coach,
+                    Long.toString(getCoachNumber()));
+        } else {
+            return resources.getString(R.string.transit_orca_station_unknown_location,
                     Long.toString(getCoachNumber()));
         }
     }
@@ -602,7 +632,8 @@ public abstract class OrcaTrip extends Trip {
             return Mode.METRO;
         } else if (isSounder()) {
             return Mode.TRAIN;
-        } else if (getAgency() == OrcaTransitInfo.AGENCY_WSF) {
+        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_FERRY
+                || getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
             return Mode.FERRY;
         } else if (isSeattleStreetcar()) {
             return Mode.TRAM;
