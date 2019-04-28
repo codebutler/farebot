@@ -514,6 +514,23 @@ final class EZLinkData {
             put("SW6", Station.create("Layar", "SW6", "SW6", "1.392180", "103.879895"));
             put("SW7", Station.create("Tongkang", "SW7", "SW7", "1.389286", "103.886145"));
             put("SW8", Station.create("Renjong", "SW8", "SW8", "1.386614", "103.890425"));
+
+            // Punggol LRT (East Loop)
+            put("PE1", Station.create("Cove", "PE1", "PE1", "1.399316", "103.906342"));
+            put("PE2", Station.create("Meridian", "PE2", "PE2", "1.396931", "103.909312"));
+            put("PE3", Station.create("Coral Edge", "PE3", "PE3", "1.393455", "103.912179"));
+            put("PE4", Station.create("Riviera", "PE4", "PE4", "1.39463", "103.916509"));
+            put("PE5", Station.create("Kadaloor", "PE5", "PE5", "1.399332", "103.916502"));
+            put("PE6", Station.create("Oasis", "PE6", "PE6", "1.401622", "103.91369"));
+            put("PE7", Station.create("Damai", "PE7", "PE7", "1.405292", "103.907818"));
+            // Punggol LRT (West Loop)
+            put("PW1", Station.create("Sam Kee", "PW1", "PW1", "1.411111", "103.904928"));
+            put("PW2", Station.create("Teck Lee", "PW2", "PW2", "1.41280", "103.906233"));
+            put("PW3", Station.create("Punggol Point", "PW3", "PW3", "1.418104", "103.906559"));
+            put("PW4", Station.create("Samudera", "PW4", "PW4", "1.417075", "103.90231"));
+            put("PW5", Station.create("Nibong", "PW5", "PW5", "1.413042", "103.900293"));
+            put("PW6", Station.create("Sumang", "PW6", "PW6", "1.409524", "103.898490"));
+            put("PW7", Station.create("Soo Teck", "PW7", "PW7", "1.405700", "103.897246"));
         }
     };
 
