@@ -531,6 +531,20 @@ final class EZLinkData {
             put("PW5", Station.create("Nibong", "PW5", "PW5", "1.413042", "103.900293"));
             put("PW6", Station.create("Sumang", "PW6", "PW6", "1.409524", "103.898490"));
             put("PW7", Station.create("Soo Teck", "PW7", "PW7", "1.405700", "103.897246"));
+
+            // Bukit Panjang LRT
+            put("BP2", Station.create("South View", "BP2", "BP2", "1.380293", "103.745294"));
+            put("BP3", Station.create("Keat Hong", "BP3", "BP3", "1.378601", "103.749057"));
+            put("BP4", Station.create("Teck Whye", "BP4", "BP4", "1.376641", "103.753695"));
+            put("BP5", Station.create("Phoenix", "BP5", "BP5", "1.378618", "103.758033"));
+            put("BP7", Station.create("Petir", "BP7", "BP7", "1.377753", "103.766665"));
+            put("BP8", Station.create("Pending", "BP8", "BP8", "1.376068", "103.770917"));
+            put("BP9", Station.create("Bangkit", "BP9", "BP9", "1.380013", "103.772658"));
+            put("BP10", Station.create("Fajar", "BP10", "BP10", "1.384524", "103.770824"));
+            put("BP11", Station.create("Segar", "BP11", "BP11", "1.387772", "103.769598"));
+            put("BP12", Station.create("Jelapang", "BP12", "BP12", "1.386691", "103.764494"));
+            put("BP13", Station.create("Senja", "BP13", "BP13", "1.382700898", "103.762363"));
+            put("BP14", Station.create("Ten Mile Junction", "BP14", "BP14", "1.380349", "103.760129"));
         }
     };
 
