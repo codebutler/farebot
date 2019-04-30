@@ -28,7 +28,7 @@ import android.net.Uri
 import android.nfc.NfcAdapter
 import android.nfc.TagLostException
 import android.provider.Settings
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.view.Menu
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations

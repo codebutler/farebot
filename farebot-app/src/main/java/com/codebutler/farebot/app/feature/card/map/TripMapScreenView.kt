@@ -25,7 +25,7 @@ package com.codebutler.farebot.app.feature.card.map
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.transit.Station
@@ -44,8 +44,8 @@ import java.util.ArrayList
 class TripMapScreenView(
     context: Context,
     private val trip: Trip
-)
-    : BaseScreenView<TripMapScreen>(context) {
+) :
+    BaseScreenView<TripMapScreen>(context) {
 
     private val mapView: MapView by bindView(R.id.map)
 

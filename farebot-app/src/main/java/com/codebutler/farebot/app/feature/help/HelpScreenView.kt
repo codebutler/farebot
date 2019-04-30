@@ -24,10 +24,10 @@ package com.codebutler.farebot.app.feature.help
 
 import android.content.Context
 import android.nfc.NfcAdapter
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -185,8 +185,8 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
     internal class SupportedCardsAdapter(
         private val context: Context,
         private val supportedCards: List<SupportedCard>
-    )
-        : RecyclerView.Adapter<SupportedCardViewHolder>() {
+    ) :
+        RecyclerView.Adapter<SupportedCardViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SupportedCardViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)

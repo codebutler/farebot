@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.card.felica;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import net.kazzz.felica.lib.FeliCaLib;
 

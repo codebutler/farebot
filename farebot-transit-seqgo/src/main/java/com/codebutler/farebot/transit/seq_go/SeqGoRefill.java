@@ -24,7 +24,7 @@
 package com.codebutler.farebot.transit.seq_go;
 
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Refill;
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTopupRecord;

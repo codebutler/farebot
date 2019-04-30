@@ -24,7 +24,7 @@ package com.codebutler.farebot.base.util;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Base64;
 
 import java.util.Arrays;

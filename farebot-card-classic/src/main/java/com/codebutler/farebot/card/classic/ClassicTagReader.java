@@ -25,8 +25,8 @@ package com.codebutler.farebot.card.classic;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.codebutler.farebot.card.TagReader;
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys;

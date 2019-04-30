@@ -24,7 +24,7 @@ package com.codebutler.farebot.app.feature.card.map
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.kotlin.compact

@@ -43,12 +43,12 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class CardStream(
-    val application: FareBotApplication,
-    val cardPersister: CardPersister,
-    val cardSerializer: CardSerializer,
-    val cardKeysPersister: CardKeysPersister,
-    val cardKeysSerializer: CardKeysSerializer,
-    val nfcStream: NfcStream,
+    private val application: FareBotApplication,
+    private val cardPersister: CardPersister,
+    private val cardSerializer: CardSerializer,
+    private val cardKeysPersister: CardKeysPersister,
+    private val cardKeysSerializer: CardKeysSerializer,
+    private val nfcStream: NfcStream,
     private val tagReaderFactory: TagReaderFactory
 ) {
 
@@ -84,10 +84,10 @@ class CardStream(
         return Observable.merge(realCards, sampleCards)
                 .doOnNext { card ->
                     application.updateTimestamp(card.tagId().hex())
-                    cardPersister.insertCard(SavedCard.create(
-                            card.cardType(),
-                            card.tagId().hex(),
-                            cardSerializer.serialize(card)))
+                    cardPersister.insertCard(SavedCard(
+                        type = card.cardType(),
+                        serial = card.tagId().hex(),
+                        data = cardSerializer.serialize(card)))
                 }
                 .doOnNext { loadingRelay.accept(false) }
     }
@@ -102,7 +102,7 @@ class CardStream(
 
     private fun getCardKeys(tagId: String): CardKeys? {
         val savedKey = cardKeysPersister.getForTagId(tagId) ?: return null
-        return cardKeysSerializer.deserialize(savedKey.key_data())
+        return cardKeysSerializer.deserialize(savedKey.keyData)
     }
 
     class CardUnauthorizedException : Throwable() {

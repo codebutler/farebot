@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.card.desfire.raw;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.desfire.DesfireApplication;
 import com.codebutler.farebot.card.desfire.DesfireFile;

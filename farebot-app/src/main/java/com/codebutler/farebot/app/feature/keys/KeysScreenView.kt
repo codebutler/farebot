@@ -24,9 +24,9 @@ package com.codebutler.farebot.app.feature.keys
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.support.v7.view.ActionMode
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.view.ActionMode
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import com.codebutler.farebot.R
@@ -42,8 +42,8 @@ class KeysScreenView(
     context: Context,
     val activityOperations: ActivityOperations,
     val listener: KeysScreenView.Listener
-)
-    : BaseScreenView<KeysScreen>(context) {
+) :
+    BaseScreenView<KeysScreen>(context) {
 
     private val selectionRelay = PublishRelay.create<List<KeyViewModel>>()
 

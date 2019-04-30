@@ -25,10 +25,10 @@ package com.codebutler.farebot.app.feature.card.advanced
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.base.ui.FareBotUiTree
@@ -37,17 +37,18 @@ class CardAdvancedTabView : FrameLayout {
 
     private val recyclerView: RecyclerView by bindView(R.id.recycler)
 
-    constructor(context: Context?)
-            : super(context)
+    constructor(context: Context?) :
+            super(context)
 
-    constructor(context: Context?, attrs: AttributeSet?)
-            : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?) :
+            super(context, attrs)
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
-            : super(context, attrs, defStyleAttr)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
+            super(context, attrs, defStyleAttr)
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int)
-            : super(context, attrs, defStyleAttr, defStyleRes)
+    @Suppress("unused")
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
+            super(context, attrs, defStyleAttr, defStyleRes)
 
     fun setAdvancedUi(fareBotUiTree: FareBotUiTree) {
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -63,10 +64,10 @@ class CardAdvancedTabView : FrameLayout {
             }
 
             override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-                for (i in 0..parent.childCount - 1) {
+                for (i in 0 until parent.childCount) {
                     val child = parent.getChildAt(i)
 
-                    if (parent.getChildAdapterPosition(child) == parent.adapter.itemCount - 1) {
+                    if (parent.getChildAdapterPosition(child) == parent.adapter!!.itemCount - 1) {
                         continue
                     }
 

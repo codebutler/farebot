@@ -26,7 +26,7 @@
 
 package com.codebutler.farebot.transit.orca;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;

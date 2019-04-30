@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit.seq_go;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.codebutler.farebot.base.util.ByteUtils;

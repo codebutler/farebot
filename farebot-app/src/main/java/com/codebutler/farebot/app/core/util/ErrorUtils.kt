@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.core.util
 
 import android.app.Activity
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast

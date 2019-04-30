@@ -33,10 +33,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.inject.ScreenScope
@@ -64,9 +64,9 @@ import javax.inject.Inject
 class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScreenView>(), HistoryScreenView.Listener {
 
     companion object {
-        private val REQUEST_SELECT_FILE = 1
-        private val REQUEST_PERMISSION_STORAGE = 2
-        private val FILENAME = "farebot-export.json"
+        private const val REQUEST_SELECT_FILE = 1
+        private const val REQUEST_PERMISSION_STORAGE = 2
+        private const val FILENAME = "farebot-export.json"
     }
 
     @Inject lateinit var activityOperations: ActivityOperations
@@ -110,7 +110,11 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
                             val importClip = clipboardManager.primaryClip
                             if (importClip != null && importClip.itemCount > 0) {
                                 val text = importClip.getItemAt(0).coerceToText(activity).toString()
-                                onCardsImported(exportHelper.importCards(text))
+                                Single.fromCallable { exportHelper.importCards(text) }
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .autoDisposable(this)
+                                        .subscribe { cards -> onCardsImported(cards) }
                             }
                         }
                         R.id.copy -> {
@@ -145,12 +149,10 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
                 .subscribe { (requestCode, resultCode, data) ->
                     when (requestCode) {
                         REQUEST_SELECT_FILE -> {
-                            if (resultCode == Activity.RESULT_OK && data != null) {
-                                val uri = data.data
-                                val json = activity.contentResolver.openInputStream(uri)
-                                        .bufferedReader()
-                                        .use { it.readText() }
-                                onCardsImported(exportHelper.importCards(json))
+                            if (resultCode == Activity.RESULT_OK) {
+                                data?.data?.let {
+                                    importFromFile(it)
+                                }
                             }
                         }
                     }
@@ -198,7 +200,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
             }
         }.map { savedCards ->
             savedCards.map { savedCard ->
-                val rawCard = cardSerializer.deserialize(savedCard.data())
+                val rawCard = cardSerializer.deserialize(savedCard.data)
                 var transitIdentity: TransitIdentity? = null
                 var parseException: Exception? = null
                 try {
@@ -220,9 +222,10 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
         if (cardIds.size == 1) {
             Single.create<Optional<SavedCard>> { e -> e.onSuccess(Optional(cardPersister.getCard(cardIds[0]))) }
                     .filterAndGetOptional()
-                    .map { savedCard -> cardSerializer.deserialize(savedCard.data()) }
+                    .map { savedCard -> cardSerializer.deserialize(savedCard.data) }
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .autoDisposable(this)
                     .subscribe { rawCard -> navigator.goTo(CardScreen(rawCard)) }
         }
     }
@@ -239,17 +242,34 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
     }
 
     private fun exportToFileWithPermission() {
-        try {
+        Single.fromCallable {
             val file = File(Environment.getExternalStorageDirectory(), FILENAME)
             file.writeText(exportHelper.exportCards())
-            Toast.makeText(activity, activity.getString(R.string.saved_to_x, FILENAME), Toast.LENGTH_SHORT).show()
-        } catch (ex: Exception) {
-            ErrorUtils.showErrorAlert(activity, ex)
         }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .autoDisposable(this)
+                .subscribe({
+                    Toast.makeText(activity, activity.getString(R.string.saved_to_x, FILENAME), Toast.LENGTH_SHORT)
+                            .show()
+                }, { ex -> ErrorUtils.showErrorAlert(activity, ex) })
+    }
+
+    private fun importFromFile(uri: Uri) {
+        Single.fromCallable {
+            val json = activity.contentResolver.openInputStream(uri)
+                    .bufferedReader()
+                    .use { it.readText() }
+            exportHelper.importCards(json)
+        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .autoDisposable(this)
+                .subscribe { cards -> onCardsImported(cards) }
     }
 
     @ScreenScope
-    @Component(dependencies = arrayOf(MainActivity.MainActivityComponent::class))
+    @Component(dependencies = [MainActivity.MainActivityComponent::class])
     interface HistoryComponent {
         fun inject(historyScreen: HistoryScreen)
     }

@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * Represents a record on a SEQ Go Card (Translink).

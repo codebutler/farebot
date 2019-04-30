@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.base.util.ByteArray;
 import com.google.auto.value.AutoValue;

@@ -24,9 +24,9 @@ package com.codebutler.farebot.app.core.kotlin
 
 import android.content.Context
 import android.graphics.Color
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.v4.content.res.ResourcesCompat
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.core.content.res.ResourcesCompat
 
 @ColorInt
 fun Context.getColor(@ColorRes colorRes: Int?, @ColorInt defaultColor: Int) =

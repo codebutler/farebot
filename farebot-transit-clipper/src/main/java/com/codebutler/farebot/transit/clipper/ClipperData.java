@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.clipper;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.transit.Station;
 import com.google.common.collect.ImmutableMap;

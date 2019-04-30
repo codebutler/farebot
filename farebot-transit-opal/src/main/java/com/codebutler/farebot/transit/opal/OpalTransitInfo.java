@@ -25,8 +25,8 @@ package com.codebutler.farebot.transit.opal;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.format.DateFormat;
 
 import com.codebutler.farebot.base.ui.FareBotUiTree;

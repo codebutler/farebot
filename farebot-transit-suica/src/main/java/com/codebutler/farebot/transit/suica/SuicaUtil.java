@@ -32,7 +32,7 @@ package com.codebutler.farebot.transit.suica;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.codebutler.farebot.card.felica.FelicaDBUtil;

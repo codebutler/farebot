@@ -47,7 +47,7 @@ import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.DbCardKeysPersister
 import com.codebutler.farebot.persist.db.DbCardPersister
-import com.codebutler.farebot.persist.db.FareBotOpenHelper
+import com.codebutler.farebot.persist.db.FareBotDb
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -82,13 +82,13 @@ class FareBotApplicationModule {
     fun provideCardKeysSerializer(gson: Gson): CardKeysSerializer = GsonCardKeysSerializer(gson)
 
     @Provides
-    fun provideFareBotOpenHelper(application: FareBotApplication): FareBotOpenHelper = FareBotOpenHelper(application)
+    fun provideFareBotDb(application: FareBotApplication): FareBotDb = FareBotDb.getInstance(application)
 
     @Provides
-    fun provideCardPersister(openHelper: FareBotOpenHelper): CardPersister = DbCardPersister(openHelper)
+    fun provideCardPersister(db: FareBotDb): CardPersister = DbCardPersister(db)
 
     @Provides
-    fun provideCardKeysPersister(openHelper: FareBotOpenHelper): CardKeysPersister = DbCardKeysPersister(openHelper)
+    fun provideCardKeysPersister(db: FareBotDb): CardKeysPersister = DbCardKeysPersister(db)
 
     @Provides
     fun provideExportHelper(cardPersister: CardPersister, cardSerializer: CardSerializer, gson: Gson): ExportHelper =

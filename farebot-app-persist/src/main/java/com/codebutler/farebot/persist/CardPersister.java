@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.persist;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.codebutler.farebot.persist.db.model.SavedCard;
 

@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.app.feature.card.advanced
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -34,8 +34,8 @@ import com.codebutler.farebot.base.util.ByteArray
 import java.util.Locale
 
 // This is not very efficient.️
-class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree)
-    : RecyclerView.Adapter<CardAdvancedAdapter.ViewHolder>() {
+class CardAdvancedAdapter(fareBotUiTree: FareBotUiTree) :
+    RecyclerView.Adapter<CardAdvancedAdapter.ViewHolder>() {
 
     private var viewModels: List<ViewModel>
     private var visibleViewModels: List<ViewModel> = listOf()

@@ -23,7 +23,7 @@
 package com.codebutler.farebot.transit.ezlink;
 
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.cepas.CEPASTransaction;
 import com.codebutler.farebot.transit.Station;

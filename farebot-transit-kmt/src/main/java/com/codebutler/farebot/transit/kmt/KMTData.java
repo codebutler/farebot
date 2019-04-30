@@ -20,7 +20,7 @@
 
 package com.codebutler.farebot.transit.kmt;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.codebutler.farebot.transit.Station;
 import com.google.common.collect.ImmutableMap;
 

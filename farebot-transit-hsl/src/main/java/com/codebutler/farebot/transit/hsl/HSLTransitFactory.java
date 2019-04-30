@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.hsl;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.desfire.DesfireCard;
 import com.codebutler.farebot.card.desfire.DesfireFile;

@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.app.core.ui
 
-import android.support.annotation.RestrictTo
+import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 enum class ScreenLifecycleEvent {

@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.app.core.ui
 
-import android.support.annotation.ColorRes
+import androidx.annotation.ColorRes
 
 data class ActionBarOptions(
     @ColorRes val backgroundColorRes: Int? = null,

@@ -31,8 +31,8 @@ import com.codebutler.farebot.app.feature.main.MainActivity
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.transit.TransitInfo
 
-class CardAdvancedScreen(private val card: Card, private val transitInfo: TransitInfo?)
-    : FareBotScreen<CardAdvancedScreen.Component, CardAdvancedScreenView>() {
+class CardAdvancedScreen(private val card: Card, private val transitInfo: TransitInfo?) :
+    FareBotScreen<CardAdvancedScreen.Component, CardAdvancedScreenView>() {
 
     override fun getActionBarOptions(): ActionBarOptions = ActionBarOptions(
             backgroundColorRes = R.color.accent,

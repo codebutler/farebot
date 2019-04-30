@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.feature.card
 
 import android.content.Context
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.codebutler.farebot.R
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.Subscription
@@ -67,8 +67,8 @@ sealed class TransactionViewModel(val context: Context) {
         }
     }
 
-    class RefillViewModel(context: Context, refill: Refill)
-        : TransactionViewModel(context) {
+    class RefillViewModel(context: Context, refill: Refill) :
+        TransactionViewModel(context) {
 
         override val date: Date = Date(refill.timestamp * 1000)
 
@@ -77,8 +77,8 @@ sealed class TransactionViewModel(val context: Context) {
         val amount = "+ ${refill.getAmountString(context.resources)}"
     }
 
-    class SubscriptionViewModel(context: Context, private val subscription: Subscription)
-        : TransactionViewModel(context) {
+    class SubscriptionViewModel(context: Context, private val subscription: Subscription) :
+        TransactionViewModel(context) {
 
         override val date = null
 

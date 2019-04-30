@@ -27,7 +27,7 @@
 package com.codebutler.farebot.transit.orca;
 
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.desfire.DesfireRecord;
 import com.codebutler.farebot.transit.Station;

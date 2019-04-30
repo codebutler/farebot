@@ -38,14 +38,14 @@ class ExportHelper(
     fun exportCards(): String = gson.toJson(Export(
             versionName = BuildConfig.VERSION_NAME,
             versionCode = BuildConfig.VERSION_CODE,
-            cards = cardPersister.cards.map { cardSerializer.deserialize(it.data()) }
+            cards = cardPersister.cards.map { cardSerializer.deserialize(it.data) }
     ))
 
     fun importCards(exportJsonString: String): List<Long> = gson.fromJson(exportJsonString, Export::class.java)
-            .cards.map { cardPersister.insertCard(SavedCard.create(
-            it.cardType(),
-            it.tagId().hex(),
-            cardSerializer.serialize(it) ))
+            .cards.map { cardPersister.insertCard(SavedCard(
+            type = it.cardType(),
+            serial = it.tagId().hex(),
+            data = cardSerializer.serialize(it)))
     }
 
     private data class Export(
