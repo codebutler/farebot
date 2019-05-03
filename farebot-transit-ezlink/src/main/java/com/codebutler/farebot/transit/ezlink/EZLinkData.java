@@ -337,6 +337,7 @@ final class EZLinkData {
         {
             // Transaction Codes
             put("GTM", Station.create("GTM Manual Top-up", "GTM", "GTM", null, null));
+            put("PSC", Station.create("Passenger Service Centre Top-up", "GTM", "GTM", null, null));
 
             // North-East Line (NEL)
             put("HBF", Station.create("HarbourFront", "NE1 / CC29", "HBF", "1.265297", "103.82225"));
