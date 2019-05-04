@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry.record;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.codebutler.farebot.base.util.ByteUtils;
 import com.google.auto.value.AutoValue;

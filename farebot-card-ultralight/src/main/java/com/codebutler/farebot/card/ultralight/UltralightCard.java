@@ -24,7 +24,7 @@
 package com.codebutler.farebot.card.ultralight;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.Card;
 import com.codebutler.farebot.card.CardType;

@@ -22,20 +22,20 @@
 
 package com.codebutler.farebot.app.feature.keys
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.codebutler.farebot.R
-import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.core.kotlin.bindView
+import com.codebutler.farebot.app.core.kotlin.inflate
 import com.jakewharton.rxrelay2.PublishRelay
 
 class KeysAdapter(
     private val viewModels: List<KeyViewModel>,
     private val selectionRelay: PublishRelay<List<KeyViewModel>>
-)
-    : RecyclerView.Adapter<KeysAdapter.KeyViewHolder>() {
+) :
+    RecyclerView.Adapter<KeysAdapter.KeyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): KeyViewHolder =
             KeyViewHolder(parent.inflate(R.layout.item_key))
@@ -81,8 +81,8 @@ class KeysAdapter(
         private val textView2: TextView by bindView(android.R.id.text2)
 
         internal fun update(viewModel: KeyViewModel) {
-            textView1.text = viewModel.savedKey.card_id()
-            textView2.text = viewModel.savedKey.card_type().toString()
+            textView1.text = viewModel.savedKey.cardId
+            textView2.text = viewModel.savedKey.cardType.toString()
             itemView.isSelected = viewModel.isSelected
         }
     }

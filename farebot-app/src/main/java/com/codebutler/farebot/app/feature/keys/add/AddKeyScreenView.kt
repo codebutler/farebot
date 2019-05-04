@@ -33,8 +33,8 @@ import com.codebutler.farebot.base.util.ByteUtils
 import com.wealthfront.magellan.BaseScreenView
 
 @SuppressLint("ViewConstructor")
-class AddKeyScreenView(context: Context, private val listener: Listener)
-    : BaseScreenView<AddKeyScreen>(context) {
+class AddKeyScreenView(context: Context, private val listener: Listener) :
+    BaseScreenView<AddKeyScreen>(context) {
 
     private val cardTypeTextView: TextView by bindView(R.id.card_type)
     private val contentView: View by bindView(R.id.content)

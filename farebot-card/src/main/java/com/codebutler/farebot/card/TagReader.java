@@ -24,8 +24,8 @@ package com.codebutler.farebot.card;
 
 import android.nfc.Tag;
 import android.nfc.tech.TagTechnology;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.codebutler.farebot.base.util.IOUtils;
 import com.codebutler.farebot.key.CardKeys;

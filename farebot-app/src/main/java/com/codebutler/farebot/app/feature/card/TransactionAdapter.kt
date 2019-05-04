@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.app.feature.card
 
-import android.support.annotation.LayoutRes
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.RecyclerView
 import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +43,8 @@ import java.util.Date
 class TransactionAdapter(
     private val viewModels: List<TransactionViewModel>,
     private val relayClicks: PublishRelay<TransactionViewModel>
-)
-    : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
+) :
+    RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     companion object {
         private const val TYPE_TRIP = 0
@@ -100,8 +100,8 @@ class TransactionAdapter(
             }
         }
 
-        class TripViewHolder(parent: ViewGroup)
-            : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_trip)) {
+        class TripViewHolder(parent: ViewGroup) :
+            TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_trip)) {
 
             val item: View by bindView(R.id.item)
             val image: ImageView by bindView(R.id.image)
@@ -135,8 +135,8 @@ class TransactionAdapter(
             }
         }
 
-        class RefillViewHolder(parent: ViewGroup)
-            : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_refill)) {
+        class RefillViewHolder(parent: ViewGroup) :
+            TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_refill)) {
 
             private val agency: TextView by bindView(R.id.agency)
             private val amount: TextView by bindView(R.id.amount)
@@ -149,8 +149,8 @@ class TransactionAdapter(
             }
         }
 
-        class SubscriptionViewHolder(parent: ViewGroup)
-            : TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_subscription)) {
+        class SubscriptionViewHolder(parent: ViewGroup) :
+            TransactionViewHolder(wrapLayout(parent, R.layout.item_transaction_subscription)) {
 
             private val agency: TextView by bindView(R.id.agency)
             val name: TextView by bindView(R.id.name)

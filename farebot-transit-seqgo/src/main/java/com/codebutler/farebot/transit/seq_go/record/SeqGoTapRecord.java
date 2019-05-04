@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.seq_go.record;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.transit.Trip;

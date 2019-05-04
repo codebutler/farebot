@@ -23,8 +23,8 @@
 package com.codebutler.farebot.app.core.ui
 
 import android.content.Context
-import android.support.annotation.CallSuper
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
 import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
 import com.codebutler.farebot.app.feature.main.MainActivity
@@ -95,7 +95,7 @@ abstract class FareBotScreen<C, V> : Screen<V>(), LifecycleScopeProvider<ScreenL
     final override fun correspondingEvents(): Function<ScreenLifecycleEvent, ScreenLifecycleEvent> =
             CORRESPONDING_EVENTS
 
-    final override fun peekLifecycle(): ScreenLifecycleEvent = lifecycleRelay.value
+    final override fun peekLifecycle(): ScreenLifecycleEvent = lifecycleRelay.value!!
 
     protected abstract fun onCreateView(context: Context): V
 

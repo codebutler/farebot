@@ -48,6 +48,6 @@ class LastValueRelay<T> private constructor() : Relay<T>() {
 
     override fun subscribeActual(observer: Observer<in T>) {
         lastValue.getAndSet(null)?.let(observer::onNext)
-        relay.subscribeActual(observer)
+        relay.subscribe(observer)
     }
 }

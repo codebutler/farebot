@@ -28,7 +28,7 @@ import android.content.Intent
 import android.net.Uri
 import android.nfc.Tag
 import android.os.Environment
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.inject.ScreenScope
@@ -118,7 +118,10 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
         val cardType = tagInfo.cardType
         if (tagId != null && keyData != null && cardType != null) {
             val serializedKey = cardKeysSerializer.serialize(ClassicCardKeys.fromProxmark3(keyData))
-            cardKeysPersister.insert(SavedKey.create(ByteUtils.getHexString(tagId), cardType, serializedKey))
+            cardKeysPersister.insert(SavedKey(
+                    cardId = ByteUtils.getHexString(tagId),
+                    cardType = cardType,
+                    keyData = serializedKey))
             navigator.goBack()
         }
     }

@@ -1,6 +1,6 @@
 package com.codebutler.farebot.transit;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.Card;
 

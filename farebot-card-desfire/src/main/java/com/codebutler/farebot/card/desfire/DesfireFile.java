@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.card.desfire;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface DesfireFile {
 

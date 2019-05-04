@@ -38,8 +38,8 @@ import com.codebutler.farebot.app.core.kotlin.bindView
 import com.wealthfront.magellan.BaseScreenView
 
 @SuppressLint("ViewConstructor")
-class HomeScreenView internal constructor(ctx: Context, private val listener: Listener)
-    : BaseScreenView<HomeScreen>(ctx) {
+class HomeScreenView internal constructor(ctx: Context, private val listener: Listener) :
+    BaseScreenView<HomeScreen>(ctx) {
 
     private val splashImageView: ImageView by bindView(R.id.splash)
     private val progressBar: ProgressBar by bindView(R.id.progress)

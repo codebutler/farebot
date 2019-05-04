@@ -20,7 +20,7 @@
 
 package com.codebutler.farebot.transit.kmt;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.codebutler.farebot.base.util.ByteArray;
 import com.codebutler.farebot.card.felica.FelicaBlock;
 import com.codebutler.farebot.card.felica.FelicaCard;

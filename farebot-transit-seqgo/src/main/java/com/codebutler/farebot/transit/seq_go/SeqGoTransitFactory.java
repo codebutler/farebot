@@ -21,7 +21,7 @@
 package com.codebutler.farebot.transit.seq_go;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.base.util.Luhn;

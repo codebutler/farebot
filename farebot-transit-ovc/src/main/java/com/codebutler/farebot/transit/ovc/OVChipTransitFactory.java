@@ -24,7 +24,7 @@
 package com.codebutler.farebot.transit.ovc;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.DataClassicSector;

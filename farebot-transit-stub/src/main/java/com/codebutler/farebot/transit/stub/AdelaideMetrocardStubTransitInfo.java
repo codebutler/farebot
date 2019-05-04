@@ -24,7 +24,7 @@
 package com.codebutler.farebot.transit.stub;
 
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
 

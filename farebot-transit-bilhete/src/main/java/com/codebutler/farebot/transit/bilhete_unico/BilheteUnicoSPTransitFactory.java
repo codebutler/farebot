@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.bilhete_unico;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.card.classic.ClassicCard;
 import com.codebutler.farebot.card.classic.DataClassicSector;

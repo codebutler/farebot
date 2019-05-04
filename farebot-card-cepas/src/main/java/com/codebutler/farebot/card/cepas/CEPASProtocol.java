@@ -26,7 +26,7 @@
 package com.codebutler.farebot.card.cepas;
 
 import android.nfc.tech.IsoDep;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory;

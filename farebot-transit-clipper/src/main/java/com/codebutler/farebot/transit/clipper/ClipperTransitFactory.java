@@ -26,7 +26,7 @@
 
 package com.codebutler.farebot.transit.clipper;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.codebutler.farebot.base.util.ByteUtils;
 import com.codebutler.farebot.card.desfire.DesfireCard;

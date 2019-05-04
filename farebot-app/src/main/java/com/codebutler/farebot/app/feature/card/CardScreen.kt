@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.feature.card
 
 import android.content.Context
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import com.codebutler.farebot.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
