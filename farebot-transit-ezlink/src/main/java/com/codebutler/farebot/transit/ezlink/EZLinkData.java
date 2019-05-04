@@ -337,6 +337,7 @@ final class EZLinkData {
         {
             // Transaction Codes
             put("GTM", Station.create("GTM Manual Top-up", "GTM", "GTM", null, null));
+            put("PSC", Station.create("Passenger Service Centre Top-up", "GTM", "GTM", null, null));
 
             // North-East Line (NEL)
             put("HBF", Station.create("HarbourFront", "NE1 / CC29", "HBF", "1.265297", "103.82225"));
@@ -514,6 +515,37 @@ final class EZLinkData {
             put("SW6", Station.create("Layar", "SW6", "SW6", "1.392180", "103.879895"));
             put("SW7", Station.create("Tongkang", "SW7", "SW7", "1.389286", "103.886145"));
             put("SW8", Station.create("Renjong", "SW8", "SW8", "1.386614", "103.890425"));
+
+            // Punggol LRT (East Loop)
+            put("PE1", Station.create("Cove", "PE1", "PE1", "1.399316", "103.906342"));
+            put("PE2", Station.create("Meridian", "PE2", "PE2", "1.396931", "103.909312"));
+            put("PE3", Station.create("Coral Edge", "PE3", "PE3", "1.393455", "103.912179"));
+            put("PE4", Station.create("Riviera", "PE4", "PE4", "1.39463", "103.916509"));
+            put("PE5", Station.create("Kadaloor", "PE5", "PE5", "1.399332", "103.916502"));
+            put("PE6", Station.create("Oasis", "PE6", "PE6", "1.401622", "103.91369"));
+            put("PE7", Station.create("Damai", "PE7", "PE7", "1.405292", "103.907818"));
+            // Punggol LRT (West Loop)
+            put("PW1", Station.create("Sam Kee", "PW1", "PW1", "1.411111", "103.904928"));
+            put("PW2", Station.create("Teck Lee", "PW2", "PW2", "1.41280", "103.906233"));
+            put("PW3", Station.create("Punggol Point", "PW3", "PW3", "1.418104", "103.906559"));
+            put("PW4", Station.create("Samudera", "PW4", "PW4", "1.417075", "103.90231"));
+            put("PW5", Station.create("Nibong", "PW5", "PW5", "1.413042", "103.900293"));
+            put("PW6", Station.create("Sumang", "PW6", "PW6", "1.409524", "103.898490"));
+            put("PW7", Station.create("Soo Teck", "PW7", "PW7", "1.405700", "103.897246"));
+
+            // Bukit Panjang LRT
+            put("BP2", Station.create("South View", "BP2", "BP2", "1.380293", "103.745294"));
+            put("BP3", Station.create("Keat Hong", "BP3", "BP3", "1.378601", "103.749057"));
+            put("BP4", Station.create("Teck Whye", "BP4", "BP4", "1.376641", "103.753695"));
+            put("BP5", Station.create("Phoenix", "BP5", "BP5", "1.378618", "103.758033"));
+            put("BP7", Station.create("Petir", "BP7", "BP7", "1.377753", "103.766665"));
+            put("BP8", Station.create("Pending", "BP8", "BP8", "1.376068", "103.770917"));
+            put("BP9", Station.create("Bangkit", "BP9", "BP9", "1.380013", "103.772658"));
+            put("BP10", Station.create("Fajar", "BP10", "BP10", "1.384524", "103.770824"));
+            put("BP11", Station.create("Segar", "BP11", "BP11", "1.387772", "103.769598"));
+            put("BP12", Station.create("Jelapang", "BP12", "BP12", "1.386691", "103.764494"));
+            put("BP13", Station.create("Senja", "BP13", "BP13", "1.382700898", "103.762363"));
+            put("BP14", Station.create("Ten Mile Junction", "BP14", "BP14", "1.380349", "103.760129"));
         }
     };
 
