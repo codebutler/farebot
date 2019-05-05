@@ -14,4 +14,12 @@ dependencies {
     implementation project(path: ':farebot-card')
 }
 
-android { }
+android {
+    defaultConfig {
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas".toString())
+            }
+        }
+    }
+}

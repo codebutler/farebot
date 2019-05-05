@@ -11,7 +11,7 @@ interface SavedCardDao {
     @Query("SELECT * FROM cards ORDER BY scanned_at DESC")
     fun selectAll(): List<SavedCard>
 
-    @Query("SELECT * FROM cards WHERE _id = :id")
+    @Query("SELECT * FROM cards WHERE id = :id")
     fun selectById(id: Long): SavedCard?
 
     @Insert
