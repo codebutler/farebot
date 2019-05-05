@@ -8,7 +8,7 @@ import java.util.Date
 
 @Entity(tableName = "cards")
 data class SavedCard(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "_id") val id: Long? = 0,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "_id") val id: Long = 0,
     @ColumnInfo(name = "type") val type: CardType,
     @ColumnInfo(name = "serial") val serial: String,
     @ColumnInfo(name = "data") val data: String,
