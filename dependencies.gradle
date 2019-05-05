@@ -5,7 +5,7 @@ ext {
         minSdkVersion: 21
     ]
 
-    def autoDisposeVersion   = '0.7.0'
+    def autoDisposeVersion   = '0.8.0'
     def autoValueGsonVersion = '0.8.0'
     def autoValueVersion     = '1.6.5'
     def daggerVersion        = '2.22.1'
@@ -23,8 +23,8 @@ ext {
         autoValueAnnotations:     "com.google.auto.value:auto-value-annotations:${autoValueVersion}",
         autoValueGson:            "com.ryanharter.auto.value:auto-value-gson:${autoValueGsonVersion}",
         autoValueGsonAnnotations: "com.ryanharter.auto.value:auto-value-gson-annotations:${autoValueGsonVersion}",
-        checkstyle:               'com.puppycrawl.tools:checkstyle:8.19',
-        crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.9.9',
+        checkstyle:               'com.puppycrawl.tools:checkstyle:8.20',
+        crashlytics:              'com.crashlytics.sdk.android:crashlytics:2.10.0',
         dagger:                   "com.google.dagger:dagger:${daggerVersion}",
         daggerCompiler:           "com.google.dagger:dagger-compiler:${daggerVersion}",
         groupie:                  "com.xwray:groupie:${groupieVersion}",
@@ -39,7 +39,7 @@ ext {
         rxBroadcast:              'com.cantrowitz:rxbroadcast:2.0.0',
         rxJava2:                  'io.reactivex.rxjava2:rxjava:2.2.8',
         rxRelay2:                 'com.jakewharton.rxrelay2:rxrelay:2.1.0',
-        supportDesign:            "com.google.android.material:material:1.0.0-rc01",
+        supportDesign:            "com.google.android.material:material:1.0.0",
         supportV4:                "androidx.legacy:legacy-support-v4:1.0.0",
         supportV7CardView:        "androidx.cardview:cardview:1.0.0",
         supportV7RecyclerView:    "androidx.recyclerview:recyclerview:1.0.0"

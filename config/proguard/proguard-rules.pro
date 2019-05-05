@@ -11,6 +11,10 @@
   public static final android.os.Parcelable$Creator *;
 }
 
+# Crashlytics
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
+
 # Dependencies
 -keep class com.google.android.gms.**
 -keep class com.wealthfront.magellan.Screen
@@ -28,3 +32,4 @@
 
 # FareBot
 -keep class com.codebutler.farebot.base.ui.FareBotUiTree
+

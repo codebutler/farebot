@@ -99,8 +99,8 @@ kapt {
 
 android {
     defaultConfig {
-        versionCode 27
-        versionName '3.0.3'
+        versionCode 28
+        versionName '3.1.0'
         multiDexEnabled true
     }
 
