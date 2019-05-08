@@ -61,6 +61,7 @@ sealed class TransactionViewModel(val context: Context) {
                 Trip.Mode.TICKET_MACHINE -> R.drawable.ic_transaction_tvm_32dp
                 Trip.Mode.VENDING_MACHINE -> R.drawable.ic_transaction_vend_32dp
                 Trip.Mode.POS -> R.drawable.ic_transaction_pos_32dp
+                Trip.Mode.HANDHELD -> R.drawable.ic_transaction_handheld_32dp
                 Trip.Mode.BANNED -> R.drawable.ic_transaction_banned_32dp
                 Trip.Mode.OTHER -> R.drawable.ic_transaction_unknown_32dp
                 else -> R.drawable.ic_transaction_unknown_32dp

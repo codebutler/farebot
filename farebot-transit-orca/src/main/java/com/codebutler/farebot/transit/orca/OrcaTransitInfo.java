@@ -53,7 +53,7 @@ public abstract class OrcaTransitInfo extends TransitInfo {
     static final int FTP_TYPE_CUSTOMER_SERVICE = 0x0B;
     static final int FTP_TYPE_BUS = 0x80;
     static final int FTP_TYPE_LINK = 0xFB;
-    static final int FTP_TYPE_WATER_TAXI = 0xFE;
+    static final int FTP_TYPE_HANDHELD = 0xFE;
     static final int FTP_TYPE_STREETCAR = 0xF9;
     static final int FTP_TYPE_BRT = 0xFA; //May also apply to future hardwired bus readers
 
