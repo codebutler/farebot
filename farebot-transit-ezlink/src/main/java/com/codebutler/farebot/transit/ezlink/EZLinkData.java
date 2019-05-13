@@ -405,7 +405,7 @@ final class EZLinkData {
             put("LRC", Station.create("Lorong Chuan", "CC14", "LRC", "1.351636", "103.864064"));
             put("BSH", Station.create("Bishan", "CC15 / NS17", "BSH", "1.351236", "103.848456"));
             // Alternate name (Circle line entrance)
-            put("BSC", Station.create("Bishan", "CC15 / NS17", "BSC", "1.351236", "103.848456"));
+            put("BHC", Station.create("Bishan", "CC15 / NS17", "BHC", "1.351236", "103.848456"));
             put("MRM", Station.create("Marymount", "CC16", "MRM", "1.349078", "103.839492"));
             put("CDT", Station.create("Caldecott", "CC17", "CDT", "1.337761", "103.839447"));
             put("BTN", Station.create("Botanic Gardens", "CC19 / DT9", "BTN", "1.322519", "103.815406"));
