@@ -398,14 +398,14 @@ final class EZLinkData {
             put("DKT", Station.create("Dakota", "CC8", "DKT", "1.308289", "103.888253"));
             put("PYL", Station.create("Paya Lebar", "CC9 / EW8", "PYL", "1.317767", "103.892381"));
             put("MPS", Station.create("MacPherson", "CC10 / DT26", "MPS", "1.32665", "103.890019"));
-            put("TAS", Station.create("Tai Seng", "CC11", "TAS", "1.335833", "103.887942"));
+            put("TSG", Station.create("Tai Seng", "CC11", "TSG", "1.335833", "103.887942"));
             put("BLY", Station.create("Bartley", "CC12", "BLY", "1.342756", "103.879697"));
             put("SER", Station.create("Serangoon", "CC13 / NE12", "SER", "1.349944", "103.873092"));
             put("SRC", Station.create("Serangoon", "CC13 / NE12", "SER", "1.349944", "103.873092"));
             put("LRC", Station.create("Lorong Chuan", "CC14", "LRC", "1.351636", "103.864064"));
             put("BSH", Station.create("Bishan", "CC15 / NS17", "BSH", "1.351236", "103.848456"));
             // Alternate name (Circle line entrance)
-            put("BSC", Station.create("Bishan", "CC15 / NS17", "BSC", "1.351236", "103.848456"));
+            put("BHC", Station.create("Bishan", "CC15 / NS17", "BHC", "1.351236", "103.848456"));
             put("MRM", Station.create("Marymount", "CC16", "MRM", "1.349078", "103.839492"));
             put("CDT", Station.create("Caldecott", "CC17", "CDT", "1.337761", "103.839447"));
             put("BTN", Station.create("Botanic Gardens", "CC19 / DT9", "BTN", "1.322519", "103.815406"));
