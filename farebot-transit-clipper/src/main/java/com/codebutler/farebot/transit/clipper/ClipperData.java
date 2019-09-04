@@ -117,6 +117,7 @@ final class ClipperData {
             .put(0x2bL, Station.create("Millbrae Station", "Millbrae", "37.599935", "-122.386478"))
             .put(0x2cL, Station.create("West Dublin/Pleasanton Station", "W. Dublin/Pleasanton", "37.699764", "-121.928118"))
             .put(0x2dL, Station.create("Oakland Airport Station", "OAK Airport", "37.75256", "-122.19806"))
+            .put(0x2eL, Station.create("Warm Springs/South Fremont Station", "Warm Springs", "37.5018136", "-121.938736"))
             .build();
 
     static final Map<Long, String> GG_FERRY_ROUTES = ImmutableMap.<Long, String>builder()
