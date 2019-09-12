@@ -46,6 +46,7 @@ import com.uber.autodispose.kotlin.autoDisposable
 import dagger.Component
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenView>(), AddKeyScreenView.Listener {
 
@@ -118,10 +119,14 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
         val cardType = tagInfo.cardType
         if (tagId != null && keyData != null && cardType != null) {
             val serializedKey = cardKeysSerializer.serialize(ClassicCardKeys.fromProxmark3(keyData))
-            cardKeysPersister.insert(SavedKey(
-                    cardId = ByteUtils.getHexString(tagId),
-                    cardType = cardType,
-                    keyData = serializedKey))
+
+            thread {
+                cardKeysPersister.insert(SavedKey(
+                        cardId = ByteUtils.getHexString(tagId),
+                        cardType = cardType,
+                        keyData = serializedKey))
+            }
+
             navigator.goBack()
         }
     }
