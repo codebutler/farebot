@@ -125,6 +125,7 @@ public abstract class Trip {
         VENDING_MACHINE,
         POS,
         OTHER,
+        HANDHELD,
         BANNED
     }
 

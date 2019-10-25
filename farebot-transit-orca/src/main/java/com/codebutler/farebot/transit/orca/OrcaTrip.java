@@ -491,9 +491,9 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitInfo.AGENCY_CT:
                 return resources.getString(R.string.transit_orca_agency_ct);
             case OrcaTransitInfo.AGENCY_KCM:
-                // The King County Water Taxi is now a separate agency but uses KCM's agency ID
-                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
-                    return resources.getString(R.string.transit_orca_agency_kcwt);
+                // This type seems to be reserved for all of KCM's handheld scanners
+                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_HANDHELD) {
+                    return resources.getString(R.string.transit_orca_agency_handheld);
                 } else {
                     return resources.getString(R.string.transit_orca_agency_kcm);
                 }
@@ -517,8 +517,8 @@ public abstract class OrcaTrip extends Trip {
             case OrcaTransitInfo.AGENCY_CT:
                 return "CT";
             case OrcaTransitInfo.AGENCY_KCM:
-                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
-                    return "KCWT";
+                if (getFTPType() == OrcaTransitInfo.FTP_TYPE_HANDHELD) {
+                    return "Handheld";
                 } else {
                     return "KCM";
                 }
@@ -550,8 +550,8 @@ public abstract class OrcaTrip extends Trip {
                 switch ((int)getFTPType()) {
                     case OrcaTransitInfo.FTP_TYPE_BUS:
                         return resources.getString(R.string.transit_orca_route_bus);
-                    case OrcaTransitInfo.FTP_TYPE_WATER_TAXI:
-                        return resources.getString(R.string.transit_orca_route_water_taxi);
+                    case OrcaTransitInfo.FTP_TYPE_HANDHELD:
+                        return null; // Irrevant for this type
                     case OrcaTransitInfo.FTP_TYPE_BRT:
                         return resources.getString(R.string.transit_orca_route_brt);
                 }
@@ -635,6 +635,8 @@ public abstract class OrcaTrip extends Trip {
         } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_BUS) {
             return resources.getString(R.string.transit_orca_station_coach,
                     Long.toString(getCoachNumber()));
+        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_HANDHELD) {
+            return resources.getString(R.string.transit_orca_agency_handheld);
         } else {
             return resources.getString(R.string.transit_orca_station_unknown_location,
                     Long.toString(getCoachNumber()));
@@ -659,11 +661,12 @@ public abstract class OrcaTrip extends Trip {
             return Mode.METRO;
         } else if (isSounder()) {
             return Mode.TRAIN;
-        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_FERRY
-                || getFTPType() == OrcaTransitInfo.FTP_TYPE_WATER_TAXI) {
+        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_FERRY) {
             return Mode.FERRY;
         } else if (isSeattleStreetcar()) {
             return Mode.TRAM;
+        } else if (getFTPType() == OrcaTransitInfo.FTP_TYPE_HANDHELD) {
+            return Mode.HANDHELD;
         } else {
             return Mode.BUS;
         }
