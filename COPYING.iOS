@@ -1,0 +1,14 @@
+Farebot’s developers are aware that the terms of service that apply to apps distributed via Apple's App Store services may conflict with the rights granted under Farebot’s license, the GNU General Public License, version 3 or (at your option) any later version.
+
+The copyright holders of Farebot do not wish this conflict to prevent the otherwise-compliant distribution of Farebot, Metrodroid, or derivative works thereof via Apple’s App Store services.
+
+Therefore, we have committed not to pursue any license violation that results solely from the conflict between the GNU GPLv3 (or at your option, any later version) and the Apple App Store Terms of Service.
+
+In other words, as long as you comply with the GNU GPLv3 in all other respects, including (but not limited to) its requirements to provide users with corresponding source code, the text of the license, and clearly mark modified versions as changed, we will not object to your distribution of Farebot, Metrodroid, or derivative works thereof through the App Store.
+
+This applies to all the code comitted after 2019-10-31.
+This applies as well to all the code by following contributors:
+
+* Eric Butler
+* Michael Farrell
+* Vladimir Serbinenko
