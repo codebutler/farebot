@@ -43,6 +43,9 @@ import java.util.Map;
 public abstract class OrcaTrip extends Trip {
 
     private static final Map<Long, Station> LINK_STATIONS = ImmutableMap.<Long, Station>builder()
+            .put(15016L, Station.create("Northgate Station", "Northgate", "47.703414", "-122.328244"))
+            .put(15017L, Station.create("Roosevelt Station", "Roosevelt", "47.677081", "-122.315928"))
+            .put(15018L, Station.create("U District Station", "U District", "47.660749", "-122.314067"))
             .put(10352L, Station.create("Capitol Hill Station", "Capitol Hill", "47.6192", "-122.3202"))
             .put(10351L, Station.create("University of Washington Station", "UW Station", "47.6496", "-122.3037"))
             .put(13193L, Station.create("Westlake Station", "Westlake", "47.6113968", "-122.337502"))
