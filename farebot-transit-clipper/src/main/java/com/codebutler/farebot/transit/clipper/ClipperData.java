@@ -132,6 +132,7 @@ final class ClipperData {
 
     static final Map<Long, Station> SF_BAY_FERRY_TERMINALS = ImmutableMap.<Long, Station>builder()
             .put(0x01L, Station.create("Alameda Main Street Terminal", "Alameda Main St.", "37.790668", "-122.294036"))
+            .put(0x05L, Station.create("Oakland Ferry Terminal", "Oakland", "37.795208", "-122.280228"))
             .put(0x08L, Station.create("San Francisco Ferry Building", "Ferry Building", "37.795873", "-122.391987"))
             .build();
 
