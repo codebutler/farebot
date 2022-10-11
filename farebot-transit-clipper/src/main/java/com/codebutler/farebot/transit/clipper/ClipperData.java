@@ -118,6 +118,7 @@ final class ClipperData {
             .put(0x2cL, Station.create("West Dublin/Pleasanton Station", "W. Dublin/Pleasanton", "37.699764", "-121.928118"))
             .put(0x2dL, Station.create("Oakland Airport Station", "OAK Airport", "37.75256", "-122.19806"))
             .put(0x2eL, Station.create("Warm Springs/South Fremont Station", "Warm Springs", "37.5018136", "-121.938736"))
+            .put(0x30L, Station.create("Berryessa/North San José station", "Berryessa", "37.3683616", "-121.874655"))
             .build();
 
     static final Map<Long, String> GG_FERRY_ROUTES = ImmutableMap.<Long, String>builder()
@@ -132,6 +133,7 @@ final class ClipperData {
 
     static final Map<Long, Station> SF_BAY_FERRY_TERMINALS = ImmutableMap.<Long, Station>builder()
             .put(0x01L, Station.create("Alameda Main Street Terminal", "Alameda Main St.", "37.790668", "-122.294036"))
+            .put(0x05L, Station.create("Oakland Ferry Terminal", "Oakland", "37.795208", "-122.280228"))
             .put(0x08L, Station.create("San Francisco Ferry Building", "Ferry Building", "37.795873", "-122.391987"))
             .build();
 
