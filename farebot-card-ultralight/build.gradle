@@ -14,5 +14,5 @@ dependencies {
 }
 
 android {
-    resourcePrefix 'ultralight_'
+    namespace "com.codebutler.farebot.card.ultralight"
 }

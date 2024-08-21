@@ -22,8 +22,7 @@
   -->
 
 <manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.codebutler.farebot">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -55,6 +54,7 @@
         <activity
             android:name="com.codebutler.farebot.app.feature.main.MainActivity"
             android:configChanges="keyboardHidden|orientation"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/FareBot.Theme.Main">
             <intent-filter>
@@ -71,6 +71,7 @@
         <activity
             android:name=".app.feature.bg.BackgroundTagActivity"
             android:enabled="false"
+            android:exported="true"
             android:noHistory="true"
             android:configChanges="keyboardHidden|orientation"
             android:launchMode="singleTop">

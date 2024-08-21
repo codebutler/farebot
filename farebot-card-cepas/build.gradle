@@ -16,5 +16,6 @@ dependencies {
 }
 
 android {
+    namespace "com.codebutler.farebot.card.cepas"
     resourcePrefix 'cepas_'
 }

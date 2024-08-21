@@ -1,5 +1,5 @@
 plugins {
-    id 'com.google.devtools.ksp'
+    id "org.jetbrains.kotlin.kapt" version "2.0.10"
 }
 
 apply plugin: 'com.android.library'
@@ -12,8 +12,10 @@ dependencies {
 
     compileOnly(libs.autoValueAnnotations)
 
-    ksp(libs.autoValue)
+    kapt(libs.autoValue)
 
 }
 
-android { }
+android {
+    namespace "com.codebutler.farebot.util"
+}

@@ -13,4 +13,6 @@ dependencies {
     annotationProcessor libs.autoValue
 }
 
-android { }
+android {
+    namespace "com.codebutler.farebot.card"
+}

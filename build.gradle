@@ -17,8 +17,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.google.devtools.ksp' version '2.0.10-1.0.24' apply false
     id 'com.github.ben-manes.versions' version '0.21.0'
+    id "org.jetbrains.kotlin.kapt" version "2.0.10"
 }
 
 allprojects {
@@ -58,7 +58,6 @@ subprojects {
         }
         if (project.hasProperty("android")) {
             android {
-                namespace "dev.meh.farebot"
                 compileSdkVersion vers.compileSdkVersion
 
                 defaultConfig {
@@ -67,8 +66,8 @@ subprojects {
                 }
 
                 compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_1_7
-                    targetCompatibility JavaVersion.VERSION_1_7
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
                 }
 
                 lintOptions {

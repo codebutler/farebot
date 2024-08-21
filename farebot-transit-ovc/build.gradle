@@ -16,5 +16,6 @@ dependencies {
 }
 
 android {
+    namespace "com.codebutler.farebot.transit.ovc"
     resourcePrefix 'ovc_'
 }

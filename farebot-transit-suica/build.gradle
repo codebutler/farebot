@@ -17,5 +17,6 @@ dependencies {
 }
 
 android {
+    namespace "com.codebutler.farebot.transit.suica"
     resourcePrefix 'suica_'
 }

@@ -14,4 +14,6 @@ dependencies {
     annotationProcessor libs.autoValueGson
 }
 
-android { }
+android {
+    namespace "com.codebutler.farebot.transit.bilhete_unico"
+}
