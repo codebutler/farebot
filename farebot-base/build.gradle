@@ -1,15 +1,18 @@
+plugins {
+    id 'com.google.devtools.ksp'
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 dependencies {
-    implementation libs.guava
-    implementation libs.supportV4
-    implementation libs.kotlinStdlib
+    implementation(libs.guava)
+    implementation(libs.supportV4)
+    implementation(libs.kotlinStdlib)
 
-    compileOnly libs.autoValueAnnotations
+    compileOnly(libs.autoValueAnnotations)
 
-    kapt libs.autoValue
+    ksp(libs.autoValue)
 
 }
 

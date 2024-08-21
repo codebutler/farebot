@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+plugins {
+    id 'com.google.devtools.ksp'
+}
+
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
 
 dependencies {
     implementation project(':farebot-base')
@@ -71,13 +71,14 @@ dependencies {
     implementation libs.supportV4
     implementation libs.supportV7CardView
     implementation libs.supportV7RecyclerView
+//
+//    implementation(libs.crashlytics) {
+//        transitive = true
+//    }
 
-    implementation(libs.crashlytics) {
-        transitive = true
-    }
-
-    implementation libs.dagger
-    kapt libs.daggerCompiler
+    implementation 'com.google.dagger:dagger:2.28.3'
+    implementation 'androidx.core:core-ktx:1.13.1'
+    ksp 'com.google.dagger:dagger-compiler'
 }
 
 static def askPassword() {
@@ -90,11 +91,6 @@ gradle.taskGraph.whenReady { taskGraph ->
         android.signingConfigs.release.storePassword = password
         android.signingConfigs.release.keyPassword = password
     }
-}
-
-kapt {
-    useBuildCache = true
-    mapDiagnosticLocations = true
 }
 
 android {
@@ -127,9 +123,10 @@ android {
             signingConfig signingConfigs.release
         }
     }
-
     packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
+        resources {
+            excludes += ['META-INF/LICENSE.txt', 'META-INF/NOTICE.txt']
+        }
     }
+
 }
