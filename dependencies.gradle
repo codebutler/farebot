@@ -7,7 +7,7 @@ ext {
 
     def autoDisposeVersion   = '0.8.0'
     def autoValueVersion     = '1.11.0'
-    def daggerVersion        = '2.28.3'
+    def daggerVersion        = '2.52'
     def groupieVersion       = '2.8.1'
     def kotlinVersion        = '1.9.25'
     def magellanVersion      = '1.1.0'
