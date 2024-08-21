@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlin_version = '2.0.10'
+        kotlin_version = '1.9.25'
     }
     repositories {
         mavenLocal()
@@ -17,8 +17,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.21.0'
-    id "org.jetbrains.kotlin.kapt" version "2.0.10"
+    id 'com.github.ben-manes.versions' version '0.51.0'
+    id "org.jetbrains.kotlin.kapt" version "1.9.25"
 }
 
 allprojects {

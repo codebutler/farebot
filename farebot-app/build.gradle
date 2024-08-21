@@ -21,7 +21,7 @@
  */
 
 plugins {
-    id "org.jetbrains.kotlin.kapt" version "2.0.10"
+    id "org.jetbrains.kotlin.kapt" version "1.9.25"
 }
 
 apply plugin: 'com.android.application'
@@ -104,17 +104,17 @@ android {
         multiDexEnabled true
     }
 
-    signingConfigs {
-        debug {
-            storeFile file('../debug.keystore')
-        }
-        release {
-            storeFile file('../release.keystore')
-            keyAlias 'ericbutler'
-            storePassword ''
-            keyPassword ''
-        }
-    }
+//    signingConfigs {
+//        debug {
+//            storeFile file('../debug.keystore')
+//        }
+//        release {
+//            storeFile file('../release.keystore')
+//            keyAlias 'ericbutler'
+//            storePassword ''
+//            keyPassword ''
+//        }
+//    }
 
     buildTypes {
         debug {
@@ -124,7 +124,7 @@ android {
             shrinkResources false
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), '../config/proguard/proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
     packagingOptions {
@@ -132,5 +132,6 @@ android {
             excludes += ['META-INF/LICENSE.txt', 'META-INF/NOTICE.txt']
         }
     }
-
+    compileSdk 34
+    buildToolsVersion '35.0.0'
 }
