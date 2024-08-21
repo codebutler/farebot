@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="edy_transaction_sequence">#</string>
+    <string name="felica_process_charge" />
+    <string name="felica_process_merchandise_purchase" />
 </resources>

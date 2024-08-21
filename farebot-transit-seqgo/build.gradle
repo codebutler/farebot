@@ -17,6 +17,6 @@ dependencies {
 }
 
 android {
-    namespace "com.codebutler.farebot.transit.ovc"
+    namespace "com.codebutler.farebot.transit.seq_go"
     resourcePrefix 'seqgo_'
 }

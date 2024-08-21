@@ -103,51 +103,51 @@ final class SuicaUtil {
     static String getConsoleTypeName(@NonNull Resources resources, int cType) {
         switch (cType & 0xff) {
             case 0x03:
-                return resources.getString(R.string.felica_terminal_fare_adjustment);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_fare_adjustment);
             case 0x04:
-                return resources.getString(R.string.felica_terminal_portable);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_portable);
             case 0x05:
-                return resources.getString(R.string.felica_terminal_vehicle); // bus
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_vehicle); // bus
             case 0x07:
-                return resources.getString(R.string.felica_terminal_ticket);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_ticket);
             case 0x08:
-                return resources.getString(R.string.felica_terminal_ticket);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_ticket);
             case 0x09:
-                return resources.getString(R.string.felica_terminal_deposit_quick_charge);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_deposit_quick_charge);
             case 0x12:
-                return resources.getString(R.string.felica_terminal_tvm_tokyo_monorail);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_tvm_tokyo_monorail);
             case 0x13:
-                return resources.getString(R.string.felica_terminal_tvm_etc);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_tvm_etc);
             case 0x14:
-                return resources.getString(R.string.felica_terminal_tvm_etc);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_tvm_etc);
             case 0x15:
-                return resources.getString(R.string.felica_terminal_tvm_etc);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_tvm_etc);
             case 0x16:
-                return resources.getString(R.string.felica_terminal_ticket_gate);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_ticket_gate);
             case 0x17:
-                return resources.getString(R.string.felica_terminal_simple_ticket_gate);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_simple_ticket_gate);
             case 0x18:
-                return resources.getString(R.string.felica_terminal_booth);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_booth);
             case 0x19:
-                return resources.getString(R.string.felica_terminal_booth_green);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_booth_green);
             case 0x1a:
-                return resources.getString(R.string.felica_terminal_ticket_gate_terminal);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_ticket_gate_terminal);
             case 0x1b:
-                return resources.getString(R.string.felica_terminal_mobile_phone);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_mobile_phone);
             case 0x1c:
-                return resources.getString(R.string.felica_terminal_connection_adjustment);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_connection_adjustment);
             case 0x1d:
-                return resources.getString(R.string.felica_terminal_transfer_adjustment);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_transfer_adjustment);
             case 0x1f:
-                return resources.getString(R.string.felica_terminal_simple_deposit);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_simple_deposit);
             case 0x46:
                 return "VIEW ALTTE";
             case 0x48:
                 return "VIEW ALTTE";
             case 0xc7:
-                return resources.getString(R.string.felica_terminal_pos);  // sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_pos);  // sales
             case 0xc8:
-                return resources.getString(R.string.felica_terminal_vending);   // sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_terminal_vending);   // sales
             default:
                 return String.format("Console 0x%s", Integer.toHexString(cType));
         }
@@ -163,55 +163,55 @@ final class SuicaUtil {
     static String getProcessTypeName(@NonNull Resources resources, int proc) {
         switch (proc & 0xff) {
             case 0x01:
-                return resources.getString(R.string.felica_process_fare_exit_gate);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_fare_exit_gate);
             case 0x02:
-                return resources.getString(R.string.felica_process_charge);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_charge);
             case 0x03:
-                return resources.getString(R.string.felica_process_purchase_magnetic);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_purchase_magnetic);
             case 0x04:
-                return resources.getString(R.string.felica_process_fare_adjustment);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_fare_adjustment);
             case 0x05:
-                return resources.getString(R.string.felica_process_admission_payment);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_admission_payment);
             case 0x06:
-                return resources.getString(R.string.felica_process_booth_exit);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_booth_exit);
             case 0x07:
-                return resources.getString(R.string.felica_process_issue_new);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_issue_new);
             case 0x08:
-                return resources.getString(R.string.felica_process_booth_deduction);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_booth_deduction);
             case 0x0d:
-                return resources.getString(R.string.felica_process_bus_pitapa);                 // Bus
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_bus_pitapa);                 // Bus
             case 0x0f:
-                return resources.getString(R.string.felica_process_bus_iruca);                  // Bus
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_bus_iruca);                  // Bus
             case 0x11:
-                return resources.getString(R.string.felica_process_reissue);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_reissue);
             case 0x13:
-                return resources.getString(R.string.felica_process_payment_shinkansen);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_payment_shinkansen);
             case 0x14:
-                return resources.getString(R.string.felica_process_entry_a_autocharge);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_entry_a_autocharge);
             case 0x15:
-                return resources.getString(R.string.felica_process_exit_a_autocharge);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_exit_a_autocharge);
             case 0x1f:
-                return resources.getString(R.string.felica_process_deposit_bus);                // Bus
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_deposit_bus);                // Bus
             case 0x23:
-                return resources.getString(R.string.felica_process_purchase_special_ticket);    // Bus
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_purchase_special_ticket);    // Bus
             case 0x46:
-                return resources.getString(R.string.felica_process_merchandise_purchase);       // Sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_merchandise_purchase);       // Sales
             case 0x48:
-                return resources.getString(R.string.felica_process_bonus_charge);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_bonus_charge);
             case 0x49:
-                return resources.getString(R.string.felica_process_register_deposit);           // Sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_register_deposit);           // Sales
             case 0x4a:
-                return resources.getString(R.string.felica_process_merchandise_cancel);         // Sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_merchandise_cancel);         // Sales
             case 0x4b:
-                return resources.getString(R.string.felica_process_merchandise_admission);      // Sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_merchandise_admission);      // Sales
             case 0xc6:
-                return resources.getString(R.string.felica_process_merchandise_purchase_cash);  // Sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_merchandise_purchase_cash);  // Sales
             case 0xcb:
-                return resources.getString(R.string.felica_process_merchandise_admission_cash); // Sales
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_merchandise_admission_cash); // Sales
             case 0x84:
-                return resources.getString(R.string.felica_process_payment_thirdparty);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_payment_thirdparty);
             case 0x85:
-                return resources.getString(R.string.felica_process_admission_thirdparty);
+                return resources.getString(com.codebutler.farebot.card.felica.R.string.felica_process_admission_thirdparty);
             default:
                 return String.format("Process0x%s", Integer.toHexString(proc));
         }

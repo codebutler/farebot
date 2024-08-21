@@ -83,17 +83,18 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.28.3'
 }
 
-static def askPassword() {
-    return 'security -q find-generic-password -w -g -l farebot-release'.execute().text.trim()
-}
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if(taskGraph.hasTask(':farebot-app:packageRelease')) {
-        def password = askPassword()
-        android.signingConfigs.release.storePassword = password
-        android.signingConfigs.release.keyPassword = password
-    }
-}
+// TODO: Fixme for release
+//static def askPassword() {
+//    return 'security -q find-generic-password -w -g -l farebot-release'.execute().text.trim()
+//}
+//
+//gradle.taskGraph.whenReady { taskGraph ->
+//    if(taskGraph.hasTask(':farebot-app:packageRelease')) {
+//        def password = askPassword()
+//        android.signingConfigs.release.storePassword = password
+//        android.signingConfigs.release.keyPassword = password
+//    }
+//}
 
 android {
     namespace "com.codebutler.farebot.app"
