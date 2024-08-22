@@ -27,13 +27,13 @@ import com.jakewharton.rxrelay2.Relay
 import io.reactivex.Observer
 import java.util.concurrent.atomic.AtomicReference
 
-class LastValueRelay<T> private constructor() : Relay<T>() {
+class LastValueRelay<T : Any> private constructor() : Relay<T>() {
 
     private val relay = PublishRelay.create<T>()
     private val lastValue: AtomicReference<T?> = AtomicReference()
 
     companion object {
-        fun <T> create(): LastValueRelay<T> = LastValueRelay()
+        fun <T : Any> create(): LastValueRelay<T> = LastValueRelay()
     }
 
     override fun accept(value: T) {

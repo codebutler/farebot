@@ -93,7 +93,6 @@ FareBot uses the following open-source libraries:
 * [Guava](https://github.com/google/guava)
 * [Kotlin](https://kotlinlang.org/)
 * [Magellan](https://github.com/wealthfront/magellan/)
-* [RxBroadcast](https://github.com/cantrowitz/RxBroadcast)
 * [RxJava](https://github.com/ReactiveX/RxJava)
 * [RxRelay](https://github.com/JakeWharton/RxRelay)
 

@@ -24,6 +24,8 @@ package com.codebutler.farebot.app.core.nfc
 
 import android.app.Activity
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.nfc.NfcAdapter
@@ -32,10 +34,12 @@ import android.nfc.tech.IsoDep
 import android.nfc.tech.MifareClassic
 import android.nfc.tech.MifareUltralight
 import android.nfc.tech.NfcF
+import android.os.Build
 import android.os.Bundle
-import com.cantrowitz.rxbroadcast.RxBroadcast
+import androidx.annotation.RequiresApi
 import com.codebutler.farebot.app.core.rx.LastValueRelay
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
 class NfcStream(private val activity: Activity) {
 
@@ -74,9 +78,29 @@ class NfcStream(private val activity: Activity) {
         nfcAdapter?.disableForegroundDispatch(activity)
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun observe(): Observable<Tag> {
-        val broadcastIntents = RxBroadcast.fromBroadcast(activity, IntentFilter(ACTION))
-                .map { it.getParcelableExtra<Tag>(INTENT_EXTRA_TAG) }
-        return Observable.merge(relay, broadcastIntents)
+        // Create a PublishSubject to emit broadcast events
+        val broadcastSubject = PublishSubject.create<Tag>()
+
+        // Register the BroadcastReceiver manually
+        val broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val tag = intent.getParcelableExtra<Tag>(INTENT_EXTRA_TAG)
+                if (tag != null) {
+                    broadcastSubject.onNext(tag)
+                }
+            }
+        }
+
+        // Register the receiver with the IntentFilter
+        activity.registerReceiver(broadcastReceiver, IntentFilter(ACTION), Context.RECEIVER_NOT_EXPORTED)
+
+        // Return an observable that merges the relay and the broadcastSubject
+        return Observable.merge(relay, broadcastSubject)
+            .doOnDispose {
+                // Unregister the receiver when the observable is disposed to avoid leaks
+                activity.unregisterReceiver(broadcastReceiver)
+            }
     }
 }
