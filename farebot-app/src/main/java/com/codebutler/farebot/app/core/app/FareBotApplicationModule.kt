@@ -23,6 +23,7 @@
 package com.codebutler.farebot.app.core.app
 
 import android.content.SharedPreferences
+import android.os.StrictMode
 import androidx.preference.PreferenceManager
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
@@ -58,8 +59,15 @@ import java.util.Date
 class FareBotApplicationModule {
 
     @Provides
-    fun provideSharedPreferences(application: FareBotApplication): SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(application)
+    fun provideSharedPreferences(application: FareBotApplication): SharedPreferences {
+        val oldPolicy = StrictMode.allowThreadDiskReads();
+        try {
+            return PreferenceManager.getDefaultSharedPreferences(application)
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy)
+        }
+    }
+
 
     @Provides
     fun provideGson(): Gson = GsonBuilder()
