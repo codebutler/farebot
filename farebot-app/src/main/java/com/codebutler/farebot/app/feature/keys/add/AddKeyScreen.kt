@@ -29,7 +29,7 @@ import android.net.Uri
 import android.nfc.Tag
 import android.os.Environment
 import androidx.appcompat.app.AlertDialog
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.nfc.NfcStream
@@ -93,7 +93,8 @@ class AddKeyScreen : FareBotScreen<AddKeyScreen.AddKeyComponent, AddKeyScreenVie
                     when (requestCode) {
                         REQUEST_SELECT_FILE -> {
                             if (resultCode == Activity.RESULT_OK && dataIntent != null) {
-                                setKey(activity.contentResolver.openInputStream(dataIntent.data).readBytes())
+                                dataIntent.data?.let { activity.contentResolver.openInputStream(it)?.readBytes() }
+                                    ?.let { setKey(it) }
                             }
                         }
                     }

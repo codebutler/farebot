@@ -25,7 +25,7 @@ package com.codebutler.farebot.app.feature.card
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
 import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
@@ -117,6 +117,9 @@ class CardScreen(private val rawCard: RawCard<*>) : FareBotScreen<CardScreen.Com
                                 navigator.goTo(TripMapScreen(trip))
                             }
                         }
+
+                        is TransactionViewModel.RefillViewModel -> TODO()
+                        is TransactionViewModel.SubscriptionViewModel -> TODO()
                     }
                 }
     }

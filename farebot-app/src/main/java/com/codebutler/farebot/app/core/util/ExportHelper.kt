@@ -22,12 +22,12 @@
 
 package com.codebutler.farebot.app.core.util
 
-import com.codebutler.farebot.BuildConfig
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
 import com.google.gson.Gson
+import com.xwray.groupie.BuildConfig
 
 class ExportHelper(
     private val cardPersister: CardPersister,

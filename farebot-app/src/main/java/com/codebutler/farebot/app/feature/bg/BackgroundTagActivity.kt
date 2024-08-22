@@ -33,7 +33,7 @@ class BackgroundTagActivity : Activity() {
 
         startActivity(Intent(this, MainActivity::class.java).apply {
             action = intent.action
-            putExtras(intent.extras)
+            intent.extras?.let { putExtras(it) }
         })
 
         finish()

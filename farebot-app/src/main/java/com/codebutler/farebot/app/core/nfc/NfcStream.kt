@@ -64,7 +64,7 @@ class NfcStream(private val activity: Activity) {
         val intent = Intent(ACTION)
         intent.`package` = activity.packageName
 
-        val pendingIntent = PendingIntent.getBroadcast(activity, 0, intent, 0)
+        val pendingIntent = PendingIntent.getBroadcast(activity, 0, intent, PendingIntent.FLAG_MUTABLE)
         val nfcAdapter = NfcAdapter.getDefaultAdapter(activity)
         nfcAdapter?.enableForegroundDispatch(activity, pendingIntent, null, TECH_LISTS)
     }

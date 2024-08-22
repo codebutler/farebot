@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.core.app
 
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
 import com.codebutler.farebot.app.core.serialize.gson.ByteArrayGsonTypeAdapter

@@ -33,7 +33,7 @@ import android.preference.CheckBoxPreference
 import android.preference.Preference
 import android.preference.PreferenceActivity
 import android.view.MenuItem
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.feature.bg.BackgroundTagActivity
 
 @Suppress("DEPRECATION")

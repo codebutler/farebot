@@ -28,12 +28,11 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.transit.TransitInfo
 import com.jakewharton.rxrelay2.PublishRelay
 import com.wealthfront.magellan.BaseScreenView
-import com.xwray.groupie.GroupAdapter
 import io.reactivex.Observable
 
 class CardScreenView(context: Context) : BaseScreenView<CardScreen>(context) {
@@ -59,7 +58,7 @@ class CardScreenView(context: Context) : BaseScreenView<CardScreen>(context) {
         } else {
             balanceTextView.text = balance
             if (viewModels.isNotEmpty()) {
-                recycler.adapter = GroupAdapter<TransactionAdapter.TransactionViewHolder>()
+//                recycler.adapter = GroupAdapter<TransactionAdapter.TransactionViewHolder>()
                 recycler.adapter = TransactionAdapter(viewModels, clicksRelay)
             } else {
                 recycler.visibility = View.GONE

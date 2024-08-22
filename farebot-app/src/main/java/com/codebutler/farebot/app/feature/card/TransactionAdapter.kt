@@ -22,21 +22,20 @@
 
 package com.codebutler.farebot.app.feature.card
 
-import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.RecyclerView
 import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.codebutler.farebot.R
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.RecyclerView
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.app.core.kotlin.inflate
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.RefillViewHolder
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.SubscriptionViewHolder
 import com.codebutler.farebot.app.feature.card.TransactionAdapter.TransactionViewHolder.TripViewHolder
 import com.jakewharton.rxrelay2.PublishRelay
-import com.xwray.groupie.ViewHolder
 import java.util.Calendar
 import java.util.Date
 
@@ -77,7 +76,7 @@ class TransactionAdapter(
         is TransactionViewModel.SubscriptionViewModel -> TYPE_SUBSCRIPTION
     }
 
-    sealed class TransactionViewHolder(itemView: View) : ViewHolder(itemView) {
+    sealed class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         companion object {
             fun wrapLayout(parent: ViewGroup, @LayoutRes layoutId: Int): View =

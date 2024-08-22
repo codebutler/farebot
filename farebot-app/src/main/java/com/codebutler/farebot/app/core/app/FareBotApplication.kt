@@ -25,18 +25,14 @@ package com.codebutler.farebot.app.core.app
 import android.app.Application
 import android.content.SharedPreferences
 import android.os.StrictMode
-import com.codebutler.farebot.BuildConfig
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
-import io.fabric.sdk.android.Fabric
 import java.util.Date
 import javax.inject.Inject
 
 class FareBotApplication : Application() {
 
     companion object {
-        val PREF_LAST_READ_ID = "last_read_id"
-        val PREF_LAST_READ_AT = "last_read_at"
+        const val PREF_LAST_READ_ID = "last_read_id"
+        const val PREF_LAST_READ_AT = "last_read_at"
     }
 
     lateinit var component: FareBotApplicationComponent
@@ -57,18 +53,12 @@ class FareBotApplication : Application() {
                 .build()
 
         component.inject(this)
-
-        if (!BuildConfig.DEBUG) {
-            Fabric.with(this, Answers(), Crashlytics())
-        } else {
-            Fabric.with(this, Answers())
-        }
     }
 
     fun updateTimestamp(tagIdString: String?) {
         val prefs = sharedPreferences.edit()
-        prefs.putString(FareBotApplication.PREF_LAST_READ_ID, tagIdString)
-        prefs.putLong(FareBotApplication.PREF_LAST_READ_AT, Date().time)
+        prefs.putString(PREF_LAST_READ_ID, tagIdString)
+        prefs.putLong(PREF_LAST_READ_AT, Date().time)
         prefs.apply()
     }
 }

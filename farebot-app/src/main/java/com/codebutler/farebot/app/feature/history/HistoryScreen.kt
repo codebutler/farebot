@@ -37,7 +37,7 @@ import android.view.Menu
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.inject.ScreenScope
 import com.codebutler.farebot.app.core.kotlin.Optional
@@ -119,7 +119,7 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
                         }
                         R.id.copy -> {
                             val exportClip = ClipData.newPlainText(null, exportHelper.exportCards())
-                            clipboardManager.primaryClip = exportClip
+                            clipboardManager.setPrimaryClip(exportClip);
                             Toast.makeText(activity, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
                         }
                         R.id.share -> {
@@ -256,16 +256,13 @@ class HistoryScreen : FareBotScreen<HistoryScreen.HistoryComponent, HistoryScree
     }
 
     private fun importFromFile(uri: Uri) {
-        Single.fromCallable {
-            val json = activity.contentResolver.openInputStream(uri)
-                    .bufferedReader()
-                    .use { it.readText() }
-            exportHelper.importCards(json)
+        val json = activity.contentResolver.openInputStream(uri);
+        if (json != null) {
+            json.bufferedReader()
+                .use { it.readText() }
+            val cards = exportHelper.importCards(json.toString())
+            onCardsImported(cards)
         }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .autoDisposable(this)
-                .subscribe { cards -> onCardsImported(cards) }
     }
 
     @ScreenScope

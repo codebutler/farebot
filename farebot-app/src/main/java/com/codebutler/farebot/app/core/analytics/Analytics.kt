@@ -22,8 +22,6 @@
 
 package com.codebutler.farebot.app.core.analytics
 
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
 
 enum class AnalyticsEventName(val value: String) {
     SCAN_CARD("Scan Card"),
@@ -34,6 +32,6 @@ enum class AnalyticsEventName(val value: String) {
 }
 
 fun logAnalyticsEvent(name: AnalyticsEventName, type: String) {
-    Answers.getInstance().logCustom(CustomEvent(name.value)
-            .putCustomAttribute("Type", type))
+//    Answers.getInstance().logCustom(CustomEvent(name.value)
+//            .putCustomAttribute("Type", type))
 }

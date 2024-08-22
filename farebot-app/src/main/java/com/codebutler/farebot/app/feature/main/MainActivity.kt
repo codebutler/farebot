@@ -37,7 +37,7 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.activity.ActivityResult
 import com.codebutler.farebot.app.core.activity.RequestPermissionsResult
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(),
         navigator.onCreate(this, savedInstanceState)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         navigator.onSaveInstanceState(outState)
     }

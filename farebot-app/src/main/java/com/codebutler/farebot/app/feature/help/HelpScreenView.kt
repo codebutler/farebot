@@ -34,7 +34,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitInfo
@@ -90,7 +90,7 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         name = "EZ-Link",
                         locationResId = R.string.location_singapore,
                         cardType = CardType.CEPAS,
-                        extraNoteResId = R.string.ezlink_card_note
+                        extraNoteResId = com.codebutler.farebot.transit.ezlink.R.string.ezlink_card_note
                 ),
                 SupportedCard(
                         imageResId = R.drawable.octopus_card,
@@ -111,7 +111,7 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         cardType = CardType.MifareClassic,
                         keysRequired = true,
                         preview = true,
-                        extraNoteResId = R.string.seqgo_card_note
+                        extraNoteResId = com.codebutler.farebot.transit.seq_go.R.string.seqgo_card_note
                 ),
                 SupportedCard(
                         imageResId = R.drawable.hsl_card,
@@ -133,7 +133,7 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         cardType = CardType.MifareDesfire,
                         keysRequired = false,
                         preview = false,
-                        extraNoteResId = R.string.myki_card_note
+                        extraNoteResId = com.codebutler.farebot.transit.myki.R.string.myki_card_note
                 ),
                 SupportedCard(
                         imageResId = R.drawable.nets_card,
@@ -157,10 +157,10 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                 SupportedCard(
                         imageResId = R.drawable.easycard,
                         name = "EasyCard",
-                        locationResId = R.string.easycard_card_location,
+                        locationResId = com.codebutler.farebot.transit.easycard.R.string.easycard_card_location,
                         cardType = CardType.MifareClassic,
                         keysRequired = true,
-                        extraNoteResId = R.string.easycard_card_note
+                        extraNoteResId = com.codebutler.farebot.transit.easycard.R.string.easycard_card_note
                 ),
                 SupportedCard(
                         imageResId = R.drawable.kmt_card,
@@ -168,7 +168,7 @@ class HelpScreenView(context: Context) : BaseScreenView<HelpScreen>(context) {
                         locationResId = R.string.location_jakarta,
                         cardType = CardType.FeliCa,
                         keysRequired = false,
-                        extraNoteResId = R.string.kmt_notes
+                        extraNoteResId = com.codebutler.farebot.transit.kmt.R.string.kmt_notes
                 )
 
         )

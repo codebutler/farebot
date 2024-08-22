@@ -106,7 +106,7 @@ class CardStream(
     }
 
     class CardUnauthorizedException : Throwable() {
-        override val message: String?
+        override val message: String
             get() = "Unauthorized"
     }
 }

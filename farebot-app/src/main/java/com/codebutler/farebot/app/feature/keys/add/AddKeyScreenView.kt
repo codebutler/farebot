@@ -27,7 +27,7 @@ import android.content.Context
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.base.util.ByteUtils
 import com.wealthfront.magellan.BaseScreenView

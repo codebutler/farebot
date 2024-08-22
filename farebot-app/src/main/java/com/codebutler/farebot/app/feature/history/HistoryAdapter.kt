@@ -27,7 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.codebutler.farebot.app.core.kotlin.inflate
 import com.jakewharton.rxrelay2.PublishRelay

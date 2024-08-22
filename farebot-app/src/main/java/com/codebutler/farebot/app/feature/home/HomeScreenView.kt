@@ -32,10 +32,10 @@ import android.view.ViewPropertyAnimator
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import com.codebutler.farebot.BuildConfig
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.kotlin.bindView
 import com.wealthfront.magellan.BaseScreenView
+import com.xwray.groupie.BuildConfig
 
 @SuppressLint("ViewConstructor")
 class HomeScreenView internal constructor(ctx: Context, private val listener: Listener) :
@@ -80,7 +80,7 @@ class HomeScreenView internal constructor(ctx: Context, private val listener: Li
                 .alpha(0f)
                 .setDuration(shortAnimationDuration)
                 .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
+                    override fun onAnimationEnd(animation: Animator) {
                         viewFadeOut.visibility = View.GONE
                     }
                 })
@@ -92,15 +92,15 @@ class HomeScreenView internal constructor(ctx: Context, private val listener: Li
             return
         }
         when (error) {
-            HomeScreenView.NfcError.DISABLED -> {
+            NfcError.DISABLED -> {
                 errorTextView.setText(R.string.nfc_off_error)
                 errorButton.visibility = View.VISIBLE
             }
-            HomeScreenView.NfcError.UNAVAILABLE -> {
+            NfcError.UNAVAILABLE -> {
                 errorTextView.setText(R.string.nfc_unavailable)
                 errorButton.visibility = View.GONE
             }
-            HomeScreenView.NfcError.NONE -> { /* Unreachable */ }
+            NfcError.NONE -> { /* Unreachable */ }
         }
         errorViewGroup.visibility = View.VISIBLE
     }

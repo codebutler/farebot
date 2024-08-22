@@ -30,7 +30,7 @@ import android.nfc.TagLostException
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import android.view.Menu
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.app.core.activity.ActivityOperations
 import com.codebutler.farebot.app.core.analytics.AnalyticsEventName
 import com.codebutler.farebot.app.core.analytics.logAnalyticsEvent
@@ -44,7 +44,6 @@ import com.codebutler.farebot.app.feature.history.HistoryScreen
 import com.codebutler.farebot.app.feature.keys.KeysScreen
 import com.codebutler.farebot.app.feature.main.MainActivity.MainActivityComponent
 import com.codebutler.farebot.app.feature.prefs.FareBotPreferenceActivity
-import com.crashlytics.android.Crashlytics
 import com.uber.autodispose.kotlin.autoDisposable
 import dagger.Component
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -124,7 +123,7 @@ class HomeScreen : FareBotScreen<HomeScreen.HomeComponent, HomeScreenView>(),
                                 .setPositiveButton(android.R.string.ok, null)
                                 .show()
                         else -> {
-                            Crashlytics.logException(ex)
+//                            Crashlytics.logException(ex)
                             ErrorUtils.showErrorAlert(activity, ex)
                         }
                     }

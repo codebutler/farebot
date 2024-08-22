@@ -24,7 +24,7 @@ package com.codebutler.farebot.app.feature.card
 
 import android.content.Context
 import androidx.annotation.DrawableRes
-import com.codebutler.farebot.R
+import com.codebutler.farebot.app.R
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.Trip

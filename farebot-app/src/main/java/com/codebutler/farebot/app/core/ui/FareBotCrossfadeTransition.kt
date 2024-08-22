@@ -54,7 +54,7 @@ class FareBotCrossfadeTransition(context: Context) : Transition {
                 .alpha(0f)
                 .setDuration(shortAnimationDuration)
                 .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
+                    override fun onAnimationEnd(animation: Animator) {
                         viewFrom.visibility = View.GONE
                         callback.onAnimationEnd()
                     }

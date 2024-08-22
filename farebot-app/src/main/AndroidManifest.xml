@@ -69,7 +69,7 @@
             android:theme="@style/FareBot.Theme.Prefs"/>
 
         <activity
-            android:name=".app.feature.bg.BackgroundTagActivity"
+            android:name="com.codebutler.farebot.app.feature.bg.BackgroundTagActivity"
             android:enabled="false"
             android:exported="true"
             android:noHistory="true"
