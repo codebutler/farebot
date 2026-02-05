@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Card name -->
+    <string name="ndef_card_name">NDEF</string>
+
+    <!-- NDEF record types -->
+    <string name="ndef_empty_record">Empty Record</string>
+    <string name="ndef_rtd_record">NFC RTD Record</string>
+    <string name="ndef_uri_record">URI Record</string>
+    <string name="ndef_text_record">Text Record</string>
+    <string name="ndef_mime_record">MIME Type Record</string>
+    <string name="ndef_uri_typed_record">Absolute URI Record</string>
+    <string name="ndef_ext_typed_record">External Type Record</string>
+    <string name="ndef_android_pkg_record">Android Application</string>
+    <string name="ndef_binary_record">Unknown Binary</string>
+    <string name="ndef_invalid_record">Invalid Record</string>
+    <string name="ndef_wifi_record">Wi-Fi Configuration</string>
+
+    <!-- NDEF field labels -->
+    <string name="ndef_id">ID</string>
+    <string name="ndef_type">Type</string>
+    <string name="ndef_payload">Payload</string>
+    <string name="ndef_uri">URI</string>
+    <string name="ndef_text">Text</string>
+    <string name="ndef_text_encoding">Encoding</string>
+    <string name="ndef_text_language">Language</string>
+    <string name="ndef_android_pkg_value">Package</string>
+
+    <!-- Wi-Fi fields -->
+    <string name="ndef_wifi_ap_channel">AP Channel</string>
+    <string name="ndef_wifi_auth_types">Authentication Types</string>
+    <string name="ndef_wifi_enc_types">Encryption Types</string>
+    <string name="ndef_wifi_device_name">Device Name</string>
+    <string name="ndef_wifi_mac_address">MAC Address</string>
+    <string name="ndef_wifi_manufacturer">Manufacturer</string>
+    <string name="ndef_wifi_model_name">Model Name</string>
+    <string name="ndef_wifi_model_number">Model Number</string>
+    <string name="ndef_wifi_network_index">Network Index</string>
+    <string name="ndef_wifi_password">Password</string>
+    <string name="ndef_wifi_bands">Bands</string>
+    <string name="ndef_wifi_serial_number">Serial Number</string>
+    <string name="ndef_wifi_ssid">SSID</string>
+    <string name="ndef_wifi_uuid_enrollee">UUID Enrollee</string>
+    <string name="ndef_wifi_uuid_registrar">UUID Registrar</string>
+    <string name="ndef_wifi_wfa_extension">WFA Extension</string>
+    <string name="ndef_wifi_unknown_vendor_extension">Unknown Vendor Extension</string>
+    <string name="ndef_wifi_version1">Version 1.x</string>
+    <string name="ndef_wifi_version2">Version 2.x</string>
+    <string name="ndef_wifi_key_provided_automatically">Key Provided Automatically</string>
+    <string name="ndef_wifi_key_provided_automatically_yes">Yes</string>
+    <string name="ndef_wifi_key_provided_automatically_no">No</string>
+    <string name="ndef_wifi_key_is_shareable">Key Is Shareable</string>
+    <string name="ndef_wifi_key_is_shareable_yes">Yes</string>
+    <string name="ndef_wifi_key_is_shareable_no">No</string>
+    <string name="ndef_wifi_unknown">Unknown (%s)</string>
+    <string name="ndef_wifi_bitmap_unknown">Unknown bit %d</string>
+
+    <!-- Wi-Fi authentication types -->
+    <string name="ndef_wifi_authtype_open">Open</string>
+    <string name="ndef_wifi_authtype_wpa_personal">WPA Personal</string>
+    <string name="ndef_wifi_authtype_wep_shared">WEP Shared</string>
+    <string name="ndef_wifi_authtype_wpa_enterprise">WPA Enterprise</string>
+    <string name="ndef_wifi_authtype_wpa2_enterprise">WPA2 Enterprise</string>
+    <string name="ndef_wifi_authtype_wpa2_personal">WPA2 Personal</string>
+
+    <!-- Wi-Fi encryption types -->
+    <string name="ndef_wifi_enctype_unencrypted">Unencrypted</string>
+    <string name="ndef_wifi_enctype_wep">WEP</string>
+    <string name="ndef_wifi_enctype_tkip">TKIP</string>
+    <string name="ndef_wifi_enctype_aes">AES</string>
+
+    <string name="ndef_tnf">TNF</string>
+
+    <!-- Wi-Fi bands -->
+    <string name="ndef_wifi_band_2_4">2.4 GHz</string>
+    <string name="ndef_wifi_band_5">5 GHz</string>
+    <string name="ndef_wifi_band_60">60 GHz</string>
+</resources>
