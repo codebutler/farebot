@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cifial_card_name">Cifial</string>
+    <string name="cifial_hotel_room_number">Room Number</string>
+    <string name="cifial_hotel_checkin">Check-in</string>
+    <string name="cifial_hotel_checkout">Check-out</string>
+</resources>
