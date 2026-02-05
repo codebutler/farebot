@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS cards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    type TEXT NOT NULL,
+    serial TEXT NOT NULL,
+    data TEXT NOT NULL,
+    scanned_at INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM cards ORDER BY scanned_at DESC;
+
+selectById:
+SELECT * FROM cards WHERE id = ?;
+
+insert:
+INSERT INTO cards (type, serial, data, scanned_at) VALUES (?, ?, ?, ?);
+
+deleteById:
+DELETE FROM cards WHERE id = ?;

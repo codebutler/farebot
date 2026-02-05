@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS keys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    card_id TEXT NOT NULL,
+    card_type TEXT NOT NULL,
+    key_data TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM keys ORDER BY created_at DESC;
+
+selectByCardId:
+SELECT * FROM keys WHERE card_id = ?;
+
+insert:
+INSERT INTO keys (card_id, card_type, key_data, created_at) VALUES (?, ?, ?, ?);
+
+deleteById:
+DELETE FROM keys WHERE id = ?;

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  strings.xml
+
+  This file is part of FareBot.
+  Learn more at: https://codebutler.github.io/farebot/
+
+  Copyright (C) 2017 Eric Butler <eric@codebutler.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="about">About</string>
+    <string name="add">Add</string>
+    <string name="add_key">Add Key</string>
+    <string name="advanced">Advanced</string>
+    <string name="app_name">FareBot</string>
+    <string name="balance">Balance</string>
+    <string name="card_id">Card ID</string>
+    <string name="card_experimental">Experimental support.</string>
+    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
+    <string name="card_not_compatible">Not compatible with some devices.</string>
+    <string name="card_not_supported">Not supported by this device</string>
+    <string name="card_photo">Card Photo</string>
+    <string name="card_type">Card Type</string>
+    <string name="coming_soon">Coming Soon</string>
+    <string name="copied_to_clipboard">Copied to clipboard.</string>
+    <string name="copy">Copy</string>
+    <string name="export_all">Export All</string>
+    <string name="general">General</string>
+    <string name="history">History</string>
+    <string name="import_">Import</string>
+    <string name="import_clipboard">Import from Clipboard</string>
+    <string name="import_file">Import from File</string>
+    <string name="keys">Keys</string>
+    <string name="keys_required">Encryption keys are required to read this card.</string>
+    <string name="launch_from_background">Launch from background</string>
+    <string name="locked_card">Locked Card</string>
+    <string name="map">Map</string>
+    <string name="nfc_off_error">NFC is turned off</string>
+    <string name="nfc_unavailable">NFC Unavailable</string>
+    <string name="no_scanned_cards">You have not scanned any cards.</string>
+    <string name="no_information">No information to display</string>
+    <string name="preferences">Preferences</string>
+    <string name="refill">Refill</string>
+    <string name="save">Save</string>
+    <string name="saved_to_x">Saved to %s</string>
+    <string name="select_file">Select File</string>
+    <string name="share">Share</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="subscription_valid_format">Valid %1$s to %2$s</string>
+    <string name="supported_cards">Supported Cards</string>
+    <string name="tag_lost">Card Connection Lost</string>
+    <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
+    <string name="unknown_card">Unknown Card</string>
+    <string name="unknown_card_desc">This card is not supported by FareBot</string>
+    <string name="wireless_settings">Wireless Settings</string>
+    <string name="delete">Delete</string>
+    <string name="key_data">Key Data</string>
+    <string name="import_keys_proxmark">Import proxmark3 key dump</string>
+    <string name="error">Error</string>
+    <string name="nfc_disabled">NFC is disabled</string>
+    <string name="nfc_settings">NFC Settings</string>
+    <string name="scan_card">Scan a card to get started</string>
+    <string name="no_keys">No keys added yet.</string>
+</resources>

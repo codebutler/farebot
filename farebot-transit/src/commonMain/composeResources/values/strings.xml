@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Subscription info labels -->
+    <string name="subscription_seller_agency">Seller agency</string>
+    <string name="subscription_machine_id">Machine ID</string>
+    <string name="subscription_purchase_date">Purchase date</string>
+    <string name="subscription_last_used">Last used</string>
+    <string name="subscription_cost">Cost</string>
+    <string name="subscription_id">Subscription ID</string>
+    <string name="subscription_payment_method">Payment method</string>
+    <string name="subscription_free_transfers_until">Free transfers until</string>
+    <string name="subscription_remaining_trips_today">Remaining trips today</string>
+    <string name="subscription_travel_zone">Travel zone</string>
+    <string name="subscription_travel_zones">Travel zones</string>
+</resources>
