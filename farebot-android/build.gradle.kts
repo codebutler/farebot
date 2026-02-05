@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":farebot-card-desfire"))
     implementation(project(":farebot-card-felica"))
     implementation(project(":farebot-card-ultralight"))
+    implementation(project(":farebot-card-iso7816"))
     implementation(project(":farebot-card-ksx6924"))
     implementation(project(":farebot-card-china"))
     implementation(project(":farebot-transit"))

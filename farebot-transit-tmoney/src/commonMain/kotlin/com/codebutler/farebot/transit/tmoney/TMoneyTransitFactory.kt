@@ -105,13 +105,18 @@ class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
             aidHex != null && aidHex in KSX6924_AIDS
         } ?: return null
 
-        // Get balance from tag in response - this is simplified since we don't have
-        // the full protocol implementation. We'll use any available balance data.
-        val balanceData = ByteArray(4) { 0 }
+        // Extract balance data stored by ISO7816CardReader with "balance/0" key
+        val balanceData = app.getFile("balance/0")?.binaryData ?: ByteArray(4) { 0 }
+
+        // Extract extra records stored with "extra/N" keys
+        val extraRecords = (0..0xf).mapNotNull { i ->
+            app.getFile("extra/$i")?.binaryData
+        }
 
         return KSX6924Application(
             application = app,
-            balance = balanceData
+            balance = balanceData,
+            extraRecords = extraRecords
         )
     }
 

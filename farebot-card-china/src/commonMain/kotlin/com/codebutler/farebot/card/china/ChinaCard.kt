@@ -102,15 +102,7 @@ data class ChinaCard(
             // Look for an application with type "china"
             val chinaApp = card.getApplication(TYPE)
             if (chinaApp != null) {
-                // If we have a china-typed application, convert it
-                // Note: balances would need to be stored separately in serialized form
-                return ChinaCard(
-                    appName = chinaApp.appName,
-                    appFci = chinaApp.appFci,
-                    files = chinaApp.files,
-                    sfiFiles = chinaApp.sfiFiles,
-                    balances = emptyMap() // Balances are not in ISO7816Application
-                )
+                return fromApplication(chinaApp)
             }
 
             // Try to find by known China AIDs
@@ -118,18 +110,36 @@ data class ChinaCard(
                 for (appNameBytes in factory.appNames) {
                     val app = card.getApplicationByName(appNameBytes)
                     if (app != null) {
-                        return ChinaCard(
-                            appName = app.appName,
-                            appFci = app.appFci,
-                            files = app.files,
-                            sfiFiles = app.sfiFiles,
-                            balances = emptyMap()
-                        )
+                        return fromApplication(app)
                     }
                 }
             }
 
             return null
+        }
+
+        private fun fromApplication(app: ISO7816Application): ChinaCard {
+            // Extract balance data stored with special "balance/N" keys
+            val balances = mutableMapOf<Int, ByteArray>()
+            val regularFiles = mutableMapOf<String, ISO7816File>()
+            for ((key, file) in app.files) {
+                if (key.startsWith("balance/")) {
+                    val idx = key.removePrefix("balance/").toIntOrNull()
+                    val data = file.binaryData
+                    if (idx != null && data != null) {
+                        balances[idx] = data
+                    }
+                } else {
+                    regularFiles[key] = file
+                }
+            }
+            return ChinaCard(
+                appName = app.appName,
+                appFci = app.appFci,
+                files = regularFiles,
+                sfiFiles = app.sfiFiles,
+                balances = balances
+            )
         }
     }
 }

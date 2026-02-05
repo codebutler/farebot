@@ -28,7 +28,6 @@ import com.codebutler.farebot.card.TagReader
 import com.codebutler.farebot.card.cepas.CEPASTagReader
 import com.codebutler.farebot.card.classic.ClassicTagReader
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
-import com.codebutler.farebot.card.desfire.DesfireTagReader
 import com.codebutler.farebot.card.felica.FelicaTagReader
 import com.codebutler.farebot.card.ultralight.UltralightTagReader
 import com.codebutler.farebot.key.CardKeys
@@ -41,7 +40,7 @@ class TagReaderFactory {
         cardKeys: CardKeys?
     ): TagReader<*, *, *> = when {
         "android.nfc.tech.NfcB" in tag.techList -> CEPASTagReader(tagId, tag)
-        "android.nfc.tech.IsoDep" in tag.techList -> DesfireTagReader(tagId, tag)
+        "android.nfc.tech.IsoDep" in tag.techList -> ISO7816TagReader(tagId, tag)
         "android.nfc.tech.NfcF" in tag.techList -> FelicaTagReader(tagId, tag)
         "android.nfc.tech.MifareClassic" in tag.techList -> ClassicTagReader(tagId, tag, cardKeys as ClassicCardKeys?)
         "android.nfc.tech.MifareUltralight" in tag.techList -> UltralightTagReader(tagId, tag)
