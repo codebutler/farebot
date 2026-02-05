@@ -1,0 +1,12 @@
+<resources>
+    <string name="yargor_card_name">YarGor</string>
+    <string name="yargor_location">Yaroslavl</string>
+    <string name="yargor_sub_weekday_tram">Weekday Tram</string>
+    <string name="yargor_sub_weekday_trolley">Weekday Trolleybus</string>
+    <string name="yargor_sub_allday_all">All-Day All Transport</string>
+    <string name="yargor_transports_valid">Transports valid</string>
+    <string name="yargor_mode_bus">Bus</string>
+    <string name="yargor_mode_tram">Tram</string>
+    <string name="yargor_mode_trolleybus">Trolleybus</string>
+    <string name="yargor_unknown_format">Unknown (%s)</string>
+</resources>
