@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bip_card_name">bip!</string>
+    <string name="bip_location">Santiago de Chile, Chile</string>
+    <string name="bip_card_type">Card type</string>
+    <string name="bip_card_type_anonymous">Anonymous</string>
+    <string name="bip_card_type_personal">Personal</string>
+    <string name="bip_card_holders_name">Holder name</string>
+    <string name="bip_card_holders_id">Holder ID</string>
+</resources>
