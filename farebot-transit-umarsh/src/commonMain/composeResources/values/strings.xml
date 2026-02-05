@@ -1,0 +1,45 @@
+<resources>
+    <string name="umarsh_card_name">Umarsh</string>
+    <string name="umarsh_adult">Adult</string>
+    <string name="umarsh_student">Student</string>
+    <string name="umarsh_school">School</string>
+    <!-- City card names -->
+    <string name="card_name_yoshkar_ola">Yoshkar-Ola Transport Card</string>
+    <string name="card_name_strizh">Strizh (Izhevsk)</string>
+    <string name="card_name_barnaul">Barnaul Transport Card</string>
+    <string name="card_name_siticard_vladimir">Siticard (Vladimir)</string>
+    <string name="card_name_kirov">Kirov Transport Card</string>
+    <string name="card_name_siticard">Siticard (Nizhny Novgorod)</string>
+    <string name="card_name_omka">Omka (Omsk)</string>
+    <string name="card_name_penza">Penza Transport Card</string>
+    <string name="card_name_ekarta">Ekarta (Yekaterinburg)</string>
+    <string name="card_name_crimea_trolleybus">Crimea Trolleybus</string>
+    <string name="card_name_crimea_parus_school">Crimea Parus (School)</string>
+    <!-- Tariff names -->
+    <string name="barnaul_ewallet">E-wallet</string>
+    <string name="siticard_adult_60min_xfer_purse">Adult 60-min transfer purse</string>
+    <string name="siticard_purse_sarov">Purse (Sarov)</string>
+    <string name="siticard_edinyj_3_days">Edinyj 3 days</string>
+    <string name="siticard_adult_90min_xfer_purse">Adult 90-min transfer purse</string>
+    <string name="siticard_edinyj_16_trips">Edinyj 16 trips</string>
+    <string name="siticard_edinyj_30_trips">Edinyj 30 trips</string>
+    <string name="siticard_aerial_tramway">Aerial tramway</string>
+    <string name="monthly_subscription">Monthly subscription</string>
+    <!-- Omsk tariff names -->
+    <string name="card_name_russia_omsk_citizen">Citizen card</string>
+    <string name="card_name_russia_omsk_pensioner">Pensioner card</string>
+    <string name="card_name_russia_omsk_social">Social card</string>
+    <string name="card_name_russia_omsk_school_unlimited_15d">School unlimited (15 days)</string>
+    <string name="card_name_russia_omsk_school_unlimited_1m">School unlimited (1 month)</string>
+    <string name="card_name_russia_omsk_adult_unlimited_15d">Adult unlimited (15 days)</string>
+    <string name="card_name_russia_omsk_adult_unlimited_1m">Adult unlimited (1 month)</string>
+    <string name="card_name_russia_omsk_adult_60d_60t">Adult 60 days / 60 trips</string>
+    <string name="card_name_russia_omsk_adult_60d_30t">Adult 60 days / 30 trips</string>
+    <!-- Info labels -->
+    <string name="umarsh_refill_counter">Refill counter</string>
+    <string name="umarsh_expiry_date">Expiry date</string>
+    <string name="umarsh_region">Region</string>
+    <string name="umarsh_last_refill">Last refill</string>
+    <string name="umarsh_machine_id">Machine ID</string>
+    <string name="umarsh_unknown">Unknown (%s)</string>
+</resources>
