@@ -1,0 +1,32 @@
+<resources>
+    <string name="ovc_unknown_format">Unknown (%s)</string>
+    <string name="ovc_card_name">OV-Chipkaart</string>
+    <string name="ovc_personal">Personal</string>
+    <string name="ovc_anonymous">Anonymous</string>
+    <string name="ovc_yes">Yes</string>
+    <string name="ovc_no">No</string>
+    <string name="ovc_hardware_information">Hardware Information</string>
+    <string name="ovc_manufacturer_id">Manufacturer ID</string>
+    <string name="ovc_publisher_id">Publisher ID</string>
+    <string name="ovc_general_information">General Information</string>
+    <string name="ovc_serial_number">Serial Number</string>
+    <string name="ovc_expiration_date">Expiration Date</string>
+    <string name="ovc_card_type">Card Type</string>
+    <string name="ovc_issuer">Issuer</string>
+    <string name="ovc_banned">Banned</string>
+    <string name="ovc_personal_information">Personal Information</string>
+    <string name="ovc_birthdate">Birthdate</string>
+    <string name="ovc_credit_information">Credit Information</string>
+    <string name="ovc_credit_slot_id">Credit Slot ID</string>
+    <string name="ovc_last_credit_id">Last Credit ID</string>
+    <string name="ovc_credit">Credit</string>
+    <string name="ovc_autocharge">Autocharge</string>
+    <string name="ovc_autocharge_limit">Autocharge Limit</string>
+    <string name="ovc_autocharge_charge">Autocharge Charge</string>
+    <string name="ovc_recent_slots">Recent Slots</string>
+    <string name="ovc_transaction_slot">Transaction Slot</string>
+    <string name="ovc_info_slot">Info Slot</string>
+    <string name="ovc_subscription_slot">Subscription Slot</string>
+    <string name="ovc_travelhistory_slot">Travelhistory Slot</string>
+    <string name="ovc_credit_slot">Credit Slot</string>
+</resources>
