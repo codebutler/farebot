@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="manly_card_name">Manly Fast Ferry</string>
     <string name="card_epoch">Card Epoch</string>
 </resources>

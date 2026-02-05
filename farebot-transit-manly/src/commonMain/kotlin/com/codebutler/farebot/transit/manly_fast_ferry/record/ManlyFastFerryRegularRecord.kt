@@ -1,5 +1,5 @@
 /*
- * ManlyFastFerryRecord.java
+ * ManlyFastFerryRegularRecord.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -21,12 +21,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.manly_fast_ferry.record;
+package com.codebutler.farebot.transit.manly_fast_ferry.record
 
 /**
- * Represents a record inside of a Manly Fast Ferry
+ * Represents a "regular" type record.
  */
-public class ManlyFastFerryRecord {
+open class ManlyFastFerryRegularRecord : ManlyFastFerryRecord() {
 
-    ManlyFastFerryRecord() { }
+    companion object {
+        fun recordFromBytes(input: ByteArray): ManlyFastFerryRegularRecord? {
+            if (input[0] != 0x02.toByte()) {
+                throw AssertionError("Regular record must start with 0x02")
+            }
+
+            return when (input[1]) {
+                0x02.toByte() -> ManlyFastFerryPurseRecord.recordFromBytes(input)
+                0x03.toByte() -> ManlyFastFerryMetadataRecord.recordFromBytes(input)
+                else -> null // Unknown record type
+            }
+        }
+    }
 }
