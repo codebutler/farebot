@@ -1,0 +1,5 @@
+<resources>
+    <string name="lax_tap_card_name">TAP</string>
+    <string name="lax_tap_long_name">Transit Access Pass</string>
+    <string name="lax_tap_unknown_route">Unknown (%s)</string>
+</resources>
