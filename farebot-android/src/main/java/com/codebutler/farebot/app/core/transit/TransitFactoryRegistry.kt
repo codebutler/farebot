@@ -99,6 +99,7 @@ import com.codebutler.farebot.transit.selecta.SelectaFranceTransitFactory
 import com.codebutler.farebot.transit.umarsh.UmarshTransitFactory
 import com.codebutler.farebot.transit.warsaw.WarsawTransitFactory
 import com.codebutler.farebot.transit.zolotayakorona.ZolotayaKoronaTransitFactory
+import com.codebutler.farebot.transit.adelaide.AdelaideTransitFactory
 import com.codebutler.farebot.transit.hafilat.HafilatTransitFactory
 import com.codebutler.farebot.transit.intercard.IntercardTransitFactory
 import com.codebutler.farebot.transit.magnacarta.MagnaCartaTransitFactory
@@ -144,6 +145,7 @@ fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistr
     registry.registerFactory(CardType.MifareDesfire, OpalTransitFactory(stringResource))
     registry.registerFactory(CardType.MifareDesfire, MykiTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, LeapTransitFactory())
+    registry.registerFactory(CardType.MifareDesfire, AdelaideTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, HafilatTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, IntercardTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, MagnaCartaTransitFactory())

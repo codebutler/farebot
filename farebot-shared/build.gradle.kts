@@ -105,6 +105,7 @@ kotlin {
             api(project(":farebot-transit-waikato"))
             api(project(":farebot-transit-bonobus"))
             api(project(":farebot-transit-cifial"))
+            api(project(":farebot-transit-adelaide"))
             api(project(":farebot-transit-hafilat"))
             api(project(":farebot-transit-intercard"))
             api(project(":farebot-transit-kazan"))

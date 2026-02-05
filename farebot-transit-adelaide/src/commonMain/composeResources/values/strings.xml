@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_name_adelaide">metroCARD</string>
+    <string name="location_adelaide">Adelaide, Australia</string>
+    <string name="card_note_adelaide">Card data is preliminary.</string>
+    <string name="ticket_type">Ticket Type</string>
+    <string name="machine_id">Machine ID</string>
+    <string name="issue_date">Issue Date</string>
+    <string name="purse_serial_number">Purse Serial Number</string>
+    <string name="adelaide_ticket_type_regular">Regular</string>
+    <string name="adelaide_ticket_type_concession">Concession</string>
+</resources>

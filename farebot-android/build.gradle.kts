@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":farebot-transit-tampere"))
     implementation(project(":farebot-transit-bonobus"))
     implementation(project(":farebot-transit-cifial"))
+    implementation(project(":farebot-transit-adelaide"))
     implementation(project(":farebot-transit-hafilat"))
     implementation(project(":farebot-transit-intercard"))
     implementation(project(":farebot-transit-kazan"))

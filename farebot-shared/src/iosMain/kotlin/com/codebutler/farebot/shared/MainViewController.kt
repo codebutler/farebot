@@ -58,6 +58,7 @@ import com.codebutler.farebot.transit.nextfareul.NextfareUnknownUltralightTransi
 import com.codebutler.farebot.transit.ventra.VentraUltralightTransitInfo
 import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.tfi_leap.LeapTransitFactory
+import com.codebutler.farebot.transit.adelaide.AdelaideTransitFactory
 import com.codebutler.farebot.transit.hafilat.HafilatTransitFactory
 import com.codebutler.farebot.transit.intercard.IntercardTransitFactory
 import com.codebutler.farebot.transit.magnacarta.MagnaCartaTransitFactory
@@ -155,6 +156,7 @@ private fun createIosTransitFactoryRegistry(): TransitFactoryRegistry {
     registry.registerFactory(CardType.MifareDesfire, OpalTransitFactory(stringResource))
     registry.registerFactory(CardType.MifareDesfire, MykiTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, LeapTransitFactory())
+    registry.registerFactory(CardType.MifareDesfire, AdelaideTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, HafilatTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, IntercardTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, MagnaCartaTransitFactory())
