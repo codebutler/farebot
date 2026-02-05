@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kiev_card_name">Kyiv Metro</string>
+    <string name="kiev_location">Kyiv, Ukraine</string>
+    <string name="kiev_agency_metro">Metro</string>
+    <string name="kiev_agency_unknown">Unknown (%s)</string>
+</resources>
