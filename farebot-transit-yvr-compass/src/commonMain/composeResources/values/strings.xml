@@ -1,0 +1,21 @@
+<resources>
+    <string name="compass_location">Vancouver</string>
+    <string name="compass_note">Single ride tickets only</string>
+    <string name="compass_card_name">Compass</string>
+    <string name="compass_product_daypass">DayPass</string>
+    <string name="compass_product_one_zone">One Zone</string>
+    <string name="compass_product_two_zone">Two Zone</string>
+    <string name="compass_product_three_zone">Three Zone</string>
+    <string name="compass_product_four_zone_wce">Four Zone WCE (one way)</string>
+    <string name="compass_product_sea_island_free">Sea Island free ticket</string>
+    <string name="compass_product_exit">Exit</string>
+    <string name="compass_product_one_zone_yvr">One Zone with YVR</string>
+    <string name="compass_product_two_zone_yvr">Two Zone with YVR</string>
+    <string name="compass_product_three_zone_yvr">Three Zone with YVR</string>
+    <string name="compass_product_daypass_yvr">DayPass with YVR</string>
+    <string name="compass_product_bulk_daypass">Bulk DayPass</string>
+    <string name="compass_product_bulk_one_zone">Bulk One Zone</string>
+    <string name="compass_product_bulk_two_zone">Bulk Two Zone</string>
+    <string name="compass_product_bulk_three_zone">Bulk Three Zone</string>
+    <string name="compass_product_gradpass">GradPass</string>
+</resources>
