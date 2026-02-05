@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="serial_only_card_header">Limited card support</string>
+    <string name="serial_only_card_description_not_stored">This card does not store data that FareBot can read.</string>
+    <string name="serial_only_card_description_locked">The data on this card is locked and cannot be read by FareBot.</string>
+    <string name="serial_only_card_description_more_research">More research is needed to read this card.</string>
+    <string name="card_format">Card format</string>
+    <string name="card_serial_number">Card serial number</string>
+    <string name="card_type">Card type</string>
+    <string name="last_transaction">Last transaction</string>
+    <string name="never">Never</string>
+    <string name="manufacture_id">Manufacturing ID</string>
+    <string name="issue_date">Issue date</string>
+    <string name="full_serial_number">Full serial number</string>
+    <string name="card_name_nol">Nol</string>
+    <string name="card_name_strelka">Strelka</string>
+    <string name="nol_silver">Silver</string>
+    <string name="nol_red">Red</string>
+    <string name="unknown_format">Unknown (%s)</string>
+    <string name="istanbulkart_2nd_card_number">2nd card number</string>
+    <string name="strelka_long_serial">Long serial number</string>
+    <string name="barcode_serial">Barcode serial</string>
+    <string name="unknown">Unknown</string>
+    <string name="country">Country</string>
+    <string name="country_code_format">Country code %d</string>
+    <string name="expiry_date">Expiry date</string>
+    <string name="owner_company">Owner company</string>
+    <string name="retailer_company">Retailer company</string>
+    <string name="unknown_company">Unknown (%d)</string>
+</resources>

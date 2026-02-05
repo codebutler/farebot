@@ -1,0 +1,29 @@
+/*
+ * StrelkaTransitInfo.kt
+ *
+ * Copyright 2015-2016 Michael Farrell <micolous+git@gmail.com>
+ * Copyright 2018 Google
+ * Copyright 2025 Eric Butler <eric@codebutler.com>
+ *
+ * Ported from Metrodroid (https://github.com/metrodroid/metrodroid)
+ */
+
+package com.codebutler.farebot.transit.serialonly
+
+import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemInterface
+import farebot.farebot_transit_serialonly.generated.resources.Res
+import farebot.farebot_transit_serialonly.generated.resources.card_name_strelka
+import farebot.farebot_transit_serialonly.generated.resources.strelka_long_serial
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
+
+class StrelkaTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() {
+
+    override val extraInfo: List<ListItemInterface>
+        get() = listOf(ListItem(Res.string.strelka_long_serial, mSerial))
+
+    override val reason get() = Reason.MORE_RESEARCH_NEEDED
+    override val serialNumber get() = StrelkaTransitFactory.formatShortSerial(mSerial)
+    override val cardName get() = runBlocking { getString(Res.string.card_name_strelka) }
+}
