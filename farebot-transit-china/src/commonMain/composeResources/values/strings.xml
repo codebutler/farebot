@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Card Names -->
+    <string name="card_name_beijing">Beijing Municipal Card</string>
+    <string name="card_name_cityunion">City Union</string>
+    <string name="card_name_shanghai">Shanghai Public Transportation Card</string>
+    <string name="card_name_szt">Shenzhen Tong</string>
+    <string name="card_name_tunion">T-Union</string>
+    <string name="card_name_wuhantong">Wuhan Tong</string>
+
+    <!-- Locations -->
+    <string name="location_beijing">Beijing, China</string>
+    <string name="location_china_mainland">Mainland China</string>
+    <string name="location_shanghai">Shanghai, China</string>
+    <string name="location_shenzhen">Shenzhen, China</string>
+    <string name="location_wuhan">Wuhan, China</string>
+
+    <!-- City Union -->
+    <string name="city_union_city">City</string>
+
+    <!-- Shenzhen -->
+    <string name="szt_metro">Shenzhen Metro</string>
+    <string name="szt_bus">Shenzhen Bus</string>
+    <string name="szt_station_gate">Gate %s</string>
+
+    <!-- Generic -->
+    <string name="unknown_format">Unknown (%s)</string>
+</resources>
