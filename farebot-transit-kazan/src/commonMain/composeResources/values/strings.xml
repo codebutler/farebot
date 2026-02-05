@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_name_kazan">Kazan Transport Card</string>
+    <string name="location_kazan">Kazan, Russia</string>
+    <string name="kazan_blank">Blank</string>
+    <string name="kazan_unknown_unlimited">Unknown unlimited (0x60)</string>
+    <string name="kazan_unknown_type">Unknown (0x%s)</string>
+</resources>
