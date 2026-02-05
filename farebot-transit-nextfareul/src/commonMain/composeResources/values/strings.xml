@@ -1,0 +1,9 @@
+<resources>
+    <string name="nextfareul_card_name">Nextfare Ultralight</string>
+    <string name="nextfareul_ticket_type">Ticket type</string>
+    <string name="nextfareul_ticket_type_concession">Concession</string>
+    <string name="nextfareul_ticket_type_regular">Regular</string>
+    <string name="nextfareul_product_type">Product type</string>
+    <string name="nextfareul_machine_code">Machine code</string>
+    <string name="nextfareul_note">Single ride tickets only</string>
+</resources>
