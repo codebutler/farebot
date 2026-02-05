@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-    Opal (Sydney, AU).
-    These are deliberately separated strings in order to match the terminology of the agency.
--->
 <resources>
+    <string name="location_sydney">Sydney, NSW</string>
     <string name="opal_automatic_top_up">Automatic top up</string>
+    <string name="opal_agency_tfnsw">Transport for NSW</string>
+    <string name="opal_agency_tfnsw_short">TfNSW</string>
     <string name="opal_weekly_trips">Weekly trips</string>
     <string name="opal_vehicle_bus">Bus</string>
     <string name="opal_vehicle_ferry_lr">Ferry or Light Rail</string>
@@ -21,7 +19,7 @@
     <string name="opal_action_journey_completed_auto_off">Journey completed (failure to tap off)</string>
     <string name="opal_action_journey_completed_auto_on">Journey completed (failure to tap on)</string>
     <string name="opal_action_tap_on_reversal">Tap on reversal</string>
-
+    <string name="opal_action_tap_on_rejected">Tap on rejected</string>
 
     <string name="opal_general">General</string>
     <string name="opal_transaction_sequence">#</string>

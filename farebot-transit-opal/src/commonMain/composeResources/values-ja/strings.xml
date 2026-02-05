@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="opal_action_journey_completed_auto_off">旅を完了しました (取り出しに失敗)</string>
   <string name="opal_action_journey_completed_auto_on">旅を完了しました (挿入に失敗)</string>
