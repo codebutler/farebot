@@ -1,0 +1,5 @@
+<resources>
+    <string name="oyster_card_name">Oyster</string>
+    <string name="oyster_travelpass">Travelpass</string>
+    <string name="oyster_online_services">https://oyster.tfl.gov.uk/</string>
+</resources>
