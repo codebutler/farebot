@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ksx6924_card_type">Card Type</string>
+    <string name="ksx6924_crypto_algorithm">Crypto Algorithm</string>
+    <string name="ksx6924_encryption_key_version">Encryption Key Version</string>
+    <string name="ksx6924_card_issuer">Card Issuer</string>
+    <string name="ksx6924_auth_id">Authentication ID</string>
+    <string name="ksx6924_ticket_type">Ticket Type</string>
+    <string name="ksx6924_discount_type">Discount Type</string>
+    <string name="ksx6924_max_balance">Maximum Balance</string>
+    <string name="ksx6924_branch_code">Branch Code</string>
+    <string name="ksx6924_one_time_limit">One Time Transaction Limit</string>
+    <string name="ksx6924_mobile_carrier">Mobile Carrier</string>
+    <string name="ksx6924_financial_institution">Financial Institution Name</string>
+    <string name="ksx6924_rfu">RFU</string>
+</resources>
