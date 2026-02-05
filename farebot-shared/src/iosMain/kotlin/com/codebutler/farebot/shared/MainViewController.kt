@@ -1,48 +1,37 @@
-/*
- * TransitFactoryRegistry.kt
- *
- * This file is part of FareBot.
- * Learn more at: https://codebutler.github.io/farebot/
- *
- * Copyright (C) 2017 Eric Butler <eric@codebutler.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+package com.codebutler.farebot.shared
 
-package com.codebutler.farebot.app.core.transit
-
-import android.content.Context
-import com.codebutler.farebot.shared.sample.SampleTransitFactory
-import com.codebutler.farebot.app.core.util.AndroidStringResource
+import androidx.compose.ui.window.ComposeUIViewController
+import com.codebutler.farebot.base.util.BundledDatabaseDriverFactory
+import com.codebutler.farebot.base.util.DefaultStringResource
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.persist.CardKeysPersister
+import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
+import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
+import com.codebutler.farebot.persist.CardPersister
+import com.codebutler.farebot.persist.db.DbCardKeysPersister
+import com.codebutler.farebot.persist.db.DbCardPersister
+import com.codebutler.farebot.persist.db.FareBotDb
+import com.codebutler.farebot.shared.di.sharedModule
+import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.IosNfcScanner
+import com.codebutler.farebot.shared.platform.IosPlatformActions
+import com.codebutler.farebot.shared.sample.SampleTransitFactory
+import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
-import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitFactory
+import com.codebutler.farebot.shared.ui.screen.ALL_SUPPORTED_CARDS
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
-import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
 import com.codebutler.farebot.transit.edy.EdyTransitFactory
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
-import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitFactory
+import com.codebutler.farebot.transit.kmt.KMTTransitFactory
+import com.codebutler.farebot.transit.mrtj.MRTJTransitFactory
 import com.codebutler.farebot.transit.myki.MykiTransitFactory
 import com.codebutler.farebot.transit.octopus.OctopusTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.orca.OrcaTransitFactory
-import com.codebutler.farebot.transit.ovc.OVChipTransitFactory
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
-import com.codebutler.farebot.transit.kmt.KMTTransitFactory
-import com.codebutler.farebot.transit.mrtj.MRTJTransitFactory
 import com.codebutler.farebot.transit.clipper.ClipperUltralightTransitFactory
 import com.codebutler.farebot.transit.ultralight.TroikaUltralightTransitFactory
 import com.codebutler.farebot.transit.ultralight.VeneziaUltralightTransitFactory
@@ -68,37 +57,7 @@ import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
 import com.codebutler.farebot.transit.nextfareul.NextfareUnknownUltralightTransitInfo
 import com.codebutler.farebot.transit.ventra.VentraUltralightTransitInfo
 import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
-import com.codebutler.farebot.transit.msp_goto.MspGotoTransitFactory
-import com.codebutler.farebot.transit.waikato.WaikatoCardTransitFactory
-import com.codebutler.farebot.transit.troika.TroikaTransitFactory
-import com.codebutler.farebot.transit.oyster.OysterTransitFactory
-import com.codebutler.farebot.transit.charlie.CharlieCardTransitFactory
-import com.codebutler.farebot.transit.gautrain.GautrainTransitFactory
-import com.codebutler.farebot.transit.smartrider.SmartRiderTransitFactory
-import com.codebutler.farebot.transit.podorozhnik.PodorozhnikTransitFactory
-import com.codebutler.farebot.transit.touchngo.TouchnGoTransitFactory
 import com.codebutler.farebot.transit.tfi_leap.LeapTransitFactory
-import com.codebutler.farebot.transit.lax_tap.LaxTapTransitFactory
-import com.codebutler.farebot.transit.ricaricami.RicaricaMiTransitFactory
-import com.codebutler.farebot.transit.yargor.YarGorTransitFactory
-import com.codebutler.farebot.transit.chc_metrocard.ChcMetrocardTransitFactory
-import com.codebutler.farebot.transit.erg.ErgTransitInfo
-import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
-import com.codebutler.farebot.transit.bip.BipTransitFactory
-import com.codebutler.farebot.transit.bonobus.BonobusTransitFactory
-import com.codebutler.farebot.transit.cifial.CifialTransitFactory
-import com.codebutler.farebot.transit.kazan.KazanTransitFactory
-import com.codebutler.farebot.transit.kiev.KievTransitFactory
-import com.codebutler.farebot.transit.komuterlink.KomuterLinkTransitFactory
-import com.codebutler.farebot.transit.metromoney.MetroMoneyTransitFactory
-import com.codebutler.farebot.transit.metroq.MetroQTransitFactory
-import com.codebutler.farebot.transit.otago.OtagoGoCardTransitFactory
-import com.codebutler.farebot.transit.pilet.KievDigitalTransitFactory
-import com.codebutler.farebot.transit.pilet.TartuTransitFactory
-import com.codebutler.farebot.transit.selecta.SelectaFranceTransitFactory
-import com.codebutler.farebot.transit.umarsh.UmarshTransitFactory
-import com.codebutler.farebot.transit.warsaw.WarsawTransitFactory
-import com.codebutler.farebot.transit.zolotayakorona.ZolotayaKoronaTransitFactory
 import com.codebutler.farebot.transit.hafilat.HafilatTransitFactory
 import com.codebutler.farebot.transit.intercard.IntercardTransitFactory
 import com.codebutler.farebot.transit.magnacarta.MagnaCartaTransitFactory
@@ -110,24 +69,76 @@ import com.codebutler.farebot.transit.serialonly.NolTransitFactory
 import com.codebutler.farebot.transit.serialonly.NorticTransitFactory
 import com.codebutler.farebot.transit.serialonly.PrestoTransitFactory
 import com.codebutler.farebot.transit.serialonly.TrimetHopTransitFactory
-import com.codebutler.farebot.transit.serialonly.StrelkaTransitFactory
-import com.codebutler.farebot.transit.serialonly.SunCardTransitFactory
 import com.codebutler.farebot.transit.krocap.KROCAPTransitFactory
-import com.codebutler.farebot.transit.ndef.NdefClassicTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefFelicaTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefUltralightTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefVicinityTransitFactory
-import com.codebutler.farebot.transit.unknown.BlankClassicTransitFactory
 import com.codebutler.farebot.transit.unknown.BlankDesfireTransitFactory
-import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitFactory
 import com.codebutler.farebot.transit.unknown.UnauthorizedDesfireTransitFactory
 import com.codebutler.farebot.transit.china.ChinaTransitRegistry
+import com.codebutler.farebot.shared.platform.PlatformActions
+import com.codebutler.farebot.shared.settings.AppSettings
+import kotlinx.serialization.json.Json
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
-fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistry {
+fun MainViewController() = ComposeUIViewController {
+    val platformActions = IosPlatformActions()
+
+    FareBotApp(
+        platformActions = platformActions,
+        supportedCards = ALL_SUPPORTED_CARDS,
+        isMifareClassicSupported = false,
+    )
+}
+
+fun handleImportedFileContent(content: String) {
+    org.koin.mp.KoinPlatform.getKoin().get<CardImporter>().submitImport(content)
+}
+
+fun initKoin() {
+    startKoin {
+        modules(sharedModule, iosModule)
+    }
+}
+
+private val iosModule = module {
+    single<StringResource> { DefaultStringResource() }
+
+    single {
+        Json {
+            serializersModule = FareBotSerializersModule
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
+    }
+
+    single<CardSerializer> { KotlinxCardSerializer(get()) }
+
+    single {
+        val driver = BundledDatabaseDriverFactory().createDriver("farebot.db", FareBotDb.Schema)
+        FareBotDb(driver)
+    }
+
+    single<CardPersister> { DbCardPersister(get()) }
+
+    single<CardKeysPersister> { DbCardKeysPersister(get()) }
+
+    single<TransitFactoryRegistry> { createIosTransitFactoryRegistry() }
+
+    single<CardScanner> { IosNfcScanner() }
+
+    single { AppSettings() }
+
+    single<PlatformActions> { IosPlatformActions() }
+}
+
+private fun createIosTransitFactoryRegistry(): TransitFactoryRegistry {
     // Register China transit factories
     ChinaTransitRegistry.registerAll()
+
     val registry = TransitFactoryRegistry()
-    val stringResource = AndroidStringResource()
+    val stringResource = DefaultStringResource()
 
     // FeliCa factories
     registry.registerFactory(CardType.FeliCa, SuicaTransitFactory(stringResource))
@@ -159,49 +170,6 @@ fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistr
     registry.registerFactory(CardType.MifareDesfire, BlankDesfireTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, UnauthorizedDesfireTransitFactory())
 
-    // Classic factories
-    registry.registerFactory(CardType.MifareClassic, OVChipTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareClassic, BilheteUnicoSPTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, ManlyFastFerryTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, SeqGoTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, EasyCardTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareClassic, TroikaTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, OysterTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, CharlieCardTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, GautrainTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, SmartRiderTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareClassic, NextfareTransitInfo.NextfareTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, PodorozhnikTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareClassic, TouchnGoTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, LaxTapTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, RicaricaMiTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, YarGorTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, ChcMetrocardTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, ErgTransitInfo.ErgTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, KomuterLinkTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, BonobusTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, CifialTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, KazanTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, KievTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, KievDigitalTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, TartuTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, MetroMoneyTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, MetroQTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, OtagoGoCardTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, SelectaFranceTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, UmarshTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, WarsawTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, ZolotayaKoronaTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, BipTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, MspGotoTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, WaikatoCardTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, StrelkaTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, SunCardTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, NdefClassicTransitFactory())
-    // Classic catch-all handlers (must be LAST for Classic)
-    registry.registerFactory(CardType.MifareClassic, BlankClassicTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, UnauthorizedClassicTransitFactory())
-
     // ISO7816 / Calypso factories
     registry.registerFactory(CardType.ISO7816, OpusTransitFactory(stringResource))
     registry.registerFactory(CardType.ISO7816, RavKavTransitFactory(stringResource))
@@ -219,6 +187,8 @@ fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistr
 
     // CEPAS factories
     registry.registerFactory(CardType.CEPAS, EZLinkTransitFactory(stringResource))
+
+    // Note: MIFARE Classic is not supported on iOS (no hardware support)
 
     // Ultralight factories (order matters - specific checks first, catch-alls last)
     registry.registerFactory(CardType.MifareUltralight, TroikaUltralightTransitFactory())

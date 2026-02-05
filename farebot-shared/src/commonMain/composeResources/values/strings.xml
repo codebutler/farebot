@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about">About</string>
+    <string name="add">Add</string>
+    <string name="add_key">Add Key</string>
+    <string name="advanced">Advanced</string>
+    <string name="app_name">FareBot</string>
+    <string name="back">Back</string>
+    <string name="balance">Balance</string>
+    <string name="cancel">Cancel</string>
+    <string name="card_id">Card ID</string>
+    <string name="card_experimental">Experimental support.</string>
+    <string name="card_keys_not_supported">FareBot does not support keys for this type of card.</string>
+    <string name="card_not_compatible">Not compatible with some devices.</string>
+    <string name="card_not_supported">Not supported by this device</string>
+    <string name="card_type">Card Type</string>
+    <string name="copied_to_clipboard">Copied to clipboard.</string>
+    <string name="copy">Copy</string>
+    <string name="delete">Delete</string>
+    <string name="delete_selected_cards">Delete %1$d selected cards?</string>
+    <string name="delete_selected_keys">Delete %1$d selected keys?</string>
+    <string name="enter_manually">Enter manually</string>
+    <string name="error">Error</string>
+    <string name="failed_to_process_card">Failed to process card</string>
+    <string name="history">History</string>
+    <string name="hold_nfc_card">Hold your NFC card against the device to detect its ID and type.</string>
+    <string name="import_clipboard">Import from Clipboard</string>
+    <string name="import_failed">Import failed: %1$s</string>
+    <string name="import_file">Import from File</string>
+    <string name="import_file_button">Import File</string>
+    <string name="imported_cards">Imported %1$d cards</string>
+    <string name="key_data">Key Data</string>
+    <string name="keys">Keys</string>
+    <string name="keys_required">Encryption keys are required to read this card.</string>
+    <string name="locked_card">Locked Card</string>
+    <string name="menu">Menu</string>
+    <string name="n_selected">%1$d selected</string>
+    <string name="nfc">NFC</string>
+    <string name="nfc_disabled">NFC is disabled</string>
+    <string name="nfc_settings">NFC Settings</string>
+    <string name="nfc_unavailable">NFC Unavailable</string>
+    <string name="no_keys">No keys added yet.</string>
+    <string name="no_location_data">No location data available for this trip.</string>
+    <string name="no_scanned_cards">You have not scanned any cards.</string>
+    <string name="ok">OK</string>
+    <string name="preferences">Preferences</string>
+    <string name="refill">Refill</string>
+    <string name="save">Save</string>
+    <string name="scan_card">Scan a card to get started</string>
+    <string name="scan_now">Scan Card</string>
+    <string name="share">Share</string>
+    <string name="station_from">From</string>
+    <string name="station_to">To</string>
+    <string name="subscription_valid_format">Valid %1$s to %2$s</string>
+    <string name="supported_cards">Supported Cards</string>
+    <string name="tag_lost">Card Connection Lost</string>
+    <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
+    <string name="tap_your_card">Tap your card</string>
+    <string name="trip_map">Trip Map</string>
+    <string name="unknown_card">Unknown Card</string>
+    <string name="unknown_card_desc">This card is not supported by FareBot</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="unknown_station">Unknown Station</string>
+
+    <string name="location_seattle">Seattle, WA</string>
+    <string name="location_san_francisco">San Francisco, CA</string>
+    <string name="location_tokyo">Tokyo, Japan</string>
+    <string name="location_kansai">Kansai, Japan</string>
+    <string name="location_singapore">Singapore</string>
+    <string name="location_hong_kong">Hong Kong</string>
+    <string name="location_sao_paulo">São Paulo, Brazil</string>
+    <string name="location_brisbane_seq_australia">Brisbane and SEQ, Australia</string>
+    <string name="location_helsinki_finland">Helsinki, Finland</string>
+    <string name="location_sydney_australia">Sydney, Australia</string>
+    <string name="location_victoria_australia">Victoria, Australia</string>
+    <string name="location_the_netherlands">The Netherlands</string>
+    <string name="location_jakarta">Jakarta, Indonesia</string>
+    <string name="easycard_card_location">Taipei, Taiwan</string>
+
+    <string name="ezlink_card_note">Not compatible with some devices.</string>
+    <string name="seqgo_card_note">Limited support. Keys required.</string>
+    <string name="myki_card_note">Serial number only.</string>
+    <string name="easycard_card_note">Keys required.</string>
+    <string name="kmt_notes">Experimental support.</string>
+
+    <!-- Settings strings -->
+    <string name="pref_category_general">General</string>
+    <string name="pref_category_raw_data">Raw Data</string>
+    <string name="pref_category_obfuscation">Obfuscation</string>
+    <string name="pref_category_obfuscation_desc">For taking screenshots or sharing exports without revealing personal data</string>
+    <string name="pref_category_localization">Localization</string>
+    <string name="pref_category_debug">Developer Options</string>
+    <string name="pref_category_accessibility">Accessibility</string>
+    <string name="pref_category_card_reading">Card Reading</string>
+
+    <string name="pref_launch_from_background">Launch from background</string>
+    <string name="pref_launch_from_background_desc">Automatically read cards without opening the app</string>
+
+    <string name="pref_raw_level">Show raw data</string>
+    <string name="pref_raw_level_desc">Display raw/debug information on card screens</string>
+    <string name="pref_raw_level_none">None</string>
+    <string name="pref_raw_level_unknown">Unknown fields only</string>
+    <string name="pref_raw_level_all">All fields</string>
+
+    <string name="pref_show_raw_station_ids">Show raw station IDs</string>
+    <string name="pref_show_raw_station_ids_desc">Display station IDs alongside station names</string>
+
+    <string name="pref_hide_card_numbers">Hide card numbers</string>
+    <string name="pref_hide_card_numbers_desc">Hide serial numbers in the user interface</string>
+
+    <string name="pref_obfuscate_balance">Obfuscate balance</string>
+    <string name="pref_obfuscate_balance_desc">Show a fake balance instead of the real one</string>
+
+    <string name="pref_obfuscate_trip_fares">Obfuscate trip fares</string>
+    <string name="pref_obfuscate_trip_fares_desc">Show fake fare amounts</string>
+
+    <string name="pref_obfuscate_trip_dates">Obfuscate trip dates</string>
+    <string name="pref_obfuscate_trip_dates_desc">Shift trip dates by a random offset</string>
+
+    <string name="pref_obfuscate_trip_times">Obfuscate trip times</string>
+    <string name="pref_obfuscate_trip_times_desc">Shift trip times by a random offset</string>
+
+    <string name="pref_show_local_and_english">Show local and English</string>
+    <string name="pref_show_local_and_english_desc">Show station names in both local language and English</string>
+
+    <string name="pref_convert_timezone">Convert timezones</string>
+    <string name="pref_convert_timezone_desc">Show times in your local timezone instead of the card\'s timezone</string>
+
+    <string name="pref_localise_places">Localise place names</string>
+    <string name="pref_localise_places_desc">Transliterate station names to Latin characters</string>
+
+    <string name="pref_language_override">Language</string>
+    <string name="pref_language_override_desc">Override system language</string>
+    <string name="pref_language_system_default">System default</string>
+
+    <string name="pref_debug_logging">Debug logging</string>
+    <string name="pref_debug_logging_desc">Enable extra logging for troubleshooting</string>
+
+    <string name="pref_debug_spans">Debug spans</string>
+    <string name="pref_debug_spans_desc">Show debug markers in formatted text</string>
+
+    <string name="pref_iso_datetime">Use ISO date format</string>
+    <string name="pref_iso_datetime_desc">Use ISO 8601 format (YYYY-MM-DD) for dates</string>
+
+    <string name="pref_speak_balance">Speak balance</string>
+    <string name="pref_speak_balance_desc">Announce the card balance aloud when scanned</string>
+
+    <string name="pref_mfc_auth_retry">MIFARE auth retries</string>
+    <string name="pref_mfc_auth_retry_desc">Number of authentication attempts for MIFARE Classic cards</string>
+
+    <string name="pref_retrieve_leap_keys">Retrieve LEAP keys</string>
+    <string name="pref_retrieve_leap_keys_desc">Attempt to fetch LEAP card keys from the network</string>
+</resources>
