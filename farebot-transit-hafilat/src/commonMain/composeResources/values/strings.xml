@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_name_hafilat">Hafilat</string>
+    <string name="location_abu_dhabi">Abu Dhabi, UAE</string>
+    <string name="ticket_type">Ticket Type</string>
+    <string name="machine_id">Machine ID</string>
+    <string name="issue_date">Issue Date</string>
+    <string name="purse_serial_number">Purse Serial Number</string>
+    <string name="hafilat_subscription_regular">Regular</string>
+</resources>
