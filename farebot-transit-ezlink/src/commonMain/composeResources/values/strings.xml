@@ -1,0 +1,20 @@
+<resources>
+    <string name="ezlink_card_note">Older generation (expired) cards only. Not compatible with many devices.</string>
+    <string name="ez_bus_number">Bus #%1$s</string>
+    <string name="ez_first_use">First use</string>
+    <string name="ez_retail_purchase">Retail Purchase</string>
+    <string name="ez_bus_refund">Bus Refund</string>
+    <string name="ez_mrt">MRT</string>
+    <string name="ez_topup">Top-up</string>
+    <string name="ez_service_charge">Service Charge</string>
+    <string name="ez_unknown_format">Unknown (%1$s)</string>
+    <!-- Card issuers -->
+    <string name="ezlink_issuer_ezlink">EZ-Link</string>
+    <string name="ezlink_issuer_nets">NETS</string>
+    <string name="ezlink_issuer_cepas">CEPAS</string>
+    <!-- Agency names -->
+    <string name="ezlink_agency_bus">BUS</string>
+    <string name="ezlink_agency_ez">EZ</string>
+    <string name="ezlink_agency_pos">POS</string>
+    <string name="ezlink_agency_smrt">SMRT</string>
+</resources>
