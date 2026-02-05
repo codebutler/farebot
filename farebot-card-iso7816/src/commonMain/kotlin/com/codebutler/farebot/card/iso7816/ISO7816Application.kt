@@ -47,6 +47,17 @@ data class ISO7816Application(
     val sfiFiles: Map<Int, ISO7816File> = emptyMap(),
     val type: String = "generic"
 ) {
+    /**
+     * Extracts the proprietary BER-TLV data (tag A5) from the FCI template.
+     * In ISO 7816, the FCI (tag 6F) contains a proprietary template (tag A5)
+     * with application-specific data.
+     */
+    val appProprietaryBerTlv: ByteArray?
+        get() {
+            val fci = appFci ?: return null
+            return ISO7816TLV.findBERTLV(fci, "a5")
+        }
+
     fun getFile(selector: String): ISO7816File? = files[selector]
 
     fun getSfiFile(sfi: Int): ISO7816File? = sfiFiles[sfi]
