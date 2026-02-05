@@ -1,0 +1,112 @@
+<resources>
+    <!-- Common Calypso strings -->
+    <string name="calypso_purchase_date">Purchase Date</string>
+    <string name="calypso_transaction_counter">Transaction Counter</string>
+    <string name="calypso_card_type">Card Type</string>
+    <string name="calypso_card_type_anonymous">Anonymous</string>
+    <string name="calypso_card_type_personal">Personal</string>
+    <string name="calypso_holder_name">Holder Name</string>
+    <string name="calypso_gender">Gender</string>
+    <string name="calypso_gender_male">Male</string>
+    <string name="calypso_gender_female">Female</string>
+    <string name="calypso_holder_id">Holder ID</string>
+    <string name="calypso_profile">Profile</string>
+    <string name="calypso_profile_normal">Normal</string>
+    <string name="calypso_profile_unknown">Unknown (%1$s)</string>
+    <string name="calypso_engraved_serial">Engraved Serial</string>
+
+    <!-- Lisboa Viva route names -->
+    <string name="lisboa_route_cascais">Cascais</string>
+    <string name="lisboa_route_sado">Sado</string>
+
+    <!-- Intercode card names -->
+    <string name="card_name_oura">OuRA</string>
+    <string name="card_name_pastel">Pastel</string>
+    <string name="card_name_transgironde">TransGironde</string>
+    <string name="card_name_passpass">Pass Pass</string>
+
+    <!-- Intercode/Navigo strings -->
+    <string name="navigo_sector_station">Sector %1$d #%2$d</string>
+    <string name="gironde_line">Gironde line %1$d</string>
+
+    <!-- EMV strings -->
+    <string name="emv_expiry_date">Expiry date</string>
+    <string name="emv_service_code">Service code</string>
+    <string name="emv_pin_attempts_remaining">PIN attempts remaining</string>
+    <string name="emv_transaction_counter">Transaction counter</string>
+
+    <!-- Navigo subscription names -->
+    <string name="navigo_forfait_mois">Forfait Mois</string>
+    <string name="navigo_forfait_semaine">Forfait Semaine</string>
+    <string name="navigo_forfait_annuel">Forfait Annuel</string>
+    <string name="navigo_forfait_jour">Forfait Jour</string>
+    <string name="navigo_forfait_imagineR_etudiant">Forfait Imagine R Etudiant</string>
+    <string name="navigo_forfait_liberte">Forfait Liberte</string>
+    <string name="navigo_forfait_mois_75">Forfait Mois 75%</string>
+    <string name="navigo_forfait_semaine_75">Forfait Semaine 75%</string>
+    <string name="navigo_ticket_tplus">Ticket t+</string>
+    <string name="navigo_metro_train_rer">Metro/Train/RER</string>
+    <string name="navigo_forfait_solidarite_gratuite">Forfait Solidarite Gratuite</string>
+
+    <!-- OuRA subscription names -->
+    <string name="oura_billet_tarif_normal">Billet tarif normal</string>
+
+    <!-- Tisseo subscription names -->
+    <string name="tisseo_10_tickets">10 Tickets</string>
+    <string name="tisseo_1_ticket">1 Ticket</string>
+    <string name="tisseo_mensuel">Mensuel</string>
+    <string name="tisseo_annuel">Annuel</string>
+    <string name="tisseo_annuel_26">Annuel -26</string>
+    <string name="tisseo_mensuel_26">Mensuel -26</string>
+    <string name="tisseo_10_tickets_26">10 Tickets -26</string>
+    <string name="tisseo_velo">Velo</string>
+
+    <!-- PassPass (Ilevia) subscription names -->
+    <string name="ilevia_trajet_unitaire">Ilevia Trajet Unitaire</string>
+    <string name="ilevia_trajet_unitaire_x10">Ilevia Trajet Unitaire x10</string>
+    <string name="ilevia_mensuel">Ilevia Mensuel</string>
+    <string name="ilevia_10mois">Ilevia 10 Mois</string>
+
+    <!-- MOBIB subscription names -->
+    <string name="mobib_jump_1_trip">JUMP 1 Trip</string>
+    <string name="mobib_jump_10_trips">JUMP 10 Trips</string>
+    <string name="mobib_airport_bus">Airport Bus</string>
+    <string name="mobib_jump_24h_bus_airport">JUMP 24h Bus+Airport</string>
+
+    <!-- Opus subscription names -->
+    <string name="opus_monthly_subscription">Monthly Subscription</string>
+    <string name="opus_weekly_subscription">Weekly Subscription</string>
+    <string name="opus_single_trips">Single Trips</string>
+
+    <!-- Rav-Kav subscription names -->
+    <string name="ravkav_generic_trips">Generic Trips</string>
+
+    <!-- Pisa subscription names -->
+    <string name="pisa_abb_ann_pers">Abb. Ann. Pers. Pisa</string>
+    <string name="pisa_abb_mens_pers">Abb. Mens. Pers. Pisa</string>
+    <string name="pisa_carnet_10_70min">Carnet 10 70min Pisa</string>
+    <string name="pisa_abb_trim_pers">Abb. Trim. Pers. Pisa</string>
+
+    <!-- Lisboa Viva subscription names -->
+    <string name="lisboa_viva_ass_pal_lis">Ass. Pal-Lis</string>
+    <string name="lisboa_viva_ass_fog_lis">Ass. Fog-Lis</string>
+    <string name="lisboa_viva_ass_pra_lis">Ass. Pra-Lis</string>
+    <string name="lisboa_viva_passe_mts">Passe MTS</string>
+    <string name="lisboa_viva_metro_rl_12">Metro/RL 1/2</string>
+    <string name="lisboa_viva_vermelho_a1">Vermelho A1</string>
+    <string name="lisboa_viva_metro_cp_r_mouro_melecas">Metro/CP R. Mouro/Melecas</string>
+    <string name="lisboa_viva_navegante_urbano">Navegante Urbano</string>
+    <string name="lisboa_viva_navegante_rede">Navegante Rede</string>
+    <string name="lisboa_viva_navegante_sl_tcb_barreiro">Navegante SL/TCB Barreiro</string>
+    <string name="lisboa_viva_fertagus_pal_lis_ml">Fertagus Pal-Lis ML</string>
+    <string name="lisboa_viva_navegante_lisboa">Navegante Lisboa</string>
+    <string name="lisboa_viva_zapping">Zapping</string>
+
+    <!-- Venezia subscription names -->
+    <string name="venezia_24h_ticket">24h Ticket</string>
+    <string name="venezia_rete_unica_75min">Rete Unica 75min</string>
+    <string name="venezia_rete_unica_100min">Rete Unica 100min</string>
+    <string name="venezia_bus_ticket_75min">Bus Ticket 75min</string>
+    <string name="venezia_airport_bus_ticket">Airport Bus Ticket</string>
+    <string name="venezia_carnet_traghetto">Carnet Traghetto</string>
+</resources>
