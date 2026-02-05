@@ -1,0 +1,23 @@
+<resources>
+    <!-- Common EN1545 strings -->
+    <string name="en1545_unknown_format">Unknown (%s)</string>
+    <string name="en1545_passenger_class">Passenger class</string>
+    <string name="en1545_with_receipt">With receipt</string>
+    <string name="en1545_without_receipt">Without receipt</string>
+    <string name="en1545_valid_origin_destination">%1$s to %2$s</string>
+    <string name="en1545_valid_origin_destination_via">%1$s to %2$s via %3$s</string>
+
+    <!-- Info property strings -->
+    <string name="en1545_network_id">Network ID</string>
+    <string name="en1545_expiry_date">Expiry date</string>
+    <string name="en1545_date_of_birth">Date of birth</string>
+    <string name="en1545_card_issuer">Issuer</string>
+    <string name="en1545_issue_date">Date of issue</string>
+    <string name="en1545_card_expiry_date_profile">Profile expiry date</string>
+    <string name="en1545_postal_code">Postal code</string>
+    <string name="en1545_card_type">Card type</string>
+    <string name="en1545_card_type_anonymous">Anonymous</string>
+    <string name="en1545_card_type_declarative">Declarative</string>
+    <string name="en1545_card_type_personal">Personal</string>
+    <string name="en1545_card_type_provider_specific">Provider-specific</string>
+</resources>
