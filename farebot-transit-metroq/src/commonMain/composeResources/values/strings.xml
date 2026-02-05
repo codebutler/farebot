@@ -1,0 +1,7 @@
+<resources>
+    <string name="metroq_card_name">Metro Q</string>
+    <string name="metroq_fare_card">Fare Card</string>
+    <string name="metroq_day_pass">Day Pass</string>
+    <string name="metroq_date1">Date 1</string>
+    <string name="metroq_expiry_date">Expiry date</string>
+</resources>
