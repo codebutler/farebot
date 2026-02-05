@@ -1,0 +1,22 @@
+<resources>
+    <string name="card_name_smartrider">SmartRider</string>
+    <string name="card_name_myway">MyWay</string>
+
+    <string name="agency_name_transperth">Transperth</string>
+    <string name="agency_name_action">ACTION</string>
+
+    <string name="smartrider_fare_standard">Standard</string>
+    <string name="smartrider_fare_student">Student</string>
+    <string name="smartrider_fare_tertiary">Tertiary</string>
+    <string name="smartrider_fare_senior">Senior</string>
+    <string name="smartrider_fare_concession">Concession</string>
+    <string name="smartrider_fare_staff">Staff</string>
+    <string name="smartrider_fare_pensioner">Pensioner</string>
+    <string name="smartrider_fare_convention">Convention</string>
+
+    <string name="smartrider_ticket_type">Ticket Type</string>
+    <string name="smartrider_autoload_threshold">Autoload Threshold</string>
+    <string name="smartrider_autoload_value">Autoload Value</string>
+
+    <string name="unknown">Unknown</string>
+</resources>
