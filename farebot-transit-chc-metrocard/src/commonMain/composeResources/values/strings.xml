@@ -1,0 +1,5 @@
+<resources>
+    <string name="chc_metrocard_card_name">Metrocard</string>
+    <string name="chc_metrocard_location">Christchurch, NZ</string>
+    <string name="chc_metrocard_note">Pre-2016 Metrocard. Post-2016 cards use a different system.</string>
+</resources>
