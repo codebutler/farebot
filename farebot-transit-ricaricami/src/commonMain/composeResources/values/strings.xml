@@ -1,0 +1,14 @@
+<resources>
+    <string name="ricaricami_card_name">RicaricaMi</string>
+    <string name="ricaricami_single_urban">Single Urban</string>
+    <string name="ricaricami_daily_urban">Daily Urban</string>
+    <string name="ricaricami_urban_2x6">Urban 2x6</string>
+    <string name="ricaricami_yearly_urban">Yearly Urban</string>
+    <string name="ricaricami_monthly_urban">Monthly Urban</string>
+    <string name="ricaricami_m1_3_ord_single">M1-M3 Ordinary Single</string>
+    <string name="ricaricami_location">Milan</string>
+    <string name="ricaricami_agency_atm">Azienda Trasporti Milanesi</string>
+    <string name="ricaricami_agency_atm_short">ATM</string>
+    <string name="ricaricami_agency_trenord_1">Trenord (1)</string>
+    <string name="ricaricami_agency_trenord_2">Trenord (2)</string>
+</resources>
