@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="seqgo_card_note">Ondersteund geen kaarten met Go Acces, Explore of SEEQ.</string>
   <string name="seqgo_refill_automatic">Automatisch opladen</string>

@@ -1,5 +1,5 @@
 /*
- * SeqGoData.java
+ * SeqGoData.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -21,34 +21,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.seq_go;
+package com.codebutler.farebot.transit.seq_go
 
-import com.codebutler.farebot.transit.Trip;
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
+import com.codebutler.farebot.transit.Trip
 
 /**
  * Constants used in Go card
  */
-public final class SeqGoData {
+object SeqGoData {
 
-    public static final Map<Integer, Trip.Mode> VEHICLES;
+    private const val VEHICLE_FARE_MACHINE = 1
+    private const val VEHICLE_BUS = 4
+    private const val VEHICLE_RAIL = 5
+    private const val VEHICLE_FERRY = 18
 
-    private static final int VEHICLE_FARE_MACHINE = 1;
-    private static final int VEHICLE_BUS = 4;
-    private static final int VEHICLE_RAIL = 5;
-    private static final int VEHICLE_FERRY = 18;
-
-    static {
-        // TODO: Gold Coast Light Rail
-        VEHICLES = ImmutableMap.<Integer, Trip.Mode>builder()
-                .put(VEHICLE_FARE_MACHINE, Trip.Mode.TICKET_MACHINE)
-                .put(VEHICLE_RAIL, Trip.Mode.TRAIN)
-                .put(VEHICLE_FERRY, Trip.Mode.FERRY)
-                .put(VEHICLE_BUS, Trip.Mode.BUS)
-                .build();
-    }
-
-    private SeqGoData() { }
+    // TODO: Gold Coast Light Rail
+    val VEHICLES: Map<Int, Trip.Mode> = mapOf(
+        VEHICLE_FARE_MACHINE to Trip.Mode.TICKET_MACHINE,
+        VEHICLE_RAIL to Trip.Mode.TRAIN,
+        VEHICLE_FERRY to Trip.Mode.FERRY,
+        VEHICLE_BUS to Trip.Mode.BUS
+    )
 }

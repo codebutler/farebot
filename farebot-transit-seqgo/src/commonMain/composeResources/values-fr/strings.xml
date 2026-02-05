@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="seqgo_card_note">Ne gère pas les cartes Go Access, Explore ou SEEQ.</string>
   <string name="seqgo_refill_automatic">Recharge automatique</string>

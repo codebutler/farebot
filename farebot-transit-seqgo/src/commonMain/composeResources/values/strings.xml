@@ -1,0 +1,10 @@
+<resources>
+    <string name="seqgo_card_name">Go card</string>
+    <string name="seqgo_refill_manual">Manual top-up</string>
+    <string name="seqgo_refill_automatic">Automatic top-up</string>
+    <string name="seqgo_card_note">Does not support Go Access, Explore or SEEQ cards.</string>
+    <string name="seqgo_agency_transdev">Transdev Brisbane Ferries</string>
+    <string name="seqgo_agency_airtrain">Airtrain</string>
+    <string name="seqgo_agency_qr">Queensland Rail</string>
+    <string name="seqgo_agency_translink">TransLink</string>
+</resources>
