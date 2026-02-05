@@ -1,5 +1,5 @@
 /*
- * MykiTransitInfo.java
+ * MykiTransitInfo.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -21,40 +21,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.myki;
+package com.codebutler.farebot.transit.myki
 
-import android.content.res.Resources;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.codebutler.farebot.transit.stub.StubTransitInfo;
-import com.google.auto.value.AutoValue;
+import com.codebutler.farebot.transit.TransitInfo
+import farebot.farebot_transit_myki.generated.resources.Res
+import farebot.farebot_transit_myki.generated.resources.myki_card_name
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data type for Myki (Melbourne, AU).
- * <p>
+ *
  * This is a very limited implementation of reading Myki, because most of the data is stored in
  * locked files.
- * <p>
+ *
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Myki
  */
-@AutoValue
-public abstract class MykiTransitInfo extends StubTransitInfo {
+class MykiTransitInfo(
+    private val serialNumberValue: String
+) : TransitInfo() {
 
-    public static final String NAME = "Myki";
+    companion object {
+        const val NAME = "Myki"
 
-    @NonNull
-    static MykiTransitInfo create(@NonNull String serialNumber) {
-        return new AutoValue_MykiTransitInfo(serialNumber);
+        fun create(serialNumber: String): MykiTransitInfo {
+            return MykiTransitInfo(serialNumber)
+        }
     }
 
-    @Nullable
-    @Override
-    public abstract String getSerialNumber();
+    override val serialNumber: String? = serialNumberValue
 
-    @NonNull
-    @Override
-    public String getCardName(@NonNull Resources resources) {
-        return NAME;
-    }
+    override val cardName: String = runBlocking { getString(Res.string.myki_card_name) }
 }

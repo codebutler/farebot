@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-    Myki (Victoria, AU)
-    These are deliberately separated strings in order to match the terminology of the agency.
--->
-<resources>
-    <string name="myki_card_note">Only the card number can be read.</string>
-</resources>

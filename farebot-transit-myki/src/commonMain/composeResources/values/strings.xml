@@ -1,0 +1,4 @@
+<resources>
+    <string name="myki_card_name">Myki</string>
+    <string name="myki_card_note">Only the card number can be read.</string>
+</resources>
