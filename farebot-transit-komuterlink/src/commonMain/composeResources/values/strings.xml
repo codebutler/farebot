@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="komuterlink_card_name">KomuterLink</string>
+    <string name="komuterlink_location">Kuala Lumpur, Malaysia</string>
+    <string name="komuterlink_card_number">Card Number</string>
+    <string name="komuterlink_issue_date">Issue Date</string>
+</resources>
