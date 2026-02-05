@@ -1,0 +1,6 @@
+<resources>
+    <string name="bilhete_card_name">Bilhete Único</string>
+    <string name="bilhete_trips_counter">Trips counter</string>
+    <string name="bilhete_refill_counter">Refill counter</string>
+    <string name="bilhete_date_1">Date 1</string>
+</resources>
