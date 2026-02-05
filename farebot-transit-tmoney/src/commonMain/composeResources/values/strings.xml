@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_name_tmoney">T-Money</string>
+    <string name="location_seoul">Seoul, South Korea</string>
+
+    <!-- Issuers -->
+    <string name="tmoney_issuer_kftci">Korea Financial Telecommunications and Clearings Institute (KFTCI)</string>
+    <string name="tmoney_issuer_mybi">MyBi</string>
+    <string name="tmoney_issuer_mondex">Mondex Korea</string>
+    <string name="tmoney_issuer_kec">Korea Expressway Corporation (KEC)</string>
+    <string name="tmoney_issuer_kscc">Korea Smart Card Co. (KSCC)</string>
+    <string name="tmoney_issuer_korail">Korail</string>
+    <string name="tmoney_issuer_eb">eB (Cashbee)</string>
+    <string name="tmoney_issuer_seoul_bus">Seoul Bus Transport Union</string>
+    <string name="tmoney_issuer_cardnet">CardNet</string>
+
+    <!-- User codes (ticket types) -->
+    <string name="tmoney_usercode_regular">Regular</string>
+    <string name="tmoney_usercode_child">Child</string>
+    <string name="tmoney_usercode_youth">Youth</string>
+    <string name="tmoney_usercode_senior">Senior</string>
+    <string name="tmoney_usercode_disabled">Disabled</string>
+    <string name="tmoney_usercode_test">Test</string>
+    <string name="tmoney_usercode_bus">Bus</string>
+    <string name="tmoney_usercode_lorry">Lorry (Truck)</string>
+    <string name="tmoney_usercode_inactive">Inactive</string>
+
+    <!-- Discount rates -->
+    <string name="tmoney_disrate_none">None</string>
+    <string name="tmoney_disrate_disabled_basic">Disabled (Basic)</string>
+    <string name="tmoney_disrate_disabled_companion">Disabled (Companion)</string>
+    <string name="tmoney_disrate_veteran_basic">Veteran (Basic)</string>
+    <string name="tmoney_disrate_veteran_companion">Veteran (Companion)</string>
+
+    <!-- Telecommunications carriers (TCODE) -->
+    <string name="tmoney_tcode_sk">SK Telecom</string>
+    <string name="tmoney_tcode_kt">KT</string>
+    <string name="tmoney_tcode_lg">LG U+</string>
+
+    <!-- Credit card / bank codes (CCODE) -->
+    <string name="tmoney_ccode_kb">KB Kookmin Card</string>
+    <string name="tmoney_ccode_nonghyup">Nonghyup Bank</string>
+    <string name="tmoney_ccode_lotte">Lotte Card</string>
+    <string name="tmoney_ccode_bc">BC Card</string>
+    <string name="tmoney_ccode_samsung">Samsung Card</string>
+    <string name="tmoney_ccode_shinhan">Shinhan Card</string>
+    <string name="tmoney_ccode_citi">Citibank Korea</string>
+    <string name="tmoney_ccode_exchange">KEB Hana Bank</string>
+    <string name="tmoney_ccode_woori">Woori Card</string>
+    <string name="tmoney_ccode_hana_sk">Hana SK Card</string>
+    <string name="tmoney_ccode_hyundai">Hyundai Card</string>
+
+    <!-- Labels -->
+    <string name="none">None</string>
+</resources>
