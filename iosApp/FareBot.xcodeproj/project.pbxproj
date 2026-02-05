@@ -1,0 +1,420 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		05657566A87EE7361884BB0C /* FareBotKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E296318A4ABC8EE549B0C47E /* FareBotKit.framework */; };
+		06701DFDA23815C8F488A4EC /* felica_stations.db3 in Resources */ = {isa = PBXBuildFile; fileRef = 9E35D15A57FC6060087EDBFF /* felica_stations.db3 */; };
+		163DFCD24E28C59B89D9C6E5 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83D8321B1983C43ACCF8539 /* iOSApp.swift */; };
+		519AA4F06AA994649EF3E3D5 /* FareBotKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E296318A4ABC8EE549B0C47E /* FareBotKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F4B83E01BC598A9B2C1896F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D98E531EA7A4F24295F5AFE1 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2DED0513E66117B90C6CF5CF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				519AA4F06AA994649EF3E3D5 /* FareBotKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4C30D909D3A3BE99AA3825F8 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
+		4FE026B0F1FFE6927F1ADAA4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9E35D15A57FC6060087EDBFF /* felica_stations.db3 */ = {isa = PBXFileReference; path = felica_stations.db3; sourceTree = "<group>"; };
+		D98E531EA7A4F24295F5AFE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E296318A4ABC8EE549B0C47E /* FareBotKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FareBotKit.framework; path = "../farebot-shared/build/bin/iosSimulatorArm64/debugFramework/FareBotKit.framework"; sourceTree = "<group>"; };
+		E83D8321B1983C43ACCF8539 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		E983FF92B9B562BCDDC6F3C8 /* iosApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0207CD568B206498D3F791DA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05657566A87EE7361884BB0C /* FareBotKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2098F79B3F3B6A526575D03F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E983FF92B9B562BCDDC6F3C8 /* iosApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3D83A36C8273079AAE555B51 /* iosApp */ = {
+			isa = PBXGroup;
+			children = (
+				D98E531EA7A4F24295F5AFE1 /* Assets.xcassets */,
+				4FE026B0F1FFE6927F1ADAA4 /* Info.plist */,
+				4C30D909D3A3BE99AA3825F8 /* iosApp.entitlements */,
+				E83D8321B1983C43ACCF8539 /* iOSApp.swift */,
+				6305C291F0D28467D5A95AFF /* Resources */,
+			);
+			path = iosApp;
+			sourceTree = "<group>";
+		};
+		6305C291F0D28467D5A95AFF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9E35D15A57FC6060087EDBFF /* felica_stations.db3 */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		9B0F3B4C26A1726B3C4A2BE9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E296318A4ABC8EE549B0C47E /* FareBotKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E8645766090C58DFD719F43E = {
+			isa = PBXGroup;
+			children = (
+				3D83A36C8273079AAE555B51 /* iosApp */,
+				9B0F3B4C26A1726B3C4A2BE9 /* Frameworks */,
+				2098F79B3F3B6A526575D03F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D229D33F7DFB4113D87FA4E4 /* iosApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C417FFD090A2B1055E46482D /* Build configuration list for PBXNativeTarget "iosApp" */;
+			buildPhases = (
+				705A4CE25C59BE2EA7080F02 /* Build KMP Framework */,
+				22B7C35158B80E17FEB900CC /* Sources */,
+				83869FE7BB25AEB0B067CB68 /* Resources */,
+				0207CD568B206498D3F791DA /* Frameworks */,
+				2DED0513E66117B90C6CF5CF /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iosApp;
+			packageProductDependencies = (
+			);
+			productName = iosApp;
+			productReference = E983FF92B9B562BCDDC6F3C8 /* iosApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A50CA6E758AD7D43FF1096C2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					D229D33F7DFB4113D87FA4E4 = {
+						DevelopmentTeam = ZJ9GEQ36AH;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.NearFieldCommunicationTagReading = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = B1B5576136ED0A91F72321F7 /* Build configuration list for PBXProject "FareBot" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E8645766090C58DFD719F43E;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D229D33F7DFB4113D87FA4E4 /* iosApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		83869FE7BB25AEB0B067CB68 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4B83E01BC598A9B2C1896F2 /* Assets.xcassets in Resources */,
+				06701DFDA23815C8F488A4EC /* felica_stations.db3 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		705A4CE25C59BE2EA7080F02 /* Build KMP Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build KMP Framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :farebot-shared:embedAndSignAppleFrameworkForXcode\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22B7C35158B80E17FEB900CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				163DFCD24E28C59B89D9C6E5 /* iOSApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		5D594B31690D7C02F0738F2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ZJ9GEQ36AH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../farebot-shared/build/XCFrameworks/release",
+					"$(SRCROOT)/../farebot-shared/build/bin/iosSimulatorArm64/debugFramework",
+					"$(SRCROOT)/../farebot-shared/build/bin/iosArm64/debugFramework",
+					"$(SRCROOT)/../farebot-shared/build/bin/iosX64/debugFramework",
+					"\"../farebot-shared/build/bin/iosSimulatorArm64/debugFramework\"",
+				);
+				INFOPLIST_FILE = iosApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					FareBotKit,
+					"-lsqlite3",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebutler.farebot;
+				PRODUCT_NAME = FareBot;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		685B9E068F8A55827EB01D8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8ABAAEE350D6279E16065A23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8D0FFD9C621D52C0C1148C0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ZJ9GEQ36AH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../farebot-shared/build/XCFrameworks/release",
+					"$(SRCROOT)/../farebot-shared/build/bin/iosSimulatorArm64/debugFramework",
+					"$(SRCROOT)/../farebot-shared/build/bin/iosArm64/debugFramework",
+					"$(SRCROOT)/../farebot-shared/build/bin/iosX64/debugFramework",
+					"\"../farebot-shared/build/bin/iosSimulatorArm64/debugFramework\"",
+				);
+				INFOPLIST_FILE = iosApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					FareBotKit,
+					"-lsqlite3",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebutler.farebot;
+				PRODUCT_NAME = FareBot;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B1B5576136ED0A91F72321F7 /* Build configuration list for PBXProject "FareBot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8ABAAEE350D6279E16065A23 /* Debug */,
+				685B9E068F8A55827EB01D8F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C417FFD090A2B1055E46482D /* Build configuration list for PBXNativeTarget "iosApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D594B31690D7C02F0738F2D /* Debug */,
+				8D0FFD9C621D52C0C1148C0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A50CA6E758AD7D43FF1096C2 /* Project object */;
+}
