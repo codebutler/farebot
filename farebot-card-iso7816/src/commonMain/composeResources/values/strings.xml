@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iso7816_fdda_version">FDDA Version No</string>
+    <string name="iso7816_unpredictable_number">Unpredictable Number</string>
+    <string name="iso7816_transaction_qualifiers">Transaction Qualifiers</string>
+    <string name="iso7816_rfu">RFU</string>
+    <string name="iso7816_fdda_tail">FDDA Tail</string>
+    <string name="iso7816_tlv_tags">TLV Tags</string>
+    <string name="iso7816_unknown_tags">Unknown tags</string>
+</resources>
