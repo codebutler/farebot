@@ -1,5 +1,5 @@
 /*
- * CEPASException.java
+ * CEPASException.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -20,10 +20,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.card.cepas;
+package com.codebutler.farebot.card.cepas
 
-class CEPASException extends Exception {
-    CEPASException(String detailMessage) {
-        super(detailMessage);
-    }
-}
+internal class CEPASException(detailMessage: String) : Exception(detailMessage)
