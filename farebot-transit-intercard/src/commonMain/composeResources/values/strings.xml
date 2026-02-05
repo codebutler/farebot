@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_name_intercard">Intercard</string>
+    <string name="location_germany_and_switzerland">Germany / Switzerland</string>
+    <string name="last_transaction">Last Transaction</string>
+</resources>
