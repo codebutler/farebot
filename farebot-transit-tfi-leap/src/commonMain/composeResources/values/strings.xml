@@ -1,0 +1,16 @@
+<resources>
+    <string name="transit_leap_card_name">Leap</string>
+    <string name="transit_leap_locked_warning">This card is locked and could not be read.</string>
+    <string name="transit_leap_location_ireland">Ireland</string>
+    <string name="transit_leap_locked_card">Locked Leap</string>
+    <string name="transit_leap_initialisation_date">Initialisation date</string>
+    <string name="transit_leap_issue_date">Issue date</string>
+    <string name="transit_leap_card_issuer">Card issuer</string>
+    <string name="transit_leap_daily_accumulators">Daily Fare Capping</string>
+    <string name="transit_leap_weekly_accumulators">Weekly Fare Capping</string>
+    <string name="transit_leap_period_start">Period start</string>
+    <string name="transit_leap_accumulator_region">Region</string>
+    <string name="transit_leap_accumulator_total">Total spend</string>
+    <string name="transit_leap_accumulator_agency">%1$s spend</string>
+    <string name="transit_leap_warning">Warning</string>
+</resources>
