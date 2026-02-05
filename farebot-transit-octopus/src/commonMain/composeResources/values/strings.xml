@@ -1,0 +1,8 @@
+<resources>
+    <string name="location_hong_kong">Hong Kong</string>
+    <string name="octopus_card_name">Octopus</string>
+    <string name="octopus_szt_card_name">Shenzhen Tong</string>
+    <string name="octopus_dual_card_name">Hu Tong Xing</string>
+    <string name="octopus_szt">Shenzhen Tong</string>
+    <string name="octopus_alternate_purse_balances">Alternate purse balances</string>
+</resources>
