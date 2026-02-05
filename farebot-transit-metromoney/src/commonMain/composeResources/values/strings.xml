@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_name_metromoney">MetroMoney</string>
+    <string name="location_tbilisi">Tbilisi, Georgia</string>
+    <string name="metromoney_date1">Date 1</string>
+    <string name="metromoney_date2">Date 2</string>
+    <string name="metromoney_date3">Date 3</string>
+    <string name="metromoney_date4">Date 4</string>
+</resources>
