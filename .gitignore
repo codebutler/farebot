@@ -13,7 +13,18 @@ local.properties
 projectFilesBackup/
 project.properties
 .gradle
+.kotlin
 release.keystore
 com_crashlytics_export_strings.xml
 crashlytics-build.properties
 crashlytics.properties
+
+# Xcode
+xcuserdata/
+*.xcscmblueprint
+DerivedData/
+
+metrodroid/
+metrodroid-commits/
+
+*.hprof

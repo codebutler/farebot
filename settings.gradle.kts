@@ -1,0 +1,43 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.PREFER_SETTINGS
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+    }
+}
+
+include(":farebot-base")
+include(":farebot-card")
+include(":farebot-card-cepas")
+include(":farebot-card-classic")
+include(":farebot-card-desfire")
+include(":farebot-card-felica")
+include(":farebot-card-ultralight")
+include(":farebot-transit")
+include(":farebot-transit-bilhete")
+include(":farebot-transit-clipper")
+include(":farebot-transit-easycard")
+include(":farebot-transit-edy")
+include(":farebot-transit-kmt")
+include(":farebot-transit-ezlink")
+include(":farebot-transit-hsl")
+include(":farebot-transit-manly")
+include(":farebot-transit-myki")
+include(":farebot-transit-octopus")
+include(":farebot-transit-opal")
+include(":farebot-transit-orca")
+include(":farebot-transit-ovc")
+include(":farebot-transit-seqgo")
+include(":farebot-transit-stub")
+include(":farebot-transit-suica")
+include(":farebot-app-persist")
+include(":farebot-android")
