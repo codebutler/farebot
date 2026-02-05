@@ -1,0 +1,7 @@
+<resources>
+    <string name="easycard_card_location">Taipei, Taiwan</string>
+    <string name="easycard_card_name">EasyCard</string>
+    <string name="easycard_card_note">Older insecure cards only.</string>
+    <string name="easycard_manufactoring_date">Manufacturing Date</string>
+    <string name="easycard_unknown">Unknown</string>
+</resources>
