@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Card names -->
+    <string name="rkf_card_name_slaccess">SLaccess</string>
+    <string name="rkf_card_name_rejsekort">Rejsekort</string>
+    <string name="rkf_card_name_vasttrafik">Vasttrafikkortet</string>
+    <string name="rkf_card_name_default">RKF</string>
+
+    <!-- Locations -->
+    <string name="rkf_location_stockholm">Stockholm</string>
+    <string name="rkf_location_denmark">Denmark</string>
+    <string name="rkf_location_gothenburg">Gothenburg</string>
+
+    <!-- Card status -->
+    <string name="rkf_card_status">Card status</string>
+    <string name="rkf_status_ok">OK</string>
+    <string name="rkf_status_action_pending">Action pending</string>
+    <string name="rkf_status_temp_disabled">Temporarily disabled</string>
+    <string name="rkf_status_not_ok">Not OK</string>
+    <string name="rkf_unknown_format">Unknown (%s)</string>
+
+    <!-- Info labels -->
+    <string name="rkf_expiry_date">Expiry date</string>
+    <string name="rkf_card_issuer">Card issuer</string>
+
+    <!-- Subscription names -->
+    <string name="rkf_stockholm_30_days">30-day pass</string>
+    <string name="rkf_stockholm_7_days">7-day pass</string>
+    <string name="rkf_stockholm_72_hours">72-hour pass</string>
+</resources>

@@ -129,6 +129,8 @@ object CurrencyFormatter {
         "ILS" to CurrencyConfig("\u20AA", 2, ".", ","),
         "MYR" to CurrencyConfig("RM", 2, ".", ","),
         "DKK" to CurrencyConfig("kr", 2, ",", "."),
+        "SEK" to CurrencyConfig("kr", 2, ",", " "),
+        "NOK" to CurrencyConfig("kr", 2, ",", " "),
         "CLP" to CurrencyConfig("$", 0, ",", "."),
         "XXX" to CurrencyConfig("", 2, ".", ","),
     )

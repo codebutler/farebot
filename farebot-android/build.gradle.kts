@@ -97,6 +97,7 @@ dependencies {
     implementation(project(":farebot-transit-tmoney"))
     implementation(project(":farebot-transit-krocap"))
     implementation(project(":farebot-transit-ndef"))
+    implementation(project(":farebot-transit-rkf"))
     implementation(project(":farebot-transit-unknown"))
     implementation(project(":farebot-shared"))
 

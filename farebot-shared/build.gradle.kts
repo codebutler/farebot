@@ -121,6 +121,7 @@ kotlin {
             api(project(":farebot-transit-serialonly"))
             api(project(":farebot-transit-krocap"))
             api(project(":farebot-transit-ndef"))
+            api(project(":farebot-transit-rkf"))
             api(project(":farebot-transit-unknown"))
             api(project(":farebot-app-persist"))
             implementation(libs.kotlinx.serialization.json)

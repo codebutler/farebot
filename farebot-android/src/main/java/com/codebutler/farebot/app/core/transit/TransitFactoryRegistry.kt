@@ -118,6 +118,7 @@ import com.codebutler.farebot.transit.ndef.NdefClassicTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefFelicaTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefUltralightTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefVicinityTransitFactory
+import com.codebutler.farebot.transit.rkf.RkfTransitFactory
 import com.codebutler.farebot.transit.unknown.BlankClassicTransitFactory
 import com.codebutler.farebot.transit.unknown.BlankDesfireTransitFactory
 import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitFactory
@@ -199,6 +200,7 @@ fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistr
     registry.registerFactory(CardType.MifareClassic, WaikatoCardTransitFactory())
     registry.registerFactory(CardType.MifareClassic, StrelkaTransitFactory())
     registry.registerFactory(CardType.MifareClassic, SunCardTransitFactory())
+    registry.registerFactory(CardType.MifareClassic, RkfTransitFactory())
     registry.registerFactory(CardType.MifareClassic, NdefClassicTransitFactory())
     // Classic catch-all handlers (must be LAST for Classic)
     registry.registerFactory(CardType.MifareClassic, BlankClassicTransitFactory())
