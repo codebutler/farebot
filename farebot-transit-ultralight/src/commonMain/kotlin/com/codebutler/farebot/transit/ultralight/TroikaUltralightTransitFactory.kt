@@ -579,6 +579,8 @@ private class TroikaTrip(
     override val fare: TransitCurrency?
         get() = null
 
+    override val fareString: String? get() = fareDescription
+
     override val mode: Mode
         get() = when (transportType) {
             null -> Mode.OTHER

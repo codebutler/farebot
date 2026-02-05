@@ -1,0 +1,21 @@
+<resources>
+    <string name="card_name_troika">Troika</string>
+    <string name="troika_unformatted">Card is not initialized or unformatted.</string>
+    <string name="troika_layout">Layout</string>
+    <string name="troika_fare_single">Single fare</string>
+    <string name="troika_fare_90mins">90-minute fare</string>
+    <string name="troika_druzhinnik_card">Druzhinnik card</string>
+    <string name="troika_unknown_ticket">Unknown (%1$s)</string>
+    <string name="troika_rides_one">%1$d ride</string>
+    <string name="troika_rides_other">%1$d rides</string>
+    <string name="troika_refill_counter">Refill counter</string>
+    <string name="troika_purse_ride_counter">Trips on purse</string>
+    <string name="troika_empty_ticket_holder">Empty ticket holder</string>
+    <string name="troika_purse">Troika purse</string>
+
+    <string name="moscow_subway">Moscow Metro</string>
+    <string name="moscow_monorail">Moscow Monorail</string>
+    <string name="moscow_ground_transport">Moscow Ground Transport</string>
+    <string name="moscow_mcc">Moscow Central Circle</string>
+    <string name="unknown">Unknown</string>
+</resources>

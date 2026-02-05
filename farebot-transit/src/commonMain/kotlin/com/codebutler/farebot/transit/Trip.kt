@@ -65,6 +65,8 @@ abstract class Trip {
 
     open val fare: TransitCurrency? get() = null
 
+    open val fareString: String? get() = null
+
     abstract val mode: Mode
 
     /**
