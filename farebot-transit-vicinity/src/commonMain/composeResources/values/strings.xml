@@ -1,0 +1,8 @@
+<resources>
+    <string name="blank_nfcv_card">Blank NFC-V</string>
+    <string name="unknown_nfcv_card">Unknown NFC-V</string>
+    <string name="fully_blank_title">Fully Blank Card</string>
+    <string name="fully_blank_desc">This card appears to be completely blank. It may be a brand new card that has never been used, or it has been factory reset.</string>
+    <string name="unknown_card_title">Unknown Card</string>
+    <string name="unknown_card_desc">This card was not recognized by any transit system parser. It may be a card type that is not yet supported.</string>
+</resources>
