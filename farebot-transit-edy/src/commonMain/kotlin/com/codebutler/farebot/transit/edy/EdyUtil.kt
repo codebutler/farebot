@@ -1,5 +1,5 @@
 /*
- * EdyUtil.java
+ * EdyUtil.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -20,31 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.transit.edy;
+package com.codebutler.farebot.transit.edy
 
-import net.kazzz.felica.lib.Util;
+import kotlin.time.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import com.codebutler.farebot.card.felica.FeliCaUtil
 
-import java.util.Calendar;
-import java.util.Date;
+internal object EdyUtil {
 
-final class EdyUtil {
+    private val EDY_EPOCH: Instant = LocalDateTime(2000, 1, 1, 0, 0, 0).toInstant(TimeZone.of("Asia/Tokyo"))
 
-    private EdyUtil() { }
-
-    static Date extractDate(byte[] data) {
-        int fulloffset = Util.toInt(data[4], data[5], data[6], data[7]);
+    fun extractDate(data: ByteArray): Instant? {
+        val fulloffset = FeliCaUtil.toInt(data[4], data[5], data[6], data[7])
         if (fulloffset == 0) {
-            return null;
+            return null
         }
 
-        int dateoffset = fulloffset >>> 17;
-        int timeoffset = fulloffset & 0x1ffff;
+        val dateoffset = fulloffset ushr 17
+        val timeoffset = fulloffset and 0x1ffff
 
-        Calendar c = Calendar.getInstance();
-        c.set(2000, 0, 1, 0, 0, 0);
-        c.add(Calendar.DATE, dateoffset);
-        c.add(Calendar.SECOND, timeoffset);
-
-        return c.getTime();
+        val offset = dateoffset.toLong() * 86400 + timeoffset.toLong()
+        return Instant.fromEpochSeconds(EDY_EPOCH.epochSeconds + offset)
     }
 }
