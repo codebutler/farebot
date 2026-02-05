@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hsl_pass_is_valid">Valid season ticket</string>
     <string name="hsl_balance_refill">Balance refill</string>
@@ -29,4 +28,14 @@
     <string name="hsl_value_ticket_vehicle_type">Vehicle type</string>
     <string name="hsl_value_ticket_line_number">Line number</string>
     <string name="hsl_season_ticket">Season ticket</string>
+
+    <string name="hsl_card_information">Card Information</string>
+    <string name="hsl_application_version">Application Version</string>
+    <string name="hsl_application_key_version">Application Key Version</string>
+    <string name="hsl_platform_type">Platform Type</string>
+    <string name="hsl_security_level">Security Level</string>
+    <string name="hsl_jore_extension">JORE extension</string>
+    <string name="hsl_direction">Direction</string>
+    <string name="hsl_mystery1">Mystery1</string>
+    <string name="hsl_region">Region</string>
 </resources>
