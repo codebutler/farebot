@@ -1,0 +1,53 @@
+<resources>
+    <string name="zolotaya_korona_card_name">Zolotaya Korona</string>
+    <string name="zolotaya_korona_region">Region</string>
+    <string name="zolotaya_korona_discount">Discount type</string>
+    <string name="zolotaya_korona_discount_111">Discount type 111</string>
+    <string name="zolotaya_korona_discount_100">Discount type 100</string>
+    <string name="zolotaya_korona_discount_200">Discount type 200</string>
+    <string name="zolotaya_korona_card_type">Card type</string>
+    <string name="zolotaya_korona_card_serial">Card serial number</string>
+    <string name="zolotaya_korona_refill_counter">Refill counter</string>
+    <string name="zolotaya_korona_unknown">Unknown (%s)</string>
+    <!-- Card names -->
+    <string name="card_name_krasnodar_etk">Krasnodar ETK</string>
+    <string name="card_name_orenburg_ekg">Orenburg EKG</string>
+    <string name="card_name_orenburg_school">Orenburg EKG (School)</string>
+    <string name="card_name_orenburg_student">Orenburg EKG (Student)</string>
+    <string name="card_name_samara_etk">Samara ETK</string>
+    <string name="card_name_samara_school">Samara ETK (School)</string>
+    <string name="card_name_samara_student">Samara ETK (Student)</string>
+    <string name="card_name_samara_garden_dacha">Samara ETK (Garden/Dacha)</string>
+    <string name="card_name_yaroslavl_etk">Yaroslavl ETK</string>
+    <!-- Region names -->
+    <string name="russia_region_04">Altai Republic</string>
+    <string name="russia_region_11">Komi</string>
+    <string name="russia_region_12">Mari El</string>
+    <string name="russia_region_18">Udmurt</string>
+    <string name="russia_region_22">Altai Krai</string>
+    <string name="russia_region_23">Krasnodar Krai</string>
+    <string name="russia_region_25">Primorsky Krai</string>
+    <string name="russia_region_27">Khabarovsk Krai</string>
+    <string name="russia_region_28">Amur Oblast</string>
+    <string name="russia_region_29">Arkhangelsk Oblast</string>
+    <string name="russia_region_33">Vladimir Oblast</string>
+    <string name="russia_region_41">Kamchatka Krai</string>
+    <string name="russia_region_42">Kemerovo Oblast</string>
+    <string name="russia_region_43">Kirov Oblast</string>
+    <string name="russia_region_45">Kurgan Oblast</string>
+    <string name="russia_region_52">Nizhny Novgorod Oblast</string>
+    <string name="russia_region_53">Novgorod Oblast</string>
+    <string name="russia_region_54">Novosibirsk Oblast</string>
+    <string name="russia_region_55">Omsk Oblast</string>
+    <string name="russia_region_56">Orenburg Oblast</string>
+    <string name="russia_region_58">Penza Oblast</string>
+    <string name="russia_region_60">Pskov Oblast</string>
+    <string name="russia_region_63">Samara Oblast</string>
+    <string name="russia_region_65">Sakhalin Oblast</string>
+    <string name="russia_region_66">Sverdlovsk Oblast</string>
+    <string name="russia_region_74">Chelyabinsk Oblast</string>
+    <string name="russia_region_76">Yaroslavl Oblast</string>
+    <string name="russia_region_79">Jewish Autonomous Oblast</string>
+    <string name="russia_region_91">Crimea</string>
+    <string name="russia_region_unknown">Unknown (%s)</string>
+</resources>
