@@ -1,0 +1,5 @@
+<resources>
+    <string name="charlie_card_name">CharlieCard</string>
+    <string name="charlie_2nd_card_number">2nd card number</string>
+    <string name="charlie_location_boston">Boston, MA, USA</string>
+</resources>
