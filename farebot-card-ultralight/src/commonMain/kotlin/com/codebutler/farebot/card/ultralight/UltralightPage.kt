@@ -1,11 +1,13 @@
 /*
- * UltralightPage.java
+ * UltralightPage.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
  * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
  * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+ *
+ * Ported from Metrodroid (https://github.com/metrodroid/metrodroid)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +23,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.card.ultralight;
+package com.codebutler.farebot.card.ultralight
 
-import androidx.annotation.NonNull;
-
-import com.codebutler.farebot.base.util.ByteArray;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 
 /**
  * Represents a page of data on a Mifare Ultralight (4 bytes)
  */
-@AutoValue
-public abstract class UltralightPage {
-
-    @NonNull
-    public static UltralightPage create(int index, @NonNull byte[] data) {
-        return new AutoValue_UltralightPage(index, ByteArray.create(data));
+@Serializable
+data class UltralightPage(
+    val index: Int,
+    @Contextual val data: ByteArray
+) {
+    companion object {
+        fun create(index: Int, data: ByteArray): UltralightPage {
+            return UltralightPage(index, data)
+        }
     }
-
-    @NonNull
-    public static TypeAdapter<UltralightPage> typeAdapter(@NonNull Gson gson) {
-        return new AutoValue_UltralightPage.GsonTypeAdapter(gson);
-    }
-
-    public abstract int getIndex();
-
-    @NonNull
-    public abstract ByteArray getData();
 }
