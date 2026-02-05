@@ -1,0 +1,5 @@
+<resources>
+    <string name="warsaw_card_name">Warszawska Karta Miejska</string>
+    <string name="warsaw_90_days">90 days</string>
+    <string name="warsaw_unknown">Unknown (%s)</string>
+</resources>
