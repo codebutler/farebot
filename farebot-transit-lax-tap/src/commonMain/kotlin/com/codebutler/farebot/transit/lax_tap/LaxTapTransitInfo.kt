@@ -41,6 +41,9 @@ class LaxTapTransitInfo(
     override val cardName: String
         get() = runBlocking { getString(Res.string.lax_tap_card_name) }
 
+    override val onlineServicesPage: String
+        get() = "https://www.taptogo.net/"
+
     companion object {
         val NAME: String
             get() = runBlocking { getString(Res.string.lax_tap_card_name) }

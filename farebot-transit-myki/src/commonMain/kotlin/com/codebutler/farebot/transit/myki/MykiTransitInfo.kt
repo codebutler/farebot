@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.myki
 
-import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
 import farebot.farebot_transit_myki.generated.resources.Res
 import farebot.farebot_transit_myki.generated.resources.myki_card_name
 import kotlinx.coroutines.runBlocking
@@ -39,7 +39,7 @@ import org.jetbrains.compose.resources.getString
  */
 class MykiTransitInfo(
     private val serialNumberValue: String
-) : TransitInfo() {
+) : SerialOnlyTransitInfo() {
 
     companion object {
         const val NAME = "Myki"
@@ -49,7 +49,12 @@ class MykiTransitInfo(
         }
     }
 
+    override val reason: Reason = Reason.LOCKED
+
     override val serialNumber: String? = serialNumberValue
 
     override val cardName: String = runBlocking { getString(Res.string.myki_card_name) }
+
+    override val moreInfoPage: String
+        get() = "https://micolous.github.io/metrodroid/myki"
 }

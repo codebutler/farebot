@@ -23,6 +23,7 @@ kotlin {
             implementation(compose.runtime)
             api(project(":farebot-transit"))
             implementation(project(":farebot-card-desfire"))
+            implementation(project(":farebot-transit-serialonly"))
             implementation(libs.kotlinx.serialization.json)
         }
     }

@@ -58,6 +58,12 @@ class SeqGoTransitInfo(
 
     override val hasUnknownStations: Boolean = unknownStations
 
+    override val moreInfoPage: String
+        get() = "https://micolous.github.io/metrodroid/seqgo"
+
+    override val onlineServicesPage: String
+        get() = "https://gocard.translink.com.au/"
+
     companion object {
         val NAME: String get() = runBlocking { getString(Res.string.seqgo_card_name) }
 
