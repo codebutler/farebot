@@ -45,6 +45,8 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 class EasyCardTransitFactory(private val stringResource: StringResource) : TransitFactory<ClassicCard, EasyCardTransitInfo> {
 
@@ -73,13 +75,16 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
         )
 
         /**
-         * Parse a Unix timestamp (seconds since 1970-01-01 00:00:00 UTC) to an Instant.
-         * EasyCard uses Unix timestamps in Taipei timezone.
+         * Parse an EasyCard timestamp to an Instant.
+         * EasyCard stores timestamps as seconds since 1970-01-01 00:00:00 in Taipei local time,
+         * not UTC. We interpret the raw value as a local datetime and convert to UTC.
          */
         internal fun parseTimestamp(ts: Long?): Instant? {
             ts ?: return null
             if (ts == 0L) return null
-            return Instant.fromEpochSeconds(ts)
+            val fakeUtc = Instant.fromEpochSeconds(ts)
+            val localDateTime = fakeUtc.toLocalDateTime(TimeZone.UTC)
+            return localDateTime.toInstant(TAIPEI_TZ)
         }
 
         /**

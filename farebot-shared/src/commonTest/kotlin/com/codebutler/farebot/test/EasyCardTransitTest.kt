@@ -45,9 +45,8 @@ import kotlin.test.assertTrue
  *
  * Ported from Metrodroid's EasyCardTest.kt
  *
- * NOTE: These tests require loading resources from the test classpath,
- * which works on JVM/Android but not on iOS native. iOS tests will skip
- * gracefully if the resource is not found.
+ * NOTE: These tests require loading resources from the test classpath (JVM/Android)
+ * or filesystem (iOS native).
  */
 class EasyCardTransitTest : CardDumpTest() {
 
@@ -70,13 +69,6 @@ class EasyCardTransitTest : CardDumpTest() {
 
     @Test
     fun testDeadbeefEnglish() {
-        // Skip test if resources not available (iOS)
-        val bytes = loadTestResource("easycard/deadbeef.mfc")
-        if (bytes == null) {
-            println("Skipping test - resource not available on this platform")
-            return
-        }
-
         val card = loadMfcCard("easycard/deadbeef.mfc")
 
         // Verify card is detected as EasyCard
@@ -111,9 +103,9 @@ class EasyCardTransitTest : CardDumpTest() {
         assertEquals(TransitCurrency.TWD(15), trainTrip.fare)
         assertEquals(Trip.Mode.METRO, trainTrip.mode)
         assertNotNull(trainTrip.startStation, "Train trip should have a start station")
-        assertEquals("Metro Taipei Main Station", trainTrip.startStation?.stationName)
+        assertEquals("Taipei Main Station", trainTrip.startStation?.stationName)
         assertNotNull(trainTrip.endStation, "Train trip should have an end station")
-        assertEquals("Metro NTU Hospital", trainTrip.endStation?.stationName)
+        assertEquals("NTU Hospital", trainTrip.endStation?.stationName)
         assertEquals("0xccbbaa", trainTrip.machineID)
 
         // Trip 2: Top-up/refill at Yongan Market
@@ -122,20 +114,13 @@ class EasyCardTransitTest : CardDumpTest() {
         assertEquals(TransitCurrency.TWD(-100), refill.fare, "Refill fare should be negative (money added)")
         assertEquals(Trip.Mode.TICKET_MACHINE, refill.mode)
         assertNotNull(refill.startStation, "Refill should have a station")
-        assertEquals("Metro Yongan Market", refill.startStation?.stationName)
+        assertEquals("Yongan Market", refill.startStation?.stationName)
         assertNull(refill.routeName, "Refill should not have a route name")
         assertEquals("0x31c046", refill.machineID)
     }
 
     @Test
     fun testAssetLoaderBasicFunctionality() {
-        // Skip test if resources not available (iOS)
-        val bytes = loadTestResource("easycard/deadbeef.mfc")
-        if (bytes == null) {
-            println("Skipping test - resource not available on this platform")
-            return
-        }
-
         // Test that loading an MFC file works
         val rawCard = TestAssetLoader.loadMfcCard("easycard/deadbeef.mfc")
         assertNotNull(rawCard, "Should load MFC card")

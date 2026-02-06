@@ -67,9 +67,10 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         try {
-            val data = (card.getApplication(0x9011f2)!!.getFile(0x08) as StandardDesfireFile).data
+            val file = card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
+                ?: throw RuntimeException("Clipper file 0x08 is not readable")
             val cardName = runBlocking { getString(Res.string.transit_clipper_card_name) }
-            return TransitIdentity.create(cardName, ByteUtils.byteArrayToLong(data, 1, 4).toString())
+            return TransitIdentity.create(cardName, ByteUtils.byteArrayToLong(file.data, 1, 4).toString())
         } catch (ex: Exception) {
             throw RuntimeException("Error parsing Clipper serial", ex)
         }
@@ -77,10 +78,13 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
 
     override fun parseInfo(card: DesfireCard): ClipperTransitInfo {
         try {
-            var data = (card.getApplication(0x9011f2)!!.getFile(0x08) as StandardDesfireFile).data
-            val serialNumber = ByteUtils.byteArrayToLong(data, 1, 4)
+            val serialFile = card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
+                ?: throw RuntimeException("Clipper file 0x08 is not readable")
+            val serialNumber = ByteUtils.byteArrayToLong(serialFile.data, 1, 4)
 
-            data = (card.getApplication(0x9011f2)!!.getFile(0x02) as StandardDesfireFile).data
+            val balanceFile = card.getApplication(0x9011f2)!!.getFile(0x02) as? StandardDesfireFile
+                ?: throw RuntimeException("Clipper file 0x02 is not readable")
+            var data = balanceFile.data
             // Read as unsigned, then convert to Short for sign extension, then to Int
             // This handles negative balances correctly
             val balance = ((0xFF and data[18].toInt()) shl 8 or (0xFF and data[19].toInt())).toShort().toInt()
@@ -157,7 +161,8 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
     }
 
     private fun parseTrips(card: DesfireCard): List<ClipperTrip> {
-        val file = card.getApplication(0x9011f2)!!.getFile(0x0e) as StandardDesfireFile
+        val file = card.getApplication(0x9011f2)!!.getFile(0x0e) as? StandardDesfireFile
+            ?: return emptyList()
         /*
          *  This file reads very much like a record file but it professes to
          *  be only a regular file.  As such, we'll need to extract the records
@@ -222,7 +227,8 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
     }
 
     private fun parseRefills(card: DesfireCard): List<ClipperRefill> {
-        val file = card.getApplication(0x9011f2)!!.getFile(0x04) as StandardDesfireFile
+        val file = card.getApplication(0x9011f2)!!.getFile(0x04) as? StandardDesfireFile
+            ?: return emptyList()
 
         /*
          *  This file reads very much like a record file but it professes to
