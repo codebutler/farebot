@@ -108,9 +108,8 @@ These are systematic differences between FareBot and Metrodroid, applied consist
 **Difference:** FareBot adds `computeBalances()` enhancement and extra agency constants. All Metrodroid features faithfully ported.
 **Action needed:** None
 
-### farebot-transit-manly — MINOR
-**Difference:** Uses legacy FareBot ERG record parsing instead of Metrodroid's ErgTransaction framework. All features work correctly.
-**Action needed:** None critical.
+### farebot-transit-manly — RESOLVED (was MINOR)
+**Resolution:** Rewrote to use ERG framework. ManlyFastFerryTransitInfo now extends ErgTransitInfo, ManlyFastFerryTrip extends ErgTrip, ManlyFastFerryRefill extends ErgRefill — matching the CHC Metrocard pattern. Deleted 6 legacy record classes.
 
 ### farebot-transit-pilet — RESOLVED (was MINOR)
 **Resolution:** Added BER-TLV extra info display to PiletTransitInfo. Now shows full serial number (PAN), issuer country, card expiration/effective dates, interchange protocol, and Kyiv Digital UID — matching Metrodroid's `PiletTransitData.TAG_MAP`.
@@ -180,7 +179,7 @@ All Metrodroid transit systems have been accounted for in FareBot:
 | farebot-transit-krocap | **PASS** | KR-OCAP detection, serial-only with BER-TLV, KSX6924 exclusion all match |
 | farebot-transit-lax-tap | **PASS** | Nextfare detection, agency constants, mode detection, MDST lookup all match |
 | farebot-transit-magnacarta | **PASS** | APP_ID, balance, no serial — all match |
-| farebot-transit-manly | **MINOR** | Legacy ERG record parsing; functionally complete but architecturally divergent |
+| farebot-transit-manly | **PASS** | Now uses ERG framework (ErgTransitInfo/ErgTrip/ErgRefill), matching CHC Metrocard pattern |
 | farebot-transit-metromoney | **PASS** | Key hash, serial, balance, date parsing from 4 sectors all match |
 
 ### Transit M-P (10 PASS)

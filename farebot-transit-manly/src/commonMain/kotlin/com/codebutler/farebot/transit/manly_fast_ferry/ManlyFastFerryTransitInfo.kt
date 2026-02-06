@@ -23,16 +23,11 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry
 
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
-import com.codebutler.farebot.transit.TransitInfo
-import com.codebutler.farebot.transit.Trip
-import com.codebutler.farebot.base.util.DateFormatStyle
-import com.codebutler.farebot.base.util.formatDate
-import kotlin.time.Instant
-import farebot.farebot_transit_manly.generated.resources.*
+import com.codebutler.farebot.transit.erg.ErgTransitInfo
+import com.codebutler.farebot.transit.erg.ErgTransitInfoCapsule
+import farebot.farebot_transit_manly.generated.resources.Res
+import farebot.farebot_transit_manly.generated.resources.manly_card_name
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -47,38 +42,13 @@ import org.jetbrains.compose.resources.getString
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Manly-Fast-Ferry
  */
 class ManlyFastFerryTransitInfo(
-    private val serialNumberValue: String,
-    private val tripList: List<Trip>,
-    private val epochDate: Instant,
-    private val balanceValue: Int
-) : TransitInfo() {
+    capsule: ErgTransitInfoCapsule
+) : ErgTransitInfo(capsule, { TransitCurrency.AUD(it) }) {
+
+    override val cardName: String
+        get() = runBlocking { getString(Res.string.manly_card_name) }
 
     companion object {
-        const val NAME = "Manly Fast Ferry"
-
-        fun create(
-            serialNumber: String,
-            trips: List<Trip>,
-            epochDate: Instant,
-            balance: Int
-        ): ManlyFastFerryTransitInfo {
-            return ManlyFastFerryTransitInfo(serialNumber, trips, epochDate, balance)
-        }
-    }
-
-    override val serialNumber: String = serialNumberValue
-
-    override val trips: List<Trip> = tripList
-
-    override val balance: TransitBalance
-        get() = TransitBalance(balance = TransitCurrency.AUD(balanceValue))
-
-    override val cardName: String = runBlocking { getString(Res.string.manly_card_name) }
-
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
-        val uiBuilder = FareBotUiTree.builder(stringResource)
-        val epochFormatted = formatDate(epochDate, DateFormatStyle.LONG)
-        uiBuilder.item().title(Res.string.card_epoch).value(epochFormatted)
-        return uiBuilder.build()
+        internal const val AGENCY_ID = 0x0227
     }
 }

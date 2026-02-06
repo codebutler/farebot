@@ -23,46 +23,14 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry
 
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.transit.Refill
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPurseRecord
-import kotlin.time.Instant
-import com.codebutler.farebot.base.util.CurrencyFormatter
+import com.codebutler.farebot.transit.TransitCurrency
+import com.codebutler.farebot.transit.erg.ErgRefill
+import com.codebutler.farebot.transit.erg.record.ErgPurseRecord
 
 /**
- * Describes top-up amounts "purse credits".
+ * Refill for Manly Fast Ferry (Sydney, AU).
  */
 class ManlyFastFerryRefill(
-    private val purse: ManlyFastFerryPurseRecord,
-    private val epoch: Instant
-) : Refill() {
-
-    companion object {
-        fun create(purse: ManlyFastFerryPurseRecord, epoch: Instant): ManlyFastFerryRefill {
-            return ManlyFastFerryRefill(purse, epoch)
-        }
-    }
-
-    override fun getTimestamp(): Long {
-        val offset = purse.day.toLong() * 86400 + purse.minute.toLong() * 60
-        return epoch.epochSeconds + offset
-    }
-
-    override fun getAgencyName(stringResource: StringResource): String {
-        // There is only one agency on the card, don't show anything.
-        return ""
-    }
-
-    override fun getShortAgencyName(stringResource: StringResource): String? {
-        // There is only one agency on the card, don't show anything.
-        return null
-    }
-
-    override fun getAmount(): Long {
-        return purse.transactionValue.toLong()
-    }
-
-    override fun getAmountString(stringResource: StringResource): String {
-        return CurrencyFormatter.formatAmount(getAmount(), "AUD")
-    }
-}
+    purse: ErgPurseRecord,
+    epochDate: Int
+) : ErgRefill(purse, epochDate, { TransitCurrency.AUD(it) })

@@ -24,33 +24,15 @@
 package com.codebutler.farebot.transit.manly_fast_ferry
 
 import com.codebutler.farebot.transit.TransitCurrency
-import com.codebutler.farebot.transit.Trip
-import com.codebutler.farebot.transit.manly_fast_ferry.record.ManlyFastFerryPurseRecord
-import kotlin.time.Instant
+import com.codebutler.farebot.transit.erg.ErgTrip
+import com.codebutler.farebot.transit.erg.record.ErgPurseRecord
 
 /**
- * Trips on the card are "purse debits", and it is not possible to tell it apart from non-ticket
- * usage (like cafe purchases).
+ * Trip for Manly Fast Ferry (Sydney, AU).
  */
 class ManlyFastFerryTrip(
-    private val purse: ManlyFastFerryPurseRecord,
-    private val epoch: Instant
-) : Trip() {
-
-    companion object {
-        fun create(purse: ManlyFastFerryPurseRecord, epoch: Instant): ManlyFastFerryTrip {
-            return ManlyFastFerryTrip(purse, epoch)
-        }
-    }
-
-    override val startTimestamp: Instant
-        get() {
-            val offset = purse.day.toLong() * 86400 + purse.minute.toLong() * 60
-            return Instant.fromEpochSeconds(epoch.epochSeconds + offset)
-        }
-
-    override val fare: TransitCurrency
-        get() = TransitCurrency.AUD(purse.transactionValue)
-
+    purse: ErgPurseRecord,
+    epochDate: Int
+) : ErgTrip(purse, epochDate, { TransitCurrency.AUD(it) }) {
     override val mode: Mode get() = Mode.FERRY
 }

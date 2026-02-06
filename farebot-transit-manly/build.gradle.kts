@@ -23,6 +23,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(project(":farebot-transit"))
             implementation(project(":farebot-card-classic"))
+            implementation(project(":farebot-transit-erg"))
             implementation(libs.kotlinx.serialization.json)
         }
     }
