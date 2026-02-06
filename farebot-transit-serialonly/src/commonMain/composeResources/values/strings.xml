@@ -27,4 +27,6 @@
     <string name="owner_company">Owner company</string>
     <string name="retailer_company">Retailer company</string>
     <string name="unknown_company">Unknown (%d)</string>
+    <string name="card_name_nextfare_desfire">Nextfare Desfire</string>
+    <string name="card_name_tpf">TPF card</string>
 </resources>

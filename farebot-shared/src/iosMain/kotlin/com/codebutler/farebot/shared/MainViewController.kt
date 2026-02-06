@@ -69,6 +69,8 @@ import com.codebutler.farebot.transit.serialonly.IstanbulKartTransitFactory
 import com.codebutler.farebot.transit.serialonly.NolTransitFactory
 import com.codebutler.farebot.transit.serialonly.NorticTransitFactory
 import com.codebutler.farebot.transit.serialonly.PrestoTransitFactory
+import com.codebutler.farebot.transit.serialonly.NextfareDesfireTransitFactory
+import com.codebutler.farebot.transit.serialonly.TPFCardTransitFactory
 import com.codebutler.farebot.transit.serialonly.TrimetHopTransitFactory
 import com.codebutler.farebot.transit.krocap.KROCAPTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefFelicaTransitFactory
@@ -168,6 +170,8 @@ private fun createIosTransitFactoryRegistry(): TransitFactoryRegistry {
     registry.registerFactory(CardType.MifareDesfire, NorticTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, PrestoTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, TrimetHopTransitFactory())
+    registry.registerFactory(CardType.MifareDesfire, NextfareDesfireTransitFactory())
+    registry.registerFactory(CardType.MifareDesfire, TPFCardTransitFactory())
     // DESFire catch-all handlers (must be LAST for DESFire)
     registry.registerFactory(CardType.MifareDesfire, BlankDesfireTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, UnauthorizedDesfireTransitFactory())
