@@ -29,4 +29,41 @@
     <string name="ovc_subscription_slot">Subscription Slot</string>
     <string name="ovc_travelhistory_slot">Travelhistory Slot</string>
     <string name="ovc_credit_slot">Credit Slot</string>
+    <string name="ovc_autocharge_information">Autocharge Information</string>
+    <string name="card_type_personal">Personal</string>
+    <string name="card_type_anonymous">Anonymous</string>
+
+    <!-- Subscription names -->
+    <!-- NS -->
+    <string name="ovc_sub_ov_jaarkaart">OV-jaarkaart</string>
+    <string name="ovc_sub_ov_bijkaart_1e_klas">OV-Bijkaart 1e klas</string>
+    <string name="ovc_sub_ns_businesscard">NS Businesscard</string>
+    <string name="ovc_sub_voordeelurenabonnement_twee_jaar">Voordeelurenabonnement (twee jaar)</string>
+    <string name="ovc_sub_studenten_ov_chipkaart_week_2009">Studenten OV-chipkaart week (2009)</string>
+    <string name="ovc_sub_studenten_ov_chipkaart_weekend_2009">Studenten OV-chipkaart weekend (2009)</string>
+    <string name="ovc_sub_studentenkaart_korting_week_2009">Studentenkaart korting week (2009)</string>
+    <string name="ovc_sub_studentenkaart_korting_weekend_2009">Studentenkaart korting weekend (2009)</string>
+    <string name="ovc_sub_reizen_op_saldo_bij_ns_1e_klasse">Reizen op saldo bij NS, 1e klasse</string>
+    <string name="ovc_sub_reizen_op_saldo_bij_ns_2de_klasse">Reizen op saldo bij NS, 2de klasse</string>
+    <string name="ovc_sub_voordeelurenabonnement_reizen_op_saldo">Voordeelurenabonnement reizen op saldo</string>
+    <string name="ovc_sub_reizen_op_saldo_tijdelijk_eerste_klas">Reizen op saldo (tijdelijk eerste klas)</string>
+    <string name="ovc_sub_reizen_op_saldo_tijdelijk_tweede_klas">Reizen op saldo (tijdelijk tweede klas)</string>
+    <string name="ovc_sub_reizen_op_saldo_tijdelijk_eerste_klas_korting">Reizen op saldo (tijdelijk eerste klas korting)</string>
+    <string name="ovc_sub_reizen_op_rekening_trein">Reizen op rekening (trein)</string>
+    <string name="ovc_sub_reizen_op_rekening_bus_tram_metro">Reizen op rekening (bus/tram/metro)</string>
+    <!-- Arriva -->
+    <string name="ovc_sub_dalkorting">Dalkorting</string>
+    <!-- Veolia -->
+    <string name="ovc_sub_dalu_dalkorting">DALU Dalkorting</string>
+    <!-- GVB -->
+    <string name="ovc_sub_gvb_nachtbus_saldo">GVB Nachtbus saldo</string>
+    <!-- Connexxion -->
+    <string name="ovc_sub_daluren_oost_nederland">Daluren Oost-Nederland</string>
+    <!-- DUO -->
+    <string name="ovc_sub_student_weekend_vrij">Student weekend-vrij</string>
+    <string name="ovc_sub_student_week_korting">Student week-korting</string>
+    <string name="ovc_sub_student_week_vrij">Student week-vrij</string>
+    <string name="ovc_sub_student_weekend_korting">Student weekend-korting</string>
+    <!-- GVB (continued) -->
+    <string name="ovc_sub_fietssupplement">Fietssupplement</string>
 </resources>

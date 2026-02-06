@@ -1,11 +1,11 @@
 /*
  * OVChipTransaction.kt
  *
- * This file is part of FareBot.
- * Learn more at: https://codebutler.github.io/farebot/
+ * Copyright 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
+ * Copyright 2012 Eric Butler <eric@codebutler.com>
+ * Copyright 2025 Eric Butler <eric@codebutler.com>
  *
- * Copyright (C) 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
- * Copyright (C) 2012, 2014-2016 Eric Butler <eric@codebutler.com>
+ * Ported from Metrodroid (https://github.com/metrodroid/metrodroid)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,168 +23,191 @@
 
 package com.codebutler.farebot.transit.ovc
 
-import com.codebutler.farebot.base.util.ByteUtils
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.isAllZero
+import com.codebutler.farebot.transit.Transaction
+import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.transit.en1545.En1545Bitmap
+import com.codebutler.farebot.transit.en1545.En1545Container
+import com.codebutler.farebot.transit.en1545.En1545FixedHex
+import com.codebutler.farebot.transit.en1545.En1545FixedInteger
+import com.codebutler.farebot.transit.en1545.En1545Lookup
+import com.codebutler.farebot.transit.en1545.En1545Parsed
+import com.codebutler.farebot.transit.en1545.En1545Parser
+import com.codebutler.farebot.transit.en1545.En1545Transaction
+import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
-@Serializable
-data class OVChipTransaction(
-    val transactionSlot: Int,
-    val date: Int,
-    val time: Int,
-    val transfer: Int,
-    val company: Int,
-    val id: Int,
-    val station: Int,
-    val machineId: Int,
-    val vehicleId: Int,
-    val productId: Int,
-    val amount: Int,
-    val subscriptionId: Int,
-    val valid: Int,
-    val unknownConstant: Int,
-    val unknownConstant2: Int,
-    val errorMessage: String
-) {
-    fun isSameTrip(nextTransaction: OVChipTransaction): Boolean {
+class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction() {
+    private val date: Int
+        get() = parsed.getIntOrZero(En1545FixedInteger.dateName(EVENT))
+
+    private val time: Int
+        get() = parsed.getIntOrZero(En1545FixedInteger.timeLocalName(EVENT))
+
+    private val transfer: Int
+        get() = parsed.getIntOrZero(TRANSACTION_TYPE)
+
+    private val company: Int
+        get() = parsed.getIntOrZero(EVENT_SERVICE_PROVIDER)
+
+    val id: Int
+        get() = parsed.getIntOrZero(EVENT_SERIAL_NUMBER)
+
+    override val lookup: En1545Lookup get() = OvcLookup
+
+    override val isTapOn get() = transfer == PROCESS_CHECKIN
+
+    override val isTapOff get() = transfer == PROCESS_CHECKOUT
+
+    override fun isSameTrip(other: Transaction): Boolean {
+        if (other !is OVChipTransaction)
+            return false
         /*
          * Information about checking in and out:
          * http://www.chipinfo.nl/inchecken/
          */
-        if (company == nextTransaction.company && transfer == OVChipTransitInfo.PROCESS_CHECKIN
-            && nextTransaction.transfer == OVChipTransitInfo.PROCESS_CHECKOUT
-        ) {
-            if (date == nextTransaction.date) {
-                return true
-            } else if (date == nextTransaction.date - 1) {
-                if (company == OVChipTransitInfo.AGENCY_NS && nextTransaction.time < 240) {
-                    return true
-                }
-                if (company != OVChipTransitInfo.AGENCY_NS) {
-                    return true
-                }
-            }
+
+        if (company != other.company)
+            return false
+        if (date == other.date) {
+            return true
         }
-        return false
+        if (date != other.date - 1)
+            return false
+
+        // All NS trips get reset at 4 AM (except if it's a night train, but that's out of our scope).
+        if (company == AGENCY_NS) {
+            return other.time < 240
+        }
+
+        /*
+         * Some companies expect a checkout at the maximum of 15 minutes after the estimated arrival at the
+         * endstation of the line.
+         * But it's hard to determine the length of every single trip there is, so for now let's just assume a
+         * checkout at the next day is still from the same trip. Better solutions are always welcome ;)
+         */
+        return true
+    }
+
+    override val mode get(): Trip.Mode {
+        val startStationId = stationId ?: 0
+
+        // FIXME: Clean this up
+        //mIsBusOrTram = (company == AGENCY_GVB || company == AGENCY_HTM || company == AGENCY_RET && (!mIsMetro));
+        //mIsBusOrTrain = company == AGENCY_VEOLIA || company == AGENCY_SYNTUS;
+
+        when (transfer) {
+            PROCESS_BANNED -> return Trip.Mode.BANNED
+            PROCESS_CREDIT -> return Trip.Mode.TICKET_MACHINE
+            // Not 100% sure about what NODATA is, but looks alright so far
+            PROCESS_PURCHASE, PROCESS_NODATA -> return Trip.Mode.TICKET_MACHINE
+        }
+
+        return when (company) {
+            AGENCY_NS -> Trip.Mode.TRAIN
+            AGENCY_TLS, AGENCY_DUO, AGENCY_STORE -> Trip.Mode.OTHER
+            // TODO: Needs verification!
+            AGENCY_GVB -> if (startStationId < 3000) Trip.Mode.METRO else Trip.Mode.BUS
+            // TODO: Needs verification!
+            AGENCY_RET -> if (startStationId < 3000) Trip.Mode.METRO else Trip.Mode.BUS
+            AGENCY_ARRIVA -> when (startStationId) {
+                in 0..800 -> Trip.Mode.TRAIN
+                // TODO: Needs verification!
+                in 4601..4699 -> Trip.Mode.FERRY
+                else -> Trip.Mode.BUS
+            }
+            // Everything else will be a bus, although this is not correct.
+            // The only way to determine them would be to collect every single 'ovcid' out there :(
+            else -> Trip.Mode.BUS
+        }
     }
 
     companion object {
-        val ID_ORDER: Comparator<OVChipTransaction> = Comparator { t1, t2 ->
-            if (t1.id < t2.id) -1 else if (t1.id == t2.id) 0 else 1
+        private const val PROCESS_PURCHASE = 0x00
+        private const val PROCESS_CHECKIN = 0x01
+        private const val PROCESS_CHECKOUT = 0x02
+        private const val PROCESS_TRANSFER = 0x06
+        private const val PROCESS_BANNED = 0x07
+        private const val PROCESS_CREDIT = -0x02
+        private const val PROCESS_NODATA = -0x03
+
+        private const val AGENCY_TLS = 0x00
+        private const val AGENCY_GVB = 0x02
+        private const val AGENCY_NS = 0x04
+        private const val AGENCY_RET = 0x05
+        private const val AGENCY_ARRIVA = 0x08
+        private const val AGENCY_DUO = 0x0C    // Could also be 2C though... ( http://www.ov-chipkaart.me/forum/viewtopic.php?f=10&t=299 )
+        private const val AGENCY_STORE = 0x19
+        private const val AGENCY_GVB_FLEX = 0x2711
+
+        const val TRANSACTION_TYPE = "TransactionType"
+
+        private fun neverSeen(i: Int) = "NeverSeen$i"
+
+        private fun neverSeenField(i: Int) = En1545FixedInteger(neverSeen(i), 8)
+
+        fun tripFields(reversed: Boolean = false) = En1545Bitmap.infixBitmap(
+                En1545Container(
+                        En1545FixedInteger.date(EVENT),
+                        En1545FixedInteger.timeLocal(EVENT)
+                ),
+                neverSeenField(1),
+                En1545FixedInteger(EVENT_UNKNOWN_A, 24),
+                En1545FixedInteger(TRANSACTION_TYPE, 7),
+                neverSeenField(4),
+                En1545FixedInteger(EVENT_SERVICE_PROVIDER, 16),
+                neverSeenField(6),
+                En1545FixedInteger(EVENT_SERIAL_NUMBER, 24),
+                neverSeenField(8),
+                En1545FixedInteger(EVENT_LOCATION_ID, 16),
+                neverSeenField(10),
+                En1545FixedInteger(EVENT_DEVICE_ID, 24),
+                neverSeenField(12),
+                neverSeenField(13),
+                neverSeenField(14),
+                En1545FixedInteger(EVENT_VEHICLE_ID, 16),
+                neverSeenField(16),
+                En1545FixedInteger(EVENT_CONTRACT_POINTER, 5),
+                neverSeenField(18),
+                neverSeenField(19),
+                neverSeenField(20),
+                En1545FixedInteger("TripDurationMinutes", 16),
+                neverSeenField(22),
+                neverSeenField(23),
+                En1545FixedInteger(EVENT_PRICE_AMOUNT, 16),
+                En1545FixedInteger("EventSubscriptionID", 13),
+                // Could be from 8 to 10
+                En1545FixedInteger(EVENT_UNKNOWN_C, 10),
+                neverSeenField(27),
+                En1545FixedInteger("EventExtra", 0),
+                reversed = reversed
+        )
+
+        private val OVC_UL_TRIP_FIELDS = En1545Container(
+                En1545FixedInteger("A", 8),
+                En1545FixedInteger(EVENT_SERIAL_NUMBER, 12),
+                En1545FixedInteger(EVENT_SERVICE_PROVIDER, 12),
+                En1545FixedInteger(TRANSACTION_TYPE, 3),
+                En1545FixedInteger.date(EVENT),
+                En1545FixedInteger.timeLocal(EVENT),
+                En1545FixedInteger("balseqno", 4),
+                En1545FixedHex("D", 64)
+        )
+
+        fun parseClassic(data: ByteArray): OVChipTransaction? {
+            if (data.getBitsFromBuffer(0, 28) == 0)
+                return null
+            val parsed = En1545Parser.parse(data, tripFields())
+            // 27 is not critical, ignore if ever
+            for (i in 1..23)
+                if (parsed.contains(neverSeen(i)))
+                    return null
+            return OVChipTransaction(parsed)
         }
 
-        fun create(transactionSlot: Int, data: ByteArray?): OVChipTransaction {
-            val d = data ?: ByteArray(32)
-
-            var valid = 1
-            var date = 0
-            var time = 0
-            var unknownConstant = 0
-            var transfer = -3
-            var company = 0
-            var id = 0
-            var station = 0
-            var machineId = 0
-            var vehicleId = 0
-            var productId = 0
-            var unknownConstant2 = 0
-            var amount = 0
-            var subscriptionId = -1
-            var errorMessage = ""
-
-            if (d[0] == 0x00.toByte()
-                && d[1] == 0x00.toByte()
-                && d[2] == 0x00.toByte()
-                && (d[3].toInt() and 0xF0) == 0x00
-            ) {
-                valid = 0
-            }
-            if ((d[3].toInt() and 0x10) != 0x00) valid = 0
-            if ((d[3].toInt() and 0x80.toByte().toInt()) != 0x00) valid = 0
-            if ((d[2].toInt() and 0x02) != 0x00) valid = 0
-            if ((d[2].toInt() and 0x08) != 0x00) valid = 0
-            if ((d[2].toInt() and 0x20) != 0x00) valid = 0
-            if ((d[2].toInt() and 0x80.toByte().toInt()) != 0x00) valid = 0
-            if ((d[1].toInt() and 0x01) != 0x00) valid = 0
-            if ((d[1].toInt() and 0x02) != 0x00) valid = 0
-            if ((d[1].toInt() and 0x08) != 0x00) valid = 0
-            if ((d[1].toInt() and 0x20) != 0x00) valid = 0
-            if ((d[1].toInt() and 0x40) != 0x00) valid = 0
-            if ((d[1].toInt() and 0x80.toByte().toInt()) != 0x00) valid = 0
-            if ((d[0].toInt() and 0x02) != 0x00) valid = 0
-            if ((d[0].toInt() and 0x04) != 0x00) valid = 0
-
-            if (valid == 0) {
-                errorMessage = "No transaction"
-            } else {
-                var iBitOffset = 53
-
-                date = (((d[3].toInt() and 0xFF) and 0x0F) shl 10) or (((d[4].toInt() and 0xFF)) shl 2) or
-                        (((d[5].toInt() and 0xFF) shr 6) and 0x03)
-                time = (((d[5].toInt() and 0xFF) and 0x3F) shl 5) or (((d[6].toInt() and 0xFF) shr 3) and 0x1F)
-
-                if ((d[3].toInt() and 0x20) != 0x00) {
-                    unknownConstant = ByteUtils.getBitsFromBuffer(d, iBitOffset, 24)
-                    iBitOffset += 24
-                }
-                if ((d[3].toInt() and 0x40) != 0x00) {
-                    transfer = ByteUtils.getBitsFromBuffer(d, iBitOffset, 7)
-                    iBitOffset += 7
-                }
-                if ((d[2].toInt() and 0x01) != 0x00) {
-                    company = ByteUtils.getBitsFromBuffer(d, iBitOffset, 16)
-                    iBitOffset += 16
-                }
-                if ((d[2].toInt() and 0x04) != 0x00) {
-                    id = ByteUtils.getBitsFromBuffer(d, iBitOffset, 24)
-                    iBitOffset += 24
-                }
-                if ((d[2].toInt() and 0x10) != 0x00) {
-                    station = ByteUtils.getBitsFromBuffer(d, iBitOffset, 16)
-                    iBitOffset += 16
-                }
-                if ((d[2].toInt() and 0x40) != 0x00) {
-                    machineId = ByteUtils.getBitsFromBuffer(d, iBitOffset, 24)
-                    iBitOffset += 24
-                }
-                if ((d[1].toInt() and 0x04) != 0x00) {
-                    vehicleId = ByteUtils.getBitsFromBuffer(d, iBitOffset, 16)
-                    iBitOffset += 16
-                }
-                if ((d[1].toInt() and 0x10) != 0x00) {
-                    productId = ByteUtils.getBitsFromBuffer(d, iBitOffset, 5)
-                    iBitOffset += 5
-                }
-                if ((d[0].toInt() and 0x01) != 0x00) {
-                    unknownConstant2 = ByteUtils.getBitsFromBuffer(d, iBitOffset, 16)
-                    iBitOffset += 16
-                }
-                if ((d[0].toInt() and 0x08) != 0x00) {
-                    amount = ByteUtils.getBitsFromBuffer(d, iBitOffset, 16)
-                    iBitOffset += 16
-                }
-                if ((d[1].toInt() and 0x10) == 0x00) {
-                    subscriptionId = ByteUtils.getBitsFromBuffer(d, iBitOffset, 13)
-                }
-            }
-
-            return OVChipTransaction(
-                transactionSlot = transactionSlot,
-                date = date,
-                time = time,
-                transfer = transfer,
-                company = company,
-                id = id,
-                station = station,
-                machineId = machineId,
-                vehicleId = vehicleId,
-                productId = productId,
-                amount = amount,
-                subscriptionId = subscriptionId,
-                valid = valid,
-                unknownConstant = unknownConstant,
-                unknownConstant2 = unknownConstant2,
-                errorMessage = errorMessage
-            )
+        fun parseUltralight(data: ByteArray): OVChipTransaction? {
+            if (data.isAllZero())
+                return null
+            return OVChipTransaction(En1545Parser.parse(data, OVC_UL_TRIP_FIELDS))
         }
     }
 }

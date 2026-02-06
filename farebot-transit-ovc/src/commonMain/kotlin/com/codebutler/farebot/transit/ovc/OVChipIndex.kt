@@ -1,11 +1,11 @@
 /*
  * OVChipIndex.kt
  *
- * This file is part of FareBot.
- * Learn more at: https://codebutler.github.io/farebot/
+ * Copyright 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
+ * Copyright 2012 Eric Butler <eric@codebutler.com>
+ * Copyright 2025 Eric Butler <eric@codebutler.com>
  *
- * Copyright (C) 2012 Wilbert Duijvenvoorde <w.a.n.duijvenvoorde@gmail.com>
- * Copyright (C) 2012, 2014-2016 Eric Butler <eric@codebutler.com>
+ * Ported from Metrodroid (https://github.com/metrodroid/metrodroid)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,85 +23,51 @@
 
 package com.codebutler.farebot.transit.ovc
 
-import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.ui.HeaderListItem
+import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import kotlinx.serialization.Serializable
 
+@ConsistentCopyVisibility
 @Serializable
-data class OVChipIndex(
-    /** Most recent transaction slot (0xFB0 or 0xFD0) */
-    val recentTransactionSlot: Int,
-    /** Most recent card information index slot (0x5C0 or 0x580) */
-    val recentInfoSlot: Int,
-    /** Most recent subscription index slot (0xF10 or 0xF30) */
-    val recentSubscriptionSlot: Int,
-    /** Most recent travel history index slot (0xF50 or 0xF70) */
-    val recentTravelhistorySlot: Int,
-    /** Most recent credit index slot (0xF90 or 0xFA0) */
-    val recentCreditSlot: Int,
-    val subscriptionIndex: IntArray
+data class OVChipIndex internal constructor(
+    val recentTransactionSlot: Boolean,  // Most recent transaction slot (0xFB0 (false) or 0xFD0 (true))
+    val recentInfoSlot: Boolean,  // Most recent card information index slot (0x5C0 (true) or 0x580(false))
+    val recentSubscriptionSlot: Boolean,   // Most recent subscription index slot (0xF10 (false) or 0xF30(true))
+    val recentTravelhistorySlot: Boolean, // Most recent travel history index slot (0xF50 (false) or 0xF70 (true))
+    val recentCreditSlot: Boolean,         // Most recent credit index slot (0xF90(false) or 0xFA0(true))
+    val subscriptionIndex: List<Int>
 ) {
+    fun getRawFields(): List<ListItemInterface> =
+        listOf(
+            HeaderListItem("Recent Slots"),
+            ListItem("Transaction Slot", if (recentTransactionSlot) "B" else "A"),
+            ListItem("Info Slot", if (recentInfoSlot) "B" else "A"),
+            ListItem("Subscription Slot", if (recentSubscriptionSlot) "B" else "A"),
+            ListItem("Travelhistory Slot", if (recentTravelhistorySlot) "B" else "A"),
+            ListItem("Credit Slot", if (recentCreditSlot) "B" else "A"))
+
     companion object {
-        fun create(data: ByteArray): OVChipIndex {
+        fun parse(data: ByteArray): OVChipIndex {
             val firstSlot = data.copyOfRange(0, data.size / 2)
             val secondSlot = data.copyOfRange(data.size / 2, data.size)
 
-            val iIDa3 = ((firstSlot[1].toInt() and 0x3F) shl 10) or ((firstSlot[2].toInt() and 0xFF) shl 2) or
-                    ((firstSlot[3].toInt() shr 6) and 0x03)
-            val iIDb3 = ((secondSlot[1].toInt() and 0x3F) shl 10) or ((secondSlot[2].toInt() and 0xFF) shl 2) or
-                    ((secondSlot[3].toInt() shr 6) and 0x03)
+            val iIDa3 = firstSlot.getBitsFromBuffer(10, 16)
+            val iIDb3 = secondSlot.getBitsFromBuffer(10, 16)
 
-            val recentTransactionSlot = if (iIDb3 > iIDa3) 0xFB0 else 0xFD0
             val buffer = if (iIDb3 > iIDa3) secondSlot else firstSlot
 
-            val cardindex = (buffer[3].toInt() shr 5) and 0x01
-            val recentInfoSlot = if (cardindex == 1) 0x5C0 else 0x580
+            val indexes = buffer.getBitsFromBuffer(31 * 8, 3)
 
-            val indexes = (buffer[31].toInt() shr 5) and 0x07
-            val recentSubscriptionSlot = if ((indexes and 0x04) == 0x00) 0xF10 else 0xF30
-            val recentTravelhistorySlot = if ((indexes and 0x02) == 0x00) 0xF50 else 0xF70
-            val recentCreditSlot = if ((indexes and 0x01) == 0x00) 0xF90 else 0xFA0
+            val subscriptionIndex = (0..11).map { i -> buffer.getBitsFromBuffer(108 + i * 4, 4) }
 
-            val subscriptionIndex = IntArray(12)
-            val offset = 108
-
-            for (i in 0 until 12) {
-                val bits = ByteUtils.getBitsFromBuffer(buffer, offset + (i * 4), 4)
-                subscriptionIndex[i] = when {
-                    bits < 5 -> 0x800 + bits * 0x30
-                    bits > 9 -> 0xA00 + (bits - 10) * 0x30
-                    else -> 0x900 + (bits - 5) * 0x30
-                }
-            }
-
-            return OVChipIndex(
-                recentTransactionSlot,
-                recentInfoSlot,
-                recentSubscriptionSlot,
-                recentTravelhistorySlot,
-                recentCreditSlot,
-                subscriptionIndex
-            )
+            return OVChipIndex(recentTransactionSlot = iIDb3 <= iIDa3,
+                    recentSubscriptionSlot = indexes and 0x04 != 0x00,
+                    recentTravelhistorySlot = indexes and 0x02 != 0x00,
+                    recentCreditSlot = indexes and 0x01 != 0x00,
+                    recentInfoSlot = buffer[3].toInt() shr 5 and 0x01 != 0,
+                    subscriptionIndex = subscriptionIndex)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is OVChipIndex) return false
-        return recentTransactionSlot == other.recentTransactionSlot &&
-                recentInfoSlot == other.recentInfoSlot &&
-                recentSubscriptionSlot == other.recentSubscriptionSlot &&
-                recentTravelhistorySlot == other.recentTravelhistorySlot &&
-                recentCreditSlot == other.recentCreditSlot &&
-                subscriptionIndex.contentEquals(other.subscriptionIndex)
-    }
-
-    override fun hashCode(): Int {
-        var result = recentTransactionSlot
-        result = 31 * result + recentInfoSlot
-        result = 31 * result + recentSubscriptionSlot
-        result = 31 * result + recentTravelhistorySlot
-        result = 31 * result + recentCreditSlot
-        result = 31 * result + subscriptionIndex.contentHashCode()
-        return result
     }
 }

@@ -23,8 +23,10 @@ kotlin {
             implementation(compose.runtime)
             implementation(project(":farebot-base"))
             api(project(":farebot-transit"))
+            api(project(":farebot-transit-en1545"))
             implementation(project(":farebot-card-classic"))
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
         }
     }
 }
