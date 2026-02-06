@@ -23,6 +23,7 @@
 
 package com.codebutler.farebot.transit.seq_go
 
+import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -39,6 +40,7 @@ import org.jetbrains.compose.resources.getString
 class SeqGoTransitInfo(
     private val serialNumberValue: String,
     private val tripList: List<Trip>,
+    private val refillList: List<Refill>,
     private val unknownStations: Boolean,
     private val balanceValue: Int
 ) : TransitInfo() {
@@ -52,6 +54,8 @@ class SeqGoTransitInfo(
 
     override val trips: List<Trip> = tripList
 
+    val refills: List<Refill> = refillList
+
     override val hasUnknownStations: Boolean = unknownStations
 
     companion object {
@@ -60,10 +64,11 @@ class SeqGoTransitInfo(
         fun create(
             serialNumber: String,
             trips: List<Trip>,
+            refills: List<Refill>,
             hasUnknownStations: Boolean,
             balance: Int
         ): SeqGoTransitInfo {
-            return SeqGoTransitInfo(serialNumber, trips, hasUnknownStations, balance)
+            return SeqGoTransitInfo(serialNumber, trips, refills, hasUnknownStations, balance)
         }
     }
 }

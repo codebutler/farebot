@@ -4,4 +4,7 @@
     <string name="kmt_defroute" translatable="false">JABODETABEK</string>
     <string name="kmt_agency" translatable="false">Kereta Commuter Indonesia</string>
     <string name="kmt_agency_short" translatable="false">KCI</string>
+    <string name="kmt_other_data">Other Data</string>
+    <string name="kmt_transaction_counter">Transaction counter</string>
+    <string name="kmt_last_trx_amount">Last transaction amount</string>
 </resources>

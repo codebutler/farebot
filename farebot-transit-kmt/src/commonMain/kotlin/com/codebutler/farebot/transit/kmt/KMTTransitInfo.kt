@@ -20,20 +20,28 @@
 
 package com.codebutler.farebot.transit.kmt
 
+import com.codebutler.farebot.base.ui.HeaderListItem
+import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_kmt.generated.resources.Res
+import farebot.farebot_transit_kmt.generated.resources.kmt_last_trx_amount
 import farebot.farebot_transit_kmt.generated.resources.kmt_longname
+import farebot.farebot_transit_kmt.generated.resources.kmt_other_data
+import farebot.farebot_transit_kmt.generated.resources.kmt_transaction_counter
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class KMTTransitInfo(
     override val trips: List<Trip>,
     private val serialNumberData: ByteArray,
-    private val currentBalance: Int
+    private val currentBalance: Int,
+    private val transactionCounter: Int = 0,
+    private val lastTransAmount: Int = 0
 ) : TransitInfo() {
 
     override val balance: TransitBalance
@@ -46,12 +54,22 @@ class KMTTransitInfo(
     override val cardName: String
         get() = runBlocking { getString(Res.string.kmt_longname) }
 
-    fun getSerialNumberData(): ByteArray = serialNumberData
-
-    fun getCurrentBalance(): Int = currentBalance
+    override val info: List<ListItemInterface>
+        get() = listOf(
+            HeaderListItem(Res.string.kmt_other_data),
+            ListItem(Res.string.kmt_transaction_counter, transactionCounter.toString()),
+            ListItem(Res.string.kmt_last_trx_amount,
+                TransitCurrency.IDR(lastTransAmount).formatCurrencyString(isBalance = false))
+        )
 
     companion object {
-        fun create(trips: List<Trip>, serialNumberData: ByteArray, currentBalance: Int): KMTTransitInfo =
-            KMTTransitInfo(trips, serialNumberData, currentBalance)
+        fun create(
+            trips: List<Trip>,
+            serialNumberData: ByteArray,
+            currentBalance: Int,
+            transactionCounter: Int = 0,
+            lastTransAmount: Int = 0
+        ): KMTTransitInfo =
+            KMTTransitInfo(trips, serialNumberData, currentBalance, transactionCounter, lastTransAmount)
     }
 }

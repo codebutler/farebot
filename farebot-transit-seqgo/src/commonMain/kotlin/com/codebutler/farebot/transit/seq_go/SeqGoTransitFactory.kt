@@ -38,7 +38,12 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
     override fun check(card: ClassicCard): Boolean {
         if (card.getSector(0) is DataClassicSector) {
             val blockData = (card.getSector(0) as DataClassicSector).getBlock(1).data
-            return blockData.copyOfRange(1, 9).contentEquals(MANUFACTURER)
+            if (!blockData.copyOfRange(1, 9).contentEquals(MANUFACTURER)) {
+                return false
+            }
+            // Also check the system code to distinguish from other Nextfare-based cards
+            val systemCode = blockData.copyOfRange(9, 15)
+            return systemCode.contentEquals(SYSTEM_CODE1) || systemCode.contentEquals(SYSTEM_CODE2)
         }
         return false
     }
@@ -139,6 +144,7 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
         return SeqGoTransitInfo.create(
             formatSerialNumber(serialNumber),
             trips.toList<Trip>(),
+            refills.toList<Refill>(),
             hasUnknownStations,
             balance
         )
@@ -148,6 +154,14 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
         private val MANUFACTURER = byteArrayOf(
             0x16, 0x18, 0x1A, 0x1B,
             0x1C, 0x1D, 0x1E, 0x1F
+        )
+
+        private val SYSTEM_CODE1 = byteArrayOf(
+            0x5A, 0x5B, 0x20, 0x21, 0x22, 0x23
+        )
+
+        private val SYSTEM_CODE2 = byteArrayOf(
+            0x20, 0x21, 0x22, 0x23, 0x01, 0x01
         )
 
         /**

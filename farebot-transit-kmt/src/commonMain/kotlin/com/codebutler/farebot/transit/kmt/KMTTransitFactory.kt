@@ -66,11 +66,15 @@ class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
         }
         val serviceBalance = card.getSystem(SYSTEMCODE_KMT)!!.getService(FELICA_SERVICE_KMT_BALANCE)
         var currentBalance = 0
+        var transactionCounter = 0
+        var lastTransAmount = 0
         if (serviceBalance != null) {
             val blocksBalance = serviceBalance.blocks
             val blockBalance = blocksBalance[0]
             val dataBalance = blockBalance.data
             currentBalance = FeliCaUtil.toInt(dataBalance[3], dataBalance[2], dataBalance[1], dataBalance[0])
+            transactionCounter = FeliCaUtil.toInt(dataBalance[13], dataBalance[14], dataBalance[15])
+            lastTransAmount = FeliCaUtil.toInt(dataBalance[7], dataBalance[6], dataBalance[5], dataBalance[4])
         }
         val serviceHistory = card.getSystem(SYSTEMCODE_KMT)!!.getService(FELICA_SERVICE_KMT_HISTORY)!!
         val trips = mutableListOf<Trip>()
@@ -82,6 +86,6 @@ class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
                 trips.add(trip)
             }
         }
-        return KMTTransitInfo.create(trips, serialNumber, currentBalance)
+        return KMTTransitInfo.create(trips, serialNumber, currentBalance, transactionCounter, lastTransAmount)
     }
 }
