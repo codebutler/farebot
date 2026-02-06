@@ -24,9 +24,10 @@
 
 package com.codebutler.farebot.transit.snapper
 
-import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.isAllFF
 import com.codebutler.farebot.card.iso7816.ISO7816Card
+import com.codebutler.farebot.card.ksx6924.KSX6924Application
+import com.codebutler.farebot.card.ksx6924.KSX6924CardTransitFactory
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
@@ -34,13 +35,14 @@ import com.codebutler.farebot.transit.TransitIdentity
  * Transit factory for Snapper cards (Wellington, New Zealand).
  *
  * Snapper uses the KSX6924 (T-Money compatible) protocol over ISO 7816.
- * This implementation identifies the card by its application AID and provides
- * basic card identification. Full balance and trip parsing requires the KSX6924
- * protocol which is not yet available in FareBot.
- *
  * Ported from Metrodroid.
  */
-class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo> {
+class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
+    KSX6924CardTransitFactory {
+
+    // ========================================================================
+    // TransitFactory<ISO7816Card, SnapperTransitInfo> implementation
+    // ========================================================================
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun check(card: ISO7816Card): Boolean {
@@ -58,17 +60,66 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo> {
     }
 
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
-        return TransitIdentity.create(SnapperTransitInfo.getCardName(), null)
+        val ksx6924App = extractKSX6924Application(card)
+            ?: return TransitIdentity.create(SnapperTransitInfo.getCardName(), null)
+        return parseTransitIdentity(ksx6924App)
     }
 
     override fun parseInfo(card: ISO7816Card): SnapperTransitInfo {
-        return SnapperTransitInfo()
+        val ksx6924App = extractKSX6924Application(card)
+            ?: return SnapperTransitInfo.createEmpty()
+        return parseTransitData(ksx6924App)
+    }
+
+    // ========================================================================
+    // KSX6924CardTransitFactory implementation
+    // ========================================================================
+
+    override fun check(app: KSX6924Application): Boolean {
+        // Snapper cards have SFI 4 records where bytes 26..46 are all 0xFF
+        val sfiFile = app.application.getSfiFile(4) ?: return false
+        return sfiFile.recordList.all { record ->
+            record.size == 46 && record.copyOfRange(26, 46).isAllFF()
+        }
+    }
+
+    override fun parseTransitIdentity(app: KSX6924Application): TransitIdentity {
+        return TransitIdentity.create(SnapperTransitInfo.getCardName(), app.serial)
+    }
+
+    override fun parseTransitData(app: KSX6924Application): SnapperTransitInfo {
+        return SnapperTransitInfo.create(app)
+    }
+
+    // ========================================================================
+    // Private helpers
+    // ========================================================================
+
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun extractKSX6924Application(card: ISO7816Card): KSX6924Application? {
+        val app = card.applications.firstOrNull { app ->
+            val aidHex = app.appName?.toHexString()?.lowercase()
+            aidHex != null && aidHex in KSX6924_AIDS
+        } ?: return null
+
+        // Extract balance data stored by ISO7816CardReader with "balance/0" key
+        val balanceData = app.getFile("balance/0")?.binaryData ?: ByteArray(4) { 0 }
+
+        // Extract extra records stored with "extra/N" keys
+        val extraRecords = (0..0xf).mapNotNull { i ->
+            app.getFile("extra/$i")?.binaryData
+        }
+
+        return KSX6924Application(
+            application = app,
+            balance = balanceData,
+            extraRecords = extraRecords
+        )
     }
 
     companion object {
         /**
          * KSX6924-compatible application AIDs.
-         * Snapper uses the T-Money AID: D4100000030001
          */
         private val KSX6924_AIDS = listOf(
             "d4100000030001",

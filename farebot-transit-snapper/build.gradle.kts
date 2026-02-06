@@ -20,8 +20,8 @@ kotlin {
             implementation(compose.runtime)
             implementation(project(":farebot-base"))
             implementation(project(":farebot-transit"))
-            implementation(project(":farebot-transit-serialonly"))
             implementation(project(":farebot-card-iso7816"))
+            implementation(project(":farebot-card-ksx6924"))
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
         }

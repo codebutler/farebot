@@ -24,33 +24,88 @@
 
 package com.codebutler.farebot.transit.snapper
 
-import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
+import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.card.ksx6924.KSX6924Application
+import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfo
+import com.codebutler.farebot.transit.TransactionTrip
+import com.codebutler.farebot.transit.TransitBalance
+import com.codebutler.farebot.transit.TransitCurrency
+import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_snapper.generated.resources.Res
 import farebot.farebot_transit_snapper.generated.resources.snapper_card_name
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.getString
 
-/**
- * Transit data type for Snapper cards (Wellington, New Zealand).
- *
- * Snapper is a contactless smart card used for public transit in Wellington.
- * It uses the KSX6924 (T-Money compatible) protocol.
- *
- * Full balance and trip data requires KSX6924 protocol support which is
- * not yet available in FareBot.
- *
- * Ported from Metrodroid.
- */
-class SnapperTransitInfo : SerialOnlyTransitInfo() {
+class SnapperTransitInfo internal constructor(
+    private val mBalance: Int,
+    private val mPurseInfo: KSX6924PurseInfo?,
+    private val mTrips: List<Trip>,
+    private val mSerialNumber: String?
+) : TransitInfo() {
+
+    override val serialNumber: String?
+        get() = mPurseInfo?.serial ?: mSerialNumber
+
+    override val balance: TransitBalance?
+        get() = mPurseInfo?.buildTransitBalance(
+            balance = TransitCurrency.NZD(mBalance),
+            tz = TZ
+        ) ?: if (mBalance != 0) {
+            TransitBalance(TransitCurrency.NZD(mBalance))
+        } else {
+            null
+        }
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.snapper_card_name) }
+        get() = getCardName()
 
-    override val serialNumber: String? = null
+    override val info: List<ListItemInterface>?
+        get() = mPurseInfo?.getInfo(SnapperPurseInfoResolver)
 
-    override val reason: Reason = Reason.MORE_RESEARCH_NEEDED
+    override val trips: List<Trip>
+        get() = mTrips
 
     companion object {
+        private val TZ = TimeZone.of("Pacific/Auckland")
+
         fun getCardName(): String = runBlocking { getString(Res.string.snapper_card_name) }
+
+        fun create(card: KSX6924Application): SnapperTransitInfo {
+            val purseInfo = card.purseInfo
+            val balance = card.balance.byteArrayToInt()
+
+            val trips = TransactionTrip.merge(
+                getSnapperTransactionRecords(card).map {
+                    SnapperTransaction.parseTransaction(it.first, it.second)
+                }
+            )
+
+            return SnapperTransitInfo(
+                mBalance = balance,
+                mPurseInfo = purseInfo,
+                mTrips = trips,
+                mSerialNumber = card.serial
+            )
+        }
+
+        fun createEmpty(serialNumber: String? = null): SnapperTransitInfo {
+            return SnapperTransitInfo(
+                mBalance = 0,
+                mPurseInfo = null,
+                mTrips = emptyList(),
+                mSerialNumber = serialNumber
+            )
+        }
+
+        private fun getSnapperTransactionRecords(card: KSX6924Application)
+                : List<Pair<ByteArray, ByteArray>> {
+            val trips = card.application.getSfiFile(3) ?: return emptyList()
+            val balances = card.application.getSfiFile(4) ?: return emptyList()
+
+            return trips.recordList zip balances.recordList
+        }
     }
 }

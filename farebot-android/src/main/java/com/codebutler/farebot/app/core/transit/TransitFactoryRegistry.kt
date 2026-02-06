@@ -63,7 +63,6 @@ import com.codebutler.farebot.transit.calypso.pisa.PisaTransitFactory
 import com.codebutler.farebot.transit.calypso.lisboaviva.LisboaVivaTransitInfo
 import com.codebutler.farebot.transit.calypso.emv.EmvTransitFactory
 import com.codebutler.farebot.transit.calypso.intercode.IntercodeTransitFactory
-import com.codebutler.farebot.transit.snapper.SnapperTransitFactory
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
 import com.codebutler.farebot.transit.nextfareul.NextfareUnknownUltralightTransitInfo
 import com.codebutler.farebot.transit.ventra.VentraUltralightTransitInfo
@@ -116,6 +115,7 @@ import com.codebutler.farebot.transit.serialonly.StrelkaTransitFactory
 import com.codebutler.farebot.transit.serialonly.SunCardTransitFactory
 import com.codebutler.farebot.transit.serialonly.TPFCardTransitFactory
 import com.codebutler.farebot.transit.krocap.KROCAPTransitFactory
+import com.codebutler.farebot.transit.snapper.SnapperTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefClassicTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefFelicaTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefUltralightTransitFactory
@@ -218,9 +218,9 @@ fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistr
     registry.registerFactory(CardType.ISO7816, PisaTransitFactory(stringResource))
     registry.registerFactory(CardType.ISO7816, LisboaVivaTransitInfo.Factory(stringResource))
     registry.registerFactory(CardType.ISO7816, IntercodeTransitFactory(stringResource))
-    registry.registerFactory(CardType.ISO7816, SnapperTransitFactory())
     registry.registerFactory(CardType.ISO7816, TMoneyTransitFactory())
     registry.registerFactory(CardType.ISO7816, KROCAPTransitFactory())
+    registry.registerFactory(CardType.ISO7816, SnapperTransitFactory())
 
     // EMV contactless payment cards
     registry.registerFactory(CardType.ISO7816, EmvTransitFactory)
