@@ -25,6 +25,8 @@ kotlin {
             implementation(project(":farebot-transit"))
             implementation(project(":farebot-card-classic"))
             implementation(project(":farebot-card-ultralight"))
+            implementation(project(":farebot-transit-podorozhnik"))
+            implementation(project(":farebot-transit-serialonly"))
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
         }

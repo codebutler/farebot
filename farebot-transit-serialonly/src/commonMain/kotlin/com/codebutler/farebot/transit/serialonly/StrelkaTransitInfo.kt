@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.getString
 
 class StrelkaTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() {
 
-    override val extraInfo: List<ListItemInterface>
+    public override val extraInfo: List<ListItemInterface>
         get() = listOf(ListItem(Res.string.strelka_long_serial, mSerial))
 
     override val reason get() = Reason.MORE_RESEARCH_NEEDED

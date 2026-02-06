@@ -1,5 +1,8 @@
 <resources>
     <string name="card_name_troika">Troika</string>
+    <string name="card_name_troika_podorozhnik_hybrid">Troika+Podorozhnik</string>
+    <string name="card_name_troika_strelka_hybrid">Troika+Strelka</string>
+    <string name="card_number">Card number</string>
     <string name="troika_unformatted">Card is not initialized or unformatted.</string>
     <string name="troika_layout">Layout</string>
     <string name="troika_fare_single">Single fare</string>

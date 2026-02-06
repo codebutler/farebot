@@ -69,7 +69,7 @@ import com.codebutler.farebot.transit.ventra.VentraUltralightTransitInfo
 import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.msp_goto.MspGotoTransitFactory
 import com.codebutler.farebot.transit.waikato.WaikatoCardTransitFactory
-import com.codebutler.farebot.transit.troika.TroikaTransitFactory
+import com.codebutler.farebot.transit.troika.TroikaHybridTransitFactory
 import com.codebutler.farebot.transit.oyster.OysterTransitFactory
 import com.codebutler.farebot.transit.charlie.CharlieCardTransitFactory
 import com.codebutler.farebot.transit.gautrain.GautrainTransitFactory
@@ -172,7 +172,7 @@ fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistr
     registry.registerFactory(CardType.MifareClassic, ManlyFastFerryTransitFactory())
     registry.registerFactory(CardType.MifareClassic, SeqGoTransitFactory())
     registry.registerFactory(CardType.MifareClassic, EasyCardTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareClassic, TroikaTransitFactory())
+    registry.registerFactory(CardType.MifareClassic, TroikaHybridTransitFactory(stringResource))
     registry.registerFactory(CardType.MifareClassic, OysterTransitFactory())
     registry.registerFactory(CardType.MifareClassic, CharlieCardTransitFactory())
     registry.registerFactory(CardType.MifareClassic, GautrainTransitFactory())
