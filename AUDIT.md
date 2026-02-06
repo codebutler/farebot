@@ -7,8 +7,8 @@
 
 ## Summary
 
-- **Total modules audited:** 66
-- **PASS:** 64 (faithful port, no issues)
+- **Total modules audited:** 65
+- **PASS:** 63 (faithful port, no issues)
 - **MINOR:** 2 (cosmetic differences, all features preserved)
 
 All FAIL and KNOWN LIMITATION items have been resolved. All MINOR items have been fixed or confirmed as acceptable.
@@ -28,7 +28,7 @@ These are systematic differences between FareBot and Metrodroid, applied consist
 | `kotlinx.serialization.Serializable` | `Parcelize`/`Parcelable` | KMP serialization |
 | `ByteArray` | `ImmutableByteArray` | No immutable equivalent in stdlib |
 | One Gradle module per transit system | Flat packages under `transit/` | Better build isolation and encapsulation |
-| Ultralight factories consolidated in `farebot-transit-ultralight` | Spread across individual transit modules | Cleaner dependency graph |
+| Ultralight factories co-located with parent transit module | Spread across individual transit modules | Each UL factory lives alongside its Classic/DESFire counterpart |
 | `StringResource` wrapper or `runBlocking { getString() }` | `Localizer.localizeString(R.string.*)` | KMP string resource access |
 | No obfuscation framework | `Preferences.obfuscateTripDates`, `hideCardNumbers` | Privacy feature — not ported (intentional) |
 
@@ -44,7 +44,7 @@ These are systematic differences between FareBot and Metrodroid, applied consist
 3. **Pluralization** — `formatPeriod()` in HSLArvo and HSLKausi now uses `getPluralString()` for proper singular/plural
 4. **Purchase date** — HSLArvo overrides `purchaseTimestamp` to null, adds custom purchase date with hour suffix
 5. **Unknown fallbacks** — Profile fallback now uses `Res.string.hsl_unknown_format` resource
-6. **Ultralight deduplication** — `farebot-transit-ultralight` now imports and uses `HSLArvo`/`HSLLookup` from `farebot-transit-hsl` instead of duplicating ~300 lines of code
+6. **Ultralight deduplication** — HSL Ultralight factory (now in `farebot-transit-hsl`) shares `HSLArvo`/`HSLLookup` instead of duplicating ~300 lines of code
 
 **Not porting (intentional):**
 - Trip time obfuscation — Metrodroid's privacy feature that fuzzes displayed trip times. FareBot does not have an obfuscation framework and does not need one; this is not a functional gap.
@@ -92,9 +92,9 @@ These are systematic differences between FareBot and Metrodroid, applied consist
 
 **Resolution:** Added `moreInfoPage` URL. Now extends `SerialOnlyTransitInfo` with `Reason.LOCKED` matching Metrodroid's architecture (Metrodroid has Myki in `serialonly/`).
 
-### MRT Ultralight (in farebot-transit-ultralight) — RESOLVED
+### MRT Ultralight (in farebot-transit-serialonly) — RESOLVED
 
-**Resolution:** `MRTUltralightTransitInfo` now extends `SerialOnlyTransitInfo` with `Reason.LOCKED` matching Metrodroid's architecture (Metrodroid has MRT Ultralight in `serialonly/`). MRT Ultralight is a transit system whose factory lives in the `farebot-transit-ultralight` framework module.
+**Resolution:** `MRTUltralightTransitInfo` now extends `SerialOnlyTransitInfo` with `Reason.LOCKED` matching Metrodroid's architecture (Metrodroid has MRT Ultralight in `serialonly/`).
 
 ### farebot-transit (Subscription base class) — RESOLVED
 
@@ -124,8 +124,8 @@ All Metrodroid transit systems have been accounted for in FareBot:
 | Metrodroid system | FareBot equivalent | Notes |
 |---|---|---|
 | `ezlinkcompat/` | Not needed | Legacy backward-compat for reading old dump formats |
-| `amiibo/` | `farebot-transit-ultralight/AmiiboTransitFactory` | Nintendo Amiibo tag reader (not transit, but ported) |
-| `serialonly/MRTUltralightTransitData` | `farebot-transit-ultralight/MRTUltralightTransitFactory` | Extends SerialOnlyTransitInfo |
+| `amiibo/` | `farebot-transit-amiibo/AmiiboTransitFactory` | Nintendo Amiibo tag reader (not transit, but ported) |
+| `serialonly/MRTUltralightTransitData` | `farebot-transit-serialonly/MRTUltralightTransitFactory` | Extends SerialOnlyTransitInfo |
 | `serialonly/MykiTransitData` | `farebot-transit-myki/` | Extends SerialOnlyTransitInfo |
 | `intercode/`, `lisboaviva/`, `mobib/`, `opus/`, `pisa/`, `ravkav/`, `venezia/`, `emv/` | `farebot-transit-calypso/` | All 8 Calypso subsystems in one module |
 
@@ -133,21 +133,20 @@ All Metrodroid transit systems have been accounted for in FareBot:
 
 ## Full Results
 
-### Framework Modules (11/11 PASS)
+### Framework Modules (10/10 PASS)
 
 | Module | Rating | Notes |
 |--------|--------|-------|
 | farebot-transit-en1545 | **PASS** | Complete EN1545 framework; all 18 files, all constants, timestamp formats match |
-| farebot-transit-calypso | **PASS** | 9 Calypso system families (Intercode, Lisboa Viva, Mobib, Opus, Pisa, Rav-Kav, Venezia, EMV) |
+| farebot-transit-calypso | **PASS** | 9 Calypso system families (Intercode, Lisboa Viva, Mobib, Opus, Pisa, Rav-Kav, Venezia, EMV) + Pisa/Venezia Ultralight factories |
 | farebot-transit-erg | **PASS** | Full ERG/Videlli/Vix framework; all record types match |
 | farebot-transit-nextfare | **PASS** | Full Cubic Nextfare Classic framework; all record types and trip merging logic |
 | farebot-transit-nextfareul | **PASS** | Full Nextfare Ultralight framework; all field offsets and detection |
-| farebot-transit-ultralight | **PASS** | Troika UL (5 layouts, 3 epochs) + 8 other UL factories; HSL UL shares code with farebot-transit-hsl; MRT UL extends SerialOnlyTransitInfo |
 | farebot-transit-ndef | **PASS** | 4 card backends, full NDEF/TLV/WiFi parsing, MAD v1/v2 with CRC |
 | farebot-transit-pilet | **PASS** | Tartu + Kyiv Digital; detection, serial, and EMV TLV extra info all match |
-| farebot-transit-serialonly | **PASS** | 11 serial-only systems (AtHop, Holo, IstanbulKart, Nol, Nortic, Presto, Strelka, SunCard, TPFCard, TrimetHop, NextfareDesfire) |
+| farebot-transit-serialonly | **PASS** | 11 serial-only systems + blank/locked handlers for Classic, DESFire, and Ultralight + MRT Ultralight |
 | farebot-transit-vicinity | **PASS** | NFC-V blank + unknown handlers |
-| farebot-transit-unknown | **PASS** | Classic + DESFire blank/locked handlers; known locked card types match |
+| farebot-transit-amiibo | **PASS** | Nintendo Amiibo tag reader; character/series/game detection all match |
 
 ### Transit A-E (11 PASS, 1 MINOR)
 
@@ -220,7 +219,7 @@ All Metrodroid transit systems have been accounted for in FareBot:
 | farebot-transit-tfi-leap | **PASS** | Comprehensive 5-file port; serial, balance, trips, accumulators all match |
 | farebot-transit-tmoney | **PASS** | KSX6924 detection, balance, trips, purse info resolver all match |
 | farebot-transit-touchngo | **PASS** | Comprehensive 9-file port; balance, trips, refills, travel pass, station lookup all match |
-| farebot-transit-troika | **PASS** | Classic detection + shared UL parsing; all 5 layouts, 3 epochs match |
+| farebot-transit-troika | **PASS** | Classic + Ultralight; all 5 layouts, 3 epochs match |
 | farebot-transit-umarsh | **PASS** | Complex 9-region module; all field offsets, tariffs, denominations match |
 | farebot-transit-ventra | **PASS** | NextfareUL detection, USD currency, mode detection all match |
 | farebot-transit-waikato | **PASS** | Dual card detection (SmartRide/BUSIT), balance, trips all match |
