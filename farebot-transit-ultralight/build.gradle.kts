@@ -25,6 +25,7 @@ kotlin {
             implementation(project(":farebot-transit"))
             implementation(project(":farebot-card-ultralight"))
             implementation(project(":farebot-transit-en1545"))
+            implementation(project(":farebot-transit-hsl"))
             implementation(libs.kotlinx.serialization.json)
         }
     }

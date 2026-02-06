@@ -21,9 +21,12 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.components.resources)
             implementation(compose.runtime)
+            implementation(project(":farebot-base"))
             implementation(project(":farebot-transit"))
+            implementation(project(":farebot-transit-en1545"))
             implementation(project(":farebot-card-desfire"))
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
         }
     }
 }
