@@ -29,7 +29,6 @@ import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
-import com.codebutler.farebot.transit.ultralight.TroikaBlock
 import farebot.farebot_transit_troika.generated.resources.Res
 import farebot.farebot_transit_troika.generated.resources.card_name_troika
 import farebot.farebot_transit_troika.generated.resources.troika_unformatted

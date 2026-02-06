@@ -77,7 +77,7 @@ kotlin {
             api(project(":farebot-transit-nextfare"))
             api(project(":farebot-transit-seqgo"))
             api(project(":farebot-transit-nextfareul"))
-            api(project(":farebot-transit-ultralight"))
+            api(project(":farebot-transit-amiibo"))
             api(project(":farebot-transit-ventra"))
             api(project(":farebot-transit-yvr-compass"))
             api(project(":farebot-transit-vicinity"))
@@ -122,7 +122,6 @@ kotlin {
             api(project(":farebot-transit-snapper"))
             api(project(":farebot-transit-ndef"))
             api(project(":farebot-transit-rkf"))
-            api(project(":farebot-transit-unknown"))
             api(project(":farebot-app-persist"))
             implementation(libs.kotlinx.serialization.json)
         }

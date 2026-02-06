@@ -78,4 +78,8 @@
         <item quantity="other">zones %1$s</item>
     </plurals>
     <string name="hsl_zone_station">Zone %s</string>
+
+    <!-- HSL Ultralight -->
+    <string name="hsl_ultralight_card_name">HSL Ultralight</string>
+    <string name="tampere_ultralight_card_name">Tampere Ultralight</string>
 </resources>

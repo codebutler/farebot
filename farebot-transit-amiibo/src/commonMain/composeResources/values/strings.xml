@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="amiibo_card_name">Amiibo</string>
+    <string name="amiibo_type">Type</string>
+    <string name="amiibo_character">Character</string>
+    <string name="amiibo_character_variant">Character variant</string>
+    <string name="amiibo_model_number">Model number</string>
+    <string name="amiibo_series">Series</string>
+    <string name="amiibo_figure_type_figure">Figure</string>
+    <string name="amiibo_figure_type_card">Card</string>
+    <string name="amiibo_figure_type_yarn">Yarn</string>
+    <string name="amiibo_unknown_type">Unknown (%1$d)</string>
+</resources>

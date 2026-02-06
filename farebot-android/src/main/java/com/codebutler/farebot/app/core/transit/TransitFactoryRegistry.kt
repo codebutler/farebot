@@ -44,15 +44,15 @@ import com.codebutler.farebot.transit.suica.SuicaTransitFactory
 import com.codebutler.farebot.transit.kmt.KMTTransitFactory
 import com.codebutler.farebot.transit.mrtj.MRTJTransitFactory
 import com.codebutler.farebot.transit.clipper.ClipperUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.TroikaUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.VeneziaUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.PisaUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.OVChipUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.HSLUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.MRTUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.AmiiboTransitFactory
-import com.codebutler.farebot.transit.ultralight.BlankUltralightTransitFactory
-import com.codebutler.farebot.transit.ultralight.LockedUltralightTransitFactory
+import com.codebutler.farebot.transit.troika.TroikaUltralightTransitFactory
+import com.codebutler.farebot.transit.calypso.venezia.VeneziaUltralightTransitFactory
+import com.codebutler.farebot.transit.calypso.pisa.PisaUltralightTransitFactory
+import com.codebutler.farebot.transit.ovc.OVChipUltralightTransitFactory
+import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
+import com.codebutler.farebot.transit.serialonly.MRTUltralightTransitFactory
+import com.codebutler.farebot.transit.amiibo.AmiiboTransitFactory
+import com.codebutler.farebot.transit.serialonly.BlankUltralightTransitFactory
+import com.codebutler.farebot.transit.serialonly.LockedUltralightTransitFactory
 import com.codebutler.farebot.transit.vicinity.BlankVicinityTransitFactory
 import com.codebutler.farebot.transit.vicinity.UnknownVicinityTransitFactory
 import com.codebutler.farebot.transit.calypso.opus.OpusTransitFactory
@@ -121,10 +121,10 @@ import com.codebutler.farebot.transit.ndef.NdefFelicaTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefUltralightTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefVicinityTransitFactory
 import com.codebutler.farebot.transit.rkf.RkfTransitFactory
-import com.codebutler.farebot.transit.unknown.BlankClassicTransitFactory
-import com.codebutler.farebot.transit.unknown.BlankDesfireTransitFactory
-import com.codebutler.farebot.transit.unknown.UnauthorizedClassicTransitFactory
-import com.codebutler.farebot.transit.unknown.UnauthorizedDesfireTransitFactory
+import com.codebutler.farebot.transit.serialonly.BlankClassicTransitFactory
+import com.codebutler.farebot.transit.serialonly.BlankDesfireTransitFactory
+import com.codebutler.farebot.transit.serialonly.UnauthorizedClassicTransitFactory
+import com.codebutler.farebot.transit.serialonly.UnauthorizedDesfireTransitFactory
 import com.codebutler.farebot.transit.china.ChinaTransitRegistry
 
 fun createAndroidTransitFactoryRegistry(context: Context): TransitFactoryRegistry {

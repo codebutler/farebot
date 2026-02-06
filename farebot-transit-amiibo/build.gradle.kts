@@ -8,7 +8,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.codebutler.farebot.transit.serialonly"
+        namespace = "com.codebutler.farebot.transit.amiibo"
         compileSdk = libs.versions.compileSdk.get().toInt()
         minSdk = libs.versions.minSdk.get().toInt()
     }
@@ -23,11 +23,8 @@ kotlin {
             implementation(compose.runtime)
             implementation(project(":farebot-base"))
             implementation(project(":farebot-transit"))
-            implementation(project(":farebot-card-classic"))
-            implementation(project(":farebot-card-desfire"))
             implementation(project(":farebot-card-ultralight"))
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.datetime)
         }
     }
 }

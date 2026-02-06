@@ -25,6 +25,7 @@ kotlin {
             implementation(project(":farebot-transit"))
             implementation(project(":farebot-transit-en1545"))
             implementation(project(":farebot-card-desfire"))
+            implementation(project(":farebot-card-ultralight"))
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
         }

@@ -29,4 +29,22 @@
     <string name="unknown_company">Unknown (%d)</string>
     <string name="card_name_nextfare_desfire">Nextfare Desfire</string>
     <string name="card_name_tpf">TPF card</string>
+
+    <!-- Blank card strings -->
+    <string name="blank_mfc_card">Blank MIFARE Classic</string>
+    <string name="blank_mfd_card">Blank MIFARE DESFire</string>
+    <string name="blank_mfu_card">Blank MIFARE Ultralight</string>
+    <string name="fully_blank_title">Fully Blank Card</string>
+    <string name="fully_blank_desc">This card appears to be completely blank. It may be a brand new card that has never been used, or it has been factory reset.</string>
+
+    <!-- Locked card strings -->
+    <string name="locked_mfc_card">Locked MIFARE Classic</string>
+    <string name="locked_mfd_card">Locked MIFARE DESFire</string>
+    <string name="locked_mfu_card">Locked MIFARE Ultralight</string>
+    <string name="fully_locked_title">Fully Locked Card</string>
+    <string name="fully_locked_desc">This card cannot be read without encryption keys. Unfortunately, the card data is protected and cannot be read without the appropriate keys.</string>
+    <string name="fully_locked_desc_unlockable">This card cannot be read without encryption keys. You may be able to read this card by adding the keys in the app settings.</string>
+
+    <!-- MRT Ultralight -->
+    <string name="ultralight_mrt">MRT Ultralight</string>
 </resources>

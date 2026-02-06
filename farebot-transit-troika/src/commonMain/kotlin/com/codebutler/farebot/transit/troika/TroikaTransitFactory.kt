@@ -28,7 +28,6 @@ import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import com.codebutler.farebot.transit.ultralight.TroikaBlock
 import farebot.farebot_transit_troika.generated.resources.Res
 import farebot.farebot_transit_troika.generated.resources.card_name_troika
 import kotlinx.coroutines.runBlocking
