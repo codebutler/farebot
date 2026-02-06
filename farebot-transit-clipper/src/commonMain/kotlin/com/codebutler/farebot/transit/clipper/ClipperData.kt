@@ -75,7 +75,7 @@ internal object ClipperData {
                 .stationName(result.stationName)
                 .shortStationName(result.shortStationName)
                 .companyName(result.companyName)
-                .lineName(result.lineNames.firstOrNull())
+                .lineNames(result.lineNames)
                 .latitude(if (result.hasLocation) result.latitude.toString() else null)
                 .longitude(if (result.hasLocation) result.longitude.toString() else null)
                 .build()

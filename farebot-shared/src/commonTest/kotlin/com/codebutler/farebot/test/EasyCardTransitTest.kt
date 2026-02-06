@@ -108,12 +108,10 @@ class EasyCardTransitTest : CardDumpTest() {
         assertEquals("NTU Hospital", trainTrip.endStation?.stationName)
         assertEquals("0xccbbaa", trainTrip.machineID)
 
-        // Route name comes from MDST line data for the metro station.
-        // Metrodroid expects "Red" (color name), but FareBot's MDST data uses
-        // the official line name "Bannan" (板南線 Bannan Line).
+        // Route name comes from MDST line data — the common line between start and end stations
         val routeName = trainTrip.routeName
         if (routeName != null) {
-            assertEquals("Bannan", routeName)
+            assertEquals("Red", routeName)
         }
 
         // Trip 2: Top-up/refill at Yongan Market

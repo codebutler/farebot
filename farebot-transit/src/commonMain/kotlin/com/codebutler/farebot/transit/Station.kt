@@ -100,7 +100,7 @@ data class Station(
         private var stationName: String? = null
         private var shortStationName: String? = null
         private var companyName: String? = null
-        private var lineName: String? = null
+        private var lineNames: List<String> = emptyList()
         private var latitude: String? = null
         private var longitude: String? = null
         private var code: String? = null
@@ -109,7 +109,7 @@ data class Station(
         fun stationName(stationName: String?): Builder { this.stationName = stationName; return this }
         fun shortStationName(shortStationName: String?): Builder { this.shortStationName = shortStationName; return this }
         fun companyName(companyName: String?): Builder { this.companyName = companyName; return this }
-        fun lineName(lineName: String?): Builder { this.lineName = lineName; return this }
+        fun lineNames(lineNames: List<String>): Builder { this.lineNames = lineNames; return this }
         fun latitude(latitude: String?): Builder { this.latitude = latitude; return this }
         fun longitude(longitude: String?): Builder { this.longitude = longitude; return this }
         fun code(code: String?): Builder { this.code = code; return this }
@@ -119,7 +119,7 @@ data class Station(
             stationNameRaw = stationName,
             shortStationNameRaw = shortStationName ?: abbreviation,
             companyName = companyName,
-            lineNames = if (lineName != null) listOf(lineName!!) else emptyList(),
+            lineNames = lineNames,
             latitude = latitude?.toFloatOrNull(),
             longitude = longitude?.toFloatOrNull(),
             humanReadableId = code

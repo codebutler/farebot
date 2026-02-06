@@ -112,7 +112,9 @@ object MdstStationLookup {
 
         val lineNames = station.lineId.mapNotNull { lineId ->
             val line = reader.getLine(lineId)
-            selectBestName(line?.name, reader.localLanguages)
+            // Use short names for lines (matching Metrodroid's selectBestName(isShort=true))
+            selectShortName(line?.name, reader.localLanguages)
+                ?: selectBestName(line?.name, reader.localLanguages)
         }
 
         return MdstStationResult(

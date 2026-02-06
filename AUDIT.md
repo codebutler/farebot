@@ -290,5 +290,5 @@ All test gaps from the Metrodroid comparison have been fixed:
 | Suica | Missing Hayakaken/NIMOCA ID tests | Added `testHayakakenCardDetection()` and `testNimocaCardDetection()` with full service ID sets |
 | Suica | Missing ambiguous service ID edge case | Added `testAmbiguousCardReturnsJapanIC()` — two subcases from Metrodroid |
 | EasyCard | Missing Chinese locale test | Added `testDeadbeefChineseTraditional()` — verifies station lookup for refill station |
-| EasyCard | Missing route name assertion | Added conditional `assertEquals("Bannan", routeName)` for Metro trip in `testDeadbeefEnglish()` (MDST uses official line name, not color) |
+| EasyCard | Missing route name assertion | Added `assertEquals("Red", routeName)` for Metro trip in `testDeadbeefEnglish()` |
 | Myki | Missing app ID verification | Added assertions for DESFire application IDs (4594, 15732978) in `testDemoCard()` |
