@@ -114,6 +114,48 @@ class SuicaUtilTest {
     }
 
     @Test
+    fun testHayakakenCardDetection() {
+        // Full Hayakaken service ID set from a card in the wild (Metrodroid SuicaTest)
+        val hayakakenServices = setOf(
+            0x48, 0x4a, 0x88, 0x8b, 0xc8, 0xca, 0xcc, 0xce, 0xd0, 0xd2, 0xd4, 0xd6, 0x810, 0x812,
+            0x816, 0x850, 0x852, 0x856, 0x890, 0x892, 0x896, 0x8c8, 0x8ca, 0x90a, 0x90c, 0x90f, 0x1008,
+            0x100a, 0x1048, 0x104a, 0x108c, 0x108f, 0x10c8, 0x10cb, 0x1108, 0x110a, 0x1148, 0x114a,
+            0x1f88, 0x1f8a, 0x2048, 0x204a, 0x2448, 0x244a, 0x2488, 0x248a, 0x24c8, 0x24ca, 0x2508,
+            0x250a, 0x2548, 0x254a)
+        assertEquals("card_name_hayakaken", SuicaUtil.getCardName(stringResource, hayakakenServices))
+    }
+
+    @Test
+    fun testNimocaCardDetection() {
+        // Full NIMOCA service ID set from a card in the wild (Metrodroid SuicaTest)
+        val nimocaServices = setOf(
+            0x48, 0x4a, 0x88, 0x8b, 0xc8, 0xca, 0xcc, 0xce, 0xd0, 0xd2, 0xd4, 0xd6, 0x810, 0x812,
+            0x816, 0x850, 0x852, 0x856, 0x890, 0x892, 0x896, 0x8c8, 0x8ca, 0x90a, 0x90c, 0x90f, 0x1008,
+            0x100a, 0x1048, 0x104a, 0x108c, 0x108f, 0x10c8, 0x10cb, 0x1108, 0x110a, 0x1148, 0x114a,
+            0x1f48, 0x1f4a, 0x1f88, 0x1f8a, 0x1fc8, 0x1fca, 0x2008, 0x200a, 0x2048, 0x204a)
+        assertEquals("card_name_nimoca", SuicaUtil.getCardName(stringResource, nimocaServices))
+    }
+
+    @Test
+    fun testAmbiguousCardReturnsJapanIC() {
+        // Ambiguous service ID lists from older Metrodroid dumps that didn't record locked services.
+        // When multiple card types match, getCardName() should fall back to "Japan IC".
+
+        // Case 1: Hayakaken and ICOCA both have only these open services
+        assertEquals(
+            "card_name_japan_ic",
+            SuicaUtil.getCardName(stringResource, setOf(0x8b, 0x90f, 0x108f, 0x10cb))
+        )
+
+        // Case 2: PASMO and Suica both only have these open services
+        assertEquals(
+            "card_name_japan_ic",
+            SuicaUtil.getCardName(stringResource, setOf(
+                0x8b, 0x90f, 0x108f, 0x10cb, 0x184b, 0x194b, 0x234b, 0x238b, 0x23cb))
+        )
+    }
+
+    @Test
     fun testExtractDateNullForZero() {
         // When date bytes are both zero, extractDate should return null
         val data = ByteArray(16)
