@@ -12,4 +12,28 @@
     <string name="subscription_remaining_trips_today">Remaining trips today</string>
     <string name="subscription_travel_zone">Travel zone</string>
     <string name="subscription_travel_zones">Travel zones</string>
+
+    <!-- Subscription validity formatting -->
+    <string name="subscription_valid_format">Valid from %1$s to %2$s</string>
+    <string name="subscription_valid_to_format">Valid to %1$s</string>
+    <string name="subscription_valid_from_format">Valid from %1$s</string>
+
+    <!-- Subscription trip counts -->
+    <plurals name="subscription_trips_remaining_total">
+        <item quantity="one">%1$d of %2$d trip remaining</item>
+        <item quantity="other">%1$d of %2$d trips remaining</item>
+    </plurals>
+    <plurals name="subscription_trips_remaining">
+        <item quantity="one">%1$d trip remaining</item>
+        <item quantity="other">%1$d trips remaining</item>
+    </plurals>
+
+    <!-- Payment methods -->
+    <string name="payment_method_unknown">Unknown</string>
+    <string name="payment_method_cash">Cash</string>
+    <string name="payment_method_credit_card">Credit card</string>
+    <string name="payment_method_debit_card">Debit card</string>
+    <string name="payment_method_cheque">Cheque</string>
+    <string name="payment_method_transit_card">Transit card</string>
+    <string name="payment_method_free">Free</string>
 </resources>

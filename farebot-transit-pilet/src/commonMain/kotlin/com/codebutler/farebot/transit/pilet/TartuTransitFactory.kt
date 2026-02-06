@@ -72,9 +72,11 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
     }
 
     override fun parseInfo(card: ClassicCard): PiletTransitInfo {
+        val ndefData = collectNdefData(card, startSector = 1)
         return PiletTransitInfo(
-            serial = getSerial(card),
-            cardName = runBlocking { getString(Res.string.pilet_tartu_card_name) }
+            serial = getSerialFromTlv(ndefData),
+            cardName = runBlocking { getString(Res.string.pilet_tartu_card_name) },
+            berTlvData = ndefData
         )
     }
 
@@ -84,13 +86,24 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
      * We search for the PAN tag and strip the prefix.
      */
     private fun getSerial(card: ClassicCard): String? {
-        // Read NDEF data from sectors 1+ looking for the PAN in BER-TLV
-        // The PAN is stored as ASCII text after the NDEF type marker
+        val data = collectNdefData(card, startSector = 1) ?: return null
+        return getSerialFromTlv(data)
+    }
+
+    private fun getSerialFromTlv(data: ByteArray?): String? {
+        if (data == null) return null
+        return findBerTlvAscii(data, 0x5A)?.let { pan ->
+            if (pan.length > SERIAL_PREFIX_LEN) pan.substring(SERIAL_PREFIX_LEN) else pan
+        }
+    }
+
+    /**
+     * Collects all data blocks from NDEF sectors into a single byte array.
+     */
+    private fun collectNdefData(card: ClassicCard, startSector: Int): ByteArray? {
         return try {
-            val sector1 = card.getSector(1) as? DataClassicSector ?: return null
-            // Collect all data blocks from sectors containing NDEF content
             val allData = mutableListOf<Byte>()
-            for (sectorIdx in 1 until card.sectors.size) {
+            for (sectorIdx in startSector until card.sectors.size) {
                 val sector = card.getSector(sectorIdx) as? DataClassicSector ?: continue
                 for (blockIdx in 0 until sector.blocks.size) {
                     val block = sector.getBlock(blockIdx)
@@ -99,11 +112,7 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
                     }
                 }
             }
-            val data = allData.toByteArray()
-            // Search for BER-TLV tag 5A (PAN)
-            findBerTlvAscii(data, 0x5A)?.let { pan ->
-                if (pan.length > SERIAL_PREFIX_LEN) pan.substring(SERIAL_PREFIX_LEN) else pan
-            }
+            if (allData.isEmpty()) null else allData.toByteArray()
         } catch (_: Exception) {
             null
         }

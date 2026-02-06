@@ -26,6 +26,9 @@ package com.codebutler.farebot.transit
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import farebot.farebot_transit.generated.resources.*
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getPluralString
+import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 
 /**
@@ -238,23 +241,27 @@ abstract class Subscription {
         val remainingTrips = remainingTripCount
         val totalTrips = totalTripCount
 
-        return when {
-            remainingTrips != null && totalTrips != null ->
-                "$remainingTrips of $totalTrips trips remaining"
-            remainingTrips != null ->
-                "$remainingTrips trips remaining"
-            else -> null
+        return runBlocking {
+            when {
+                remainingTrips != null && totalTrips != null ->
+                    getPluralString(Res.plurals.subscription_trips_remaining_total, remainingTrips, remainingTrips, totalTrips)
+                remainingTrips != null ->
+                    getPluralString(Res.plurals.subscription_trips_remaining, remainingTrips, remainingTrips)
+                else -> null
+            }
         }
     }
 
     fun formatValidity(): String? {
         val from = validFrom
         val to = validTo
-        return when {
-            from != null && to != null -> "Valid from $from to $to"
-            to != null -> "Valid to $to"
-            from != null -> "Valid from $from"
-            else -> null
+        return runBlocking {
+            when {
+                from != null && to != null -> getString(Res.string.subscription_valid_format, from.toString(), to.toString())
+                to != null -> getString(Res.string.subscription_valid_to_format, to.toString())
+                from != null -> getString(Res.string.subscription_valid_from_format, from.toString())
+                else -> null
+            }
         }
     }
 
@@ -276,15 +283,17 @@ abstract class Subscription {
     /**
      * Describes payment methods for a [Subscription].
      */
-    enum class PaymentMethod(val description: String) {
-        UNKNOWN("Unknown"),
-        CASH("Cash"),
-        CREDIT_CARD("Credit card"),
-        DEBIT_CARD("Debit card"),
-        CHEQUE("Cheque"),
+    enum class PaymentMethod(val descriptionRes: org.jetbrains.compose.resources.StringResource) {
+        UNKNOWN(Res.string.payment_method_unknown),
+        CASH(Res.string.payment_method_cash),
+        CREDIT_CARD(Res.string.payment_method_credit_card),
+        DEBIT_CARD(Res.string.payment_method_debit_card),
+        CHEQUE(Res.string.payment_method_cheque),
         /** The payment is made using stored balance on the transit card itself. */
-        TRANSIT_CARD("Transit card"),
+        TRANSIT_CARD(Res.string.payment_method_transit_card),
         /** The subscription costs nothing (gratis). */
-        FREE("Free")
+        FREE(Res.string.payment_method_free);
+
+        val description: String get() = runBlocking { getString(descriptionRes) }
     }
 }

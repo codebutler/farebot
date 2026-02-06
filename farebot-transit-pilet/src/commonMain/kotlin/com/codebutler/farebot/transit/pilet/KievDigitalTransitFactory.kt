@@ -69,9 +69,11 @@ class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> 
     }
 
     override fun parseInfo(card: ClassicCard): PiletTransitInfo {
+        val ndefData = collectNdefData(card, startSector = 2)
         return PiletTransitInfo(
-            serial = getSerial(card),
-            cardName = runBlocking { getString(Res.string.pilet_kiev_digital_card_name) }
+            serial = getSerialFromTlv(ndefData),
+            cardName = runBlocking { getString(Res.string.pilet_kiev_digital_card_name) },
+            berTlvData = ndefData
         )
     }
 
@@ -80,9 +82,24 @@ class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> 
      * The payload contains a BER-TLV with PAN (tag 5A) containing the serial as ASCII.
      */
     private fun getSerial(card: ClassicCard): String? {
+        val data = collectNdefData(card, startSector = 2) ?: return null
+        return getSerialFromTlv(data)
+    }
+
+    private fun getSerialFromTlv(data: ByteArray?): String? {
+        if (data == null) return null
+        return findBerTlvAscii(data, 0x5A)?.let { pan ->
+            if (pan.length > SERIAL_PREFIX_LEN) pan.substring(SERIAL_PREFIX_LEN) else pan
+        }
+    }
+
+    /**
+     * Collects all data blocks from NDEF sectors into a single byte array.
+     */
+    private fun collectNdefData(card: ClassicCard, startSector: Int): ByteArray? {
         return try {
             val allData = mutableListOf<Byte>()
-            for (sectorIdx in 2 until card.sectors.size) {
+            for (sectorIdx in startSector until card.sectors.size) {
                 val sector = card.getSector(sectorIdx) as? DataClassicSector ?: continue
                 for (blockIdx in 0 until sector.blocks.size) {
                     val block = sector.getBlock(blockIdx)
@@ -91,10 +108,7 @@ class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> 
                     }
                 }
             }
-            val data = allData.toByteArray()
-            findBerTlvAscii(data, 0x5A)?.let { pan ->
-                if (pan.length > SERIAL_PREFIX_LEN) pan.substring(SERIAL_PREFIX_LEN) else pan
-            }
+            if (allData.isEmpty()) null else allData.toByteArray()
         } catch (_: Exception) {
             null
         }
