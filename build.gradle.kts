@@ -20,8 +20,26 @@ subprojects {
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
         extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+            jvm()
             compilerOptions {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
+
+    plugins.withId("org.jetbrains.compose") {
+        plugins.withId("org.jetbrains.kotlin.multiplatform") {
+            afterEvaluate {
+                val composeExt = extensions.findByType<org.jetbrains.compose.ComposeExtension>()
+                if (composeExt != null) {
+                    extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+                        sourceSets.named("jvmMain") {
+                            dependencies {
+                                implementation(composeExt.dependencies.desktop.currentOs)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

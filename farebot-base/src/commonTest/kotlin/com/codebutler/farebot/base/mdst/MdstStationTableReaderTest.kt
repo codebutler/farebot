@@ -46,7 +46,7 @@ import kotlin.test.assertFalse
  * This test focuses on the core MDST parsing functionality that can be tested without
  * those dependencies.
  *
- * Tests that require MDST files from bundled resources may be skipped if the resources
+ * Tests that require MDST files from bundled resources will fail if the resources
  * are not available in the test environment.
  */
 class MdstStationTableReaderTest {
@@ -58,12 +58,9 @@ class MdstStationTableReaderTest {
         const val AMIIBO_STR = "amiibo"
     }
 
-    /**
-     * Helper to skip tests when MDST files are not available.
-     */
     private fun requireMdstFile(dbName: String): MdstStationTableReader {
         return MdstStationTableReader.getReader(dbName)
-            ?: throw AssertionError("MDST file '$dbName' not available - test skipped")
+            ?: throw AssertionError("MDST file '$dbName' not available")
     }
 
     /**
@@ -71,11 +68,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSeqGoDatabase() {
-        val reader = MdstStationTableReader.getReader(SEQ_GO_STR)
-        if (reader == null) {
-            println("SEQ Go MDST not available, skipping test")
-            return
-        }
+        requireMdstFile(SEQ_GO_STR)
 
         val station = MdstStationLookup.getStation(SEQ_GO_STR, DOMESTIC_AIRPORT)
         assertNotNull(station, "Station should be found in SEQ Go database")
@@ -90,7 +83,7 @@ class MdstStationTableReaderTest {
     @Test
     fun testMdstProtobufParsing() {
         val bytes = loadTestFile("farebot-base/src/commonMain/composeResources/files/seq_go.mdst")
-            ?: return println("Could not load seq_go.mdst, skipping")
+        assertNotNull(bytes, "Could not load seq_go.mdst")
 
         val reader = MdstStationTableReader.fromByteArray(bytes)
         assertNotNull(reader.notice, "License notice should exist")
@@ -108,7 +101,7 @@ class MdstStationTableReaderTest {
     @Test
     fun testSuicaRailStationLookup() {
         val bytes = loadTestFile("farebot-base/src/commonMain/composeResources/files/suica_rail.mdst")
-            ?: return println("Could not load suica_rail.mdst, skipping")
+        assertNotNull(bytes, "Could not load suica_rail.mdst")
 
         val reader = MdstStationTableReader.fromByteArray(bytes)
 
@@ -130,7 +123,7 @@ class MdstStationTableReaderTest {
     @Test
     fun testSuicaBusStationLookup() {
         val bytes = loadTestFile("farebot-base/src/commonMain/composeResources/files/suica_bus.mdst")
-            ?: return println("Could not load suica_bus.mdst, skipping")
+        assertNotNull(bytes, "Could not load suica_bus.mdst")
 
         // Just verify it parses without error and can look up stations
         val reader = MdstStationTableReader.fromByteArray(bytes)
@@ -176,11 +169,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testLicenseNotice() {
-        val reader = MdstStationTableReader.getReader(SEQ_GO_STR)
-        if (reader == null) {
-            println("SEQ Go MDST not available, skipping test")
-            return
-        }
+        val reader = requireMdstFile(SEQ_GO_STR)
 
         val notice = reader.notice
         assertNotNull(notice, "License notice should not be null")
@@ -193,11 +182,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testNoLocation() {
-        val reader = MdstStationTableReader.getReader(AMIIBO_STR)
-        if (reader == null) {
-            println("Amiibo MDST not available, skipping test")
-            return
-        }
+        requireMdstFile(AMIIBO_STR)
 
         // Amiibo database has entries without location data
         val station = MdstStationLookup.getStation(AMIIBO_STR, 2)
@@ -212,11 +197,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testOperator() {
-        val reader = MdstStationTableReader.getReader(AMIIBO_STR)
-        if (reader == null) {
-            println("Amiibo MDST not available, skipping test")
-            return
-        }
+        requireMdstFile(AMIIBO_STR)
 
         val operatorName = MdstStationLookup.getOperatorName(AMIIBO_STR, 1)
         assertNotNull(operatorName, "Operator should be found")
@@ -291,11 +272,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testLocationHandling() {
-        val reader = MdstStationTableReader.getReader(SEQ_GO_STR)
-        if (reader == null) {
-            println("SEQ Go MDST not available, skipping test")
-            return
-        }
+        requireMdstFile(SEQ_GO_STR)
 
         // Test a station that has coordinates (Domestic Airport in SEQ Go)
         val stationWithLocation = MdstStationLookup.getStation(SEQ_GO_STR, DOMESTIC_AIRPORT)
@@ -312,11 +289,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testUnknownStation() {
-        val reader = MdstStationTableReader.getReader(SEQ_GO_STR)
-        if (reader == null) {
-            println("SEQ Go MDST not available, skipping test")
-            return
-        }
+        requireMdstFile(SEQ_GO_STR)
 
         val station = MdstStationLookup.getStation(SEQ_GO_STR, 99999)
         assertNull(station, "Unknown station ID should return null")
@@ -327,11 +300,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testLineName() {
-        val reader = MdstStationTableReader.getReader(SEQ_GO_STR)
-        if (reader == null) {
-            println("SEQ Go MDST not available, skipping test")
-            return
-        }
+        requireMdstFile(SEQ_GO_STR)
 
         // The SEQ Go database may not have line names in a simple format we can test,
         // but we can at least verify the lookup doesn't crash and returns null for unknown
@@ -344,11 +313,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testReaderCaching() {
-        val reader1 = MdstStationTableReader.getReader(SEQ_GO_STR)
-        if (reader1 == null) {
-            println("SEQ Go MDST not available, skipping test")
-            return
-        }
+        val reader1 = requireMdstFile(SEQ_GO_STR)
 
         val reader2 = MdstStationTableReader.getReader(SEQ_GO_STR)
         assertNotNull(reader2)

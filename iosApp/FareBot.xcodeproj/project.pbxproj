@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		05657566A87EE7361884BB0C /* FareBotKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E296318A4ABC8EE549B0C47E /* FareBotKit.framework */; };
-		06701DFDA23815C8F488A4EC /* felica_stations.db3 in Resources */ = {isa = PBXBuildFile; fileRef = 9E35D15A57FC6060087EDBFF /* felica_stations.db3 */; };
 		163DFCD24E28C59B89D9C6E5 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83D8321B1983C43ACCF8539 /* iOSApp.swift */; };
 		519AA4F06AA994649EF3E3D5 /* FareBotKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E296318A4ABC8EE549B0C47E /* FareBotKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F4B83E01BC598A9B2C1896F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D98E531EA7A4F24295F5AFE1 /* Assets.xcassets */; };
@@ -31,7 +30,6 @@
 /* Begin PBXFileReference section */
 		4C30D909D3A3BE99AA3825F8 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		4FE026B0F1FFE6927F1ADAA4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		9E35D15A57FC6060087EDBFF /* felica_stations.db3 */ = {isa = PBXFileReference; path = felica_stations.db3; sourceTree = "<group>"; };
 		D98E531EA7A4F24295F5AFE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E296318A4ABC8EE549B0C47E /* FareBotKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FareBotKit.framework; path = "../farebot-shared/build/bin/iosSimulatorArm64/debugFramework/FareBotKit.framework"; sourceTree = "<group>"; };
 		E83D8321B1983C43ACCF8539 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
@@ -65,17 +63,8 @@
 				4FE026B0F1FFE6927F1ADAA4 /* Info.plist */,
 				4C30D909D3A3BE99AA3825F8 /* iosApp.entitlements */,
 				E83D8321B1983C43ACCF8539 /* iOSApp.swift */,
-				6305C291F0D28467D5A95AFF /* Resources */,
 			);
 			path = iosApp;
-			sourceTree = "<group>";
-		};
-		6305C291F0D28467D5A95AFF /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				9E35D15A57FC6060087EDBFF /* felica_stations.db3 */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		9B0F3B4C26A1726B3C4A2BE9 /* Frameworks */ = {
@@ -164,7 +153,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4B83E01BC598A9B2C1896F2 /* Assets.xcassets in Resources */,
-				06701DFDA23815C8F488A4EC /* felica_stations.db3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

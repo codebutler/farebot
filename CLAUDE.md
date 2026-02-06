@@ -4,6 +4,8 @@
 
 FareBot is a Kotlin Multiplatform (KMP) Android/iOS app for reading NFC transit cards. It is being ported from/aligned with [Metrodroid](https://github.com/metrodroid/metrodroid).
 
+**Metrodroid source code is in the `metrodroid/` directory in this repo.** Always use this local copy for comparisons and porting — do not fetch from GitHub.
+
 ## Critical Rules
 
 ### 1. NEVER lose existing features

@@ -24,36 +24,43 @@ package com.codebutler.farebot.test
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
-import platform.Foundation.NSBundle
 import platform.Foundation.NSData
+import platform.Foundation.NSFileManager
 import platform.Foundation.dataWithContentsOfFile
 import platform.posix.memcpy
 
 /**
  * iOS implementation of test resource loading.
- * Uses NSBundle to find resources in the test bundle.
+ * Reads from the source tree since NSBundle.mainBundle doesn't contain test resources.
  */
 @OptIn(ExperimentalForeignApi::class)
 actual fun loadTestResource(path: String): ByteArray? {
-    // Try to find the resource in the main bundle
-    val bundle = NSBundle.mainBundle
-    val pathComponents = path.split("/")
-    val fileName = pathComponents.lastOrNull() ?: return null
-    val directory = if (pathComponents.size > 1) {
-        pathComponents.dropLast(1).joinToString("/")
-    } else {
-        null
+    val possibleRoots = listOf(
+        "/Users/eric/Code/farebot",
+        getEnv("PROJECT_DIR"),
+        ".",
+        ".."
+    )
+
+    val resourceDirs = listOf(
+        "farebot-shared/src/commonTest/resources",
+        "src/commonTest/resources"
+    )
+
+    val fileManager = NSFileManager.defaultManager
+    for (root in possibleRoots) {
+        if (root.isNullOrEmpty()) continue
+        for (dir in resourceDirs) {
+            val fullPath = "$root/$dir/$path"
+            if (fileManager.fileExistsAtPath(fullPath)) {
+                val data = NSData.dataWithContentsOfFile(fullPath) ?: continue
+                return data.toByteArray()
+            }
+        }
     }
-
-    val resourcePath = bundle.pathForResource(
-        name = fileName.substringBeforeLast("."),
-        ofType = fileName.substringAfterLast(".", ""),
-        inDirectory = directory
-    ) ?: return null
-
-    val data = NSData.dataWithContentsOfFile(resourcePath) ?: return null
-    return data.toByteArray()
+    return null
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -67,3 +74,6 @@ private fun NSData.toByteArray(): ByteArray {
     }
     return bytes
 }
+
+@OptIn(ExperimentalForeignApi::class)
+private fun getEnv(name: String): String? = platform.posix.getenv(name)?.toKString()
