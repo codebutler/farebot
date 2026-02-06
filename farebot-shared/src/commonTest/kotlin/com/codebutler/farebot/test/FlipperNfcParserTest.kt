@@ -24,6 +24,8 @@ package com.codebutler.farebot.test
 
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
+import com.codebutler.farebot.card.desfire.raw.RawDesfireCard
+import com.codebutler.farebot.card.felica.raw.RawFelicaCard
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.shared.serialize.FlipperNfcParser
 import kotlin.test.Test
@@ -264,12 +266,136 @@ class FlipperNfcParserTest {
         val dump = buildString {
             appendLine("Filetype: Flipper NFC device")
             appendLine("Version: 4")
-            appendLine("Device type: Mifare DESFire")
+            appendLine("Device type: ISO15693-3")
             appendLine("UID: 01 02 03 04 05 06 07")
         }
 
         val result = FlipperNfcParser.parse(dump)
         assertNull(result)
+    }
+
+    @Test
+    fun testParseDesfire() {
+        val dump = buildString {
+            appendLine("Filetype: Flipper NFC device")
+            appendLine("Version: 4")
+            appendLine("Device type: Mifare DESFire")
+            appendLine("UID: 04 15 37 29 99 1B 80")
+            appendLine("ATQA: 03 44")
+            appendLine("SAK: 20")
+            appendLine("PICC Version: 04 01 01 00 02 18 05 04 01 01 00 06 18 05 04 15 37 29 99 1B 80 8F D4 57 55 70 29 08")
+            appendLine("Application Count: 1")
+            appendLine("Application IDs: AB CD EF")
+            appendLine("Application abcdef File IDs: 01 02")
+            appendLine("Application abcdef File 1 Type: 00")
+            appendLine("Application abcdef File 1 Communication Settings: 00")
+            appendLine("Application abcdef File 1 Access Rights: F2 EF")
+            appendLine("Application abcdef File 1 Size: 5")
+            appendLine("Application abcdef File 1: AA BB CC DD EE")
+            appendLine("Application abcdef File 2 Type: 04")
+            appendLine("Application abcdef File 2 Communication Settings: 00")
+            appendLine("Application abcdef File 2 Access Rights: 32 E4")
+            appendLine("Application abcdef File 2 Size: 48")
+            appendLine("Application abcdef File 2 Max: 11")
+            appendLine("Application abcdef File 2 Cur: 10")
+        }
+
+        val result = FlipperNfcParser.parse(dump)
+        assertNotNull(result)
+        assertIs<RawDesfireCard>(result)
+
+        // Verify UID
+        assertEquals(0x04.toByte(), result.tagId()[0])
+        assertEquals(7, result.tagId().size)
+
+        // Verify manufacturing data
+        assertEquals(28, result.manufacturingData.data.size)
+        assertEquals(0x04.toByte(), result.manufacturingData.data[0])
+
+        // Verify applications
+        assertEquals(1, result.applications.size)
+        val app = result.applications[0]
+        assertEquals(0xABCDEF, app.appId)
+
+        // Verify files
+        assertEquals(2, app.files.size)
+
+        // File 1: standard file with data
+        val file1 = app.files[0]
+        assertEquals(1, file1.fileId)
+        assertNotNull(file1.fileData)
+        assertEquals(5, file1.fileData!!.size)
+        assertEquals(0xAA.toByte(), file1.fileData!![0])
+        assertNull(file1.error)
+
+        // File 2: cyclic record file without data (should be invalid)
+        val file2 = app.files[1]
+        assertEquals(2, file2.fileId)
+        assertNotNull(file2.error)
+    }
+
+    @Test
+    fun testParseFelica() {
+        val dump = buildString {
+            appendLine("Filetype: Flipper NFC device")
+            appendLine("Version: 4")
+            appendLine("Device type: FeliCa")
+            appendLine("UID: 01 02 03 04 05 06 07 08")
+            appendLine("Data format version: 2")
+            appendLine("Manufacture id: 01 02 03 04 05 06 07 08")
+            appendLine("Manufacture parameter: 10 0B 4B 42 84 85 D0 FF")
+            appendLine("IC Type: FeliCa Standard")
+            appendLine("System found: 1")
+            appendLine()
+            appendLine("System 00: 0003")
+            appendLine()
+            appendLine("Service found: 3")
+            appendLine("Service 000: | Code 008B | Attrib. 0B | Public  | Random | Read Only  |")
+            appendLine("Service 001: | Code 090F | Attrib. 0F | Public  | Random | Read Only  |")
+            appendLine("Service 002: | Code 1808 | Attrib. 08 | Private | Random | Read/Write |")
+            appendLine()
+            appendLine("Public blocks read: 3")
+            appendLine("Block 0000: | Service code 008B | Block index 00 | Data: 00 00 00 00 00 00 00 00 20 00 00 0A 00 00 01 E3 |")
+            appendLine("Block 0001: | Service code 090F | Block index 00 | Data: 16 01 00 02 16 6C E3 3B E6 21 0A 00 00 01 E3 00 |")
+            appendLine("Block 0002: | Service code 090F | Block index 01 | Data: 16 01 00 02 16 6B E3 36 E3 38 AA 00 00 01 E1 00 |")
+        }
+
+        val result = FlipperNfcParser.parse(dump)
+        assertNotNull(result)
+        assertIs<RawFelicaCard>(result)
+
+        // Verify UID
+        assertEquals(0x01.toByte(), result.tagId()[0])
+        assertEquals(8, result.tagId().size)
+
+        // Verify IDm and PMm
+        assertEquals(0x01.toByte(), result.idm.getBytes()[0])
+        assertEquals(0x10.toByte(), result.pmm.getBytes()[0])
+
+        // Verify systems
+        assertEquals(1, result.systems.size)
+        val system = result.systems[0]
+        assertEquals(0x0003, system.code)
+
+        // Verify allServiceCodes includes all listed services (not just ones with blocks)
+        assertTrue(system.allServiceCodes.contains(0x008B))
+        assertTrue(system.allServiceCodes.contains(0x090F))
+        assertTrue(system.allServiceCodes.contains(0x1808))
+        assertEquals(3, system.allServiceCodes.size)
+
+        // Verify services (only those with block data)
+        assertEquals(2, system.services.size)
+
+        // Service 008B has 1 block
+        val service008B = system.getService(0x008B)
+        assertNotNull(service008B)
+        assertEquals(1, service008B.blocks.size)
+
+        // Service 090F has 2 blocks
+        val service090F = system.getService(0x090F)
+        assertNotNull(service090F)
+        assertEquals(2, service090F.blocks.size)
+        assertEquals(0x16.toByte(), service090F.blocks[0].data[0])
     }
 
     @Test

@@ -1,0 +1,141 @@
+Filetype: Flipper NFC device
+Version: 4
+# Device type can be ISO14443-3A, ISO14443-3B, ISO14443-4A, ISO14443-4B, ISO15693-3, FeliCa, NTAG/Ultralight, Mifare Classic, Mifare Plus, Mifare DESFire, SLIX, ST25TB
+Device type: FeliCa
+# UID is common for all formats
+UID: 01 01 02 12 0E 0F 32 17
+# FeliCa specific data
+Data format version: 2
+Manufacture id: 01 01 02 12 0E 0F 32 17
+Manufacture parameter: 04 01 4B 02 4F 49 93 FF
+IC Type: FeliCa Standard RC-S915
+
+# Felica Standard specific data
+System found: 1
+
+
+System 00: 0003
+
+Area found: 9
+Area 000: | Code 0000 | Services #000-#000 |
+Area 001: | Code 0040 | Services #000-#003 |
+Area 002: | Code 0800 | Services #004-#010 |
+Area 003: | Code 0FC0 | Services #011-#000 |
+Area 004: | Code 1000 | Services #011-#01C |
+Area 005: | Code 17C0 | Services #01D-#000 |
+Area 006: | Code 1A40 | Services #01D-#020 |
+Area 007: | Code 8000 | Services #021-#000 |
+Area 008: | Code 9600 | Services #021-#022 |
+
+Service found: 35
+Service 000: | Code 0048 | Attrib. 08 | Private | Random | Read/Write |
+Service 001: | Code 004A | Attrib. 0A | Private | Random | Read Only  |
+Service 002: | Code 0088 | Attrib. 08 | Private | Random | Read/Write |
+Service 003: | Code 008B | Attrib. 0B | Public  | Random | Read Only  |
+Service 004: | Code 0810 | Attrib. 10 | Private | Purse  | Direct     |
+Service 005: | Code 0812 | Attrib. 12 | Private | Purse  | Cashback   |
+Service 006: | Code 0816 | Attrib. 16 | Private | Purse  | Read Only  |
+Service 007: | Code 0850 | Attrib. 10 | Private | Purse  | Direct     |
+Service 008: | Code 0852 | Attrib. 12 | Private | Purse  | Cashback   |
+Service 009: | Code 0856 | Attrib. 16 | Private | Purse  | Read Only  |
+Service 00A: | Code 0890 | Attrib. 10 | Private | Purse  | Direct     |
+Service 00B: | Code 0892 | Attrib. 12 | Private | Purse  | Cashback   |
+Service 00C: | Code 0896 | Attrib. 16 | Private | Purse  | Read Only  |
+Service 00D: | Code 08C8 | Attrib. 08 | Private | Random | Read/Write |
+Service 00E: | Code 08CA | Attrib. 0A | Private | Random | Read Only  |
+Service 00F: | Code 090C | Attrib. 0C | Private | Random | Read/Write |
+Service 010: | Code 090F | Attrib. 0F | Public  | Random | Read Only  |
+Service 011: | Code 1008 | Attrib. 08 | Private | Random | Read/Write |
+Service 012: | Code 100A | Attrib. 0A | Private | Random | Read Only  |
+Service 013: | Code 1048 | Attrib. 08 | Private | Random | Read/Write |
+Service 014: | Code 104A | Attrib. 0A | Private | Random | Read Only  |
+Service 015: | Code 108C | Attrib. 0C | Private | Random | Read/Write |
+Service 016: | Code 108F | Attrib. 0F | Public  | Random | Read Only  |
+Service 017: | Code 10C8 | Attrib. 08 | Private | Random | Read/Write |
+Service 018: | Code 10CB | Attrib. 0B | Public  | Random | Read Only  |
+Service 019: | Code 1108 | Attrib. 08 | Private | Random | Read/Write |
+Service 01A: | Code 110A | Attrib. 0A | Private | Random | Read Only  |
+Service 01B: | Code 1148 | Attrib. 08 | Private | Random | Read/Write |
+Service 01C: | Code 114A | Attrib. 0A | Private | Random | Read Only  |
+Service 01D: | Code 1A48 | Attrib. 08 | Private | Random | Read/Write |
+Service 01E: | Code 1A4A | Attrib. 0A | Private | Random | Read Only  |
+Service 01F: | Code 1A88 | Attrib. 08 | Private | Random | Read/Write |
+Service 020: | Code 1A8A | Attrib. 0A | Private | Random | Read Only  |
+Service 021: | Code 9608 | Attrib. 08 | Private | Random | Read/Write |
+Service 022: | Code 960A | Attrib. 0A | Private | Random | Read Only  |
+
+Directory Tree: 
++++ ... are public services
+||| ... are private services
+- AREA_0000/
+|- AREA_0001/
+| |- serv_0048
+| |- serv_004A
+| |- serv_0088
++ +- serv_008B
+|- AREA_0020/
+| |- serv_0810
+| |- serv_0812
+| |- serv_0816
+| |- serv_0850
+| |- serv_0852
+| |- serv_0856
+| |- serv_0890
+| |- serv_0892
+| |- serv_0896
+| |- serv_08C8
+| |- serv_08CA
+| |- serv_090C
++ +- serv_090F
+|- AREA_003F/
+| |- AREA_0040/
+| | |- serv_1008
+| | |- serv_100A
+| | |- serv_1048
+| | |- serv_104A
+| | |- serv_108C
++ + +- serv_108F
+| | |- serv_10C8
++ + +- serv_10CB
+| | |- serv_1108
+| | |- serv_110A
+| | |- serv_1148
+| | |- serv_114A
+| |- AREA_005F/
+| | |- AREA_0069/
+| | | |- serv_1A48
+| | | |- serv_1A4A
+| | | |- serv_1A88
+| | | |- serv_1A8A
+| | |- AREA_0200/
+| | | |- AREA_0258/
+| | | | |- serv_9608
+| | | | |- serv_960A
+
+Public blocks read: 26
+Block 0000: | Service code 008B | Block index 00 | Data: 00 00 00 00 00 00 00 00 32 00 00 AF 00 00 00 2A |
+Block 0001: | Service code 090F | Block index 00 | Data: 16 01 00 02 25 31 8B A5 8A A5 AF 00 00 00 2A A0 |
+Block 0002: | Service code 090F | Block index 01 | Data: C8 46 00 00 16 CE 62 63 DE 43 B3 01 00 00 28 00 |
+Block 0003: | Service code 090F | Block index 02 | Data: C8 46 00 00 16 CB 84 03 92 C7 17 02 00 00 27 00 |
+Block 0004: | Service code 090F | Block index 03 | Data: C8 46 00 00 16 CB 72 A0 40 E3 AD 02 00 00 26 00 |
+Block 0005: | Service code 090F | Block index 04 | Data: 05 0D 00 0F 16 CB 0E 51 00 51 3D 04 00 00 25 A0 |
+Block 0006: | Service code 090F | Block index 05 | Data: 16 01 00 02 16 C9 E7 01 E8 1F 05 05 00 00 24 A0 |
+Block 0007: | Service code 090F | Block index 06 | Data: 16 01 00 02 16 C9 81 1F 81 24 21 07 00 00 22 A0 |
+Block 0008: | Service code 090F | Block index 07 | Data: 16 01 00 02 16 C8 81 1C 81 23 E9 07 00 00 20 A0 |
+Block 0009: | Service code 090F | Block index 08 | Data: 16 01 00 02 16 C8 5B 06 0C 03 CF 08 00 00 1E 00 |
+Block 000A: | Service code 090F | Block index 09 | Data: 1F 02 00 00 16 C8 5B 06 00 00 79 09 00 00 1C 00 |
+Block 000B: | Service code 090F | Block index 0A | Data: C7 46 00 00 16 C8 84 60 2B 7F A9 01 00 00 1B 00 |
+Block 000C: | Service code 090F | Block index 0B | Data: 16 01 00 02 16 C8 81 24 84 19 65 04 00 00 1A A0 |
+Block 000D: | Service code 090F | Block index 0C | Data: 16 01 00 02 16 C8 81 17 81 24 4B 05 00 00 18 A0 |
+Block 000E: | Service code 090F | Block index 0D | Data: 16 01 00 02 16 C8 8A A5 8B AB 59 06 00 00 16 A0 |
+Block 000F: | Service code 090F | Block index 0E | Data: 21 02 00 00 16 C8 8A A5 00 00 53 07 00 00 15 80 |
+Block 0010: | Service code 090F | Block index 0F | Data: 16 01 00 02 16 C7 C5 50 C5 5C 6B 03 00 00 13 A0 |
+Block 0011: | Service code 090F | Block index 10 | Data: C7 46 00 00 16 C7 4F 20 2B 59 6F 04 00 00 11 00 |
+Block 0012: | Service code 090F | Block index 11 | Data: 08 02 00 00 16 C7 01 CC 00 00 2D 08 00 00 10 00 |
+Block 0013: | Service code 090F | Block index 12 | Data: C7 46 00 00 16 C7 4C 20 2B 51 5D 00 00 00 0F 00 |
+Block 0014: | Service code 090F | Block index 13 | Data: C8 46 00 00 16 C6 45 C0 29 4C 3B 03 00 00 0E 00 |
+Block 0015: | Service code 108F | Block index 00 | Data: 20 00 8A A5 04 03 25 31 09 29 04 01 00 00 00 00 |
+Block 0016: | Service code 108F | Block index 01 | Data: A0 00 8B A5 01 01 25 31 09 11 00 00 00 00 00 00 |
+Block 0017: | Service code 108F | Block index 02 | Data: 20 08 EB D3 04 34 16 CB 09 39 C8 00 00 00 00 51 |
+Block 0018: | Service code 10CB | Block index 00 | Data: 8B A5 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0019: | Service code 10CB | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 8A 40 00 00 |

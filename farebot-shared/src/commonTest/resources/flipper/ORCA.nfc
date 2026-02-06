@@ -1,0 +1,104 @@
+Filetype: Flipper NFC device
+Version: 4
+# Device type can be ISO14443-3A, ISO14443-3B, ISO14443-4A, ISO14443-4B, ISO15693-3, FeliCa, NTAG/Ultralight, Mifare Classic, Mifare Plus, Mifare DESFire, SLIX, ST25TB
+Device type: Mifare DESFire
+# UID is common for all formats
+UID: 04 15 37 29 99 1B 80
+# ISO14443-3A specific data
+ATQA: 03 44
+SAK: 20
+# ISO14443-4A specific data
+T0: 75
+TA(1): 77
+TB(1): 81
+TC(1): 02
+T1...Tk: 80
+# Mifare DESFire specific data
+PICC Version: 04 01 01 00 02 18 05 04 01 01 00 06 18 05 04 15 37 29 99 1B 80 8F D4 57 55 70 29 08
+PICC Change Key ID: 00
+PICC Config Changeable: true
+PICC Free Create Delete: false
+PICC Free Directory List: true
+PICC Key Changeable: true
+PICC Flags: 00
+PICC Max Keys: 01
+PICC Key 0 Version: 03
+Application Count: 2
+Application IDs: FF FF FF 30 10 F2
+Application ffffff Change Key ID: 01
+Application ffffff Config Changeable: true
+Application ffffff Free Create Delete: false
+Application ffffff Free Directory List: true
+Application ffffff Key Changeable: true
+Application ffffff Flags: 00
+Application ffffff Max Keys: 04
+Application ffffff Key 0 Version: 03
+Application ffffff Key 1 Version: 03
+Application ffffff Key 2 Version: 03
+Application ffffff Key 3 Version: 03
+Application ffffff File IDs: 0F 07
+Application ffffff File 15 Type: 00
+Application ffffff File 15 Communication Settings: 00
+Application ffffff File 15 Access Rights: F2 EF
+Application ffffff File 15 Size: 9
+Application ffffff File 15: 00 04 B5 55 00 99 3E 84 08
+Application ffffff File 7 Type: 01
+Application ffffff File 7 Communication Settings: 01
+Application ffffff File 7 Access Rights: 32 E3
+Application ffffff File 7 Size: 32
+Application ffffff File 7: 03 00 00 01 FF FF 03 48 00 00 00 00 00 FF FF FF FF C0 00 00 00 00 AB 38 00 00 00 00 00 00 00 00
+Application 3010f2 Change Key ID: 01
+Application 3010f2 Config Changeable: true
+Application 3010f2 Free Create Delete: false
+Application 3010f2 Free Directory List: true
+Application 3010f2 Key Changeable: true
+Application 3010f2 Flags: 00
+Application 3010f2 Max Keys: 05
+Application 3010f2 Key 0 Version: 02
+Application 3010f2 Key 1 Version: 02
+Application 3010f2 Key 2 Version: 02
+Application 3010f2 Key 3 Version: 02
+Application 3010f2 Key 4 Version: 02
+Application 3010f2 File IDs: 05 00 0F 02 03 04 06 07
+Application 3010f2 File 5 Type: 01
+Application 3010f2 File 5 Communication Settings: 00
+Application 3010f2 File 5 Access Rights: 32 E4
+Application 3010f2 File 5 Size: 32
+Application 3010f2 File 5: 00 00 00 00 01 00 00 00 01 30 00 25 AA A8 04 C9 F4 20 00 FF FF FF FF 04 00 00 00 00 00 00 00 00
+Application 3010f2 File 0 Type: 01
+Application 3010f2 File 0 Communication Settings: 00
+Application 3010f2 File 0 Access Rights: 32 E4
+Application 3010f2 File 0 Size: 160
+Application 3010f2 File 0: FF FF 20 42 00 02 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 00 FF FF FF FF 00 00 00 00 01 00 B1 00 04 04 00 00 00 02 29 80 08 04 00 00 00 02 29 C0 0C 04 00 00 00 01 13 C0 FC 12 04 10 43 11 23 C0 50 05 10 10 1E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Application 3010f2 File 15 Type: 00
+Application 3010f2 File 15 Communication Settings: 01
+Application 3010f2 File 15 Access Rights: 32 E4
+Application 3010f2 File 15 Size: 416
+Application 3010f2 File 15: 10 48 00 00 00 10 00 0F FF 00 10 00 01 35 60 64 10 00 36 60 00 20 00 07 FF 80 10 00 01 00 00 00 10 48 18 0F FF C0 00 04 FD 70 00 08 01 35 60 64 10 00 59 D0 00 20 00 07 FF 80 10 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Application 3010f2 File 2 Type: 04
+Application 3010f2 File 2 Communication Settings: 00
+Application 3010f2 File 2 Access Rights: 32 E4
+Application 3010f2 File 2 Size: 48
+Application 3010f2 File 2 Max: 11
+Application 3010f2 File 2 Cur: 10
+Application 3010f2 File 3 Type: 04
+Application 3010f2 File 3 Communication Settings: 00
+Application 3010f2 File 3 Access Rights: 32 E4
+Application 3010f2 File 3 Size: 48
+Application 3010f2 File 3 Max: 6
+Application 3010f2 File 3 Cur: 5
+Application 3010f2 File 4 Type: 01
+Application 3010f2 File 4 Communication Settings: 01
+Application 3010f2 File 4 Access Rights: 32 E4
+Application 3010f2 File 4 Size: 64
+Application 3010f2 File 4: 10 48 18 00 00 02 0B B8 A2 D3 AD EF 04 65 00 07 D0 00 0A 41 03 78 00 0F 9E 00 07 00 00 00 00 00 00 00 00 02 00 00 00 16 00 0A 41 04 65 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Application 3010f2 File 6 Type: 01
+Application 3010f2 File 6 Communication Settings: 00
+Application 3010f2 File 6 Access Rights: 32 E4
+Application 3010f2 File 6 Size: 64
+Application 3010f2 File 6: 18 00 24 47 6A D7 32 71 80 01 00 00 3F 00 00 08 00 00 00 00 01 5F B1 D4 00 00 00 00 00 00 00 00 01 F0 00 0E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Application 3010f2 File 7 Type: 01
+Application 3010f2 File 7 Communication Settings: 00
+Application 3010f2 File 7 Access Rights: 32 E4
+Application 3010f2 File 7 Size: 64
+Application 3010f2 File 7: 18 00 24 7E D9 42 2D B9 40 00 10 00 4E EA 00 10 06 04 00 06 04 D9 42 2C 00 00 00 00 00 00 00 00 00 00 00 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
