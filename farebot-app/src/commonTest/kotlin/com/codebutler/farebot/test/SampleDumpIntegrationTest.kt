@@ -35,6 +35,7 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
 import com.codebutler.farebot.transit.easycard.EasyCardTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
+import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitInfo
@@ -323,5 +324,29 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         assertEquals(Trip.Mode.BUS, trips[0].mode)
         assertEquals(Trip.Mode.METRO, trips[1].mode)
         assertEquals(Trip.Mode.TICKET_MACHINE, trips[2].mode)
+    }
+
+    // --- Compass (Ultralight) ---
+    // Source: CompassTransitTest LENREK_TEST_DATA[0]
+    // Card: Compass, Vancouver, Canada
+    // Serial: 0001 0084 2851 9244 6735
+
+    @Test
+    fun testCompassDump() {
+        val factory = CompassUltralightTransitInfo.FACTORY
+        val (card, info) = loadAndParseMetrodroidJson<UltralightCard, CompassUltralightTransitInfo>(
+            "compass/Compass.json", factory
+        )
+
+        val identity = factory.parseIdentity(card)
+        assertNotNull(identity.name)
+        assertEquals("0001 0084 2851 9244 6735", identity.serialNumber)
+
+        assertNotNull(info.serialNumber)
+
+        // Should have trips (this card has 2 transaction records)
+        val trips = info.trips
+        assertNotNull(trips)
+        assertTrue(trips.isNotEmpty(), "Should have at least one trip")
     }
 }

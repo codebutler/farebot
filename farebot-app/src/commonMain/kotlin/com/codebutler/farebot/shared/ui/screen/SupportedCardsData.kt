@@ -20,7 +20,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_sun_card, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_orlando_fl, serialOnly = true, imageRes = Res.drawable.suncard, latitude = 28.5383f, longitude = -81.3792f),
 
     // North America - Canada
-    CardInfo(Res.string.card_name_compass, CardType.MifareUltralight, TransitRegion.CANADA, Res.string.card_location_vancouver_canada, extraNoteRes = Res.string.card_note_compass, imageRes = Res.drawable.yvr_compass_card, latitude = 49.2827f, longitude = -123.1207f),
+    CardInfo(Res.string.card_name_compass, CardType.MifareUltralight, TransitRegion.CANADA, Res.string.card_location_vancouver_canada, extraNoteRes = Res.string.card_note_compass, imageRes = Res.drawable.yvr_compass_card, latitude = 49.2827f, longitude = -123.1207f, sampleDumpFile = "Compass.json"),
     CardInfo(Res.string.card_name_opus, CardType.ISO7816, TransitRegion.CANADA, Res.string.card_location_montreal_canada, imageRes = Res.drawable.opus_card, latitude = 45.5017f, longitude = -73.5673f),
     CardInfo(Res.string.card_name_presto, CardType.MifareDesfire, TransitRegion.CANADA, Res.string.card_location_ontario_canada, serialOnly = true, imageRes = Res.drawable.presto_card, latitude = 43.6532f, longitude = -79.3832f),
 
