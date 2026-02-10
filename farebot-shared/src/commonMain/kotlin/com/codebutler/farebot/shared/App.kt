@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import farebot.farebot_shared.generated.resources.Res
 import farebot.farebot_shared.generated.resources.*
 import com.codebutler.farebot.base.util.hex
@@ -28,13 +29,16 @@ import com.codebutler.farebot.shared.ui.screen.AddKeyScreen
 import com.codebutler.farebot.shared.ui.screen.AdvancedTab
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
+import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
+import com.codebutler.farebot.shared.ui.screen.CardsMapScreen
+import com.codebutler.farebot.shared.ui.screen.CardsMapUiState
 import com.codebutler.farebot.shared.ui.screen.CardScreen
 import com.codebutler.farebot.shared.ui.screen.HelpScreen
 import com.codebutler.farebot.shared.ui.screen.HistoryScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
 import com.codebutler.farebot.shared.ui.screen.SettingsScreen
-import com.codebutler.farebot.shared.ui.screen.SupportedCardInfo
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapUiState
 import com.codebutler.farebot.shared.ui.theme.FareBotTheme
@@ -57,8 +61,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FareBotApp(
     platformActions: PlatformActions,
-    supportedCards: List<SupportedCardInfo> = emptyList(),
-    isMifareClassicSupported: Boolean = false,
+    supportedCards: List<CardInfo> = emptyList(),
+    supportedCardTypes: Set<CardType> = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.CEPAS),
+    deviceRegion: String? = null,
+    loadedKeyBundles: Set<String> = emptySet(),
     onNavigateToPrefs: (() -> Unit)? = null,
 ) {
     FareBotTheme {
@@ -135,11 +141,33 @@ fun FareBotApp(
             composable(Screen.Help.route) {
                 HelpScreen(
                     supportedCards = supportedCards,
-                    isMifareClassicSupported = isMifareClassicSupported,
+                    supportedCardTypes = supportedCardTypes,
+                    deviceRegion = deviceRegion,
+                    loadedKeyBundles = loadedKeyBundles,
                     onBack = { navController.popBackStack() },
                     onKeysRequiredTap = {
                         platformActions.showToast(runBlocking { getString(Res.string.keys_required) })
                     },
+                    onNavigateToCardsMap = { navController.navigate(Screen.CardsMap.route) },
+                )
+            }
+
+            composable(Screen.CardsMap.route) {
+                val markers = remember(supportedCards) {
+                    supportedCards
+                        .filter { it.latitude != null && it.longitude != null }
+                        .map { card ->
+                            CardsMapMarker(
+                                name = runBlocking { getString(card.nameRes) },
+                                location = runBlocking { getString(card.locationRes) },
+                                latitude = card.latitude!!.toDouble(),
+                                longitude = card.longitude!!.toDouble(),
+                            )
+                        }
+                }
+                CardsMapScreen(
+                    uiState = CardsMapUiState(markers = markers),
+                    onBack = { navController.popBackStack() },
                 )
             }
 

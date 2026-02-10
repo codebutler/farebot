@@ -16,4 +16,5 @@ sealed class Screen(val route: String) {
     data object TripMap : Screen("trip_map/{tripKey}") {
         fun createRoute(tripKey: String): String = "trip_map/$tripKey"
     }
+    data object CardsMap : Screen("cards_map")
 }
