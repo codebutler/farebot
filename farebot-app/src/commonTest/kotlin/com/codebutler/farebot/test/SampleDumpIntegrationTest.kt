@@ -23,10 +23,17 @@
 package com.codebutler.farebot.test
 
 import com.codebutler.farebot.card.cepas.CEPASCard
+import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.shared.serialize.CardImporter
+import com.codebutler.farebot.shared.serialize.ImportResult
+import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import com.codebutler.farebot.transit.TransitCurrency
+import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
+import com.codebutler.farebot.transit.easycard.EasyCardTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
@@ -42,6 +49,7 @@ import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitInfo
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitFactory
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitInfo
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -272,5 +280,48 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val trips = info.trips
         assertNotNull(trips)
         assertEquals(0, trips.size)
+    }
+
+    // --- EasyCard (Classic, MFC binary) ---
+    // Source: Test asset deadbeef.mfc (from Metrodroid's EasyCard test)
+    // Card: EasyCard, Taipei, Taiwan
+    // Tests the CardImporter.importMfcDump() path used by the Explore screen
+
+    @Test
+    fun testEasyCardMfcDump() {
+        val bytes = loadTestResource("easycard/deadbeef.mfc")
+        assertNotNull(bytes, "Test resource not found: easycard/deadbeef.mfc")
+
+        val json = Json { isLenient = true; ignoreUnknownKeys = true }
+        val importer = CardImporter.create(KotlinxCardSerializer(json))
+        val result = importer.importMfcDump(bytes)
+        assertTrue(result is ImportResult.Success, "Failed to import MFC dump: $result")
+
+        val rawCard = (result as ImportResult.Success).cards.first()
+        val card = rawCard.parse() as ClassicCard
+
+        val factory = EasyCardTransitFactory(stringResource)
+        assertTrue(factory.check(card), "EasyCard factory should recognize this card")
+
+        val identity = factory.parseIdentity(card)
+        assertNotNull(identity.name)
+
+        val info = factory.parseInfo(card)
+        assertNotNull(info, "Failed to parse EasyCard transit info")
+        assertTrue(info is EasyCardTransitInfo)
+
+        // Balance: 245 TWD
+        val balances = info.balances
+        assertNotNull(balances)
+        assertEquals(1, balances.size)
+        assertEquals(TransitCurrency.TWD(245), balances[0].balance)
+
+        // 3 trips: bus, metro (merged tap-on/off), refill
+        val trips = info.trips
+        assertNotNull(trips)
+        assertEquals(3, trips.size)
+        assertEquals(Trip.Mode.BUS, trips[0].mode)
+        assertEquals(Trip.Mode.METRO, trips[1].mode)
+        assertEquals(Trip.Mode.TICKET_MACHINE, trips[2].mode)
     }
 }
