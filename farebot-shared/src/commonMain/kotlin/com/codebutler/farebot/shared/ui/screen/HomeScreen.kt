@@ -68,7 +68,7 @@ fun HomeScreen(
     onDismissError: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToHelp: () -> Unit,
-    onNavigateToKeys: () -> Unit,
+    onNavigateToKeys: (() -> Unit)? = null,
     onNavigateToPrefs: (() -> Unit)? = null,
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: () -> Unit,
@@ -103,10 +103,12 @@ fun HomeScreen(
                             text = { Text(stringResource(Res.string.history)) },
                             onClick = { menuExpanded = false; onNavigateToHistory() }
                         )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.keys)) },
-                            onClick = { menuExpanded = false; onNavigateToKeys() }
-                        )
+                        if (onNavigateToKeys != null) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.keys)) },
+                                onClick = { menuExpanded = false; onNavigateToKeys() }
+                            )
+                        }
                         if (onNavigateToPrefs != null) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.preferences)) },

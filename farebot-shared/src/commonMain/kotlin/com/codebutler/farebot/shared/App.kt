@@ -126,7 +126,9 @@ fun FareBotApp(
                     onDismissError = { viewModel.dismissError() },
                     onNavigateToHistory = { navController.navigate(Screen.History.route) },
                     onNavigateToHelp = { navController.navigate(Screen.Help.route) },
-                    onNavigateToKeys = { navController.navigate(Screen.Keys.route) },
+                    onNavigateToKeys = if (CardType.MifareClassic in supportedCardTypes) {
+                        { navController.navigate(Screen.Keys.route) }
+                    } else null,
                     onNavigateToPrefs = when {
                         onNavigateToPrefs != null -> onNavigateToPrefs
                         else -> { { navController.navigate(Screen.Settings.route) } }
