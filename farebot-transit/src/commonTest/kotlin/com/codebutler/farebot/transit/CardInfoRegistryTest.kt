@@ -20,21 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:OptIn(InternalResourceApi::class)
+
 package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
+import org.jetbrains.compose.resources.InternalResourceApi
+import org.jetbrains.compose.resources.StringResource
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class CardInfoRegistryTest {
+
+    private fun testStringRes(name: String) = StringResource("string:$name", name, emptySet())
 
     @Test
     fun testEmptyRegistry() {
         val registry = CardInfoRegistry(emptyList())
         assertEquals(0, registry.allCards.size)
-        assertEquals(0, registry.allCardsAlphabetical.size)
         assertEquals(0, registry.allCardsByRegion.size)
     }
 
@@ -43,42 +47,25 @@ class CardInfoRegistryTest {
         val factory = TestFactory(
             listOf(
                 CardInfo(
-                    name = "Test Card",
+                    nameRes = testStringRes("test_card"),
                     cardType = CardType.MifareDesfire,
-                    region = TransitRegion.USA
+                    region = TransitRegion.USA,
+                    locationRes = testStringRes("location_test"),
                 )
             )
         )
         val registry = CardInfoRegistry(listOf(factory))
         assertEquals(1, registry.allCards.size)
-        assertEquals("Test Card", registry.allCards[0].name)
-    }
-
-    @Test
-    fun testAlphabeticalSorting() {
-        val factory = TestFactory(
-            listOf(
-                CardInfo(name = "Zeta Card", cardType = CardType.MifareDesfire, region = TransitRegion.USA),
-                CardInfo(name = "Alpha Card", cardType = CardType.MifareDesfire, region = TransitRegion.USA),
-                CardInfo(name = "Beta Card", cardType = CardType.MifareDesfire, region = TransitRegion.USA)
-            )
-        )
-        val registry = CardInfoRegistry(listOf(factory))
-        val cards = registry.allCardsAlphabetical
-        assertEquals(3, cards.size)
-        assertEquals("Alpha Card", cards[0].name)
-        assertEquals("Beta Card", cards[1].name)
-        assertEquals("Zeta Card", cards[2].name)
     }
 
     @Test
     fun testGroupByRegion() {
         val factory = TestFactory(
             listOf(
-                CardInfo(name = "Clipper", cardType = CardType.MifareDesfire, region = TransitRegion.USA),
-                CardInfo(name = "ORCA", cardType = CardType.MifareDesfire, region = TransitRegion.USA),
-                CardInfo(name = "Opal", cardType = CardType.MifareDesfire, region = TransitRegion.AUSTRALIA),
-                CardInfo(name = "Suica", cardType = CardType.FeliCa, region = TransitRegion.JAPAN)
+                CardInfo(nameRes = testStringRes("clipper"), cardType = CardType.MifareDesfire, region = TransitRegion.USA, locationRes = testStringRes("sf")),
+                CardInfo(nameRes = testStringRes("orca"), cardType = CardType.MifareDesfire, region = TransitRegion.USA, locationRes = testStringRes("seattle")),
+                CardInfo(nameRes = testStringRes("opal"), cardType = CardType.MifareDesfire, region = TransitRegion.AUSTRALIA, locationRes = testStringRes("sydney")),
+                CardInfo(nameRes = testStringRes("suica"), cardType = CardType.FeliCa, region = TransitRegion.JAPAN, locationRes = testStringRes("tokyo")),
             )
         )
         val registry = CardInfoRegistry(listOf(factory))
@@ -91,41 +78,39 @@ class CardInfoRegistryTest {
         assertEquals("Japan", byRegion[1].first.translatedName)
         assertEquals("United States", byRegion[2].first.translatedName)
 
-        // Cards within each region should be alphabetically sorted
-        assertEquals(listOf("Opal"), byRegion[0].second.map { it.name })
-        assertEquals(listOf("Suica"), byRegion[1].second.map { it.name })
-        assertEquals(listOf("Clipper", "ORCA"), byRegion[2].second.map { it.name })
+        assertEquals(1, byRegion[0].second.size)
+        assertEquals(1, byRegion[1].second.size)
+        assertEquals(2, byRegion[2].second.size)
     }
 
     @Test
     fun testWorldwideRegionFirst() {
         val factory = TestFactory(
             listOf(
-                CardInfo(name = "Clipper", cardType = CardType.MifareDesfire, region = TransitRegion.USA),
-                CardInfo(name = "EMV", cardType = CardType.ISO7816, region = TransitRegion.WORLDWIDE)
+                CardInfo(nameRes = testStringRes("clipper"), cardType = CardType.MifareDesfire, region = TransitRegion.USA, locationRes = testStringRes("sf")),
+                CardInfo(nameRes = testStringRes("emv"), cardType = CardType.ISO7816, region = TransitRegion.WORLDWIDE, locationRes = testStringRes("various")),
             )
         )
         val registry = CardInfoRegistry(listOf(factory))
         val byRegion = registry.allCardsByRegion
 
         assertEquals(2, byRegion.size)
-        // Worldwide should come before USA (it has a lower section priority)
         assertEquals("Worldwide", byRegion[0].first.translatedName)
         assertEquals("United States", byRegion[1].first.translatedName)
     }
 
     @Test
-    fun testDistinctCardsByName() {
+    fun testDistinctCardsByNameRes() {
+        val sharedRes = testStringRes("clipper")
         val factory1 = TestFactory(
-            listOf(CardInfo(name = "Clipper", cardType = CardType.MifareDesfire, region = TransitRegion.USA))
+            listOf(CardInfo(nameRes = sharedRes, cardType = CardType.MifareDesfire, region = TransitRegion.USA, locationRes = testStringRes("sf")))
         )
         val factory2 = TestFactory(
-            listOf(CardInfo(name = "Clipper", cardType = CardType.MifareUltralight, region = TransitRegion.USA))
+            listOf(CardInfo(nameRes = sharedRes, cardType = CardType.MifareUltralight, region = TransitRegion.USA, locationRes = testStringRes("sf")))
         )
         val registry = CardInfoRegistry(listOf(factory1, factory2))
-
-        // allCardsAlphabetical should dedupe by name
-        assertEquals(1, registry.allCardsAlphabetical.size)
+        val byRegion = registry.allCardsByRegion
+        assertEquals(1, byRegion.flatMap { it.second }.size)
     }
 
     @Test
@@ -147,9 +132,7 @@ class CardInfoRegistryTest {
         )
         val sorted = regions.sortedWith(TransitRegion.RegionComparator)
 
-        // WORLDWIDE has section -1 (higher priority), others are section 0
         assertEquals("Worldwide", sorted[0].translatedName)
-        // Rest alphabetically: Australia, Japan, United States
         assertEquals("Australia", sorted[1].translatedName)
         assertEquals("Japan", sorted[2].translatedName)
         assertEquals("United States", sorted[3].translatedName)

@@ -24,48 +24,17 @@ import com.codebutler.farebot.card.CardType
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 
-/**
- * Metadata about a supported transit card.
- *
- * This class holds information about a transit card that is displayed
- * in the "Supported Cards" list, including:
- * - Card name and location
- * - Card type (MIFARE Classic, DESFire, FeliCa, etc.)
- * - Geographic region
- * - Optional card image
- * - Whether keys are required for reading
- * - Preview status (for incomplete/beta implementations)
- *
- * @property name Display name of the card
- * @property cardType The NFC card technology used
- * @property region Geographic region where this card is used
- * @property locationId Optional string resource for more specific location
- * @property keysRequired Whether authentication keys are needed to read this card
- * @property keyBundle Name of the key bundle file, if keys are required
- * @property preview Whether this is a preview/beta decoder with possibly incomplete data
- * @property extraNote Optional note about limitations or special information
- * @property imageId Optional drawable resource for the card image
- * @property imageAlphaId Optional drawable resource for the card image alpha mask
- * @property iOSSupported Whether this card type is supported on iOS
- * @property iOSExtraNote Optional note that replaces extraNote on iOS only
- */
 data class CardInfo(
-    val name: String,
+    val nameRes: StringResource,
     val cardType: CardType,
     val region: TransitRegion,
-    val locationId: StringResource? = null,
+    val locationRes: StringResource,
     val keysRequired: Boolean = false,
     val keyBundle: String? = null,
     val preview: Boolean = false,
-    val extraNote: StringResource? = null,
-    val imageId: DrawableResource? = null,
-    val imageAlphaId: DrawableResource? = null,
-    val iOSSupported: Boolean? = null,
-    val iOSExtraNote: StringResource? = null
-) {
-    /**
-     * Whether this card has an associated image.
-     */
-    val hasBitmap: Boolean
-        get() = imageId != null
-}
+    val serialOnly: Boolean = false,
+    val extraNoteRes: StringResource? = null,
+    val imageRes: DrawableResource? = null,
+    val latitude: Float? = null,
+    val longitude: Float? = null,
+)

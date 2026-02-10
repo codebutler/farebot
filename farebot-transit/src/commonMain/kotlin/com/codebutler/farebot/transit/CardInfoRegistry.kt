@@ -22,38 +22,16 @@ package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.card.Card
 
-/**
- * Registry that collects [CardInfo] metadata from all registered [TransitFactory] instances.
- *
- * This provides methods to retrieve the list of all supported cards, either
- * alphabetically sorted or grouped by region.
- */
 class CardInfoRegistry(
     private val factories: List<TransitFactory<out Card, out TransitInfo>>
 ) {
-    /**
-     * All card info from all registered factories.
-     */
     val allCards: List<CardInfo> by lazy {
         factories.flatMap { it.allCards }
     }
 
-    /**
-     * All cards sorted alphabetically by name.
-     */
-    val allCardsAlphabetical: List<CardInfo>
-        get() = allCards
-            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
-            .distinctBy { it.name }
-
-    /**
-     * All cards grouped by region, with regions sorted by priority and then alphabetically.
-     *
-     * Each pair contains the region and the list of cards in that region (sorted alphabetically).
-     */
     val allCardsByRegion: List<Pair<TransitRegion, List<CardInfo>>>
         get() {
-            val cards = allCards.distinctBy { it.name }
+            val cards = allCards.distinctBy { it.nameRes }
             val regions = cards.map { it.region }
                 .distinct()
                 .sortedWith(TransitRegion.RegionComparator)
@@ -61,18 +39,11 @@ class CardInfoRegistry(
                 Pair(
                     region,
                     cards.filter { it.region == region }
-                        .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
                 )
             }
         }
 
     companion object {
-        /**
-         * Creates a CardInfoRegistry from a collection of factories.
-         *
-         * This is a convenience factory method for cases where factories
-         * are stored in different data structures.
-         */
         fun fromFactories(vararg factories: TransitFactory<out Card, out TransitInfo>): CardInfoRegistry {
             return CardInfoRegistry(factories.toList())
         }
