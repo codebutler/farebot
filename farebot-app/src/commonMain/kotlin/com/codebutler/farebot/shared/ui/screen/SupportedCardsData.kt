@@ -130,7 +130,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_city_union, CardType.ISO7816, TransitRegion.CHINA, Res.string.card_location_china, imageRes = Res.drawable.city_union, latitude = 39.9042f, longitude = 116.4074f),
 
     // Asia - Southeast Asia
-    CardInfo(Res.string.card_name_octopus, CardType.FeliCa, TransitRegion.HONG_KONG, Res.string.card_location_hong_kong, imageRes = Res.drawable.octopus_card, latitude = 22.3193f, longitude = 114.1694f),
+    CardInfo(Res.string.card_name_octopus, CardType.FeliCa, TransitRegion.HONG_KONG, Res.string.card_location_hong_kong, imageRes = Res.drawable.octopus_card, latitude = 22.3193f, longitude = 114.1694f, sampleDumpFile = "Octopus.json"),
     CardInfo(Res.string.card_name_ez_link, CardType.CEPAS, TransitRegion.SINGAPORE, Res.string.card_location_singapore, imageRes = Res.drawable.ezlink_card, latitude = 1.3521f, longitude = 103.8198f, sampleDumpFile = "EZLink.json"),
     CardInfo(Res.string.card_name_nets_flashpay, CardType.CEPAS, TransitRegion.SINGAPORE, Res.string.card_location_singapore, imageRes = Res.drawable.nets_card, latitude = 1.3521f, longitude = 103.8198f),
     CardInfo(Res.string.card_name_touch_n_go, CardType.MifareClassic, TransitRegion.MALAYSIA, Res.string.card_location_malaysia, imageRes = Res.drawable.touchngo, latitude = 3.1390f, longitude = 101.6869f),

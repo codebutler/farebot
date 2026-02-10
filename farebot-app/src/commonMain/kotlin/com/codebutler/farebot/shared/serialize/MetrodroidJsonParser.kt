@@ -38,6 +38,12 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireCard
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
+import com.codebutler.farebot.card.felica.FeliCaIdm
+import com.codebutler.farebot.card.felica.FeliCaPmm
+import com.codebutler.farebot.card.felica.FelicaBlock
+import com.codebutler.farebot.card.felica.FelicaService
+import com.codebutler.farebot.card.felica.FelicaSystem
+import com.codebutler.farebot.card.felica.raw.RawFelicaCard
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816File
 import com.codebutler.farebot.card.iso7816.raw.RawISO7816Card
@@ -78,6 +84,8 @@ object MetrodroidJsonParser {
                 parseISO7816(obj["iso7816"]!!.jsonObject, tagId, scannedAt)
             obj.containsKey("cepasCompat") ->
                 parseCEPAS(obj["cepasCompat"]!!.jsonObject, tagId, scannedAt)
+            obj.containsKey("felica") ->
+                parseFelica(obj["felica"]!!.jsonObject, tagId, scannedAt)
             else -> null
         }
     }
@@ -321,6 +329,52 @@ object MetrodroidJsonParser {
             records = records,
             fci = fci
         )
+    }
+
+    // --- FeliCa ---
+
+    private fun parseFelica(
+        felica: JsonObject,
+        tagId: ByteArray,
+        scannedAt: Instant
+    ): RawFelicaCard {
+        val idmHex = felica["iDm"]?.jsonPrimitive?.content ?: ""
+        val pmmHex = felica["pMm"]?.jsonPrimitive?.content ?: ""
+
+        val idmBytes = if (idmHex.isNotEmpty()) hexToBytes(idmHex) else ByteArray(8)
+        val pmmBytes = if (pmmHex.isNotEmpty()) hexToBytes(pmmHex) else ByteArray(8)
+
+        val idm = FeliCaIdm(if (idmBytes.size == 8) idmBytes else ByteArray(8))
+        val pmm = FeliCaPmm(if (pmmBytes.size == 8) pmmBytes else ByteArray(8))
+
+        val systemsObj = felica["systems"]?.jsonObject ?: JsonObject(emptyMap())
+        val systems = systemsObj.entries.map { (codeStr, systemElement) ->
+            val code = codeStr.toIntOrNull() ?: codeStr.toIntOrNull(16) ?: 0
+            parseFelicaSystem(code, systemElement.jsonObject)
+        }
+
+        return RawFelicaCard.create(tagId, scannedAt, idm, pmm, systems)
+    }
+
+    private fun parseFelicaSystem(code: Int, systemObj: JsonObject): FelicaSystem {
+        val servicesObj = systemObj["services"]?.jsonObject ?: JsonObject(emptyMap())
+        val services = servicesObj.entries.map { (codeStr, serviceElement) ->
+            val serviceCode = codeStr.toIntOrNull() ?: codeStr.toIntOrNull(16) ?: 0
+            parseFelicaService(serviceCode, serviceElement.jsonObject)
+        }
+        return FelicaSystem.create(code, services)
+    }
+
+    private fun parseFelicaService(serviceCode: Int, serviceObj: JsonObject): FelicaService {
+        val blocksArray = serviceObj["blocks"]?.jsonArray ?: JsonArray(emptyList())
+        val blocks = blocksArray.mapIndexed { index, blockElement ->
+            val blockObj = blockElement.jsonObject
+            val dataHex = blockObj["data"]?.jsonPrimitive?.content ?: ""
+            val data = if (dataHex.isNotEmpty()) hexToBytes(dataHex) else ByteArray(16)
+            val address = blockObj["address"]?.jsonPrimitive?.intOrNull ?: index
+            FelicaBlock.create(address.toByte(), data)
+        }
+        return FelicaService.create(serviceCode, blocks)
     }
 
     // --- CEPAS (compat format) ---

@@ -50,6 +50,9 @@ import com.codebutler.farebot.transit.hsl.HSLTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitInfo
 import com.codebutler.farebot.transit.calypso.mobib.MobibTransitInfo
+import com.codebutler.farebot.card.felica.FelicaCard
+import com.codebutler.farebot.transit.octopus.OctopusTransitFactory
+import com.codebutler.farebot.transit.octopus.OctopusTransitInfo
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
 import com.codebutler.farebot.transit.serialonly.HoloTransitFactory
@@ -430,5 +433,27 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val identity = factory.parseIdentity(card)
         assertNotNull(identity.name)
         assertEquals("308425123456780", identity.serialNumber)
+    }
+
+    // --- Octopus (FeliCa) ---
+    // Source: OctopusTransitTest test data
+    // Card: Octopus, Hong Kong
+    // Balance: -HKD 14.40 (raw 0x164 = 356, offset 500, (356-500)*10 = -1440 cents)
+    // scannedAt: 2017-10-02 (post-offset-change date)
+
+    @Test
+    fun testOctopusDump() {
+        val factory = OctopusTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<FelicaCard, OctopusTransitInfo>(
+            "octopus/Octopus.json", factory
+        )
+
+        val identity = factory.parseIdentity(card)
+        assertNotNull(identity.name)
+
+        val balances = info.balances
+        assertNotNull(balances)
+        assertEquals(1, balances.size)
+        assertEquals(TransitCurrency.HKD(-1440), balances[0].balance)
     }
 }
