@@ -22,7 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -254,8 +254,8 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            if (homeUiState.nfcStatus != NfcStatus.UNAVAILABLE) {
-                FloatingActionButton(
+            if (selectedTab == 0 && homeUiState.nfcStatus != NfcStatus.UNAVAILABLE) {
+                ExtendedFloatingActionButton(
                     onClick = {
                         if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
                             onOpenNfcSettings()
@@ -263,17 +263,19 @@ fun HomeScreen(
                             onScanCard()
                         }
                     },
-                ) {
-                    if (homeUiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.padding(8.dp),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            strokeWidth = 2.dp,
-                        )
-                    } else {
-                        Icon(Icons.Default.Nfc, contentDescription = stringResource(Res.string.scan))
-                    }
-                }
+                    icon = {
+                        if (homeUiState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.padding(4.dp),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Icon(Icons.Default.Nfc, contentDescription = null)
+                        }
+                    },
+                    text = { Text(stringResource(Res.string.scan)) },
+                )
             }
         },
     ) { padding ->
