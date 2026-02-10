@@ -1,0 +1,482 @@
+/*
+ * MetrodroidJsonParser.kt
+ *
+ * This file is part of FareBot.
+ * Learn more at: https://codebutler.github.io/farebot/
+ *
+ * Copyright (C) 2025 Eric Butler <eric@codebutler.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.codebutler.farebot.shared.serialize
+
+import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.card.Card
+import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.cepas.CEPASCard
+import com.codebutler.farebot.card.cepas.CEPASHistory
+import com.codebutler.farebot.card.cepas.CEPASPurse
+import com.codebutler.farebot.card.cepas.CEPASTransaction
+import com.codebutler.farebot.card.classic.raw.RawClassicBlock
+import com.codebutler.farebot.card.classic.raw.RawClassicCard
+import com.codebutler.farebot.card.classic.raw.RawClassicSector
+import com.codebutler.farebot.card.desfire.raw.RawDesfireApplication
+import com.codebutler.farebot.card.desfire.raw.RawDesfireCard
+import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
+import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
+import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
+import com.codebutler.farebot.card.iso7816.ISO7816Application
+import com.codebutler.farebot.card.iso7816.ISO7816File
+import com.codebutler.farebot.card.iso7816.raw.RawISO7816Card
+import com.codebutler.farebot.card.ultralight.UltralightPage
+import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
+import kotlin.time.Instant
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
+import kotlinx.serialization.json.longOrNull
+
+/**
+ * Parses Metrodroid JSON card dumps into FareBot RawCard objects.
+ *
+ * Metrodroid uses a different JSON schema than FareBot. This parser handles the
+ * structural differences by directly constructing RawCard objects from the
+ * Metrodroid JSON tree, similar to how FlipperNfcParser handles Flipper NFC dumps.
+ */
+object MetrodroidJsonParser {
+
+    fun parse(obj: JsonObject): RawCard<*>? {
+        val tagId = parseTagId(obj)
+        val scannedAt = parseScannedAt(obj)
+
+        return when {
+            obj.containsKey("mifareDesfire") ->
+                parseDesfire(obj["mifareDesfire"]!!.jsonObject, tagId, scannedAt)
+            obj.containsKey("mifareUltralight") ->
+                parseUltralight(obj["mifareUltralight"]!!.jsonObject, tagId, scannedAt)
+            obj.containsKey("mifareClassic") ->
+                parseClassic(obj["mifareClassic"]!!.jsonObject, tagId, scannedAt)
+            obj.containsKey("iso7816") ->
+                parseISO7816(obj["iso7816"]!!.jsonObject, tagId, scannedAt)
+            obj.containsKey("cepasCompat") ->
+                parseCEPAS(obj["cepasCompat"]!!.jsonObject, tagId, scannedAt)
+            else -> null
+        }
+    }
+
+    // --- Common parsing ---
+
+    private fun parseTagId(obj: JsonObject): ByteArray {
+        val hex = obj["tagId"]?.jsonPrimitive?.content ?: "00000000"
+        return hexToBytes(hex)
+    }
+
+    private fun parseScannedAt(obj: JsonObject): Instant {
+        val scannedAtObj = obj["scannedAt"]?.jsonObject ?: return Instant.fromEpochMilliseconds(0)
+        val timeInMillis = scannedAtObj["timeInMillis"]?.jsonPrimitive?.longOrNull
+            ?: return Instant.fromEpochMilliseconds(0)
+        return Instant.fromEpochMilliseconds(timeInMillis)
+    }
+
+    // --- DESFire ---
+
+    private fun parseDesfire(
+        desfire: JsonObject,
+        tagId: ByteArray,
+        scannedAt: Instant
+    ): RawDesfireCard {
+        val manufDataHex = desfire["manufacturingData"]?.jsonPrimitive?.content ?: ""
+        val manufData = RawDesfireManufacturingData.create(
+            if (manufDataHex.isNotEmpty()) hexToBytes(manufDataHex) else ByteArray(28)
+        )
+
+        val appsObj = desfire["applications"]?.jsonObject ?: JsonObject(emptyMap())
+        val applications = appsObj.entries.map { (appIdStr, appElement) ->
+            val appId = appIdStr.toIntOrNull() ?: appIdStr.toIntOrNull(16) ?: 0
+            parseDesfireApplication(appId, appElement.jsonObject)
+        }
+
+        return RawDesfireCard.create(tagId, scannedAt, applications, manufData)
+    }
+
+    private fun parseDesfireApplication(appId: Int, appObj: JsonObject): RawDesfireApplication {
+        val filesObj = appObj["files"]?.jsonObject ?: JsonObject(emptyMap())
+        val files = filesObj.entries.map { (fileIdStr, fileElement) ->
+            val fileId = fileIdStr.toIntOrNull() ?: fileIdStr.toIntOrNull(16) ?: 0
+            parseDesfireFile(fileId, fileElement.jsonObject)
+        }
+        return RawDesfireApplication.create(appId, files)
+    }
+
+    private fun parseDesfireFile(fileId: Int, fileObj: JsonObject): RawDesfireFile {
+        val settingsHex = fileObj["settings"]?.jsonPrimitive?.content ?: ""
+        val dataHex = fileObj["data"]?.jsonPrimitive?.content
+
+        val settings = RawDesfireFileSettings.create(
+            if (settingsHex.isNotEmpty()) hexToBytes(settingsHex) else byteArrayOf(0, 0, 0, 0, 0, 0, 0)
+        )
+
+        return if (dataHex != null && dataHex.isNotEmpty()) {
+            RawDesfireFile.create(fileId, settings, hexToBytes(dataHex))
+        } else {
+            // File with settings but no data (e.g., unauthorized or empty)
+            RawDesfireFile.create(fileId, settings, ByteArray(0))
+        }
+    }
+
+    // --- Ultralight ---
+
+    private fun parseUltralight(
+        ul: JsonObject,
+        tagId: ByteArray,
+        scannedAt: Instant
+    ): RawUltralightCard {
+        val pagesArray = ul["pages"]?.jsonArray ?: JsonArray(emptyList())
+        val pages = pagesArray.mapIndexed { index, pageElement ->
+            val pageObj = pageElement.jsonObject
+            val dataHex = pageObj["data"]?.jsonPrimitive?.content ?: ""
+            val data = if (dataHex.isNotEmpty()) hexToBytes(dataHex) else ByteArray(4)
+            UltralightPage.create(index, data)
+        }
+
+        val cardModel = ul["cardModel"]?.jsonPrimitive?.content
+        val ultralightType = mapUltralightType(cardModel)
+
+        return RawUltralightCard.create(tagId, scannedAt, pages, ultralightType)
+    }
+
+    private fun mapUltralightType(model: String?): Int = when (model) {
+        "EV1_MF0UL11" -> 0
+        "EV1_MF0UL21" -> 0
+        "NTAG213" -> 2
+        "NTAG215" -> 4
+        "NTAG216" -> 6
+        else -> 0
+    }
+
+    // --- Classic ---
+
+    private fun parseClassic(
+        classic: JsonObject,
+        tagId: ByteArray,
+        scannedAt: Instant
+    ): RawClassicCard {
+        val sectorsArray = classic["sectors"]?.jsonArray ?: JsonArray(emptyList())
+        val sectors = sectorsArray.mapIndexed { index, sectorElement ->
+            val sectorObj = sectorElement.jsonObject
+            val type = sectorObj["type"]?.jsonPrimitive?.content
+
+            if (type == "unauthorized" || type == "keyA" || type == "unknown") {
+                RawClassicSector.createUnauthorized(index)
+            } else {
+                val blocksArray = sectorObj["blocks"]?.jsonArray ?: JsonArray(emptyList())
+                val blocks = blocksArray.mapIndexed { blockIndex, blockElement ->
+                    val blockObj = blockElement.jsonObject
+                    val dataHex = blockObj["data"]?.jsonPrimitive?.content ?: ""
+                    val data = if (dataHex.isNotEmpty()) hexToBytes(dataHex) else ByteArray(16)
+                    RawClassicBlock.create(blockIndex, data)
+                }
+                RawClassicSector.createData(index, blocks)
+            }
+        }
+        return RawClassicCard.create(tagId, scannedAt, sectors)
+    }
+
+    // --- ISO 7816 ---
+
+    private fun parseISO7816(
+        iso: JsonObject,
+        tagId: ByteArray,
+        scannedAt: Instant
+    ): RawISO7816Card {
+        val appsArray = iso["applications"]?.jsonArray ?: JsonArray(emptyList())
+        val applications = appsArray.mapNotNull { appElement ->
+            parseISO7816Application(appElement.jsonArray)
+        }
+        return RawISO7816Card.create(tagId, scannedAt, applications)
+    }
+
+    /**
+     * Parses an ISO7816 application from Metrodroid format.
+     * Metrodroid uses [type, data] array pairs for applications.
+     */
+    private fun parseISO7816Application(appArray: JsonArray): ISO7816Application? {
+        if (appArray.size < 2) return null
+        val type = appArray[0].jsonPrimitive.content
+        val appData = appArray[1].jsonObject
+
+        val generic = appData["generic"]?.jsonObject ?: return null
+
+        // Parse app name and FCI
+        val appNameHex = generic["appName"]?.jsonPrimitive?.content
+        val appName = if (!appNameHex.isNullOrEmpty()) hexToBytes(appNameHex) else null
+
+        val appFciHex = generic["appFci"]?.jsonPrimitive?.content
+        val appFci = if (!appFciHex.isNullOrEmpty()) hexToBytes(appFciHex) else null
+
+        // Parse files
+        val filesObj = generic["files"]?.jsonObject ?: JsonObject(emptyMap())
+        val files = mutableMapOf<String, ISO7816File>()
+        val sfiFiles = mutableMapOf<Int, ISO7816File>()
+
+        for ((fileKey, fileElement) in filesObj.entries) {
+            val fileObj = fileElement.jsonObject
+            val file = parseISO7816File(fileObj)
+
+            // Store with original key in files map
+            files[fileKey] = file
+
+            // Try to determine SFI from the file key or FCI
+            val sfi = extractSfiFromKey(fileKey) ?: extractSfiFromFci(fileObj)
+            if (sfi != null) {
+                sfiFiles[sfi] = file
+            }
+        }
+
+        // Handle balance field — TMoney stores balance as hex under "balance" key
+        val balanceHex = appData["balance"]?.jsonPrimitive?.content
+        if (!balanceHex.isNullOrEmpty()) {
+            val balanceFile = ISO7816File.create(binaryData = hexToBytes(balanceHex))
+            files["balance/0"] = balanceFile
+        }
+
+        return ISO7816Application.create(
+            appName = appName,
+            appFci = appFci,
+            files = files,
+            sfiFiles = sfiFiles,
+            type = type
+        )
+    }
+
+    /**
+     * Extracts SFI from a Metrodroid file key like "#appname:N" where N is the SFI.
+     * Only applies to "#"-prefixed keys (e.g., "#d4100000030001:4").
+     * File-selector keys like ":2000:2001" should not use this — they get SFI from FCI.
+     */
+    private fun extractSfiFromKey(key: String): Int? {
+        if (!key.startsWith("#")) return null
+        if (!key.contains(":")) return null
+        val afterColon = key.substringAfterLast(":")
+        return afterColon.toIntOrNull()
+    }
+
+    /**
+     * Extracts SFI from Calypso FCI data.
+     * In Calypso cards, the FCI proprietary template (tag 85) contains the SFI at byte 2.
+     */
+    private fun extractSfiFromFci(fileObj: JsonObject): Int? {
+        val fciHex = fileObj["fci"]?.jsonPrimitive?.content
+        if (fciHex.isNullOrEmpty() || fciHex.length < 6) return null
+        val fciBytes = hexToBytes(fciHex)
+        // Calypso FCI format: tag(85) + length + SFI + ...
+        if (fciBytes.size >= 3 && fciBytes[0] == 0x85.toByte()) {
+            return fciBytes[2].toInt() and 0xFF
+        }
+        return null
+    }
+
+    private fun parseISO7816File(fileObj: JsonObject): ISO7816File {
+        // Binary data
+        val binaryHex = fileObj["binaryData"]?.jsonPrimitive?.content
+        val binaryData = if (!binaryHex.isNullOrEmpty()) hexToBytes(binaryHex) else null
+
+        // FCI
+        val fciHex = fileObj["fci"]?.jsonPrimitive?.content
+        val fci = if (!fciHex.isNullOrEmpty()) hexToBytes(fciHex) else null
+
+        // Records
+        val recordsObj = fileObj["records"]?.jsonObject
+        val records = mutableMapOf<Int, ByteArray>()
+        if (recordsObj != null) {
+            for ((recordIdStr, recordElement) in recordsObj.entries) {
+                val recordId = recordIdStr.toIntOrNull() ?: continue
+                val recordHex = recordElement.jsonPrimitive.content
+                if (recordHex.isNotEmpty()) {
+                    records[recordId] = hexToBytes(recordHex)
+                }
+            }
+        }
+
+        return ISO7816File.create(
+            binaryData = binaryData,
+            records = records,
+            fci = fci
+        )
+    }
+
+    // --- CEPAS (compat format) ---
+
+    private fun parseCEPAS(
+        cepas: JsonObject,
+        tagId: ByteArray,
+        scannedAt: Instant
+    ): RawCard<CEPASCard> {
+        val pursesArray = cepas["purses"]?.jsonArray ?: JsonArray(emptyList())
+        val historiesArray = cepas["histories"]?.jsonArray ?: JsonArray(emptyList())
+
+        val purses = parseCEPASPurses(pursesArray)
+        val histories = parseCEPASHistories(historiesArray)
+        val card = CEPASCard.create(tagId, scannedAt, purses, histories)
+
+        return PreParsedRawCard(CardType.CEPAS, tagId, scannedAt, card)
+    }
+
+    private fun parseCEPASPurses(pursesArray: JsonArray): List<CEPASPurse> {
+        val parsedById = mutableMapOf<Int, CEPASPurse>()
+
+        pursesArray.forEachIndexed { index, purseElement ->
+            val purseObj = purseElement.jsonObject
+            val id = purseObj["id"]?.jsonPrimitive?.intOrNull ?: index
+            val purseBalance = purseObj["purseBalance"]?.jsonPrimitive?.intOrNull
+            val canStr = purseObj["can"]?.jsonPrimitive?.content
+
+            val purse = if (purseBalance != null) {
+                // Purse with data — CAN is a hex string representing raw bytes
+                val can = if (canStr != null) hexToBytes(canStr) else ByteArray(8)
+
+                CEPASPurse(
+                    id = id,
+                    cepasVersion = 0,
+                    purseStatus = 0,
+                    purseBalance = purseBalance,
+                    autoLoadAmount = 0,
+                    can = can,
+                    csn = ByteArray(8),
+                    purseExpiryDate = 0,
+                    purseCreationDate = 0,
+                    lastCreditTransactionTRP = 0,
+                    lastCreditTransactionHeader = ByteArray(8),
+                    logfileRecordCount = 0,
+                    issuerDataLength = 0,
+                    lastTransactionTRP = 0,
+                    lastTransactionRecord = null,
+                    issuerSpecificData = ByteArray(0),
+                    lastTransactionDebitOptionsByte = 0,
+                    isValid = true,
+                    errorMessage = null
+                )
+            } else {
+                // Empty purse
+                CEPASPurse(
+                    id = id,
+                    cepasVersion = 0,
+                    purseStatus = 0,
+                    purseBalance = 0,
+                    autoLoadAmount = 0,
+                    can = null,
+                    csn = null,
+                    purseExpiryDate = 0,
+                    purseCreationDate = 0,
+                    lastCreditTransactionTRP = 0,
+                    lastCreditTransactionHeader = null,
+                    logfileRecordCount = 0,
+                    issuerDataLength = 0,
+                    lastTransactionTRP = 0,
+                    lastTransactionRecord = null,
+                    issuerSpecificData = null,
+                    lastTransactionDebitOptionsByte = 0,
+                    isValid = false,
+                    errorMessage = "No purse data"
+                )
+            }
+            parsedById[id] = purse
+        }
+
+        // Return purses ordered by ID (0..15) so getPurse(n) returns purse with ID n
+        return (0..15).map { id ->
+            parsedById[id] ?: CEPASPurse(
+                id = id, cepasVersion = 0, purseStatus = 0, purseBalance = 0,
+                autoLoadAmount = 0, can = null, csn = null,
+                purseExpiryDate = 0, purseCreationDate = 0,
+                lastCreditTransactionTRP = 0, lastCreditTransactionHeader = null,
+                logfileRecordCount = 0, issuerDataLength = 0,
+                lastTransactionTRP = 0, lastTransactionRecord = null,
+                issuerSpecificData = null, lastTransactionDebitOptionsByte = 0,
+                isValid = false, errorMessage = "No purse data"
+            )
+        }
+    }
+
+    private fun parseCEPASHistories(historiesArray: JsonArray): List<CEPASHistory> {
+        val parsedById = mutableMapOf<Int, CEPASHistory>()
+
+        historiesArray.forEachIndexed { index, histElement ->
+            val histObj = histElement.jsonObject
+            val id = histObj["id"]?.jsonPrimitive?.intOrNull ?: index
+            val transactionsArray = histObj["transactions"]?.jsonArray
+
+            val history = if (transactionsArray != null && transactionsArray.isNotEmpty()) {
+                val transactions = transactionsArray.map { txElement ->
+                    parseCEPASTransaction(txElement.jsonObject)
+                }
+                CEPASHistory.create(id, transactions)
+            } else {
+                CEPASHistory.create(id, emptyList<CEPASTransaction>())
+            }
+            parsedById[id] = history
+        }
+
+        // Return histories ordered by ID (0..15) so getHistory(n) returns history with ID n
+        return (0..15).map { id ->
+            parsedById[id] ?: CEPASHistory.create(id, emptyList<CEPASTransaction>())
+        }
+    }
+
+    private fun parseCEPASTransaction(txObj: JsonObject): CEPASTransaction {
+        val type = txObj["type"]?.jsonPrimitive?.intOrNull ?: 0
+        val amount = txObj["amount"]?.jsonPrimitive?.intOrNull ?: 0
+        // date2 is milliseconds since Unix epoch
+        val date2 = txObj["date2"]?.jsonPrimitive?.longOrNull ?: 0L
+        val timestamp = (date2 / 1000).toInt()
+        val userData = txObj["user-data"]?.jsonPrimitive?.content ?: ""
+        return CEPASTransaction(type, amount, timestamp, userData)
+    }
+
+    // --- Helpers ---
+
+    private fun hexToBytes(hex: String): ByteArray {
+        if (hex.isEmpty()) return ByteArray(0)
+        return try {
+            ByteUtils.hexStringToByteArray(hex)
+        } catch (e: Exception) {
+            ByteArray(0)
+        }
+    }
+
+    /**
+     * A RawCard wrapper that holds a pre-parsed Card object.
+     * Used for card types (like CEPAS compat) where the Metrodroid format
+     * provides decoded fields rather than raw binary data.
+     */
+    private class PreParsedRawCard<T : Card>(
+        private val _cardType: CardType,
+        private val _tagId: ByteArray,
+        private val _scannedAt: Instant,
+        private val parsed: T
+    ) : RawCard<T> {
+        override fun cardType() = _cardType
+        override fun tagId() = _tagId
+        override fun scannedAt() = _scannedAt
+        override fun isUnauthorized() = false
+        override fun parse() = parsed
+    }
+}

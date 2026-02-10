@@ -28,6 +28,8 @@ import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
+import com.codebutler.farebot.shared.serialize.CardImporter
+import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitInfo
@@ -70,6 +72,25 @@ object TestAssetLoader {
         assertNotNull(bytes, "Test resource not found: $resourcePath")
         val jsonString = bytes.decodeToString()
         return serializer.deserialize(jsonString)
+    }
+
+    /**
+     * Loads a Metrodroid JSON card dump and converts it to a RawCard.
+     * Handles the Metrodroid format (with mifareDesfire, mifareUltralight, etc. keys)
+     * by using CardImporter for format conversion.
+     *
+     * @param resourcePath Path to the JSON file relative to test resources
+     * @return The deserialized RawCard
+     * @throws AssertionError if the file is not found or import fails
+     */
+    fun loadMetrodroidJsonCard(resourcePath: String): RawCard<*> {
+        val bytes = loadTestResource(resourcePath)
+        assertNotNull(bytes, "Test resource not found: $resourcePath")
+        val jsonString = bytes.decodeToString()
+        val importer = CardImporter.create(KotlinxCardSerializer(json))
+        val result = importer.importCards(jsonString)
+        assertTrue(result is ImportResult.Success, "Failed to import card from $resourcePath: $result")
+        return (result as ImportResult.Success).cards.first()
     }
 
     /**
@@ -219,5 +240,22 @@ abstract class CardDumpTest {
         assertNotNull(transitInfo, "Failed to parse transit info")
         assertTrue(transitInfo is T, "Transit info is not of expected type")
         return transitInfo
+    }
+
+    /**
+     * Loads a Metrodroid JSON card dump and parses it using the given transit factory.
+     */
+    inline fun <reified C : Card, reified T : TransitInfo> loadAndParseMetrodroidJson(
+        path: String,
+        factory: TransitFactory<C, T>
+    ): Pair<C, T> {
+        val rawCard = TestAssetLoader.loadMetrodroidJsonCard(path)
+        @Suppress("UNCHECKED_CAST")
+        val card = rawCard.parse() as C
+        assertTrue(factory.check(card), "Card did not match factory: ${factory::class.simpleName}")
+        val transitInfo = factory.parseInfo(card)
+        assertNotNull(transitInfo, "Failed to parse transit info")
+        assertTrue(transitInfo is T, "Transit info is not of expected type")
+        return Pair(card, transitInfo)
     }
 }

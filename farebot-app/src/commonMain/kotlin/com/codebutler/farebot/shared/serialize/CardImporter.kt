@@ -235,50 +235,10 @@ class CardImporter(
      * Complex Metrodroid cards may require additional conversion logic.
      */
     private fun importMetrodroidCard(obj: JsonObject): RawCard<*> {
-        // Metrodroid uses a polymorphic format like:
-        // { "tagId": "...", "scannedAt": {...}, "mifareDesfire": {...}, ... }
-        //
-        // FareBot uses:
-        // { "cardType": "MifareDesfire", "tagId": "...", "scannedAt": "...", ... }
-
-        // For now, we try to detect the card type from the object keys
-        // and convert to FareBot format
-        val cardTypeKey = listOf(
-            "mifareDesfire" to "MifareDesfire",
-            "mifareClassic" to "MifareClassic",
-            "mifareUltralight" to "MifareUltralight",
-            "felica" to "FeliCa",
-            "cepasCompat" to "CEPAS",
-            "iso7816" to "ISO7816",
-        ).firstOrNull { obj.containsKey(it.first) }
-
-        if (cardTypeKey != null) {
-            // Get the card-specific data
-            val cardData = obj[cardTypeKey.first]?.jsonObject
-                ?: throw IllegalArgumentException("Card data not found for ${cardTypeKey.first}")
-
-            // Build FareBot format by merging cardType with card data
-            val farebotJson = buildString {
-                append("{")
-                append("\"cardType\":\"${cardTypeKey.second}\"")
-                append(",\"tagId\":")
-                append(json.encodeToString(JsonElement.serializer(), obj["tagId"]!!))
-                append(",\"scannedAt\":")
-                append(json.encodeToString(JsonElement.serializer(), obj["scannedAt"]!!))
-
-                // Add all card-specific data fields
-                for ((key, value) in cardData.entries) {
-                    append(",\"$key\":")
-                    append(json.encodeToString(JsonElement.serializer(), value))
-                }
-                append("}")
-            }
-
-            return cardSerializer.deserialize(farebotJson)
-        }
-
-        // Fall back to trying direct deserialization
-        return cardSerializer.deserialize(json.encodeToString(JsonObject.serializer(), obj))
+        return MetrodroidJsonParser.parse(obj)
+            ?: throw IllegalArgumentException(
+                "Unsupported Metrodroid card format. Known keys: ${obj.keys.joinToString()}"
+            )
     }
 
     /**

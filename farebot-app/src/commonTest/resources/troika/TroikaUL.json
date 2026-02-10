@@ -1,0 +1,72 @@
+{
+    "tagId": "12345677889900",
+    "scannedAt": {
+        "timeInMillis": 1234567890120,
+        "tz": "Europe/Zurich"
+    },
+    "mifareUltralight": {
+        "cardModel": "EV1_MF0UL11",
+        "pages": [
+            {
+                "data": "123456bd"
+            },
+            {
+                "data": "77889900"
+            },
+            {
+                "data": "9848f000"
+            },
+            {
+                "data": "fffffffc"
+            },
+            {
+                "data": "45d9a123"
+            },
+            {
+                "data": "45678d00"
+            },
+            {
+                "data": "26010000"
+            },
+            {
+                "data": "26010000"
+            },
+            {
+                "data": "25bc0500"
+            },
+            {
+                "data": "800078aa"
+            },
+            {
+                "data": "4f84e60c"
+            },
+            {
+                "data": "25bc3ba0"
+            },
+            {
+                "data": "25bc0500"
+            },
+            {
+                "data": "800078aa"
+            },
+            {
+                "data": "4f84e60c"
+            },
+            {
+                "data": "25bc3ba0"
+            },
+            {
+                "data": "000000ff"
+            },
+            {
+                "data": "00050000"
+            },
+            {
+                "data": "00000000"
+            },
+            {
+                "data": "00000000"
+            }
+        ]
+    }
+}
