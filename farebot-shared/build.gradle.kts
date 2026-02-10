@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -28,6 +29,10 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.maps.compose)
             implementation(libs.play.services.maps)
+            implementation(libs.sqldelight.android.driver)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -122,8 +127,16 @@ kotlin {
             api(project(":farebot-transit-snapper"))
             api(project(":farebot-transit-ndef"))
             api(project(":farebot-transit-rkf"))
-            api(project(":farebot-app-persist"))
+            implementation(libs.sqldelight.runtime)
             implementation(libs.kotlinx.serialization.json)
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("FareBotDb") {
+            packageName.set("com.codebutler.farebot.persist.db")
         }
     }
 }

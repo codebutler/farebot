@@ -29,8 +29,7 @@ plugins {
 
 dependencies {
     implementation(project(":farebot-base"))
-    implementation(project(":farebot-app-persist"))
-    implementation(project(":farebot-card"))
+implementation(project(":farebot-card"))
     implementation(project(":farebot-card-cepas"))
     implementation(project(":farebot-card-classic"))
     implementation(project(":farebot-card-desfire"))
