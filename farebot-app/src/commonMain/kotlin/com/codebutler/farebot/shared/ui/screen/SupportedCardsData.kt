@@ -16,7 +16,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_msp_goto, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_minneapolis_mn, imageRes = Res.drawable.msp_goto_card, latitude = 44.9778f, longitude = -93.2650f, sampleDumpFile = "MspGoTo.json"),
     CardInfo(Res.string.card_name_ventra, CardType.MifareUltralight, TransitRegion.USA, Res.string.card_location_chicago_il, extraNoteRes = Res.string.card_note_ventra, imageRes = Res.drawable.ventra, latitude = 41.8781f, longitude = -87.6298f, sampleDumpFile = "Ventra.json"),
     CardInfo(Res.string.card_name_holo, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_oahu_hawaii, serialOnly = true, imageRes = Res.drawable.holo_card, latitude = 21.3069f, longitude = -157.8583f, sampleDumpFile = "Holo.json"),
-    CardInfo(Res.string.card_name_trimet_hop, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_portland_or, serialOnly = true, imageRes = Res.drawable.trimethop_card, latitude = 45.5152f, longitude = -122.6784f),
+    CardInfo(Res.string.card_name_trimet_hop, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_portland_or, serialOnly = true, imageRes = Res.drawable.trimethop_card, latitude = 45.5152f, longitude = -122.6784f, sampleDumpFile = "TrimetHop.json"),
     CardInfo(Res.string.card_name_sun_card, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_orlando_fl, serialOnly = true, imageRes = Res.drawable.suncard, latitude = 28.5383f, longitude = -81.3792f),
 
     // North America - Canada
@@ -25,7 +25,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_presto, CardType.MifareDesfire, TransitRegion.CANADA, Res.string.card_location_ontario_canada, serialOnly = true, imageRes = Res.drawable.presto_card, latitude = 43.6532f, longitude = -79.3832f),
 
     // South America
-    CardInfo(Res.string.card_name_bilhete_unico, CardType.MifareClassic, TransitRegion.BRAZIL, Res.string.card_location_sao_paulo_brazil, imageRes = Res.drawable.bilheteunicosp_card, latitude = -23.5505f, longitude = -46.6333f),
+    CardInfo(Res.string.card_name_bilhete_unico, CardType.MifareClassic, TransitRegion.BRAZIL, Res.string.card_location_sao_paulo_brazil, imageRes = Res.drawable.bilheteunicosp_card, latitude = -23.5505f, longitude = -46.6333f, sampleDumpFile = "BilheteUnico.json"),
     CardInfo(Res.string.card_name_bip, CardType.MifareClassic, TransitRegion.CHILE, Res.string.card_location_santiago_chile, imageRes = Res.drawable.chilebip, latitude = -33.4489f, longitude = -70.6693f),
 
     // Europe - UK & Ireland

@@ -51,12 +51,16 @@ import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitInfo
 import com.codebutler.farebot.transit.calypso.mobib.MobibTransitInfo
 import com.codebutler.farebot.card.felica.FelicaCard
+import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitFactory
+import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitInfo
 import com.codebutler.farebot.transit.octopus.OctopusTransitFactory
 import com.codebutler.farebot.transit.octopus.OctopusTransitInfo
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
 import com.codebutler.farebot.transit.serialonly.HoloTransitFactory
 import com.codebutler.farebot.transit.serialonly.HoloTransitInfo
+import com.codebutler.farebot.transit.serialonly.TrimetHopTransitFactory
+import com.codebutler.farebot.transit.serialonly.TrimetHopTransitInfo
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitInfo
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitFactory
@@ -455,5 +459,53 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         assertNotNull(balances)
         assertEquals(1, balances.size)
         assertEquals(TransitCurrency.HKD(-1440), balances[0].balance)
+    }
+
+    // --- TriMet Hop (DESFire, serial-only) ---
+    // Source: Synthetic dump based on TrimetHopTransitFactory data format
+    // Card: Hop Fastpass, Portland, Oregon, USA
+    // Serial: 01-001-12345678-RA, issue date: 2023-06-15
+
+    @Test
+    fun testTrimetHopDump() {
+        val factory = TrimetHopTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, TrimetHopTransitInfo>(
+            "trimethop/TrimetHop.json", factory
+        )
+
+        val identity = factory.parseIdentity(card)
+        assertEquals("Hop Fastpass", identity.name)
+        assertEquals("01-001-12345678-RA", identity.serialNumber)
+
+        assertTrue(info is TrimetHopTransitInfo)
+        assertEquals("01-001-12345678-RA", info.serialNumber)
+    }
+
+    // --- Bilhete Unico (Classic) ---
+    // Source: Synthetic dump based on BilheteUnicoSPTransitFactory data format
+    // Card: Bilhete Unico, Sao Paulo, Brazil
+    // Balance: R$24.00 (2400 cents BRL), serial: 110 242901149
+
+    @Test
+    fun testBilheteUnicoDump() {
+        val factory = BilheteUnicoSPTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, BilheteUnicoSPTransitInfo>(
+            "bilhete/BilheteUnico.json", factory
+        )
+
+        val identity = factory.parseIdentity(card)
+        assertNotNull(identity.name)
+        assertEquals("110 242901149", identity.serialNumber)
+
+        // Balance: R$24.00 (2400 cents BRL)
+        val balances = info.balances
+        assertNotNull(balances)
+        assertEquals(1, balances.size)
+        assertEquals(TransitCurrency.BRL(2400), balances[0].balance)
+
+        // Synthetic card has no trips
+        val trips = info.trips
+        assertNotNull(trips)
+        assertEquals(0, trips.size)
     }
 }
