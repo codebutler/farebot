@@ -115,7 +115,7 @@ When continuing from a previous session, read these files to recover context rat
 ```bash
 ./gradlew allTests          # Run all tests
 ./gradlew assemble          # Full build (Android + iOS frameworks)
-./gradlew :farebot-android:assembleDebug  # Android only
+./gradlew :farebot-app-android:assembleDebug  # Android only
 ```
 
 ## Module Structure
@@ -125,19 +125,18 @@ When continuing from a previous session, read these files to recover context rat
 - `farebot-transit-*/` — Transit system implementations (one module per system)
 - `farebot-transit-serialonly/` — Identification-only systems (serial number + reason, matches Metrodroid's `serialonly/`)
 - `farebot-transit/` — Shared transit abstractions (Trip, Station, TransitInfo, TransitCurrency, etc.)
-- `farebot-shared/` — Shared app code, Compose UI, ViewModels
-- `farebot-android/` — Android app entry point
-- `farebot-ios/` — iOS app (Xcode project)
+- `farebot-app/` — KMP app framework (UI, ViewModels, DI, platform code)
+- `farebot-app-android/` — Android app shell (Activities, manifest, resources)
+- `farebot-app-ios/` — iOS app shell (Swift entry point, assets, config)
 
 ## Registration Checklist for New Transit Modules
 
 1. Create `farebot-transit-{name}/build.gradle.kts`
 2. Add `include(":farebot-transit-{name}")` to `settings.gradle.kts`
-3. Add `api(project(":farebot-transit-{name}"))` to `farebot-shared/build.gradle.kts`
-4. Add `implementation(project(":farebot-transit-{name}"))` to `farebot-android/build.gradle.kts`
-5. Register factory in `TransitFactoryRegistry.kt` (Android)
-6. Register factory in `MainViewController.kt` (iOS, non-Classic cards only)
-7. Add string resources in `composeResources/values/strings.xml`
+3. Add `api(project(":farebot-transit-{name}"))` to `farebot-app/build.gradle.kts`
+4. Register factory in `TransitFactoryRegistry.kt` (Android)
+5. Register factory in `MainViewController.kt` (iOS, non-Classic cards only)
+6. Add string resources in `composeResources/values/strings.xml`
 
 ## Kotlin/Native Gotchas
 

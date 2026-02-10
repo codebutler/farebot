@@ -211,6 +211,16 @@ $ make              # show all targets
 * [kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime) (date/time)
 * [SQLDelight](https://github.com/cashapp/sqldelight) (database)
 
+## Project Structure
+
+- `farebot-base/` — Core utilities, MDST reader, ByteArray extensions
+- `farebot-card-*/` — Card protocol implementations (classic, desfire, felica, etc.)
+- `farebot-transit/` — Shared transit abstractions (Trip, Station, TransitInfo, etc.)
+- `farebot-transit-*/` — Transit system implementations (one per system)
+- `farebot-app/` — KMP app framework (UI, ViewModels, DI, platform code)
+- `farebot-app-android/` — Android app shell (Activities, manifest, resources)
+- `farebot-app-ios/` — iOS app shell (Swift entry point, assets, config)
+
 ## Written By
 
 * [Eric Butler](https://x.com/codebutler) <eric@codebutler.com>

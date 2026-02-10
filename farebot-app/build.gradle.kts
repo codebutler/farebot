@@ -1,0 +1,144 @@
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.sqldelight)
+}
+
+kotlin {
+    androidLibrary {
+        namespace = "com.codebutler.farebot.shared"
+        compileSdk = libs.versions.compileSdk.get().toInt()
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.binaries.framework {
+            baseName = "FareBotKit"
+            isStatic = true
+        }
+    }
+
+    sourceSets {
+        androidMain.dependencies {
+            implementation(libs.maps.compose)
+            implementation(libs.play.services.maps)
+            implementation(libs.sqldelight.android.driver)
+            implementation(libs.koin.android)
+            implementation(libs.activity.compose)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.components.resources)
+            implementation(libs.navigation.compose)
+            implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.kotlinx.coroutines.core)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
+            api(project(":farebot-base"))
+            api(project(":farebot-card"))
+            api(project(":farebot-card-cepas"))
+            api(project(":farebot-card-classic"))
+            api(project(":farebot-card-desfire"))
+            api(project(":farebot-card-felica"))
+            api(project(":farebot-card-ultralight"))
+            api(project(":farebot-card-iso7816"))
+            api(project(":farebot-card-ksx6924"))
+            api(project(":farebot-card-china"))
+            api(project(":farebot-card-vicinity"))
+            api(project(":farebot-transit-china"))
+            api(project(":farebot-transit"))
+            api(project(":farebot-transit-bilhete"))
+            api(project(":farebot-transit-bip"))
+            api(project(":farebot-transit-clipper"))
+            api(project(":farebot-transit-easycard"))
+            api(project(":farebot-transit-edy"))
+            api(project(":farebot-transit-ezlink"))
+            api(project(":farebot-transit-hsl"))
+            api(project(":farebot-transit-kmt"))
+            api(project(":farebot-transit-mrtj"))
+            api(project(":farebot-transit-manly"))
+            api(project(":farebot-transit-myki"))
+            api(project(":farebot-transit-octopus"))
+            api(project(":farebot-transit-opal"))
+            api(project(":farebot-transit-orca"))
+            api(project(":farebot-transit-ovc"))
+            api(project(":farebot-transit-erg"))
+            api(project(":farebot-transit-nextfare"))
+            api(project(":farebot-transit-seqgo"))
+            api(project(":farebot-transit-nextfareul"))
+            api(project(":farebot-transit-amiibo"))
+            api(project(":farebot-transit-ventra"))
+            api(project(":farebot-transit-yvr-compass"))
+            api(project(":farebot-transit-vicinity"))
+            api(project(":farebot-transit-suica"))
+            api(project(":farebot-transit-en1545"))
+            api(project(":farebot-transit-calypso"))
+            api(project(":farebot-transit-troika"))
+            api(project(":farebot-transit-oyster"))
+            api(project(":farebot-transit-charlie"))
+            api(project(":farebot-transit-gautrain"))
+            api(project(":farebot-transit-smartrider"))
+            api(project(":farebot-transit-podorozhnik"))
+            api(project(":farebot-transit-touchngo"))
+            api(project(":farebot-transit-tfi-leap"))
+            api(project(":farebot-transit-lax-tap"))
+            api(project(":farebot-transit-ricaricami"))
+            api(project(":farebot-transit-yargor"))
+            api(project(":farebot-transit-chc-metrocard"))
+            api(project(":farebot-transit-komuterlink"))
+            api(project(":farebot-transit-magnacarta"))
+            api(project(":farebot-transit-tampere"))
+            api(project(":farebot-transit-msp-goto"))
+            api(project(":farebot-transit-tmoney"))
+            api(project(":farebot-transit-waikato"))
+            api(project(":farebot-transit-bonobus"))
+            api(project(":farebot-transit-cifial"))
+            api(project(":farebot-transit-adelaide"))
+            api(project(":farebot-transit-hafilat"))
+            api(project(":farebot-transit-intercard"))
+            api(project(":farebot-transit-kazan"))
+            api(project(":farebot-transit-kiev"))
+            api(project(":farebot-transit-metromoney"))
+            api(project(":farebot-transit-metroq"))
+            api(project(":farebot-transit-otago"))
+            api(project(":farebot-transit-pilet"))
+            api(project(":farebot-transit-selecta"))
+            api(project(":farebot-transit-umarsh"))
+            api(project(":farebot-transit-warsaw"))
+            api(project(":farebot-transit-zolotayakorona"))
+            api(project(":farebot-transit-serialonly"))
+            api(project(":farebot-transit-krocap"))
+            api(project(":farebot-transit-snapper"))
+            api(project(":farebot-transit-ndef"))
+            api(project(":farebot-transit-rkf"))
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.kotlinx.serialization.json)
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("FareBotDb") {
+            packageName.set("com.codebutler.farebot.persist.db")
+        }
+    }
+}
