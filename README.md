@@ -189,11 +189,18 @@ Some MIFARE Classic cards require encryption keys to read. You can obtain keys u
 ```
 $ git clone https://github.com/codebutler/farebot.git
 $ cd farebot
-$ ./gradlew assembleDebug          # Android
-$ ./gradlew allTests               # Run all tests
+$ make              # show all targets
 ```
 
-The iOS app can be built via the Xcode project in `iosApp/`.
+| Command | Description |
+|---------|-------------|
+| `make android` | Build Android debug APK |
+| `make android-install` | Build and install on connected Android device (via adb) |
+| `make ios` | Build iOS app for physical device |
+| `make ios-sim` | Build iOS app for simulator |
+| `make ios-install` | Build and install on connected iOS device (auto-detects device) |
+| `make test` | Run all tests |
+| `make clean` | Clean all build artifacts |
 
 ## Tech Stack
 
