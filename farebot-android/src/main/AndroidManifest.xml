@@ -76,11 +76,6 @@
         </activity>
 
         <activity
-            android:name="com.codebutler.farebot.app.feature.prefs.FareBotPreferenceActivity"
-            android:label="@string/preferences"
-            android:theme="@style/FareBot.Theme.Prefs"/>
-
-        <activity
             android:name=".app.feature.bg.BackgroundTagActivity"
             android:enabled="false"
             android:noHistory="true"

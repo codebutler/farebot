@@ -33,6 +33,4 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
-
-    <style name="FareBot.Theme.Prefs" parent="@android:style/Theme.DeviceDefault.Light.DarkActionBar"/>
 </resources>
