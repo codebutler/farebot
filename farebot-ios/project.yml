@@ -10,16 +10,16 @@ settings:
   CURRENT_PROJECT_VERSION: "1"
 
 targets:
-  iosApp:
+  FareBot:
     type: application
     platform: iOS
     sources:
-      - iosApp
+      - FareBot
     settings:
       base:
         PRODUCT_NAME: FareBot
-        INFOPLIST_FILE: iosApp/Info.plist
-        CODE_SIGN_ENTITLEMENTS: iosApp/iosApp.entitlements
+        INFOPLIST_FILE: FareBot/Info.plist
+        CODE_SIGN_ENTITLEMENTS: FareBot/FareBot.entitlements
         PRODUCT_BUNDLE_IDENTIFIER: com.codebutler.farebot
         SWIFT_VERSION: "5.9"
         CODE_SIGN_IDENTITY: "Apple Development"

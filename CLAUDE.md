@@ -127,7 +127,7 @@ When continuing from a previous session, read these files to recover context rat
 - `farebot-transit/` — Shared transit abstractions (Trip, Station, TransitInfo, TransitCurrency, etc.)
 - `farebot-shared/` — Shared app code, Compose UI, ViewModels
 - `farebot-android/` — Android app entry point
-- `iosApp/` — iOS app (Xcode project)
+- `farebot-ios/` — iOS app (Xcode project)
 
 ## Registration Checklist for New Transit Modules
 
