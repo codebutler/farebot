@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.viewinterop.UIKitView
 import androidx.compose.ui.unit.dp
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreLocation.CLLocationCoordinate2DMake
@@ -36,17 +36,17 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
             MKMapView().apply {
                 val startAnnotation = if (hasStart) {
                     MKPointAnnotation().apply {
-                        setCoordinate(CLLocationCoordinate2DMake(startLat!!, startLng!!))
-                        setTitle(startStation?.stationName ?: "Start")
-                        setSubtitle(startStation?.companyName)
+                        setCoordinate(CLLocationCoordinate2DMake(startLat, startLng))
+                        setTitle(startStation.stationName ?: "Start")
+                        setSubtitle(startStation.companyName)
                     }
                 } else null
 
                 val endAnnotation = if (hasEnd) {
                     MKPointAnnotation().apply {
-                        setCoordinate(CLLocationCoordinate2DMake(endLat!!, endLng!!))
-                        setTitle(endStation?.stationName ?: "End")
-                        setSubtitle(endStation?.companyName)
+                        setCoordinate(CLLocationCoordinate2DMake(endLat, endLng))
+                        setTitle(endStation.stationName ?: "End")
+                        setSubtitle(endStation.companyName)
                     }
                 } else null
 
@@ -55,8 +55,8 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
 
                 // Set the visible region
                 if (hasStart && hasEnd) {
-                    val centerLat = (startLat!! + endLat!!) / 2.0
-                    val centerLng = (startLng!! + endLng!!) / 2.0
+                    val centerLat = (startLat + endLat) / 2.0
+                    val centerLng = (startLng + endLng) / 2.0
                     val latDelta = kotlin.math.abs(startLat - endLat)
                     val lngDelta = kotlin.math.abs(startLng - endLng)
                     val maxDelta = maxOf(latDelta, lngDelta)
