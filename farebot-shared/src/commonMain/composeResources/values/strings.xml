@@ -41,7 +41,6 @@
     <string name="no_location_data">No location data available for this trip.</string>
     <string name="no_scanned_cards">You have not scanned any cards.</string>
     <string name="ok">OK</string>
-    <string name="preferences">Preferences</string>
     <string name="refill">Refill</string>
     <string name="save">Save</string>
     <string name="scan_card">Scan a card to get started</string>
@@ -285,62 +284,4 @@
     <string name="card_note_oyster">Only first generation (MIFARE Classic) cards are supported. Current generation cards (which have a \"D\" printed on the bottom left corner) are fully locked DESFire cards, and thus unsupportable.</string>
     <string name="card_note_russia">Bank-issued cards are not supported.</string>
     <string name="card_note_ventra">Single ride tickets only</string>
-
-    <!-- Settings strings -->
-    <string name="pref_category_general">General</string>
-    <string name="pref_category_raw_data">Raw Data</string>
-    <string name="pref_category_obfuscation">Obfuscation</string>
-    <string name="pref_category_obfuscation_desc">For taking screenshots or sharing exports without revealing personal data</string>
-    <string name="pref_category_localization">Localization</string>
-    <string name="pref_category_debug">Developer Options</string>
-
-    <string name="pref_launch_from_background">Launch from background</string>
-    <string name="pref_launch_from_background_desc">Automatically read cards without opening the app</string>
-
-    <string name="pref_raw_level">Show raw data</string>
-    <string name="pref_raw_level_desc">Display raw/debug information on card screens</string>
-    <string name="pref_raw_level_none">None</string>
-    <string name="pref_raw_level_unknown">Unknown fields only</string>
-    <string name="pref_raw_level_all">All fields</string>
-
-    <string name="pref_show_raw_station_ids">Show raw station IDs</string>
-    <string name="pref_show_raw_station_ids_desc">Display station IDs alongside station names</string>
-
-    <string name="pref_hide_card_numbers">Hide card numbers</string>
-    <string name="pref_hide_card_numbers_desc">Hide serial numbers in the user interface</string>
-
-    <string name="pref_obfuscate_balance">Obfuscate balance</string>
-    <string name="pref_obfuscate_balance_desc">Show a fake balance instead of the real one</string>
-
-    <string name="pref_obfuscate_trip_fares">Obfuscate trip fares</string>
-    <string name="pref_obfuscate_trip_fares_desc">Show fake fare amounts</string>
-
-    <string name="pref_obfuscate_trip_dates">Obfuscate trip dates</string>
-    <string name="pref_obfuscate_trip_dates_desc">Shift trip dates by a random offset</string>
-
-    <string name="pref_obfuscate_trip_times">Obfuscate trip times</string>
-    <string name="pref_obfuscate_trip_times_desc">Shift trip times by a random offset</string>
-
-    <string name="pref_show_local_and_english">Show local and English</string>
-    <string name="pref_show_local_and_english_desc">Show station names in both local language and English</string>
-
-    <string name="pref_convert_timezone">Convert timezones</string>
-    <string name="pref_convert_timezone_desc">Show times in your local timezone instead of the card\'s timezone</string>
-
-    <string name="pref_localise_places">Localise place names</string>
-    <string name="pref_localise_places_desc">Transliterate station names to Latin characters</string>
-
-    <string name="pref_debug_logging">Debug logging</string>
-    <string name="pref_debug_logging_desc">Enable extra logging for troubleshooting</string>
-
-    <string name="pref_debug_spans">Debug spans</string>
-    <string name="pref_debug_spans_desc">Show debug markers in formatted text</string>
-
-    <string name="pref_iso_datetime">Use ISO date format</string>
-    <string name="pref_iso_datetime_desc">Use ISO 8601 format (YYYY-MM-DD) for dates</string>
-
-    <string name="pref_speak_balance">Speak balance</string>
-    <string name="pref_speak_balance_desc">Announce the card balance aloud when scanned</string>
-
-    <string name="pref_retrieve_leap_keys">Retrieve LEAP keys</string>
 </resources>

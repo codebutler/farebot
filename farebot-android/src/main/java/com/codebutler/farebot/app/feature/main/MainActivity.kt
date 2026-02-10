@@ -45,7 +45,7 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.FareBotApp
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.serialize.CardImporter
-import com.codebutler.farebot.shared.settings.AppSettings
+import com.codebutler.farebot.shared.platform.initDeviceRegion
 import com.codebutler.farebot.shared.ui.screen.ALL_SUPPORTED_CARDS
 import org.koin.android.ext.android.inject
 
@@ -67,7 +67,6 @@ class MainActivity : ComponentActivity() {
     private val nfcStream: NfcStream by inject()
     private val cardScanner: CardScanner by inject()
     private val cardImporter: CardImporter by inject()
-    private val appSettings: AppSettings by inject()
 
     private var nfcReceiver: BroadcastReceiver? = null
 
@@ -98,6 +97,8 @@ class MainActivity : ComponentActivity() {
         }
         registerReceiver(nfcReceiver, IntentFilter(ACTION_TAG))
 
+        initDeviceRegion(this)
+
         val supportedCardTypes = CardType.entries.toSet().let { all ->
             if (packageManager.hasSystemFeature("com.nxp.mifare")) all
             else all - setOf(CardType.MifareClassic)
@@ -110,7 +111,6 @@ class MainActivity : ComponentActivity() {
                 platformActions = platformActions,
                 supportedCards = SUPPORTED_CARDS,
                 supportedCardTypes = supportedCardTypes,
-                deviceRegion = appSettings.region,
             )
         }
     }

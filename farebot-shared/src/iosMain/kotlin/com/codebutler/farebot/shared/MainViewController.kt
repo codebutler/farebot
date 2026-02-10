@@ -1,5 +1,6 @@
 package com.codebutler.farebot.shared
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.window.ComposeUIViewController
 import com.codebutler.farebot.base.util.BundledDatabaseDriverFactory
 import com.codebutler.farebot.base.util.DefaultStringResource
@@ -22,20 +23,17 @@ import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.transit.createTransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.screen.ALL_SUPPORTED_CARDS
 import com.codebutler.farebot.shared.platform.PlatformActions
-import com.codebutler.farebot.shared.settings.AppSettings
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
 fun MainViewController() = ComposeUIViewController {
-    val platformActions = IosPlatformActions()
-    val appSettings = org.koin.mp.KoinPlatform.getKoin().get<AppSettings>()
+    val platformActions = remember { IosPlatformActions() }
 
     FareBotApp(
         platformActions = platformActions,
         supportedCards = ALL_SUPPORTED_CARDS,
         supportedCardTypes = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.CEPAS),
-        deviceRegion = appSettings.region,
     )
 }
 
@@ -78,8 +76,6 @@ private val iosModule = module {
     }
 
     single<CardScanner> { IosNfcScanner() }
-
-    single { AppSettings() }
 
     single<PlatformActions> { IosPlatformActions() }
 }

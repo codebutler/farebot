@@ -9,7 +9,6 @@ import com.codebutler.farebot.shared.viewmodel.CardViewModel
 import com.codebutler.farebot.shared.viewmodel.HistoryViewModel
 import com.codebutler.farebot.shared.viewmodel.HomeViewModel
 import com.codebutler.farebot.shared.viewmodel.KeysViewModel
-import com.codebutler.farebot.shared.viewmodel.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -23,5 +22,4 @@ val sharedModule = module {
     viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
     viewModel { KeysViewModel(get()) }
     viewModel { AddKeyViewModel(get(), getOrNull()) }
-    viewModel { SettingsViewModel(get(), getOrNull()) }
 }

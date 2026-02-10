@@ -1,6 +1,5 @@
 package com.codebutler.farebot.app.core.di
 
-import android.content.SharedPreferences
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
@@ -17,17 +16,12 @@ import com.codebutler.farebot.persist.db.DbCardKeysPersister
 import com.codebutler.farebot.persist.db.DbCardPersister
 import com.codebutler.farebot.persist.db.FareBotDb
 import com.codebutler.farebot.shared.nfc.CardScanner
-import com.codebutler.farebot.shared.settings.AppSettings
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val androidModule = module {
-    single<SharedPreferences> { androidContext().getSharedPreferences(androidContext().packageName + "_preferences", android.content.Context.MODE_PRIVATE) }
-
-    single { AppSettings(androidContext()) }
-
     single {
         Json {
             serializersModule = FareBotSerializersModule

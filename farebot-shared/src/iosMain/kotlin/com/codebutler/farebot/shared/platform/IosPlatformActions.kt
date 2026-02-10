@@ -44,12 +44,12 @@ import platform.darwin.NSObject
 class IosPlatformActions : PlatformActions {
 
     override fun openUrl(url: String) {
-        val nsUrl = NSURL(string = url) ?: return
+        val nsUrl = NSURL(string = url)
         UIApplication.sharedApplication.openURL(nsUrl, emptyMap<Any?, Any>(), null)
     }
 
     override fun openNfcSettings() {
-        val settingsUrl = NSURL(string = "App-prefs:root") ?: return
+        val settingsUrl = NSURL(string = "App-prefs:root")
         UIApplication.sharedApplication.openURL(settingsUrl, emptyMap<Any?, Any>(), null)
     }
 
@@ -116,8 +116,6 @@ class IosPlatformActions : PlatformActions {
         )
         viewController.presentViewController(activityVC, animated = true, completion = null)
     }
-
-    override fun supportsLaunchFromBackground(): Boolean = false
 
     private fun getTopViewController(): UIViewController? {
         val keyWindow = UIApplication.sharedApplication.windows

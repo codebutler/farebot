@@ -22,6 +22,7 @@ import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
 import com.codebutler.farebot.shared.core.NavDataHolder
 import com.codebutler.farebot.shared.platform.PlatformActions
+import com.codebutler.farebot.shared.platform.getDeviceRegion
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.ui.navigation.Screen
@@ -37,7 +38,6 @@ import com.codebutler.farebot.shared.ui.screen.HelpScreen
 import com.codebutler.farebot.shared.ui.screen.HistoryScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
-import com.codebutler.farebot.shared.ui.screen.SettingsScreen
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapUiState
@@ -63,9 +63,7 @@ fun FareBotApp(
     platformActions: PlatformActions,
     supportedCards: List<CardInfo> = emptyList(),
     supportedCardTypes: Set<CardType> = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.CEPAS),
-    deviceRegion: String? = null,
     loadedKeyBundles: Set<String> = emptySet(),
-    onNavigateToPrefs: (() -> Unit)? = null,
 ) {
     FareBotTheme {
         val navController = rememberNavController()
@@ -129,10 +127,6 @@ fun FareBotApp(
                     onNavigateToKeys = if (CardType.MifareClassic in supportedCardTypes) {
                         { navController.navigate(Screen.Keys.route) }
                     } else null,
-                    onNavigateToPrefs = when {
-                        onNavigateToPrefs != null -> onNavigateToPrefs
-                        else -> { { navController.navigate(Screen.Settings.route) } }
-                    },
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = { platformActions.openNfcSettings() },
                     onScanCard = { viewModel.startActiveScan() },
@@ -144,7 +138,7 @@ fun FareBotApp(
                 HelpScreen(
                     supportedCards = supportedCards,
                     supportedCardTypes = supportedCardTypes,
-                    deviceRegion = deviceRegion,
+                    deviceRegion = getDeviceRegion(),
                     loadedKeyBundles = loadedKeyBundles,
                     onBack = { navController.popBackStack() },
                     onKeysRequiredTap = {
@@ -275,12 +269,6 @@ fun FareBotApp(
                             }
                         }
                     },
-                )
-            }
-
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    onBack = { navController.popBackStack() },
                 )
             }
 

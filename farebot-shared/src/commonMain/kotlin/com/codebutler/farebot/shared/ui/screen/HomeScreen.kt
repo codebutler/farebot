@@ -51,7 +51,6 @@ import farebot.farebot_shared.generated.resources.nfc_disabled
 import farebot.farebot_shared.generated.resources.nfc_settings
 import farebot.farebot_shared.generated.resources.nfc_unavailable
 import farebot.farebot_shared.generated.resources.ok
-import farebot.farebot_shared.generated.resources.preferences
 import farebot.farebot_shared.generated.resources.scan_card
 import farebot.farebot_shared.generated.resources.scan_now
 import farebot.farebot_shared.generated.resources.supported_cards
@@ -69,7 +68,6 @@ fun HomeScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToKeys: (() -> Unit)? = null,
-    onNavigateToPrefs: (() -> Unit)? = null,
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: () -> Unit,
     onScanCard: () -> Unit,
@@ -107,12 +105,6 @@ fun HomeScreen(
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.keys)) },
                                 onClick = { menuExpanded = false; onNavigateToKeys() }
-                            )
-                        }
-                        if (onNavigateToPrefs != null) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.preferences)) },
-                                onClick = { menuExpanded = false; onNavigateToPrefs() }
                             )
                         }
                         DropdownMenuItem(

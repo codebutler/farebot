@@ -15,7 +15,4 @@ interface PlatformActions {
     fun saveFileForExport(content: String, defaultFileName: String)
     fun updateAppTimestamp() {}
     fun pickFileForBytes(onResult: (ByteArray?) -> Unit) { onResult(null) }
-    fun isLaunchFromBackgroundEnabled(): Boolean = false
-    fun setLaunchFromBackgroundEnabled(enabled: Boolean) {}
-    fun supportsLaunchFromBackground(): Boolean = false
 }

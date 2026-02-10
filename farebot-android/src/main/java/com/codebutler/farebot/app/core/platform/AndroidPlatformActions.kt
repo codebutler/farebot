@@ -3,17 +3,14 @@ package com.codebutler.farebot.app.core.platform
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.codebutler.farebot.app.feature.bg.BackgroundTagActivity
 import com.codebutler.farebot.shared.platform.PlatformActions
 
 class AndroidPlatformActions(
@@ -149,25 +146,4 @@ class AndroidPlatformActions(
         })
     }
 
-    override fun supportsLaunchFromBackground(): Boolean = true
-
-    override fun isLaunchFromBackgroundEnabled(): Boolean {
-        val componentName = ComponentName(context, BackgroundTagActivity::class.java)
-        val state = context.packageManager.getComponentEnabledSetting(componentName)
-        return state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-    }
-
-    override fun setLaunchFromBackgroundEnabled(enabled: Boolean) {
-        val componentName = ComponentName(context, BackgroundTagActivity::class.java)
-        val newState = if (enabled) {
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-        } else {
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-        }
-        context.packageManager.setComponentEnabledSetting(
-            componentName,
-            newState,
-            PackageManager.DONT_KILL_APP,
-        )
-    }
 }
