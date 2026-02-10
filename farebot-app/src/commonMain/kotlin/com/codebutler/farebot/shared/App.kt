@@ -157,22 +157,6 @@ fun FareBotApp(
                             }
                         }
                     },
-                    onImportClipboard = {
-                        val text = platformActions.getClipboardText()
-                        if (text != null) {
-                            val count = historyViewModel.importCards(text)
-                            platformActions.showToast(runBlocking { getString(Res.string.imported_cards, count) })
-                            historyViewModel.loadCards()
-                        }
-                    },
-                    onExportShare = {
-                        val json = historyViewModel.exportCards()
-                        platformActions.shareText(json)
-                    },
-                    onExportSave = {
-                        val json = historyViewModel.exportCards()
-                        platformActions.saveFileForExport(json, "farebot-export.json")
-                    },
                     onDeleteItem = { itemId -> historyViewModel.deleteItem(itemId) },
                     onToggleSelection = { itemId -> historyViewModel.toggleSelection(itemId) },
                     onClearSelection = { historyViewModel.clearSelection() },

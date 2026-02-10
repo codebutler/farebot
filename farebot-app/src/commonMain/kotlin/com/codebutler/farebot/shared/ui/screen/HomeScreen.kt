@@ -55,7 +55,6 @@ import farebot.farebot_app.generated.resources.app_name
 import farebot.farebot_app.generated.resources.cancel
 import farebot.farebot_app.generated.resources.delete
 import farebot.farebot_app.generated.resources.delete_selected_cards
-import farebot.farebot_app.generated.resources.import_clipboard
 import farebot.farebot_app.generated.resources.import_file
 import farebot.farebot_app.generated.resources.keys
 import farebot.farebot_app.generated.resources.menu
@@ -63,9 +62,7 @@ import farebot.farebot_app.generated.resources.n_selected
 import farebot.farebot_app.generated.resources.nfc_disabled
 import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
-import farebot.farebot_app.generated.resources.save
 import farebot.farebot_app.generated.resources.scan
-import farebot.farebot_app.generated.resources.share
 import farebot.farebot_app.generated.resources.show_unsupported_cards
 import farebot.farebot_app.generated.resources.tab_explore
 import farebot.farebot_app.generated.resources.tab_scan
@@ -82,9 +79,6 @@ fun HomeScreen(
     historyUiState: HistoryUiState,
     onNavigateToCard: (String) -> Unit,
     onImportFile: () -> Unit,
-    onImportClipboard: () -> Unit,
-    onExportShare: () -> Unit,
-    onExportSave: () -> Unit,
     onDeleteItem: (String) -> Unit,
     onToggleSelection: (String) -> Unit,
     onClearSelection: () -> Unit,
@@ -196,18 +190,6 @@ fun HomeScreen(
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.import_file)) },
                                 onClick = { menuExpanded = false; onImportFile() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_clipboard)) },
-                                onClick = { menuExpanded = false; onImportClipboard() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.share)) },
-                                onClick = { menuExpanded = false; onExportShare() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.save)) },
-                                onClick = { menuExpanded = false; onExportSave() }
                             )
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
