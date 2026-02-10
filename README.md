@@ -1,27 +1,228 @@
 # FareBot
 
-View your remaining balance, recent trips, and other information from contactless public transit cards using your NFC Android phone!
+Read your remaining balance, recent trips, and other information from contactless public transit cards using your NFC-enabled Android or iOS device.
 
-[![Build Status](https://travis-ci.org/codebutler/farebot.svg?branch=master)](https://travis-ci.org/codebutler/farebot)
+FareBot is a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) app built with [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/), targeting Android (NFC) and iOS (CoreNFC).
+
+## Platform Compatibility
+
+| Protocol | Android | iOS |
+|----------|---------|-----|
+| [CEPAS](https://en.wikipedia.org/wiki/CEPAS) | Yes | Yes |
+| [FeliCa](https://en.wikipedia.org/wiki/FeliCa) | Yes | Yes |
+| [ISO 7816](https://en.wikipedia.org/wiki/ISO/IEC_7816) | Yes | Yes |
+| [MIFARE Classic](https://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic) | NXP NFC chips only | No |
+| [MIFARE DESFire](https://en.wikipedia.org/wiki/MIFARE#MIFARE_DESFire) | Yes | Yes |
+| [MIFARE Ultralight](https://en.wikipedia.org/wiki/MIFARE#MIFARE_Ultralight_and_MIFARE_Ultralight_EV1) | Yes | Yes |
+| [NFC-V / Vicinity](https://en.wikipedia.org/wiki/Near-field_communication#Standards) | Yes | Yes |
+
+MIFARE Classic requires proprietary NXP hardware and is not supported on iOS or on Android devices with non-NXP NFC controllers (e.g. most Samsung and some other devices). All other protocols work on both platforms. Cards marked **Android only** in the tables below use MIFARE Classic.
+
+## Supported Cards
+
+### Asia
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Beijing Municipal Card](https://en.wikipedia.org/wiki/Yikatong) | Beijing, China | ISO 7816 | Android, iOS |
+| [City Union](https://en.wikipedia.org/wiki/China_T-Union) | China | ISO 7816 | Android, iOS |
+| [Edy](https://en.wikipedia.org/wiki/Edy) | Japan | FeliCa | Android, iOS |
+| [EZ-Link](http://www.ezlink.com.sg/) | Singapore | CEPAS | Android, iOS |
+| [Kartu Multi Trip](https://en.wikipedia.org/wiki/Kereta_Commuter_Indonesia) | Jakarta, Indonesia | FeliCa | Android, iOS |
+| [KomuterLink](https://en.wikipedia.org/wiki/KTM_Komuter) | Malaysia | Classic | Android only |
+| [NETS FlashPay](https://www.nets.com.sg/) | Singapore | CEPAS | Android, iOS |
+| [Octopus](https://www.octopus.com.hk/) | Hong Kong | FeliCa | Android, iOS |
+| [One Card All Pass](https://en.wikipedia.org/wiki/One_Card_All_Pass) | South Korea | ISO 7816 | Android, iOS |
+| [Shanghai Public Transportation Card](https://en.wikipedia.org/wiki/Shanghai_Public_Transportation_Card) | Shanghai, China | ISO 7816 | Android, iOS |
+| [Shenzhen Tong](https://en.wikipedia.org/wiki/Shenzhen_Tong) | Shenzhen, China | ISO 7816 | Android, iOS |
+| [Suica](https://en.wikipedia.org/wiki/Suica) / ICOCA / PASMO | Japan | FeliCa | Android, iOS |
+| [T-money](https://en.wikipedia.org/wiki/T-money) | South Korea | ISO 7816 | Android, iOS |
+| [T-Union](https://en.wikipedia.org/wiki/China_T-Union) | China | ISO 7816 | Android, iOS |
+| [Touch 'n Go](https://www.touchngo.com.my/) | Malaysia | Classic | Android only |
+| [Wuhan Tong](https://en.wikipedia.org/wiki/Wuhan_Metro) | Wuhan, China | ISO 7816 | Android, iOS |
+
+### Australia & New Zealand
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Adelaide Metrocard](https://www.adelaidemetro.com.au/) | Adelaide, SA | DESFire | Android, iOS |
+| [BUSIT](https://www.busit.co.nz/) | Waikato, NZ | Classic | Android only |
+| [Manly Fast Ferry](http://www.manlyfastferry.com.au/) | Sydney, NSW | Classic | Android only |
+| [Metrocard](https://www.metroinfo.co.nz/) | Christchurch, NZ | Classic | Android only |
+| [Myki](https://www.ptv.vic.gov.au/tickets/myki/) | Melbourne, VIC | DESFire | Android, iOS |
+| [Opal](https://www.opal.com.au/) | Sydney, NSW | DESFire | Android, iOS |
+| [Otago GoCard](https://www.orc.govt.nz/) | Otago, NZ | Classic | Android only |
+| [SeqGo](https://translink.com.au/) | Queensland | Classic | Android only |
+| [SmartRide](https://www.busit.co.nz/) | Rotorua, NZ | Classic | Android only |
+| [SmartRider](https://www.transperth.wa.gov.au/) | Perth, WA | Classic | Android only |
+| [Snapper](https://www.snapper.co.nz/) | Wellington, NZ | ISO 7816 | Android, iOS |
+
+### Europe
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Bonobus](https://www.bonobus.es/) | Cadiz, Spain | Classic | Android only |
+| [Carta Mobile](https://www.at-bus.it/) | Pisa, Italy | ISO 7816 (Calypso) | Android, iOS |
+| [Envibus](https://www.envibus.fr/) | Sophia Antipolis, France | ISO 7816 (Calypso) | Android, iOS |
+| [HSL](https://www.hsl.fi/) | Helsinki, Finland | DESFire | Android, iOS |
+| [KorriGo](https://www.star.fr/) | Brittany, France | ISO 7816 (Calypso) | Android, iOS |
+| [Leap](https://www.leapcard.ie/) | Dublin, Ireland | DESFire | Android, iOS |
+| [Lisboa Viva](https://www.portalviva.pt/) | Lisbon, Portugal | ISO 7816 (Calypso) | Android, iOS |
+| [Mobib](https://mobib.be/) | Brussels, Belgium | ISO 7816 (Calypso) | Android, iOS |
+| [Navigo](https://www.iledefrance-mobilites.fr/) | Paris, France | ISO 7816 (Calypso) | Android, iOS |
+| [OuRA](https://www.oura.com/) | Grenoble, France | ISO 7816 (Calypso) | Android, iOS |
+| [OV-chipkaart](https://www.ov-chipkaart.nl/) | Netherlands | Classic / Ultralight | Android only (Classic), Android + iOS (Ultralight) |
+| [Oyster](https://oyster.tfl.gov.uk/) | London, UK | Classic | Android only |
+| [Pass Pass](https://www.passpass.fr/) | Hauts-de-France, France | ISO 7816 (Calypso) | Android, iOS |
+| [Pastel](https://www.tisseo.fr/) | Toulouse, France | ISO 7816 (Calypso) | Android, iOS |
+| [Rejsekort](https://www.rejsekort.dk/) | Denmark | Classic | Android only |
+| [RicaricaMi](https://www.atm.it/) | Milan, Italy | Classic | Android only |
+| [SLaccess](https://sl.se/) | Stockholm, Sweden | Classic | Android only |
+| [TaM](https://www.tam-voyages.com/) | Montpellier, France | ISO 7816 (Calypso) | Android, iOS |
+| [Tampere](https://www.nysse.fi/) | Tampere, Finland | DESFire | Android, iOS |
+| [Tartu Bus](https://www.tartu.ee/) | Tartu, Estonia | Classic | Android only |
+| [TransGironde](https://transgironde.fr/) | Gironde, France | ISO 7816 (Calypso) | Android, iOS |
+| [Västtrafik](https://www.vasttrafik.se/) | Gothenburg, Sweden | Classic | Android only |
+| [Venezia Unica](https://actv.avmspa.it/) | Venice, Italy | ISO 7816 (Calypso) | Android, iOS |
+| [Waltti](https://waltti.fi/) | Finland | DESFire | Android, iOS |
+| [Warsaw](https://www.ztm.waw.pl/) | Warsaw, Poland | Classic | Android only |
+
+### Middle East & Africa
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Gautrain](https://www.gautrain.co.za/) | Gauteng, South Africa | Classic | Android only |
+| [Hafilat](https://www.dot.abudhabi/) | Abu Dhabi, UAE | DESFire | Android, iOS |
+| [Metro Q](https://www.qr.com.qa/) | Qatar | Classic | Android only |
+| [RavKav](https://ravkav.co.il/) | Israel | ISO 7816 (Calypso) | Android, iOS |
+
+### North America
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Charlie Card](https://www.mbta.com/fares/charliecard) | Boston, MA | Classic | Android only |
+| [Clipper](https://www.clippercard.com/) | San Francisco, CA | DESFire / Ultralight | Android, iOS |
+| [Compass](https://www.compasscard.ca/) | Vancouver, Canada | Ultralight | Android, iOS |
+| [LAX TAP](https://www.taptogo.net/) | Los Angeles, CA | Classic | Android only |
+| [MSP GoTo](https://www.metrotransit.org/) | Minneapolis, MN | Classic | Android only |
+| [Opus](https://www.stm.info/) | Montreal, Canada | ISO 7816 (Calypso) | Android, iOS |
+| [ORCA](https://www.orcacard.com/) | Seattle, WA | DESFire | Android, iOS |
+| [Ventra](https://www.ventrachicago.com/) | Chicago, IL | Ultralight | Android, iOS |
+
+### Russia & Former Soviet Union
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Crimea Trolleybus Card](https://www.korona.net/) | Crimea | Classic | Android only |
+| [Ekarta](https://www.korona.net/) | Yekaterinburg, Russia | Classic | Android only |
+| [Electronic Barnaul](https://umarsh.com/) | Barnaul, Russia | Classic | Android only |
+| [Kazan](https://en.wikipedia.org/wiki/Kazan_Metro) | Kazan, Russia | Classic | Android only |
+| [Kirov transport card](https://umarsh.com/) | Kirov, Russia | Classic | Android only |
+| [Krasnodar ETK](https://www.korona.net/) | Krasnodar, Russia | Classic | Android only |
+| [Kyiv Digital](https://www.eway.in.ua/) | Kyiv, Ukraine | Classic | Android only |
+| [Kyiv Metro](https://www.eway.in.ua/) | Kyiv, Ukraine | Classic | Android only |
+| [MetroMoney](https://www.tbilisi.gov.ge/) | Tbilisi, Georgia | Classic | Android only |
+| [OMKA](https://umarsh.com/) | Omsk, Russia | Classic | Android only |
+| [Orenburg EKG](https://www.korona.net/) | Orenburg, Russia | Classic | Android only |
+| [Parus school card](https://www.korona.net/) | Crimea | Classic | Android only |
+| [Penza transport card](https://umarsh.com/) | Penza, Russia | Classic | Android only |
+| [Podorozhnik](https://podorozhnik.spb.ru/) | St. Petersburg, Russia | Classic | Android only |
+| [Samara ETK](https://www.korona.net/) | Samara, Russia | Classic | Android only |
+| [SitiCard](https://umarsh.com/) | Nizhniy Novgorod, Russia | Classic | Android only |
+| [SitiCard (Vladimir)](https://umarsh.com/) | Vladimir, Russia | Classic | Android only |
+| [Strizh](https://umarsh.com/) | Izhevsk, Russia | Classic | Android only |
+| [Troika](https://troika.mos.ru/) | Moscow, Russia | Classic / Ultralight | Android only (Classic), Android + iOS (Ultralight) |
+| [YarGor](https://yargor.ru/) | Yaroslavl, Russia | Classic | Android only |
+| [Yaroslavl ETK](https://www.korona.net/) | Yaroslavl, Russia | Classic | Android only |
+| [Yoshkar-Ola transport card](https://umarsh.com/) | Yoshkar-Ola, Russia | Classic | Android only |
+| [Zolotaya Korona](https://www.korona.net/) | Russia | Classic | Android only |
+
+### South America
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) | São Paulo, Brazil | Classic | Android only |
+| [Bip!](https://www.red.cl/tarjeta-bip) | Santiago, Chile | Classic | Android only |
+
+### Taiwan
+
+| Card | Location | Protocol | Platform |
+|------|----------|----------|----------|
+| [EasyCard](https://www.easycard.com.tw/) | Taipei | Classic / DESFire | Android only (Classic), Android + iOS (DESFire) |
+
+### Identification Only (Serial Number)
+
+These cards can be detected and identified, but their data is locked or not stored on-card:
+
+| Card | Location | Protocol | Platform | Reason |
+|------|----------|----------|----------|--------|
+| [AT HOP](https://at.govt.nz/bus-train-ferry/at-hop-card/) | Auckland, NZ | DESFire | Android, iOS | Locked |
+| [Holo](https://www.holocard.net/) | Oahu, HI | DESFire | Android, iOS | Not stored on card |
+| [Istanbul Kart](https://www.istanbulkart.istanbul/) | Istanbul, Turkey | DESFire | Android, iOS | Locked |
+| [Nextfare DESFire](https://en.wikipedia.org/wiki/Cubic_Transportation_Systems) | Various | DESFire | Android, iOS | Locked |
+| [Nol](https://www.nol.ae/) | Dubai, UAE | DESFire | Android, iOS | Locked |
+| [Nortic](https://rfrend.no/) | Scandinavia | DESFire | Android, iOS | Locked |
+| [Presto](https://www.prestocard.ca/) | Ontario, Canada | DESFire | Android, iOS | Locked |
+| [Strelka](https://strelkacard.ru/) | Moscow Region, Russia | Classic | Android only | Locked |
+| [Sun Card](https://sunrail.com/) | Orlando, FL | Classic | Android only | Locked |
+| [TPF](https://www.tpf.ch/) | Fribourg, Switzerland | DESFire | Android, iOS | Locked |
+| [TriMet Hop](https://myhopcard.com/) | Portland, OR | DESFire | Android, iOS | Not stored on card |
+
+## Cards Requiring Keys
+
+Some MIFARE Classic cards require encryption keys to read. You can obtain keys using a [Proxmark3](https://github.com/Proxmark/proxmark3/wiki/Mifare-HowTo) or [MFOC](https://github.com/nfc-tools/mfoc). These include:
+
+* Bilhete Único
+* Charlie Card
+* EasyCard (older MIFARE Classic variant)
+* OV-chipkaart
+* Oyster
+* And most other MIFARE Classic-based cards
+
+## Requirements
+
+* **Android:** NFC-enabled device running Android 6.0 (API 23) or later
+* **iOS:** iPhone 7 or later with iOS support for CoreNFC
+
+## Building
+
+```
+$ git clone https://github.com/codebutler/farebot.git
+$ cd farebot
+$ ./gradlew assembleDebug          # Android
+$ ./gradlew allTests               # Run all tests
+```
+
+The iOS app can be built via the Xcode project in `iosApp/`.
+
+## Tech Stack
+
+* [Kotlin](https://kotlinlang.org/) 2.3.0 (Multiplatform)
+* [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) (shared UI)
+* [Koin](https://insert-koin.io/) (dependency injection)
+* [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) (serialization)
+* [kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime) (date/time)
+* [SQLDelight](https://github.com/cashapp/sqldelight) (database)
 
 ## Written By
 
-* [Eric Butler][5] <eric@codebutler.com>
+* [Eric Butler](https://x.com/codebutler) <eric@codebutler.com>
 
 ## Thanks To
 
-* [Karl Koscher][3] (ORCA)
-* [Sean Cross][4] (CEPAS/EZ-Link)
+* [Karl Koscher](https://x.com/supersat) (ORCA)
+* [Sean Cross](https://x.com/xobs) (CEPAS/EZ-Link)
 * Anonymous Contributor (Clipper)
-* [nfc-felica][13] and [IC SFCard Fan][14] projects (Suica)
+* [nfc-felica](http://code.google.com/p/nfc-felica/) and [IC SFCard Fan](http://www014.upp.so-net.ne.jp/SFCardFan/) projects (Suica)
 * [Wilbert Duijvenvoorde](https://github.com/wandcode) (MIFARE Classic/OV-chipkaart)
 * [tbonang](https://github.com/tbonang) (NETS FlashPay)
-* [Marcelo Liberato](https://github.com/mliberato) (Bilhete Único)
+* [Marcelo Liberato](https://github.com/mliberato) (Bilhete Unico)
 * [Lauri Andler](https://github.com/landler/) (HSL)
 * [Michael Farrell](https://github.com/micolous/) (Opal, Manly Fast Ferry, Go card, Myki, Octopus)
 * [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
+* [The Metrodroid project](https://github.com/metrodroid/metrodroid) (many transit system implementations)
 * [b33f](http://www.fuzzysecurity.com/tutorials/rfid/4.html) (EasyCard)
-* [Bondan](https://github.com/sybond) [Sumbodo](http://sybond.web.id) (Kartu Multi Trip, COMMET)
+* [Bondan Sumbodo](http://sybond.web.id) (Kartu Multi Trip, COMMET)
 
 ## License
 
@@ -37,88 +238,3 @@ View your remaining balance, recent trips, and other information from contactles
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-## Supported Protocols
-
-* [CEPAS][2] (Not compatible with all devices)
-* [FeliCa][8]
-* [MIFARE Classic][23] (Not compatible with all devices)
-* [MIFARE DESFire][6]
-* [MIFARE Ultralight][24] (Not compatible with all devices)
-
-## Supported Cards
-
-* [Clipper][1] - San Francisco, CA, USA
-* [EZ-Link][7] - Singapore (Not compatible with all devices)
-* [Myki][21] - Melbourne (and surrounds), VIC, Australia (Only the card number can be read)
-* [Matkakortti][16], [HSL][17] - Finland
-* [NETS FlashPay](http://www.netsflashpay.com.sg/) - Singapore
-* [Octopus][25] - Hong Kong
-* [Opal][18] - Sydney (and surrounds), NSW, Australia
-* [ORCA][0] - Seattle, WA, USA
-* [Suica][9], [ICOCA][10], [PASMO][11], [Edy][12] - Japan
-* [Kartu Multi Trip][26] - Jakarta, Indonesia (Only for new FeliCa cards)
-
-## Supported Cards (Keys Required)
-
-These cards require that you crack the encryption key (using a [proxmark3](https://github.com/Proxmark/proxmark3/wiki/Mifare-HowTo#how-can-i-break-a-card) 
-or [mfcuk](https://github.com/nfc-tools/mfcuk)+[mfoc](https://github.com/nfc-tools/mfoc)) and are not compatible with all devices.
-
-* [Bilhete Único](http://www.sptrans.com.br/bilhete_unico/) - São Paulo, Brazil
-* [Go card][20] (Translink) - Brisbane and South East Queensland, Australia
-* [Manly Fast Ferry][19] - Sydney, Australia 
-* [OV-chipkaart](http://www.ov-chipkaart.nl/) - Netherlands
-* [EasyCard](http://www.easycard.com.tw/english/index.asp) - Taipei (Older insecure cards only)
-
-## Supported Phones
-
-FareBot requires an NFC Android phone running 5.0 or later.
-
-## Building
-
-    $ git clone https://github.com/codebutler/farebot.git
-    $ cd farebot
-    $ git submodule update --init
-    $ ./gradlew assembleDebug
-
-## Open Source Libraries
-
-FareBot uses the following open-source libraries:
-
-* [AutoDispose](https://github.com/uber/AutoDispose)
-* [AutoValue](https://github.com/google/auto/tree/master/value)
-* [AutoValue Gson](https://github.com/rharter/auto-value-gson)
-* [Dagger](https://google.github.io/dagger/)
-* [Gson](https://github.com/google/gson)
-* [Guava](https://github.com/google/guava)
-* [Kotlin](https://kotlinlang.org/)
-* [Magellan](https://github.com/wealthfront/magellan/)
-* [RxBroadcast](https://github.com/cantrowitz/RxBroadcast)
-* [RxJava](https://github.com/ReactiveX/RxJava)
-* [RxRelay](https://github.com/JakeWharton/RxRelay)
-
-[0]: http://www.orcacard.com/
-[1]: https://www.clippercard.com/
-[2]: https://en.wikipedia.org/wiki/CEPAS
-[3]: https://twitter.com/#!/supersat
-[4]: https://twitter.com/#!/xobs
-[5]: https://twitter.com/#!/codebutler
-[6]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_DESFire
-[7]: http://www.ezlink.com.sg/
-[8]: https://en.wikipedia.org/wiki/FeliCa
-[9]: https://en.wikipedia.org/wiki/Suica
-[10]: https://en.wikipedia.org/wiki/ICOCA
-[11]: https://en.wikipedia.org/wiki/PASMO
-[12]: https://en.wikipedia.org/wiki/Edy
-[13]: http://code.google.com/p/nfc-felica/
-[14]: http://www014.upp.so-net.ne.jp/SFCardFan/
-[16]: http://www.hsl.fi/EN/passengersguide/travelcard/Pages/default.aspx
-[17]: http://www.hsl.fi/EN/
-[18]: http://www.opal.com.au/
-[19]: http://www.manlyfastferry.com.au/
-[20]: http://translink.com.au/tickets-and-fares/go-card
-[21]: http://ptv.vic.gov.au/
-[23]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic
-[24]: https://en.wikipedia.org/wiki/MIFARE#MIFARE_Ultralight_and_MIFARE_Ultralight_EV1
-[25]: http://www.octopus.com.hk/home/en/index.html
-[26]: https://en.wikipedia.org/wiki/Kereta_Commuter_Indonesia
