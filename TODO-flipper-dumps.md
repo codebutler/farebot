@@ -20,6 +20,8 @@ Dumps live in `farebot-app/src/commonTest/resources/` (test) and will also be em
 | PASMO | FeliCa | `flipper/PASMO.nfc` | Flipper | Yes — 11 trips, 500 JPY balance |
 | ICOCA | FeliCa | `flipper/ICOCA.nfc` | Flipper | Yes — 20 trips, 827 JPY balance |
 | EasyCard | Classic | `easycard/deadbeef.mfc` | Raw MFC | No |
+| Ventra | Ultralight | `samples/Ventra.json` | Metrodroid JSON | Yes — $8.44 balance, 2 trips |
+| Troika (Classic) | Classic | *(programmatic)* | Test code | Yes — E/3 (0 RUB) and E/5 (50 RUB) |
 
 ### Metrodroid test assets (`metrodroid/src/commonTest/assets/`)
 
@@ -41,6 +43,46 @@ These are Metrodroid JSON dumps. `CardImporter` already supports this format via
 The `metrodroid/src/commonTest/assets/farebot/` directory has format-test dumps (Opal, CEPAS, FeliCa, Classic, Ultralight, DESFire) but these are for testing import compatibility, not specific transit systems.
 
 The `metrodroid/src/commonTest/assets/parsed/` directory has expected *parse results* (not raw dumps): Rejsekort, Bilhete Unico, EasyCard, HSL v2, HSL UL, Opal, Troika UL, T-Money, CEPAS, Mobib, Holo, Selecta.
+
+---
+
+## Dumps available on GitHub (not yet downloaded)
+
+These dumps were found in Metrodroid/FareBot issue trackers and can be downloaded.
+
+### High priority — complete Metrodroid JSON dumps, directly downloadable
+
+| Card | Type | Source | Files | Notes |
+|------|------|--------|-------|-------|
+| **Venezia Unica UL** | Ultralight | [metrodroid PR#869](https://github.com/metrodroid/metrodroid/pull/869) | 12 JSON files (4 cards × 3 reads) | Before/after transaction snapshots. UID pattern `05xxxxxxxx64e9`. |
+| **Andante Blue** | Ultralight | [metrodroid#887](https://github.com/metrodroid/metrodroid/issues/887) | 4 JSON files (4 different cards) | Porto, Portugal. 20-page MFU. New system — not yet in FareBot. |
+| **Riga E-talons** | Calypso/ISO7816 | [metrodroid#896](https://github.com/metrodroid/metrodroid/issues/896) | 2 JSON files (active + expired) | Latvia. Period tickets and 90-min tickets. New system — not yet in FareBot. |
+| **Mexico City Movilidad Integrada** | Calypso/ISO7816 | [metrodroid#707](https://github.com/metrodroid/metrodroid/issues/707) | ZIP with 3 JSON files | Calypso, country code 0x484. New system — not yet in FareBot. |
+
+### Medium priority — partial data or non-standard format
+
+| Card | Type | Source | Data | Notes |
+|------|------|--------|------|-------|
+| **Zaragoza Tarjeta Bus** | Classic | [metrodroid#756](https://github.com/metrodroid/metrodroid/issues/756) | Google Drive link with MCT dumps | Spain. 16-sector MFC, static keys, before/after each trip. New system — not yet in FareBot. External link may be dead. |
+| **Pittsburgh ConnecTix** | Ultralight | [farebot#64](https://github.com/codebutler/farebot/issues/64) | Inline hex (16 pages) | Ten Trip ticket, 2 admissions remaining. 2013 data. New system — not in FareBot. |
+
+### Low priority — insufficient data or serial-only
+
+| Card | Type | Source | Notes |
+|------|------|--------|-------|
+| TriMet Hop Fastpass | DESFire EV1 | [farebot#147](https://github.com/codebutler/farebot/issues/147) | Full NFC TagInfo XML. Serial-only — balance/trips not stored on card. |
+| NY/NJ PATH SmartLink | DESFire | [farebot#63](https://github.com/codebutler/farebot/issues/63) | Card fully locked, no readable data. |
+| E-Go Luxembourg | ISO7816 (VDV) | [farebot#72](https://github.com/codebutler/farebot/issues/72) | Only scan metadata, no file contents. |
+
+### Dumps offered privately (not publicly downloadable)
+
+| Card | Type | Source | Notes |
+|------|------|--------|-------|
+| Tehran Ezpay | Classic | [metrodroid#660](https://github.com/metrodroid/metrodroid/issues/660) | Full 16-sector, static keys. Sent to devs privately. |
+| GoExplore (Gold Coast) | Classic | [metrodroid#813](https://github.com/metrodroid/metrodroid/issues/813) | Sent privately. |
+| OPUS Quebec disposable | Ultralight | [metrodroid#754](https://github.com/metrodroid/metrodroid/issues/754) | Sent privately. |
+| CharlieCard | Classic | [farebot#68](https://github.com/codebutler/farebot/issues/68) | Some data emailed privately. |
+| KoriGo / Bibus (Brittany) | Calypso | [metrodroid#837](https://github.com/metrodroid/metrodroid/issues/837) | Offered but not posted. |
 
 ---
 
@@ -77,7 +119,7 @@ Most Classic cards need sector keys to read useful data. Flipper supports key di
 |------|--------|----------|------|-------|
 | **OV-chipkaart** | `farebot-transit-ovc` | High | Required | Full EN1545 rewrite, trip dedup, subscriptions, autocharge. 4K card. |
 | **Oyster** | `farebot-transit-oyster` | Medium | Required | London. Complex trip parsing. |
-| **Troika (Classic)** | `farebot-transit-troika` | Medium | Required | Moscow. Note: have UL variant (`metrodroid/.../troika/troikaul.json`), still need Classic. |
+| ~~Troika (Classic)~~ | `farebot-transit-troika` | Medium | Required | **Have:** integration tests (E/3, E/5 from metrodroid#735). Moscow. Also have UL variant (`metrodroid/.../troika/troikaul.json`). |
 | **Podorozhnik** | `farebot-transit-podorozhnik` | Medium | Required | Saint Petersburg. |
 | **Charlie Card** | `farebot-transit-charlie` | Medium | No | Boston. |
 | **LAX TAP** | `farebot-transit-lax-tap` | Medium | No | Los Angeles. Nextfare-based. |
@@ -130,7 +172,7 @@ Most Classic cards need sector keys to read useful data. Flipper supports key di
 
 | Card | Module | Priority | Notes |
 |------|--------|----------|-------|
-| **Ventra** | `farebot-transit-ventra` | Medium | Chicago. Nextfare UL-based. |
+| ~~Ventra~~ | `farebot-transit-ventra` | Medium | **Have:** `samples/Ventra.json` + integration test. Chicago. Nextfare UL-based. |
 | **Compass** | `farebot-transit-yvr-compass` | Medium | Vancouver. Nextfare UL-based. |
 | **OV-chipkaart UL** | `farebot-transit-ovc` | High | Dutch disposable. Part of OVC rewrite. |
 | ~~HSL Ultralight~~ | `farebot-transit-hsl` | High | **Have:** `metrodroid/.../hsl/hslul.json`. Helsinki single-use tickets. |
@@ -147,7 +189,7 @@ Flipper Zero does not support ISO 14443-4 / ISO 7816 protocol reads. These requi
 | ~~Mobib~~ | `farebot-transit-calypso` | Medium | **Have:** `metrodroid/.../iso7816/mobib_blank.json`. Blank card (no trips). |
 | **RavKav** | `farebot-transit-calypso` | Medium | Israel. EN1545. |
 | **Lisboa Viva** | `farebot-transit-calypso` | Medium | Lisbon. EN1545. |
-| **Venezia Unica** | `farebot-transit-calypso` | Medium | Venice. EN1545. |
+| **Venezia Unica** | `farebot-transit-calypso` | Medium | Venice. EN1545. Note: UL variant dumps available in metrodroid PR#869 — needs UL factory. |
 | Oura | `farebot-transit-calypso` | Low | Grenoble. EN1545. |
 | TaM | `farebot-transit-calypso` | Low | Montpellier. EN1545. |
 | Korrigo | `farebot-transit-calypso` | Low | Brittany. EN1545. |
@@ -177,15 +219,15 @@ Flipper Zero does not support ISO 14443-4 / ISO 7816 protocol reads. These requi
 
 ## Summary
 
-| Category | Have (FareBot) | Have (Metrodroid) | Still need | Sample-only |
-|----------|---------------|-------------------|------------|-------------|
-| DESFire | 2 (Clipper, ORCA) | 3 (Opal, HSL v2, Holo) | 7 | 7 |
-| Classic | 1 (EasyCard) | 0 | 25+ | 2 |
-| FeliCa | 3 (Suica, PASMO, ICOCA) | 0 | 3 | 7 |
-| Ultralight | 0 | 2 (HSL UL, Troika UL) | 3 | 0 |
-| ISO7816 | 0 | 3 (T-Money, Mobib, EZ-Link†) | 17 | 0 |
-| CEPAS | 0 | (†counted above) | 1 | 0 |
-| **Total** | **6** | **8** | **~56** | **~16** |
+| Category | Have (FareBot) | Have (Metrodroid) | On GitHub (not downloaded) | Still need | Sample-only |
+|----------|---------------|-------------------|---------------------------|------------|-------------|
+| DESFire | 2 (Clipper, ORCA) | 3 (Opal, HSL v2, Holo) | 0 | 7 | 7 |
+| Classic | 1 (EasyCard) + Troika Classic (test) | 0 | 1 (Zaragoza) | 24+ | 2 |
+| FeliCa | 3 (Suica, PASMO, ICOCA) | 0 | 0 | 3 | 7 |
+| Ultralight | 1 (Ventra) | 2 (HSL UL, Troika UL) | 2 (Venezia UL, Andante) | 2 | 0 |
+| ISO7816 | 0 | 3 (T-Money, Mobib, EZ-Link†) | 2 (Riga, Mexico City) | 15 | 0 |
+| CEPAS | 0 | (†counted above) | 0 | 1 | 0 |
+| **Total** | **7** | **8** | **5** | **~52** | **~16** |
 
 † EZ-Link uses CEPAS protocol but is stored as ISO7816-like JSON in Metrodroid.
 
