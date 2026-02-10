@@ -31,11 +31,7 @@ import com.codebutler.farebot.shared.ui.screen.AdvancedTab
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
 import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
-import com.codebutler.farebot.shared.ui.screen.CardsMapScreen
-import com.codebutler.farebot.shared.ui.screen.CardsMapUiState
 import com.codebutler.farebot.shared.ui.screen.CardScreen
-import com.codebutler.farebot.shared.ui.screen.HelpScreen
-import com.codebutler.farebot.shared.ui.screen.HistoryScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
 import com.codebutler.farebot.transit.CardInfo
@@ -104,88 +100,44 @@ fun FareBotApp(
 
         NavHost(navController = navController, startDestination = Screen.Home.route) {
             composable(Screen.Home.route) {
-                val viewModel = koinViewModel<HomeViewModel>()
-                val uiState by viewModel.uiState.collectAsState()
-                val errorMessage by viewModel.errorMessage.collectAsState()
+                val homeViewModel = koinViewModel<HomeViewModel>()
+                val homeUiState by homeViewModel.uiState.collectAsState()
+                val errorMessage by homeViewModel.errorMessage.collectAsState()
+
+                val historyViewModel = koinViewModel<HistoryViewModel>()
+                val historyUiState by historyViewModel.uiState.collectAsState()
 
                 LaunchedEffect(Unit) {
-                    viewModel.startObserving()
+                    homeViewModel.startObserving()
                 }
 
                 LaunchedEffect(Unit) {
-                    viewModel.navigateToCard.collect { cardKey ->
+                    historyViewModel.loadCards()
+                }
+
+                LaunchedEffect(Unit) {
+                    homeViewModel.navigateToCard.collect { cardKey ->
+                        navController.navigate(Screen.Card.createRoute(cardKey))
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    historyViewModel.navigateToCard.collect { cardKey ->
                         navController.navigate(Screen.Card.createRoute(cardKey))
                     }
                 }
 
                 HomeScreen(
-                    uiState = uiState,
+                    homeUiState = homeUiState,
                     errorMessage = errorMessage,
-                    onDismissError = { viewModel.dismissError() },
-                    onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                    onNavigateToHelp = { navController.navigate(Screen.Help.route) },
-                    onNavigateToKeys = if (CardType.MifareClassic in supportedCardTypes) {
-                        { navController.navigate(Screen.Keys.route) }
-                    } else null,
-                    onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
-                    onOpenNfcSettings = { platformActions.openNfcSettings() },
-                    onScanCard = { viewModel.startActiveScan() },
-                    onEmitSample = { viewModel.emitSampleCard() },
-                )
-            }
-
-            composable(Screen.Help.route) {
-                HelpScreen(
-                    supportedCards = supportedCards,
-                    supportedCardTypes = supportedCardTypes,
-                    deviceRegion = getDeviceRegion(),
-                    loadedKeyBundles = loadedKeyBundles,
-                    onBack = { navController.popBackStack() },
-                    onKeysRequiredTap = {
-                        platformActions.showToast(runBlocking { getString(Res.string.keys_required) })
+                    onDismissError = { homeViewModel.dismissError() },
+                    onNavigateToAddKeyForCard = { tagId, cardType ->
+                        navController.navigate(Screen.AddKey.createRoute(tagId, cardType))
                     },
-                    onNavigateToCardsMap = { navController.navigate(Screen.CardsMap.route) },
-                )
-            }
-
-            composable(Screen.CardsMap.route) {
-                val markers = remember(supportedCards) {
-                    supportedCards
-                        .filter { it.latitude != null && it.longitude != null }
-                        .map { card ->
-                            CardsMapMarker(
-                                name = runBlocking { getString(card.nameRes) },
-                                location = runBlocking { getString(card.locationRes) },
-                                latitude = card.latitude!!.toDouble(),
-                                longitude = card.longitude!!.toDouble(),
-                            )
-                        }
-                }
-                CardsMapScreen(
-                    uiState = CardsMapUiState(markers = markers),
-                    onBack = { navController.popBackStack() },
-                )
-            }
-
-            composable(Screen.History.route) {
-                val viewModel = koinViewModel<HistoryViewModel>()
-                val uiState by viewModel.uiState.collectAsState()
-
-                LaunchedEffect(Unit) {
-                    viewModel.loadCards()
-                }
-
-                LaunchedEffect(Unit) {
-                    viewModel.navigateToCard.collect { cardKey ->
-                        navController.navigate(Screen.Card.createRoute(cardKey))
-                    }
-                }
-
-                HistoryScreen(
-                    uiState = uiState,
-                    onBack = { navController.popBackStack() },
+                    onScanCard = { homeViewModel.startActiveScan() },
+                    historyUiState = historyUiState,
                     onNavigateToCard = { itemId ->
-                        val cardKey = viewModel.getCardNavKey(itemId)
+                        val cardKey = historyViewModel.getCardNavKey(itemId)
                         if (cardKey != null) {
                             navController.navigate(Screen.Card.createRoute(cardKey))
                         }
@@ -193,32 +145,56 @@ fun FareBotApp(
                     onImportFile = {
                         platformActions.pickFileForImport { text ->
                             if (text != null) {
-                                val count = viewModel.importCards(text)
+                                val count = historyViewModel.importCards(text)
                                 platformActions.showToast(runBlocking { getString(Res.string.imported_cards, count) })
-                                viewModel.loadCards()
+                                historyViewModel.loadCards()
                             }
                         }
                     },
                     onImportClipboard = {
                         val text = platformActions.getClipboardText()
                         if (text != null) {
-                            val count = viewModel.importCards(text)
+                            val count = historyViewModel.importCards(text)
                             platformActions.showToast(runBlocking { getString(Res.string.imported_cards, count) })
-                            viewModel.loadCards()
+                            historyViewModel.loadCards()
                         }
                     },
                     onExportShare = {
-                        val json = viewModel.exportCards()
+                        val json = historyViewModel.exportCards()
                         platformActions.shareText(json)
                     },
                     onExportSave = {
-                        val json = viewModel.exportCards()
+                        val json = historyViewModel.exportCards()
                         platformActions.saveFileForExport(json, "farebot-export.json")
                     },
-                    onDeleteItem = { itemId -> viewModel.deleteItem(itemId) },
-                    onToggleSelection = { itemId -> viewModel.toggleSelection(itemId) },
-                    onClearSelection = { viewModel.clearSelection() },
-                    onDeleteSelected = { viewModel.deleteSelected() },
+                    onDeleteItem = { itemId -> historyViewModel.deleteItem(itemId) },
+                    onToggleSelection = { itemId -> historyViewModel.toggleSelection(itemId) },
+                    onClearSelection = { historyViewModel.clearSelection() },
+                    onDeleteSelected = { historyViewModel.deleteSelected() },
+                    supportedCards = supportedCards,
+                    supportedCardTypes = supportedCardTypes,
+                    deviceRegion = getDeviceRegion(),
+                    loadedKeyBundles = loadedKeyBundles,
+                    mapMarkers = remember(supportedCards) {
+                        supportedCards
+                            .filter { it.latitude != null && it.longitude != null }
+                            .map { card ->
+                                CardsMapMarker(
+                                    name = runBlocking { getString(card.nameRes) },
+                                    location = runBlocking { getString(card.locationRes) },
+                                    latitude = card.latitude!!.toDouble(),
+                                    longitude = card.longitude!!.toDouble(),
+                                )
+                            }
+                    },
+                    onKeysRequiredTap = {
+                        platformActions.showToast(runBlocking { getString(Res.string.keys_required) })
+                    },
+                    onNavigateToKeys = if (CardType.MifareClassic in supportedCardTypes) {
+                        { navController.navigate(Screen.Keys.route) }
+                    } else null,
+                    onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
+                    onOpenNfcSettings = { platformActions.openNfcSettings() },
                 )
             }
 
@@ -233,7 +209,7 @@ fun FareBotApp(
                 KeysScreen(
                     uiState = uiState,
                     onBack = { navController.popBackStack() },
-                    onNavigateToAddKey = { navController.navigate(Screen.AddKey.route) },
+                    onNavigateToAddKey = { navController.navigate(Screen.AddKey.createRoute()) },
                     onDeleteKey = { keyId -> viewModel.deleteKey(keyId) },
                     onToggleSelection = { keyId -> viewModel.toggleSelection(keyId) },
                     onClearSelection = { viewModel.clearSelection() },
@@ -241,9 +217,27 @@ fun FareBotApp(
                 )
             }
 
-            composable(Screen.AddKey.route) {
+            composable(
+                route = Screen.AddKey.route,
+                arguments = listOf(
+                    navArgument("tagId") { type = NavType.StringType; nullable = true; defaultValue = null },
+                    navArgument("cardType") { type = NavType.StringType; nullable = true; defaultValue = null },
+                ),
+            ) { backStackEntry ->
                 val viewModel = koinViewModel<AddKeyViewModel>()
                 val uiState by viewModel.uiState.collectAsState()
+
+                val prefillTagId = backStackEntry.arguments?.read { getStringOrNull("tagId") }
+                val prefillCardTypeName = backStackEntry.arguments?.read { getStringOrNull("cardType") }
+
+                LaunchedEffect(prefillTagId, prefillCardTypeName) {
+                    if (prefillTagId != null && prefillCardTypeName != null) {
+                        val cardType = CardType.entries.firstOrNull { it.name == prefillCardTypeName }
+                        if (cardType != null) {
+                            viewModel.prefillCardData(prefillTagId, cardType)
+                        }
+                    }
+                }
 
                 LaunchedEffect(Unit) {
                     viewModel.startObservingTags()

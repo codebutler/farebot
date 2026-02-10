@@ -9,6 +9,7 @@ import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.key.CardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +66,7 @@ class AndroidCardScanner(
                     val cardKeys = getCardKeys(ByteUtils.getHexString(tag.id))
                     val rawCard = tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
                     if (rawCard.isUnauthorized()) {
-                        throw CardUnauthorizedException()
+                        throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                     }
                     _scannedCards.emit(rawCard)
                 } catch (error: Throwable) {
@@ -93,8 +94,4 @@ class AndroidCardScanner(
         }
     }
 
-    class CardUnauthorizedException : Throwable() {
-        override val message: String
-            get() = "Unauthorized"
-    }
 }

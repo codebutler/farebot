@@ -41,6 +41,13 @@ class AddKeyViewModel(
         }
     }
 
+    fun prefillCardData(tagId: String, cardType: CardType) {
+        _uiState.value = _uiState.value.copy(
+            detectedTagId = tagId,
+            detectedCardType = cardType,
+        )
+    }
+
     fun enterManualMode() {
         _uiState.value = _uiState.value.copy(
             detectedTagId = "",

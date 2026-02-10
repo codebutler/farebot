@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -13,22 +14,42 @@ import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun PlatformCardsMap(markers: List<CardsMapMarker>, modifier: Modifier) {
+actual fun PlatformCardsMap(
+    markers: List<CardsMapMarker>,
+    modifier: Modifier,
+    onMarkerTap: ((String) -> Unit)?,
+    focusMarkers: List<CardsMapMarker>,
+) {
     if (markers.isEmpty()) return
+
+    val delegate = remember { CardsMapDelegate() }
+    delegate.onMarkerTap = onMarkerTap
+
+    val annotations = remember(markers) {
+        markers.map { marker ->
+            MKPointAnnotation().apply {
+                setCoordinate(CLLocationCoordinate2DMake(marker.latitude, marker.longitude))
+                setTitle(marker.name)
+                setSubtitle(marker.location)
+            }
+        }
+    }
 
     UIKitView(
         factory = {
             MKMapView().apply {
-                val annotations = markers.map { marker ->
-                    MKPointAnnotation().apply {
-                        setCoordinate(CLLocationCoordinate2DMake(marker.latitude, marker.longitude))
-                        setTitle(marker.name)
-                        setSubtitle(marker.location)
-                    }
-                }
                 addAnnotations(annotations)
                 showAnnotations(annotations, animated = false)
-                delegate = CardsMapDelegate()
+                this.delegate = delegate
+            }
+        },
+        update = { mapView ->
+            if (focusMarkers.isNotEmpty()) {
+                val focusNames = focusMarkers.map { it.name }.toSet()
+                val focusAnnotations = annotations.filter { it.title in focusNames }
+                if (focusAnnotations.isNotEmpty()) {
+                    mapView.showAnnotations(focusAnnotations, animated = true)
+                }
             }
         },
         modifier = modifier,
@@ -37,6 +58,8 @@ actual fun PlatformCardsMap(markers: List<CardsMapMarker>, modifier: Modifier) {
 
 @OptIn(ExperimentalForeignApi::class)
 private class CardsMapDelegate : NSObject(), MKMapViewDelegateProtocol {
+    var onMarkerTap: ((String) -> Unit)? = null
+
     override fun mapView(
         mapView: MKMapView,
         viewForAnnotation: platform.MapKit.MKAnnotationProtocol,
@@ -50,5 +73,10 @@ private class CardsMapDelegate : NSObject(), MKMapViewDelegateProtocol {
         pinView.pinTintColor = platform.UIKit.UIColor.redColor
 
         return pinView
+    }
+
+    override fun mapView(mapView: MKMapView, didSelectAnnotationView: platform.MapKit.MKAnnotationView) {
+        val title = didSelectAnnotationView.annotation?.title ?: return
+        onMarkerTap?.invoke(title)
     }
 }

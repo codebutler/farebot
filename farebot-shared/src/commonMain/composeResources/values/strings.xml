@@ -19,7 +19,6 @@
     <string name="enter_manually">Enter manually</string>
     <string name="error">Error</string>
     <string name="failed_to_process_card">Failed to process card</string>
-    <string name="history">History</string>
     <string name="hold_nfc_card">Hold your NFC card against the device to detect its ID and type.</string>
     <string name="import_clipboard">Import from Clipboard</string>
     <string name="import_failed">Import failed: %1$s</string>
@@ -43,19 +42,15 @@
     <string name="ok">OK</string>
     <string name="refill">Refill</string>
     <string name="save">Save</string>
-    <string name="scan_card">Scan a card to get started</string>
-    <string name="scan_now">Scan Card</string>
     <string name="share">Share</string>
     <string name="station_from">From</string>
     <string name="station_to">To</string>
     <string name="subscription_valid_format">Valid %1$s to %2$s</string>
     <string name="show_unsupported_cards">Show unsupported cards</string>
-    <string name="supported_cards">Supported Cards</string>
     <string name="tag_lost">Card Connection Lost</string>
     <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
     <string name="tap_your_card">Tap your card</string>
     <string name="trip_map">Trip Map</string>
-    <string name="cards_map">Card Map</string>
     <string name="unknown_card">Unknown Card</string>
     <string name="unknown_card_desc">This card is not supported by FareBot</string>
     <string name="unknown_error">Unknown error</string>
@@ -284,4 +279,11 @@
     <string name="card_note_oyster">Only first generation (MIFARE Classic) cards are supported. Current generation cards (which have a \"D\" printed on the bottom left corner) are fully locked DESFire cards, and thus unsupportable.</string>
     <string name="card_note_russia">Bank-issued cards are not supported.</string>
     <string name="card_note_ventra">Single ride tickets only</string>
+
+    <!-- Home screen tabs -->
+    <string name="tab_scan">Scan</string>
+    <string name="tab_explore">Explore</string>
+    <string name="scan">Scan</string>
+    <string name="search_supported_cards">Search supported cards</string>
+    <string name="nfc_disabled_tap_to_enable">Enable NFC to scan cards</string>
 </resources>

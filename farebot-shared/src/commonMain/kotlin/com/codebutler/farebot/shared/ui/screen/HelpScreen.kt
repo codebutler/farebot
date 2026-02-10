@@ -14,27 +14,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,82 +48,154 @@ import farebot.farebot_shared.generated.resources.card_not_supported
 import farebot.farebot_shared.generated.resources.keys_required
 import farebot.farebot_shared.generated.resources.keys_loaded
 import farebot.farebot_shared.generated.resources.card_serial_only
-import farebot.farebot_shared.generated.resources.cards_map
-import farebot.farebot_shared.generated.resources.show_unsupported_cards
-import farebot.farebot_shared.generated.resources.supported_cards
-import farebot.farebot_shared.generated.resources.back
-import farebot.farebot_shared.generated.resources.menu
+import farebot.farebot_shared.generated.resources.search_supported_cards
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HelpScreen(
+fun ExploreContent(
     supportedCards: List<CardInfo>,
     supportedCardTypes: Set<CardType>,
-    deviceRegion: String? = null,
-    loadedKeyBundles: Set<String> = emptySet(),
-    onBack: () -> Unit,
-    onKeysRequiredTap: () -> Unit = {},
-    onNavigateToCardsMap: () -> Unit = {},
+    deviceRegion: String?,
+    loadedKeyBundles: Set<String>,
+    showUnsupported: Boolean,
+    onKeysRequiredTap: () -> Unit,
+    mapMarkers: List<CardsMapMarker> = emptyList(),
+    onMapMarkerTap: ((String) -> Unit)? = null,
+    modifier: Modifier = Modifier,
 ) {
-    var showUnsupported by remember { mutableStateOf(false) }
-    var menuExpanded by remember { mutableStateOf(false) }
-
-    val hasUnsupportedCards = remember(supportedCards, supportedCardTypes) {
-        supportedCards.any { it.cardType !in supportedCardTypes }
-    }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     val displayedCards = remember(supportedCards, supportedCardTypes, showUnsupported) {
         if (showUnsupported) supportedCards
         else supportedCards.filter { it.cardType in supportedCardTypes }
     }
 
+    // Pre-resolve card names for search
+    val cardNames = remember(displayedCards) {
+        displayedCards.associate { card ->
+            card.nameRes.key to runBlocking { getString(card.nameRes) }
+        }
+    }
+
     val regionComparator = remember(deviceRegion) {
         TransitRegion.DeviceRegionComparator(deviceRegion)
     }
 
-    val groupedCards = remember(displayedCards, regionComparator) {
-        displayedCards
+    val groupedCards = remember(displayedCards, regionComparator, searchQuery, cardNames) {
+        val filtered = if (searchQuery.isBlank()) {
+            displayedCards
+        } else {
+            displayedCards.filter { card ->
+                val name = cardNames[card.nameRes.key] ?: ""
+                name.contains(searchQuery, ignoreCase = true) ||
+                    card.region.translatedName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+        filtered
             .groupBy { it.region }
             .entries
             .sortedWith(compareBy(regionComparator) { it.key })
             .associate { it.key to it.value }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(Res.string.supported_cards)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
+    // Build index-to-region mapping for the LazyColumn
+    // (only sticky headers + card items, map and search are outside)
+    val indexToRegion = remember(groupedCards) {
+        buildList {
+            var index = 0
+            groupedCards.forEach { (region, cards) ->
+                add(index to region)
+                index += 1 + cards.size // header + cards
+            }
+        }
+    }
+
+    // Build flat index mapping card name keys to their position in the LazyColumn
+    val cardKeyToIndex = remember(groupedCards) {
+        val map = mutableMapOf<String, Int>()
+        var index = 0
+        groupedCards.forEach { (_, cards) ->
+            index++ // sticky header
+            cards.forEach { card ->
+                map[card.nameRes.key] = index
+                index++
+            }
+        }
+        map
+    }
+
+    // Track which region is currently visible based on scroll position
+    val currentRegion by remember {
+        derivedStateOf {
+            val firstVisible = listState.firstVisibleItemIndex
+            indexToRegion.lastOrNull { (startIndex, _) -> startIndex <= firstVisible }?.second
+        }
+    }
+
+    // Compute focus markers for the current visible region
+    val focusMarkers = remember(currentRegion, groupedCards, cardNames, mapMarkers) {
+        val region = currentRegion ?: return@remember mapMarkers
+        val regionCards = groupedCards[region] ?: return@remember mapMarkers
+        val regionCardNames = regionCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
+        val filtered = mapMarkers.filter { it.name in regionCardNames }
+        filtered.ifEmpty { mapMarkers }
+    }
+
+    Column(modifier = modifier.fillMaxSize()) {
+        // Fixed map (stays visible while list scrolls)
+        if (mapMarkers.isNotEmpty() && searchQuery.isBlank()) {
+            PlatformCardsMap(
+                markers = mapMarkers,
+                focusMarkers = focusMarkers,
+                onMarkerTap = { markerName ->
+                    val matchingCard = displayedCards.find { card ->
+                        cardNames[card.nameRes.key] == markerName
+                    }
+                    if (matchingCard != null) {
+                        val targetIndex = cardKeyToIndex[matchingCard.nameRes.key]
+                        if (targetIndex != null) {
+                            scope.launch {
+                                listState.animateScrollToItem(targetIndex)
+                            }
+                        }
                     }
                 },
-                actions = {
-                    IconButton(onClick = onNavigateToCardsMap) {
-                        Icon(Icons.Default.Map, contentDescription = stringResource(Res.string.cards_map))
-                    }
-                    if (hasUnsupportedCards) {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
-                        }
-                        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.show_unsupported_cards)) },
-                                leadingIcon = if (showUnsupported) {
-                                    { Icon(Icons.Default.Check, contentDescription = null) }
-                                } else null,
-                                onClick = { showUnsupported = !showUnsupported; menuExpanded = false },
-                            )
-                        }
-                    }
-                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
             )
         }
-    ) { padding ->
+
+        // Fixed search box
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = { Text(stringResource(Res.string.search_supported_cards)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            trailingIcon = if (searchQuery.isNotEmpty()) {
+                {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(Icons.Default.Clear, contentDescription = null)
+                    }
+                }
+            } else null,
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+        )
+
+        // Scrollable card list
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 8.dp, vertical = 8.dp)
+            state = listState,
+            modifier = Modifier.fillMaxSize()
         ) {
             groupedCards.forEach { (region, cards) ->
                 stickyHeader(key = region.translatedName) {
@@ -159,7 +230,7 @@ private fun CardInfoItem(
     onKeysRequiredTap: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(12.dp)

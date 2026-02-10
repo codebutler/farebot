@@ -4,5 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun PlatformCardsMap(markers: List<CardsMapMarker>, modifier: Modifier) {
+actual fun PlatformCardsMap(
+    markers: List<CardsMapMarker>,
+    modifier: Modifier,
+    onMarkerTap: ((String) -> Unit)?,
+    focusMarkers: List<CardsMapMarker>,
+) {
 }
