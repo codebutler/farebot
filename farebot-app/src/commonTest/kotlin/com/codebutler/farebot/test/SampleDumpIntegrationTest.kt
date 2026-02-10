@@ -35,8 +35,16 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
 import com.codebutler.farebot.transit.easycard.EasyCardTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
-import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitInfo
+import com.codebutler.farebot.transit.lax_tap.LaxTapTransitFactory
+import com.codebutler.farebot.transit.lax_tap.LaxTapTransitInfo
+import com.codebutler.farebot.transit.msp_goto.MspGotoTransitFactory
+import com.codebutler.farebot.transit.msp_goto.MspGotoTransitInfo
+import com.codebutler.farebot.transit.myki.MykiTransitFactory
+import com.codebutler.farebot.transit.myki.MykiTransitInfo
+import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
+import com.codebutler.farebot.transit.seq_go.SeqGoTransitInfo
+import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
@@ -348,5 +356,79 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val trips = info.trips
         assertNotNull(trips)
         assertTrue(trips.isNotEmpty(), "Should have at least one trip")
+    }
+
+    // --- SEQ Go (Classic, Nextfare) ---
+    // Source: NextfareTransitTest test data
+    // Card: SEQ Go, Brisbane, Australia
+    // Serial: 0160 0012 3456 7893
+
+    @Test
+    fun testSeqGoDump() {
+        val factory = SeqGoTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, SeqGoTransitInfo>(
+            "seqgo/SeqGo.json", factory
+        )
+
+        assertEquals("0160 0012 3456 7893", info.serialNumber)
+
+        val balances = info.balances
+        assertNotNull(balances)
+        assertEquals("AUD", balances.first().balance.currencyCode)
+    }
+
+    // --- LAX TAP (Classic, Nextfare) ---
+    // Source: NextfareTransitTest test data
+    // Card: LAX TAP, Los Angeles, USA
+    // Serial: 0160 0323 4663 8769
+
+    @Test
+    fun testLaxTapDump() {
+        val factory = LaxTapTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, LaxTapTransitInfo>(
+            "laxtap/LaxTap.json", factory
+        )
+
+        assertEquals("0160 0323 4663 8769", info.serialNumber)
+
+        val balances = info.balances
+        assertNotNull(balances)
+        assertEquals("USD", balances.first().balance.currencyCode)
+    }
+
+    // --- MSP GoTo (Classic, Nextfare) ---
+    // Source: NextfareTransitTest test data
+    // Card: MSP GoTo, Minneapolis, USA
+    // Serial: 0160 0112 3581 3212
+
+    @Test
+    fun testMspGoToDump() {
+        val factory = MspGotoTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, MspGotoTransitInfo>(
+            "mspgoto/MspGoTo.json", factory
+        )
+
+        assertEquals("0160 0112 3581 3212", info.serialNumber)
+
+        val balances = info.balances
+        assertNotNull(balances)
+        assertEquals("USD", balances.first().balance.currencyCode)
+    }
+
+    // --- Myki (DESFire, serial-only) ---
+    // Source: MykiTransitTest test data
+    // Card: Myki, Melbourne, Australia
+    // Serial: 308425123456780
+
+    @Test
+    fun testMykiDump() {
+        val factory = MykiTransitFactory()
+        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, MykiTransitInfo>(
+            "myki/Myki.json", factory
+        )
+
+        val identity = factory.parseIdentity(card)
+        assertNotNull(identity.name)
+        assertEquals("308425123456780", identity.serialNumber)
     }
 }

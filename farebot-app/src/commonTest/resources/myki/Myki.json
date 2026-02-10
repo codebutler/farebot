@@ -1,0 +1,23 @@
+{
+    "tagId": "04000000000000",
+    "scannedAt": {
+        "timeInMillis": 1609459200000,
+        "tz": "Australia/Melbourne"
+    },
+    "mifareDesfire": {
+        "manufacturingData": "04010101001805040101010018050400000000000000000000001514",
+        "applications": {
+            "4594": {
+                "files": {
+                    "15": {
+                        "settings": "00001000100000",
+                        "data": "c9b404004e61bc000000000000000000"
+                    }
+                }
+            },
+            "15732978": {
+                "files": {}
+            }
+        }
+    }
+}
