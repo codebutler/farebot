@@ -2,12 +2,15 @@ package com.codebutler.farebot.app.feature.home
 
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
-import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
 import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.classic.key.ClassicCardKeys
+import com.codebutler.farebot.key.CardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,7 +32,7 @@ class AndroidCardScanner(
     private val nfcStream: NfcStream,
     private val tagReaderFactory: TagReaderFactory,
     private val cardKeysPersister: CardKeysPersister,
-    private val cardKeysSerializer: CardKeysSerializer,
+    private val json: Json,
 ) : CardScanner {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -82,9 +85,12 @@ class AndroidCardScanner(
         // No-op on Android
     }
 
-    private fun getCardKeys(tagId: String): com.codebutler.farebot.key.CardKeys? {
+    private fun getCardKeys(tagId: String): CardKeys? {
         val savedKey = cardKeysPersister.getForTagId(tagId) ?: return null
-        return cardKeysSerializer.deserialize(savedKey.keyData)
+        return when (savedKey.cardType) {
+            CardType.MifareClassic -> json.decodeFromString(ClassicCardKeys.serializer(), savedKey.keyData)
+            else -> null
+        }
     }
 
     class CardUnauthorizedException : Throwable() {

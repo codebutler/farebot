@@ -4,11 +4,9 @@ import android.content.SharedPreferences
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
-import com.codebutler.farebot.app.core.serialize.CardKeysSerializer
-import com.codebutler.farebot.app.core.serialize.KotlinxCardKeysSerializer
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
-import com.codebutler.farebot.app.core.transit.createAndroidTransitFactoryRegistry
+import com.codebutler.farebot.shared.transit.createTransitFactoryRegistry
 import com.codebutler.farebot.app.feature.home.AndroidCardScanner
 import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
@@ -40,8 +38,6 @@ val androidModule = module {
 
     single<CardSerializer> { KotlinxCardSerializer(get()) }
 
-    single<CardKeysSerializer> { KotlinxCardKeysSerializer(get()) }
-
     single {
         val driver = AndroidSqliteDriver(FareBotDb.Schema, androidContext(), "farebot.db")
         FareBotDb(driver)
@@ -55,7 +51,7 @@ val androidModule = module {
 
     single { TagReaderFactory() }
 
-    single<TransitFactoryRegistry> { createAndroidTransitFactoryRegistry(androidContext()) }
+    single<TransitFactoryRegistry> { createTransitFactoryRegistry() }
 
     single<StringResource> { DefaultStringResource() }
 
@@ -64,7 +60,7 @@ val androidModule = module {
             nfcStream = get(),
             tagReaderFactory = get(),
             cardKeysPersister = get(),
-            cardKeysSerializer = get(),
+            json = get(),
         )
     }
 }
