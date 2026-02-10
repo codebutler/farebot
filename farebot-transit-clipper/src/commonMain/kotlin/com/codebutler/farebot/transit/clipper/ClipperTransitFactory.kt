@@ -51,10 +51,10 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
         private const val SECONDS_PER_DAY = 86400L
 
         private val CARD_INFO = CardInfo(
-            name = "Clipper",
+            nameRes = Res.string.transit_clipper_card_name,
             cardType = CardType.MifareDesfire,
             region = TransitRegion.USA,
-            locationId = Res.string.location_san_francisco
+            locationRes = Res.string.location_san_francisco,
         )
     }
 

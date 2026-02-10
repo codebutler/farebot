@@ -95,10 +95,10 @@ class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
 
     companion object {
         private val CARD_INFO = CardInfo(
-            name = runBlocking { getString(Res.string.octopus_card_name) },
+            nameRes = Res.string.octopus_card_name,
             cardType = CardType.FeliCa,
             region = TransitRegion.HONG_KONG,
-            locationId = Res.string.location_hong_kong
+            locationRes = Res.string.location_hong_kong,
         )
     }
 }

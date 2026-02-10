@@ -51,6 +51,10 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.farebot_transit_rkf.generated.resources.Res
 import farebot.farebot_transit_rkf.generated.resources.rkf_card_issuer
+import farebot.farebot_transit_rkf.generated.resources.rkf_card_name_default
+import farebot.farebot_transit_rkf.generated.resources.rkf_card_name_rejsekort
+import farebot.farebot_transit_rkf.generated.resources.rkf_card_name_slaccess
+import farebot.farebot_transit_rkf.generated.resources.rkf_card_name_vasttrafik
 import farebot.farebot_transit_rkf.generated.resources.rkf_card_status
 import farebot.farebot_transit_rkf.generated.resources.rkf_expiry_date
 import farebot.farebot_transit_rkf.generated.resources.rkf_location_denmark
@@ -100,7 +104,9 @@ class RkfTransitInfo internal constructor(
     private val mSubscriptions: List<RkfTicket>
 ) : TransitInfo() {
 
-    override val cardName: String get() = issuerMap[aid]?.name ?: "RKF"
+    override val cardName: String get() = issuerMap[aid]?.let {
+        runBlocking { getString(it.nameRes) }
+    } ?: runBlocking { getString(Res.string.rkf_card_name_default) }
 
     private val aid
         get() = mTcci.getIntOrZero(En1545TransitData.ENV_APPLICATION_ISSUER_ID)
@@ -147,22 +153,22 @@ class RkfTransitInfo internal constructor(
     companion object {
         val issuerMap = mapOf(
             RkfLookup.SLACCESS to CardInfo(
-                name = "SLaccess",
-                locationId = Res.string.rkf_location_stockholm,
+                nameRes = Res.string.rkf_card_name_slaccess,
+                locationRes = Res.string.rkf_location_stockholm,
                 cardType = CardType.MifareClassic,
                 keysRequired = true, keyBundle = "slaccess",
                 region = TransitRegion.SWEDEN,
                 preview = true),
             RkfLookup.REJSEKORT to CardInfo(
-                name = "Rejsekort",
-                locationId = Res.string.rkf_location_denmark,
+                nameRes = Res.string.rkf_card_name_rejsekort,
+                locationRes = Res.string.rkf_location_denmark,
                 cardType = CardType.MifareClassic,
                 keysRequired = true, keyBundle = "rejsekort",
                 region = TransitRegion.DENMARK,
                 preview = true),
             RkfLookup.VASTTRAFIK to CardInfo(
-                name = "Vasttrafikkortet",
-                locationId = Res.string.rkf_location_gothenburg,
+                nameRes = Res.string.rkf_card_name_vasttrafik,
+                locationRes = Res.string.rkf_location_gothenburg,
                 cardType = CardType.MifareClassic,
                 keysRequired = true, keyBundle = "gothenburg",
                 region = TransitRegion.SWEDEN,
@@ -416,7 +422,9 @@ class RkfTransitFactory : TransitFactory<ClassicCard, RkfTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = RkfTransitInfo.getSerial(card)
-        val issuerName = RkfTransitInfo.issuerMap[serial.mCompany]?.name ?: "RKF"
+        val issuerName = RkfTransitInfo.issuerMap[serial.mCompany]?.let {
+            runBlocking { getString(it.nameRes) }
+        } ?: runBlocking { getString(Res.string.rkf_card_name_default) }
         return TransitIdentity(issuerName, serial.formatted)
     }
 

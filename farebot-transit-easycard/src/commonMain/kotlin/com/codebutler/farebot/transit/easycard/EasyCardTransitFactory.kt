@@ -66,12 +66,12 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
         )
 
         private val CARD_INFO = CardInfo(
-            name = runBlocking { getString(Res.string.easycard_card_name) },
+            nameRes = Res.string.easycard_card_name,
             cardType = CardType.MifareClassic,
             region = TransitRegion.TAIWAN,
-            locationId = Res.string.easycard_card_location,
+            locationRes = Res.string.easycard_card_location,
             keysRequired = true,
-            extraNote = Res.string.easycard_card_note
+            extraNoteRes = Res.string.easycard_card_note,
         )
 
         /**

@@ -31,6 +31,7 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_opal.generated.resources.Res
 import farebot.farebot_transit_opal.generated.resources.location_sydney
+import farebot.farebot_transit_opal.generated.resources.transit_opal_card_name
 
 /**
  * Transit data type for Opal (Sydney, AU).
@@ -98,10 +99,10 @@ class OpalTransitFactory(private val stringResource: StringResource) : TransitFa
 
     companion object {
         private val CARD_INFO = CardInfo(
-            name = OpalTransitInfo.NAME,
+            nameRes = Res.string.transit_opal_card_name,
             cardType = CardType.MifareDesfire,
             region = TransitRegion.AUSTRALIA,
-            locationId = Res.string.location_sydney
+            locationRes = Res.string.location_sydney,
         )
 
         private fun formatSerialNumber(serialNumber: Int, lastDigit: Int): String =

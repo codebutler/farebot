@@ -184,10 +184,10 @@ class SuicaTransitFactory(
 
     companion object {
         private val CARD_INFO = CardInfo(
-            name = "Suica",
+            nameRes = Res.string.card_name_suica,
             cardType = CardType.FeliCa,
             region = TransitRegion.JAPAN,
-            locationId = Res.string.location_japan
+            locationRes = Res.string.location_japan,
         )
     }
 }

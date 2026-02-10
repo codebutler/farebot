@@ -1,4 +1,5 @@
 <resources>
+    <string name="transit_opal_card_name">Opal</string>
     <string name="location_sydney">Sydney, NSW</string>
     <string name="opal_automatic_top_up">Automatic top up</string>
     <string name="opal_agency_tfnsw">Transport for NSW</string>

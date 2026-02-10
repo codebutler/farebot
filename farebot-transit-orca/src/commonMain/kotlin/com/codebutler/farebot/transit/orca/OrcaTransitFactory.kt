@@ -101,10 +101,10 @@ class OrcaTransitFactory(private val stringResource: StringResource) : TransitFa
         const val APP_ID = 0x3010f2
 
         private val CARD_INFO = CardInfo(
-            name = "ORCA",
+            nameRes = Res.string.transit_orca_card_name,
             cardType = CardType.MifareDesfire,
             region = TransitRegion.USA,
-            locationId = Res.string.location_seattle
+            locationRes = Res.string.location_seattle,
         )
     }
 }
