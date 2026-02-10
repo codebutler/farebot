@@ -13,6 +13,7 @@ data class CardUiState(
     val warning: String? = null,
     val error: String? = null,
     val hasAdvancedData: Boolean = false,
+    val isSample: Boolean = false,
 )
 
 data class BalanceItem(

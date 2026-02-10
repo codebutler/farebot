@@ -23,7 +23,11 @@
 package com.codebutler.farebot.shared.serialize
 
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.classic.raw.RawClassicBlock
+import com.codebutler.farebot.card.classic.raw.RawClassicCard
+import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.serialize.CardSerializer
+import kotlin.time.Clock
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -275,6 +279,58 @@ class CardImporter(
 
         // Fall back to trying direct deserialization
         return cardSerializer.deserialize(json.encodeToString(JsonObject.serializer(), obj))
+    }
+
+    /**
+     * Imports a binary .mfc (MIFARE Classic dump) file.
+     */
+    fun importMfcDump(bytes: ByteArray): ImportResult {
+        return try {
+            val rawCard = parseMfcBytes(bytes)
+            ImportResult.Success(listOf(rawCard), ImportFormat.UNKNOWN)
+        } catch (e: Exception) {
+            ImportResult.Error("Failed to parse MFC dump: ${e.message}", e)
+        }
+    }
+
+    private fun parseMfcBytes(bytes: ByteArray): RawClassicCard {
+        val sectors = mutableListOf<RawClassicSector>()
+        var offset = 0
+        var sectorNum = 0
+
+        while (offset < bytes.size) {
+            val blockCount = if (sectorNum >= 32) 16 else 4
+            val sectorSize = blockCount * 16
+            if (offset + sectorSize > bytes.size) break
+
+            val sectorBytes = bytes.copyOfRange(offset, offset + sectorSize)
+            val blocks = (0 until blockCount).map { blockIndex ->
+                val blockStart = blockIndex * 16
+                val blockData = sectorBytes.copyOfRange(blockStart, blockStart + 16)
+                RawClassicBlock.create(blockIndex, blockData)
+            }
+
+            sectors.add(RawClassicSector.createData(sectorNum, blocks))
+            offset += sectorSize
+            sectorNum++
+        }
+
+        val tagId = if (sectors.isNotEmpty() && !sectors[0].blocks.isNullOrEmpty()) {
+            sectors[0].blocks!![0].data.copyOfRange(0, 4)
+        } else {
+            byteArrayOf(0xDE.toByte(), 0xAD.toByte(), 0xBE.toByte(), 0xEF.toByte())
+        }
+
+        val maxSector = when {
+            sectorNum <= 16 -> 15
+            sectorNum <= 32 -> 31
+            else -> 39
+        }
+        while (sectors.size <= maxSector) {
+            sectors.add(RawClassicSector.createUnauthorized(sectors.size))
+        }
+
+        return RawClassicCard.create(tagId, Clock.System.now(), sectors)
     }
 
     private fun importFromFlipper(data: String): ImportResult {

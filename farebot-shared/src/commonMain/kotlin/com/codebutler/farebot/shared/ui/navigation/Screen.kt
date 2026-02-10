@@ -20,6 +20,10 @@ sealed class Screen(val route: String) {
     data object CardAdvanced : Screen("card_advanced/{cardKey}") {
         fun createRoute(cardKey: String): String = "card_advanced/$cardKey"
     }
+    data object SampleCard : Screen("sample_card/{cardKey}/{cardName}") {
+        fun createRoute(cardKey: String, cardName: String): String =
+            "sample_card/$cardKey/$cardName"
+    }
     data object TripMap : Screen("trip_map/{tripKey}") {
         fun createRoute(tripKey: String): String = "trip_map/$tripKey"
     }

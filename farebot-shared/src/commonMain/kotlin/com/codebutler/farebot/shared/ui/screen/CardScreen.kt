@@ -99,26 +99,30 @@ fun CardScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
-                    }
-                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.share)) },
-                            onClick = { menuExpanded = false; onExportShare() }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.save)) },
-                            onClick = { menuExpanded = false; onExportSave() }
-                        )
-                        if (uiState.hasAdvancedData) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.advanced)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToAdvanced()
-                                }
-                            )
+                    if (!uiState.isSample || uiState.hasAdvancedData) {
+                        IconButton(onClick = { menuExpanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
+                        }
+                        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                            if (!uiState.isSample) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.share)) },
+                                    onClick = { menuExpanded = false; onExportShare() }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.save)) },
+                                    onClick = { menuExpanded = false; onExportSave() }
+                                )
+                            }
+                            if (uiState.hasAdvancedData) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.advanced)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onNavigateToAdvanced()
+                                    }
+                                )
+                            }
                         }
                     }
                 },

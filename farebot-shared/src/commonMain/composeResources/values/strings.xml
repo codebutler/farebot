@@ -11,6 +11,7 @@
     <string name="card_id">Card ID</string>
     <string name="card_experimental">Experimental support.</string>
     <string name="card_not_supported">Not supported by this device</string>
+    <string name="view_sample">View sample data</string>
     <string name="card_type">Card Type</string>
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>

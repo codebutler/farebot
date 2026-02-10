@@ -49,6 +49,7 @@ import farebot.farebot_shared.generated.resources.keys_required
 import farebot.farebot_shared.generated.resources.keys_loaded
 import farebot.farebot_shared.generated.resources.card_serial_only
 import farebot.farebot_shared.generated.resources.search_supported_cards
+import farebot.farebot_shared.generated.resources.view_sample
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -66,6 +67,7 @@ fun ExploreContent(
     onKeysRequiredTap: () -> Unit,
     mapMarkers: List<CardsMapMarker> = emptyList(),
     onMapMarkerTap: ((String) -> Unit)? = null,
+    onSampleCardTap: ((CardInfo) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -215,6 +217,7 @@ fun ExploreContent(
                         isSupported = card.cardType in supportedCardTypes,
                         keysLoaded = card.keyBundle != null && card.keyBundle in loadedKeyBundles,
                         onKeysRequiredTap = onKeysRequiredTap,
+                        onSampleCardTap = onSampleCardTap,
                     )
                 }
             }
@@ -228,9 +231,17 @@ private fun CardInfoItem(
     isSupported: Boolean,
     keysLoaded: Boolean,
     onKeysRequiredTap: () -> Unit,
+    onSampleCardTap: ((CardInfo) -> Unit)? = null,
 ) {
+    val hasSample = card.sampleDumpFile != null && onSampleCardTap != null
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .let { mod ->
+                val callback = onSampleCardTap
+                if (hasSample && callback != null) mod.clickable { callback(card) } else mod
+            },
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(12.dp)
@@ -298,6 +309,13 @@ private fun CardInfoItem(
                     text = stringResource(Res.string.card_not_supported),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
+                )
+            }
+            if (hasSample) {
+                Text(
+                    text = stringResource(Res.string.view_sample),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }

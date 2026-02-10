@@ -1,0 +1,337 @@
+Filetype: Flipper NFC device
+Version: 4
+# Device type can be ISO14443-3A, ISO14443-3B, ISO14443-4A, ISO14443-4B, ISO15693-3, FeliCa, NTAG/Ultralight, Mifare Classic, Mifare Plus, Mifare DESFire, SLIX, ST25TB
+Device type: FeliCa
+# UID is common for all formats
+UID: 01 01 02 14 FB 0B 39 06
+# FeliCa specific data
+Data format version: 2
+Manufacture id: 01 01 02 14 FB 0B 39 06
+Manufacture parameter: 10 0B 4B 42 84 85 D0 FF
+IC Type: FeliCa Standard RC-S9X4, Japan Transit IC
+
+# Felica Standard specific data
+System found: 3
+
+
+System 00: 0003
+
+Area found: 8
+Area 000: | Code 0000 | Services #000-#000 |
+Area 001: | Code 0040 | Services #000-#003 |
+Area 002: | Code 0800 | Services #004-#011 |
+Area 003: | Code 0FC0 | Services #012-#000 |
+Area 004: | Code 1000 | Services #012-#01D |
+Area 005: | Code 17C0 | Services #01E-#000 |
+Area 006: | Code 1800 | Services #01E-#029 |
+Area 007: | Code 2300 | Services #02A-#031 |
+
+Service found: 50
+Service 000: | Code 0048 | Attrib. 08 | Private | Random | Read/Write |
+Service 001: | Code 004A | Attrib. 0A | Private | Random | Read Only  |
+Service 002: | Code 0088 | Attrib. 08 | Private | Random | Read/Write |
+Service 003: | Code 008B | Attrib. 0B | Public  | Random | Read Only  |
+Service 004: | Code 0810 | Attrib. 10 | Private | Purse  | Direct     |
+Service 005: | Code 0812 | Attrib. 12 | Private | Purse  | Cashback   |
+Service 006: | Code 0816 | Attrib. 16 | Private | Purse  | Read Only  |
+Service 007: | Code 0850 | Attrib. 10 | Private | Purse  | Direct     |
+Service 008: | Code 0852 | Attrib. 12 | Private | Purse  | Cashback   |
+Service 009: | Code 0856 | Attrib. 16 | Private | Purse  | Read Only  |
+Service 00A: | Code 0890 | Attrib. 10 | Private | Purse  | Direct     |
+Service 00B: | Code 0892 | Attrib. 12 | Private | Purse  | Cashback   |
+Service 00C: | Code 0896 | Attrib. 16 | Private | Purse  | Read Only  |
+Service 00D: | Code 08C8 | Attrib. 08 | Private | Random | Read/Write |
+Service 00E: | Code 08CA | Attrib. 0A | Private | Random | Read Only  |
+Service 00F: | Code 090A | Attrib. 0A | Private | Random | Read Only  |
+Service 010: | Code 090C | Attrib. 0C | Private | Random | Read/Write |
+Service 011: | Code 090F | Attrib. 0F | Public  | Random | Read Only  |
+Service 012: | Code 1008 | Attrib. 08 | Private | Random | Read/Write |
+Service 013: | Code 100A | Attrib. 0A | Private | Random | Read Only  |
+Service 014: | Code 1048 | Attrib. 08 | Private | Random | Read/Write |
+Service 015: | Code 104A | Attrib. 0A | Private | Random | Read Only  |
+Service 016: | Code 108C | Attrib. 0C | Private | Random | Read/Write |
+Service 017: | Code 108F | Attrib. 0F | Public  | Random | Read Only  |
+Service 018: | Code 10C8 | Attrib. 08 | Private | Random | Read/Write |
+Service 019: | Code 10CB | Attrib. 0B | Public  | Random | Read Only  |
+Service 01A: | Code 1108 | Attrib. 08 | Private | Random | Read/Write |
+Service 01B: | Code 110A | Attrib. 0A | Private | Random | Read Only  |
+Service 01C: | Code 1148 | Attrib. 08 | Private | Random | Read/Write |
+Service 01D: | Code 114A | Attrib. 0A | Private | Random | Read Only  |
+Service 01E: | Code 1808 | Attrib. 08 | Private | Random | Read/Write |
+Service 01F: | Code 180A | Attrib. 0A | Private | Random | Read Only  |
+Service 020: | Code 1848 | Attrib. 08 | Private | Random | Read/Write |
+Service 021: | Code 184B | Attrib. 0B | Public  | Random | Read Only  |
+Service 022: | Code 18C8 | Attrib. 08 | Private | Random | Read/Write |
+Service 023: | Code 18CA | Attrib. 0A | Private | Random | Read Only  |
+Service 024: | Code 1908 | Attrib. 08 | Private | Random | Read/Write |
+Service 025: | Code 190A | Attrib. 0A | Private | Random | Read Only  |
+Service 026: | Code 1948 | Attrib. 08 | Private | Random | Read/Write |
+Service 027: | Code 194B | Attrib. 0B | Public  | Random | Read Only  |
+Service 028: | Code 1988 | Attrib. 08 | Private | Random | Read/Write |
+Service 029: | Code 198B | Attrib. 0B | Public  | Random | Read Only  |
+Service 02A: | Code 2308 | Attrib. 08 | Private | Random | Read/Write |
+Service 02B: | Code 230A | Attrib. 0A | Private | Random | Read Only  |
+Service 02C: | Code 2348 | Attrib. 08 | Private | Random | Read/Write |
+Service 02D: | Code 234B | Attrib. 0B | Public  | Random | Read Only  |
+Service 02E: | Code 2388 | Attrib. 08 | Private | Random | Read/Write |
+Service 02F: | Code 238B | Attrib. 0B | Public  | Random | Read Only  |
+Service 030: | Code 23C8 | Attrib. 08 | Private | Random | Read/Write |
+Service 031: | Code 23CB | Attrib. 0B | Public  | Random | Read Only  |
+
+Directory Tree: 
++++ ... are public services
+||| ... are private services
+- AREA_0000/
+|- AREA_0001/
+| |- serv_0048
+| |- serv_004A
+| |- serv_0088
++ +- serv_008B
+|- AREA_0020/
+| |- serv_0810
+| |- serv_0812
+| |- serv_0816
+| |- serv_0850
+| |- serv_0852
+| |- serv_0856
+| |- serv_0890
+| |- serv_0892
+| |- serv_0896
+| |- serv_08C8
+| |- serv_08CA
+| |- serv_090A
+| |- serv_090C
++ +- serv_090F
+|- AREA_003F/
+| |- AREA_0040/
+| | |- serv_1008
+| | |- serv_100A
+| | |- serv_1048
+| | |- serv_104A
+| | |- serv_108C
++ + +- serv_108F
+| | |- serv_10C8
++ + +- serv_10CB
+| | |- serv_1108
+| | |- serv_110A
+| | |- serv_1148
+| | |- serv_114A
+| |- AREA_005F/
+| | |- AREA_0060/
+| | | |- serv_1808
+| | | |- serv_180A
+| | | |- serv_1848
++ + + +- serv_184B
+| | | |- serv_18C8
+| | | |- serv_18CA
+| | | |- serv_1908
+| | | |- serv_190A
+| | | |- serv_1948
++ + + +- serv_194B
+| | | |- serv_1988
++ + + +- serv_198B
+| | |- AREA_008C/
+| | | |- serv_2308
+| | | |- serv_230A
+| | | |- serv_2348
++ + + +- serv_234B
+| | | |- serv_2388
++ + + +- serv_238B
+| | | |- serv_23C8
++ + + +- serv_23CB
+
+Public blocks read: 105
+Block 0000: | Service code 008B | Block index 00 | Data: 00 00 00 00 00 00 00 00 20 00 00 0A 00 00 01 E3 |
+Block 0001: | Service code 090F | Block index 00 | Data: 16 01 00 02 16 6C E3 3B E6 21 0A 00 00 01 E3 00 |
+Block 0002: | Service code 090F | Block index 01 | Data: 16 01 00 02 16 6B E3 36 E3 38 AA 00 00 01 E1 00 |
+Block 0003: | Service code 090F | Block index 02 | Data: 16 01 00 02 16 6B E3 3B E3 36 4A 01 00 01 DF 00 |
+Block 0004: | Service code 090F | Block index 03 | Data: 16 01 00 02 16 6A E5 37 E3 3D EA 01 00 01 DD 00 |
+Block 0005: | Service code 090F | Block index 04 | Data: 16 01 00 02 16 6A E3 3E E5 37 A8 02 00 01 DB 00 |
+Block 0006: | Service code 090F | Block index 05 | Data: 16 01 00 02 16 6A E3 3B E3 3E 66 03 00 01 D9 00 |
+Block 0007: | Service code 090F | Block index 06 | Data: 16 01 00 02 16 69 F1 01 F2 18 06 04 00 01 D7 00 |
+Block 0008: | Service code 090F | Block index 07 | Data: 16 01 00 02 16 69 F2 1A F1 01 D8 04 00 01 D5 00 |
+Block 0009: | Service code 090F | Block index 08 | Data: 16 01 00 02 16 64 16 03 25 07 82 05 00 01 D3 00 |
+Block 000A: | Service code 090F | Block index 09 | Data: 16 01 00 05 16 64 F0 38 F1 08 54 06 00 01 D1 00 |
+Block 000B: | Service code 090F | Block index 0A | Data: C8 46 00 00 16 64 7B 80 27 40 B8 06 00 01 D0 00 |
+Block 000C: | Service code 090F | Block index 0B | Data: 16 01 00 02 16 64 E3 3B E6 29 30 07 00 01 CE 00 |
+Block 000D: | Service code 090F | Block index 0C | Data: 08 02 00 00 16 64 E3 3B 00 00 D0 07 00 01 CC 00 |
+Block 000E: | Service code 090F | Block index 0D | Data: 08 03 00 00 16 63 E5 2B 00 00 00 00 00 01 CB 00 |
+Block 000F: | Service code 090F | Block index 0E | Data: 16 01 00 02 15 3B 03 12 03 0D 6E 00 00 01 CA 00 |
+Block 0010: | Service code 090F | Block index 0F | Data: 16 01 00 02 15 39 03 0D 03 12 04 01 00 01 C8 00 |
+Block 0011: | Service code 090F | Block index 10 | Data: 16 01 00 02 15 39 03 12 03 0D 9A 01 00 01 C6 00 |
+Block 0012: | Service code 090F | Block index 11 | Data: 1A 01 00 02 15 39 25 07 03 12 30 02 00 01 C4 00 |
+Block 0013: | Service code 090F | Block index 12 | Data: 16 01 00 02 15 38 CE 1F CE 26 D0 02 00 01 C2 00 |
+Block 0014: | Service code 090F | Block index 13 | Data: 16 01 00 02 15 38 CE 26 CE 1F 66 03 00 01 C0 00 |
+Block 0015: | Service code 108F | Block index 00 | Data: 20 00 E6 21 20 05 16 6C 12 52 A0 00 00 00 00 00 |
+Block 0016: | Service code 108F | Block index 01 | Data: A0 00 E3 3B 20 12 16 6C 12 42 00 00 00 00 00 00 |
+Block 0017: | Service code 108F | Block index 02 | Data: 20 00 E3 38 30 31 16 6B 14 57 A0 00 00 00 00 00 |
+Block 0018: | Service code 10CB | Block index 00 | Data: E3 3B 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0019: | Service code 10CB | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 001A: | Service code 184B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 001B: | Service code 184B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 001C: | Service code 184B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 001D: | Service code 184B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 001E: | Service code 184B | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 001F: | Service code 184B | Block index 05 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0020: | Service code 184B | Block index 06 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0021: | Service code 184B | Block index 07 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0022: | Service code 184B | Block index 08 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0023: | Service code 184B | Block index 09 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0024: | Service code 184B | Block index 0A | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0025: | Service code 184B | Block index 0B | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0026: | Service code 184B | Block index 0C | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0027: | Service code 184B | Block index 0D | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0028: | Service code 184B | Block index 0E | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0029: | Service code 184B | Block index 0F | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 002A: | Service code 184B | Block index 10 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 002B: | Service code 184B | Block index 11 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 002C: | Service code 184B | Block index 12 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 002D: | Service code 184B | Block index 13 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 002E: | Service code 184B | Block index 14 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 002F: | Service code 184B | Block index 15 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0030: | Service code 184B | Block index 16 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0031: | Service code 184B | Block index 17 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0032: | Service code 184B | Block index 18 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0033: | Service code 184B | Block index 19 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0034: | Service code 184B | Block index 1A | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0035: | Service code 184B | Block index 1B | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0036: | Service code 184B | Block index 1C | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0037: | Service code 184B | Block index 1D | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0038: | Service code 184B | Block index 1E | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0039: | Service code 184B | Block index 1F | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 003A: | Service code 184B | Block index 20 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 003B: | Service code 184B | Block index 21 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 003C: | Service code 184B | Block index 22 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 003D: | Service code 184B | Block index 23 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 003E: | Service code 194B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 003F: | Service code 194B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0040: | Service code 194B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0041: | Service code 194B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0042: | Service code 194B | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0043: | Service code 194B | Block index 05 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0044: | Service code 194B | Block index 06 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0045: | Service code 194B | Block index 07 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0046: | Service code 194B | Block index 08 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0047: | Service code 194B | Block index 09 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0048: | Service code 194B | Block index 0A | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0049: | Service code 194B | Block index 0B | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 004A: | Service code 194B | Block index 0C | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 004B: | Service code 194B | Block index 0D | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 004C: | Service code 194B | Block index 0E | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 004D: | Service code 194B | Block index 0F | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 004E: | Service code 198B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 004F: | Service code 198B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0050: | Service code 198B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0051: | Service code 234B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0052: | Service code 234B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0053: | Service code 234B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0054: | Service code 234B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0055: | Service code 238B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0056: | Service code 238B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0057: | Service code 238B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0058: | Service code 238B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0059: | Service code 238B | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 005A: | Service code 238B | Block index 05 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 005B: | Service code 238B | Block index 06 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 005C: | Service code 238B | Block index 07 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 005D: | Service code 238B | Block index 08 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 005E: | Service code 238B | Block index 09 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 005F: | Service code 238B | Block index 0A | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0060: | Service code 238B | Block index 0B | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0061: | Service code 238B | Block index 0C | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0062: | Service code 238B | Block index 0D | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0063: | Service code 238B | Block index 0E | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0064: | Service code 238B | Block index 0F | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0065: | Service code 23CB | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0066: | Service code 23CB | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0067: | Service code 23CB | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0068: | Service code 23CB | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+
+
+System 01: FE00
+
+Area found: 3
+Area 000: | Code 0000 | Services #000-#000 |
+Area 001: | Code 3940 | Services #000-#000 |
+Area 002: | Code 3941 | Services #000-#004 |
+
+Service found: 5
+Service 000: | Code 3948 | Attrib. 08 | Private | Random | Read/Write |
+Service 001: | Code 394B | Attrib. 0B | Public  | Random | Read Only  |
+Service 002: | Code 3988 | Attrib. 08 | Private | Random | Read/Write |
+Service 003: | Code 398B | Attrib. 0B | Public  | Random | Read Only  |
+Service 004: | Code 39C9 | Attrib. 09 | Public  | Random | Read/Write |
+
+Directory Tree: 
++++ ... are public services
+||| ... are private services
+- AREA_0000/
+|- AREA_00E5/
+| |- AREA_00E5/
+| | |- serv_3948
++ + +- serv_394B
+| | |- serv_3988
++ + +- serv_398B
++ + +- serv_39C9
+
+Public blocks read: 23
+Block 0000: | Service code 394B | Block index 00 | Data: 48 02 4A 1B 08 00 00 04 01 00 00 00 00 00 00 00 |
+Block 0001: | Service code 398B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0002: | Service code 398B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0003: | Service code 398B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0004: | Service code 398B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0005: | Service code 398B | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0006: | Service code 398B | Block index 05 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0007: | Service code 398B | Block index 06 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0008: | Service code 398B | Block index 07 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0009: | Service code 398B | Block index 08 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 000A: | Service code 398B | Block index 09 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 000B: | Service code 398B | Block index 0A | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 000C: | Service code 398B | Block index 0B | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 000D: | Service code 398B | Block index 0C | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 000E: | Service code 398B | Block index 0D | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 000F: | Service code 398B | Block index 0E | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0010: | Service code 398B | Block index 0F | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0011: | Service code 39C9 | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0012: | Service code 39C9 | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0013: | Service code 39C9 | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0014: | Service code 39C9 | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0015: | Service code 39C9 | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0016: | Service code 39C9 | Block index 05 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+
+
+System 02: 86A7
+
+Area found: 3
+Area 000: | Code 0000 | Services #000-#000 |
+Area 001: | Code 0040 | Services #000-#001 |
+Area 002: | Code 0280 | Services #002-#003 |
+
+Service found: 4
+Service 000: | Code 0048 | Attrib. 08 | Private | Random | Read/Write |
+Service 001: | Code 004B | Attrib. 0B | Public  | Random | Read Only  |
+Service 002: | Code 0288 | Attrib. 08 | Private | Random | Read/Write |
+Service 003: | Code 028B | Attrib. 0B | Public  | Random | Read Only  |
+
+Directory Tree: 
++++ ... are public services
+||| ... are private services
+- AREA_0000/
+|- AREA_0001/
+| |- serv_0048
++ +- serv_004B
+|- AREA_000A/
+| |- serv_0288
++ +- serv_028B
+
+Public blocks read: 10
+Block 0000: | Service code 004B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0001: | Service code 004B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0002: | Service code 004B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0003: | Service code 004B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0004: | Service code 004B | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0005: | Service code 028B | Block index 00 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0006: | Service code 028B | Block index 01 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0007: | Service code 028B | Block index 02 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0008: | Service code 028B | Block index 03 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
+Block 0009: | Service code 028B | Block index 04 | Data: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |

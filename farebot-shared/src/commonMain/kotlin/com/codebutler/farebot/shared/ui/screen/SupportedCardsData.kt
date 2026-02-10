@@ -9,13 +9,13 @@ import farebot.farebot_shared.generated.resources.Res
 /** All supported cards across all platforms. */
 val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     // North America - USA
-    CardInfo(Res.string.card_name_orca, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_seattle_wa, imageRes = Res.drawable.orca_card, latitude = 47.6062f, longitude = -122.3321f),
-    CardInfo(Res.string.card_name_clipper, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_san_francisco_ca, extraNoteRes = Res.string.card_note_clipper, imageRes = Res.drawable.clipper_card, latitude = 37.7749f, longitude = -122.4194f),
+    CardInfo(Res.string.card_name_orca, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_seattle_wa, imageRes = Res.drawable.orca_card, latitude = 47.6062f, longitude = -122.3321f, sampleDumpFile = "ORCA.nfc"),
+    CardInfo(Res.string.card_name_clipper, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_san_francisco_ca, extraNoteRes = Res.string.card_note_clipper, imageRes = Res.drawable.clipper_card, latitude = 37.7749f, longitude = -122.4194f, sampleDumpFile = "Clipper.nfc"),
     CardInfo(Res.string.card_name_charlie_card, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_boston_ma, imageRes = Res.drawable.charlie_card, latitude = 42.3601f, longitude = -71.0589f),
     CardInfo(Res.string.card_name_lax_tap, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_los_angeles_ca, imageRes = Res.drawable.laxtap_card, latitude = 34.0522f, longitude = -118.2437f),
     CardInfo(Res.string.card_name_msp_goto, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_minneapolis_mn, imageRes = Res.drawable.msp_goto_card, latitude = 44.9778f, longitude = -93.2650f),
     CardInfo(Res.string.card_name_ventra, CardType.MifareUltralight, TransitRegion.USA, Res.string.card_location_chicago_il, extraNoteRes = Res.string.card_note_ventra, imageRes = Res.drawable.ventra, latitude = 41.8781f, longitude = -87.6298f),
-    CardInfo(Res.string.card_name_holo, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_oahu_hawaii, serialOnly = true, imageRes = Res.drawable.holo_card, latitude = 21.3069f, longitude = -157.8583f),
+    CardInfo(Res.string.card_name_holo, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_oahu_hawaii, serialOnly = true, imageRes = Res.drawable.holo_card, latitude = 21.3069f, longitude = -157.8583f, sampleDumpFile = "Holo.json"),
     CardInfo(Res.string.card_name_trimet_hop, CardType.MifareDesfire, TransitRegion.USA, Res.string.card_location_portland_or, serialOnly = true, imageRes = Res.drawable.trimethop_card, latitude = 45.5152f, longitude = -122.6784f),
     CardInfo(Res.string.card_name_sun_card, CardType.MifareClassic, TransitRegion.USA, Res.string.card_location_orlando_fl, serialOnly = true, imageRes = Res.drawable.suncard, latitude = 28.5383f, longitude = -81.3792f),
 
@@ -34,7 +34,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
 
     // Europe - Benelux
     CardInfo(Res.string.card_name_ov_chipkaart, CardType.MifareClassic, TransitRegion.NETHERLANDS, Res.string.card_location_the_netherlands, keysRequired = true, imageRes = Res.drawable.ovchip_card, latitude = 52.3676f, longitude = 4.9041f),
-    CardInfo(Res.string.card_name_mobib, CardType.ISO7816, TransitRegion.BELGIUM, Res.string.card_location_brussels_belgium, imageRes = Res.drawable.mobib_card, latitude = 50.8503f, longitude = 4.3517f),
+    CardInfo(Res.string.card_name_mobib, CardType.ISO7816, TransitRegion.BELGIUM, Res.string.card_location_brussels_belgium, imageRes = Res.drawable.mobib_card, latitude = 50.8503f, longitude = 4.3517f, sampleDumpFile = "Mobib.json"),
 
     // Europe - France (Intercode)
     CardInfo(Res.string.card_name_navigo, CardType.ISO7816, TransitRegion.FRANCE, Res.string.card_location_paris_france, imageRes = Res.drawable.navigo, latitude = 48.8566f, longitude = 2.3522f),
@@ -54,7 +54,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_lisboa_viva, CardType.ISO7816, TransitRegion.PORTUGAL, Res.string.card_location_lisbon_portugal, imageRes = Res.drawable.lisboaviva, latitude = 38.7223f, longitude = -9.1393f),
 
     // Europe - Scandinavia & Finland
-    CardInfo(Res.string.card_name_hsl, CardType.MifareDesfire, TransitRegion.FINLAND, Res.string.card_location_helsinki_finland, extraNoteRes = Res.string.card_note_hsl, imageRes = Res.drawable.hsl_card, latitude = 60.1699f, longitude = 24.9384f),
+    CardInfo(Res.string.card_name_hsl, CardType.MifareDesfire, TransitRegion.FINLAND, Res.string.card_location_helsinki_finland, extraNoteRes = Res.string.card_note_hsl, imageRes = Res.drawable.hsl_card, latitude = 60.1699f, longitude = 24.9384f, sampleDumpFile = "HSL.json"),
     CardInfo(Res.string.card_name_waltti, CardType.MifareDesfire, TransitRegion.FINLAND, Res.string.card_location_finland, imageRes = Res.drawable.waltti_logo, latitude = 61.4978f, longitude = 23.7610f),
     CardInfo(Res.string.card_name_tampere, CardType.MifareDesfire, TransitRegion.FINLAND, Res.string.card_location_tampere_finland, imageRes = Res.drawable.tampere, latitude = 61.4978f, longitude = 23.7610f),
     CardInfo(Res.string.card_name_slaccess, CardType.MifareClassic, TransitRegion.SWEDEN, Res.string.card_location_stockholm_sweden, keysRequired = true, keyBundle = "slaccess", preview = true, imageRes = Res.drawable.slaccess, latitude = 59.3293f, longitude = 18.0686f),
@@ -65,7 +65,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_tartu_bus, CardType.MifareClassic, TransitRegion.ESTONIA, Res.string.card_location_tartu_estonia, imageRes = Res.drawable.tartu, latitude = 58.3780f, longitude = 26.7290f),
 
     // Europe - Russia & Former USSR
-    CardInfo(Res.string.card_name_troika, CardType.MifareClassic, TransitRegion.RUSSIA, Res.string.card_location_moscow_russia, extraNoteRes = Res.string.card_note_russia, imageRes = Res.drawable.troika_card, latitude = 55.7558f, longitude = 37.6173f),
+    CardInfo(Res.string.card_name_troika, CardType.MifareClassic, TransitRegion.RUSSIA, Res.string.card_location_moscow_russia, extraNoteRes = Res.string.card_note_russia, imageRes = Res.drawable.troika_card, latitude = 55.7558f, longitude = 37.6173f, sampleDumpFile = "Troika.json"),
     CardInfo(Res.string.card_name_podorozhnik, CardType.MifareClassic, TransitRegion.RUSSIA, Res.string.card_location_saint_petersburg_russia, extraNoteRes = Res.string.card_note_russia, imageRes = Res.drawable.podorozhnik_card, latitude = 59.9343f, longitude = 30.3351f),
     CardInfo(Res.string.card_name_strelka, CardType.MifareClassic, TransitRegion.RUSSIA, Res.string.card_location_moscow_region_russia, serialOnly = true, imageRes = Res.drawable.strelka_card, latitude = 55.7558f, longitude = 37.6173f),
     CardInfo(Res.string.card_name_kazan, CardType.MifareClassic, TransitRegion.RUSSIA, Res.string.card_location_kazan_russia, keysRequired = true, imageRes = Res.drawable.kazan, latitude = 55.7963f, longitude = 49.1089f),
@@ -107,9 +107,9 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_gautrain, CardType.MifareClassic, TransitRegion.SOUTH_AFRICA, Res.string.card_location_gauteng_south_africa, imageRes = Res.drawable.gautrain, latitude = -26.2041f, longitude = 28.0473f),
 
     // Asia - Japan
-    CardInfo(Res.string.card_name_suica, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_tokyo_japan, imageRes = Res.drawable.suica_card, latitude = 35.6762f, longitude = 139.6503f),
-    CardInfo(Res.string.card_name_pasmo, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_tokyo_japan, imageRes = Res.drawable.pasmo_card, latitude = 35.6762f, longitude = 139.6503f),
-    CardInfo(Res.string.card_name_icoca, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_kansai_japan, imageRes = Res.drawable.icoca_card, latitude = 34.6937f, longitude = 135.5023f),
+    CardInfo(Res.string.card_name_suica, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_tokyo_japan, imageRes = Res.drawable.suica_card, latitude = 35.6762f, longitude = 139.6503f, sampleDumpFile = "Suica.nfc"),
+    CardInfo(Res.string.card_name_pasmo, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_tokyo_japan, imageRes = Res.drawable.pasmo_card, latitude = 35.6762f, longitude = 139.6503f, sampleDumpFile = "PASMO.nfc"),
+    CardInfo(Res.string.card_name_icoca, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_kansai_japan, imageRes = Res.drawable.icoca_card, latitude = 34.6937f, longitude = 135.5023f, sampleDumpFile = "ICOCA.nfc"),
     CardInfo(Res.string.card_name_toica, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_nagoya_japan, imageRes = Res.drawable.toica, latitude = 35.1815f, longitude = 136.9066f),
     CardInfo(Res.string.card_name_manaca, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_nagoya_japan, imageRes = Res.drawable.manaca, latitude = 35.1815f, longitude = 136.9066f),
     CardInfo(Res.string.card_name_pitapa, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_kansai_japan, imageRes = Res.drawable.pitapa, latitude = 34.6937f, longitude = 135.5023f),
@@ -120,7 +120,7 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
     CardInfo(Res.string.card_name_edy, CardType.FeliCa, TransitRegion.JAPAN, Res.string.card_location_tokyo_japan, imageRes = Res.drawable.edy_card, latitude = 35.6762f, longitude = 139.6503f),
 
     // Asia - Korea
-    CardInfo(Res.string.card_name_t_money, CardType.ISO7816, TransitRegion.SOUTH_KOREA, Res.string.card_location_seoul_south_korea, imageRes = Res.drawable.tmoney_card, latitude = 37.5665f, longitude = 126.9780f),
+    CardInfo(Res.string.card_name_t_money, CardType.ISO7816, TransitRegion.SOUTH_KOREA, Res.string.card_location_seoul_south_korea, imageRes = Res.drawable.tmoney_card, latitude = 37.5665f, longitude = 126.9780f, sampleDumpFile = "TMoney.json"),
     // Asia - China
     CardInfo(Res.string.card_name_beijing_municipal_card, CardType.ISO7816, TransitRegion.CHINA, Res.string.card_location_beijing_china, imageRes = Res.drawable.beijing, latitude = 39.9042f, longitude = 116.4074f),
     CardInfo(Res.string.card_name_shanghai_public_transportation_card, CardType.ISO7816, TransitRegion.CHINA, Res.string.card_location_shanghai_china, imageRes = Res.drawable.shanghai, latitude = 31.2304f, longitude = 121.4737f),
@@ -131,17 +131,17 @@ val ALL_SUPPORTED_CARDS: List<CardInfo> = listOf(
 
     // Asia - Southeast Asia
     CardInfo(Res.string.card_name_octopus, CardType.FeliCa, TransitRegion.HONG_KONG, Res.string.card_location_hong_kong, imageRes = Res.drawable.octopus_card, latitude = 22.3193f, longitude = 114.1694f),
-    CardInfo(Res.string.card_name_ez_link, CardType.CEPAS, TransitRegion.SINGAPORE, Res.string.card_location_singapore, imageRes = Res.drawable.ezlink_card, latitude = 1.3521f, longitude = 103.8198f),
+    CardInfo(Res.string.card_name_ez_link, CardType.CEPAS, TransitRegion.SINGAPORE, Res.string.card_location_singapore, imageRes = Res.drawable.ezlink_card, latitude = 1.3521f, longitude = 103.8198f, sampleDumpFile = "EZLink.json"),
     CardInfo(Res.string.card_name_nets_flashpay, CardType.CEPAS, TransitRegion.SINGAPORE, Res.string.card_location_singapore, imageRes = Res.drawable.nets_card, latitude = 1.3521f, longitude = 103.8198f),
     CardInfo(Res.string.card_name_touch_n_go, CardType.MifareClassic, TransitRegion.MALAYSIA, Res.string.card_location_malaysia, imageRes = Res.drawable.touchngo, latitude = 3.1390f, longitude = 101.6869f),
     CardInfo(Res.string.card_name_komuterlink, CardType.MifareClassic, TransitRegion.MALAYSIA, Res.string.card_location_malaysia, imageRes = Res.drawable.komuterlink, latitude = 3.1390f, longitude = 101.6869f),
     CardInfo(Res.string.card_name_kartu_multi_trip, CardType.FeliCa, TransitRegion.INDONESIA, Res.string.card_location_jakarta_indonesia, extraNoteRes = Res.string.card_note_kmt_felica, imageRes = Res.drawable.kmt_card, latitude = -6.2088f, longitude = 106.8456f),
 
     // Asia - Taiwan
-    CardInfo(Res.string.card_name_easycard, CardType.MifareClassic, TransitRegion.TAIWAN, Res.string.card_location_taipei_taiwan, keysRequired = true, imageRes = Res.drawable.easycard, latitude = 25.0330f, longitude = 121.5654f),
+    CardInfo(Res.string.card_name_easycard, CardType.MifareClassic, TransitRegion.TAIWAN, Res.string.card_location_taipei_taiwan, keysRequired = true, imageRes = Res.drawable.easycard, latitude = 25.0330f, longitude = 121.5654f, sampleDumpFile = "EasyCard.mfc"),
 
     // Oceania - Australia
-    CardInfo(Res.string.card_name_opal, CardType.MifareDesfire, TransitRegion.AUSTRALIA, Res.string.card_location_sydney_australia, extraNoteRes = Res.string.card_note_opal, imageRes = Res.drawable.opal_card, latitude = -33.8688f, longitude = 151.2093f),
+    CardInfo(Res.string.card_name_opal, CardType.MifareDesfire, TransitRegion.AUSTRALIA, Res.string.card_location_sydney_australia, extraNoteRes = Res.string.card_note_opal, imageRes = Res.drawable.opal_card, latitude = -33.8688f, longitude = 151.2093f, sampleDumpFile = "Opal.json"),
     CardInfo(Res.string.card_name_myki, CardType.MifareDesfire, TransitRegion.AUSTRALIA, Res.string.card_location_victoria_australia, serialOnly = true, imageRes = Res.drawable.myki_card, latitude = -37.8136f, longitude = 144.9631f),
     CardInfo(Res.string.card_name_seqgo, CardType.MifareClassic, TransitRegion.AUSTRALIA, Res.string.card_location_brisbane_and_seq_australia, keysRequired = true, imageRes = Res.drawable.seqgo_card, latitude = -27.4698f, longitude = 153.0251f),
     CardInfo(Res.string.card_name_manly_fast_ferry, CardType.MifareClassic, TransitRegion.AUSTRALIA, Res.string.card_location_sydney_australia, keysRequired = true, imageRes = Res.drawable.manly_fast_ferry_card, latitude = -33.8688f, longitude = 151.2093f),

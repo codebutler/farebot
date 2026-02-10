@@ -43,6 +43,14 @@ class CardViewModel(
     private var currentRawCard: RawCard<*>? = null
 
     fun loadCard(cardKey: String) {
+        loadCardInternal(cardKey, isSample = false, sampleTitle = null)
+    }
+
+    fun loadSampleCard(cardKey: String, sampleTitle: String) {
+        loadCardInternal(cardKey, isSample = true, sampleTitle = sampleTitle)
+    }
+
+    private fun loadCardInternal(cardKey: String, isSample: Boolean, sampleTitle: String?) {
         val rawCard = navDataHolder.get<RawCard<*>>(cardKey) ?: return
         currentRawCard = rawCard
 
@@ -52,9 +60,11 @@ class CardViewModel(
                 val transitInfo = transitFactoryRegistry.parseTransitInfo(card)
 
                 if (transitInfo != null) {
-                    analytics.logEvent("view_card", mapOf(
-                        "card_name" to transitInfo.cardName,
-                    ))
+                    if (!isSample) {
+                        analytics.logEvent("view_card", mapOf(
+                            "card_name" to transitInfo.cardName,
+                        ))
+                    }
                     val transactions = createTransactionItems(transitInfo)
                     val balances = createBalanceItems(transitInfo)
                     val infoItems = createInfoItems(transitInfo)
@@ -64,13 +74,14 @@ class CardViewModel(
 
                     _uiState.value = CardUiState(
                         isLoading = false,
-                        cardName = transitInfo.cardName,
+                        cardName = sampleTitle ?: transitInfo.cardName,
                         serialNumber = transitInfo.serialNumber,
                         balances = balances,
                         transactions = transactions,
                         infoItems = infoItems,
                         warning = transitInfo.warning,
                         hasAdvancedData = true,
+                        isSample = isSample,
                     )
                 } else {
                     val tagIdHex = card.tagId.joinToString("") {
@@ -83,10 +94,11 @@ class CardViewModel(
                     parsedCardKey = navDataHolder.put(Pair(card, unknownInfo))
                     _uiState.value = CardUiState(
                         isLoading = false,
-                        cardName = unknownInfo.cardName,
+                        cardName = sampleTitle ?: unknownInfo.cardName,
                         serialNumber = unknownInfo.serialNumber,
                         balances = createBalanceItems(unknownInfo),
                         hasAdvancedData = true,
+                        isSample = isSample,
                     )
                 }
             } catch (ex: Exception) {

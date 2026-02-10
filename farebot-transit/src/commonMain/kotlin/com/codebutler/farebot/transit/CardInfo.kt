@@ -37,4 +37,5 @@ data class CardInfo(
     val imageRes: DrawableResource? = null,
     val latitude: Float? = null,
     val longitude: Float? = null,
+    val sampleDumpFile: String? = null,
 )

@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavType
 import androidx.savedstate.read
 import androidx.navigation.compose.NavHost
@@ -25,6 +26,8 @@ import com.codebutler.farebot.shared.platform.PlatformActions
 import com.codebutler.farebot.shared.platform.getDeviceRegion
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import com.codebutler.farebot.shared.ui.navigation.Screen
 import com.codebutler.farebot.shared.ui.screen.AddKeyScreen
 import com.codebutler.farebot.shared.ui.screen.AdvancedTab
@@ -48,12 +51,14 @@ import com.codebutler.farebot.transit.Trip
 import org.koin.compose.koinInject
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * FareBot app entry point using Koin DI and shared ViewModels.
  * Used by both Android and iOS platforms.
  */
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun FareBotApp(
     platformActions: PlatformActions,
@@ -68,6 +73,7 @@ fun FareBotApp(
         val cardImporter = koinInject<CardImporter>()
         val cardPersister = koinInject<CardPersister>()
         val cardSerializer = koinInject<CardSerializer>()
+        val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
             cardImporter.pendingImport.collect { content ->
@@ -195,6 +201,27 @@ fun FareBotApp(
                     } else null,
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = { platformActions.openNfcSettings() },
+                    onSampleCardTap = { cardInfo ->
+                        val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
+                        scope.launch {
+                            try {
+                                val bytes = Res.readBytes("files/samples/$fileName")
+                                val result = if (fileName.endsWith(".mfc")) {
+                                    cardImporter.importMfcDump(bytes)
+                                } else {
+                                    cardImporter.importCards(bytes.decodeToString())
+                                }
+                                if (result is ImportResult.Success && result.cards.isNotEmpty()) {
+                                    val rawCard = result.cards.first()
+                                    val navKey = navDataHolder.put(rawCard)
+                                    val cardName = getString(cardInfo.nameRes)
+                                    navController.navigate(Screen.SampleCard.createRoute(navKey, cardName))
+                                }
+                            } catch (e: Exception) {
+                                platformActions.showToast("Failed to load sample: ${e.message}")
+                            }
+                        }
+                    },
                 )
             }
 
@@ -301,6 +328,37 @@ fun FareBotApp(
                         if (json != null) {
                             platformActions.saveFileForExport(json, "farebot-card.json")
                         }
+                    },
+                )
+            }
+
+            composable(
+                route = Screen.SampleCard.route,
+                arguments = listOf(
+                    navArgument("cardKey") { type = NavType.StringType },
+                    navArgument("cardName") { type = NavType.StringType },
+                )
+            ) { backStackEntry ->
+                val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
+                val cardName = backStackEntry.arguments?.read { getStringOrNull("cardName") } ?: return@composable
+                val viewModel = koinViewModel<CardViewModel>()
+                val uiState by viewModel.uiState.collectAsState()
+
+                LaunchedEffect(cardKey) {
+                    viewModel.loadSampleCard(cardKey, "Sample: $cardName")
+                }
+
+                CardScreen(
+                    uiState = uiState,
+                    onBack = { navController.popBackStack() },
+                    onNavigateToAdvanced = {
+                        val advKey = viewModel.getAdvancedCardKey()
+                        if (advKey != null) {
+                            navController.navigate(Screen.CardAdvanced.createRoute(advKey))
+                        }
+                    },
+                    onNavigateToTripMap = { tripKey ->
+                        navController.navigate(Screen.TripMap.createRoute(tripKey))
                     },
                 )
             }

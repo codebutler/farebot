@@ -98,6 +98,7 @@ fun HomeScreen(
     onNavigateToKeys: (() -> Unit)?,
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: () -> Unit,
+    onSampleCardTap: ((CardInfo) -> Unit)? = null,
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var menuExpanded by remember { mutableStateOf(false) }
@@ -342,6 +343,7 @@ fun HomeScreen(
                         showUnsupported = showUnsupported,
                         onKeysRequiredTap = onKeysRequiredTap,
                         mapMarkers = mapMarkers,
+                        onSampleCardTap = onSampleCardTap,
                     )
                 }
             }
