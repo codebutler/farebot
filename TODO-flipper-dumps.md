@@ -98,7 +98,9 @@ These dumps were found in Metrodroid/FareBot issue trackers and can be downloade
 
 ---
 
-## Dumps still needed — by card type
+## Dumps still needed — full implementations
+
+Cards with actual trip/balance/subscription parsing. These are the most valuable to get dump data for.
 
 ### DESFire (Flipper can read directly)
 
@@ -110,50 +112,44 @@ These dumps were found in Metrodroid/FareBot issue trackers and can be downloade
 | **Leap** | `farebot-transit-tfi-leap` | Medium | Yes — Flipper | Dublin, Ireland. EN1545-based. |
 | **Adelaide Metrocard** | `farebot-transit-adelaide` | Medium | Yes — Flipper | Adelaide, Australia. |
 | **Hafilat** | `farebot-transit-hafilat` | Low | Yes — Flipper | Abu Dhabi. |
-| Nol | serialonly | Sample only | Yes — Flipper | Dubai, UAE. |
-| Istanbul Kart | serialonly | Sample only | Yes — Flipper | Istanbul, Turkey. |
-| AT HOP | serialonly | Sample only | Yes — Flipper | Auckland, NZ. |
-| Presto | serialonly | Sample only | Yes — Flipper | Ontario, Canada. |
-| TPF | serialonly | Sample only | Yes — Flipper | Fribourg, Switzerland. |
 
-### Mifare Classic (Flipper can read — keys required for encrypted sectors)
+### Mifare Classic — no keys needed (Flipper can read directly)
 
-Most Classic cards need sector keys to read useful data. Flipper supports key dictionaries.
+These Classic cards don't use encrypted sectors for their transit data, so Flipper can read them like any other card.
+
+| Card | Module | Needs scan? | Notes |
+|------|--------|-------------|-------|
+| **Bip** | `farebot-transit-bip` | Yes — Flipper | Santiago, Chile. |
+| **Bonobus** | `farebot-transit-bonobus` | Yes — Flipper | Cadiz, Spain. |
+| **Ricaricami** | `farebot-transit-ricaricami` | Yes — Flipper | Milan, Italy. |
+| **Metromoney** | `farebot-transit-metromoney` | Yes — Flipper | Tbilisi, Georgia. |
+| **Kyiv Metro** | `farebot-transit-kiev` | Yes — Flipper | Kyiv, Ukraine. |
+| **Kyiv Digital** | `farebot-transit-kiev` | Yes — Flipper | Kyiv, Ukraine. Variant. |
+| **Metro Q** | `farebot-transit-metroq` | Yes — Flipper | Qatar. |
+| **Gautrain** | `farebot-transit-gautrain` | Yes — Flipper | Gauteng, South Africa. |
+| **Touch n Go** | `farebot-transit-touchngo` | Yes — Flipper | Malaysia. |
+| **KomuterLink** | `farebot-transit-komuterlink` | Yes — Flipper | Malaysia. |
+| **SmartRider** | `farebot-transit-smartrider` | Yes — Flipper | Perth, Australia. |
+| **Otago GoCard** | `farebot-transit-otago` | Yes — Flipper | Otago, NZ. |
+| **Tartu Bus** | `farebot-transit-pilet` | Yes — Flipper | Tartu, Estonia. |
+| **YarGor** | `farebot-transit-yargor` | Yes — Flipper | Yaroslavl, Russia. |
+
+### Mifare Classic — keys required (Flipper needs key dictionary)
+
+These cards encrypt their transit sectors. Flipper can crack some keys with `mfkey32` or use a known dictionary, but it's more effort.
 
 **Note on Charlie Card:** `check()` uses salted MD5 key hashes. Our JSON/Flipper parsers don't currently extract keys from the trailer block, so `DataClassicSector.keyA`/`keyB` are always null. Fix: either add key extraction to `RawClassicSector.parse()` (reads bytes 0-5 and 10-15 from trailer block), or add explicit key fields to the JSON format. Once fixed, a Flipper scan with MBTA keys (publicly documented) would work.
 
-| Card | Module | Priority | Keys | Needs scan? | Notes |
-|------|--------|----------|------|-------------|-------|
-| **OV-chipkaart** | `farebot-transit-ovc` | High | Required | Yes — Flipper + keys | Full EN1545 rewrite, trip dedup, subscriptions, autocharge. 4K card. |
-| **Oyster** | `farebot-transit-oyster` | Medium | Required | Yes — Flipper + keys | London. Complex trip parsing. |
-| **Charlie Card** | `farebot-transit-charlie` | Medium | MBTA keys (public) | Yes — Flipper + keys + key extraction fix | Boston. See note above. |
-| **Podorozhnik** | `farebot-transit-podorozhnik` | Medium | Required | Yes — Flipper + keys | Saint Petersburg. |
-| **Bip** | `farebot-transit-bip` | Medium | No | Yes — Flipper | Santiago, Chile. |
-| **Bonobus** | `farebot-transit-bonobus` | Medium | No | Yes — Flipper | Cadiz, Spain. |
-| **Ricaricami** | `farebot-transit-ricaricami` | Medium | No | Yes — Flipper | Milan, Italy. |
-| **Metromoney** | `farebot-transit-metromoney` | Medium | No | Yes — Flipper | Tbilisi, Georgia. |
-| **Kyiv Metro** | `farebot-transit-kiev` | Medium | No | Yes — Flipper | Kyiv, Ukraine. |
-| **Kyiv Digital** | `farebot-transit-kiev` | Medium | No | Yes — Flipper | Kyiv, Ukraine. Variant. |
-| **Metro Q** | `farebot-transit-metroq` | Medium | No | Yes — Flipper | Qatar. |
-| **Gautrain** | `farebot-transit-gautrain` | Medium | No | Yes — Flipper | Gauteng, South Africa. |
-| **Touch n Go** | `farebot-transit-touchngo` | Medium | No | Yes — Flipper | Malaysia. |
-| **KomuterLink** | `farebot-transit-komuterlink` | Medium | No | Yes — Flipper | Malaysia. |
-| **SmartRider** | `farebot-transit-smartrider` | Medium | No | Yes — Flipper | Perth, Australia. |
-| **Manly Fast Ferry** | `farebot-transit-manly` | Medium | Required | Yes — Flipper + keys | Sydney, Australia. |
-| **Otago GoCard** | `farebot-transit-otago` | Medium | No | Yes — Flipper | Otago, NZ. |
-| **Tartu Bus** | `farebot-transit-pilet` | Medium | No | Yes — Flipper | Tartu, Estonia. |
-| **Warsaw** | `farebot-transit-warsaw` | Medium | Required | Yes — Flipper + keys | Warsaw, Poland. |
-| **Kazan** | `farebot-transit-kazan` | Low | Required | Yes — Flipper + keys | Kazan, Russia. |
-| **YarGor** | `farebot-transit-yargor` | Low | No | Yes — Flipper | Yaroslavl, Russia. |
-| **Christchurch Metrocard** | `farebot-transit-chc-metrocard` | Low | Required | Yes — Flipper + keys | Christchurch, NZ. |
-| SLAccess | `farebot-transit-rkf` | Low | Required | Yes — Flipper + keys | Stockholm. Preview. |
-| Rejsekort | `farebot-transit-rkf` | Low | Required | Yes — Flipper + keys | Denmark. Preview. |
-| Vasttrafik | `farebot-transit-rkf` | Low | Required | Yes — Flipper + keys | Gothenburg. Preview. |
-| Sun Card | serialonly | Sample only | No | Yes — Flipper | Orlando, FL. |
-| Strelka | serialonly | Sample only | No | Yes — Flipper | Moscow region. |
-| Umarsh variants (8) | `farebot-transit-umarsh` | Low | Required | Yes — Flipper + keys | All preview. Yoshkar-Ola, Strizh, Barnaul, Vladimir, Kirov, Siticard, Omka, Penza. |
-| Zolotaya Korona variants (5) | `farebot-transit-zolotayakorona` | Low | Required | Yes — Flipper + keys | All preview. Krasnodar, Orenburg, Samara, Yaroslavl. |
-| Crimea variants (2) | — | Low | Required | Yes — Flipper + keys | Preview. Trolleybus, Parus school. |
+| Card | Module | Needs scan? | Notes |
+|------|--------|-------------|-------|
+| **OV-chipkaart** | `farebot-transit-ovc` | Yes — Flipper + keys | Full EN1545 rewrite, trip dedup, subscriptions, autocharge. 4K card. |
+| **Oyster** | `farebot-transit-oyster` | Yes — Flipper + keys | London. Complex trip parsing. |
+| **Charlie Card** | `farebot-transit-charlie` | Yes — Flipper + keys + key extraction fix | Boston. MBTA keys are public. See note above. |
+| **Podorozhnik** | `farebot-transit-podorozhnik` | Yes — Flipper + keys | Saint Petersburg. |
+| **Manly Fast Ferry** | `farebot-transit-manly` | Yes — Flipper + keys | Sydney, Australia. |
+| **Warsaw** | `farebot-transit-warsaw` | Yes — Flipper + keys | Warsaw, Poland. |
+| **Kazan** | `farebot-transit-kazan` | Yes — Flipper + keys | Kazan, Russia. |
+| **Christchurch Metrocard** | `farebot-transit-chc-metrocard` | Yes — Flipper + keys | Christchurch, NZ. |
 
 ### FeliCa (Flipper can read directly)
 
@@ -161,13 +157,6 @@ Most Classic cards need sector keys to read useful data. Flipper supports key di
 |------|--------|----------|-------------|-------|
 | **Edy** | `farebot-transit-edy` | Medium | Yes — Flipper | Japan e-money. |
 | **KMT** | `farebot-transit-kmt` | Medium | Yes — Flipper | Jakarta. FeliCa variant. |
-| TOICA | `farebot-transit-suica` | Sample only | Yes — Flipper | Nagoya. Same parser as Suica. |
-| manaca | `farebot-transit-suica` | Sample only | Yes — Flipper | Nagoya. Same parser as Suica. |
-| PiTaPa | `farebot-transit-suica` | Sample only | Yes — Flipper | Kansai. Same parser as Suica. |
-| Kitaca | `farebot-transit-suica` | Sample only | Yes — Flipper | Hokkaido. Same parser as Suica. |
-| SUGOCA | `farebot-transit-suica` | Sample only | Yes — Flipper | Fukuoka. Same parser as Suica. |
-| nimoca | `farebot-transit-suica` | Sample only | Yes — Flipper | Fukuoka. Same parser as Suica. |
-| hayakaken | `farebot-transit-suica` | Sample only | Yes — Flipper | Fukuoka City. Same parser as Suica. |
 
 ### Ultralight (Flipper can read directly)
 
@@ -186,14 +175,6 @@ Flipper Zero does not support ISO 14443-4 / ISO 7816 protocol reads. These requi
 | **RavKav** | `farebot-transit-calypso` | Medium | Yes — Android phone | Israel. EN1545. |
 | **Lisboa Viva** | `farebot-transit-calypso` | Medium | Yes — Android phone | Lisbon. EN1545. |
 | **Venezia Unica** | `farebot-transit-calypso` | Medium | Yes — Android phone | Venice. EN1545. Note: UL variant dumps available in metrodroid PR#869. |
-| Oura | `farebot-transit-calypso` | Low | Yes — Android phone | Grenoble. EN1545. |
-| TaM | `farebot-transit-calypso` | Low | Yes — Android phone | Montpellier. EN1545. |
-| Korrigo | `farebot-transit-calypso` | Low | Yes — Android phone | Brittany. EN1545. |
-| Envibus | `farebot-transit-calypso` | Low | Yes — Android phone | Sophia Antipolis. EN1545. |
-| Carta Mobile | `farebot-transit-calypso` | Low | Yes — Android phone | Pisa. EN1545. |
-| Pastel | `farebot-transit-calypso` | Low | Yes — Android phone | Toulouse. Preview. |
-| Pass Pass | `farebot-transit-calypso` | Low | Yes — Android phone | Hauts-de-France. Preview. |
-| TransGironde | `farebot-transit-calypso` | Low | Yes — Android phone | Gironde. Preview. |
 | **Snapper** | `farebot-transit-snapper` | Medium | Yes — Android phone | Wellington, NZ. KSX6924. |
 | **Beijing** | `farebot-transit-china` | Low | Yes — Android phone | China T-Union. |
 | **Shanghai** | `farebot-transit-china` | Low | Yes — Android phone | China T-Union. |
@@ -208,20 +189,80 @@ Flipper Zero does not support ISO 14443-4 / ISO 7816 protocol reads. These requi
 |------|--------|----------|-------------|-------|
 | **NETS FlashPay** | `farebot-transit-ezlink` | Medium | Yes — Android phone | Singapore. Shares EZ-Link module. |
 
+---
+
+## Dumps still needed — serial-only and preview (low priority)
+
+These cards only show a card name and serial number (no trip/balance parsing), or are `preview = true` (keysRequired, not fully functional). A dump is nice for Explore screen completeness but doesn't exercise much parsing logic.
+
+### Serial-only (identification only)
+
+| Card | Type | Module | Needs scan? | Notes |
+|------|------|--------|-------------|-------|
+| Nol | DESFire | serialonly | Yes — Flipper | Dubai, UAE. |
+| Istanbul Kart | DESFire | serialonly | Yes — Flipper | Istanbul, Turkey. |
+| AT HOP | DESFire | serialonly | Yes — Flipper | Auckland, NZ. |
+| Presto | DESFire | serialonly | Yes — Flipper | Ontario, Canada. |
+| TPF | DESFire | serialonly | Yes — Flipper | Fribourg, Switzerland. |
+| Sun Card | Classic | serialonly | Yes — Flipper | Orlando, FL. |
+| Strelka | Classic | serialonly | Yes — Flipper | Moscow region. |
+
+### Preview cards (keysRequired + preview, not fully functional)
+
+| Card | Type | Module | Needs scan? | Notes |
+|------|------|--------|-------------|-------|
+| SLAccess | Classic | `farebot-transit-rkf` | Yes — Flipper + keys | Stockholm. |
+| Rejsekort | Classic | `farebot-transit-rkf` | Yes — Flipper + keys | Denmark. |
+| Vasttrafik | Classic | `farebot-transit-rkf` | Yes — Flipper + keys | Gothenburg. |
+| Umarsh variants (8) | Classic | `farebot-transit-umarsh` | Yes — Flipper + keys | Yoshkar-Ola, Strizh, Barnaul, Vladimir, Kirov, Siticard, Omka, Penza. |
+| Zolotaya Korona variants (5) | Classic | `farebot-transit-zolotayakorona` | Yes — Flipper + keys | Krasnodar, Orenburg, Samara, Yaroslavl. |
+| Ekarta | Classic | `farebot-transit-zolotayakorona` | Yes — Flipper + keys | Yekaterinburg. |
+| Crimea variants (2) | Classic | — | Yes — Flipper + keys | Trolleybus, Parus school. |
+| Pastel | ISO7816 | `farebot-transit-calypso` | Yes — Android phone | Toulouse. |
+| Pass Pass | ISO7816 | `farebot-transit-calypso` | Yes — Android phone | Hauts-de-France. |
+| TransGironde | ISO7816 | `farebot-transit-calypso` | Yes — Android phone | Gironde. |
+| BusIt | Classic | `farebot-transit-nextfare` | Yes — Flipper + keys | Waikato, NZ. |
+| SmartRide | Classic | `farebot-transit-nextfare` | Yes — Flipper + keys | Rotorua, NZ. |
+
+### Suica-compatible IC cards (same parser, different branding)
+
+These all use the Suica FeliCa parser — a scan just confirms detection, doesn't test new parsing logic.
+
+| Card | Needs scan? | Notes |
+|------|-------------|-------|
+| TOICA | Yes — Flipper | Nagoya. |
+| manaca | Yes — Flipper | Nagoya. |
+| PiTaPa | Yes — Flipper | Kansai. |
+| Kitaca | Yes — Flipper | Hokkaido. |
+| SUGOCA | Yes — Flipper | Fukuoka. |
+| nimoca | Yes — Flipper | Fukuoka. |
+| hayakaken | Yes — Flipper | Fukuoka City. |
+
+### Calypso/Intercode low-priority (full impl but less common)
+
+| Card | Needs scan? | Notes |
+|------|-------------|-------|
+| Oura | Yes — Android phone | Grenoble. |
+| TaM | Yes — Android phone | Montpellier. |
+| Korrigo | Yes — Android phone | Brittany. |
+| Envibus | Yes — Android phone | Sophia Antipolis. |
+| Carta Mobile | Yes — Android phone | Pisa. |
+
 
 ---
 
 ## Summary
 
-| Category | Have (with tests) | Synthetic (need real scan) | On GitHub (not downloaded) | Still need scan |
-|----------|------------------|---------------------------|---------------------------|-----------------|
-| DESFire | 8 (Clipper, ORCA, Opal, HSL v2, Holo, Myki†, TriMet Hop†) | 2 (Myki, TriMet Hop) | 0 | 6 full + 5 serial-only |
-| Classic | 7 (EasyCard, SEQ Go†, LAX TAP†, MSP GoTo†, Troika*, Bilhete Unico†) | 4 (SEQ Go, LAX TAP, MSP GoTo, Bilhete Unico) | 1 (Zaragoza) | ~25 |
-| FeliCa | 4 (Suica, PASMO, ICOCA, Octopus†) | 1 (Octopus) | 0 | 2 full + 7 Suica variants |
-| Ultralight | 4 (Ventra, HSL UL, Troika UL, Compass†) | 1 (Compass) | 2 (Venezia UL, Andante) | 1 |
-| ISO7816 | 2 (T-Money, Mobib) | 0 | 2 (Riga, Mexico City) | ~20 |
-| CEPAS | 1 (EZ-Link) | 0 | 0 | 1 |
-| **Total** | **23** (15 real + 8 synthetic) | **8** | **5** | **~67** |
+| Category | Have (with tests) | Synthetic (need real scan) | On GitHub (not downloaded) | Need scan: no keys | Need scan: keys required | Need scan: serial/preview |
+|----------|------------------|---------------------------|---------------------------|--------------------|--------------------------|---------------------------|
+| DESFire | 8 | 2 (Myki, TriMet Hop) | 0 | 6 | — | 5 |
+| Classic (no keys) | 7 | 4 (SEQ Go, LAX TAP, MSP GoTo, Bilhete Unico) | 1 (Zaragoza) | 14 | — | 2 serial |
+| Classic (keys) | — | — | — | — | 8 | ~18 preview |
+| FeliCa | 4 | 1 (Octopus) | 0 | 2 | — | 7 Suica variants |
+| Ultralight | 4 | 1 (Compass) | 2 (Venezia UL, Andante) | 1 | — | 0 |
+| ISO7816 | 2 | 0 | 2 (Riga, Mexico City) | 12 | — | 8 |
+| CEPAS | 1 | 0 | 0 | 1 | — | 0 |
+| **Total** | **23** (15 real + 8 synthetic) | **8** | **5** | **36 easy** | **8 need keys** | **~40 low-pri** |
 
 † Synthetic dump — works for tests but a real Flipper/phone scan would provide more realistic data.
 \* Troika Classic has programmatic test data only (not a sample file).
