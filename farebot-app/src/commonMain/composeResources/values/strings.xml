@@ -48,6 +48,8 @@
     <string name="station_to">To</string>
     <string name="subscription_valid_format">Valid %1$s to %2$s</string>
     <string name="show_unsupported_cards">Show unsupported cards</string>
+    <string name="show_serial_only_cards">Show serial-only cards</string>
+    <string name="show_keys_required_cards">Show keys-required cards</string>
     <string name="tag_lost">Card Connection Lost</string>
     <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
     <string name="tap_your_card">Tap your card</string>

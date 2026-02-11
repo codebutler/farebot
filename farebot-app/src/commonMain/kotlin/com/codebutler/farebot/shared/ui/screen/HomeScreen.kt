@@ -63,6 +63,8 @@ import farebot.farebot_app.generated.resources.nfc_disabled
 import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
 import farebot.farebot_app.generated.resources.scan
+import farebot.farebot_app.generated.resources.show_keys_required_cards
+import farebot.farebot_app.generated.resources.show_serial_only_cards
 import farebot.farebot_app.generated.resources.show_unsupported_cards
 import farebot.farebot_app.generated.resources.tab_explore
 import farebot.farebot_app.generated.resources.tab_scan
@@ -98,10 +100,13 @@ fun HomeScreen(
     var menuExpanded by remember { mutableStateOf(false) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showUnsupported by rememberSaveable { mutableStateOf(false) }
+    var showSerialOnly by rememberSaveable { mutableStateOf(false) }
+    var showKeysRequired by rememberSaveable { mutableStateOf(false) }
 
     val hasUnsupportedCards = remember(supportedCards, supportedCardTypes) {
         supportedCards.any { it.cardType !in supportedCardTypes }
     }
+
 
     if (errorMessage != null) {
         AlertDialog(
@@ -222,6 +227,20 @@ fun HomeScreen(
                                     onClick = { showUnsupported = !showUnsupported; menuExpanded = false },
                                 )
                             }
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.show_serial_only_cards)) },
+                                leadingIcon = if (showSerialOnly) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = { showSerialOnly = !showSerialOnly; menuExpanded = false },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.show_keys_required_cards)) },
+                                leadingIcon = if (showKeysRequired) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = { showKeysRequired = !showKeysRequired; menuExpanded = false },
+                            )
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.keys)) },
@@ -325,6 +344,8 @@ fun HomeScreen(
                         deviceRegion = deviceRegion,
                         loadedKeyBundles = loadedKeyBundles,
                         showUnsupported = showUnsupported,
+                        showSerialOnly = showSerialOnly,
+                        showKeysRequired = showKeysRequired,
                         onKeysRequiredTap = onKeysRequiredTap,
                         mapMarkers = mapMarkers,
                         onSampleCardTap = onSampleCardTap,

@@ -64,6 +64,8 @@ fun ExploreContent(
     deviceRegion: String?,
     loadedKeyBundles: Set<String>,
     showUnsupported: Boolean,
+    showSerialOnly: Boolean = false,
+    showKeysRequired: Boolean = false,
     onKeysRequiredTap: () -> Unit,
     mapMarkers: List<CardsMapMarker> = emptyList(),
     onMapMarkerTap: ((String) -> Unit)? = null,
@@ -74,9 +76,12 @@ fun ExploreContent(
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val displayedCards = remember(supportedCards, supportedCardTypes, showUnsupported) {
-        if (showUnsupported) supportedCards
-        else supportedCards.filter { it.cardType in supportedCardTypes }
+    val displayedCards = remember(supportedCards, supportedCardTypes, loadedKeyBundles, showUnsupported, showSerialOnly, showKeysRequired) {
+        supportedCards.filter { card ->
+            (showUnsupported || card.cardType in supportedCardTypes) &&
+                (showSerialOnly || !card.serialOnly) &&
+                (showKeysRequired || !card.keysRequired || card.keyBundle in loadedKeyBundles)
+        }
     }
 
     // Pre-resolve card names for search
