@@ -1,6 +1,6 @@
 <resources>
   <string name="felica_process_admission_payment">Paiement de l’admission</string>
-  <string name="felica_process_admission_thirdparty">Frais d\'admission (entreprise tierce)</string>
+  <string name="felica_process_admission_thirdparty">Frais d&apos;admission (entreprise tierce)</string>
   <string name="felica_process_bonus_charge">Bonus de charge</string>
   <string name="felica_process_booth_deduction">Réduction de guichet</string>
   <string name="felica_process_booth_exit">Sortie du guichet principal de la station</string>
@@ -26,9 +26,9 @@
   <string name="felica_process_reissue">Ré-édition</string>
   <string name="felica_terminal_booth">Stand</string>
   <string name="felica_terminal_booth_green">Stand (Green)</string>
-  <string name="felica_terminal_connection_adjustment">Machine d\'ajustement de commutation</string>
+  <string name="felica_terminal_connection_adjustment">Machine d&apos;ajustement de commutation</string>
   <string name="felica_terminal_deposit_quick_charge">Machine de recharge rapide</string>
-  <string name="felica_terminal_fare_adjustment">Machine d\'ajustement de tarif</string>
+  <string name="felica_terminal_fare_adjustment">Machine d&apos;ajustement de tarif</string>
   <string name="felica_terminal_mobile_phone">Téléphone mobile</string>
   <string name="felica_terminal_portable">Terminal portable</string>
   <string name="felica_terminal_pos">Terminal point de vente</string>
@@ -37,7 +37,7 @@
   <string name="felica_terminal_ticket">Horodateur</string>
   <string name="felica_terminal_ticket_gate">Portique</string>
   <string name="felica_terminal_ticket_gate_terminal">Portique terminal</string>
-  <string name="felica_terminal_transfer_adjustment">Machine d\'ajustement de transfert</string>
+  <string name="felica_terminal_transfer_adjustment">Machine d&apos;ajustement de transfert</string>
   <string name="felica_terminal_tvm_etc">Horodateur, etc..</string>
   <string name="felica_terminal_tvm_tokyo_monorail">Horodateur du Tokyo Monorail</string>
   <string name="felica_terminal_vehicle">Terminal de véhicule (en bus)</string>

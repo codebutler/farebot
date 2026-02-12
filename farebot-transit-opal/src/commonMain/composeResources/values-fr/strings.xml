@@ -1,6 +1,6 @@
 <resources>
   <string name="opal_action_journey_completed_auto_off">Voyage terminé (défaut de sortie)</string>
-  <string name="opal_action_journey_completed_auto_on">Voyage terminé (défaut d\'entrée)</string>
+  <string name="opal_action_journey_completed_auto_on">Voyage terminé (défaut d&apos;entrée)</string>
   <string name="opal_action_journey_completed_distance">Voyage terminé (tarif de distance)</string>
   <string name="opal_action_journey_completed_flat_rate">Voyage terminé (tarif forfaitaire)</string>
   <string name="opal_action_manly_new_journey">Nouveau voyage (Manly Ferry)</string>
@@ -8,8 +8,8 @@
   <string name="opal_action_manly_transfer_same_mode">Transfer (d’un autre ferry vers Manly Ferry)</string>
   <string name="opal_action_new_journey">Nouveau voyage</string>
   <string name="opal_action_none">Aucun (carte neuve, non utilisée)</string>
-  <string name="opal_action_tap_on_reversal">Insérer dans l\'autre sens</string>
-  <string name="opal_action_transfer_diff_mode">Transfert (d\'un mode différent)</string>
+  <string name="opal_action_tap_on_reversal">Insérer dans l&apos;autre sens</string>
+  <string name="opal_action_transfer_diff_mode">Transfert (d&apos;un mode différent)</string>
   <string name="opal_action_transfer_same_mode">Transfert (depuis le même mode)</string>
   <string name="opal_automatic_top_up">Recharge automatique</string>
   <string name="opal_checksum">Somme de contrôle</string>

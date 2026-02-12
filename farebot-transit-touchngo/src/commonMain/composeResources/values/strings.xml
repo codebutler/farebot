@@ -1,5 +1,5 @@
 <resources>
-    <string name="touchngo_card_name">Touch \'n Go</string>
+    <string name="touchngo_card_name">Touch &apos;n Go</string>
     <string name="touchngo_location">Malaysia</string>
     <string name="touchngo_machine">Machine %s</string>
     <string name="touchngo_travel_pass">Travel Pass</string>
