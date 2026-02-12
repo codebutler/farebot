@@ -18,7 +18,7 @@ val sharedModule = module {
     single<Analytics> { NoOpAnalytics() }
 
     viewModel { HomeViewModel(getOrNull(), get(), get(), get(), get()) }
-    viewModel { CardViewModel(get(), get(), get(), get(), get()) }
+    viewModel { CardViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
     viewModel { KeysViewModel(get()) }
     viewModel { AddKeyViewModel(get(), getOrNull()) }

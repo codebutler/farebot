@@ -1,9 +1,12 @@
 package com.codebutler.farebot.shared.ui.screen
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -19,6 +22,7 @@ actual fun PlatformCardsMap(
     modifier: Modifier,
     onMarkerTap: ((String) -> Unit)?,
     focusMarkers: List<CardsMapMarker>,
+    topPadding: Dp,
 ) {
     if (markers.isEmpty()) return
 
@@ -48,6 +52,7 @@ actual fun PlatformCardsMap(
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
+        contentPadding = PaddingValues(top = topPadding),
     ) {
         markers.forEach { marker ->
             Marker(

@@ -46,6 +46,7 @@ import farebot.farebot_app.generated.resources.menu
 import farebot.farebot_app.generated.resources.advanced
 import farebot.farebot_app.generated.resources.balance
 import farebot.farebot_app.generated.resources.copy
+import farebot.farebot_app.generated.resources.delete
 import farebot.farebot_app.generated.resources.save
 import farebot.farebot_app.generated.resources.share
 import farebot.farebot_app.generated.resources.ic_transaction_banned_32dp
@@ -73,6 +74,7 @@ fun CardScreen(
     onNavigateToTripMap: (String) -> Unit,
     onExportShare: () -> Unit = {},
     onExportSave: () -> Unit = {},
+    onDelete: (() -> Unit)? = null,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -120,6 +122,15 @@ fun CardScreen(
                                     onClick = {
                                         menuExpanded = false
                                         onNavigateToAdvanced()
+                                    }
+                                )
+                            }
+                            if (onDelete != null) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.delete)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onDelete()
                                     }
                                 )
                             }

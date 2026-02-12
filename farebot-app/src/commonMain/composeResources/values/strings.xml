@@ -35,6 +35,7 @@
     <string name="n_selected">%1$d selected</string>
     <string name="nfc">NFC</string>
     <string name="nfc_disabled">NFC is disabled</string>
+    <string name="nfc_listening">Ready to scan — hold your card to the device</string>
     <string name="nfc_settings">NFC Settings</string>
     <string name="nfc_unavailable">NFC Unavailable</string>
     <string name="no_keys">No keys added yet.</string>

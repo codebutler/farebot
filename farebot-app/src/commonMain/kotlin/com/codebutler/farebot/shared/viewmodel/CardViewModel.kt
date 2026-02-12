@@ -8,8 +8,10 @@ import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.base.util.formatTime
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.shared.core.NavDataHolder
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
@@ -33,6 +35,7 @@ class CardViewModel(
     private val stringResource: StringResource,
     private val analytics: Analytics,
     private val cardSerializer: CardSerializer,
+    private val cardPersister: CardPersister,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CardUiState())
@@ -115,6 +118,13 @@ class CardViewModel(
     fun exportCard(): String? {
         val rawCard = currentRawCard ?: return null
         return cardSerializer.serialize(rawCard)
+    }
+
+    fun deleteCard() {
+        val rawCard = currentRawCard ?: return
+        val serial = rawCard.tagId().hex()
+        val savedCard = cardPersister.getCards().find { it.serial == serial } ?: return
+        cardPersister.deleteCard(savedCard)
     }
 
     fun getTripKey(tripItem: TransactionItem.TripItem): String? {

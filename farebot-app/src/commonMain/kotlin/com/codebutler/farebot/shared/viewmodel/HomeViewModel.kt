@@ -43,6 +43,7 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(
         HomeUiState(
             nfcStatus = if (cardScanner != null) NfcStatus.AVAILABLE else NfcStatus.UNAVAILABLE,
+            requiresActiveScan = cardScanner?.requiresActiveScan ?: true,
         )
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()

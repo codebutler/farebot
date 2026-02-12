@@ -3,6 +3,8 @@ package com.codebutler.farebot.shared.ui.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreLocation.CLLocationCoordinate2DMake
@@ -10,6 +12,7 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
 import platform.MapKit.MKPinAnnotationView
 import platform.MapKit.MKPointAnnotation
+import platform.UIKit.UIEdgeInsetsMake
 import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
@@ -19,6 +22,7 @@ actual fun PlatformCardsMap(
     modifier: Modifier,
     onMarkerTap: ((String) -> Unit)?,
     focusMarkers: List<CardsMapMarker>,
+    topPadding: Dp,
 ) {
     if (markers.isEmpty()) return
 
@@ -35,15 +39,19 @@ actual fun PlatformCardsMap(
         }
     }
 
+    val topInset = topPadding.value.toDouble()
+
     UIKitView(
         factory = {
             MKMapView().apply {
+                layoutMargins = UIEdgeInsetsMake(topInset, 0.0, 0.0, 0.0)
                 addAnnotations(annotations)
                 showAnnotations(annotations, animated = false)
                 this.delegate = delegate
             }
         },
         update = { mapView ->
+            mapView.layoutMargins = UIEdgeInsetsMake(topInset, 0.0, 0.0, 0.0)
             if (focusMarkers.isNotEmpty()) {
                 val focusNames = focusMarkers.map { it.name }.toSet()
                 val focusAnnotations = annotations.filter { it.title in focusNames }

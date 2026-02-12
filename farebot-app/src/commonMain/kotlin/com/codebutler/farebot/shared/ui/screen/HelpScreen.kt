@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -70,6 +71,7 @@ fun ExploreContent(
     mapMarkers: List<CardsMapMarker> = emptyList(),
     onMapMarkerTap: ((String) -> Unit)? = null,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
+    topBarHeight: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -174,9 +176,10 @@ fun ExploreContent(
                         }
                     }
                 },
+                topPadding = topBarHeight,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(200.dp + topBarHeight),
             )
         }
 
@@ -244,8 +247,7 @@ private fun CardInfoItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .let { mod ->
-                val callback = onSampleCardTap
-                if (hasSample && callback != null) mod.clickable { callback(card) } else mod
+                if (hasSample) mod.clickable { onSampleCardTap?.invoke(card) } else mod
             },
     ) {
         Column(

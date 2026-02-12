@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -60,6 +61,7 @@ import farebot.farebot_app.generated.resources.keys
 import farebot.farebot_app.generated.resources.menu
 import farebot.farebot_app.generated.resources.n_selected
 import farebot.farebot_app.generated.resources.nfc_disabled
+import farebot.farebot_app.generated.resources.nfc_listening
 import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
 import farebot.farebot_app.generated.resources.scan
@@ -81,7 +83,6 @@ fun HomeScreen(
     historyUiState: HistoryUiState,
     onNavigateToCard: (String) -> Unit,
     onImportFile: () -> Unit,
-    onDeleteItem: (String) -> Unit,
     onToggleSelection: (String) -> Unit,
     onClearSelection: () -> Unit,
     onDeleteSelected: () -> Unit,
@@ -161,6 +162,7 @@ fun HomeScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             if (selectedTab == 0 && historyUiState.isSelectionMode) {
                 // Scan tab — selection mode
@@ -210,9 +212,12 @@ fun HomeScreen(
                     }
                 )
             } else {
-                // Explore tab
+                // Explore tab — translucent so the map shows through
                 TopAppBar(
                     title = { Text(stringResource(Res.string.app_name)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                    ),
                     actions = {
                         IconButton(onClick = { menuExpanded = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
@@ -273,7 +278,7 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            if (selectedTab == 0 && homeUiState.nfcStatus != NfcStatus.UNAVAILABLE) {
+            if (selectedTab == 0 && homeUiState.requiresActiveScan && homeUiState.nfcStatus != NfcStatus.UNAVAILABLE) {
                 ExtendedFloatingActionButton(
                     onClick = {
                         if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
@@ -298,13 +303,18 @@ fun HomeScreen(
             }
         },
     ) { padding ->
+        // On the Explore tab, skip top padding so the map extends behind the translucent top bar
+        val isExploreTab = selectedTab == 1
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(
+                    top = if (isExploreTab) 0.dp else padding.calculateTopPadding(),
+                    bottom = padding.calculateBottomPadding(),
+                )
         ) {
-            // NFC disabled banner
-            if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
+            // NFC disabled banner (scan tab only)
+            if (selectedTab == 0 && homeUiState.nfcStatus == NfcStatus.DISABLED) {
                 Surface(
                     color = MaterialTheme.colorScheme.errorContainer,
                     modifier = Modifier.fillMaxWidth()
@@ -329,13 +339,39 @@ fun HomeScreen(
                 }
             }
 
+            // NFC listening banner (Android passive scanning, scan tab only)
+            if (selectedTab == 0 && !homeUiState.requiresActiveScan && homeUiState.nfcStatus == NfcStatus.AVAILABLE) {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Nfc,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = stringResource(Res.string.nfc_listening),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    }
+                }
+            }
+
             // Tab content
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTab) {
                     0 -> HistoryContent(
                         uiState = historyUiState,
                         onNavigateToCard = onNavigateToCard,
-                        onDeleteItem = onDeleteItem,
                         onToggleSelection = onToggleSelection,
                     )
                     1 -> ExploreContent(
@@ -349,6 +385,7 @@ fun HomeScreen(
                         onKeysRequiredTap = onKeysRequiredTap,
                         mapMarkers = mapMarkers,
                         onSampleCardTap = onSampleCardTap,
+                        topBarHeight = padding.calculateTopPadding(),
                     )
                 }
             }

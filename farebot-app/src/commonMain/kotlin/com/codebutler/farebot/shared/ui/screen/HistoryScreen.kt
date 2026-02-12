@@ -12,13 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import farebot.farebot_app.generated.resources.Res
-import farebot.farebot_app.generated.resources.delete
 import farebot.farebot_app.generated.resources.no_scanned_cards
 import farebot.farebot_app.generated.resources.unknown_card
 import org.jetbrains.compose.resources.stringResource
@@ -36,7 +31,6 @@ import org.jetbrains.compose.resources.stringResource
 fun HistoryContent(
     uiState: HistoryUiState,
     onNavigateToCard: (String) -> Unit,
-    onDeleteItem: (String) -> Unit,
     onToggleSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -107,16 +101,6 @@ fun HistoryContent(
                                         text = item.parseError,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            }
-                            if (!uiState.isSelectionMode) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                IconButton(onClick = { onDeleteItem(item.id) }) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = stringResource(Res.string.delete),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }

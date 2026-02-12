@@ -36,6 +36,8 @@ class AndroidCardScanner(
     private val json: Json,
 ) : CardScanner {
 
+    override val requiresActiveScan: Boolean get() = false
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _scannedCards = MutableSharedFlow<RawCard<*>>()

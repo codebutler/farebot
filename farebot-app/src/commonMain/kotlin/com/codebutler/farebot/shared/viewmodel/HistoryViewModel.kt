@@ -135,16 +135,6 @@ class HistoryViewModel(
         }
     }
 
-    fun deleteItem(itemId: String) {
-        val savedCard = savedCardMap[itemId] ?: return
-        viewModelScope.launch {
-            cardPersister.deleteCard(savedCard)
-            rawCardMap.remove(itemId)
-            savedCardMap.remove(itemId)
-            loadCards()
-        }
-    }
-
     fun getCardNavKey(itemId: String): String? {
         val rawCard = rawCardMap[itemId] ?: return null
         return navDataHolder.put(rawCard)

@@ -68,6 +68,8 @@ import platform.darwin.dispatch_semaphore_wait
 @OptIn(ExperimentalForeignApi::class)
 class IosNfcScanner : CardScanner {
 
+    override val requiresActiveScan: Boolean get() = true
+
     private var session: NFCTagReaderSession? = null
     private var delegate: ScanDelegate? = null
     private val nfcQueue: dispatch_queue_t = dispatch_queue_create("com.codebutler.farebot.nfc", null)

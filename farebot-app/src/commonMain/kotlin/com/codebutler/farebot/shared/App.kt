@@ -104,13 +104,14 @@ fun FareBotApp(
             }
         }
 
+        val historyViewModel = koinViewModel<HistoryViewModel>()
+
         NavHost(navController = navController, startDestination = Screen.Home.route) {
             composable(Screen.Home.route) {
                 val homeViewModel = koinViewModel<HomeViewModel>()
                 val homeUiState by homeViewModel.uiState.collectAsState()
                 val errorMessage by homeViewModel.errorMessage.collectAsState()
 
-                val historyViewModel = koinViewModel<HistoryViewModel>()
                 val historyUiState by historyViewModel.uiState.collectAsState()
 
                 LaunchedEffect(Unit) {
@@ -157,7 +158,6 @@ fun FareBotApp(
                             }
                         }
                     },
-                    onDeleteItem = { itemId -> historyViewModel.deleteItem(itemId) },
                     onToggleSelection = { itemId -> historyViewModel.toggleSelection(itemId) },
                     onClearSelection = { historyViewModel.clearSelection() },
                     onDeleteSelected = { historyViewModel.deleteSelected() },
@@ -312,6 +312,11 @@ fun FareBotApp(
                         if (json != null) {
                             platformActions.saveFileForExport(json, "farebot-card.json")
                         }
+                    },
+                    onDelete = {
+                        viewModel.deleteCard()
+                        historyViewModel.loadCards()
+                        navController.popBackStack()
                     },
                 )
             }

@@ -47,6 +47,9 @@ data class ScannedTag(val id: ByteArray, val techList: List<String>) {
  */
 interface CardScanner {
 
+    /** Whether this platform requires user-initiated scanning (e.g., iOS Core NFC). */
+    val requiresActiveScan: Boolean get() = true
+
     /** Flow of raw tag detections before card reading. */
     val scannedTags: SharedFlow<ScannedTag>
         get() = MutableSharedFlow() // default empty
