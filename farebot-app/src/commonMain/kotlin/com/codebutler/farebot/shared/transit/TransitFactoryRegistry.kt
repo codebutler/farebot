@@ -24,7 +24,7 @@ package com.codebutler.farebot.shared.transit
 
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.transit.CardInfoRegistry
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -33,22 +33,15 @@ class TransitFactoryRegistry {
 
     private val registry = mutableMapOf<CardType, MutableList<TransitFactory<Card, TransitInfo>>>()
 
-    /**
-     * All registered factories across all card types.
-     */
-    val allFactories: List<TransitFactory<Card, TransitInfo>>
-        get() = registry.values.flatten()
-
-    /**
-     * Creates a CardInfoRegistry from all registered factories.
-     *
-     * This can be used to populate the "Supported Cards" screen.
-     */
-    fun createCardInfoRegistry(): CardInfoRegistry = CardInfoRegistry(allFactories)
+    val allCards: List<CardInfo>
+        get() = registry.values.flatten().flatMap { it.allCards }
 
     fun parseTransitIdentity(card: Card): TransitIdentity? = findFactory(card)?.parseIdentity(card)
 
     fun parseTransitInfo(card: Card): TransitInfo? = findFactory(card)?.parseInfo(card)
+
+    fun findBrandColor(card: Card): Int? =
+        findFactory(card)?.allCards?.firstOrNull()?.brandColor
 
     @Suppress("UNCHECKED_CAST")
     fun registerFactory(cardType: CardType, factory: TransitFactory<*, *>) {

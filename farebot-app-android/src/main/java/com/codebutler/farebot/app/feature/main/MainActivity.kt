@@ -46,7 +46,6 @@ import com.codebutler.farebot.shared.FareBotApp
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.platform.initDeviceRegion
-import com.codebutler.farebot.shared.ui.screen.ALL_SUPPORTED_CARDS
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -61,7 +60,6 @@ class MainActivity : ComponentActivity() {
                 arrayOf(MifareUltralight::class.java.name),
                 arrayOf(NfcF::class.java.name))
 
-        private val SUPPORTED_CARDS = ALL_SUPPORTED_CARDS
     }
 
     private val nfcStream: NfcStream by inject()
@@ -109,7 +107,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             FareBotApp(
                 platformActions = platformActions,
-                supportedCards = SUPPORTED_CARDS,
                 supportedCardTypes = supportedCardTypes,
             )
         }
