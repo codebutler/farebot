@@ -25,7 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.MobileOff
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -35,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -48,6 +51,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -61,6 +66,7 @@ import farebot.farebot_app.generated.resources.card_experimental
 import farebot.farebot_app.generated.resources.legend_keys_required
 import farebot.farebot_app.generated.resources.legend_serial_only
 import farebot.farebot_app.generated.resources.legend_experimental
+import farebot.farebot_app.generated.resources.credits
 import farebot.farebot_app.generated.resources.legend_unsupported
 import farebot.farebot_app.generated.resources.view_sample
 import kotlinx.coroutines.launch
@@ -251,13 +257,13 @@ fun ExploreContent(
         // Legend bar
         if (showUnsupported || showKeysRequired || showSerialOnly || showExperimental) {
             HorizontalDivider()
-            Row(
+            FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (showUnsupported) {
                     LegendEntry(
@@ -471,46 +477,99 @@ private fun CardDetailSheet(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        // Status chips (card type + status indicators)
+        Spacer(Modifier.height(8.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // Card type chip (always shown)
+            NonInteractiveChip {
+                SuggestionChip(
+                    onClick = {},
+                    label = { Text(card.cardType.toString()) },
+                    icon = { Icon(Icons.Default.Nfc, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                )
+            }
+
+            if (!isSupported) {
+                NonInteractiveChip {
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(stringResource(Res.string.legend_unsupported)) },
+                        icon = { Icon(Icons.Default.MobileOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    )
+                }
+            }
+            if (isKeysRequired) {
+                NonInteractiveChip {
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(stringResource(Res.string.legend_keys_required)) },
+                        icon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    )
+                }
+            }
+            if (card.serialOnly) {
+                NonInteractiveChip {
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(stringResource(Res.string.legend_serial_only)) },
+                        icon = { Icon(Icons.Default.VisibilityOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    )
+                }
+            }
+            if (card.preview) {
+                NonInteractiveChip {
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(stringResource(Res.string.card_experimental)) },
+                        icon = { Icon(Icons.Default.Science, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    )
+                }
+            }
+        }
+
         // Extra note
         val extraNoteRes = card.extraNoteRes
         if (extraNoteRes != null) {
-            Text(
-                text = stringResource(extraNoteRes),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        // Experimental label
-        if (card.preview) {
-            Text(
-                text = stringResource(Res.string.card_experimental),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        // Status chips
-        val chips = buildList {
-            if (!isSupported) add(Icons.Default.MobileOff to stringResource(Res.string.legend_unsupported))
-            if (isKeysRequired) add(Icons.Default.Lock to stringResource(Res.string.legend_keys_required))
-            if (card.serialOnly) add(Icons.Default.VisibilityOff to stringResource(Res.string.legend_serial_only))
-            if (card.preview) add(Icons.Default.Science to stringResource(Res.string.card_experimental))
-        }
-        if (chips.isNotEmpty()) {
-            Spacer(Modifier.height(8.dp))
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Spacer(Modifier.height(12.dp))
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(12.dp),
             ) {
-                for ((icon, label) in chips) {
-                    SuggestionChip(
-                        onClick = {},
-                        label = { Text(label) },
-                        icon = {
-                            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
-                        },
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = stringResource(extraNoteRes),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
+        }
+
+        // Credits
+        if (card.credits.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(Res.string.credits),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            for (name in card.credits) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
 
@@ -532,5 +591,21 @@ private fun CardDetailSheet(
         }
 
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun NonInteractiveChip(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    event.changes.forEach { it.consume() }
+                }
+            }
+        },
+    ) {
+        content()
     }
 }
