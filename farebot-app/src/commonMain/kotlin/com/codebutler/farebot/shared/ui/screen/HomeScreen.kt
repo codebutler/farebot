@@ -1,5 +1,6 @@
 package com.codebutler.farebot.shared.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +9,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -16,7 +20,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,6 +36,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,12 +50,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import farebot.farebot_app.generated.resources.search_supported_cards
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NfcStatus
 import com.codebutler.farebot.shared.viewmodel.ScanError
 import com.codebutler.farebot.transit.CardInfo
 import farebot.farebot_app.generated.resources.Res
+import farebot.farebot_app.generated.resources.ic_cards_stack
+import farebot.farebot_app.generated.resources.ic_launcher
 import farebot.farebot_app.generated.resources.about
 import farebot.farebot_app.generated.resources.add_key
 import farebot.farebot_app.generated.resources.app_name
@@ -65,12 +79,15 @@ import farebot.farebot_app.generated.resources.nfc_listening
 import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
 import farebot.farebot_app.generated.resources.scan
+import farebot.farebot_app.generated.resources.show_all_scans
 import farebot.farebot_app.generated.resources.show_keys_required_cards
 import farebot.farebot_app.generated.resources.show_serial_only_cards
 import farebot.farebot_app.generated.resources.show_unsupported_cards
 import farebot.farebot_app.generated.resources.tab_explore
 import farebot.farebot_app.generated.resources.tab_scan
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,13 +113,23 @@ fun HomeScreen(
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: () -> Unit,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
+    onToggleShowAllScans: () -> Unit = {},
 ) {
+    val appPreferences = koinInject<AppPreferences>()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var menuExpanded by remember { mutableStateOf(false) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
-    var showUnsupported by rememberSaveable { mutableStateOf(false) }
-    var showSerialOnly by rememberSaveable { mutableStateOf(false) }
-    var showKeysRequired by rememberSaveable { mutableStateOf(false) }
+    var showUnsupported by rememberSaveable {
+        mutableStateOf(appPreferences.getBoolean(AppPreferences.KEY_SHOW_UNSUPPORTED, false))
+    }
+    var showSerialOnly by rememberSaveable {
+        mutableStateOf(appPreferences.getBoolean(AppPreferences.KEY_SHOW_SERIAL_ONLY, false))
+    }
+    var showKeysRequired by rememberSaveable {
+        mutableStateOf(appPreferences.getBoolean(AppPreferences.KEY_SHOW_KEYS_REQUIRED, false))
+    }
+    var exploreSearchQuery by rememberSaveable { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     val hasUnsupportedCards = remember(supportedCards, supportedCardTypes) {
         supportedCards.any { it.cardType !in supportedCardTypes }
@@ -188,7 +215,19 @@ fun HomeScreen(
             } else if (selectedTab == 0) {
                 // Scan tab — normal mode
                 TopAppBar(
-                    title = { Text(stringResource(Res.string.app_name)) },
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = painterResource(Res.drawable.ic_launcher),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(RoundedCornerShape(6.dp)),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(Res.string.app_name))
+                        }
+                    },
                     actions = {
                         IconButton(onClick = { menuExpanded = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
@@ -197,6 +236,13 @@ fun HomeScreen(
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.import_file)) },
                                 onClick = { menuExpanded = false; onImportFile() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.show_all_scans)) },
+                                trailingIcon = if (historyUiState.showAllScans) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = { onToggleShowAllScans(); menuExpanded = false },
                             )
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
@@ -212,9 +258,24 @@ fun HomeScreen(
                     }
                 )
             } else {
-                // Explore tab — translucent so the map shows through
+                // Explore tab — search bar in place of title
                 TopAppBar(
-                    title = { Text(stringResource(Res.string.app_name)) },
+                    title = {
+                        TextField(
+                            value = exploreSearchQuery,
+                            onValueChange = { exploreSearchQuery = it },
+                            placeholder = { Text(stringResource(Res.string.search_supported_cards)) },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            singleLine = true,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
                     ),
@@ -226,25 +287,37 @@ fun HomeScreen(
                             if (hasUnsupportedCards) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.show_unsupported_cards)) },
-                                    leadingIcon = if (showUnsupported) {
+                                    trailingIcon = if (showUnsupported) {
                                         { Icon(Icons.Default.Check, contentDescription = null) }
                                     } else null,
-                                    onClick = { showUnsupported = !showUnsupported; menuExpanded = false },
+                                    onClick = {
+                                    showUnsupported = !showUnsupported
+                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_UNSUPPORTED, showUnsupported)
+                                    menuExpanded = false
+                                },
                                 )
                             }
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.show_serial_only_cards)) },
-                                leadingIcon = if (showSerialOnly) {
+                                trailingIcon = if (showSerialOnly) {
                                     { Icon(Icons.Default.Check, contentDescription = null) }
                                 } else null,
-                                onClick = { showSerialOnly = !showSerialOnly; menuExpanded = false },
+                                onClick = {
+                                    showSerialOnly = !showSerialOnly
+                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_SERIAL_ONLY, showSerialOnly)
+                                    menuExpanded = false
+                                },
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.show_keys_required_cards)) },
-                                leadingIcon = if (showKeysRequired) {
+                                trailingIcon = if (showKeysRequired) {
                                     { Icon(Icons.Default.Check, contentDescription = null) }
                                 } else null,
-                                onClick = { showKeysRequired = !showKeysRequired; menuExpanded = false },
+                                onClick = {
+                                    showKeysRequired = !showKeysRequired
+                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_KEYS_REQUIRED, showKeysRequired)
+                                    menuExpanded = false
+                                },
                             )
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
@@ -266,7 +339,7 @@ fun HomeScreen(
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.Default.Receipt, contentDescription = null) },
+                    icon = { Icon(painterResource(Res.drawable.ic_cards_stack), contentDescription = null) },
                     label = { Text(stringResource(Res.string.tab_scan)) },
                 )
                 NavigationBarItem(
@@ -366,8 +439,15 @@ fun HomeScreen(
                 }
             }
 
-            // Tab content
-            Box(modifier = Modifier.fillMaxSize()) {
+            // Tab content — dismiss keyboard on any touch
+            Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitPointerEvent(PointerEventPass.Initial)
+                        focusManager.clearFocus()
+                    }
+                }
+            }) {
                 when (selectedTab) {
                     0 -> HistoryContent(
                         uiState = historyUiState,
@@ -385,6 +465,7 @@ fun HomeScreen(
                         onKeysRequiredTap = onKeysRequiredTap,
                         mapMarkers = mapMarkers,
                         onSampleCardTap = onSampleCardTap,
+                        searchQuery = exploreSearchQuery,
                         topBarHeight = padding.calculateTopPadding(),
                     )
                 }

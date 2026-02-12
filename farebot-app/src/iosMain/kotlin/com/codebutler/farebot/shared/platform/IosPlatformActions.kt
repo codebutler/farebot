@@ -126,12 +126,14 @@ class IosPlatformActions : PlatformActions {
     }
 
     private fun getTopViewController(): UIViewController? {
-        // Use scene-based API (UIApplication.windows is deprecated on iOS 15+)
-        val keyWindow = UIApplication.sharedApplication.connectedScenes
+        // Use scene-based API (UIApplication.windows is deprecated on iOS 15+).
+        // Don't filter by isKeyWindow — in SwiftUI scene-based apps it may not be set.
+        val window = UIApplication.sharedApplication.connectedScenes
             .filterIsInstance<UIWindowScene>()
-            .flatMap { it.windows.filterIsInstance<UIWindow>() }
-            .firstOrNull { it.isKeyWindow() }
-        var topVC = keyWindow?.rootViewController
+            .firstNotNullOfOrNull { scene ->
+                scene.windows.filterIsInstance<UIWindow>().firstOrNull()
+            }
+        var topVC = window?.rootViewController
         while (topVC?.presentedViewController != null) {
             topVC = topVC.presentedViewController
         }
