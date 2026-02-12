@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -25,9 +26,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ElevatedCard
 import com.codebutler.farebot.transit.Trip
@@ -45,9 +50,11 @@ import farebot.farebot_app.generated.resources.back
 import farebot.farebot_app.generated.resources.menu
 import farebot.farebot_app.generated.resources.advanced
 import farebot.farebot_app.generated.resources.balance
-import farebot.farebot_app.generated.resources.copy
+import farebot.farebot_app.generated.resources.current_scan
 import farebot.farebot_app.generated.resources.delete
+import farebot.farebot_app.generated.resources.n_scans
 import farebot.farebot_app.generated.resources.save
+import farebot.farebot_app.generated.resources.scan_history
 import farebot.farebot_app.generated.resources.share
 import farebot.farebot_app.generated.resources.ic_transaction_banned_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_bus_32dp
@@ -75,6 +82,8 @@ fun CardScreen(
     onExportShare: () -> Unit = {},
     onExportSave: () -> Unit = {},
     onDelete: (() -> Unit)? = null,
+    onShowScanHistory: () -> Unit = {},
+    onNavigateToScan: (String) -> Unit = {},
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -101,6 +110,24 @@ fun CardScreen(
                     }
                 },
                 actions = {
+                    if (uiState.currentScanLabel != null) {
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = RoundedCornerShape(12.dp),
+                                )
+                                .clickable(onClick = onShowScanHistory)
+                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                        ) {
+                            Text(
+                                text = uiState.currentScanLabel,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
+                        }
+                    }
                     if (!uiState.isSample || uiState.hasAdvancedData) {
                         IconButton(onClick = { menuExpanded = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
@@ -237,6 +264,58 @@ fun CardScreen(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    // Scan history bottom sheet
+    if (uiState.showScanHistory && uiState.scanHistory.isNotEmpty()) {
+        ModalBottomSheet(
+            onDismissRequest = onShowScanHistory,
+            sheetState = rememberModalBottomSheetState(),
+        ) {
+            Column(modifier = Modifier.padding(bottom = 24.dp)) {
+                Text(
+                    text = stringResource(Res.string.scan_history),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+                for (entry in uiState.scanHistory) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .let { mod ->
+                                if (!entry.isCurrent) {
+                                    mod.clickable { onNavigateToScan(entry.savedCardId) }
+                                } else mod
+                            }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = entry.scannedDate,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            if (entry.scannedTime.isNotEmpty()) {
+                                Text(
+                                    text = entry.scannedTime,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        if (entry.isCurrent) {
+                            Text(
+                                text = stringResource(Res.string.current_scan),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                    HorizontalDivider()
                 }
             }
         }

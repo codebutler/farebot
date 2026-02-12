@@ -14,6 +14,17 @@ data class CardUiState(
     val error: String? = null,
     val hasAdvancedData: Boolean = false,
     val isSample: Boolean = false,
+    val scanCount: Int = 1,
+    val currentScanLabel: String? = null,
+    val scanHistory: List<ScanHistoryEntry> = emptyList(),
+    val showScanHistory: Boolean = false,
+)
+
+data class ScanHistoryEntry(
+    val savedCardId: String,
+    val scannedDate: String,
+    val scannedTime: String,
+    val isCurrent: Boolean,
 )
 
 data class BalanceItem(

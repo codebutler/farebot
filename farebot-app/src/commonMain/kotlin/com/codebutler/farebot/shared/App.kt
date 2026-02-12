@@ -1,5 +1,7 @@
 package com.codebutler.farebot.shared
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,6 +39,7 @@ import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
 import com.codebutler.farebot.shared.ui.screen.CardScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
+import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapUiState
@@ -62,14 +65,15 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FareBotApp(
     platformActions: PlatformActions,
-    supportedCards: List<CardInfo> = emptyList(),
-    supportedCardTypes: Set<CardType> = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.CEPAS),
+    supportedCardTypes: Set<CardType> = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.Vicinity),
     loadedKeyBundles: Set<String> = emptySet(),
 ) {
     FareBotTheme {
         val navController = rememberNavController()
         val navDataHolder = koinInject<NavDataHolder>()
         val stringResource = koinInject<StringResource>()
+        val transitFactoryRegistry = koinInject<TransitFactoryRegistry>()
+        val supportedCards = remember { transitFactoryRegistry.allCards }
         val cardImporter = koinInject<CardImporter>()
         val cardPersister = koinInject<CardPersister>()
         val cardSerializer = koinInject<CardSerializer>()
@@ -146,7 +150,9 @@ fun FareBotApp(
                     onNavigateToCard = { itemId ->
                         val cardKey = historyViewModel.getCardNavKey(itemId)
                         if (cardKey != null) {
-                            navController.navigate(Screen.Card.createRoute(cardKey))
+                            val scanIds = historyViewModel.getCardScanIds(itemId)
+                            val scanIdsKey = if (scanIds.size > 1) navDataHolder.put(scanIds) else null
+                            navController.navigate(Screen.Card.createRoute(cardKey, scanIdsKey, itemId))
                         }
                     },
                     onImportFile = {
@@ -210,6 +216,7 @@ fun FareBotApp(
                     } else null,
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = { platformActions.openNfcSettings() },
+                    onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
                     onSampleCardTap = { cardInfo ->
                         val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
                         scope.launch {
@@ -304,14 +311,28 @@ fun FareBotApp(
 
             composable(
                 route = Screen.Card.route,
-                arguments = listOf(navArgument("cardKey") { type = NavType.StringType })
+                arguments = listOf(
+                    navArgument("cardKey") { type = NavType.StringType },
+                    navArgument("scanIdsKey") { type = NavType.StringType; nullable = true; defaultValue = null },
+                    navArgument("currentScanId") { type = NavType.StringType; nullable = true; defaultValue = null },
+                ),
+                enterTransition = {
+                    if (initialState.destination.route == Screen.Card.route) fadeIn() else null
+                },
+                exitTransition = {
+                    if (targetState.destination.route == Screen.Card.route) fadeOut() else null
+                },
             ) { backStackEntry ->
                 val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
+                val scanIdsKey = backStackEntry.arguments?.read { getStringOrNull("scanIdsKey") }
+                val currentScanId = backStackEntry.arguments?.read { getStringOrNull("currentScanId") }
+                @Suppress("UNCHECKED_CAST")
+                val scanIds = scanIdsKey?.let { navDataHolder.get<List<String>>(it) } ?: emptyList()
                 val viewModel = koinViewModel<CardViewModel>()
                 val uiState by viewModel.uiState.collectAsState()
 
                 LaunchedEffect(cardKey) {
-                    viewModel.loadCard(cardKey)
+                    viewModel.loadCard(cardKey, scanIds, currentScanId)
                 }
 
                 CardScreen(
@@ -342,6 +363,18 @@ fun FareBotApp(
                         viewModel.deleteCard()
                         historyViewModel.loadCards()
                         navController.popBackStack()
+                    },
+                    onShowScanHistory = {
+                        viewModel.toggleScanHistory()
+                    },
+                    onNavigateToScan = { savedCardId ->
+                        val navKey = viewModel.navigateToScan(savedCardId)
+                        if (navKey != null) {
+                            val route = Screen.Card.createRoute(navKey, scanIdsKey, savedCardId)
+                            navController.navigate(route) {
+                                popUpTo(Screen.Card.route) { inclusive = true }
+                            }
+                        }
                     },
                 )
             }

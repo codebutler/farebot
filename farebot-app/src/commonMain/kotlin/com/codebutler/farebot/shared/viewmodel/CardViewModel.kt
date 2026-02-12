@@ -3,11 +3,12 @@ package com.codebutler.farebot.shared.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.base.ui.HeaderListItem
-import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
+import com.codebutler.farebot.base.util.formatHumanDate
 import com.codebutler.farebot.base.util.formatTime
+import com.codebutler.farebot.base.util.formatTimeShort
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
@@ -18,6 +19,7 @@ import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.screen.BalanceItem
 import com.codebutler.farebot.shared.ui.screen.CardUiState
 import com.codebutler.farebot.shared.ui.screen.InfoItem
+import com.codebutler.farebot.shared.ui.screen.ScanHistoryEntry
 import com.codebutler.farebot.shared.ui.screen.TransactionItem
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
@@ -44,8 +46,12 @@ class CardViewModel(
     // Store parsed data for advanced screen navigation
     private var parsedCardKey: String? = null
     private var currentRawCard: RawCard<*>? = null
+    private var currentScanIds: List<String> = emptyList()
+    private var currentCardId: String? = null
 
-    fun loadCard(cardKey: String) {
+    fun loadCard(cardKey: String, scanIds: List<String> = emptyList(), currentScanId: String? = null) {
+        currentScanIds = scanIds
+        currentCardId = currentScanId ?: scanIds.firstOrNull()
         loadCardInternal(cardKey, isSample = false, sampleTitle = null)
     }
 
@@ -61,6 +67,14 @@ class CardViewModel(
             try {
                 val card = rawCard.parse()
                 val transitInfo = transitFactoryRegistry.parseTransitInfo(card)
+
+                // Build scan history entries
+                val scanHistory = buildScanHistory()
+                val currentScan = scanHistory.firstOrNull { it.isCurrent }
+                val currentScanLabel = if (scanHistory.size > 1 && currentScan != null) {
+                    listOfNotNull(currentScan.scannedDate, currentScan.scannedTime.ifEmpty { null })
+                        .joinToString(" ")
+                } else null
 
                 if (transitInfo != null) {
                     if (!isSample) {
@@ -85,6 +99,9 @@ class CardViewModel(
                         warning = transitInfo.warning,
                         hasAdvancedData = true,
                         isSample = isSample,
+                        scanCount = currentScanIds.size.coerceAtLeast(1),
+                        currentScanLabel = currentScanLabel,
+                        scanHistory = scanHistory,
                     )
                 } else {
                     val tagIdHex = card.tagId.joinToString("") {
@@ -102,6 +119,9 @@ class CardViewModel(
                         balances = createBalanceItems(unknownInfo),
                         hasAdvancedData = true,
                         isSample = isSample,
+                        scanCount = currentScanIds.size.coerceAtLeast(1),
+                        currentScanLabel = currentScanLabel,
+                        scanHistory = scanHistory,
                     )
                 }
             } catch (ex: Exception) {
@@ -111,6 +131,40 @@ class CardViewModel(
                 )
             }
         }
+    }
+
+    private fun buildScanHistory(): List<ScanHistoryEntry> {
+        if (currentScanIds.size <= 1) return emptyList()
+        return currentScanIds.mapIndexed { index, scanId ->
+            val savedCard = cardPersister.getCard(scanId.toLongOrNull() ?: return@mapIndexed null)
+            if (savedCard == null) return@mapIndexed null
+            val scannedDate = try {
+                formatHumanDate(savedCard.scannedAt)
+            } catch (_: Exception) {
+                "?"
+            }
+            val scannedTime = try {
+                formatTimeShort(savedCard.scannedAt)
+            } catch (_: Exception) {
+                ""
+            }
+            ScanHistoryEntry(
+                savedCardId = scanId,
+                scannedDate = scannedDate,
+                scannedTime = scannedTime,
+                isCurrent = scanId == currentCardId,
+            )
+        }.filterNotNull()
+    }
+
+    fun toggleScanHistory() {
+        _uiState.value = _uiState.value.copy(showScanHistory = !_uiState.value.showScanHistory)
+    }
+
+    fun navigateToScan(savedCardId: String): String? {
+        val savedCard = cardPersister.getCard(savedCardId.toLongOrNull() ?: return null) ?: return null
+        val rawCard = cardSerializer.deserialize(savedCard.data)
+        return navDataHolder.put(rawCard)
     }
 
     fun getAdvancedCardKey(): String? = parsedCardKey
@@ -123,8 +177,14 @@ class CardViewModel(
     fun deleteCard() {
         val rawCard = currentRawCard ?: return
         val serial = rawCard.tagId().hex()
-        val savedCard = cardPersister.getCards().find { it.serial == serial } ?: return
-        cardPersister.deleteCard(savedCard)
+        val cardType = rawCard.cardType()
+        // Delete all scans of this card (all matching type+serial)
+        val allCards = cardPersister.getCards()
+        for (saved in allCards) {
+            if (saved.type == cardType && saved.serial == serial) {
+                cardPersister.deleteCard(saved)
+            }
+        }
     }
 
     fun getTripKey(tripItem: TransactionItem.TripItem): String? {

@@ -14,8 +14,14 @@ sealed class Screen(val route: String) {
             if (params.isNotEmpty()) append("?${params.joinToString("&")}")
         }
     }
-    data object Card : Screen("card/{cardKey}") {
-        fun createRoute(cardKey: String): String = "card/$cardKey"
+    data object Card : Screen("card/{cardKey}?scanIdsKey={scanIdsKey}&currentScanId={currentScanId}") {
+        fun createRoute(cardKey: String, scanIdsKey: String? = null, currentScanId: String? = null): String = buildString {
+            append("card/$cardKey")
+            val params = mutableListOf<String>()
+            if (scanIdsKey != null) params.add("scanIdsKey=$scanIdsKey")
+            if (currentScanId != null) params.add("currentScanId=$currentScanId")
+            if (params.isNotEmpty()) append("?${params.joinToString("&")}")
+        }
     }
     data object CardAdvanced : Screen("card_advanced/{cardKey}") {
         fun createRoute(cardKey: String): String = "card_advanced/$cardKey"
