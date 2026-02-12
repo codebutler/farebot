@@ -285,7 +285,7 @@
     <string name="card_note_ventra">Single ride tickets only</string>
 
     <!-- Home screen tabs -->
-    <string name="tab_scan">Scan</string>
+    <string name="tab_scan">Cards</string>
     <string name="tab_explore">Explore</string>
     <string name="scan">Scan</string>
     <string name="search_supported_cards">Search supported cards</string>

@@ -152,9 +152,34 @@ fun FareBotApp(
                     onImportFile = {
                         platformActions.pickFileForImport { text ->
                             if (text != null) {
-                                val count = historyViewModel.importCards(text)
-                                platformActions.showToast(runBlocking { getString(Res.string.imported_cards, count) })
-                                historyViewModel.loadCards()
+                                val result = historyViewModel.importCardsDetailed(text)
+                                when (result) {
+                                    is ImportResult.Success -> {
+                                        for (rawCard in result.cards) {
+                                            cardPersister.insertCard(
+                                                SavedCard(
+                                                    type = rawCard.cardType(),
+                                                    serial = rawCard.tagId().hex(),
+                                                    data = cardSerializer.serialize(rawCard),
+                                                )
+                                            )
+                                        }
+                                        if (result.cards.size == 1) {
+                                            val rawCard = result.cards.first()
+                                            val navKey = navDataHolder.put(rawCard)
+                                            navController.navigate(Screen.Card.createRoute(navKey))
+                                        }
+                                        platformActions.showToast(
+                                            runBlocking { getString(Res.string.imported_cards, result.cards.size) }
+                                        )
+                                        historyViewModel.loadCards()
+                                    }
+                                    is ImportResult.Error -> {
+                                        platformActions.showToast(
+                                            runBlocking { getString(Res.string.import_failed, result.message) }
+                                        )
+                                    }
+                                }
                             }
                         }
                     },

@@ -24,6 +24,7 @@ package com.codebutler.farebot.shared.platform
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSString
+import platform.Foundation.NSTimer
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.stringWithContentsOfURL
@@ -36,6 +37,7 @@ import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIPasteboard
 import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
+import platform.UIKit.UIWindowScene
 import platform.UniformTypeIdentifiers.UTTypeData
 import platform.UniformTypeIdentifiers.UTTypeJSON
 import platform.UniformTypeIdentifiers.UTTypePlainText
@@ -84,7 +86,7 @@ class IosPlatformActions : PlatformActions {
         )
         viewController.presentViewController(alert, animated = true, completion = null)
         // Auto-dismiss after 1.5 seconds
-        platform.Foundation.NSTimer.scheduledTimerWithTimeInterval(
+        NSTimer.scheduledTimerWithTimeInterval(
             interval = 1.5,
             repeats = false,
         ) {
@@ -93,12 +95,12 @@ class IosPlatformActions : PlatformActions {
     }
 
     override fun pickFileForImport(onResult: (String?) -> Unit) {
-        // Dispatch to next run loop iteration to avoid presenting a view controller
-        // while Compose is mid-recomposition (which silently fails on iOS).
-        dispatch_async(dispatch_get_main_queue()) {
+        // Delay presentation to let Compose finish its recomposition cycle
+        // (presenting a view controller mid-recomposition silently fails on iOS).
+        NSTimer.scheduledTimerWithTimeInterval(0.1, repeats = false) {
             val viewController = getTopViewController() ?: run {
                 onResult(null)
-                return@dispatch_async
+                return@scheduledTimerWithTimeInterval
             }
             val picker = UIDocumentPickerViewController(
                 forOpeningContentTypes = listOf(UTTypeJSON, UTTypePlainText, UTTypeData),
@@ -124,8 +126,10 @@ class IosPlatformActions : PlatformActions {
     }
 
     private fun getTopViewController(): UIViewController? {
-        val keyWindow = UIApplication.sharedApplication.windows
-            .filterIsInstance<UIWindow>()
+        // Use scene-based API (UIApplication.windows is deprecated on iOS 15+)
+        val keyWindow = UIApplication.sharedApplication.connectedScenes
+            .filterIsInstance<UIWindowScene>()
+            .flatMap { it.windows.filterIsInstance<UIWindow>() }
             .firstOrNull { it.isKeyWindow() }
         var topVC = keyWindow?.rootViewController
         while (topVC?.presentedViewController != null) {
@@ -149,20 +153,27 @@ class IosPlatformActions : PlatformActions {
             val url = didPickDocumentsAtURLs.firstOrNull() as? NSURL
             if (url != null) {
                 val accessed = url.startAccessingSecurityScopedResource()
+                val content: String?
                 try {
-                    val content = NSString.stringWithContentsOfURL(
+                    content = NSString.stringWithContentsOfURL(
                         url,
                         encoding = NSUTF8StringEncoding,
                         error = null,
                     )
-                    onResult(content)
                 } finally {
                     if (accessed) {
                         url.stopAccessingSecurityScopedResource()
                     }
                 }
+                // Dispatch to next run loop to ensure picker dismiss animation completes
+                // before the caller tries to present toasts or navigate.
+                dispatch_async(dispatch_get_main_queue()) {
+                    onResult(content)
+                }
             } else {
-                onResult(null)
+                dispatch_async(dispatch_get_main_queue()) {
+                    onResult(null)
+                }
             }
         }
 

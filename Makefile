@@ -15,7 +15,6 @@ android-install: android ## Build and install on connected Android device
 
 ios: ## Build iOS app for physical device
 	./gradlew :farebot-app:linkDebugFrameworkIosArm64
-	./gradlew :farebot-app:linkDebugFrameworkIosSimulatorArm64
 	xcodebuild -project farebot-app-ios/FareBot.xcodeproj -scheme FareBot \
 		-destination 'id=$(IOS_DEVICE_ID)' -allowProvisioningUpdates build
 

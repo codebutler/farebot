@@ -305,10 +305,12 @@ private fun InfoItemRow(item: InfoItem) {
                 )
             }
             if (item.value != null) {
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = item.value,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

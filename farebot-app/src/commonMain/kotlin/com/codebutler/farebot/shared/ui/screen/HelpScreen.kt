@@ -18,23 +18,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +43,6 @@ import farebot.farebot_app.generated.resources.card_not_supported
 import farebot.farebot_app.generated.resources.keys_required
 import farebot.farebot_app.generated.resources.keys_loaded
 import farebot.farebot_app.generated.resources.card_serial_only
-import farebot.farebot_app.generated.resources.search_supported_cards
 import farebot.farebot_app.generated.resources.view_sample
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -71,10 +64,10 @@ fun ExploreContent(
     mapMarkers: List<CardsMapMarker> = emptyList(),
     onMapMarkerTap: ((String) -> Unit)? = null,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
+    searchQuery: String = "",
     topBarHeight: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
-    var searchQuery by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -86,10 +79,15 @@ fun ExploreContent(
         }
     }
 
-    // Pre-resolve card names for search
+    // Pre-resolve card names and locations for search
     val cardNames = remember(displayedCards) {
         displayedCards.associate { card ->
             card.nameRes.key to runBlocking { getString(card.nameRes) }
+        }
+    }
+    val cardLocations = remember(displayedCards) {
+        displayedCards.associate { card ->
+            card.nameRes.key to runBlocking { getString(card.locationRes) }
         }
     }
 
@@ -97,13 +95,15 @@ fun ExploreContent(
         TransitRegion.DeviceRegionComparator(deviceRegion)
     }
 
-    val groupedCards = remember(displayedCards, regionComparator, searchQuery, cardNames) {
+    val groupedCards = remember(displayedCards, regionComparator, searchQuery, cardNames, cardLocations) {
         val filtered = if (searchQuery.isBlank()) {
             displayedCards
         } else {
             displayedCards.filter { card ->
                 val name = cardNames[card.nameRes.key] ?: ""
+                val location = cardLocations[card.nameRes.key] ?: ""
                 name.contains(searchQuery, ignoreCase = true) ||
+                    location.contains(searchQuery, ignoreCase = true) ||
                     card.region.translatedName.contains(searchQuery, ignoreCase = true)
             }
         }
@@ -140,11 +140,17 @@ fun ExploreContent(
         map
     }
 
-    // Track which region is currently visible based on scroll position
+    // Track which region is currently visible based on the center of the viewport
     val currentRegion by remember {
         derivedStateOf {
-            val firstVisible = listState.firstVisibleItemIndex
-            indexToRegion.lastOrNull { (startIndex, _) -> startIndex <= firstVisible }?.second
+            val layoutInfo = listState.layoutInfo
+            val viewportCenter = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
+            val centerItem = layoutInfo.visibleItemsInfo.minByOrNull { item ->
+                val itemCenter = item.offset + item.size / 2
+                kotlin.math.abs(itemCenter - viewportCenter)
+            }
+            val centerIndex = centerItem?.index ?: listState.firstVisibleItemIndex
+            indexToRegion.lastOrNull { (startIndex, _) -> startIndex <= centerIndex }?.second
         }
     }
 
@@ -159,7 +165,7 @@ fun ExploreContent(
 
     Column(modifier = modifier.fillMaxSize()) {
         // Fixed map (stays visible while list scrolls)
-        if (mapMarkers.isNotEmpty() && searchQuery.isBlank()) {
+        if (mapMarkers.isNotEmpty()) {
             PlatformCardsMap(
                 markers = mapMarkers,
                 focusMarkers = focusMarkers,
@@ -179,28 +185,9 @@ fun ExploreContent(
                 topPadding = topBarHeight,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp + topBarHeight),
+                    .height(180.dp + topBarHeight),
             )
         }
-
-        // Fixed search box
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text(stringResource(Res.string.search_supported_cards)) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            trailingIcon = if (searchQuery.isNotEmpty()) {
-                {
-                    IconButton(onClick = { searchQuery = "" }) {
-                        Icon(Icons.Default.Clear, contentDescription = null)
-                    }
-                }
-            } else null,
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-        )
 
         // Scrollable card list
         LazyColumn(
@@ -247,7 +234,7 @@ private fun CardInfoItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .let { mod ->
-                if (hasSample) mod.clickable { onSampleCardTap?.invoke(card) } else mod
+                if (hasSample) mod.clickable { onSampleCardTap!!(card) } else mod
             },
     ) {
         Column(
