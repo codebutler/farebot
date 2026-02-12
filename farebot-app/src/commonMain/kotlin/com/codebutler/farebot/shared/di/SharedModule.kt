@@ -2,6 +2,8 @@ package com.codebutler.farebot.shared.di
 
 import com.codebutler.farebot.shared.core.NavDataHolder
 import com.codebutler.farebot.shared.platform.Analytics
+import com.codebutler.farebot.shared.platform.AppPreferences
+import com.codebutler.farebot.shared.platform.InMemoryAppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.viewmodel.AddKeyViewModel
@@ -16,6 +18,7 @@ val sharedModule = module {
     single { NavDataHolder() }
     single { CardImporter(get(), get()) }
     single<Analytics> { NoOpAnalytics() }
+    single<AppPreferences> { InMemoryAppPreferences() }
 
     viewModel { HomeViewModel(getOrNull(), get(), get(), get(), get()) }
     viewModel { CardViewModel(get(), get(), get(), get(), get(), get()) }

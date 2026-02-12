@@ -21,7 +21,8 @@ import com.codebutler.farebot.shared.platform.IosPlatformActions
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.transit.createTransitFactoryRegistry
-import com.codebutler.farebot.shared.ui.screen.ALL_SUPPORTED_CARDS
+import com.codebutler.farebot.shared.platform.AppPreferences
+import com.codebutler.farebot.shared.platform.IosAppPreferences
 import com.codebutler.farebot.shared.platform.PlatformActions
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
@@ -32,8 +33,7 @@ fun MainViewController() = ComposeUIViewController {
 
     FareBotApp(
         platformActions = platformActions,
-        supportedCards = ALL_SUPPORTED_CARDS,
-        supportedCardTypes = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.CEPAS),
+        supportedCardTypes = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.Vicinity),
     )
 }
 
@@ -48,6 +48,8 @@ fun initKoin() {
 }
 
 private val iosModule = module {
+    single<AppPreferences> { IosAppPreferences() }
+
     single<StringResource> { DefaultStringResource() }
 
     single {
@@ -70,9 +72,7 @@ private val iosModule = module {
     single<CardKeysPersister> { DbCardKeysPersister(get()) }
 
     single<TransitFactoryRegistry> {
-        createTransitFactoryRegistry(
-            supportedCardTypes = CardType.entries.toSet() - setOf(CardType.MifareClassic),
-        )
+        createTransitFactoryRegistry()
     }
 
     single<CardScanner> { IosNfcScanner() }

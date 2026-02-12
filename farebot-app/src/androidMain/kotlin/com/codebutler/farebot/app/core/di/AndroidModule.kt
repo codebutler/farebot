@@ -1,6 +1,7 @@
 package com.codebutler.farebot.app.core.di
 
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.codebutler.farebot.app.core.platform.AndroidAppPreferences
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
@@ -11,6 +12,7 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardKeysPersister
+import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.DbCardKeysPersister
 import com.codebutler.farebot.persist.db.DbCardPersister
@@ -29,6 +31,8 @@ val androidModule = module {
             encodeDefaults = true
         }
     }
+
+    single<AppPreferences> { AndroidAppPreferences(androidContext()) }
 
     single<CardSerializer> { KotlinxCardSerializer(get()) }
 
