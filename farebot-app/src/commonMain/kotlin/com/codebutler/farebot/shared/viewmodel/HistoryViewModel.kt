@@ -2,10 +2,13 @@ package com.codebutler.farebot.shared.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.codebutler.farebot.base.util.DateFormatStyle
-import com.codebutler.farebot.base.util.formatDate
-import com.codebutler.farebot.base.util.formatTime
+import com.codebutler.farebot.base.util.formatHumanDate
+import com.codebutler.farebot.base.util.formatTimeShort
 import com.codebutler.farebot.base.util.hex
+import farebot.farebot_app.generated.resources.Res
+import farebot.farebot_app.generated.resources.date_today
+import farebot.farebot_app.generated.resources.date_yesterday
+import org.jetbrains.compose.resources.getString
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardPersister
@@ -60,8 +63,12 @@ class HistoryViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
+                val todayLabel = getString(Res.string.date_today)
+                val yesterdayLabel = getString(Res.string.date_yesterday)
                 val savedCards = cardPersister.getCards()
-                val items = savedCards.map { savedCard ->
+
+                // Build flat list of all items (one per scan)
+                val allItems = savedCards.map { savedCard ->
                     val rawCard = cardSerializer.deserialize(savedCard.data)
                     val id = savedCard.id.toString()
                     rawCardMap[id] = rawCard
@@ -70,9 +77,12 @@ class HistoryViewModel(
                     var cardName: String? = null
                     var serial = savedCard.serial
                     var parseError: String? = null
+                    var brandColor: Int? = null
                     try {
-                        val identity = transitFactoryRegistry.parseTransitIdentity(rawCard.parse())
+                        val card = rawCard.parse()
+                        val identity = transitFactoryRegistry.parseTransitIdentity(card)
                         cardName = identity?.name
+                        brandColor = transitFactoryRegistry.findBrandColor(card)
                         if (identity?.serialNumber != null) {
                             serial = identity.serialNumber!!
                         }
@@ -80,8 +90,13 @@ class HistoryViewModel(
                         parseError = ex.message
                     }
 
-                    val scannedAtStr = try {
-                        "${formatDate(savedCard.scannedAt, DateFormatStyle.SHORT)} ${formatTime(savedCard.scannedAt, DateFormatStyle.SHORT)}"
+                    val scannedDate = try {
+                        formatHumanDate(savedCard.scannedAt, todayLabel, yesterdayLabel)
+                    } catch (_: Exception) {
+                        null
+                    }
+                    val scannedTime = try {
+                        formatTimeShort(savedCard.scannedAt)
                     } catch (_: Exception) {
                         null
                     }
@@ -90,15 +105,44 @@ class HistoryViewModel(
                         id = id,
                         cardName = cardName,
                         serial = serial,
-                        scannedAt = scannedAtStr,
+                        scannedDate = scannedDate,
+                        scannedTime = scannedTime,
                         parseError = parseError,
+                        brandColor = brandColor,
+                        scanCount = 1,
+                        allScanIds = listOf(id),
                     )
                 }
-                _uiState.value = HistoryUiState(items = items, isLoading = false)
+
+                // Build deduplicated list (one per unique card, most recent scan first)
+                // Group by identity: cardType:serial
+                val groupedItems = allItems
+                    .groupBy { item ->
+                        val savedCard = savedCardMap[item.id]
+                        if (savedCard != null) "${savedCard.type.name}:${savedCard.serial}" else item.id
+                    }
+                    .map { (_, scans) ->
+                        // scans are already sorted newest-first (from getCards() order)
+                        val newest = scans.first()
+                        newest.copy(
+                            scanCount = scans.size,
+                            allScanIds = scans.map { it.id },
+                        )
+                    }
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    allItems = allItems,
+                    groupedItems = groupedItems,
+                )
             } catch (e: Throwable) {
-                _uiState.value = HistoryUiState(isLoading = false)
+                _uiState.value = _uiState.value.copy(isLoading = false, allItems = emptyList(), groupedItems = emptyList())
             }
         }
+    }
+
+    fun toggleShowAllScans() {
+        _uiState.value = _uiState.value.copy(showAllScans = !_uiState.value.showAllScans)
     }
 
     fun toggleSelection(itemId: String) {
@@ -125,10 +169,15 @@ class HistoryViewModel(
         val selectedIds = _uiState.value.selectedIds.toList()
         viewModelScope.launch {
             for (id in selectedIds) {
-                val savedCard = savedCardMap[id] ?: continue
-                cardPersister.deleteCard(savedCard)
-                rawCardMap.remove(id)
-                savedCardMap.remove(id)
+                // Find the item to get all scan IDs (for grouped view, deletes all scans)
+                val item = _uiState.value.items.find { it.id == id }
+                val idsToDelete = item?.allScanIds ?: listOf(id)
+                for (scanId in idsToDelete) {
+                    val savedCard = savedCardMap[scanId] ?: continue
+                    cardPersister.deleteCard(savedCard)
+                    rawCardMap.remove(scanId)
+                    savedCardMap.remove(scanId)
+                }
             }
             clearSelection()
             loadCards()
@@ -138,6 +187,11 @@ class HistoryViewModel(
     fun getCardNavKey(itemId: String): String? {
         val rawCard = rawCardMap[itemId] ?: return null
         return navDataHolder.put(rawCard)
+    }
+
+    fun getCardScanIds(itemId: String): List<String> {
+        val item = _uiState.value.items.find { it.id == itemId }
+        return item?.allScanIds ?: listOf(itemId)
     }
 
     /**
