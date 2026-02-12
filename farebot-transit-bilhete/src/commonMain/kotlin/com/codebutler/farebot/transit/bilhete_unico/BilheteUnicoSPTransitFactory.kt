@@ -30,20 +30,37 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicBlock
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import farebot.farebot_transit_bilhete.generated.resources.Res
-import farebot.farebot_transit_bilhete.generated.resources.bilhete_card_name
+import farebot.farebot_transit_bilhete.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class BilheteUnicoSPTransitFactory : TransitFactory<ClassicCard, BilheteUnicoSPTransitInfo> {
 
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
+
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.bilhete_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.BRAZIL,
+            locationRes = Res.string.bilhete_location,
+            imageRes = Res.drawable.bilheteunicosp_card,
+            latitude = -23.5505f,
+            longitude = -46.6333f,
+            brandColor = 0xD32424,
+            sampleDumpFile = "BilheteUnico.json",
+        )
+
         private val MANUFACTURER = byteArrayOf(
             0x62.toByte(), 0x63.toByte(), 0x64.toByte(), 0x65.toByte(),
             0x66.toByte(), 0x67.toByte(), 0x68.toByte(), 0x69.toByte()

@@ -1,5 +1,6 @@
 <resources>
     <string name="mrtj_longname" translatable="false">Kartu Jelajah Berganda MRTJ</string>
+    <string name="location_jakarta_indonesia">Jakarta, Indonesia</string>
     <string name="mrtj_agency" translatable="false">MRT Jakarta</string>
     <string name="mrtj_agency_short" translatable="false">MRTJ</string>
     <string name="mrtj_other_data">Other data</string>

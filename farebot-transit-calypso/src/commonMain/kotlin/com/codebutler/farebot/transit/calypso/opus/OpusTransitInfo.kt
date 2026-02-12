@@ -23,8 +23,11 @@
 package com.codebutler.farebot.transit.calypso.opus
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.calypso.CalypsoTransitInfo
 import com.codebutler.farebot.transit.calypso.IntercodeFields
@@ -38,6 +41,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Repeat
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
+import farebot.farebot_transit_calypso.generated.resources.*
 
 internal class OpusTransitInfo(
     result: CalypsoParseResult
@@ -77,6 +81,9 @@ internal class OpusTransitInfo(
 }
 
 class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override val name: String
         get() = OpusTransitInfo.NAME
@@ -146,5 +153,18 @@ class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
             result = (result shl 8) or (this[offset + i].toLong() and 0xFF)
         }
         return result
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_opus,
+            cardType = CardType.ISO7816,
+            region = TransitRegion.CANADA,
+            locationRes = Res.string.card_location_montreal_canada,
+            imageRes = Res.drawable.opus_card,
+            latitude = 45.5017f,
+            longitude = -73.5673f,
+            brandColor = 0x209BD6,
+        )
     }
 }

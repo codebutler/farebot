@@ -22,12 +22,19 @@ package com.codebutler.farebot.transit.myki
 
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.Luhn
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_myki.generated.resources.*
 
 class MykiTransitFactory : TransitFactory<DesfireCard, MykiTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: DesfireCard): Boolean {
         return (card.getApplication(4594) != null) && (card.getApplication(15732978) != null)
@@ -55,6 +62,19 @@ class MykiTransitFactory : TransitFactory<DesfireCard, MykiTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.myki_card_name,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.AUSTRALIA,
+            locationRes = Res.string.myki_location,
+            imageRes = Res.drawable.myki_card,
+            latitude = -37.8136f,
+            longitude = 144.9631f,
+            brandColor = 0x89961C,
+            serialOnly = true,
+            sampleDumpFile = "Myki.json",
+        )
+
         private fun formatSerialNumber(serialNumber1: Long, serialNumber2: Long): String {
             val formattedSerial = "${serialNumber1.toString().padStart(6, '0')}${serialNumber2.toString().padStart(8, '0')}"
             return formattedSerial + Luhn.calculateLuhn(formattedSerial)

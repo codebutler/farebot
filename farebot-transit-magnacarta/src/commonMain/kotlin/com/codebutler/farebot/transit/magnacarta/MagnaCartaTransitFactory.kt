@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.magnacarta
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_magnacarta.generated.resources.Res
@@ -33,6 +34,8 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class MagnaCartaTransitFactory : TransitFactory<DesfireCard, MagnaCartaTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: DesfireCard): Boolean {
         return card.getApplication(MagnaCartaTransitInfo.APP_ID_BALANCE) != null

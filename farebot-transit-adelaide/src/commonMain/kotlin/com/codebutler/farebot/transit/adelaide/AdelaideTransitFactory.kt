@@ -26,22 +26,27 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Parser
-import farebot.farebot_transit_adelaide.generated.resources.Res
-import farebot.farebot_transit_adelaide.generated.resources.card_name_adelaide
+import farebot.farebot_transit_adelaide.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class AdelaideTransitFactory(
     private val stringResource: StringResource = DefaultStringResource()
 ) : TransitFactory<DesfireCard, AdelaideTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: DesfireCard): Boolean {
         return card.getApplication(APP_ID) != null
@@ -99,6 +104,18 @@ class AdelaideTransitFactory(
 
     companion object {
         private const val APP_ID = 0xb006f2
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_adelaide,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.AUSTRALIA,
+            locationRes = Res.string.location_adelaide,
+            imageRes = Res.drawable.adelaide,
+            latitude = -34.9285f,
+            longitude = 138.6007f,
+            brandColor = 0xA7CAEA,
+            extraNoteRes = Res.string.card_note_adelaide,
+        )
 
         private fun getSerial(tagId: ByteArray): Long =
             tagId.byteArrayToLongReversed(1, 6)

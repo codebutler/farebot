@@ -35,9 +35,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import farebot.farebot_transit_clipper.generated.resources.Res
-import farebot.farebot_transit_clipper.generated.resources.location_san_francisco
-import farebot.farebot_transit_clipper.generated.resources.transit_clipper_card_name
+import farebot.farebot_transit_clipper.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import org.jetbrains.compose.resources.getString
@@ -55,6 +53,11 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
             cardType = CardType.MifareDesfire,
             region = TransitRegion.USA,
             locationRes = Res.string.location_san_francisco,
+            imageRes = Res.drawable.clipper_card,
+            latitude = 37.7749f,
+            longitude = -122.4194f,
+            brandColor = 0xF26522,
+            sampleDumpFile = "Clipper.nfc",
         )
     }
 

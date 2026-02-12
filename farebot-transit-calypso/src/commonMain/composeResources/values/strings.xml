@@ -19,11 +19,38 @@
     <string name="lisboa_route_cascais">Cascais</string>
     <string name="lisboa_route_sado">Sado</string>
 
-    <!-- Intercode card names -->
+    <!-- Card names -->
+    <string name="card_name_opus">Opus</string>
+    <string name="card_name_ravkav">RavKav</string>
+    <string name="card_name_mobib">Mobib</string>
+    <string name="card_name_venezia_unica">Venezia Unica</string>
+    <string name="card_name_carta_mobile">Carta Mobile</string>
+    <string name="card_name_lisboa_viva">Lisboa Viva</string>
+    <string name="card_name_navigo">Navigo</string>
     <string name="card_name_oura">OuRA</string>
     <string name="card_name_pastel">Pastel</string>
-    <string name="card_name_transgironde">TransGironde</string>
+    <string name="card_name_pass_pass">Pass Pass</string>
     <string name="card_name_passpass">Pass Pass</string>
+    <string name="card_name_transgironde">TransGironde</string>
+    <string name="card_name_tam">TaM</string>
+    <string name="card_name_korrigo">KorriGo</string>
+    <string name="card_name_envibus">Envibus</string>
+
+    <!-- Card locations -->
+    <string name="card_location_montreal_canada">Montreal, Canada</string>
+    <string name="card_location_israel">Israel</string>
+    <string name="card_location_brussels_belgium">Brussels, Belgium</string>
+    <string name="card_location_venice_italy">Venice, Italy</string>
+    <string name="card_location_pisa_italy">Pisa, Italy</string>
+    <string name="card_location_lisbon_portugal">Lisbon, Portugal</string>
+    <string name="card_location_paris_france">Paris, France</string>
+    <string name="card_location_grenoble_france">Grenoble, France</string>
+    <string name="card_location_toulouse_france">Toulouse, France</string>
+    <string name="card_location_hauts_de_france">Hauts-de-France, France</string>
+    <string name="card_location_gironde_france">Gironde, France</string>
+    <string name="card_location_montpellier_france">Montpellier, France</string>
+    <string name="card_location_brittany_france">Brittany, France</string>
+    <string name="card_location_sophia_antipolis_france">Sophia Antipolis, France</string>
 
     <!-- Intercode/Navigo strings -->
     <string name="navigo_sector_station">Sector %1$d #%2$d</string>

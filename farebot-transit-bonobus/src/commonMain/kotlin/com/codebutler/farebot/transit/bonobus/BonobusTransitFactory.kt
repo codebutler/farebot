@@ -24,10 +24,13 @@ package com.codebutler.farebot.transit.bonobus
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_bonobus.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -37,7 +40,21 @@ class BonobusTransitFactory : TransitFactory<ClassicCard, BonobusTransitInfo> {
     companion object {
         val NAME: String
             get() = runBlocking { getString(Res.string.card_name_bonobus) }
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_bonobus,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.SPAIN,
+            locationRes = Res.string.location_cadiz,
+            imageRes = Res.drawable.cadizcard,
+            latitude = 36.5271f,
+            longitude = -6.2886f,
+            brandColor = 0x1781C7,
+        )
     }
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false

@@ -1,5 +1,6 @@
 <resources>
     <string name="card_name_smartrider">SmartRider</string>
+    <string name="smartrider_location">Perth, Australia</string>
     <string name="card_name_myway">MyWay</string>
 
     <string name="agency_name_transperth">Transperth</string>

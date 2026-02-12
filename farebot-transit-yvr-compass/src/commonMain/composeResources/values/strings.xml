@@ -2,6 +2,8 @@
     <string name="compass_location">Vancouver</string>
     <string name="compass_note">Single ride tickets only</string>
     <string name="compass_card_name">Compass</string>
+    <string name="card_location_vancouver_canada">Vancouver, Canada</string>
+    <string name="card_note_compass">Single ride tickets only</string>
     <string name="compass_product_daypass">DayPass</string>
     <string name="compass_product_one_zone">One Zone</string>
     <string name="compass_product_two_zone">Two Zone</string>

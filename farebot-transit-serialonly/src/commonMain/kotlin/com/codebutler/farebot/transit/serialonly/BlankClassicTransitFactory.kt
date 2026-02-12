@@ -29,6 +29,7 @@ import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.card.classic.InvalidClassicSector
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -42,6 +43,8 @@ import org.jetbrains.compose.resources.getString
  * just before UnauthorizedClassicTransitFactory.
  */
 class BlankClassicTransitFactory : TransitFactory<ClassicCard, BlankClassicTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     /**
      * @param card Card to read.

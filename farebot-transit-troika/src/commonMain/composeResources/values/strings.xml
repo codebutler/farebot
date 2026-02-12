@@ -1,5 +1,6 @@
 <resources>
     <string name="card_name_troika">Troika</string>
+    <string name="troika_location">Moscow, Russia</string>
     <string name="card_name_troika_podorozhnik_hybrid">Troika+Podorozhnik</string>
     <string name="card_name_troika_strelka_hybrid">Troika+Strelka</string>
     <string name="card_number">Card number</string>

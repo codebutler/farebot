@@ -24,12 +24,30 @@ package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_serialonly.generated.resources.*
 
 class AtHopTransitFactory : TransitFactory<DesfireCard, AtHopTransitInfo> {
+
+    override val allCards: List<CardInfo> = listOf(
+        CardInfo(
+            nameRes = Res.string.card_name_at_hop,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.NEW_ZEALAND,
+            locationRes = Res.string.card_location_auckland_new_zealand,
+            serialOnly = true,
+            imageRes = Res.drawable.athopcard,
+            latitude = -36.8485f,
+            longitude = 174.7633f,
+            brandColor = 0x333C45,
+        )
+    )
 
     companion object {
         private const val APP_ID_SERIAL = 0xffffff

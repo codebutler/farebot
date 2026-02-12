@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitCurrency
@@ -54,6 +55,8 @@ private val NAME by lazy { runBlocking { getString(Res.string.pisa_ultralight_ca
  * Ported from Metrodroid's PisaUltralightTransitData.kt.
  */
 class PisaUltralightTransitFactory : TransitFactory<UltralightCard, PisaUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         val page4 = card.getPage(4).data

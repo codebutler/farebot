@@ -23,10 +23,13 @@
 package com.codebutler.farebot.shared.sample
 
 import com.codebutler.farebot.base.util.hex
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class SampleTransitFactory : TransitFactory<SampleCard, SampleTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: SampleCard): Boolean = true
 

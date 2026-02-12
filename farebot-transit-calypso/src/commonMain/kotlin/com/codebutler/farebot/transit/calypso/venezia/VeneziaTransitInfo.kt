@@ -25,14 +25,11 @@ package com.codebutler.farebot.transit.calypso.venezia
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
-import farebot.farebot_transit_calypso.generated.resources.Res
-import farebot.farebot_transit_calypso.generated.resources.calypso_profile
-import farebot.farebot_transit_calypso.generated.resources.calypso_profile_normal
-import farebot.farebot_transit_calypso.generated.resources.calypso_profile_unknown
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.calypso.CalypsoTransitInfo
 import com.codebutler.farebot.transit.en1545.Calypso1545TransitData
@@ -41,6 +38,9 @@ import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545TransitData
+import farebot.farebot_transit_calypso.generated.resources.*
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
 
 internal class VeneziaTransitInfo(
     result: CalypsoParseResult
@@ -78,6 +78,9 @@ internal class VeneziaTransitInfo(
 }
 
 class VeneziaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override val name: String
         get() = VeneziaTransitInfo.NAME
@@ -122,4 +125,17 @@ class VeneziaTransitFactory(stringResource: StringResource) : CalypsoTransitFact
         En1545FixedHex(En1545TransitData.ENV_UNKNOWN_B, 2),
         En1545FixedInteger.datePacked(En1545TransitData.HOLDER_PROFILE)
     )
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_venezia_unica,
+            cardType = CardType.ISO7816,
+            region = TransitRegion.ITALY,
+            locationRes = Res.string.card_location_venice_italy,
+            imageRes = Res.drawable.veneziaunica,
+            latitude = 45.4408f,
+            longitude = 12.3155f,
+            brandColor = 0xC4F5F7,
+        )
+    }
 }

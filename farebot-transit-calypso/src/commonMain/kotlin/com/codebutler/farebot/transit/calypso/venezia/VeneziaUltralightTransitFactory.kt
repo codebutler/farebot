@@ -29,6 +29,7 @@ import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
@@ -62,6 +63,8 @@ private const val Y_VALUE = "Y"
  * Ported from Metrodroid's VeneziaUltralightTransitData.kt.
  */
 class VeneziaUltralightTransitFactory : TransitFactory<UltralightCard, VeneziaUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         val otp = card.getPage(3).data

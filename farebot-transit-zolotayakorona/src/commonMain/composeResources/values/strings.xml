@@ -10,6 +10,7 @@
     <string name="zolotaya_korona_refill_counter">Refill counter</string>
     <string name="zolotaya_korona_unknown">Unknown (%s)</string>
     <!-- Card names -->
+    <string name="card_name_zolotaya_korona">Zolotaya Korona</string>
     <string name="card_name_krasnodar_etk">Krasnodar ETK</string>
     <string name="card_name_orenburg_ekg">Orenburg EKG</string>
     <string name="card_name_orenburg_school">Orenburg EKG (School)</string>
@@ -19,6 +20,12 @@
     <string name="card_name_samara_student">Samara ETK (Student)</string>
     <string name="card_name_samara_garden_dacha">Samara ETK (Garden/Dacha)</string>
     <string name="card_name_yaroslavl_etk">Yaroslavl ETK</string>
+    <!-- Card locations -->
+    <string name="card_location_russia">Russia</string>
+    <string name="card_location_krasnodar_russia">Krasnodar, Russia</string>
+    <string name="card_location_orenburg_russia">Orenburg, Russia</string>
+    <string name="card_location_samara_russia">Samara, Russia</string>
+    <string name="card_location_yaroslavl_russia">Yaroslavl, Russia</string>
     <!-- Region names -->
     <string name="russia_region_04">Altai Republic</string>
     <string name="russia_region_11">Komi</string>

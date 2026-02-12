@@ -23,14 +23,14 @@ package com.codebutler.farebot.transit.calypso.lisboaviva
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.readLatin1
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
-import farebot.farebot_transit_calypso.generated.resources.Res
-import farebot.farebot_transit_calypso.generated.resources.calypso_engraved_serial
-import farebot.farebot_transit_calypso.generated.resources.calypso_holder_name
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.calypso.CalypsoTransitInfo
 import com.codebutler.farebot.transit.en1545.Calypso1545TransitData
@@ -41,6 +41,7 @@ import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
+import farebot.farebot_transit_calypso.generated.resources.*
 
 // Reference: https://github.com/L1L1/cardpeek/blob/master/dot_cardpeek_dir/scripts/calypso/c131.lua
 class LisboaVivaTransitInfo internal constructor(
@@ -68,6 +69,9 @@ class LisboaVivaTransitInfo internal constructor(
     }
 
     class Factory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+        override val allCards: List<CardInfo>
+            get() = listOf(CARD_INFO)
 
         override val name: String = NAME
 
@@ -110,6 +114,17 @@ class LisboaVivaTransitInfo internal constructor(
         }
 
         companion object {
+            private val CARD_INFO = CardInfo(
+                nameRes = Res.string.card_name_lisboa_viva,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.PORTUGAL,
+                locationRes = Res.string.card_location_lisbon_portugal,
+                imageRes = Res.drawable.lisboaviva,
+                latitude = 38.7223f,
+                longitude = -9.1393f,
+                brandColor = 0x46552C,
+            )
+
             private const val COUNTRY_CODE_PORTUGAL = 0x131
             private const val ENV_UNKNOWN_A = "EnvUnknownA"
             private const val ENV_UNKNOWN_B = "EnvUnknownB"

@@ -13,12 +13,30 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.base.util.hex
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_serialonly.generated.resources.*
 
 class IstanbulKartTransitFactory : TransitFactory<DesfireCard, IstanbulKartTransitInfo> {
+
+    override val allCards: List<CardInfo> = listOf(
+        CardInfo(
+            nameRes = Res.string.card_name_istanbul_kart,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.TURKEY,
+            locationRes = Res.string.card_location_istanbul_turkey,
+            serialOnly = true,
+            imageRes = Res.drawable.istanbulkart_card,
+            latitude = 41.0082f,
+            longitude = 28.9784f,
+            brandColor = 0xA7C5FD,
+        )
+    )
 
     companion object {
         internal const val APP_ID = 0x422201

@@ -22,15 +22,22 @@
 package com.codebutler.farebot.transit.tfi_leap
 
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.card.desfire.UnauthorizedDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_tfi_leap.generated.resources.*
 import kotlin.time.Instant
 
 class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: DesfireCard): Boolean {
         return card.getApplication(LeapTransitInfo.APP_ID) != null
@@ -108,5 +115,16 @@ class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
 
     companion object {
         private const val BLOCK_SIZE = 0x180
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.transit_leap_card_name,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.IRELAND,
+            locationRes = Res.string.transit_leap_location_ireland,
+            imageRes = Res.drawable.leap_card,
+            latitude = 53.3498f,
+            longitude = -6.2603f,
+            brandColor = 0x08B26E,
+        )
     }
 }

@@ -37,6 +37,7 @@ import farebot.farebot_transit_calypso.generated.resources.emv_service_code
 import farebot.farebot_transit_calypso.generated.resources.emv_transaction_counter
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -46,6 +47,8 @@ import com.codebutler.farebot.transit.Trip
  * Identifies and parses EMV contactless payment cards (Visa, Mastercard, etc.).
  */
 object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     // Common EMV application AIDs
     private val EMV_AIDS = mapOf(

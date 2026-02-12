@@ -27,23 +27,16 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.formatDate
-import com.codebutler.farebot.card.iso7816.ISO7816Application
-import farebot.farebot_transit_calypso.generated.resources.Res
-import farebot.farebot_transit_calypso.generated.resources.calypso_card_type
-import farebot.farebot_transit_calypso.generated.resources.calypso_card_type_anonymous
-import farebot.farebot_transit_calypso.generated.resources.calypso_card_type_personal
-import farebot.farebot_transit_calypso.generated.resources.calypso_gender
-import farebot.farebot_transit_calypso.generated.resources.calypso_gender_female
-import farebot.farebot_transit_calypso.generated.resources.calypso_gender_male
-import farebot.farebot_transit_calypso.generated.resources.calypso_holder_name
-import farebot.farebot_transit_calypso.generated.resources.calypso_purchase_date
-import farebot.farebot_transit_calypso.generated.resources.calypso_transaction_counter
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.card.iso7816.ISO7816Application
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.en1545.Calypso1545TransitData
@@ -57,6 +50,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Subscription
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
+import farebot.farebot_transit_calypso.generated.resources.*
 import kotlinx.datetime.TimeZone
 
 /*
@@ -118,6 +112,9 @@ class MobibTransitInfo internal constructor(
     }
 
     class Factory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+        override val allCards: List<CardInfo>
+            get() = listOf(CARD_INFO)
 
         override val name: String = NAME
 
@@ -210,6 +207,18 @@ class MobibTransitInfo internal constructor(
         }
 
         companion object {
+            private val CARD_INFO = CardInfo(
+                nameRes = Res.string.card_name_mobib,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.BELGIUM,
+                locationRes = Res.string.card_location_brussels_belgium,
+                imageRes = Res.drawable.mobib_card,
+                latitude = 50.8503f,
+                longitude = 4.3517f,
+                sampleDumpFile = "Mobib.json",
+                brandColor = 0x9CBC17,
+            )
+
             private fun ticketEnvFields(version: Int) = when {
                 version <= 2 -> En1545Container(
                     En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 6),

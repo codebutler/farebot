@@ -1,4 +1,7 @@
 <resources>
+    <string name="card_name_ezlink">EZ-Link</string>
+    <string name="card_name_nets">NETS FlashPay</string>
+    <string name="location_singapore">Singapore</string>
     <string name="ezlink_card_note">Older generation (expired) cards only. Not compatible with many devices.</string>
     <string name="ez_bus_number">Bus #%1$s</string>
     <string name="ez_first_use">First use</string>

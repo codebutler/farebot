@@ -27,13 +27,15 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransactionTripLastPrice
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_gautrain.generated.resources.Res
-import farebot.farebot_transit_gautrain.generated.resources.gautrain_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_gautrain.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -46,6 +48,9 @@ import org.jetbrains.compose.resources.getString
 class GautrainTransitFactory(
     private val stringResource: StringResource = DefaultStringResource()
 ) : TransitFactory<ClassicCard, GautrainTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -111,6 +116,17 @@ class GautrainTransitFactory(
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.gautrain_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.SOUTH_AFRICA,
+            locationRes = Res.string.transit_gautrain_location,
+            imageRes = Res.drawable.gautrain,
+            latitude = -26.2041f,
+            longitude = 28.0473f,
+            brandColor = 0xA2813C,
+        )
+
         private val MAGIC_HEADER = byteArrayOf(
             0xb1.toByte(), 0x80.toByte(), 0x00, 0x00, 0x06,
             0xb5.toByte(), 0x5c, 0x00, 0x13,

@@ -24,14 +24,15 @@
 package com.codebutler.farebot.transit.troika
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.podorozhnik.PodorozhnikTransitFactory
 import com.codebutler.farebot.transit.serialonly.StrelkaTransitFactory
-import farebot.farebot_transit_troika.generated.resources.Res
-import farebot.farebot_transit_troika.generated.resources.card_name_troika_podorozhnik_hybrid
-import farebot.farebot_transit_troika.generated.resources.card_name_troika_strelka_hybrid
+import farebot.farebot_transit_troika.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -47,6 +48,9 @@ import org.jetbrains.compose.resources.getString
 class TroikaHybridTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, TroikaHybridTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     private val troikaFactory = TroikaTransitFactory()
     private val podorozhnikFactory = PodorozhnikTransitFactory(stringResource)
@@ -88,6 +92,20 @@ class TroikaHybridTransitFactory(
             troika = troika,
             podorozhnik = podorozhnik,
             strelka = strelka,
+        )
+    }
+
+    companion object {
+        internal val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_troika,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.RUSSIA,
+            locationRes = Res.string.troika_location,
+            imageRes = Res.drawable.troika_card,
+            latitude = 55.7558f,
+            longitude = 37.6173f,
+            brandColor = 0x1885A9,
+            sampleDumpFile = "Troika.json",
         )
     }
 }

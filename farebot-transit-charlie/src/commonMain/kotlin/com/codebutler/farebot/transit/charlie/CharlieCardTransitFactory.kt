@@ -26,12 +26,14 @@ import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_charlie.generated.resources.Res
-import farebot.farebot_transit_charlie.generated.resources.charlie_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_charlie.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -40,6 +42,9 @@ import org.jetbrains.compose.resources.getString
  * Card detection requires MBTA-specific keys.
  */
 class CharlieCardTransitFactory : TransitFactory<ClassicCard, CharlieCardTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -83,6 +88,17 @@ class CharlieCardTransitFactory : TransitFactory<ClassicCard, CharlieCardTransit
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.charlie_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.USA,
+            locationRes = Res.string.charlie_location_boston,
+            imageRes = Res.drawable.charlie_card,
+            latitude = 42.3601f,
+            longitude = -71.0589f,
+            brandColor = 0x47A64A,
+        )
+
         internal val NAME: String
             get() = runBlocking { getString(Res.string.charlie_card_name) }
 

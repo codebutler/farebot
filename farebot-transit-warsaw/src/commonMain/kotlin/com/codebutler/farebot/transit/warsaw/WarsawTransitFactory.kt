@@ -25,16 +25,21 @@ package com.codebutler.farebot.transit.warsaw
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_warsaw.generated.resources.Res
-import farebot.farebot_transit_warsaw.generated.resources.warsaw_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_warsaw.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class WarsawTransitFactory : TransitFactory<ClassicCard, WarsawTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -58,6 +63,20 @@ class WarsawTransitFactory : TransitFactory<ClassicCard, WarsawTransitInfo> {
             serial = getSerial(card),
             sectorA = WarsawSector.parse(card.getSector(2) as DataClassicSector),
             sectorB = WarsawSector.parse(card.getSector(3) as DataClassicSector)
+        )
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.warsaw_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.POLAND,
+            locationRes = Res.string.warsaw_location,
+            imageRes = Res.drawable.warsaw_card,
+            latitude = 52.2297f,
+            longitude = 21.0122f,
+            brandColor = 0x092979,
+            keysRequired = true,
         )
     }
 

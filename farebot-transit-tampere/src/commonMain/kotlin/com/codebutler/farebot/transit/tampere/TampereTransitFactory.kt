@@ -28,17 +28,22 @@ import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.RecordDesfireFile
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_tampere.generated.resources.Res
-import farebot.farebot_transit_tampere.generated.resources.tampere_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_tampere.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: DesfireCard): Boolean {
         return card.getApplication(TampereTransitInfo.APP_ID) != null
@@ -111,5 +116,18 @@ class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
         if (hexStr.length < 20) return null
         val raw = hexStr.substring(2, 20)
         return NumberUtils.groupString(raw, " ", 6, 4, 4, 3)
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.tampere_card_name,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.FINLAND,
+            locationRes = Res.string.tampere_location,
+            imageRes = Res.drawable.tampere,
+            latitude = 61.4978f,
+            longitude = 23.7610f,
+            brandColor = 0xA8C9E6,
+        )
     }
 }

@@ -25,12 +25,14 @@ package com.codebutler.farebot.transit.pilet
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_pilet.generated.resources.Res
-import farebot.farebot_transit_pilet.generated.resources.pilet_kiev_digital_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_pilet.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -44,7 +46,21 @@ class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> 
     companion object {
         private const val NDEF_TYPE = "pilet.ee:ekaart:5"
         private const val SERIAL_PREFIX_LEN = 7
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.pilet_kiev_digital_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.UKRAINE,
+            locationRes = Res.string.pilet_location_kyiv,
+            imageRes = Res.drawable.kiev_digital,
+            latitude = 50.4501f,
+            longitude = 30.5234f,
+            brandColor = 0x0289FA,
+        )
     }
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)

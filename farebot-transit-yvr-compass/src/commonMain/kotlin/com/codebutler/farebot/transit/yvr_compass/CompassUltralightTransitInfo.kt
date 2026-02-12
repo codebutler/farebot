@@ -23,30 +23,16 @@
 package com.codebutler.farebot.transit.yvr_compass
 
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.nextfareul.NextfareUltralightTransitData
 import com.codebutler.farebot.transit.nextfareul.NextfareUltralightTransitDataCapsule
-import farebot.farebot_transit_yvr_compass.generated.resources.Res
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_card_name
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_bulk_daypass
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_bulk_one_zone
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_bulk_three_zone
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_bulk_two_zone
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_daypass
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_daypass_yvr
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_exit
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_four_zone_wce
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_gradpass
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_one_zone
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_one_zone_yvr
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_sea_island_free
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_three_zone
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_three_zone_yvr
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_two_zone
-import farebot.farebot_transit_yvr_compass.generated.resources.compass_product_two_zone_yvr
+import farebot.farebot_transit_yvr_compass.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.getString
@@ -73,6 +59,21 @@ class CompassUltralightTransitInfo(
 
         val FACTORY: TransitFactory<UltralightCard, CompassUltralightTransitInfo> =
             object : TransitFactory<UltralightCard, CompassUltralightTransitInfo> {
+
+                override val allCards: List<CardInfo> = listOf(
+                    CardInfo(
+                        nameRes = Res.string.compass_card_name,
+                        cardType = CardType.MifareUltralight,
+                        region = TransitRegion.CANADA,
+                        locationRes = Res.string.card_location_vancouver_canada,
+                        extraNoteRes = Res.string.card_note_compass,
+                        imageRes = Res.drawable.yvr_compass_card,
+                        latitude = 49.2827f,
+                        longitude = -123.1207f,
+                        sampleDumpFile = "Compass.json",
+                        brandColor = 0x66B9E1,
+                    )
+                )
 
                 override fun check(card: UltralightCard): Boolean {
                     val head = card.getPage(4).data.byteArrayToInt(0, 3)

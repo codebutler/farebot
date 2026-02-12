@@ -26,11 +26,15 @@ import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getHexString
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_smartrider.generated.resources.*
 
 /**
  * Transit factory for SmartRider (Perth, Western Australia) and MyWay (Canberra, ACT).
@@ -45,7 +49,21 @@ class SmartRiderTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, SmartRiderTransitInfo> {
 
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
+
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_smartrider,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.AUSTRALIA,
+            locationRes = Res.string.smartrider_location,
+            imageRes = Res.drawable.smartrider_card,
+            latitude = -31.9505f,
+            longitude = 115.8605f,
+            brandColor = 0x158736,
+        )
+
         // Unfortunately, there's no way to reliably identify these cards except for the
         // "standard" keys which are used for some empty sectors. It is not enough to read
         // the whole card (most data is protected by a unique key).

@@ -26,12 +26,19 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.reverseBuffer
 import com.codebutler.farebot.base.util.sliceOffLen
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_kiev.generated.resources.*
 
 class KievTransitFactory : TransitFactory<ClassicCard, KievTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector1 = card.getSector(1) as? DataClassicSector ?: return false
@@ -56,6 +63,17 @@ class KievTransitFactory : TransitFactory<ClassicCard, KievTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.kiev_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.UKRAINE,
+            locationRes = Res.string.kiev_location,
+            imageRes = Res.drawable.kiev,
+            latitude = 50.4501f,
+            longitude = 30.5234f,
+            brandColor = 0x4972AC,
+        )
+
         private fun parseTrips(card: ClassicCard): List<KievTrip> =
             (0..5).mapNotNull { i ->
                 val sector = card.getSector(3 + i / 3) as? DataClassicSector ?: return@mapNotNull null

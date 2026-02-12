@@ -13,12 +13,30 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_serialonly.generated.resources.*
 
 class PrestoTransitFactory : TransitFactory<DesfireCard, PrestoTransitInfo> {
+
+    override val allCards: List<CardInfo> = listOf(
+        CardInfo(
+            nameRes = Res.string.card_name_presto,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.CANADA,
+            locationRes = Res.string.card_location_ontario_canada,
+            serialOnly = true,
+            imageRes = Res.drawable.presto_card,
+            latitude = 43.6532f,
+            longitude = -79.3832f,
+            brandColor = 0x728452,
+        )
+    )
 
     companion object {
         private const val APP_ID_SERIAL = 0xff30ff

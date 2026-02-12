@@ -30,17 +30,22 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import farebot.farebot_transit_touchngo.generated.resources.Res
-import farebot.farebot_transit_touchngo.generated.resources.touchngo_card_name
+import farebot.farebot_transit_touchngo.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class TouchnGoTransitFactory : TransitFactory<ClassicCard, TouchnGoTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -103,6 +108,17 @@ class TouchnGoTransitFactory : TransitFactory<ClassicCard, TouchnGoTransitInfo> 
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.touchngo_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.MALAYSIA,
+            locationRes = Res.string.touchngo_location,
+            imageRes = Res.drawable.touchngo,
+            latitude = 3.1390f,
+            longitude = 101.6869f,
+            brandColor = 0x292C6C,
+        )
+
         internal val NAME: String
             get() = runBlocking { getString(Res.string.touchngo_card_name) }
 

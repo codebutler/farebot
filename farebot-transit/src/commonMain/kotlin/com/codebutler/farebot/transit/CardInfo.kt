@@ -38,4 +38,6 @@ data class CardInfo(
     val latitude: Float? = null,
     val longitude: Float? = null,
     val sampleDumpFile: String? = null,
+    /** Brand color as 0xRRGGBB (no alpha). Null if unknown — UI will use a theme-appropriate fallback. */
+    val brandColor: Int?,
 )

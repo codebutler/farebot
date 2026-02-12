@@ -22,18 +22,25 @@ package com.codebutler.farebot.transit.seq_go
 
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.Luhn
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.seq_go.record.SeqGoBalanceRecord
 import com.codebutler.farebot.transit.seq_go.record.SeqGoRecord
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTapRecord
 import com.codebutler.farebot.transit.seq_go.record.SeqGoTopupRecord
+import farebot.farebot_transit_seqgo.generated.resources.*
 
 class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         if (card.getSector(0) is DataClassicSector) {
@@ -151,6 +158,19 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.seqgo_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.AUSTRALIA,
+            locationRes = Res.string.seqgo_location,
+            imageRes = Res.drawable.seqgo_card,
+            latitude = -27.4698f,
+            longitude = 153.0251f,
+            brandColor = 0x00427B,
+            keysRequired = true,
+            sampleDumpFile = "SeqGo.json",
+        )
+
         private val MANUFACTURER = byteArrayOf(
             0x16, 0x18, 0x1A, 0x1B,
             0x1C, 0x1D, 0x1E, 0x1F

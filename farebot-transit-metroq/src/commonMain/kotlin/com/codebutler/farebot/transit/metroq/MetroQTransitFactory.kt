@@ -26,12 +26,14 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_metroq.generated.resources.Res
-import farebot.farebot_transit_metroq.generated.resources.metroq_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_metroq.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.getString
@@ -40,7 +42,21 @@ class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
 
     companion object {
         private const val METRO_Q_ID = 0x5420
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.metroq_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.QATAR,
+            locationRes = Res.string.metroq_location,
+            imageRes = Res.drawable.metroq,
+            latitude = 25.2854f,
+            longitude = 51.5310f,
+            brandColor = 0xFC4337,
+        )
     }
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector = card.getSector(0)

@@ -29,16 +29,22 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_podorozhnik.generated.resources.*
 
 class PodorozhnikTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, PodorozhnikTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector4 = card.getSector(4) as? DataClassicSector ?: return false
@@ -175,6 +181,17 @@ class PodorozhnikTransitFactory(
     )
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.podorozhnik_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.RUSSIA,
+            locationRes = Res.string.podorozhnik_location,
+            imageRes = Res.drawable.podorozhnik_card,
+            latitude = 59.9343f,
+            longitude = 30.3351f,
+            brandColor = 0x7CA22C,
+        )
+
         // We don't want to actually include these keys in the program, so include a hashed version of
         // this key.
         private const val KEY_SALT = "podorozhnik"

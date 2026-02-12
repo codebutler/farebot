@@ -23,10 +23,13 @@
 package com.codebutler.farebot.transit.calypso.intercode
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816Card
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.Calypso1545TransitData
@@ -34,8 +37,12 @@ import com.codebutler.farebot.transit.en1545.CalypsoConstants
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
+import farebot.farebot_transit_calypso.generated.resources.*
 
 class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+    override val allCards: List<CardInfo>
+        get() = ALL_CARDS
 
     override val name: String
         get() = "Intercode"
@@ -146,4 +153,92 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
     }
 
     private val HEX_CHARS = "0123456789abcdef".toCharArray()
+
+    companion object {
+        private val ALL_CARDS = listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_navigo,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_paris_france,
+                imageRes = Res.drawable.navigo,
+                latitude = 48.8566f,
+                longitude = 2.3522f,
+                brandColor = 0x92D6FE,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_oura,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_grenoble_france,
+                imageRes = Res.drawable.oura,
+                latitude = 45.1885f,
+                longitude = 5.7245f,
+                brandColor = 0x005AA7,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_pastel,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_toulouse_france,
+                preview = true,
+                imageRes = Res.drawable.pastel,
+                latitude = 43.6047f,
+                longitude = 1.4442f,
+                brandColor = 0x285999,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_pass_pass,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_hauts_de_france,
+                preview = true,
+                imageRes = Res.drawable.passpass,
+                latitude = 50.6292f,
+                longitude = 3.0573f,
+                brandColor = 0x4E2D8D,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_transgironde,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_gironde_france,
+                preview = true,
+                imageRes = Res.drawable.transgironde,
+                latitude = 44.8378f,
+                longitude = -0.5792f,
+                brandColor = 0xE39A45,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_tam,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_montpellier_france,
+                imageRes = Res.drawable.tam_montpellier,
+                latitude = 43.6108f,
+                longitude = 3.8767f,
+                brandColor = 0x357828,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_korrigo,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_brittany_france,
+                imageRes = Res.drawable.korrigo,
+                latitude = 48.1173f,
+                longitude = -1.6778f,
+                brandColor = 0xAB7423,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_envibus,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.card_location_sophia_antipolis_france,
+                imageRes = Res.drawable.envibus,
+                latitude = 43.6163f,
+                longitude = 7.0552f,
+                brandColor = 0xE1047A,
+            ),
+        )
+    }
 }

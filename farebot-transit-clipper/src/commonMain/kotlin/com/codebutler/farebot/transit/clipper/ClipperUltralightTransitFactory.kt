@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.clipper
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
@@ -41,6 +42,8 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         return card.getPage(4).data[0].toInt() == 0x13

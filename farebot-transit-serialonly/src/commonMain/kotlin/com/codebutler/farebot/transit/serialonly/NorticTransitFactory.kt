@@ -14,10 +14,13 @@ import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class NorticTransitFactory : TransitFactory<DesfireCard, NorticTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     companion object {
         internal const val APP_ID = 0x8057

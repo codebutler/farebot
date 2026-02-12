@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.UnauthorizedDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -40,6 +41,8 @@ import org.jetbrains.compose.resources.getString
  * This factory should be registered LAST in the DESFire factory list.
  */
 class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, UnauthorizedDesfireTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     /**
      * This should be the last executed MIFARE DESFire check, after all the other checks are done.

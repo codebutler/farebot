@@ -1,4 +1,5 @@
 <resources>
     <string name="waikato_card_name_rotorua">SmartRide (Rotorua)</string>
     <string name="waikato_card_name_busit">BUSIT</string>
+    <string name="waikato_location">Hamilton, New Zealand</string>
 </resources>

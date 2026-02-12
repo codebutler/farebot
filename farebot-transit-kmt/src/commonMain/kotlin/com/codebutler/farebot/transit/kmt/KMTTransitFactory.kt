@@ -20,17 +20,22 @@
 
 package com.codebutler.farebot.transit.kmt
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FelicaCard
+import com.codebutler.farebot.card.felica.FeliCaUtil
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import com.codebutler.farebot.card.felica.FeliCaUtil
-import farebot.farebot_transit_kmt.generated.resources.Res
-import farebot.farebot_transit_kmt.generated.resources.kmt_longname
+import farebot.farebot_transit_kmt.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     companion object {
         //Taken from NXP TagInfo reader data
@@ -41,6 +46,18 @@ class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
         private const val FELICA_SERVICE_KMT_ID = 0x300B
         private const val FELICA_SERVICE_KMT_BALANCE = 0x1017
         private const val FELICA_SERVICE_KMT_HISTORY = 0x200F
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.kmt_longname,
+            cardType = CardType.FeliCa,
+            region = TransitRegion.INDONESIA,
+            locationRes = Res.string.location_jakarta_indonesia,
+            imageRes = Res.drawable.kmt_card,
+            latitude = -6.2088f,
+            longitude = 106.8456f,
+            brandColor = 0x97D2C4,
+            extraNoteRes = Res.string.kmt_notes,
+        )
     }
 
     override fun check(card: FelicaCard): Boolean {

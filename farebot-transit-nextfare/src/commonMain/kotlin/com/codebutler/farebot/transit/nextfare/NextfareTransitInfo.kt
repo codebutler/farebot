@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.nextfare
 
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -270,6 +271,8 @@ open class NextfareTransitInfo(
      * Fallback factory for unrecognized Nextfare cards.
      */
     open class NextfareTransitFactory : TransitFactory<ClassicCard, NextfareTransitInfo> {
+
+        override val allCards: List<CardInfo> = emptyList()
 
         override fun check(card: ClassicCard): Boolean {
             val sector0 = card.getSector(0)

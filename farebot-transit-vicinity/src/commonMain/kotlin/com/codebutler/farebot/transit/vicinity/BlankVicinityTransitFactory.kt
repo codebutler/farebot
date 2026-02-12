@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.card.vicinity.VicinityCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -38,6 +39,8 @@ import org.jetbrains.compose.resources.getString
  * Detects blank NFC-V cards.
  */
 class BlankVicinityTransitFactory : TransitFactory<VicinityCard, BlankVicinityTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     /**
      * @param card Card to read.

@@ -25,11 +25,15 @@
 package com.codebutler.farebot.transit.snapper
 
 import com.codebutler.farebot.base.util.isAllFF
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
 import com.codebutler.farebot.card.ksx6924.KSX6924CardTransitFactory
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_snapper.generated.resources.*
 
 /**
  * Transit factory for Snapper cards (Wellington, New Zealand).
@@ -39,6 +43,9 @@ import com.codebutler.farebot.transit.TransitIdentity
  */
 class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
     KSX6924CardTransitFactory {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     // ========================================================================
     // TransitFactory<ISO7816Card, SnapperTransitInfo> implementation
@@ -118,6 +125,17 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_snapper,
+            cardType = CardType.ISO7816,
+            region = TransitRegion.NEW_ZEALAND,
+            locationRes = Res.string.card_location_wellington_new_zealand,
+            imageRes = Res.drawable.snapperplus,
+            latitude = -41.2865f,
+            longitude = 174.7762f,
+            brandColor = 0xD52726,
+        )
+
         /**
          * KSX6924-compatible application AIDs.
          */

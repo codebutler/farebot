@@ -26,10 +26,13 @@ import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.card.desfire.ValueDesfireFileSettings
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class IntercardTransitFactory : TransitFactory<DesfireCard, IntercardTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: DesfireCard): Boolean {
         return card.getApplication(APP_ID_BALANCE) != null

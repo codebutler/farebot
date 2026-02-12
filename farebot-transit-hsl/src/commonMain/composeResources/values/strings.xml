@@ -1,4 +1,8 @@
 <resources>
+    <!-- Card info -->
+    <string name="hsl_card_name">HSL</string>
+    <string name="hsl_location">Helsinki, Finland</string>
+
     <!-- General -->
     <string name="hsl_balance_refill">Balance refill</string>
     <string name="hsl_balance_ticket_label">Value ticket</string>

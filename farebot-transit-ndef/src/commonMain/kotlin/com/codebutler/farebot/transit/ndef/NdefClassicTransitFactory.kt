@@ -23,10 +23,13 @@
 package com.codebutler.farebot.transit.ndef
 
 import com.codebutler.farebot.card.classic.ClassicCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class NdefClassicTransitFactory : TransitFactory<ClassicCard, NdefData> {
+    override val allCards: List<CardInfo> = emptyList()
+
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(NdefData.NAME, null)
 

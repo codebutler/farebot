@@ -25,14 +25,12 @@ package com.codebutler.farebot.transit.calypso.ravkav
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
-import farebot.farebot_transit_calypso.generated.resources.Res
-import farebot.farebot_transit_calypso.generated.resources.calypso_card_type
-import farebot.farebot_transit_calypso.generated.resources.calypso_card_type_anonymous
-import farebot.farebot_transit_calypso.generated.resources.calypso_card_type_personal
-import farebot.farebot_transit_calypso.generated.resources.calypso_holder_id
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.calypso.CalypsoTransitInfo
 import com.codebutler.farebot.transit.en1545.Calypso1545TransitData
@@ -43,6 +41,7 @@ import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
+import farebot.farebot_transit_calypso.generated.resources.*
 
 // Reference: https://github.com/L1L1/cardpeek/blob/master/dot_cardpeek_dir/scripts/calypso/c376n3.lua
 internal class RavKavTransitInfo(
@@ -84,6 +83,9 @@ internal class RavKavTransitInfo(
 }
 
 class RavKavTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override val name: String
         get() = RavKavTransitInfo.NAME
@@ -131,5 +133,18 @@ class RavKavTransitFactory(stringResource: StringResource) : CalypsoTransitFacto
             result = (result shl 8) or (this[offset + i].toLong() and 0xFF)
         }
         return result
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_ravkav,
+            cardType = CardType.ISO7816,
+            region = TransitRegion.ISRAEL,
+            locationRes = Res.string.card_location_israel,
+            imageRes = Res.drawable.ravkav_card,
+            latitude = 32.0853f,
+            longitude = 34.7818f,
+            brandColor = 0x99A400,
+        )
     }
 }

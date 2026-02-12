@@ -1,5 +1,6 @@
 <resources>
     <string name="kmt_longname" translatable="false">Kartu Multi Trip</string>
+    <string name="location_jakarta_indonesia">Jakarta, Indonesia</string>
     <string name="kmt_notes">For new FeliCa cards only.</string>
     <string name="kmt_defroute" translatable="false">JABODETABEK</string>
     <string name="kmt_agency" translatable="false">Kereta Commuter Indonesia</string>

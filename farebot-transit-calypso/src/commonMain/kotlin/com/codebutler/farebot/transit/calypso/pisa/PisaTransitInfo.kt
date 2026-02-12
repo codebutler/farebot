@@ -23,8 +23,11 @@
 package com.codebutler.farebot.transit.calypso.pisa
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.CalypsoTransitFactory
 import com.codebutler.farebot.transit.calypso.CalypsoTransitInfo
 import com.codebutler.farebot.transit.en1545.Calypso1545TransitData
@@ -35,6 +38,7 @@ import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
+import farebot.farebot_transit_calypso.generated.resources.*
 
 internal class PisaTransitInfo(
     result: CalypsoParseResult
@@ -49,6 +53,9 @@ internal class PisaTransitInfo(
 }
 
 class PisaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override val name: String
         get() = PisaTransitInfo.NAME
@@ -86,4 +93,17 @@ class PisaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
         En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
         En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE)
     )
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_carta_mobile,
+            cardType = CardType.ISO7816,
+            region = TransitRegion.ITALY,
+            locationRes = Res.string.card_location_pisa_italy,
+            imageRes = Res.drawable.cartamobile,
+            latitude = 43.7228f,
+            longitude = 10.4017f,
+            brandColor = 0x0BADDB,
+        )
+    }
 }

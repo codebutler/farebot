@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_serialonly.generated.resources.*
@@ -30,6 +31,8 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class MRTUltralightTransitFactory : TransitFactory<UltralightCard, MRTUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         val page3 = card.getPage(3).data

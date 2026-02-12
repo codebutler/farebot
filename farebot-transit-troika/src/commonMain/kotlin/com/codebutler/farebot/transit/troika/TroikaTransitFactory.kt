@@ -26,10 +26,10 @@ package com.codebutler.farebot.transit.troika
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_troika.generated.resources.Res
-import farebot.farebot_transit_troika.generated.resources.card_name_troika
+import farebot.farebot_transit_troika.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -41,6 +41,10 @@ import org.jetbrains.compose.resources.getString
  * checking the header magic bytes on sector 8 and sector 4.
  */
 class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
+
+    // TroikaHybridTransitFactory is the registered factory; this is an internal helper.
+    override val allCards: List<CardInfo>
+        get() = emptyList()
 
     override fun check(card: ClassicCard): Boolean {
         // First try key-hash based early detection on sector 1

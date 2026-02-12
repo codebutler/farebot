@@ -24,11 +24,29 @@ package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.reverseBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_serialonly.generated.resources.*
 
 class TPFCardTransitFactory : TransitFactory<DesfireCard, TPFCardTransitInfo> {
+
+    override val allCards: List<CardInfo> = listOf(
+        CardInfo(
+            nameRes = Res.string.card_name_tpf,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.SWITZERLAND,
+            locationRes = Res.string.card_location_fribourg_switzerland,
+            serialOnly = true,
+            imageRes = Res.drawable.tpf_card,
+            latitude = 46.8065f,
+            longitude = 7.1620f,
+            brandColor = 0xA01D3D,
+        )
+    )
 
     override fun check(card: DesfireCard): Boolean =
         card.getApplication(APP_ID) != null

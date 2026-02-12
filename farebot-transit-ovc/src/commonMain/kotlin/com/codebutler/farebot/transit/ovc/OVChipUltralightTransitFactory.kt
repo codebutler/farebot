@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.ovc
 
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransactionTrip
@@ -48,6 +49,8 @@ private const val NAME = "OV-chipkaart (single-use)"
  * Ported from Metrodroid.
  */
 class OVChipUltralightTransitFactory : TransitFactory<UltralightCard, OVChipUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         val firstByte = card.getPage(4).data[0]

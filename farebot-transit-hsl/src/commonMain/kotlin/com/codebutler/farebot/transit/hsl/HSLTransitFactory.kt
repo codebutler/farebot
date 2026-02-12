@@ -28,18 +28,25 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.hex
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.RecordDesfireFile
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
+import farebot.farebot_transit_hsl.generated.resources.*
 
 class HSLTransitFactory(
     private val stringResource: StringResource
 ) : TransitFactory<DesfireCard, HSLTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: DesfireCard): Boolean {
         return ALL_IDS.any { card.getApplication(it) != null }
@@ -68,6 +75,18 @@ class HSLTransitFactory(
     companion object {
         private const val CARD_NAME_HSL = "HSL"
         private const val CARD_NAME_WALTTI = "Waltti"
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.hsl_card_name,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.FINLAND,
+            locationRes = Res.string.hsl_location,
+            imageRes = Res.drawable.hsl_card,
+            latitude = 60.1699f,
+            longitude = 24.9384f,
+            brandColor = 0xB7EC13,
+            sampleDumpFile = "HSL.json",
+        )
 
         private const val APP_ID_V1 = 0x1120ef
         internal const val APP_ID_V2 = 0x1420ef

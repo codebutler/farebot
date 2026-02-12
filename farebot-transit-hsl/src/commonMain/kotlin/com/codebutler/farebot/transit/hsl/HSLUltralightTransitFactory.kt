@@ -30,6 +30,7 @@ import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitFactory
@@ -50,6 +51,8 @@ private fun getNameUL(city: Int) = runBlocking {
  * Ported from Metrodroid.
  */
 class HSLUltralightTransitFactory : TransitFactory<UltralightCard, HSLUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         val page4 = card.getPage(4).data

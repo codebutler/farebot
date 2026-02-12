@@ -1,5 +1,10 @@
 <resources>
     <string name="location_japan">Japan</string>
+    <string name="location_tokyo_japan">Tokyo, Japan</string>
+    <string name="location_osaka_japan">Osaka, Japan</string>
+    <string name="location_nagoya_japan">Nagoya, Japan</string>
+    <string name="location_sapporo_japan">Sapporo, Japan</string>
+    <string name="location_fukuoka_japan">Fukuoka, Japan</string>
     <!-- Card names -->
     <string name="card_name_japan_ic">Japan IC</string>
     <string name="card_name_hayakaken">Hayakaken</string>

@@ -25,6 +25,7 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.card.vicinity.VicinityCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -37,6 +38,8 @@ import org.jetbrains.compose.resources.getString
  * Should be registered last in the Vicinity factory list.
  */
 class UnknownVicinityTransitFactory : TransitFactory<VicinityCard, UnknownVicinityTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: VicinityCard): Boolean {
         return card.pages.isNotEmpty()

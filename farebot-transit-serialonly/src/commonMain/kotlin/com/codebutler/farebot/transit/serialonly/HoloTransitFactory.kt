@@ -13,12 +13,31 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.card.desfire.DesfireApplication
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_serialonly.generated.resources.*
 
 class HoloTransitFactory : TransitFactory<DesfireCard, HoloTransitInfo> {
+
+    override val allCards: List<CardInfo> = listOf(
+        CardInfo(
+            nameRes = Res.string.card_name_holo,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.USA,
+            locationRes = Res.string.card_location_oahu_hawaii,
+            serialOnly = true,
+            imageRes = Res.drawable.holo_card,
+            latitude = 21.3069f,
+            longitude = -157.8583f,
+            brandColor = 0x00A8C4,
+            sampleDumpFile = "Holo.json",
+        )
+    )
 
     companion object {
         internal const val APP_ID = 0x6013f2

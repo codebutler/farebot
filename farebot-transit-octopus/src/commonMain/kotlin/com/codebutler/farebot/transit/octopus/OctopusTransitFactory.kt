@@ -99,6 +99,11 @@ class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
             cardType = CardType.FeliCa,
             region = TransitRegion.HONG_KONG,
             locationRes = Res.string.location_hong_kong,
+            imageRes = Res.drawable.octopus_card,
+            latitude = 22.3193f,
+            longitude = 114.1694f,
+            brandColor = 0xFDB813,
+            sampleDumpFile = "Octopus.json",
         )
     }
 }

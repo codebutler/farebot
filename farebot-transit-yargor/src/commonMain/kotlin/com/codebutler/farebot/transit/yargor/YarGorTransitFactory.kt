@@ -22,16 +22,21 @@
 package com.codebutler.farebot.transit.yargor
 
 import com.codebutler.farebot.base.util.HashUtils
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_yargor.generated.resources.Res
-import farebot.farebot_transit_yargor.generated.resources.yargor_card_name
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_yargor.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector10 = card.getSector(10) as? DataClassicSector ?: return false
@@ -50,4 +55,17 @@ class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
         )
 
     override fun parseInfo(card: ClassicCard) = YarGorTransitInfo.parse(card)
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.yargor_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.RUSSIA,
+            locationRes = Res.string.yargor_location,
+            imageRes = Res.drawable.yargor,
+            latitude = 57.6261f,
+            longitude = 39.8845f,
+            brandColor = 0x6676A6,
+        )
+    }
 }

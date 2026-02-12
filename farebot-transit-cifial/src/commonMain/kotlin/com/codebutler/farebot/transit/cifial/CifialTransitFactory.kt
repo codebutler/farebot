@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_cifial.generated.resources.Res
@@ -38,6 +39,8 @@ import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.getString
 
 class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false

@@ -22,20 +22,36 @@
 
 package com.codebutler.farebot.transit.mrtj
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FelicaCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_mrtj.generated.resources.Res
-import farebot.farebot_transit_mrtj.generated.resources.mrtj_longname
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_mrtj.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
 
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
+
     companion object {
         private const val SYSTEMCODE_MRTJ = 0x9373
         private const val SERVICE_MRTJ_ID = 0x100B
         private const val SERVICE_MRTJ_BALANCE = 0x10D7
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.mrtj_longname,
+            cardType = CardType.FeliCa,
+            region = TransitRegion.INDONESIA,
+            locationRes = Res.string.location_jakarta_indonesia,
+            imageRes = Res.drawable.mrtj_card,
+            latitude = -6.2088f,
+            longitude = 106.8456f,
+            brandColor = 0x86B6B4,
+        )
     }
 
     override fun check(card: FelicaCard): Boolean {

@@ -28,21 +28,28 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransactionTripLastPrice
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545TransitData
+import farebot.farebot_transit_ovc.generated.resources.*
 
 class OVChipTransitFactory(
     private val stringResource: StringResource
 ) : TransitFactory<ClassicCard, OVChipTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         if (card.sectors.size != 40) return false
@@ -177,6 +184,18 @@ class OVChipTransitFactory(
 
     companion object {
         private const val NAME = "OV-chipkaart"
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.ovc_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.NETHERLANDS,
+            locationRes = Res.string.ovc_location,
+            imageRes = Res.drawable.ovchip_card,
+            latitude = 52.3676f,
+            longitude = 4.9041f,
+            brandColor = 0x84ABC7,
+            keysRequired = true,
+        )
 
         private val OVC_HEADER = byteArrayOf(
             0x84.toByte(), 0x00, 0x00, 0x00, 0x06, 0x03,

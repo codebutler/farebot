@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="card_name_tmoney">T-Money</string>
+    <string name="card_name_t_money">T-Money</string>
+    <string name="card_location_seoul_south_korea">Seoul, South Korea</string>
     <string name="location_seoul">Seoul, South Korea</string>
 
     <!-- Issuers -->

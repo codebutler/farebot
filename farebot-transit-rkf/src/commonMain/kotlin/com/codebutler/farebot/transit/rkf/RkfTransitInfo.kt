@@ -158,21 +158,24 @@ class RkfTransitInfo internal constructor(
                 cardType = CardType.MifareClassic,
                 keysRequired = true, keyBundle = "slaccess",
                 region = TransitRegion.SWEDEN,
-                preview = true),
+                preview = true,
+                brandColor = 0x00ACEE),
             RkfLookup.REJSEKORT to CardInfo(
                 nameRes = Res.string.rkf_card_name_rejsekort,
                 locationRes = Res.string.rkf_location_denmark,
                 cardType = CardType.MifareClassic,
                 keysRequired = true, keyBundle = "rejsekort",
                 region = TransitRegion.DENMARK,
-                preview = true),
+                preview = true,
+                brandColor = 0x4591C9),
             RkfLookup.VASTTRAFIK to CardInfo(
                 nameRes = Res.string.rkf_card_name_vasttrafik,
                 locationRes = Res.string.rkf_location_gothenburg,
                 cardType = CardType.MifareClassic,
                 keysRequired = true, keyBundle = "gothenburg",
                 region = TransitRegion.SWEDEN,
-                preview = true)
+                preview = true,
+                brandColor = 0x88C797)
         )
 
         internal fun clearSeconds(timeInMillis: Long) = timeInMillis / 60000 * 60000

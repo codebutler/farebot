@@ -105,6 +105,11 @@ class OrcaTransitFactory(private val stringResource: StringResource) : TransitFa
             cardType = CardType.MifareDesfire,
             region = TransitRegion.USA,
             locationRes = Res.string.location_seattle,
+            imageRes = Res.drawable.orca_card,
+            latitude = 47.6062f,
+            longitude = -122.3321f,
+            brandColor = 0x00693E,
+            sampleDumpFile = "ORCA.nfc",
         )
     }
 }

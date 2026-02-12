@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.erg
 
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -166,6 +167,8 @@ open class ErgTransitInfo(
      * Fallback factory for unrecognized ERG cards.
      */
     open class ErgTransitFactory : TransitFactory<ClassicCard, ErgTransitInfo> {
+
+        override val allCards: List<CardInfo> = emptyList()
 
         /**
          * Override to match a specific ERG agency ID. Return -1 to match any.

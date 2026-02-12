@@ -20,17 +20,22 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
-import farebot.farebot_transit_manly.generated.resources.Res
-import farebot.farebot_transit_manly.generated.resources.manly_card_name
+import farebot.farebot_transit_manly.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class ManlyFastFerryTransitFactory : TransitFactory<ClassicCard, ManlyFastFerryTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -66,5 +71,19 @@ class ManlyFastFerryTransitFactory : TransitFactory<ClassicCard, ManlyFastFerryT
             newRefill = { purse, epoch -> ManlyFastFerryRefill(purse, epoch) }
         )
         return ManlyFastFerryTransitInfo(capsule)
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.manly_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.AUSTRALIA,
+            locationRes = Res.string.manly_location,
+            imageRes = Res.drawable.manly_fast_ferry_card,
+            latitude = -33.8688f,
+            longitude = 151.2093f,
+            brandColor = 0x004080,
+            keysRequired = true,
+        )
     }
 }

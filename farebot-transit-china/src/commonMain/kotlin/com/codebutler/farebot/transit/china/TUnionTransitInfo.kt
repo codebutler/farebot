@@ -28,13 +28,19 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.card.china.ChinaCard
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_china.generated.resources.Res
+import farebot.farebot_transit_china.generated.resources.card_location_china
+import farebot.farebot_transit_china.generated.resources.card_name_t_union
 import farebot.farebot_transit_china.generated.resources.card_name_tunion
+import farebot.farebot_transit_china.generated.resources.tunion
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
@@ -88,6 +94,10 @@ class TUnionTransitInfo(
 
         @OptIn(ExperimentalStdlibApi::class)
         val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
+            override val allCards: List<CardInfo> = listOf(
+                CardInfo(nameRes = Res.string.card_name_t_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.tunion, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0xFD0026)
+            )
+
             override val appNames: List<ByteArray>
                 get() = listOf("A000000632010105".hexToByteArray())
 

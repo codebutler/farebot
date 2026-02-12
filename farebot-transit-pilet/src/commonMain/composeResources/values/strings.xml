@@ -1,6 +1,8 @@
 <resources>
     <string name="pilet_tartu_card_name">Tartu Bus</string>
     <string name="pilet_kiev_digital_card_name">Kyiv Digital</string>
+    <string name="pilet_location_kyiv">Kyiv, Ukraine</string>
+    <string name="pilet_location_tartu">Tartu, Estonia</string>
     <string name="pilet_full_serial_number">Full serial number</string>
     <string name="pilet_issuer_country">Issuer country</string>
     <string name="pilet_card_expiration_date">Card expiration date</string>

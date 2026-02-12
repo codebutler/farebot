@@ -1,4 +1,6 @@
 <resources>
     <string name="ventra_card_name">Ventra</string>
     <string name="ventra_location">Chicago</string>
+    <string name="card_location_chicago_il">Chicago, IL</string>
+    <string name="card_note_ventra">Single ride tickets only</string>
 </resources>

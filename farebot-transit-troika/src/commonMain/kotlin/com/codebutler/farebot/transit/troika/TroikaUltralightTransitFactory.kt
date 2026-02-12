@@ -30,7 +30,9 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.base.util.hexString
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -38,6 +40,7 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_troika.generated.resources.Res
 import farebot.farebot_transit_troika.generated.resources.*
@@ -62,6 +65,21 @@ private val TROIKA_EPOCH_2019 = LocalDate(2019, 1, 1).atStartOfDayIn(MOSCOW)
  * Ported from Metrodroid.
  */
 class TroikaUltralightTransitFactory : TransitFactory<UltralightCard, TroikaUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_troika,
+                cardType = CardType.MifareUltralight,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.troika_location,
+                imageRes = Res.drawable.troika_card,
+                latitude = 55.7558f,
+                longitude = 37.6173f,
+                brandColor = 0x1885A9,
+                sampleDumpFile = "Troika.json",
+            )
+        )
 
     override fun check(card: UltralightCard): Boolean =
         TroikaBlock.check(card.getPage(4).data)

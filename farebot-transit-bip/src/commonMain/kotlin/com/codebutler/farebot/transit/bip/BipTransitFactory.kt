@@ -28,15 +28,22 @@ import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.reverseBuffer
 import com.codebutler.farebot.base.util.sliceOffLen
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_bip.generated.resources.*
 import kotlin.experimental.and
 
 private const val NAME = "bip!"
 
 class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         if (card.sectors.isEmpty()) return false
@@ -83,6 +90,17 @@ class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.bip_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.CHILE,
+            locationRes = Res.string.bip_location,
+            imageRes = Res.drawable.chilebip,
+            latitude = -33.4489f,
+            longitude = -70.6693f,
+            brandColor = 0x214B87,
+        )
+
         private fun getSerial(card: ClassicCard): Long =
             (card.getSector(0) as DataClassicSector).getBlock(1).data
                 .byteArrayToLongReversed(4, 4)

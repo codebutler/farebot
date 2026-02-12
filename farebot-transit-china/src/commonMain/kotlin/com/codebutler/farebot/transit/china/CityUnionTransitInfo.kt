@@ -29,16 +29,25 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.card.china.ChinaCard
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_china.generated.resources.Res
+import farebot.farebot_transit_china.generated.resources.card_location_china
+import farebot.farebot_transit_china.generated.resources.card_location_shanghai_china
+import farebot.farebot_transit_china.generated.resources.card_name_city_union
 import farebot.farebot_transit_china.generated.resources.card_name_cityunion
 import farebot.farebot_transit_china.generated.resources.card_name_shanghai
+import farebot.farebot_transit_china.generated.resources.card_name_shanghai_public_transportation_card
+import farebot.farebot_transit_china.generated.resources.city_union
 import farebot.farebot_transit_china.generated.resources.city_union_city
 import farebot.farebot_transit_china.generated.resources.location_shanghai
+import farebot.farebot_transit_china.generated.resources.shanghai
 import farebot.farebot_transit_china.generated.resources.unknown_format
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
@@ -127,6 +136,11 @@ class CityUnionTransitInfo(
 
         @OptIn(ExperimentalStdlibApi::class)
         val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
+            override val allCards: List<CardInfo> = listOf(
+                CardInfo(nameRes = Res.string.card_name_city_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.city_union, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0x5494B6),
+                CardInfo(nameRes = Res.string.card_name_shanghai_public_transportation_card, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_shanghai_china, imageRes = Res.drawable.shanghai, latitude = 31.2304f, longitude = 121.4737f, brandColor = 0x1777EA),
+            )
+
             override val appNames: List<ByteArray>
                 get() = listOf("A00000000386980701".hexToByteArray())
 

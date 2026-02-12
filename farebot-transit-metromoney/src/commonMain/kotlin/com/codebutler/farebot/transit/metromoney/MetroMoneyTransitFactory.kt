@@ -26,16 +26,21 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_metromoney.generated.resources.Res
-import farebot.farebot_transit_metromoney.generated.resources.card_name_metromoney
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_metromoney.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -69,6 +74,17 @@ class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitIn
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_metromoney,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.GEORGIA,
+            locationRes = Res.string.location_tbilisi,
+            imageRes = Res.drawable.metromoney,
+            latitude = 41.7151f,
+            longitude = 44.8271f,
+            brandColor = 0xF2C8B6,
+        )
+
         private fun getSerial(card: ClassicCard): Long {
             val sector0 = card.getSector(0) as DataClassicSector
             return sector0.getBlock(0).data.byteArrayToLongReversed(0, 4)

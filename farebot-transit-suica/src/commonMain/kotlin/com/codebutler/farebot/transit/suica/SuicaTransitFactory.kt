@@ -46,16 +46,14 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import farebot.farebot_transit_suica.generated.resources.Res
-import farebot.farebot_transit_suica.generated.resources.card_name_suica
-import farebot.farebot_transit_suica.generated.resources.location_japan
+import farebot.farebot_transit_suica.generated.resources.*
 
 class SuicaTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<FelicaCard, SuicaTransitInfo> {
 
     override val allCards: List<CardInfo>
-        get() = listOf(CARD_INFO)
+        get() = ALL_CARDS
 
     override fun check(card: FelicaCard): Boolean {
         return card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA) != null
@@ -183,11 +181,110 @@ class SuicaTransitFactory(
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_suica,
-            cardType = CardType.FeliCa,
-            region = TransitRegion.JAPAN,
-            locationRes = Res.string.location_japan,
+        private val ALL_CARDS = listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_suica,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_tokyo_japan,
+                imageRes = Res.drawable.suica_card,
+                latitude = 35.6762f,
+                longitude = 139.6503f,
+                brandColor = 0x6CBB5A,
+                sampleDumpFile = "Suica.nfc",
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_pasmo,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_tokyo_japan,
+                imageRes = Res.drawable.pasmo_card,
+                latitude = 35.6762f,
+                longitude = 139.6503f,
+                brandColor = 0xFC848C,
+                sampleDumpFile = "PASMO.nfc",
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_icoca,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_osaka_japan,
+                imageRes = Res.drawable.icoca_card,
+                latitude = 34.6937f,
+                longitude = 135.5023f,
+                brandColor = 0x74C6D3,
+                sampleDumpFile = "ICOCA.nfc",
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_toica,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_nagoya_japan,
+                imageRes = Res.drawable.toica,
+                latitude = 35.1815f,
+                longitude = 136.9066f,
+                brandColor = 0x01C4FE,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_manaca,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_nagoya_japan,
+                imageRes = Res.drawable.manaca,
+                latitude = 35.1815f,
+                longitude = 136.9066f,
+                brandColor = 0x95B5C6,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_pitapa,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_osaka_japan,
+                imageRes = Res.drawable.pitapa,
+                latitude = 34.6937f,
+                longitude = 135.5023f,
+                brandColor = 0x898CB0,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_kitaca,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_sapporo_japan,
+                imageRes = Res.drawable.kitaca,
+                latitude = 43.0618f,
+                longitude = 141.3545f,
+                brandColor = 0xE5F5BA,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_sugoca,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_fukuoka_japan,
+                imageRes = Res.drawable.sugoca,
+                latitude = 33.5904f,
+                longitude = 130.4017f,
+                brandColor = 0xD98696,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_nimoca,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_fukuoka_japan,
+                imageRes = Res.drawable.nimoca,
+                latitude = 33.5904f,
+                longitude = 130.4017f,
+                brandColor = 0xE9D0A1,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_hayakaken,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_fukuoka_japan,
+                imageRes = Res.drawable.hayakaken,
+                latitude = 33.5904f,
+                longitude = 130.4017f,
+                brandColor = 0xA0D8EE,
+            ),
         )
     }
 }

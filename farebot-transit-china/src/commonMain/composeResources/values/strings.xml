@@ -8,12 +8,27 @@
     <string name="card_name_tunion">T-Union</string>
     <string name="card_name_wuhantong">Wuhan Tong</string>
 
+    <!-- Card Names (for allCards) -->
+    <string name="card_name_beijing_municipal_card">Beijing Municipal Card</string>
+    <string name="card_name_shanghai_public_transportation_card">Shanghai Public Transportation Card</string>
+    <string name="card_name_shenzhen_tong">Shenzhen Tong</string>
+    <string name="card_name_wuhan_tong">Wuhan Tong</string>
+    <string name="card_name_t_union">T-Union</string>
+    <string name="card_name_city_union">City Union</string>
+
     <!-- Locations -->
     <string name="location_beijing">Beijing, China</string>
     <string name="location_china_mainland">Mainland China</string>
     <string name="location_shanghai">Shanghai, China</string>
     <string name="location_shenzhen">Shenzhen, China</string>
     <string name="location_wuhan">Wuhan, China</string>
+
+    <!-- Locations (for allCards) -->
+    <string name="card_location_beijing_china">Beijing, China</string>
+    <string name="card_location_shanghai_china">Shanghai, China</string>
+    <string name="card_location_shenzhen_china">Shenzhen, China</string>
+    <string name="card_location_wuhan_china">Wuhan, China</string>
+    <string name="card_location_china">China</string>
 
     <!-- City Union -->
     <string name="city_union_city">City</string>

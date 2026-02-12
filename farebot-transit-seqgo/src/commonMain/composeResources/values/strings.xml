@@ -1,5 +1,6 @@
 <resources>
     <string name="seqgo_card_name">Go card</string>
+    <string name="seqgo_location">Brisbane, Australia</string>
     <string name="seqgo_refill_manual">Manual top-up</string>
     <string name="seqgo_refill_automatic">Automatic top-up</string>
     <string name="seqgo_card_note">Does not support Go Access, Explore or SEEQ cards.</string>

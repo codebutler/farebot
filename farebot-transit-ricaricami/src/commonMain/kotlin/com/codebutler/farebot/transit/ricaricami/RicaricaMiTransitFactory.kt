@@ -26,20 +26,25 @@ import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.isAllZero
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.en1545.*
-import farebot.farebot_transit_ricaricami.generated.resources.Res
-import farebot.farebot_transit_ricaricami.generated.resources.ricaricami_card_name
+import farebot.farebot_transit_ricaricami.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class RicaricaMiTransitFactory(
     private val stringResource: StringResource = DefaultStringResource()
 ) : TransitFactory<ClassicCard, RicaricaMiTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -62,6 +67,17 @@ class RicaricaMiTransitFactory(
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.ricaricami_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.ITALY,
+            locationRes = Res.string.ricaricami_location,
+            imageRes = Res.drawable.ricaricami,
+            latitude = 45.4642f,
+            longitude = 9.1900f,
+            brandColor = 0xB8D27B,
+        )
+
         private const val RICARICA_MI_ID = 0x0221
 
         private val CONTRACT_LIST_FIELDS = En1545Container(

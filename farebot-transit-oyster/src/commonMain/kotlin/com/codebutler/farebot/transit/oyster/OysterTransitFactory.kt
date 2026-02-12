@@ -25,10 +25,14 @@ package com.codebutler.farebot.transit.oyster
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.isAllFF
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_oyster.generated.resources.*
 
 /**
  * Oyster card, London, UK (Transport for London).
@@ -39,6 +43,9 @@ import com.codebutler.farebot.transit.TransitIdentity
  * Reference: https://github.com/micolous/metrodroid/wiki/Oyster
  */
 class OysterTransitFactory : TransitFactory<ClassicCard, OysterTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -70,6 +77,17 @@ class OysterTransitFactory : TransitFactory<ClassicCard, OysterTransitInfo> {
 
     companion object {
         private const val NAME = "Oyster"
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.oyster_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.UK,
+            locationRes = Res.string.oyster_location,
+            imageRes = Res.drawable.oyster_card,
+            latitude = 51.5074f,
+            longitude = -0.1278f,
+            brandColor = 0x67A8EB,
+        )
 
         // From Metrodroid: ImmutableByteArray.fromHex("964142434445464748494A4B4C4D0101")
         private val MAGIC_BLOCK1 = byteArrayOf(

@@ -23,14 +23,16 @@
 package com.codebutler.farebot.transit.ventra
 
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.nextfareul.NextfareUltralightTransitData
 import com.codebutler.farebot.transit.nextfareul.NextfareUltralightTransitDataCapsule
-import farebot.farebot_transit_ventra.generated.resources.Res
-import farebot.farebot_transit_ventra.generated.resources.ventra_card_name
+import farebot.farebot_transit_ventra.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.getString
@@ -57,6 +59,21 @@ class VentraUltralightTransitInfo(
 
         val FACTORY: TransitFactory<UltralightCard, VentraUltralightTransitInfo> =
             object : TransitFactory<UltralightCard, VentraUltralightTransitInfo> {
+
+                override val allCards: List<CardInfo> = listOf(
+                    CardInfo(
+                        nameRes = Res.string.ventra_card_name,
+                        cardType = CardType.MifareUltralight,
+                        region = TransitRegion.USA,
+                        locationRes = Res.string.card_location_chicago_il,
+                        extraNoteRes = Res.string.card_note_ventra,
+                        imageRes = Res.drawable.ventra,
+                        latitude = 41.8781f,
+                        longitude = -87.6298f,
+                        sampleDumpFile = "Ventra.json",
+                        brandColor = 0x6ACCEB,
+                    )
+                )
 
                 override fun check(card: UltralightCard): Boolean {
                     val head = card.getPage(4).data.byteArrayToInt(0, 3)

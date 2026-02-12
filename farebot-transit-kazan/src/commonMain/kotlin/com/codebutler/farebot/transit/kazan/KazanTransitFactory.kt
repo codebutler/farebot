@@ -26,12 +26,14 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
-import farebot.farebot_transit_kazan.generated.resources.Res
-import farebot.farebot_transit_kazan.generated.resources.card_name_kazan
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_kazan.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
@@ -42,6 +44,9 @@ import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.getString
 
 class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector8 = card.getSector(8) as? DataClassicSector ?: return false
@@ -78,6 +83,18 @@ class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_kazan,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.RUSSIA,
+            locationRes = Res.string.location_kazan,
+            imageRes = Res.drawable.kazan,
+            latitude = 55.7963f,
+            longitude = 49.1089f,
+            brandColor = 0x014797,
+            keysRequired = true,
+        )
+
         private val TZ = TimeZone.of("Europe/Moscow")
 
         private fun getSerial(card: ClassicCard): Long =

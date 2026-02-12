@@ -28,15 +28,16 @@ import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import farebot.farebot_transit_waikato.generated.resources.Res
-import farebot.farebot_transit_waikato.generated.resources.waikato_card_name_busit
-import farebot.farebot_transit_waikato.generated.resources.waikato_card_name_rotorua
+import farebot.farebot_transit_waikato.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
@@ -55,6 +56,9 @@ import org.jetbrains.compose.resources.getString
  * Ported from Metrodroid.
  */
 class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -115,6 +119,18 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.waikato_card_name_busit,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.NEW_ZEALAND,
+            locationRes = Res.string.waikato_location,
+            imageRes = Res.drawable.busitcard,
+            latitude = -37.7870f,
+            longitude = 175.2793f,
+            brandColor = 0x2675AB,
+            preview = true,
+        )
+
         private val TIME_ZONE = TimeZone.of("Pacific/Auckland")
 
         private fun getSerial(card: ClassicCard): Long {

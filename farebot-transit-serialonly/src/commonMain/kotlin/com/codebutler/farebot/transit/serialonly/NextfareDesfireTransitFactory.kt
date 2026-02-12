@@ -29,10 +29,13 @@ import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFileSettings
 import com.codebutler.farebot.card.desfire.UnauthorizedDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class NextfareDesfireTransitFactory : TransitFactory<DesfireCard, NextfareDesfireTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: DesfireCard): Boolean {
         // Early check: exactly 1 app with ID 0x10000, app list not locked

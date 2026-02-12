@@ -27,14 +27,20 @@ package com.codebutler.farebot.transit.china
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.card.china.ChinaCard
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_china.generated.resources.Res
+import farebot.farebot_transit_china.generated.resources.beijing
+import farebot.farebot_transit_china.generated.resources.card_location_beijing_china
 import farebot.farebot_transit_china.generated.resources.card_name_beijing
+import farebot.farebot_transit_china.generated.resources.card_name_beijing_municipal_card
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
@@ -86,6 +92,10 @@ class BeijingTransitInfo(
         }
 
         val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
+            override val allCards: List<CardInfo> = listOf(
+                CardInfo(nameRes = Res.string.card_name_beijing_municipal_card, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_beijing_china, imageRes = Res.drawable.beijing, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0x0A18A8)
+            )
+
             override val appNames: List<ByteArray>
                 get() = listOf(
                     "OC".encodeToByteArray(),

@@ -23,15 +23,17 @@
 package com.codebutler.farebot.transit.msp_goto
 
 import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.nextfare.NextfareRefill
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
 import com.codebutler.farebot.transit.nextfare.record.NextfareRecord
-import farebot.farebot_transit_msp_goto.generated.resources.Res
-import farebot.farebot_transit_msp_goto.generated.resources.msp_goto_card_name
+import farebot.farebot_transit_msp_goto.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.getString
@@ -43,6 +45,9 @@ import org.jetbrains.compose.resources.getString
  * Ported from Metrodroid.
  */
 class MspGotoTransitFactory : TransitFactory<ClassicCard, MspGotoTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -73,6 +78,18 @@ class MspGotoTransitFactory : TransitFactory<ClassicCard, MspGotoTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.msp_goto_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.USA,
+            locationRes = Res.string.msp_goto_location,
+            imageRes = Res.drawable.msp_goto_card,
+            latitude = 44.9778f,
+            longitude = -93.2650f,
+            brandColor = 0x0E519E,
+            sampleDumpFile = "MspGoTo.json",
+        )
+
         private val BLOCK1 = byteArrayOf(
             0x16, 0x18, 0x1A, 0x1B,
             0x1C, 0x1D, 0x1E, 0x1F,

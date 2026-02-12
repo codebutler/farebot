@@ -22,13 +22,17 @@
 
 package com.codebutler.farebot.transit.lax_tap
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.nextfare.NextfareRefill
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
+import farebot.farebot_transit_lax_tap.generated.resources.*
 import kotlinx.datetime.TimeZone
 
 /**
@@ -37,6 +41,9 @@ import kotlinx.datetime.TimeZone
  * TAP is a Nextfare-based MiFare Classic card used in the Los Angeles metro area.
  */
 class LaxTapTransitFactory : TransitFactory<ClassicCard, LaxTapTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -76,6 +83,18 @@ class LaxTapTransitFactory : TransitFactory<ClassicCard, LaxTapTransitInfo> {
     }
 
     companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.lax_tap_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.USA,
+            locationRes = Res.string.lax_tap_location,
+            imageRes = Res.drawable.laxtap_card,
+            latitude = 34.0522f,
+            longitude = -118.2437f,
+            brandColor = 0x497ABD,
+            sampleDumpFile = "LaxTap.json",
+        )
+
         private val TIME_ZONE = TimeZone.of("America/Los_Angeles")
     }
 }

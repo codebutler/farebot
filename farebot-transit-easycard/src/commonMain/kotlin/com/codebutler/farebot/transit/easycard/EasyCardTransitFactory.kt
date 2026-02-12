@@ -72,6 +72,11 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
             locationRes = Res.string.easycard_card_location,
             keysRequired = true,
             extraNoteRes = Res.string.easycard_card_note,
+            imageRes = Res.drawable.easycard,
+            latitude = 25.0330f,
+            longitude = 121.5654f,
+            brandColor = 0xE63279,
+            sampleDumpFile = "EasyCard.mfc",
         )
 
         /**

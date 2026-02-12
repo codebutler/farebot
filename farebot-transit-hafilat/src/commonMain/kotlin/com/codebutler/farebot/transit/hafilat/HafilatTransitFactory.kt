@@ -26,22 +26,27 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Parser
-import farebot.farebot_transit_hafilat.generated.resources.Res
-import farebot.farebot_transit_hafilat.generated.resources.card_name_hafilat
+import farebot.farebot_transit_hafilat.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
 class HafilatTransitFactory(
     private val stringResource: StringResource = DefaultStringResource()
 ) : TransitFactory<DesfireCard, HafilatTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: DesfireCard): Boolean {
         return card.getApplication(APP_ID) != null
@@ -99,6 +104,17 @@ class HafilatTransitFactory(
 
     companion object {
         private const val APP_ID = 0x107f2
+
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.card_name_hafilat,
+            cardType = CardType.MifareDesfire,
+            region = TransitRegion.UAE,
+            locationRes = Res.string.location_abu_dhabi,
+            imageRes = Res.drawable.hafilat,
+            latitude = 24.4539f,
+            longitude = 54.3773f,
+            brandColor = 0x95A966,
+        )
 
         private fun getSerial(tagId: ByteArray): Long =
             tagId.byteArrayToLongReversed(1, 6)

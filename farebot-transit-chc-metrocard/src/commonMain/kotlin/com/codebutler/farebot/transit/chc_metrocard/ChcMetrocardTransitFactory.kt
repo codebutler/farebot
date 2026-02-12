@@ -21,13 +21,15 @@
 
 package com.codebutler.farebot.transit.chc_metrocard
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
-import farebot.farebot_transit_chc_metrocard.generated.resources.Res
-import farebot.farebot_transit_chc_metrocard.generated.resources.chc_metrocard_card_name
+import farebot.farebot_transit_chc_metrocard.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -37,6 +39,9 @@ import org.jetbrains.compose.resources.getString
  * This is an ERG-based card identified by the ERG signature and agency ID 0x0136.
  */
 class ChcMetrocardTransitFactory : TransitFactory<ClassicCard, ChcMetrocardTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -72,5 +77,20 @@ class ChcMetrocardTransitFactory : TransitFactory<ClassicCard, ChcMetrocardTrans
             newRefill = { purse, epoch -> ChcMetrocardRefill(purse, epoch) }
         )
         return ChcMetrocardTransitInfo(capsule)
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.chc_metrocard_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.NEW_ZEALAND,
+            locationRes = Res.string.chc_metrocard_location,
+            imageRes = Res.drawable.chc_metrocard,
+            latitude = -43.5321f,
+            longitude = 172.6362f,
+            brandColor = 0x242245,
+            keysRequired = true,
+            extraNoteRes = Res.string.chc_metrocard_note,
+        )
     }
 }

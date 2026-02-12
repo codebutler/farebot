@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -40,6 +41,8 @@ import org.jetbrains.compose.resources.getString
  * This factory should be registered LAST in the Classic factory list.
  */
 class UnauthorizedClassicTransitFactory : TransitFactory<ClassicCard, UnauthorizedClassicTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     /**
      * This should be the last executed MIFARE Classic check, after all the other checks are done.

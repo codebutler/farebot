@@ -28,13 +28,15 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import farebot.farebot_transit_komuterlink.generated.resources.Res
-import farebot.farebot_transit_komuterlink.generated.resources.komuterlink_card_name
+import farebot.farebot_transit_komuterlink.generated.resources.*
 import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
@@ -43,6 +45,9 @@ import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.getString
 
 class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
@@ -92,6 +97,19 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
             mIssueTimestamp = parseTimestamp(sector1.getBlock(0).data, 5),
             mCardNo = sector0.getBlock(2).data.byteArrayToInt(4, 4),
             mStoredLuhn = sector0.getBlock(2).data[8].toInt() and 0xff
+        )
+    }
+
+    companion object {
+        private val CARD_INFO = CardInfo(
+            nameRes = Res.string.komuterlink_card_name,
+            cardType = CardType.MifareClassic,
+            region = TransitRegion.MALAYSIA,
+            locationRes = Res.string.komuterlink_location,
+            imageRes = Res.drawable.komuterlink,
+            latitude = 3.1390f,
+            longitude = 101.6869f,
+            brandColor = 0x563281,
         )
     }
 }

@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -41,6 +42,8 @@ import org.jetbrains.compose.resources.getString
  * https://3dbrew.org/wiki/Amiibo#Data_structures
  */
 class AmiiboTransitFactory : TransitFactory<UltralightCard, AmiiboTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
         // Amiibo uses NTAG215 (135 pages). Check the lock/CC bytes

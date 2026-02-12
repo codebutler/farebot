@@ -27,13 +27,20 @@ import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.base.util.sliceOffLen
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
+import com.codebutler.farebot.transit.TransitRegion
+import farebot.farebot_transit_zolotayakorona.generated.resources.*
 
 class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaTransitInfo> {
+
+    override val allCards: List<CardInfo>
+        get() = ALL_CARDS
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0)
@@ -88,5 +95,70 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
     private fun getCardType(card: ClassicCard): Int {
         val sector15 = card.getSector(15) as DataClassicSector
         return sector15.getBlock(1).data.byteArrayToInt(10, 3)
+    }
+
+    companion object {
+        private val ALL_CARDS = listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_zolotaya_korona,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.card_location_russia,
+                keysRequired = true,
+                preview = true,
+                imageRes = Res.drawable.zolotayakorona,
+                latitude = 55.0084f,
+                longitude = 82.9357f,
+                brandColor = 0xE0002D,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_krasnodar_etk,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.card_location_krasnodar_russia,
+                keysRequired = true,
+                preview = true,
+                imageRes = Res.drawable.krasnodar_etk,
+                latitude = 45.0355f,
+                longitude = 38.9753f,
+                brandColor = 0x4B75B8,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_orenburg_ekg,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.card_location_orenburg_russia,
+                keysRequired = true,
+                preview = true,
+                imageRes = Res.drawable.orenburg_ekg,
+                latitude = 51.7727f,
+                longitude = 55.0988f,
+                brandColor = 0xFED653,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_samara_etk,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.card_location_samara_russia,
+                keysRequired = true,
+                preview = true,
+                imageRes = Res.drawable.samara_etk,
+                latitude = 53.1959f,
+                longitude = 50.1001f,
+                brandColor = 0xE6213A,
+            ),
+            CardInfo(
+                nameRes = Res.string.card_name_yaroslavl_etk,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.card_location_yaroslavl_russia,
+                keysRequired = true,
+                preview = true,
+                imageRes = Res.drawable.yaroslavl_etk,
+                latitude = 57.6261f,
+                longitude = 39.8845f,
+                brandColor = 0x1C3778,
+            ),
+        )
     }
 }

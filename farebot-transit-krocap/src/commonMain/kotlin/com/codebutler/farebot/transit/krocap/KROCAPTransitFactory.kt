@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.krocap
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
 import com.codebutler.farebot.card.ksx6924.KROCAPData
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
@@ -39,6 +40,8 @@ import com.codebutler.farebot.transit.TransitIdentity
  * Reference: https://github.com/micolous/metrodroid/wiki/South-Korea#a0000004520001
  */
 class KROCAPTransitFactory : TransitFactory<ISO7816Card, KROCAPTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: ISO7816Card): Boolean {
         // Only handle cards with KR-OCAP Config DF but WITHOUT KSX6924 application.

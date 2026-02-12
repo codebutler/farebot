@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.nextfareul
 
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
@@ -52,6 +53,8 @@ class NextfareUnknownUltralightTransitInfo(
 
         val FACTORY: TransitFactory<UltralightCard, NextfareUnknownUltralightTransitInfo> =
             object : TransitFactory<UltralightCard, NextfareUnknownUltralightTransitInfo> {
+
+                override val allCards: List<CardInfo> = emptyList()
 
                 override fun check(card: UltralightCard): Boolean {
                     val head = card.getPage(4).data.byteArrayToInt(0, 3)

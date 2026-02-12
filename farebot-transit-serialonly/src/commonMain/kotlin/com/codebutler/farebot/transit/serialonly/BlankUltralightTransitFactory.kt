@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.card.ultralight.UltralightCard
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
@@ -38,6 +39,8 @@ import org.jetbrains.compose.resources.getString
  * This factory should be registered near the END of the Ultralight factory list.
  */
 class BlankUltralightTransitFactory : TransitFactory<UltralightCard, BlankUltralightTransitInfo> {
+
+    override val allCards: List<CardInfo> = emptyList()
 
     /**
      * @param card Card to read.

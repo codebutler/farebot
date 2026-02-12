@@ -3,7 +3,7 @@
     <string name="umarsh_adult">Adult</string>
     <string name="umarsh_student">Student</string>
     <string name="umarsh_school">School</string>
-    <!-- City card names -->
+    <!-- City card names (internal, used by UmarshData for card identification) -->
     <string name="card_name_yoshkar_ola">Yoshkar-Ola Transport Card</string>
     <string name="card_name_strizh">Strizh (Izhevsk)</string>
     <string name="card_name_barnaul">Barnaul Transport Card</string>
@@ -15,6 +15,21 @@
     <string name="card_name_ekarta">Ekarta (Yekaterinburg)</string>
     <string name="card_name_crimea_trolleybus">Crimea Trolleybus</string>
     <string name="card_name_crimea_parus_school">Crimea Parus (School)</string>
+    <!-- Card names for Explore screen (matching farebot-app conventions) -->
+    <string name="card_name_yoshkar_ola_transport_card">Yoshkar-Ola transport card</string>
+    <string name="card_name_electronic_barnaul">Electronic Barnaul</string>
+    <string name="card_name_kirov_transport_card">Kirov transport card</string>
+    <string name="card_name_penza_transport_card">Penza transport card</string>
+    <!-- Card locations -->
+    <string name="card_location_yoshkar_ola_russia">Yoshkar-Ola, Russia</string>
+    <string name="card_location_izhevsk_russia">Izhevsk, Russia</string>
+    <string name="card_location_barnaul_russia">Barnaul, Russia</string>
+    <string name="card_location_vladimir_russia">Vladimir, Russia</string>
+    <string name="card_location_kirov_russia">Kirov, Russia</string>
+    <string name="card_location_nizhniy_novgorod_russia">Nizhniy Novgorod, Russia</string>
+    <string name="card_location_omsk_russia">Omsk, Russia</string>
+    <string name="card_location_penza_russia">Penza, Russia</string>
+    <string name="card_location_yekaterinburg_russia">Yekaterinburg, Russia</string>
     <!-- Tariff names -->
     <string name="barnaul_ewallet">E-wallet</string>
     <string name="siticard_adult_60min_xfer_purse">Adult 60-min transfer purse</string>
