@@ -309,7 +309,7 @@ fun HomeScreen(
                                     text = {
                                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                             Text(stringResource(Res.string.show_unsupported_cards))
-                                            Badge { Text("$unsupportedCount") }
+                                            Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$unsupportedCount") }
                                         }
                                     },
                                     trailingIcon = if (showUnsupported) {
@@ -326,7 +326,7 @@ fun HomeScreen(
                                 text = {
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Text(stringResource(Res.string.show_serial_only_cards))
-                                        Badge { Text("$serialOnlyCount") }
+                                        Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$serialOnlyCount") }
                                     }
                                 },
                                 trailingIcon = if (showSerialOnly) {
@@ -342,7 +342,7 @@ fun HomeScreen(
                                 text = {
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Text(stringResource(Res.string.show_keys_required_cards))
-                                        Badge { Text("$keysRequiredCount") }
+                                        Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$keysRequiredCount") }
                                     }
                                 },
                                 trailingIcon = if (showKeysRequired) {
@@ -358,7 +358,7 @@ fun HomeScreen(
                                 text = {
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Text(stringResource(Res.string.show_experimental_cards))
-                                        Badge { Text("$experimentalCount") }
+                                        Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$experimentalCount") }
                                     }
                                 },
                                 trailingIcon = if (showExperimental) {
