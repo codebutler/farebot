@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>FareBot Card Image Review</title>
+<style>
+body { font-family: -apple-system, sans-serif; background: #1a1a1a; color: #ddd; margin: 20px; }
+h1 { color: #fff; }
+h2 { color: #aaa; margin-top: 30px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.card { background: #2a2a2a; border-radius: 12px; overflow: hidden; border: 1px solid #333; }
+.card.issue { border: 2px solid #ff6b6b; }
+.card.ok { }
+body.issues-only .card.ok { display: none; }
+body.issues-only h2.no-issues { display: none; }
+.card-img-wrapper {
+  aspect-ratio: 1.586; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  background: repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 50% / 16px 16px;
+}
+.card-img-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.card-info { padding: 8px 10px; font-size: 11px; }
+.card-info .name { font-weight: bold; font-size: 13px; color: #fff; }
+.card-info .dims { color: #888; }
+.card-info .path { color: #555; font-size: 10px; word-break: break-all; }
+.card-info .issue-label { color: #ff6b6b; font-weight: bold; }
+.toolbar { background: #222; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+.toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.toggle input { width: 18px; height: 18px; accent-color: #ff6b6b; cursor: pointer; }
+.legend-item { display: inline-flex; align-items: center; gap: 4px; }
+.count { color: #888; font-size: 13px; }
+</style></head><body>
+<h1>FareBot Card Image Review</h1>
+<div class="toolbar">
+  <label class="toggle">
+    <input type="checkbox" id="issuesToggle" onchange="toggleIssues()">
+    <span>Show issues only</span>
+  </label>
+  <span class="legend-item"><span style="color:#ff6b6b">&#9679;</span> Red border = flagged issue</span>
+  <span class="legend-item">Checkerboard = transparency</span>
+  <span class="count" id="countLabel"></span>
+</div>
+<script>
+function toggleIssues() {
+  var on = document.getElementById('issuesToggle').checked;
+  document.body.classList.toggle('issues-only', on);
+  updateCount();
+}
+function updateCount() {
+  var all = document.querySelectorAll('.card');
+  var issues = document.querySelectorAll('.card.issue');
+  var on = document.getElementById('issuesToggle').checked;
+  var label = document.getElementById('countLabel');
+  if (on) {
+    label.textContent = issues.length + ' issues';
+  } else {
+    label.textContent = all.length + ' total, ' + issues.length + ' with issues';
+  }
+}
+document.addEventListener('DOMContentLoaded', updateCount);
+</script>
+<h2 class="no-issues">farebot-transit-adelaide</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-adelaide/src/commonMain/composeResources/drawable/adelaide.png" alt="adelaide.png"></div>
+  <div class="card-info">
+    <div class="name">adelaide.png</div>
+    <div class="dims">600x361 &middot; png &middot; 118KB</div>
+    
+    <div class="path">farebot-transit-adelaide/src/commonMain/composeResources/drawable/adelaide.png</div>
+  </div></div>
+</div>
+<h2 class="">farebot-transit-bilhete</h2>
+<div class="grid">
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-bilhete/src/commonMain/composeResources/drawable/bilheteunicosp_card.png" alt="bilheteunicosp_card.png"></div>
+  <div class="card-info">
+    <div class="name">bilheteunicosp_card.png</div>
+    <div class="dims">372x235 &middot; png &middot; 127KB</div>
+    <div class="issue-label">Low resolution (372px)</div>
+    <div class="path">farebot-transit-bilhete/src/commonMain/composeResources/drawable/bilheteunicosp_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-bip</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-bip/src/commonMain/composeResources/drawable/chilebip.png" alt="chilebip.png"></div>
+  <div class="card-info">
+    <div class="name">chilebip.png</div>
+    <div class="dims">520x331 &middot; png &middot; 14KB</div>
+    
+    <div class="path">farebot-transit-bip/src/commonMain/composeResources/drawable/chilebip.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-bonobus</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-bonobus/src/commonMain/composeResources/drawable/cadizcard.png" alt="cadizcard.png"></div>
+  <div class="card-info">
+    <div class="name">cadizcard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 170KB</div>
+    
+    <div class="path">farebot-transit-bonobus/src/commonMain/composeResources/drawable/cadizcard.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-calypso</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/cartamobile.png" alt="cartamobile.png"></div>
+  <div class="card-info">
+    <div class="name">cartamobile.png</div>
+    <div class="dims">380x240 &middot; png &middot; 139KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/cartamobile.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/envibus.png" alt="envibus.png"></div>
+  <div class="card-info">
+    <div class="name">envibus.png</div>
+    <div class="dims">400x252 &middot; png &middot; 192KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/envibus.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/korrigo.png" alt="korrigo.png"></div>
+  <div class="card-info">
+    <div class="name">korrigo.png</div>
+    <div class="dims">380x240 &middot; png &middot; 120KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/korrigo.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/lisboaviva.png" alt="lisboaviva.png"></div>
+  <div class="card-info">
+    <div class="name">lisboaviva.png</div>
+    <div class="dims">380x240 &middot; png &middot; 99KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/lisboaviva.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/mobib_card.png" alt="mobib_card.png"></div>
+  <div class="card-info">
+    <div class="name">mobib_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 19KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/mobib_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/navigo.png" alt="navigo.png"></div>
+  <div class="card-info">
+    <div class="name">navigo.png</div>
+    <div class="dims">380x240 &middot; png &middot; 110KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/navigo.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/opus_card.svg" alt="opus_card.svg"></div>
+  <div class="card-info">
+    <div class="name">opus_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 5KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/opus_card.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/oura.png" alt="oura.png"></div>
+  <div class="card-info">
+    <div class="name">oura.png</div>
+    <div class="dims">380x240 &middot; png &middot; 98KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/oura.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/passpass.png" alt="passpass.png"></div>
+  <div class="card-info">
+    <div class="name">passpass.png</div>
+    <div class="dims">573x366 &middot; png &middot; 34KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/passpass.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/pastel.png" alt="pastel.png"></div>
+  <div class="card-info">
+    <div class="name">pastel.png</div>
+    <div class="dims">380x240 &middot; png &middot; 154KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/pastel.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/ravkav_card.svg" alt="ravkav_card.svg"></div>
+  <div class="card-info">
+    <div class="name">ravkav_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 20KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/ravkav_card.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/tam_montpellier.png" alt="tam_montpellier.png"></div>
+  <div class="card-info">
+    <div class="name">tam_montpellier.png</div>
+    <div class="dims">380x240 &middot; png &middot; 162KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/tam_montpellier.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/transgironde.png" alt="transgironde.png"></div>
+  <div class="card-info">
+    <div class="name">transgironde.png</div>
+    <div class="dims">380x240 &middot; png &middot; 93KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/transgironde.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-calypso/src/commonMain/composeResources/drawable/veneziaunica.png" alt="veneziaunica.png"></div>
+  <div class="card-info">
+    <div class="name">veneziaunica.png</div>
+    <div class="dims">380x240 &middot; png &middot; 70KB</div>
+    
+    <div class="path">farebot-transit-calypso/src/commonMain/composeResources/drawable/veneziaunica.png</div>
+  </div></div>
+</div>
+<h2 class="">farebot-transit-charlie</h2>
+<div class="grid">
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-charlie/src/commonMain/composeResources/drawable/charlie_card.png" alt="charlie_card.png"></div>
+  <div class="card-info">
+    <div class="name">charlie_card.png</div>
+    <div class="dims">300x189 &middot; png &middot; 116KB</div>
+    <div class="issue-label">Low resolution (300px)</div>
+    <div class="path">farebot-transit-charlie/src/commonMain/composeResources/drawable/charlie_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-chc-metrocard</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-chc-metrocard/src/commonMain/composeResources/drawable/chc_metrocard.png" alt="chc_metrocard.png"></div>
+  <div class="card-info">
+    <div class="name">chc_metrocard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 55KB</div>
+    
+    <div class="path">farebot-transit-chc-metrocard/src/commonMain/composeResources/drawable/chc_metrocard.png</div>
+  </div></div>
+</div>
+<h2 class="">farebot-transit-china</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-china/src/commonMain/composeResources/drawable/beijing.png" alt="beijing.png"></div>
+  <div class="card-info">
+    <div class="name">beijing.png</div>
+    <div class="dims">380x240 &middot; png &middot; 148KB</div>
+    
+    <div class="path">farebot-transit-china/src/commonMain/composeResources/drawable/beijing.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-china/src/commonMain/composeResources/drawable/city_union.svg" alt="city_union.svg"></div>
+  <div class="card-info">
+    <div class="name">city_union.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 2KB</div>
+    <div class="issue-label">Not a card (logo)</div>
+    <div class="path">farebot-transit-china/src/commonMain/composeResources/drawable/city_union.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-china/src/commonMain/composeResources/drawable/shanghai.png" alt="shanghai.png"></div>
+  <div class="card-info">
+    <div class="name">shanghai.png</div>
+    <div class="dims">380x240 &middot; png &middot; 166KB</div>
+    
+    <div class="path">farebot-transit-china/src/commonMain/composeResources/drawable/shanghai.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-china/src/commonMain/composeResources/drawable/szt_card.png" alt="szt_card.png"></div>
+  <div class="card-info">
+    <div class="name">szt_card.png</div>
+    <div class="dims">379x183 &middot; png &middot; 7KB</div>
+    <div class="issue-label">Low resolution (379px) | Not a card (logo)</div>
+    <div class="path">farebot-transit-china/src/commonMain/composeResources/drawable/szt_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-china/src/commonMain/composeResources/drawable/tunion.png" alt="tunion.png"></div>
+  <div class="card-info">
+    <div class="name">tunion.png</div>
+    <div class="dims">380x246 &middot; png &middot; 22KB</div>
+    
+    <div class="path">farebot-transit-china/src/commonMain/composeResources/drawable/tunion.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-china/src/commonMain/composeResources/drawable/wuhantong.png" alt="wuhantong.png"></div>
+  <div class="card-info">
+    <div class="name">wuhantong.png</div>
+    <div class="dims">380x240 &middot; png &middot; 104KB</div>
+    
+    <div class="path">farebot-transit-china/src/commonMain/composeResources/drawable/wuhantong.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-clipper</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-clipper/src/commonMain/composeResources/drawable/clipper_card.png" alt="clipper_card.png"></div>
+  <div class="card-info">
+    <div class="name">clipper_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 215KB</div>
+    
+    <div class="path">farebot-transit-clipper/src/commonMain/composeResources/drawable/clipper_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-easycard</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-easycard/src/commonMain/composeResources/drawable/easycard.png" alt="easycard.png"></div>
+  <div class="card-info">
+    <div class="name">easycard.png</div>
+    <div class="dims">532x327 &middot; png &middot; 152KB</div>
+    
+    <div class="path">farebot-transit-easycard/src/commonMain/composeResources/drawable/easycard.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-edy</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-edy/src/commonMain/composeResources/drawable/edy_card.png" alt="edy_card.png"></div>
+  <div class="card-info">
+    <div class="name">edy_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 37KB</div>
+    
+    <div class="path">farebot-transit-edy/src/commonMain/composeResources/drawable/edy_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-ezlink</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-ezlink/src/commonMain/composeResources/drawable/ezlink_card.png" alt="ezlink_card.png"></div>
+  <div class="card-info">
+    <div class="name">ezlink_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 179KB</div>
+    
+    <div class="path">farebot-transit-ezlink/src/commonMain/composeResources/drawable/ezlink_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-ezlink/src/commonMain/composeResources/drawable/nets_card.png" alt="nets_card.png"></div>
+  <div class="card-info">
+    <div class="name">nets_card.png</div>
+    <div class="dims">600x379 &middot; png &middot; 77KB</div>
+    
+    <div class="path">farebot-transit-ezlink/src/commonMain/composeResources/drawable/nets_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-gautrain</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-gautrain/src/commonMain/composeResources/drawable/gautrain.png" alt="gautrain.png"></div>
+  <div class="card-info">
+    <div class="name">gautrain.png</div>
+    <div class="dims">380x240 &middot; png &middot; 145KB</div>
+    
+    <div class="path">farebot-transit-gautrain/src/commonMain/composeResources/drawable/gautrain.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-hafilat</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-hafilat/src/commonMain/composeResources/drawable/hafilat.png" alt="hafilat.png"></div>
+  <div class="card-info">
+    <div class="name">hafilat.png</div>
+    <div class="dims">380x240 &middot; png &middot; 99KB</div>
+    
+    <div class="path">farebot-transit-hafilat/src/commonMain/composeResources/drawable/hafilat.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-hsl</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-hsl/src/commonMain/composeResources/drawable/hsl_card.png" alt="hsl_card.png"></div>
+  <div class="card-info">
+    <div class="name">hsl_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 72KB</div>
+    
+    <div class="path">farebot-transit-hsl/src/commonMain/composeResources/drawable/hsl_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-kazan</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-kazan/src/commonMain/composeResources/drawable/kazan.png" alt="kazan.png"></div>
+  <div class="card-info">
+    <div class="name">kazan.png</div>
+    <div class="dims">380x240 &middot; png &middot; 175KB</div>
+    
+    <div class="path">farebot-transit-kazan/src/commonMain/composeResources/drawable/kazan.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-kiev</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-kiev/src/commonMain/composeResources/drawable/kiev.png" alt="kiev.png"></div>
+  <div class="card-info">
+    <div class="name">kiev.png</div>
+    <div class="dims">380x240 &middot; png &middot; 135KB</div>
+    
+    <div class="path">farebot-transit-kiev/src/commonMain/composeResources/drawable/kiev.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-kmt</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-kmt/src/commonMain/composeResources/drawable/kmt_card.png" alt="kmt_card.png"></div>
+  <div class="card-info">
+    <div class="name">kmt_card.png</div>
+    <div class="dims">380x239 &middot; png &middot; 65KB</div>
+    
+    <div class="path">farebot-transit-kmt/src/commonMain/composeResources/drawable/kmt_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-komuterlink</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-komuterlink/src/commonMain/composeResources/drawable/komuterlink.png" alt="komuterlink.png"></div>
+  <div class="card-info">
+    <div class="name">komuterlink.png</div>
+    <div class="dims">380x240 &middot; png &middot; 144KB</div>
+    
+    <div class="path">farebot-transit-komuterlink/src/commonMain/composeResources/drawable/komuterlink.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-lax-tap</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-lax-tap/src/commonMain/composeResources/drawable/laxtap_card.png" alt="laxtap_card.png"></div>
+  <div class="card-info">
+    <div class="name">laxtap_card.png</div>
+    <div class="dims">380x243 &middot; png &middot; 36KB</div>
+    
+    <div class="path">farebot-transit-lax-tap/src/commonMain/composeResources/drawable/laxtap_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-manly</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-manly/src/commonMain/composeResources/drawable/manly_fast_ferry_card.png" alt="manly_fast_ferry_card.png"></div>
+  <div class="card-info">
+    <div class="name">manly_fast_ferry_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 7KB</div>
+    
+    <div class="path">farebot-transit-manly/src/commonMain/composeResources/drawable/manly_fast_ferry_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-metromoney</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-metromoney/src/commonMain/composeResources/drawable/metromoney.png" alt="metromoney.png"></div>
+  <div class="card-info">
+    <div class="name">metromoney.png</div>
+    <div class="dims">380x240 &middot; png &middot; 11KB</div>
+    
+    <div class="path">farebot-transit-metromoney/src/commonMain/composeResources/drawable/metromoney.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-metroq</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-metroq/src/commonMain/composeResources/drawable/metroq.png" alt="metroq.png"></div>
+  <div class="card-info">
+    <div class="name">metroq.png</div>
+    <div class="dims">380x240 &middot; png &middot; 99KB</div>
+    
+    <div class="path">farebot-transit-metroq/src/commonMain/composeResources/drawable/metroq.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-mrtj</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-mrtj/src/commonMain/composeResources/drawable/mrtj_card.png" alt="mrtj_card.png"></div>
+  <div class="card-info">
+    <div class="name">mrtj_card.png</div>
+    <div class="dims">380x239 &middot; png &middot; 73KB</div>
+    
+    <div class="path">farebot-transit-mrtj/src/commonMain/composeResources/drawable/mrtj_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-msp-goto</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-msp-goto/src/commonMain/composeResources/drawable/msp_goto_card.png" alt="msp_goto_card.png"></div>
+  <div class="card-info">
+    <div class="name">msp_goto_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 6KB</div>
+    
+    <div class="path">farebot-transit-msp-goto/src/commonMain/composeResources/drawable/msp_goto_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-myki</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-myki/src/commonMain/composeResources/drawable/myki_card.png" alt="myki_card.png"></div>
+  <div class="card-info">
+    <div class="name">myki_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 36KB</div>
+    
+    <div class="path">farebot-transit-myki/src/commonMain/composeResources/drawable/myki_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-octopus</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-octopus/src/commonMain/composeResources/drawable/octopus_card.png" alt="octopus_card.png"></div>
+  <div class="card-info">
+    <div class="name">octopus_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 63KB</div>
+    
+    <div class="path">farebot-transit-octopus/src/commonMain/composeResources/drawable/octopus_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-opal</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-opal/src/commonMain/composeResources/drawable/opal_card.png" alt="opal_card.png"></div>
+  <div class="card-info">
+    <div class="name">opal_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 45KB</div>
+    
+    <div class="path">farebot-transit-opal/src/commonMain/composeResources/drawable/opal_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-orca</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-orca/src/commonMain/composeResources/drawable/orca_card.png" alt="orca_card.png"></div>
+  <div class="card-info">
+    <div class="name">orca_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 187KB</div>
+    
+    <div class="path">farebot-transit-orca/src/commonMain/composeResources/drawable/orca_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-otago</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-otago/src/commonMain/composeResources/drawable/otago_gocard.svg" alt="otago_gocard.svg"></div>
+  <div class="card-info">
+    <div class="name">otago_gocard.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 3KB</div>
+    
+    <div class="path">farebot-transit-otago/src/commonMain/composeResources/drawable/otago_gocard.svg</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-ovc</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-ovc/src/commonMain/composeResources/drawable/ovchip_card.png" alt="ovchip_card.png"></div>
+  <div class="card-info">
+    <div class="name">ovchip_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 181KB</div>
+    
+    <div class="path">farebot-transit-ovc/src/commonMain/composeResources/drawable/ovchip_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-oyster</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-oyster/src/commonMain/composeResources/drawable/oyster_card.png" alt="oyster_card.png"></div>
+  <div class="card-info">
+    <div class="name">oyster_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 4KB</div>
+    
+    <div class="path">farebot-transit-oyster/src/commonMain/composeResources/drawable/oyster_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-pilet</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-pilet/src/commonMain/composeResources/drawable/kiev_digital.png" alt="kiev_digital.png"></div>
+  <div class="card-info">
+    <div class="name">kiev_digital.png</div>
+    <div class="dims">390x250 &middot; png &middot; 34KB</div>
+    
+    <div class="path">farebot-transit-pilet/src/commonMain/composeResources/drawable/kiev_digital.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-pilet/src/commonMain/composeResources/drawable/tartu.png" alt="tartu.png"></div>
+  <div class="card-info">
+    <div class="name">tartu.png</div>
+    <div class="dims">380x240 &middot; png &middot; 106KB</div>
+    
+    <div class="path">farebot-transit-pilet/src/commonMain/composeResources/drawable/tartu.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-podorozhnik</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-podorozhnik/src/commonMain/composeResources/drawable/podorozhnik_card.png" alt="podorozhnik_card.png"></div>
+  <div class="card-info">
+    <div class="name">podorozhnik_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 153KB</div>
+    
+    <div class="path">farebot-transit-podorozhnik/src/commonMain/composeResources/drawable/podorozhnik_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-ricaricami</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-ricaricami/src/commonMain/composeResources/drawable/ricaricami.png" alt="ricaricami.png"></div>
+  <div class="card-info">
+    <div class="name">ricaricami.png</div>
+    <div class="dims">380x240 &middot; png &middot; 151KB</div>
+    
+    <div class="path">farebot-transit-ricaricami/src/commonMain/composeResources/drawable/ricaricami.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-selecta</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-selecta/src/commonMain/composeResources/drawable/selecta.png" alt="selecta.png"></div>
+  <div class="card-info">
+    <div class="name">selecta.png</div>
+    <div class="dims">400x178 &middot; png &middot; 75KB</div>
+    
+    <div class="path">farebot-transit-selecta/src/commonMain/composeResources/drawable/selecta.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-seqgo</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-seqgo/src/commonMain/composeResources/drawable/seqgo_card.png" alt="seqgo_card.png"></div>
+  <div class="card-info">
+    <div class="name">seqgo_card.png</div>
+    <div class="dims">380x236 &middot; png &middot; 61KB</div>
+    
+    <div class="path">farebot-transit-seqgo/src/commonMain/composeResources/drawable/seqgo_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-serialonly</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/athopcard.png" alt="athopcard.png"></div>
+  <div class="card-info">
+    <div class="name">athopcard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 83KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/athopcard.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/holo_card.png" alt="holo_card.png"></div>
+  <div class="card-info">
+    <div class="name">holo_card.png</div>
+    <div class="dims">380x239 &middot; png &middot; 80KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/holo_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/istanbulkart_card.png" alt="istanbulkart_card.png"></div>
+  <div class="card-info">
+    <div class="name">istanbulkart_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 131KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/istanbulkart_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/nol.png" alt="nol.png"></div>
+  <div class="card-info">
+    <div class="name">nol.png</div>
+    <div class="dims">380x240 &middot; png &middot; 55KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/nol.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/presto_card.png" alt="presto_card.png"></div>
+  <div class="card-info">
+    <div class="name">presto_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 16KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/presto_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/strelka_card.png" alt="strelka_card.png"></div>
+  <div class="card-info">
+    <div class="name">strelka_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 96KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/strelka_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/suncard.png" alt="suncard.png"></div>
+  <div class="card-info">
+    <div class="name">suncard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 69KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/suncard.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/tpf_card.png" alt="tpf_card.png"></div>
+  <div class="card-info">
+    <div class="name">tpf_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 8KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/tpf_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-serialonly/src/commonMain/composeResources/drawable/trimethop_card.svg" alt="trimethop_card.svg"></div>
+  <div class="card-info">
+    <div class="name">trimethop_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 17KB</div>
+    
+    <div class="path">farebot-transit-serialonly/src/commonMain/composeResources/drawable/trimethop_card.svg</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-smartrider</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-smartrider/src/commonMain/composeResources/drawable/smartrider_card.png" alt="smartrider_card.png"></div>
+  <div class="card-info">
+    <div class="name">smartrider_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 24KB</div>
+    
+    <div class="path">farebot-transit-smartrider/src/commonMain/composeResources/drawable/smartrider_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-snapper</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-snapper/src/commonMain/composeResources/drawable/snapperplus.png" alt="snapperplus.png"></div>
+  <div class="card-info">
+    <div class="name">snapperplus.png</div>
+    <div class="dims">380x240 &middot; png &middot; 134KB</div>
+    
+    <div class="path">farebot-transit-snapper/src/commonMain/composeResources/drawable/snapperplus.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-suica</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/hayakaken.png" alt="hayakaken.png"></div>
+  <div class="card-info">
+    <div class="name">hayakaken.png</div>
+    <div class="dims">600x386 &middot; png &middot; 94KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/hayakaken.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/icoca_card.png" alt="icoca_card.png"></div>
+  <div class="card-info">
+    <div class="name">icoca_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 129KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/icoca_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/kitaca.png" alt="kitaca.png"></div>
+  <div class="card-info">
+    <div class="name">kitaca.png</div>
+    <div class="dims">485x303 &middot; png &middot; 125KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/kitaca.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/manaca.png" alt="manaca.png"></div>
+  <div class="card-info">
+    <div class="name">manaca.png</div>
+    <div class="dims">520x327 &middot; png &middot; 187KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/manaca.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/nimoca.png" alt="nimoca.png"></div>
+  <div class="card-info">
+    <div class="name">nimoca.png</div>
+    <div class="dims">420x259 &middot; png &middot; 16KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/nimoca.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/pasmo_card.png" alt="pasmo_card.png"></div>
+  <div class="card-info">
+    <div class="name">pasmo_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 127KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/pasmo_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/pitapa.png" alt="pitapa.png"></div>
+  <div class="card-info">
+    <div class="name">pitapa.png</div>
+    <div class="dims">600x380 &middot; png &middot; 297KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/pitapa.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/sugoca.png" alt="sugoca.png"></div>
+  <div class="card-info">
+    <div class="name">sugoca.png</div>
+    <div class="dims">600x375 &middot; png &middot; 144KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/sugoca.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/suica_card.png" alt="suica_card.png"></div>
+  <div class="card-info">
+    <div class="name">suica_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 135KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/suica_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-suica/src/commonMain/composeResources/drawable/toica.png" alt="toica.png"></div>
+  <div class="card-info">
+    <div class="name">toica.png</div>
+    <div class="dims">600x384 &middot; png &middot; 373KB</div>
+    
+    <div class="path">farebot-transit-suica/src/commonMain/composeResources/drawable/toica.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-tampere</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-tampere/src/commonMain/composeResources/drawable/tampere.png" alt="tampere.png"></div>
+  <div class="card-info">
+    <div class="name">tampere.png</div>
+    <div class="dims">380x240 &middot; png &middot; 182KB</div>
+    
+    <div class="path">farebot-transit-tampere/src/commonMain/composeResources/drawable/tampere.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-tfi-leap</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-tfi-leap/src/commonMain/composeResources/drawable/leap_card.png" alt="leap_card.png"></div>
+  <div class="card-info">
+    <div class="name">leap_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 6KB</div>
+    
+    <div class="path">farebot-transit-tfi-leap/src/commonMain/composeResources/drawable/leap_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-tmoney</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-tmoney/src/commonMain/composeResources/drawable/tmoney_card.svg" alt="tmoney_card.svg"></div>
+  <div class="card-info">
+    <div class="name">tmoney_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 8KB</div>
+    
+    <div class="path">farebot-transit-tmoney/src/commonMain/composeResources/drawable/tmoney_card.svg</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-touchngo</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-touchngo/src/commonMain/composeResources/drawable/touchngo.svg" alt="touchngo.svg"></div>
+  <div class="card-info">
+    <div class="name">touchngo.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 1KB</div>
+    
+    <div class="path">farebot-transit-touchngo/src/commonMain/composeResources/drawable/touchngo.svg</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-troika</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-troika/src/commonMain/composeResources/drawable/troika_card.png" alt="troika_card.png"></div>
+  <div class="card-info">
+    <div class="name">troika_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 152KB</div>
+    
+    <div class="path">farebot-transit-troika/src/commonMain/composeResources/drawable/troika_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-umarsh</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/barnaul.png" alt="barnaul.png"></div>
+  <div class="card-info">
+    <div class="name">barnaul.png</div>
+    <div class="dims">380x240 &middot; png &middot; 100KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/barnaul.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/ekarta.png" alt="ekarta.png"></div>
+  <div class="card-info">
+    <div class="name">ekarta.png</div>
+    <div class="dims">380x240 &middot; png &middot; 16KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/ekarta.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/kirov.png" alt="kirov.png"></div>
+  <div class="card-info">
+    <div class="name">kirov.png</div>
+    <div class="dims">380x240 &middot; png &middot; 18KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/kirov.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/omka.png" alt="omka.png"></div>
+  <div class="card-info">
+    <div class="name">omka.png</div>
+    <div class="dims">600x377 &middot; png &middot; 93KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/omka.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/penza.png" alt="penza.png"></div>
+  <div class="card-info">
+    <div class="name">penza.png</div>
+    <div class="dims">380x240 &middot; png &middot; 183KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/penza.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/siticard.png" alt="siticard.png"></div>
+  <div class="card-info">
+    <div class="name">siticard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 15KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/siticard.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/siticard_vladimir.png" alt="siticard_vladimir.png"></div>
+  <div class="card-info">
+    <div class="name">siticard_vladimir.png</div>
+    <div class="dims">380x240 &middot; png &middot; 136KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/siticard_vladimir.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/strizh.png" alt="strizh.png"></div>
+  <div class="card-info">
+    <div class="name">strizh.png</div>
+    <div class="dims">380x240 &middot; png &middot; 29KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/strizh.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-umarsh/src/commonMain/composeResources/drawable/yoshkar_ola.png" alt="yoshkar_ola.png"></div>
+  <div class="card-info">
+    <div class="name">yoshkar_ola.png</div>
+    <div class="dims">380x240 &middot; png &middot; 21KB</div>
+    
+    <div class="path">farebot-transit-umarsh/src/commonMain/composeResources/drawable/yoshkar_ola.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-ventra</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-ventra/src/commonMain/composeResources/drawable/ventra.png" alt="ventra.png"></div>
+  <div class="card-info">
+    <div class="name">ventra.png</div>
+    <div class="dims">600x378 &middot; png &middot; 64KB</div>
+    
+    <div class="path">farebot-transit-ventra/src/commonMain/composeResources/drawable/ventra.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-waikato</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-waikato/src/commonMain/composeResources/drawable/busitcard.png" alt="busitcard.png"></div>
+  <div class="card-info">
+    <div class="name">busitcard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 160KB</div>
+    
+    <div class="path">farebot-transit-waikato/src/commonMain/composeResources/drawable/busitcard.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-warsaw</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-warsaw/src/commonMain/composeResources/drawable/warsaw_card.png" alt="warsaw_card.png"></div>
+  <div class="card-info">
+    <div class="name">warsaw_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 141KB</div>
+    
+    <div class="path">farebot-transit-warsaw/src/commonMain/composeResources/drawable/warsaw_card.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-yargor</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-yargor/src/commonMain/composeResources/drawable/yargor.png" alt="yargor.png"></div>
+  <div class="card-info">
+    <div class="name">yargor.png</div>
+    <div class="dims">380x240 &middot; png &middot; 156KB</div>
+    
+    <div class="path">farebot-transit-yargor/src/commonMain/composeResources/drawable/yargor.png</div>
+  </div></div>
+</div>
+<h2 class="no-issues">farebot-transit-yvr-compass</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-yvr-compass/src/commonMain/composeResources/drawable/yvr_compass_card.svg" alt="yvr_compass_card.svg"></div>
+  <div class="card-info">
+    <div class="name">yvr_compass_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 7KB</div>
+    
+    <div class="path">farebot-transit-yvr-compass/src/commonMain/composeResources/drawable/yvr_compass_card.svg</div>
+  </div></div>
+</div>
+<h2 class="">farebot-transit-zolotayakorona</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/krasnodar_etk.png" alt="krasnodar_etk.png"></div>
+  <div class="card-info">
+    <div class="name">krasnodar_etk.png</div>
+    <div class="dims">380x240 &middot; png &middot; 151KB</div>
+    
+    <div class="path">farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/krasnodar_etk.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/orenburg_ekg.png" alt="orenburg_ekg.png"></div>
+  <div class="card-info">
+    <div class="name">orenburg_ekg.png</div>
+    <div class="dims">380x240 &middot; png &middot; 19KB</div>
+    
+    <div class="path">farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/orenburg_ekg.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/samara_etk.png" alt="samara_etk.png"></div>
+  <div class="card-info">
+    <div class="name">samara_etk.png</div>
+    <div class="dims">380x240 &middot; png &middot; 10KB</div>
+    
+    <div class="path">farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/samara_etk.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/yaroslavl_etk.png" alt="yaroslavl_etk.png"></div>
+  <div class="card-info">
+    <div class="name">yaroslavl_etk.png</div>
+    <div class="dims">380x240 &middot; png &middot; 137KB</div>
+    
+    <div class="path">farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/yaroslavl_etk.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/zolotayakorona.png" alt="zolotayakorona.png"></div>
+  <div class="card-info">
+    <div class="name">zolotayakorona.png</div>
+    <div class="dims">380x189 &middot; png &middot; 44KB</div>
+    <div class="issue-label">Not a card (logo)</div>
+    <div class="path">farebot-transit-zolotayakorona/src/commonMain/composeResources/drawable/zolotayakorona.png</div>
+  </div></div>
+</div>
+<h2 class="">farebot-app</h2>
+<div class="grid">
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/barnaul.png" alt="barnaul.png"></div>
+  <div class="card-info">
+    <div class="name">barnaul.png</div>
+    <div class="dims">380x240 &middot; png &middot; 100KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/barnaul.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/bilheteunicosp_card.png" alt="bilheteunicosp_card.png"></div>
+  <div class="card-info">
+    <div class="name">bilheteunicosp_card.png</div>
+    <div class="dims">372x235 &middot; png &middot; 127KB</div>
+    <div class="issue-label">Low resolution (372px)</div>
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/bilheteunicosp_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/chc_metrocard.png" alt="chc_metrocard.png"></div>
+  <div class="card-info">
+    <div class="name">chc_metrocard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 55KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/chc_metrocard.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/chilebip.png" alt="chilebip.png"></div>
+  <div class="card-info">
+    <div class="name">chilebip.png</div>
+    <div class="dims">520x331 &middot; png &middot; 14KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/chilebip.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/city_union.svg" alt="city_union.svg"></div>
+  <div class="card-info">
+    <div class="name">city_union.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 2KB</div>
+    <div class="issue-label">Not a card (logo)</div>
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/city_union.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/clipper_card.png" alt="clipper_card.png"></div>
+  <div class="card-info">
+    <div class="name">clipper_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 215KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/clipper_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/easycard.png" alt="easycard.png"></div>
+  <div class="card-info">
+    <div class="name">easycard.png</div>
+    <div class="dims">532x327 &middot; png &middot; 152KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/easycard.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/edy_card.png" alt="edy_card.png"></div>
+  <div class="card-info">
+    <div class="name">edy_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 37KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/edy_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ekarta.png" alt="ekarta.png"></div>
+  <div class="card-info">
+    <div class="name">ekarta.png</div>
+    <div class="dims">380x240 &middot; png &middot; 16KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ekarta.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ezlink_card.png" alt="ezlink_card.png"></div>
+  <div class="card-info">
+    <div class="name">ezlink_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 179KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ezlink_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/hayakaken.png" alt="hayakaken.png"></div>
+  <div class="card-info">
+    <div class="name">hayakaken.png</div>
+    <div class="dims">600x386 &middot; png &middot; 94KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/hayakaken.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/holo_card.png" alt="holo_card.png"></div>
+  <div class="card-info">
+    <div class="name">holo_card.png</div>
+    <div class="dims">380x239 &middot; png &middot; 80KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/holo_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/hsl_card.png" alt="hsl_card.png"></div>
+  <div class="card-info">
+    <div class="name">hsl_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 72KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/hsl_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/icoca_card.png" alt="icoca_card.png"></div>
+  <div class="card-info">
+    <div class="name">icoca_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 129KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/icoca_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/kiev_digital.png" alt="kiev_digital.png"></div>
+  <div class="card-info">
+    <div class="name">kiev_digital.png</div>
+    <div class="dims">390x250 &middot; png &middot; 34KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/kiev_digital.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/kirov.png" alt="kirov.png"></div>
+  <div class="card-info">
+    <div class="name">kirov.png</div>
+    <div class="dims">380x240 &middot; png &middot; 18KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/kirov.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/kmt_card.png" alt="kmt_card.png"></div>
+  <div class="card-info">
+    <div class="name">kmt_card.png</div>
+    <div class="dims">380x239 &middot; png &middot; 65KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/kmt_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/laxtap_card.png" alt="laxtap_card.png"></div>
+  <div class="card-info">
+    <div class="name">laxtap_card.png</div>
+    <div class="dims">380x243 &middot; png &middot; 36KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/laxtap_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/leap_card.png" alt="leap_card.png"></div>
+  <div class="card-info">
+    <div class="name">leap_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 6KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/leap_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/manly_fast_ferry_card.png" alt="manly_fast_ferry_card.png"></div>
+  <div class="card-info">
+    <div class="name">manly_fast_ferry_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 7KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/manly_fast_ferry_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/metromoney.png" alt="metromoney.png"></div>
+  <div class="card-info">
+    <div class="name">metromoney.png</div>
+    <div class="dims">380x240 &middot; png &middot; 11KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/metromoney.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/mobib_card.png" alt="mobib_card.png"></div>
+  <div class="card-info">
+    <div class="name">mobib_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 19KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/mobib_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/mrtj_card.png" alt="mrtj_card.png"></div>
+  <div class="card-info">
+    <div class="name">mrtj_card.png</div>
+    <div class="dims">380x239 &middot; png &middot; 73KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/mrtj_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/msp_goto_card.png" alt="msp_goto_card.png"></div>
+  <div class="card-info">
+    <div class="name">msp_goto_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 6KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/msp_goto_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/myki_card.png" alt="myki_card.png"></div>
+  <div class="card-info">
+    <div class="name">myki_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 36KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/myki_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/myway_card.png" alt="myway_card.png"></div>
+  <div class="card-info">
+    <div class="name">myway_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 8KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/myway_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/navigo.png" alt="navigo.png"></div>
+  <div class="card-info">
+    <div class="name">navigo.png</div>
+    <div class="dims">380x240 &middot; png &middot; 110KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/navigo.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/nets_card.png" alt="nets_card.png"></div>
+  <div class="card-info">
+    <div class="name">nets_card.png</div>
+    <div class="dims">600x379 &middot; png &middot; 77KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/nets_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/nimoca.png" alt="nimoca.png"></div>
+  <div class="card-info">
+    <div class="name">nimoca.png</div>
+    <div class="dims">420x259 &middot; png &middot; 16KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/nimoca.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/octopus_card.png" alt="octopus_card.png"></div>
+  <div class="card-info">
+    <div class="name">octopus_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 63KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/octopus_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/opal_card.png" alt="opal_card.png"></div>
+  <div class="card-info">
+    <div class="name">opal_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 45KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/opal_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/opus_card.svg" alt="opus_card.svg"></div>
+  <div class="card-info">
+    <div class="name">opus_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 5KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/opus_card.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/orca_card.png" alt="orca_card.png"></div>
+  <div class="card-info">
+    <div class="name">orca_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 187KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/orca_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/orenburg_ekg.png" alt="orenburg_ekg.png"></div>
+  <div class="card-info">
+    <div class="name">orenburg_ekg.png</div>
+    <div class="dims">380x240 &middot; png &middot; 19KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/orenburg_ekg.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/otago_gocard.svg" alt="otago_gocard.svg"></div>
+  <div class="card-info">
+    <div class="name">otago_gocard.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 3KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/otago_gocard.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ovchip_card.png" alt="ovchip_card.png"></div>
+  <div class="card-info">
+    <div class="name">ovchip_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 181KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ovchip_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ovchip_single_card.png" alt="ovchip_single_card.png"></div>
+  <div class="card-info">
+    <div class="name">ovchip_single_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 21KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ovchip_single_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/oyster_card.png" alt="oyster_card.png"></div>
+  <div class="card-info">
+    <div class="name">oyster_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 4KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/oyster_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/parus_school.png" alt="parus_school.png"></div>
+  <div class="card-info">
+    <div class="name">parus_school.png</div>
+    <div class="dims">380x240 &middot; png &middot; 46KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/parus_school.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/pasmo_card.png" alt="pasmo_card.png"></div>
+  <div class="card-info">
+    <div class="name">pasmo_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 127KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/pasmo_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/passpass.png" alt="passpass.png"></div>
+  <div class="card-info">
+    <div class="name">passpass.png</div>
+    <div class="dims">573x366 &middot; png &middot; 34KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/passpass.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/presto_card.png" alt="presto_card.png"></div>
+  <div class="card-info">
+    <div class="name">presto_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 16KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/presto_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ravkav_card.svg" alt="ravkav_card.svg"></div>
+  <div class="card-info">
+    <div class="name">ravkav_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 20KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ravkav_card.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/rejsekort.png" alt="rejsekort.png"></div>
+  <div class="card-info">
+    <div class="name">rejsekort.png</div>
+    <div class="dims">380x240 &middot; png &middot; 59KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/rejsekort.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/samara_etk.png" alt="samara_etk.png"></div>
+  <div class="card-info">
+    <div class="name">samara_etk.png</div>
+    <div class="dims">380x240 &middot; png &middot; 10KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/samara_etk.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/selecta.png" alt="selecta.png"></div>
+  <div class="card-info">
+    <div class="name">selecta.png</div>
+    <div class="dims">400x178 &middot; png &middot; 75KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/selecta.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/seqgo_card.png" alt="seqgo_card.png"></div>
+  <div class="card-info">
+    <div class="name">seqgo_card.png</div>
+    <div class="dims">380x236 &middot; png &middot; 61KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/seqgo_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/siticard.png" alt="siticard.png"></div>
+  <div class="card-info">
+    <div class="name">siticard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 15KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/siticard.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/slaccess.svg" alt="slaccess.svg"></div>
+  <div class="card-info">
+    <div class="name">slaccess.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 22KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/slaccess.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/smartrider_card.png" alt="smartrider_card.png"></div>
+  <div class="card-info">
+    <div class="name">smartrider_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 24KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/smartrider_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/strizh.png" alt="strizh.png"></div>
+  <div class="card-info">
+    <div class="name">strizh.png</div>
+    <div class="dims">380x240 &middot; png &middot; 29KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/strizh.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/sugoca.png" alt="sugoca.png"></div>
+  <div class="card-info">
+    <div class="name">sugoca.png</div>
+    <div class="dims">600x375 &middot; png &middot; 144KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/sugoca.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/suica_card.png" alt="suica_card.png"></div>
+  <div class="card-info">
+    <div class="name">suica_card.png</div>
+    <div class="dims">380x235 &middot; png &middot; 135KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/suica_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/suncard.png" alt="suncard.png"></div>
+  <div class="card-info">
+    <div class="name">suncard.png</div>
+    <div class="dims">380x240 &middot; png &middot; 69KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/suncard.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/szt_card.png" alt="szt_card.png"></div>
+  <div class="card-info">
+    <div class="name">szt_card.png</div>
+    <div class="dims">379x183 &middot; png &middot; 7KB</div>
+    <div class="issue-label">Low resolution (379px) | Not a card (logo)</div>
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/szt_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/tmoney_card.svg" alt="tmoney_card.svg"></div>
+  <div class="card-info">
+    <div class="name">tmoney_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 8KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/tmoney_card.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/touchngo.svg" alt="touchngo.svg"></div>
+  <div class="card-info">
+    <div class="name">touchngo.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 1KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/touchngo.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/tpe_easy_card.png" alt="tpe_easy_card.png"></div>
+  <div class="card-info">
+    <div class="name">tpe_easy_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 11KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/tpe_easy_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/tpf_card.png" alt="tpf_card.png"></div>
+  <div class="card-info">
+    <div class="name">tpf_card.png</div>
+    <div class="dims">380x240 &middot; png &middot; 8KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/tpf_card.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/trimethop_card.svg" alt="trimethop_card.svg"></div>
+  <div class="card-info">
+    <div class="name">trimethop_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 17KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/trimethop_card.svg</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/tunion.png" alt="tunion.png"></div>
+  <div class="card-info">
+    <div class="name">tunion.png</div>
+    <div class="dims">380x246 &middot; png &middot; 22KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/tunion.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ventra.png" alt="ventra.png"></div>
+  <div class="card-info">
+    <div class="name">ventra.png</div>
+    <div class="dims">600x378 &middot; png &middot; 64KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ventra.png</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/waltti_logo.svg" alt="waltti_logo.svg"></div>
+  <div class="card-info">
+    <div class="name">waltti_logo.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 3KB</div>
+    <div class="issue-label">Not a card (logo)</div>
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/waltti_logo.svg</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/ximedes.png" alt="ximedes.png"></div>
+  <div class="card-info">
+    <div class="name">ximedes.png</div>
+    <div class="dims">380x84 &middot; png &middot; 8KB</div>
+    <div class="issue-label">Not a card (text banner)</div>
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/ximedes.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/yoshkar_ola.png" alt="yoshkar_ola.png"></div>
+  <div class="card-info">
+    <div class="name">yoshkar_ola.png</div>
+    <div class="dims">380x240 &middot; png &middot; 21KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/yoshkar_ola.png</div>
+  </div></div>
+<div class="card ok">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/yvr_compass_card.svg" alt="yvr_compass_card.svg"></div>
+  <div class="card-info">
+    <div class="name">yvr_compass_card.svg</div>
+    <div class="dims">SVGxSVG &middot; svg &middot; 7KB</div>
+    
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/yvr_compass_card.svg</div>
+  </div></div>
+<div class="card issue">
+  <div class="card-img-wrapper"><img src="file:///Users/eric/Code/farebot/farebot-app/src/commonMain/composeResources/drawable/zolotayakorona.png" alt="zolotayakorona.png"></div>
+  <div class="card-info">
+    <div class="name">zolotayakorona.png</div>
+    <div class="dims">380x189 &middot; png &middot; 44KB</div>
+    <div class="issue-label">Not a card (logo)</div>
+    <div class="path">farebot-app/src/commonMain/composeResources/drawable/zolotayakorona.png</div>
+  </div></div>
+</div></body></html>

@@ -19,7 +19,8 @@ from collections import Counter
 from pathlib import Path
 from PIL import Image
 
-DRAWABLE_DIR = Path(__file__).parent.parent / "farebot-app/src/commonMain/composeResources/drawable"
+PROJECT_ROOT = Path(__file__).parent.parent
+DRAWABLE_DIR = PROJECT_ROOT / "farebot-app/src/commonMain/composeResources/drawable"
 
 SUPPORTED_RASTER = {".png", ".jpg", ".jpeg"}
 SUPPORTED_SVG = {".svg"}
@@ -102,28 +103,43 @@ def dominant_color(img_path):
     return (rsum // n, gsum // n, bsum // n)
 
 
+def find_all_drawable_dirs():
+    """Find all composeResources/drawable directories in the project."""
+    dirs = []
+    if DRAWABLE_DIR.is_dir():
+        dirs.append(DRAWABLE_DIR)
+    for module_dir in sorted(PROJECT_ROOT.glob("farebot-transit-*/src/commonMain/composeResources/drawable")):
+        if module_dir.is_dir():
+            dirs.append(module_dir)
+    return dirs
+
+
 def main():
-    if not DRAWABLE_DIR.is_dir():
-        print(f"Error: {DRAWABLE_DIR} not found")
+    drawable_dirs = find_all_drawable_dirs()
+    if not drawable_dirs:
+        print("Error: no drawable directories found")
         return
 
     results = []
-    for path in sorted(DRAWABLE_DIR.iterdir()):
-        stem = path.stem
-        if stem in SKIP:
-            continue
-        suffix = path.suffix.lower()
-        if suffix not in SUPPORTED_RASTER | SUPPORTED_SVG:
-            continue
+    seen = set()
+    for drawable_dir in drawable_dirs:
+        for path in sorted(drawable_dir.iterdir()):
+            stem = path.stem
+            if stem in SKIP or stem in seen:
+                continue
+            seen.add(stem)
+            suffix = path.suffix.lower()
+            if suffix not in SUPPORTED_RASTER | SUPPORTED_SVG:
+                continue
 
-        color = dominant_color(path)
-        if color is None:
-            results.append((stem, None))
-            continue
+            color = dominant_color(path)
+            if color is None:
+                results.append((stem, None))
+                continue
 
-        r, g, b = color
-        hex_val = f"0x{r:02X}{g:02X}{b:02X}"
-        results.append((stem, hex_val))
+            r, g, b = color
+            hex_val = f"0x{r:02X}{g:02X}{b:02X}"
+            results.append((stem, hex_val))
 
     # Print as a table
     print(f"{'Image':<35} {'brandColor':<12} {'Preview'}")
