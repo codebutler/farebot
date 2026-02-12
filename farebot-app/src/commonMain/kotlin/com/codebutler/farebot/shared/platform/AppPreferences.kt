@@ -8,6 +8,7 @@ interface AppPreferences {
         const val KEY_SHOW_UNSUPPORTED = "explore_show_unsupported"
         const val KEY_SHOW_SERIAL_ONLY = "explore_show_serial_only"
         const val KEY_SHOW_KEYS_REQUIRED = "explore_show_keys_required"
+        const val KEY_SHOW_EXPERIMENTAL = "explore_show_experimental"
     }
 }
 

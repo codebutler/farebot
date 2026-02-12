@@ -1,15 +1,15 @@
 package com.codebutler.farebot.shared.ui.screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,14 +24,20 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandCircleDown
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MobileOff
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -43,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
@@ -55,6 +60,7 @@ import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.card_experimental
 import farebot.farebot_app.generated.resources.legend_keys_required
 import farebot.farebot_app.generated.resources.legend_serial_only
+import farebot.farebot_app.generated.resources.legend_experimental
 import farebot.farebot_app.generated.resources.legend_unsupported
 import farebot.farebot_app.generated.resources.view_sample
 import kotlinx.coroutines.launch
@@ -63,6 +69,7 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreContent(
     supportedCards: List<CardInfo>,
@@ -72,6 +79,7 @@ fun ExploreContent(
     showUnsupported: Boolean,
     showSerialOnly: Boolean = false,
     showKeysRequired: Boolean = false,
+    showExperimental: Boolean = false,
     onKeysRequiredTap: () -> Unit,
     mapMarkers: List<CardsMapMarker> = emptyList(),
     onMapMarkerTap: ((String) -> Unit)? = null,
@@ -83,12 +91,14 @@ fun ExploreContent(
     val gridState = rememberLazyGridState()
     val scope = rememberCoroutineScope()
     var selectedCardKey by remember { mutableStateOf<String?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
-    val displayedCards = remember(supportedCards, supportedCardTypes, loadedKeyBundles, showUnsupported, showSerialOnly, showKeysRequired) {
+    val displayedCards = remember(supportedCards, supportedCardTypes, loadedKeyBundles, showUnsupported, showSerialOnly, showKeysRequired, showExperimental) {
         supportedCards.filter { card ->
             (showUnsupported || card.cardType in supportedCardTypes) &&
                 (showSerialOnly || !card.serialOnly) &&
-                (showKeysRequired || !card.keysRequired || card.keyBundle in loadedKeyBundles)
+                (showKeysRequired || !card.keysRequired || card.keyBundle in loadedKeyBundles) &&
+                (showExperimental || !card.preview)
         }
     }
 
@@ -228,21 +238,18 @@ fun ExploreContent(
                     CardImageTile(
                         card = card,
                         cardName = cardNames[card.nameRes.key] ?: "",
-                        cardLocation = cardLocations[card.nameRes.key] ?: "",
                         isSupported = card.cardType in supportedCardTypes,
                         isKeysRequired = card.keysRequired && card.keyBundle !in loadedKeyBundles,
-                        isSelected = selectedCardKey == card.nameRes.key,
                         onTap = {
-                            selectedCardKey = if (selectedCardKey == card.nameRes.key) null else card.nameRes.key
+                            selectedCardKey = card.nameRes.key
                         },
-                        onSampleCardTap = onSampleCardTap,
                     )
                 }
             }
         }
 
         // Legend bar
-        if (showUnsupported || showKeysRequired || showSerialOnly) {
+        if (showUnsupported || showKeysRequired || showSerialOnly || showExperimental) {
             HorizontalDivider()
             Row(
                 modifier = Modifier
@@ -270,7 +277,42 @@ fun ExploreContent(
                         label = stringResource(Res.string.legend_serial_only),
                     )
                 }
+                if (showExperimental) {
+                    LegendEntry(
+                        icon = Icons.Default.Science,
+                        label = stringResource(Res.string.legend_experimental),
+                    )
+                }
             }
+        }
+    }
+
+    // Bottom sheet for selected card details
+    val selectedCard = selectedCardKey?.let { key ->
+        supportedCards.find { it.nameRes.key == key }
+    }
+    if (selectedCard != null) {
+        ModalBottomSheet(
+            onDismissRequest = { selectedCardKey = null },
+            sheetState = sheetState,
+        ) {
+            CardDetailSheet(
+                card = selectedCard,
+                cardName = cardNames[selectedCard.nameRes.key] ?: "",
+                cardLocation = cardLocations[selectedCard.nameRes.key] ?: "",
+                isSupported = selectedCard.cardType in supportedCardTypes,
+                isKeysRequired = selectedCard.keysRequired && selectedCard.keyBundle !in loadedKeyBundles,
+                onSampleCardTap = if (selectedCard.sampleDumpFile != null && onSampleCardTap != null) {
+                    {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            selectedCardKey = null
+                        }
+                        onSampleCardTap(selectedCard)
+                    }
+                } else {
+                    null
+                },
+            )
         }
     }
 }
@@ -299,12 +341,9 @@ private fun LegendEntry(icon: ImageVector, label: String) {
 private fun CardImageTile(
     card: CardInfo,
     cardName: String,
-    cardLocation: String,
     isSupported: Boolean,
     isKeysRequired: Boolean,
-    isSelected: Boolean,
     onTap: () -> Unit,
-    onSampleCardTap: ((CardInfo) -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier
@@ -337,25 +376,12 @@ private fun CardImageTile(
             }
         }
 
-        // Info overlay
-        AnimatedVisibility(
-            visible = isSelected,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            CardInfoOverlay(
-                card = card,
-                cardName = cardName,
-                cardLocation = cardLocation,
-                onSampleCardTap = onSampleCardTap,
-            )
-        }
-
-        // Status badge icons (top-right corner, rendered after overlay to stay on top)
+        // Status badge icons (top-right corner)
         val badges = buildList {
             if (!isSupported) add(Icons.Default.MobileOff)
             if (isKeysRequired) add(Icons.Default.Lock)
             if (card.serialOnly) add(Icons.Default.VisibilityOff)
+            if (card.preview) add(Icons.Default.Science)
         }
         if (badges.isNotEmpty()) {
             Row(
@@ -384,66 +410,127 @@ private fun CardImageTile(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun CardInfoOverlay(
+private fun CardDetailSheet(
     card: CardInfo,
     cardName: String,
     cardLocation: String,
-    onSampleCardTap: ((CardInfo) -> Unit)? = null,
+    isSupported: Boolean,
+    isKeysRequired: Boolean,
+    onSampleCardTap: (() -> Unit)? = null,
 ) {
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.75f)),
-        contentAlignment = Alignment.BottomStart,
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp),
+        // Card image
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1.586f)
+                .clip(RoundedCornerShape(12.dp)),
         ) {
-            Text(
-                text = cardName,
-                style = MaterialTheme.typography.titleSmall,
-                color = Color.White,
-            )
-            Text(
-                text = cardLocation,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.7f),
-            )
-            val extraNoteRes = card.extraNoteRes
-            if (extraNoteRes != null) {
-                Text(
-                    text = stringResource(extraNoteRes),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.7f),
+            val imageRes = card.imageRes
+            if (imageRes != null) {
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = cardName,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
                 )
-            }
-            if (card.preview) {
-                Text(
-                    text = stringResource(Res.string.card_experimental),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.7f),
-                )
-            }
-            if (card.sampleDumpFile != null && onSampleCardTap != null) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.clickable { onSampleCardTap(card) },
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Icon(
-                        Icons.Default.ExpandCircleDown,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp).graphicsLayer(rotationZ = -90f),
-                        tint = Color(0xFF64B5F6),
-                    )
                     Text(
-                        text = stringResource(Res.string.view_sample),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF64B5F6),
+                        text = cardName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
         }
+
+        Spacer(Modifier.height(12.dp))
+
+        // Card name
+        Text(
+            text = cardName,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        // Location
+        Text(
+            text = cardLocation,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        // Extra note
+        val extraNoteRes = card.extraNoteRes
+        if (extraNoteRes != null) {
+            Text(
+                text = stringResource(extraNoteRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        // Experimental label
+        if (card.preview) {
+            Text(
+                text = stringResource(Res.string.card_experimental),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        // Status chips
+        val chips = buildList {
+            if (!isSupported) add(Icons.Default.MobileOff to stringResource(Res.string.legend_unsupported))
+            if (isKeysRequired) add(Icons.Default.Lock to stringResource(Res.string.legend_keys_required))
+            if (card.serialOnly) add(Icons.Default.VisibilityOff to stringResource(Res.string.legend_serial_only))
+            if (card.preview) add(Icons.Default.Science to stringResource(Res.string.card_experimental))
+        }
+        if (chips.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                for ((icon, label) in chips) {
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(label) },
+                        icon = {
+                            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
+                        },
+                    )
+                }
+            }
+        }
+
+        // View sample card
+        if (onSampleCardTap != null) {
+            Spacer(Modifier.height(8.dp))
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.view_sample)) },
+                trailingContent = {
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                    )
+                },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onSampleCardTap() },
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
     }
 }

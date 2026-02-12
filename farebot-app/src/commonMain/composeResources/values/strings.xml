@@ -50,6 +50,7 @@
     <string name="show_unsupported_cards">Show incompatible cards</string>
     <string name="show_serial_only_cards">Show serial-only cards</string>
     <string name="show_keys_required_cards">Show keys-required cards</string>
+    <string name="show_experimental_cards">Show experimental cards</string>
     <string name="tag_lost">Card Connection Lost</string>
     <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
     <string name="tap_your_card">Tap your card</string>
@@ -74,6 +75,7 @@
     <string name="legend_unsupported">Incompatible</string>
     <string name="legend_keys_required">Keys required</string>
     <string name="legend_serial_only">Serial only</string>
+    <string name="legend_experimental">Experimental</string>
 
     <!-- Date labels -->
     <string name="date_today">Today</string>

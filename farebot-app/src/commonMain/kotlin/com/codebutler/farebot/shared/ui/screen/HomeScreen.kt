@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Badge
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -80,6 +82,7 @@ import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
 import farebot.farebot_app.generated.resources.scan
 import farebot.farebot_app.generated.resources.show_all_scans
+import farebot.farebot_app.generated.resources.show_experimental_cards
 import farebot.farebot_app.generated.resources.show_keys_required_cards
 import farebot.farebot_app.generated.resources.show_serial_only_cards
 import farebot.farebot_app.generated.resources.show_unsupported_cards
@@ -128,11 +131,28 @@ fun HomeScreen(
     var showKeysRequired by rememberSaveable {
         mutableStateOf(appPreferences.getBoolean(AppPreferences.KEY_SHOW_KEYS_REQUIRED, false))
     }
+    var showExperimental by rememberSaveable {
+        mutableStateOf(appPreferences.getBoolean(AppPreferences.KEY_SHOW_EXPERIMENTAL, false))
+    }
     var exploreSearchQuery by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
     val hasUnsupportedCards = remember(supportedCards, supportedCardTypes) {
         supportedCards.any { it.cardType !in supportedCardTypes }
+    }
+
+    // Counts for each hidden-by-default category
+    val unsupportedCount = remember(supportedCards, supportedCardTypes) {
+        supportedCards.count { it.cardType !in supportedCardTypes }
+    }
+    val serialOnlyCount = remember(supportedCards) {
+        supportedCards.count { it.serialOnly }
+    }
+    val keysRequiredCount = remember(supportedCards, loadedKeyBundles) {
+        supportedCards.count { it.keysRequired && it.keyBundle !in loadedKeyBundles }
+    }
+    val experimentalCount = remember(supportedCards) {
+        supportedCards.count { it.preview }
     }
 
 
@@ -286,7 +306,12 @@ fun HomeScreen(
                         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                             if (hasUnsupportedCards) {
                                 DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.show_unsupported_cards)) },
+                                    text = {
+                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Text(stringResource(Res.string.show_unsupported_cards))
+                                            Badge { Text("$unsupportedCount") }
+                                        }
+                                    },
                                     trailingIcon = if (showUnsupported) {
                                         { Icon(Icons.Default.Check, contentDescription = null) }
                                     } else null,
@@ -298,7 +323,12 @@ fun HomeScreen(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.show_serial_only_cards)) },
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text(stringResource(Res.string.show_serial_only_cards))
+                                        Badge { Text("$serialOnlyCount") }
+                                    }
+                                },
                                 trailingIcon = if (showSerialOnly) {
                                     { Icon(Icons.Default.Check, contentDescription = null) }
                                 } else null,
@@ -309,13 +339,34 @@ fun HomeScreen(
                                 },
                             )
                             DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.show_keys_required_cards)) },
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text(stringResource(Res.string.show_keys_required_cards))
+                                        Badge { Text("$keysRequiredCount") }
+                                    }
+                                },
                                 trailingIcon = if (showKeysRequired) {
                                     { Icon(Icons.Default.Check, contentDescription = null) }
                                 } else null,
                                 onClick = {
                                     showKeysRequired = !showKeysRequired
                                     appPreferences.putBoolean(AppPreferences.KEY_SHOW_KEYS_REQUIRED, showKeysRequired)
+                                    menuExpanded = false
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text(stringResource(Res.string.show_experimental_cards))
+                                        Badge { Text("$experimentalCount") }
+                                    }
+                                },
+                                trailingIcon = if (showExperimental) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = {
+                                    showExperimental = !showExperimental
+                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_EXPERIMENTAL, showExperimental)
                                     menuExpanded = false
                                 },
                             )
@@ -462,6 +513,7 @@ fun HomeScreen(
                         showUnsupported = showUnsupported,
                         showSerialOnly = showSerialOnly,
                         showKeysRequired = showKeysRequired,
+                        showExperimental = showExperimental,
                         onKeysRequiredTap = onKeysRequiredTap,
                         mapMarkers = mapMarkers,
                         onSampleCardTap = onSampleCardTap,
