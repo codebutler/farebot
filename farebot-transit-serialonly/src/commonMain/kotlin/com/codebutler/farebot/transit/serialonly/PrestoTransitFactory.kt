@@ -35,6 +35,7 @@ class PrestoTransitFactory : TransitFactory<DesfireCard, PrestoTransitInfo> {
             latitude = 43.6532f,
             longitude = -79.3832f,
             brandColor = 0x728452,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell", "Philip Duncan"),
         )
     )
 

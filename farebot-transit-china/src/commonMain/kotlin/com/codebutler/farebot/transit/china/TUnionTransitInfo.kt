@@ -95,7 +95,7 @@ class TUnionTransitInfo(
         @OptIn(ExperimentalStdlibApi::class)
         val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
             override val allCards: List<CardInfo> = listOf(
-                CardInfo(nameRes = Res.string.card_name_t_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.tunion, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0xFD0026)
+                CardInfo(nameRes = Res.string.card_name_t_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.tunion, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0xFD0026, credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib"))
             )
 
             override val appNames: List<ByteArray>

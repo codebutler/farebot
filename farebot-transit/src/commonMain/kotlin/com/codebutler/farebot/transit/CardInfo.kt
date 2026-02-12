@@ -40,4 +40,5 @@ data class CardInfo(
     val sampleDumpFile: String? = null,
     /** Brand color as 0xRRGGBB (no alpha). Null if unknown — UI will use a theme-appropriate fallback. */
     val brandColor: Int?,
+    val credits: List<String> = emptyList(),
 )

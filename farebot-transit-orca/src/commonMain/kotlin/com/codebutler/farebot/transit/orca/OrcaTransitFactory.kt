@@ -109,6 +109,7 @@ class OrcaTransitFactory(private val stringResource: StringResource) : TransitFa
             latitude = 47.6062f,
             longitude = -122.3321f,
             brandColor = 0x00693E,
+            credits = listOf("Karl Koscher", "Sean CyberKitsune McClenaghan", "Kramer Campbell"),
             sampleDumpFile = "ORCA.nfc",
         )
     }

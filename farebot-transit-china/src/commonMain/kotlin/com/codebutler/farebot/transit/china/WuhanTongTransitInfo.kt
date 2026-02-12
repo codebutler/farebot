@@ -89,7 +89,7 @@ class WuhanTongTransitInfo(
 
         val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
             override val allCards: List<CardInfo> = listOf(
-                CardInfo(nameRes = Res.string.card_name_wuhan_tong, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_wuhan_china, imageRes = Res.drawable.wuhantong, latitude = 30.5928f, longitude = 114.3055f, brandColor = 0x0C2C58)
+                CardInfo(nameRes = Res.string.card_name_wuhan_tong, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_wuhan_china, imageRes = Res.drawable.wuhantong, latitude = 30.5928f, longitude = 114.3055f, brandColor = 0x0C2C58, credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib"))
             )
 
             override val appNames: List<ByteArray>

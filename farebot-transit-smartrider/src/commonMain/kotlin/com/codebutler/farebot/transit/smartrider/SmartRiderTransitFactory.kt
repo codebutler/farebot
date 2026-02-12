@@ -62,6 +62,7 @@ class SmartRiderTransitFactory(
             latitude = -31.9505f,
             longitude = 115.8605f,
             brandColor = 0x158736,
+            credits = listOf("Metrodroid Project", "Michael Farrell"),
         )
 
         // Unfortunately, there's no way to reliably identify these cards except for the

@@ -128,6 +128,7 @@ class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
             latitude = 61.4978f,
             longitude = 23.7610f,
             brandColor = 0xA8C9E6,
+            credits = listOf("Metrodroid Project"),
         )
     }
 }

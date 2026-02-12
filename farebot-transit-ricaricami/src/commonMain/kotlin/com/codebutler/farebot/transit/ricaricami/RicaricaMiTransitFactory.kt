@@ -76,6 +76,7 @@ class RicaricaMiTransitFactory(
             latitude = 45.4642f,
             longitude = 9.1900f,
             brandColor = 0xB8D27B,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
 
         private const val RICARICA_MI_ID = 0x0221

@@ -103,6 +103,7 @@ class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
             latitude = 22.3193f,
             longitude = 114.1694f,
             brandColor = 0xFDB813,
+            credits = listOf("Michael Farrell", "Sinpo Wei"),
             sampleDumpFile = "Octopus.json",
         )
     }

@@ -71,6 +71,7 @@ class SelectaFranceTransitFactory : TransitFactory<ClassicCard, SelectaFranceTra
             locationRes = Res.string.selecta_location,
             imageRes = Res.drawable.selecta,
             brandColor = 0xD9423A,
+            credits = listOf("Metrodroid Project"),
         )
     }
 

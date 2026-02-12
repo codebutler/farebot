@@ -58,6 +58,7 @@ class BilheteUnicoSPTransitFactory : TransitFactory<ClassicCard, BilheteUnicoSPT
             latitude = -23.5505f,
             longitude = -46.6333f,
             brandColor = 0xD32424,
+            credits = listOf("Marcelo Liberato", "Michael Farrell"),
             sampleDumpFile = "BilheteUnico.json",
         )
 

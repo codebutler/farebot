@@ -83,6 +83,7 @@ class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitIn
             latitude = 41.7151f,
             longitude = 44.8271f,
             brandColor = 0xF2C8B6,
+            credits = listOf("Metrodroid Project"),
         )
 
         private fun getSerial(card: ClassicCard): Long {

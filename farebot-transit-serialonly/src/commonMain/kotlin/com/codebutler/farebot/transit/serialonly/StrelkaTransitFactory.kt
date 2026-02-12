@@ -35,6 +35,7 @@ class StrelkaTransitFactory : TransitFactory<ClassicCard, StrelkaTransitInfo> {
             latitude = 55.7558f,
             longitude = 37.6173f,
             brandColor = 0x154477,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
         )
     )
 

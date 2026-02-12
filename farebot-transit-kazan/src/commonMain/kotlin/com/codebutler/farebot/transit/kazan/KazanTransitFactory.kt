@@ -92,6 +92,7 @@ class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
             latitude = 55.7963f,
             longitude = 49.1089f,
             brandColor = 0x014797,
+            credits = listOf("Metrodroid Project"),
             keysRequired = true,
         )
 

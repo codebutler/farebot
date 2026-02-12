@@ -76,6 +76,7 @@ class WarsawTransitFactory : TransitFactory<ClassicCard, WarsawTransitInfo> {
             latitude = 52.2297f,
             longitude = 21.0122f,
             brandColor = 0x092979,
+            credits = listOf("Metrodroid Project"),
             keysRequired = true,
         )
     }

@@ -217,6 +217,7 @@ class MobibTransitInfo internal constructor(
                 longitude = 4.3517f,
                 sampleDumpFile = "Mobib.json",
                 brandColor = 0x9CBC17,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             )
 
             private fun ticketEnvFields(version: Int) = when {

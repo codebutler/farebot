@@ -137,8 +137,8 @@ class CityUnionTransitInfo(
         @OptIn(ExperimentalStdlibApi::class)
         val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
             override val allCards: List<CardInfo> = listOf(
-                CardInfo(nameRes = Res.string.card_name_city_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.city_union, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0x5494B6),
-                CardInfo(nameRes = Res.string.card_name_shanghai_public_transportation_card, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_shanghai_china, imageRes = Res.drawable.shanghai, latitude = 31.2304f, longitude = 121.4737f, brandColor = 0x1777EA),
+                CardInfo(nameRes = Res.string.card_name_city_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.city_union, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0x5494B6, credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib")),
+                CardInfo(nameRes = Res.string.card_name_shanghai_public_transportation_card, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_shanghai_china, imageRes = Res.drawable.shanghai, latitude = 31.2304f, longitude = 121.4737f, brandColor = 0x1777EA, credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib")),
             )
 
             override val appNames: List<ByteArray>

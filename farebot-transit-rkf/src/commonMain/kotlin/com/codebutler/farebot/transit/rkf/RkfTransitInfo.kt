@@ -159,7 +159,8 @@ class RkfTransitInfo internal constructor(
                 keysRequired = true, keyBundle = "slaccess",
                 region = TransitRegion.SWEDEN,
                 preview = true,
-                brandColor = 0x00ACEE),
+                brandColor = 0x00ACEE,
+                credits = listOf("Metrodroid Project")),
             RkfLookup.REJSEKORT to CardInfo(
                 nameRes = Res.string.rkf_card_name_rejsekort,
                 locationRes = Res.string.rkf_location_denmark,
@@ -167,7 +168,8 @@ class RkfTransitInfo internal constructor(
                 keysRequired = true, keyBundle = "rejsekort",
                 region = TransitRegion.DENMARK,
                 preview = true,
-                brandColor = 0x4591C9),
+                brandColor = 0x4591C9,
+                credits = listOf("Metrodroid Project")),
             RkfLookup.VASTTRAFIK to CardInfo(
                 nameRes = Res.string.rkf_card_name_vasttrafik,
                 locationRes = Res.string.rkf_location_gothenburg,
@@ -175,7 +177,8 @@ class RkfTransitInfo internal constructor(
                 keysRequired = true, keyBundle = "gothenburg",
                 region = TransitRegion.SWEDEN,
                 preview = true,
-                brandColor = 0x88C797)
+                brandColor = 0x88C797,
+                credits = listOf("Metrodroid Project"))
         )
 
         internal fun clearSeconds(timeInMillis: Long) = timeInMillis / 60000 * 60000

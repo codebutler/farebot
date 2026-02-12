@@ -136,6 +136,7 @@ class VeneziaTransitFactory(stringResource: StringResource) : CalypsoTransitFact
             latitude = 45.4408f,
             longitude = 12.3155f,
             brandColor = 0xC4F5F7,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
     }
 }

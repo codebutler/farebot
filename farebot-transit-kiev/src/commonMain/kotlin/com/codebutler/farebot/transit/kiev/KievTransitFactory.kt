@@ -72,6 +72,7 @@ class KievTransitFactory : TransitFactory<ClassicCard, KievTransitInfo> {
             latitude = 50.4501f,
             longitude = 30.5234f,
             brandColor = 0x4972AC,
+            credits = listOf("Metrodroid Project"),
         )
 
         private fun parseTrips(card: ClassicCard): List<KievTrip> =

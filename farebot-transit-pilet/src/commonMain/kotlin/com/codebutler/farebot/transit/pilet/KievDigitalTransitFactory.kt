@@ -56,6 +56,7 @@ class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> 
             latitude = 50.4501f,
             longitude = 30.5234f,
             brandColor = 0x0289FA,
+            credits = listOf("Metrodroid Project"),
         )
     }
 

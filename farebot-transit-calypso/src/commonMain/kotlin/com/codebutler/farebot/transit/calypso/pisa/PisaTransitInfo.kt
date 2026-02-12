@@ -104,6 +104,7 @@ class PisaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
             latitude = 43.7228f,
             longitude = 10.4017f,
             brandColor = 0x0BADDB,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
     }
 }

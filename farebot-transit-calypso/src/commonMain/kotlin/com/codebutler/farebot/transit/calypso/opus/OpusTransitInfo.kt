@@ -165,6 +165,7 @@ class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
             latitude = 45.5017f,
             longitude = -73.5673f,
             brandColor = 0x209BD6,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
     }
 }

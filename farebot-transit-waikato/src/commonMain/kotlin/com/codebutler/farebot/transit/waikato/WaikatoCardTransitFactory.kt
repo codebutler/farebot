@@ -128,6 +128,7 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
             latitude = -37.7870f,
             longitude = 175.2793f,
             brandColor = 0x2675AB,
+            credits = listOf("Metrodroid Project"),
             preview = true,
         )
 

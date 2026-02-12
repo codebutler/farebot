@@ -191,6 +191,7 @@ class SuicaTransitFactory(
                 latitude = 35.6762f,
                 longitude = 139.6503f,
                 brandColor = 0x6CBB5A,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
                 sampleDumpFile = "Suica.nfc",
             ),
             CardInfo(
@@ -202,6 +203,7 @@ class SuicaTransitFactory(
                 latitude = 35.6762f,
                 longitude = 139.6503f,
                 brandColor = 0xFC848C,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
                 sampleDumpFile = "PASMO.nfc",
             ),
             CardInfo(
@@ -213,6 +215,7 @@ class SuicaTransitFactory(
                 latitude = 34.6937f,
                 longitude = 135.5023f,
                 brandColor = 0x74C6D3,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
                 sampleDumpFile = "ICOCA.nfc",
             ),
             CardInfo(
@@ -224,6 +227,7 @@ class SuicaTransitFactory(
                 latitude = 35.1815f,
                 longitude = 136.9066f,
                 brandColor = 0x01C4FE,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_manaca,
@@ -234,6 +238,7 @@ class SuicaTransitFactory(
                 latitude = 35.1815f,
                 longitude = 136.9066f,
                 brandColor = 0x95B5C6,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_pitapa,
@@ -244,6 +249,7 @@ class SuicaTransitFactory(
                 latitude = 34.6937f,
                 longitude = 135.5023f,
                 brandColor = 0x898CB0,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_kitaca,
@@ -254,6 +260,7 @@ class SuicaTransitFactory(
                 latitude = 43.0618f,
                 longitude = 141.3545f,
                 brandColor = 0xE5F5BA,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_sugoca,
@@ -264,6 +271,7 @@ class SuicaTransitFactory(
                 latitude = 33.5904f,
                 longitude = 130.4017f,
                 brandColor = 0xD98696,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_nimoca,
@@ -274,6 +282,7 @@ class SuicaTransitFactory(
                 latitude = 33.5904f,
                 longitude = 130.4017f,
                 brandColor = 0xE9D0A1,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_hayakaken,
@@ -284,6 +293,7 @@ class SuicaTransitFactory(
                 latitude = 33.5904f,
                 longitude = 130.4017f,
                 brandColor = 0xA0D8EE,
+                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
         )
     }

@@ -77,6 +77,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 56.6346f,
                 longitude = 47.8998f,
                 brandColor = 0x0466B5,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_strizh,
@@ -89,6 +90,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 56.8519f,
                 longitude = 53.2114f,
                 brandColor = 0xBAD7EC,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_electronic_barnaul,
@@ -101,6 +103,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 53.3548f,
                 longitude = 83.7698f,
                 brandColor = 0xA7C7E2,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_siticard_vladimir,
@@ -113,6 +116,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 56.1290f,
                 longitude = 40.4066f,
                 brandColor = 0x0265FA,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_kirov_transport_card,
@@ -125,6 +129,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 58.6036f,
                 longitude = 49.6680f,
                 brandColor = 0xD61B02,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_siticard,
@@ -137,6 +142,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 56.2965f,
                 longitude = 43.9361f,
                 brandColor = 0x106AA9,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_omka,
@@ -149,6 +155,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 54.9885f,
                 longitude = 73.3242f,
                 brandColor = 0xA9D4A7,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_penza_transport_card,
@@ -161,6 +168,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 53.1959f,
                 longitude = 45.0184f,
                 brandColor = 0x27A956,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_ekarta,
@@ -173,6 +181,7 @@ class UmarshTransitFactory : TransitFactory<ClassicCard, UmarshTransitInfo> {
                 latitude = 56.8389f,
                 longitude = 60.6057f,
                 brandColor = 0x008946,
+                credits = listOf("Metrodroid Project"),
             ),
         )
     }

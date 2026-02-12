@@ -97,6 +97,7 @@ class CharlieCardTransitFactory : TransitFactory<ClassicCard, CharlieCardTransit
             latitude = 42.3601f,
             longitude = -71.0589f,
             brandColor = 0x47A64A,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
 
         internal val NAME: String

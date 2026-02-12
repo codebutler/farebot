@@ -35,6 +35,7 @@ class IstanbulKartTransitFactory : TransitFactory<DesfireCard, IstanbulKartTrans
             latitude = 41.0082f,
             longitude = 28.9784f,
             brandColor = 0xA7C5FD,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
         )
     )
 

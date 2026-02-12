@@ -52,6 +52,7 @@ class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
             latitude = 25.2854f,
             longitude = 51.5310f,
             brandColor = 0xFC4337,
+            credits = listOf("Metrodroid Project"),
         )
     }
 

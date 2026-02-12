@@ -35,6 +35,7 @@ class TrimetHopTransitFactory : TransitFactory<DesfireCard, TrimetHopTransitInfo
             latitude = 45.5152f,
             longitude = -122.6784f,
             brandColor = 0x36079D,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
             sampleDumpFile = "TrimetHop.json",
         )
     )

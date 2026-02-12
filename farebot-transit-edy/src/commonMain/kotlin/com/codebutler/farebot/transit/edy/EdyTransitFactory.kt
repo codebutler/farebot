@@ -57,6 +57,7 @@ class EdyTransitFactory(private val stringResource: StringResource) : TransitFac
             latitude = 35.6762f,
             longitude = 139.6503f,
             brandColor = 0x000059,
+            credits = listOf("Chris Norden", "Kazzz"),
         )
     }
 

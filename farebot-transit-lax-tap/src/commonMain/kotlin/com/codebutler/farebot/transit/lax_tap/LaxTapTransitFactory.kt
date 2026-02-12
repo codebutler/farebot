@@ -92,6 +92,7 @@ class LaxTapTransitFactory : TransitFactory<ClassicCard, LaxTapTransitInfo> {
             latitude = 34.0522f,
             longitude = -118.2437f,
             brandColor = 0x497ABD,
+            credits = listOf("Metrodroid Project", "Michael Farrell", "Steven Steiner"),
             sampleDumpFile = "LaxTap.json",
         )
 

@@ -34,6 +34,7 @@ class NolTransitFactory : TransitFactory<DesfireCard, NolTransitInfo> {
             latitude = 25.2048f,
             longitude = 55.2708f,
             brandColor = null,
+            credits = listOf("Metrodroid Project"),
         )
     )
 

@@ -46,6 +46,7 @@ class AtHopTransitFactory : TransitFactory<DesfireCard, AtHopTransitInfo> {
             latitude = -36.8485f,
             longitude = 174.7633f,
             brandColor = 0x333C45,
+            credits = listOf("Metrodroid Project", "Michael Farrell"),
         )
     )
 

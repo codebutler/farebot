@@ -33,6 +33,7 @@ class SunCardTransitFactory : TransitFactory<ClassicCard, SunCardTransitInfo> {
             latitude = 28.5383f,
             longitude = -81.3792f,
             brandColor = 0xFDC448,
+            credits = listOf("Metrodroid Project"),
         )
     )
 

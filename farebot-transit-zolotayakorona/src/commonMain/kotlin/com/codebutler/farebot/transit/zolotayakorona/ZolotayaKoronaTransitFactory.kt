@@ -110,6 +110,7 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
                 latitude = 55.0084f,
                 longitude = 82.9357f,
                 brandColor = 0xE0002D,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_krasnodar_etk,
@@ -122,6 +123,7 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
                 latitude = 45.0355f,
                 longitude = 38.9753f,
                 brandColor = 0x4B75B8,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_orenburg_ekg,
@@ -134,6 +136,7 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
                 latitude = 51.7727f,
                 longitude = 55.0988f,
                 brandColor = 0xFED653,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_samara_etk,
@@ -146,6 +149,7 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
                 latitude = 53.1959f,
                 longitude = 50.1001f,
                 brandColor = 0xE6213A,
+                credits = listOf("Metrodroid Project"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_yaroslavl_etk,
@@ -158,6 +162,7 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
                 latitude = 57.6261f,
                 longitude = 39.8845f,
                 brandColor = 0x1C3778,
+                credits = listOf("Metrodroid Project"),
             ),
         )
     }

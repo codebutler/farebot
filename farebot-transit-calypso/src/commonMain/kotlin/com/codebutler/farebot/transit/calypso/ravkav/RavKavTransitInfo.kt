@@ -145,6 +145,7 @@ class RavKavTransitFactory(stringResource: StringResource) : CalypsoTransitFacto
             latitude = 32.0853f,
             longitude = 34.7818f,
             brandColor = 0x99A400,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
     }
 }

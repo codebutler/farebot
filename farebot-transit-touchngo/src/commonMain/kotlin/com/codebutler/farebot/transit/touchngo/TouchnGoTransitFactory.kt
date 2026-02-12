@@ -117,6 +117,7 @@ class TouchnGoTransitFactory : TransitFactory<ClassicCard, TouchnGoTransitInfo> 
             latitude = 3.1390f,
             longitude = 101.6869f,
             brandColor = 0x292C6C,
+            credits = listOf("Metrodroid Project"),
         )
 
         internal val NAME: String

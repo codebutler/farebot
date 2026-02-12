@@ -123,6 +123,7 @@ class LisboaVivaTransitInfo internal constructor(
                 latitude = 38.7223f,
                 longitude = -9.1393f,
                 brandColor = 0x46552C,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             )
 
             private const val COUNTRY_CODE_PORTUGAL = 0x131

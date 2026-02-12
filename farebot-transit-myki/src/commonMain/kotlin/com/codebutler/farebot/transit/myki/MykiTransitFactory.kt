@@ -71,6 +71,7 @@ class MykiTransitFactory : TransitFactory<DesfireCard, MykiTransitInfo> {
             latitude = -37.8136f,
             longitude = 144.9631f,
             brandColor = 0x89961C,
+            credits = listOf("Michael Farrell"),
             serialOnly = true,
             sampleDumpFile = "Myki.json",
         )

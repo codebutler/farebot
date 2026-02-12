@@ -190,6 +190,7 @@ class PodorozhnikTransitFactory(
             latitude = 59.9343f,
             longitude = 30.3351f,
             brandColor = 0x7CA22C,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
         )
 
         // We don't want to actually include these keys in the program, so include a hashed version of

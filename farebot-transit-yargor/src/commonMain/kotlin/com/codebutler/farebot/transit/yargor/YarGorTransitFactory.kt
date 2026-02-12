@@ -66,6 +66,7 @@ class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
             latitude = 57.6261f,
             longitude = 39.8845f,
             brandColor = 0x6676A6,
+            credits = listOf("Metrodroid Project"),
         )
     }
 }

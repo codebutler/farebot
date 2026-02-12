@@ -35,6 +35,7 @@ class HoloTransitFactory : TransitFactory<DesfireCard, HoloTransitInfo> {
             latitude = 21.3069f,
             longitude = -157.8583f,
             brandColor = 0x00A8C4,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell", "Trevor Nielsen"),
             sampleDumpFile = "Holo.json",
         )
     )

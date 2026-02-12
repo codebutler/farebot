@@ -110,6 +110,7 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
             latitude = 3.1390f,
             longitude = 101.6869f,
             brandColor = 0x563281,
+            credits = listOf("Metrodroid Project"),
         )
     }
 }

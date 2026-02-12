@@ -83,6 +83,7 @@ class ManlyFastFerryTransitFactory : TransitFactory<ClassicCard, ManlyFastFerryT
             latitude = -33.8688f,
             longitude = 151.2093f,
             brandColor = 0x004080,
+            credits = listOf("Michael Farrell"),
             keysRequired = true,
         )
     }

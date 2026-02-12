@@ -87,6 +87,7 @@ class OysterTransitFactory : TransitFactory<ClassicCard, OysterTransitInfo> {
             latitude = 51.5074f,
             longitude = -0.1278f,
             brandColor = 0x67A8EB,
+            credits = listOf("Metrodroid Project", "Michael Farrell"),
         )
 
         // From Metrodroid: ImmutableByteArray.fromHex("964142434445464748494A4B4C4D0101")

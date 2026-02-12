@@ -90,6 +90,7 @@ class EZLinkTransitFactory(
                 latitude = 1.3521f,
                 longitude = 103.8198f,
                 brandColor = 0x0199D9,
+                credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
                 sampleDumpFile = "EZLink.json",
                 extraNoteRes = Res.string.ezlink_card_note,
             ),
@@ -102,6 +103,7 @@ class EZLinkTransitFactory(
                 latitude = 1.3521f,
                 longitude = 103.8198f,
                 brandColor = 0xDA253A,
+                credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
                 extraNoteRes = Res.string.ezlink_card_note,
             ),
         )

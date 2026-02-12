@@ -194,6 +194,7 @@ class OVChipTransitFactory(
             latitude = 52.3676f,
             longitude = 4.9041f,
             brandColor = 0x84ABC7,
+            credits = listOf("Wilbert Duijvenvoorde"),
             keysRequired = true,
         )
 

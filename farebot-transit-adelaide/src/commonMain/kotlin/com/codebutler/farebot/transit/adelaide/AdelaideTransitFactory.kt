@@ -114,6 +114,7 @@ class AdelaideTransitFactory(
             latitude = -34.9285f,
             longitude = 138.6007f,
             brandColor = 0xA7CAEA,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
             extraNoteRes = Res.string.card_note_adelaide,
         )
 

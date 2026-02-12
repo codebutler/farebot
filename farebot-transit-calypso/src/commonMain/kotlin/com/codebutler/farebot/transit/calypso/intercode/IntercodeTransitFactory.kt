@@ -165,6 +165,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 48.8566f,
                 longitude = 2.3522f,
                 brandColor = 0x92D6FE,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_oura,
@@ -175,6 +176,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 45.1885f,
                 longitude = 5.7245f,
                 brandColor = 0x005AA7,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_pastel,
@@ -186,6 +188,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 43.6047f,
                 longitude = 1.4442f,
                 brandColor = 0x285999,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_pass_pass,
@@ -197,6 +200,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 50.6292f,
                 longitude = 3.0573f,
                 brandColor = 0x4E2D8D,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_transgironde,
@@ -208,6 +212,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 44.8378f,
                 longitude = -0.5792f,
                 brandColor = 0xE39A45,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_tam,
@@ -218,6 +223,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 43.6108f,
                 longitude = 3.8767f,
                 brandColor = 0x357828,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_korrigo,
@@ -228,6 +234,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 48.1173f,
                 longitude = -1.6778f,
                 brandColor = 0xAB7423,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
             CardInfo(
                 nameRes = Res.string.card_name_envibus,
@@ -238,6 +245,7 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
                 latitude = 43.6163f,
                 longitude = 7.0552f,
                 brandColor = 0xE1047A,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             ),
         )
     }

@@ -76,6 +76,7 @@
     <string name="legend_keys_required">Keys required</string>
     <string name="legend_serial_only">Serial only</string>
     <string name="legend_experimental">Experimental</string>
+    <string name="credits">Credits</string>
 
     <!-- Date labels -->
     <string name="date_today">Today</string>

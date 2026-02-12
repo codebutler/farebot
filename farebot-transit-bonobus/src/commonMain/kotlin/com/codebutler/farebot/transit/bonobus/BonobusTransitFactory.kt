@@ -50,6 +50,7 @@ class BonobusTransitFactory : TransitFactory<ClassicCard, BonobusTransitInfo> {
             latitude = 36.5271f,
             longitude = -6.2886f,
             brandColor = 0x1781C7,
+            credits = listOf("Metrodroid Project"),
         )
     }
 

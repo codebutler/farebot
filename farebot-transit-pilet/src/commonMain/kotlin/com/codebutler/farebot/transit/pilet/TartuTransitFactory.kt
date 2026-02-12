@@ -59,6 +59,7 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
             latitude = 58.3780f,
             longitude = 26.7290f,
             brandColor = 0xE91B28,
+            credits = listOf("Metrodroid Project"),
         )
     }
 

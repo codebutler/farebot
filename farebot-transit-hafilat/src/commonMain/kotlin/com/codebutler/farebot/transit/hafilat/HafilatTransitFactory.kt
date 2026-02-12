@@ -114,6 +114,7 @@ class HafilatTransitFactory(
             latitude = 24.4539f,
             longitude = 54.3773f,
             brandColor = 0x95A966,
+            credits = listOf("Metrodroid Project", "Michael Farrell"),
         )
 
         private fun getSerial(tagId: ByteArray): Long =

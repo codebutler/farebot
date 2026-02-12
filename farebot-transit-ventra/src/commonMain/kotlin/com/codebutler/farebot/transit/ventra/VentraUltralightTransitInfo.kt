@@ -72,6 +72,7 @@ class VentraUltralightTransitInfo(
                         longitude = -87.6298f,
                         sampleDumpFile = "Ventra.json",
                         brandColor = 0x6ACCEB,
+                        credits = listOf("Metrodroid Project"),
                     )
                 )
 

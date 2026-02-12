@@ -89,6 +89,7 @@ class ChcMetrocardTransitFactory : TransitFactory<ClassicCard, ChcMetrocardTrans
             latitude = -43.5321f,
             longitude = 172.6362f,
             brandColor = 0x242245,
+            credits = listOf("Metrodroid Project", "Michael Farrell"),
             keysRequired = true,
             extraNoteRes = Res.string.chc_metrocard_note,
         )

@@ -56,6 +56,7 @@ class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
             latitude = -6.2088f,
             longitude = 106.8456f,
             brandColor = 0x97D2C4,
+            credits = listOf("Bondan Sumbodo"),
             extraNoteRes = Res.string.kmt_notes,
         )
     }

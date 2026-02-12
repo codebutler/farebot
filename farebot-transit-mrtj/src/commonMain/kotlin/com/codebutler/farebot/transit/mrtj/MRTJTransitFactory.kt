@@ -51,6 +51,7 @@ class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
             latitude = -6.2088f,
             longitude = 106.8456f,
             brandColor = 0x86B6B4,
+            credits = listOf("Metrodroid Project", "Bondan Sumbodo"),
         )
     }
 

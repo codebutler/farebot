@@ -99,6 +99,7 @@ class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
             latitude = -33.4489f,
             longitude = -70.6693f,
             brandColor = 0x214B87,
+            credits = listOf("Metrodroid Project"),
         )
 
         private fun getSerial(card: ClassicCard): Long =

@@ -87,6 +87,7 @@ class MspGotoTransitFactory : TransitFactory<ClassicCard, MspGotoTransitInfo> {
             latitude = 44.9778f,
             longitude = -93.2650f,
             brandColor = 0x0E519E,
+            credits = listOf("Metrodroid Project"),
             sampleDumpFile = "MspGoTo.json",
         )
 

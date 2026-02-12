@@ -76,6 +76,7 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
             latitude = 25.0330f,
             longitude = 121.5654f,
             brandColor = 0xE63279,
+            credits = listOf("b33f"),
             sampleDumpFile = "EasyCard.mfc",
         )
 

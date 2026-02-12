@@ -72,6 +72,7 @@ class CompassUltralightTransitInfo(
                         longitude = -123.1207f,
                         sampleDumpFile = "Compass.json",
                         brandColor = 0x66B9E1,
+                        credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Toomas Losin"),
                     )
                 )
 

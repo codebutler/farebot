@@ -138,6 +138,7 @@ class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
             longitude = 126.9780f,
             sampleDumpFile = "TMoney.json",
             brandColor = 0x1B3389,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
         )
 
         /**

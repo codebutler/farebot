@@ -105,6 +105,7 @@ class TroikaHybridTransitFactory(
             latitude = 55.7558f,
             longitude = 37.6173f,
             brandColor = 0x1885A9,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
             sampleDumpFile = "Troika.json",
         )
     }

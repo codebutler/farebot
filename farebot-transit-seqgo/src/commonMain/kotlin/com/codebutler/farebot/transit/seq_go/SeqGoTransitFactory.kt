@@ -167,6 +167,7 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
             latitude = -27.4698f,
             longitude = 153.0251f,
             brandColor = 0x00427B,
+            credits = listOf("Michael Farrell"),
             keysRequired = true,
             sampleDumpFile = "SeqGo.json",
         )

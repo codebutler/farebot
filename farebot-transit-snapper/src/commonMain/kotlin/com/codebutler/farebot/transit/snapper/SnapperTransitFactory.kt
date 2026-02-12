@@ -134,6 +134,7 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
             latitude = -41.2865f,
             longitude = 174.7762f,
             brandColor = 0xD52726,
+            credits = listOf("Metrodroid Project", "Michael Farrell"),
         )
 
         /**

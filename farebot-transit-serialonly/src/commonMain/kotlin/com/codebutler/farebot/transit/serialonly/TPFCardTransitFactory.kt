@@ -45,6 +45,7 @@ class TPFCardTransitFactory : TransitFactory<DesfireCard, TPFCardTransitInfo> {
             latitude = 46.8065f,
             longitude = 7.1620f,
             brandColor = 0xA01D3D,
+            credits = listOf("Metrodroid Project"),
         )
     )
 

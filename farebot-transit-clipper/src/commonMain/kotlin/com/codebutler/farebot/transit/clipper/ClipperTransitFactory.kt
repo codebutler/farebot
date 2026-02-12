@@ -57,6 +57,7 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
             latitude = 37.7749f,
             longitude = -122.4194f,
             brandColor = 0xF26522,
+            credits = listOf("Anonymous Contributor", "Bao-Long Nguyen-Trong", "Michael Farrell"),
             sampleDumpFile = "Clipper.nfc",
         )
     }

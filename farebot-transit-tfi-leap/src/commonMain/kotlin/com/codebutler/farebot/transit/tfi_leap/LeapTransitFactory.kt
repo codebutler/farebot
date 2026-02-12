@@ -125,6 +125,7 @@ class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
             latitude = 53.3498f,
             longitude = -6.2603f,
             brandColor = 0x08B26E,
+            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
         )
     }
 }

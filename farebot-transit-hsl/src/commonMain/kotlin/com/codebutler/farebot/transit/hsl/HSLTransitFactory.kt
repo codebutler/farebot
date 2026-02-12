@@ -85,6 +85,7 @@ class HSLTransitFactory(
             latitude = 60.1699f,
             longitude = 24.9384f,
             brandColor = 0xB7EC13,
+            credits = listOf("Lauri Andler"),
             sampleDumpFile = "HSL.json",
         )
 

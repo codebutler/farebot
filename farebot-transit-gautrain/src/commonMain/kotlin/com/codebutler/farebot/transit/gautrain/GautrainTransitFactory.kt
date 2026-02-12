@@ -125,6 +125,7 @@ class GautrainTransitFactory(
             latitude = -26.2041f,
             longitude = 28.0473f,
             brandColor = 0xA2813C,
+            credits = listOf("Metrodroid Project"),
         )
 
         private val MAGIC_HEADER = byteArrayOf(
