@@ -215,14 +215,15 @@ $ make              # show all targets
 
 ## Project Structure
 
-- `farebot-base/` — Core utilities, MDST reader, ByteArray extensions
-- `farebot-card-*/` — Card protocol implementations (classic, desfire, felica, etc.)
-- `farebot-transit/` — Shared transit abstractions (Trip, Station, TransitInfo, etc.)
-- `farebot-transit-*/` — Transit system implementations (one per system)
-- `farebot-app/` — KMP app framework (UI, ViewModels, DI, platform code)
-- `farebot-app-android/` — Android app shell (Activities, manifest, resources)
-- `farebot-app-ios/` — iOS app shell (Swift entry point, assets, config)
-- `farebot-app-desktop/` — macOS desktop app (experimental, PC/SC NFC)
+- `base/` — Core utilities, MDST reader, ByteArray extensions
+- `card/` — Shared card abstractions
+- `card/*/` — Card protocol implementations (classic, desfire, felica, etc.)
+- `transit/` — Shared transit abstractions (Trip, Station, TransitInfo, etc.)
+- `transit/*/` — Transit system implementations (one per system)
+- `app/` — KMP app framework (UI, ViewModels, DI, platform code)
+- `app/android/` — Android app shell (Activities, manifest, resources)
+- `app/ios/` — iOS app shell (Swift entry point, assets, config)
+- `app/desktop/` — macOS desktop app (experimental, PC/SC NFC)
 
 ## Written By
 
