@@ -1,5 +1,7 @@
 package com.codebutler.farebot.shared.ui.screen
 
+import com.codebutler.farebot.card.CardType
+
 data class HistoryUiState(
     val isLoading: Boolean = true,
     val showAllScans: Boolean = false,
@@ -22,6 +24,11 @@ data class HistoryItem(
     val parseError: String?,
     /** Brand color as 0xRRGGBB (no alpha). Null if unknown. */
     val brandColor: Int? = null,
+    val cardType: CardType? = null,
+    val keysRequired: Boolean = false,
+    val keyBundle: String? = null,
+    val preview: Boolean = false,
+    val serialOnly: Boolean = false,
     val scanCount: Int = 1,
     val allScanIds: List<String> = emptyList(),
 )

@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.transit
 
 import com.codebutler.farebot.base.util.DefaultStringResource
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.sample.SampleTransitFactory
 import com.codebutler.farebot.transit.amiibo.AmiiboTransitFactory
@@ -103,11 +104,12 @@ import com.codebutler.farebot.transit.yargor.YarGorTransitFactory
 import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.zolotayakorona.ZolotayaKoronaTransitFactory
 
-fun createTransitFactoryRegistry(): TransitFactoryRegistry {
+fun createTransitFactoryRegistry(
+    stringResource: StringResource = DefaultStringResource()
+): TransitFactoryRegistry {
     ChinaTransitRegistry.registerAll()
 
     val registry = TransitFactoryRegistry()
-    val stringResource = DefaultStringResource()
 
     // FeliCa factories
     registry.registerFactory(CardType.FeliCa, SuicaTransitFactory(stringResource))
@@ -153,10 +155,12 @@ fun createTransitFactoryRegistry(): TransitFactoryRegistry {
     registry.registerFactory(CardType.MifareClassic, CharlieCardTransitFactory())
     registry.registerFactory(CardType.MifareClassic, GautrainTransitFactory())
     registry.registerFactory(CardType.MifareClassic, SmartRiderTransitFactory(stringResource))
+    // Nextfare-specific factories must come before generic NextfareTransitFactory
+    registry.registerFactory(CardType.MifareClassic, LaxTapTransitFactory())
+    registry.registerFactory(CardType.MifareClassic, MspGotoTransitFactory())
     registry.registerFactory(CardType.MifareClassic, NextfareTransitInfo.NextfareTransitFactory())
     registry.registerFactory(CardType.MifareClassic, PodorozhnikTransitFactory(stringResource))
     registry.registerFactory(CardType.MifareClassic, TouchnGoTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, LaxTapTransitFactory())
     registry.registerFactory(CardType.MifareClassic, RicaricaMiTransitFactory())
     registry.registerFactory(CardType.MifareClassic, YarGorTransitFactory())
     registry.registerFactory(CardType.MifareClassic, ChcMetrocardTransitFactory())
@@ -176,7 +180,6 @@ fun createTransitFactoryRegistry(): TransitFactoryRegistry {
     registry.registerFactory(CardType.MifareClassic, WarsawTransitFactory())
     registry.registerFactory(CardType.MifareClassic, ZolotayaKoronaTransitFactory())
     registry.registerFactory(CardType.MifareClassic, BipTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, MspGotoTransitFactory())
     registry.registerFactory(CardType.MifareClassic, WaikatoCardTransitFactory())
     registry.registerFactory(CardType.MifareClassic, StrelkaTransitFactory())
     registry.registerFactory(CardType.MifareClassic, SunCardTransitFactory())

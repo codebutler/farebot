@@ -40,8 +40,10 @@ class TransitFactoryRegistry {
 
     fun parseTransitInfo(card: Card): TransitInfo? = findFactory(card)?.parseInfo(card)
 
-    fun findBrandColor(card: Card): Int? =
-        findFactory(card)?.allCards?.firstOrNull()?.brandColor
+    fun findCardInfo(card: Card): CardInfo? =
+        findFactory(card)?.allCards?.firstOrNull()
+
+    fun findBrandColor(card: Card): Int? = findCardInfo(card)?.brandColor
 
     @Suppress("UNCHECKED_CAST")
     fun registerFactory(cardType: CardType, factory: TransitFactory<*, *>) {
