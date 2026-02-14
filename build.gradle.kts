@@ -68,6 +68,36 @@ subprojects {
         }
     }
 
+    // Workaround: Compose Multiplatform's CopyResourcesToAndroidAssetsTask doesn't
+    // configure its outputDirectory with com.android.kotlin.multiplatform.library (AGP 9).
+    // Fix by assembling compose resources as Java classpath resources instead of Android
+    // assets. DefaultAndroidResourceReader falls back to ClassLoader.getResourceAsStream().
+    plugins.withId("com.android.kotlin.multiplatform.library") {
+        plugins.withId("org.jetbrains.compose") {
+            plugins.withId("org.jetbrains.kotlin.multiplatform") {
+                val resourceNamespace = "${project.group}.${project.name.replace("-", "_")}.generated.resources"
+                val outputBaseDir = layout.buildDirectory.dir("compose-android-classpath-resources")
+
+                val copyTask = tasks.register<Copy>("copyComposeResourcesToAndroidClasspath") {
+                    from(layout.buildDirectory.dir("generated/compose/resourceGenerator/preparedResources/commonMain/composeResources"))
+                    into(outputBaseDir.map { it.dir("composeResources/$resourceNamespace") })
+                    dependsOn("prepareComposeResourcesTaskForCommonMain")
+                }
+
+                afterEvaluate {
+                    extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+                        sourceSets.named("androidMain") {
+                            resources.srcDir(outputBaseDir)
+                        }
+                    }
+                    tasks.named("processAndroidMainJavaRes") {
+                        dependsOn(copyTask)
+                    }
+                }
+            }
+        }
+    }
+
     plugins.withType<com.android.build.gradle.BasePlugin> {
         @Suppress("DEPRECATION")
         extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
