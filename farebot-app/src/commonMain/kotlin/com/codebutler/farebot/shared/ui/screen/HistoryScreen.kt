@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.ui.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -24,8 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import farebot.farebot_app.generated.resources.Res
-import farebot.farebot_app.generated.resources.no_scanned_cards
+import farebot.farebot_app.generated.resources.img_home_splash
 import farebot.farebot_app.generated.resources.unknown_card
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -44,12 +46,13 @@ fun HistoryContent(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             uiState.items.isEmpty() -> {
-                Text(
-                    text = stringResource(Res.string.no_scanned_cards),
-                    style = MaterialTheme.typography.bodyLarge,
+                Image(
+                    painter = painterResource(Res.drawable.img_home_splash),
+                    contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .padding(16.dp)
+                        .fillMaxSize()
+                        .padding(80.dp),
                 )
             }
             else -> {
