@@ -30,7 +30,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.MobileOff
 import androidx.compose.material.icons.filled.Science
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.SubtitlesOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -287,7 +287,7 @@ fun ExploreContent(
                 }
                 if (showSerialOnly) {
                     LegendEntry(
-                        icon = Icons.Default.VisibilityOff,
+                        icon = Icons.Default.SubtitlesOff,
                         label = stringResource(Res.string.legend_serial_only),
                     )
                 }
@@ -394,7 +394,7 @@ private fun CardImageTile(
         val badges = buildList {
             if (!isSupported) add(Icons.Default.MobileOff)
             if (isKeysRequired) add(Icons.Default.Lock)
-            if (card.serialOnly) add(Icons.Default.VisibilityOff)
+            if (card.serialOnly) add(Icons.Default.SubtitlesOff)
             if (card.preview) add(Icons.Default.Science)
         }
         if (badges.isNotEmpty()) {
@@ -522,7 +522,7 @@ private fun CardDetailSheet(
                     SuggestionChip(
                         onClick = {},
                         label = { Text(stringResource(Res.string.legend_serial_only)) },
-                        icon = { Icon(Icons.Default.VisibilityOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        icon = { Icon(Icons.Default.SubtitlesOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     )
                 }
             }
