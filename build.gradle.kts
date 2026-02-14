@@ -14,6 +14,23 @@ plugins {
 
 allprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        filter {
+            exclude { element ->
+                element.file.path.contains("/build/")
+            }
+        }
+    }
+
+    // Workaround: ktlint-gradle filter doesn't reliably exclude generated sources
+    // added via KMP source sets. Exclude them by removing build dir from task sources.
+    afterEvaluate {
+        tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask>().configureEach {
+            val buildDir = layout.buildDirectory.get().asFile
+            exclude { it.file.startsWith(buildDir) }
+        }
+    }
 }
 
 subprojects {
@@ -83,11 +100,16 @@ subprojects {
                 val resourceNamespace = "${project.group}.${project.name.replace("-", "_")}.generated.resources"
                 val outputBaseDir = layout.buildDirectory.dir("compose-android-classpath-resources")
 
-                val copyTask = tasks.register<Copy>("copyComposeResourcesToAndroidClasspath") {
-                    from(layout.buildDirectory.dir("generated/compose/resourceGenerator/preparedResources/commonMain/composeResources"))
-                    into(outputBaseDir.map { it.dir("composeResources/$resourceNamespace") })
-                    dependsOn("prepareComposeResourcesTaskForCommonMain")
-                }
+                val copyTask =
+                    tasks.register<Copy>("copyComposeResourcesToAndroidClasspath") {
+                        from(
+                            layout.buildDirectory.dir(
+                                "generated/compose/resourceGenerator/preparedResources/commonMain/composeResources",
+                            ),
+                        )
+                        into(outputBaseDir.map { it.dir("composeResources/$resourceNamespace") })
+                        dependsOn("prepareComposeResourcesTaskForCommonMain")
+                    }
 
                 afterEvaluate {
                     extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {

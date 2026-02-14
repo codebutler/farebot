@@ -6,4 +6,6 @@ continuation_indent_size = 8
 insert_final_newline = true
 max_line_length = 120
 ktlint_code_style = ktlint_official
+ktlint_function_naming_ignore_when_annotated_with = Composable
+ij_kotlin_packages_to_use_import_on_demand = farebot.**
 
