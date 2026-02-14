@@ -11,8 +11,11 @@ import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKCoordinateRegionMakeWithDistance
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
-import platform.MapKit.MKPinAnnotationView
+import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKPointAnnotation
+import platform.CoreGraphics.CGRectMake
+import platform.UIKit.UIColor
+import platform.UIKit.UIView
 import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
@@ -95,18 +98,27 @@ private class MapViewDelegate(
         mapView: MKMapView,
         viewForAnnotation: platform.MapKit.MKAnnotationProtocol,
     ): platform.MapKit.MKAnnotationView? {
-        val identifier = "pin"
-        val pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier) as? MKPinAnnotationView
-            ?: MKPinAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier)
-
-        pinView.annotation = viewForAnnotation
-        pinView.canShowCallout = true
-        pinView.pinTintColor = when (viewForAnnotation) {
-            startAnnotation -> platform.UIKit.UIColor.blueColor
-            endAnnotation -> platform.UIKit.UIColor.redColor
-            else -> platform.UIKit.UIColor.redColor
+        val identifier = "tripDot"
+        val dotSize = 20.0
+        val innerSize = dotSize / 2.0
+        val innerInset = dotSize / 4.0
+        val dotView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+            ?: MKAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier).apply {
+                canShowCallout = true
+                setBounds(CGRectMake(0.0, 0.0, dotSize, dotSize))
+                layer.cornerRadius = dotSize / 2.0
+                val innerView = UIView(frame = CGRectMake(innerInset, innerInset, innerSize, innerSize))
+                innerView.backgroundColor = UIColor.whiteColor
+                innerView.layer.cornerRadius = innerSize / 2.0
+                innerView.userInteractionEnabled = false
+                addSubview(innerView)
+            }
+        dotView.annotation = viewForAnnotation
+        dotView.backgroundColor = when (viewForAnnotation) {
+            startAnnotation -> UIColor.blueColor
+            endAnnotation -> UIColor.redColor
+            else -> UIColor.redColor
         }
-
-        return pinView
+        return dotView
     }
 }

@@ -11,8 +11,10 @@ import kotlinx.cinterop.useContents
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
-import platform.MapKit.MKPinAnnotationView
+import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKPointAnnotation
+import platform.CoreGraphics.CGRectMake
+import platform.UIKit.UIColor
 import platform.UIKit.UIEdgeInsetsMake
 import platform.darwin.NSObject
 
@@ -90,15 +92,19 @@ private class CardsMapDelegate : NSObject(), MKMapViewDelegateProtocol {
         mapView: MKMapView,
         viewForAnnotation: platform.MapKit.MKAnnotationProtocol,
     ): platform.MapKit.MKAnnotationView? {
-        val identifier = "cardPin"
-        val pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier) as? MKPinAnnotationView
-            ?: MKPinAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier)
-
-        pinView.annotation = viewForAnnotation
-        pinView.canShowCallout = true
-        pinView.pinTintColor = platform.UIKit.UIColor.redColor
-
-        return pinView
+        val identifier = "cardDot"
+        val dotSize = 14.0
+        val dotView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+            ?: MKAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier).apply {
+                canShowCallout = true
+                setBounds(CGRectMake(0.0, 0.0, dotSize, dotSize))
+                backgroundColor = UIColor.redColor
+                layer.cornerRadius = dotSize / 2.0
+                layer.borderWidth = 2.0
+                layer.borderColor = UIColor.whiteColor.CGColor
+            }
+        dotView.annotation = viewForAnnotation
+        return dotView
     }
 
     override fun mapView(mapView: MKMapView, didSelectAnnotationView: platform.MapKit.MKAnnotationView) {
