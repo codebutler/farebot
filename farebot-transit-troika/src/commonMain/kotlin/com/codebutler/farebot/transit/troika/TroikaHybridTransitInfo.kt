@@ -23,9 +23,11 @@
 
 package com.codebutler.farebot.transit.troika
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -76,8 +78,6 @@ class TroikaHybridTransitInfo(
             if (strelka != null) {
                 items.add(HeaderListItem(strelka.cardName))
                 items.add(ListItem(Res.string.card_number, strelka.serialNumber))
-
-                items += strelka.extraInfo
             }
 
             return items.ifEmpty { null }
@@ -105,4 +105,21 @@ class TroikaHybridTransitInfo(
 
     override val warning: String?
         get() = troika.warning
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+        val trees =
+            listOfNotNull(
+                troika.getAdvancedUi(stringResource),
+                podorozhnik?.getAdvancedUi(stringResource),
+                strelka?.getAdvancedUi(stringResource),
+            )
+        if (trees.isEmpty()) return null
+        val b = FareBotUiTree.builder(stringResource)
+        for (tree in trees) {
+            for (item in tree.items) {
+                b.item().title(item.title).value(item.value)
+            }
+        }
+        return b.build()
+    }
 }

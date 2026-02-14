@@ -22,11 +22,12 @@
 
 package com.codebutler.farebot.transit.nextfareul
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getStringBlocking
@@ -99,15 +100,14 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
             } else {
                 items.add(ListItem(Res.string.nextfareul_product_type, capsule.mProductCode.toString(16)))
             }
-            items.add(
-                ListItem(
-                    Res.string.nextfareul_machine_code,
-                    capsule.mMachineCode.toString(16),
-                    ListItemCategory.ADVANCED,
-                ),
-            )
             return items
         }
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
+        val b = FareBotUiTree.builder(stringResource)
+        b.item().title(Res.string.nextfareul_machine_code).value(capsule.mMachineCode.toString(16))
+        return b.build()
+    }
 
     protected abstract fun makeCurrency(value: Int): TransitCurrency
 

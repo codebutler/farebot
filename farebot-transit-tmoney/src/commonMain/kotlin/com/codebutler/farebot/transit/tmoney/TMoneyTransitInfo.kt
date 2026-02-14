@@ -23,7 +23,9 @@
 
 package com.codebutler.farebot.transit.tmoney
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
@@ -72,6 +74,9 @@ open class TMoneyTransitInfo protected constructor(
 
     override val info: List<ListItemInterface>?
         get() = mPurseInfo?.getInfo(purseInfoResolver)
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? =
+        mPurseInfo?.getAdvancedInfo(stringResource, purseInfoResolver)
 
     override val trips: List<Trip>
         get() = mTrips

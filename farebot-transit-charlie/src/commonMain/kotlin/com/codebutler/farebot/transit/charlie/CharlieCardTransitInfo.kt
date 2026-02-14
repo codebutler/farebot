@@ -22,10 +22,9 @@
 
 package com.codebutler.farebot.transit.charlie
 
-import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
-import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -87,19 +86,12 @@ class CharlieCardTransitInfo internal constructor(
 
     override val hasUnknownStations: Boolean = true
 
-    override val info: List<ListItemInterface>?
-        get() =
-            if (secondSerial == 0L || secondSerial == 0xffffffffL) {
-                null
-            } else {
-                listOf(
-                    ListItem(
-                        Res.string.charlie_2nd_card_number,
-                        "A" + NumberUtils.zeroPad(secondSerial, 10),
-                        ListItemCategory.ADVANCED,
-                    ),
-                )
-            }
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+        if (secondSerial == 0L || secondSerial == 0xffffffffL) return null
+        val b = FareBotUiTree.builder(stringResource)
+        b.item().title(Res.string.charlie_2nd_card_number).value("A" + NumberUtils.zeroPad(secondSerial, 10))
+        return b.build()
+    }
 
     companion object {
         internal fun parseTimestamp(timestamp: Int): Instant = CHARLIE_EPOCH + timestamp.minutes

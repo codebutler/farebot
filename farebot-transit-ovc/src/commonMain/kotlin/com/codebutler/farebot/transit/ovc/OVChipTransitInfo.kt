@@ -24,9 +24,9 @@
 
 package com.codebutler.farebot.transit.ovc
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
@@ -145,16 +145,17 @@ class OVChipTransitInfo(
                 ),
             )
 
-            // Raw debug fields
-            li.addAll(
-                listOf(
-                    ListItem("Credit Slot ID", creditSlotId.toString(), ListItemCategory.ADVANCED),
-                    ListItem("Last Credit ID", creditId.toString(), ListItemCategory.ADVANCED),
-                ) + index.getRawFields(),
-            )
-
             return li
         }
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
+        val b = FareBotUiTree.builder(stringResource)
+        b.item().title("Credit Slot ID").value(creditSlotId.toString())
+        b.item().title("Last Credit ID").value(creditId.toString())
+        val slotsItem = b.item().title("Recent Slots")
+        index.addAdvancedItems(slotsItem)
+        return b.build()
+    }
 
     companion object {
         private const val NAME = "OV-chipkaart"

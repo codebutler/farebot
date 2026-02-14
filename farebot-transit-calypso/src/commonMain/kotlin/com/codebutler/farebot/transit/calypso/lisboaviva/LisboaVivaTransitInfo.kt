@@ -20,8 +20,8 @@
 
 package com.codebutler.farebot.transit.calypso.lisboaviva
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
@@ -54,15 +54,16 @@ class LisboaVivaTransitInfo internal constructor(
 
     override val info: List<ListItemInterface>
         get() {
-            val li = mutableListOf<ListItemInterface>()
-            if (tagId != null) {
-                li.add(ListItem(Res.string.calypso_engraved_serial, tagId.toString(), ListItemCategory.ADVANCED))
-            }
-            if (!holderName.isNullOrEmpty()) {
-                li.add(ListItem(Res.string.calypso_holder_name, holderName))
-            }
-            return li
+            if (holderName.isNullOrEmpty()) return emptyList()
+            return listOf(ListItem(Res.string.calypso_holder_name, holderName))
         }
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+        if (tagId == null) return null
+        val b = FareBotUiTree.builder(stringResource)
+        b.item().title(Res.string.calypso_engraved_serial).value(tagId.toString())
+        return b.build()
+    }
 
     companion object {
         const val NAME = "Viva"

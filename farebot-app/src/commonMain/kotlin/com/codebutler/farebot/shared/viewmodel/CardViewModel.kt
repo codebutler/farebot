@@ -3,7 +3,6 @@ package com.codebutler.farebot.shared.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.base.ui.HeaderListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
@@ -228,21 +227,13 @@ class CardViewModel(
 
     private fun createInfoItems(transitInfo: TransitInfo): List<InfoItem> {
         val items = transitInfo.info ?: return emptyList()
-        // Filter to NORMAL items, removing headers that have no NORMAL items following them
-        val filtered = mutableListOf<InfoItem>()
-        var pendingHeader: InfoItem? = null
-        for (item in items) {
-            if (item is HeaderListItem) {
-                pendingHeader = InfoItem(title = item.text1, value = item.text2, isHeader = true)
-            } else if (item.category == ListItemCategory.NORMAL) {
-                if (pendingHeader != null) {
-                    filtered.add(pendingHeader)
-                    pendingHeader = null
-                }
-                filtered.add(InfoItem(title = item.text1, value = item.text2, isHeader = false))
-            }
+        return items.map { item ->
+            InfoItem(
+                title = item.text1,
+                value = item.text2,
+                isHeader = item is HeaderListItem,
+            )
         }
-        return filtered
     }
 
     private fun createTransactionItems(transitInfo: TransitInfo): List<TransactionItem> {

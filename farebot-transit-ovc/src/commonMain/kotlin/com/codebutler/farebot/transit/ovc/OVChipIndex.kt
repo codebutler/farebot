@@ -23,10 +23,7 @@
 
 package com.codebutler.farebot.transit.ovc
 
-import com.codebutler.farebot.base.ui.HeaderListItem
-import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
-import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import kotlinx.serialization.Serializable
 
@@ -40,15 +37,13 @@ data class OVChipIndex internal constructor(
     val recentCreditSlot: Boolean, // Most recent credit index slot (0xF90(false) or 0xFA0(true))
     val subscriptionIndex: List<Int>,
 ) {
-    fun getRawFields(): List<ListItemInterface> =
-        listOf(
-            HeaderListItem("Recent Slots"),
-            ListItem("Transaction Slot", if (recentTransactionSlot) "B" else "A", ListItemCategory.ADVANCED),
-            ListItem("Info Slot", if (recentInfoSlot) "B" else "A", ListItemCategory.ADVANCED),
-            ListItem("Subscription Slot", if (recentSubscriptionSlot) "B" else "A", ListItemCategory.ADVANCED),
-            ListItem("Travelhistory Slot", if (recentTravelhistorySlot) "B" else "A", ListItemCategory.ADVANCED),
-            ListItem("Credit Slot", if (recentCreditSlot) "B" else "A", ListItemCategory.ADVANCED),
-        )
+    fun addAdvancedItems(b: FareBotUiTree.Item.Builder) {
+        b.item("Transaction Slot", if (recentTransactionSlot) "B" else "A")
+        b.item("Info Slot", if (recentInfoSlot) "B" else "A")
+        b.item("Subscription Slot", if (recentSubscriptionSlot) "B" else "A")
+        b.item("Travelhistory Slot", if (recentTravelhistorySlot) "B" else "A")
+        b.item("Credit Slot", if (recentCreditSlot) "B" else "A")
+    }
 
     companion object {
         fun parse(data: ByteArray): OVChipIndex {

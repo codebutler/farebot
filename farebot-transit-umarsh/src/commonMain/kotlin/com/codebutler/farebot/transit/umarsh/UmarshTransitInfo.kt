@@ -22,10 +22,11 @@
 
 package com.codebutler.farebot.transit.umarsh
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -72,12 +73,21 @@ class UmarshTransitInfo(
                     if (sec.denomination == UmarshDenomination.RUB) {
                         listOf(
                             ListItem(Res.string.umarsh_last_refill, sec.lastRefill?.toString() ?: ""),
-                            ListItem(Res.string.umarsh_machine_id, sec.machineId.toString(), ListItemCategory.ADVANCED),
                         )
                     } else {
                         emptyList()
                     }
             }
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+        val rubSectors = sectors.filter { it.denomination == UmarshDenomination.RUB }
+        if (rubSectors.isEmpty()) return null
+        val b = FareBotUiTree.builder(stringResource)
+        for (sec in rubSectors) {
+            b.item().title(Res.string.umarsh_machine_id).value(sec.machineId.toString())
+        }
+        return b.build()
+    }
 
     override val trips: List<Trip>?
         get() = validation?.let { listOf(it) }

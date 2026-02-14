@@ -24,9 +24,8 @@
 
 package com.codebutler.farebot.transit.hsl
 
-import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
-import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -51,20 +50,13 @@ class HSLTransitInfo(
     override val balance: TransitBalance?
         get() = TransitBalance(balance = TransitCurrency.EUR(mBalance))
 
-    override val info: List<ListItemInterface>
-        get() =
-            listOfNotNull(
-                applicationVersion?.let {
-                    ListItem(Res.string.hsl_application_version, it.toString(), ListItemCategory.ADVANCED)
-                },
-                applicationKeyVersion?.let {
-                    ListItem(Res.string.hsl_application_key_version, it.toString(), ListItemCategory.ADVANCED)
-                },
-                platformType?.let {
-                    ListItem(Res.string.hsl_platform_type, it.toString(), ListItemCategory.ADVANCED)
-                },
-                securityLevel?.let {
-                    ListItem(Res.string.hsl_security_level, it.toString(), ListItemCategory.ADVANCED)
-                },
-            )
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+        val b = FareBotUiTree.builder(stringResource)
+        applicationVersion?.let { b.item().title(Res.string.hsl_application_version).value(it) }
+        applicationKeyVersion?.let { b.item().title(Res.string.hsl_application_key_version).value(it) }
+        platformType?.let { b.item().title(Res.string.hsl_platform_type).value(it) }
+        securityLevel?.let { b.item().title(Res.string.hsl_security_level).value(it) }
+        val tree = b.build()
+        return if (tree.items.isEmpty()) null else tree
+    }
 }

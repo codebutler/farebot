@@ -10,9 +10,10 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
-import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.last_transaction
@@ -41,8 +42,13 @@ class HoloTransitInfo(
                         }
                     },
                 ),
-                ListItem(Res.string.manufacture_id, mManufacturingId, ListItemCategory.ADVANCED),
             )
+
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
+        val b = FareBotUiTree.builder(stringResource)
+        b.item().title(Res.string.manufacture_id).value(mManufacturingId)
+        return b.build()
+    }
 
     override val reason get() = Reason.NOT_STORED
     override val cardName get() = HoloTransitFactory.NAME
