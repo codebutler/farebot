@@ -97,7 +97,7 @@ fun ExploreContent(
     val gridState = rememberLazyGridState()
     val scope = rememberCoroutineScope()
     var selectedCardKey by remember { mutableStateOf<String?>(null) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val displayedCards = remember(supportedCards, supportedCardTypes, loadedKeyBundles, showUnsupported, showSerialOnly, showKeysRequired, showExperimental) {
         supportedCards.filter { card ->
@@ -182,20 +182,28 @@ fun ExploreContent(
         }
     }
 
+    // Filter map markers to only show cards visible in the list
+    val displayedCardNames = remember(displayedCards, cardNames) {
+        displayedCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
+    }
+    val visibleMarkers = remember(mapMarkers, displayedCardNames) {
+        mapMarkers.filter { it.name in displayedCardNames }
+    }
+
     // Compute focus markers for the current visible region
-    val focusMarkers = remember(currentRegion, groupedCards, cardNames, mapMarkers) {
-        val region = currentRegion ?: return@remember mapMarkers
-        val regionCards = groupedCards[region] ?: return@remember mapMarkers
+    val focusMarkers = remember(currentRegion, groupedCards, cardNames, visibleMarkers) {
+        val region = currentRegion ?: return@remember visibleMarkers
+        val regionCards = groupedCards[region] ?: return@remember visibleMarkers
         val regionCardNames = regionCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
-        val filtered = mapMarkers.filter { it.name in regionCardNames }
-        filtered.ifEmpty { mapMarkers }
+        val filtered = visibleMarkers.filter { it.name in regionCardNames }
+        filtered.ifEmpty { visibleMarkers }
     }
 
     Column(modifier = modifier.fillMaxSize()) {
         // Fixed map (stays visible while list scrolls)
-        if (mapMarkers.isNotEmpty()) {
+        if (visibleMarkers.isNotEmpty()) {
             PlatformCardsMap(
-                markers = mapMarkers,
+                markers = visibleMarkers,
                 focusMarkers = focusMarkers,
                 onMarkerTap = { markerName ->
                     val matchingCard = displayedCards.find { card ->
@@ -558,19 +566,18 @@ private fun CardDetailSheet(
 
         // Credits
         if (card.credits.isNotEmpty()) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(12.dp))
             Text(
                 text = stringResource(Res.string.credits),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            for (name in card.credits) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = card.credits.joinToString(", "),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         // View sample card
