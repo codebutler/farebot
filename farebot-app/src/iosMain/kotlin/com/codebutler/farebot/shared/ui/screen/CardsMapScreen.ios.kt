@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
@@ -56,7 +57,24 @@ actual fun PlatformCardsMap(
                 val focusNames = focusMarkers.map { it.name }.toSet()
                 val focusAnnotations = annotations.filter { it.title in focusNames }
                 if (focusAnnotations.isNotEmpty()) {
-                    mapView.showAnnotations(focusAnnotations, animated = true)
+                    if (focusAnnotations.size == 1) {
+                        val coord = focusAnnotations.first().coordinate
+                        val span = platform.MapKit.MKCoordinateSpanMake(2.0, 2.0)
+                        val region = platform.MapKit.MKCoordinateRegionMake(coord, span)
+                        mapView.setRegion(region, animated = true)
+                    } else {
+                        var rect = platform.MapKit.MKMapPointForCoordinate(focusAnnotations.first().coordinate).useContents {
+                            platform.MapKit.MKMapRectMake(x, y, 0.0, 0.0)
+                        }
+                        focusAnnotations.drop(1).forEach { ann ->
+                            val pointRect = platform.MapKit.MKMapPointForCoordinate(ann.coordinate).useContents {
+                                platform.MapKit.MKMapRectMake(x, y, 0.0, 0.0)
+                            }
+                            rect = platform.MapKit.MKMapRectUnion(rect, pointRect)
+                        }
+                        val padding = UIEdgeInsetsMake(20.0, 20.0, 20.0, 20.0)
+                        mapView.setVisibleMapRect(rect, edgePadding = padding, animated = true)
+                    }
                 }
             }
         },
