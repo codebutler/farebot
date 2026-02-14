@@ -27,7 +27,7 @@ class TrimetHopTransitInfo(
         get() = mIssueDate?.let {
             val instant = Instant.fromEpochSeconds(it.toLong())
             val local = instant.toLocalDateTime(TimeZone.of("America/Los_Angeles"))
-            listOf(ListItem(Res.string.issue_date, "${local.date} ${local.hour}:${local.minute.toString().padStart(2, '0')}"))
+            listOf(ListItem(Res.string.issue_date, "${local.date} ${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"))
         }
 
     override val reason get() = Reason.NOT_STORED

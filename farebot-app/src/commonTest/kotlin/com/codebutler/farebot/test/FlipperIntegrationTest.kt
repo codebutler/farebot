@@ -571,7 +571,7 @@ class FlipperIntegrationTest {
 
         // Trip 3: Simple Deposit Machine Charge, -1000 JPY
         trips[3].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
+            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
             assertEquals(TransitCurrency.JPY(-1000), t.fare)
             assertNull(t.agencyName)
             assertEquals("Simple Deposit Machine Charge", t.routeName)
@@ -731,7 +731,7 @@ class FlipperIntegrationTest {
 
         // Trip 5: Console 0x21 Charge, -1000 JPY
         trips[5].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
+            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
             assertEquals(TransitCurrency.JPY(-1000), t.fare)
             assertEquals("Console 0x21 Charge", t.routeName)
         }
@@ -776,7 +776,7 @@ class FlipperIntegrationTest {
 
         // Trip 10: Simple Deposit Machine Charge, -2000 JPY
         trips[10].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
+            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
             assertEquals(TransitCurrency.JPY(-2000), t.fare)
             assertEquals("Simple Deposit Machine Charge", t.routeName)
         }

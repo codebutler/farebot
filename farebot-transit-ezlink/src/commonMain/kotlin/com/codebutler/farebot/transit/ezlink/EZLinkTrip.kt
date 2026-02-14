@@ -33,6 +33,9 @@ import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_ezlink.generated.resources.*
 import kotlin.time.Instant
 
+private fun String.toStationOrNull(): Station? =
+    trim().ifEmpty { null }?.let { Station.nameOnly(it) }
+
 internal data class EZUserData(
     val startStation: Station?,
     val endStation: Station?,
@@ -40,20 +43,25 @@ internal data class EZUserData(
 ) {
     companion object {
         fun parse(userData: String, type: CEPASTransaction.TransactionType, stringResource: StringResource): EZUserData {
-            if (type == CEPASTransaction.TransactionType.BUS &&
+            if ((type == CEPASTransaction.TransactionType.BUS || type == CEPASTransaction.TransactionType.BUS_REFUND) &&
                 (userData.startsWith("SVC") || userData.startsWith("BUS"))
             ) {
+                val routeName = if (type == CEPASTransaction.TransactionType.BUS_REFUND) {
+                    stringResource.getString(Res.string.ez_bus_refund)
+                } else {
+                    stringResource.getString(Res.string.ez_bus_number, userData.substring(3, 7).replace(" ", ""))
+                }
                 return EZUserData(
                     startStation = null,
                     endStation = null,
-                    routeName = stringResource.getString(Res.string.ez_bus_number, userData.substring(3, 7).replace(" ", "")),
+                    routeName = routeName,
                 )
             }
             if (type == CEPASTransaction.TransactionType.CREATION) {
-                return EZUserData(Station.nameOnly(userData), null, stringResource.getString(Res.string.ez_first_use))
+                return EZUserData(userData.toStationOrNull(), null, stringResource.getString(Res.string.ez_first_use))
             }
             if (type == CEPASTransaction.TransactionType.RETAIL) {
-                return EZUserData(Station.nameOnly(userData), null, stringResource.getString(Res.string.ez_retail_purchase))
+                return EZUserData(userData.toStationOrNull(), null, stringResource.getString(Res.string.ez_retail_purchase))
             }
 
             val routeName = when (type) {
@@ -74,7 +82,7 @@ internal data class EZUserData(
                     routeName,
                 )
             }
-            return EZUserData(Station.nameOnly(userData), null, routeName)
+            return EZUserData(userData.toStationOrNull(), null, routeName)
         }
     }
 }

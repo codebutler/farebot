@@ -207,6 +207,7 @@ class SuicaTrip(
             val consoleType = consoleTypeInt and 0xFF
             return when {
                 isTVM(consoleTypeInt) -> Mode.TICKET_MACHINE
+                processType == CONSOLE_CHARGE.toByte().toInt() -> Mode.TICKET_MACHINE
                 consoleType == 0xc8 -> Mode.VENDING_MACHINE
                 consoleType == 0xc7 -> Mode.POS
                 consoleTypeInt == CONSOLE_BUS.toByte().toInt() -> Mode.BUS
