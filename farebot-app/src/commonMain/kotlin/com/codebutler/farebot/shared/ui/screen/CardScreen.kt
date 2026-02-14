@@ -387,7 +387,7 @@ private fun InfoItemRow(item: InfoItem) {
     } else {
         ListItem(
             headlineContent = { Text(text = item.title ?: "") },
-            trailingContent = if (item.value != null) {
+            supportingContent = if (item.value != null) {
                 {
                     Text(
                         text = item.value,
