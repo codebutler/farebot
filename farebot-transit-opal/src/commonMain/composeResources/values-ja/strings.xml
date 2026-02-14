@@ -17,7 +17,7 @@
   <string name="opal_last_transaction">最後のトランザクション</string>
   <string name="opal_time">時刻</string>
   <string name="opal_transaction_type">トランザクションの種類</string>
-  <string name="opal_unknown_format">不明 (%s)</string>
+  <string name="opal_unknown_format">不明 (%1$s)</string>
   <string name="opal_vehicle_bus">バス</string>
   <string name="opal_vehicle_ferry_lr">フェリーや路面電車</string>
   <string name="opal_vehicle_rail">鉄道</string>

@@ -1,7 +1,7 @@
 <resources>
     <string name="transit_orca_card_name">ORCA</string>
     <string name="location_seattle">Seattle, WA</string>
-    <string name="transit_orca_fare_cancelled_format">%s (Cancelled)</string>
+    <string name="transit_orca_fare_cancelled_format">%1$s (Cancelled)</string>
 
     <string name="transit_orca_agency_ct">Community Transit</string>
     <string name="transit_orca_agency_ct_short">CT</string>
@@ -22,7 +22,7 @@
     <string name="transit_orca_agency_kcwt">King County Water Taxi</string>
     <string name="transit_orca_agency_kcwt_short">KCWT</string>
     <string name="transit_orca_agency_handheld">Handheld Scanner</string>
-    <string name="transit_orca_agency_unknown">Unknown Agency: %s</string>
+    <string name="transit_orca_agency_unknown">Unknown Agency: %1$s</string>
     <string name="transit_orca_agency_unknown_short">Unknown</string>
 
     <string name="transit_orca_raw_fields">Raw Fields</string>
@@ -37,8 +37,8 @@
     <string name="transit_orca_route_monorail">Seattle Monorail</string>
     <string name="transit_orca_route_water_taxi">Water Taxi</string>
 
-    <string name="transit_orca_station_coach">Coach #%s</string>
-    <string name="transit_orca_station_unknown_location">Unknown Location #%s</string>
-    <string name="transit_orca_station_unknown_station">Unknown Station #%s</string>
-    <string name="transit_orca_station_unknown_terminal">Unknown Terminal #%s</string>
+    <string name="transit_orca_station_coach">Coach #%1$s</string>
+    <string name="transit_orca_station_unknown_location">Unknown Location #%1$s</string>
+    <string name="transit_orca_station_unknown_station">Unknown Station #%1$s</string>
+    <string name="transit_orca_station_unknown_terminal">Unknown Terminal #%1$s</string>
 </resources>

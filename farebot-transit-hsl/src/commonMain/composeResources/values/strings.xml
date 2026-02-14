@@ -6,8 +6,8 @@
     <!-- General -->
     <string name="hsl_balance_refill">Balance refill</string>
     <string name="hsl_balance_ticket_label">Value ticket</string>
-    <string name="hsl_mins_format">%s mins</string>
-    <string name="hsl_unknown_format">Unknown (%s)</string>
+    <string name="hsl_mins_format">%1$s mins</string>
+    <string name="hsl_unknown_format">Unknown (%1$s)</string>
 
     <!-- Card info -->
     <string name="hsl_application_version">Application Version</string>
@@ -16,7 +16,7 @@
     <string name="hsl_security_level">Security Level</string>
 
     <!-- Arvo (value ticket) -->
-    <string name="hsl_arvo_format">eTicket for %s</string>
+    <string name="hsl_arvo_format">eTicket for %1$s</string>
     <string name="hsl_purchase_date">Purchase date</string>
     <string name="hsl_period">Validity period</string>
     <plurals name="hsl_valid_mins">
@@ -41,7 +41,7 @@
     <string name="hsl_child">Child</string>
 
     <!-- Kausi (season ticket) -->
-    <string name="hsl_kausi_format">PeriodPass for %s</string>
+    <string name="hsl_kausi_format">PeriodPass for %1$s</string>
 
     <!-- Languages -->
     <string name="hsl_finnish">Finnish</string>
@@ -81,7 +81,7 @@
         <item quantity="one">zone %1$s</item>
         <item quantity="other">zones %1$s</item>
     </plurals>
-    <string name="hsl_zone_station">Zone %s</string>
+    <string name="hsl_zone_station">Zone %1$s</string>
 
     <!-- HSL Ultralight -->
     <string name="hsl_ultralight_card_name">HSL Ultralight</string>

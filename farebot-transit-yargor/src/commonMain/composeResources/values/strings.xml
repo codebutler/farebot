@@ -8,5 +8,5 @@
     <string name="yargor_mode_bus">Bus</string>
     <string name="yargor_mode_tram">Tram</string>
     <string name="yargor_mode_trolleybus">Trolleybus</string>
-    <string name="yargor_unknown_format">Unknown (%s)</string>
+    <string name="yargor_unknown_format">Unknown (%1$s)</string>
 </resources>

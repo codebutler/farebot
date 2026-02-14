@@ -17,7 +17,7 @@
   <string name="opal_last_transaction">Dernière transaction</string>
   <string name="opal_time">Heure</string>
   <string name="opal_transaction_type">Type de transaction</string>
-  <string name="opal_unknown_format">Inconnu (%s)</string>
+  <string name="opal_unknown_format">Inconnu (%1$s)</string>
   <string name="opal_vehicle_bus">Bus</string>
   <string name="opal_vehicle_ferry_lr">Ferry ou train léger sur Rail</string>
   <string name="opal_vehicle_rail">Chemin de fer</string>

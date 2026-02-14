@@ -1,4 +1,4 @@
 <resources>
     <string name="ultralight_pages">Pages</string>
-    <string name="ultralight_page_title_format">Page: 0x%s</string>
+    <string name="ultralight_page_title_format">Page: 0x%1$s</string>
 </resources>

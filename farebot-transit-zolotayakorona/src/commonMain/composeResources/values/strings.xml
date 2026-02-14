@@ -8,7 +8,7 @@
     <string name="zolotaya_korona_card_type">Card type</string>
     <string name="zolotaya_korona_card_serial">Card serial number</string>
     <string name="zolotaya_korona_refill_counter">Refill counter</string>
-    <string name="zolotaya_korona_unknown">Unknown (%s)</string>
+    <string name="zolotaya_korona_unknown">Unknown (%1$s)</string>
     <!-- Card names -->
     <string name="card_name_zolotaya_korona">Zolotaya Korona</string>
     <string name="card_name_krasnodar_etk">Krasnodar ETK</string>
@@ -56,5 +56,5 @@
     <string name="russia_region_76">Yaroslavl Oblast</string>
     <string name="russia_region_79">Jewish Autonomous Oblast</string>
     <string name="russia_region_91">Crimea</string>
-    <string name="russia_region_unknown">Unknown (%s)</string>
+    <string name="russia_region_unknown">Unknown (%1$s)</string>
 </resources>

@@ -56,5 +56,5 @@
     <string name="umarsh_region">Region</string>
     <string name="umarsh_last_refill">Last refill</string>
     <string name="umarsh_machine_id">Machine ID</string>
-    <string name="umarsh_unknown">Unknown (%s)</string>
+    <string name="umarsh_unknown">Unknown (%1$s)</string>
 </resources>

@@ -1,6 +1,6 @@
 <resources>
     <!-- Common EN1545 strings -->
-    <string name="en1545_unknown_format">Unknown (%s)</string>
+    <string name="en1545_unknown_format">Unknown (%1$s)</string>
     <string name="en1545_passenger_class">Passenger class</string>
     <string name="en1545_with_receipt">With receipt</string>
     <string name="en1545_without_receipt">Without receipt</string>

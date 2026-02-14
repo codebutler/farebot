@@ -17,7 +17,7 @@
   <string name="opal_last_transaction">Laatste transactie</string>
   <string name="opal_time">Tijd</string>
   <string name="opal_transaction_type">Transactietype</string>
-  <string name="opal_unknown_format">Onbekend (%s)</string>
+  <string name="opal_unknown_format">Onbekend (%1$s)</string>
   <string name="opal_vehicle_bus">Bus</string>
   <string name="opal_vehicle_ferry_lr">Veerboot of lightrail</string>
   <string name="opal_vehicle_rail">Trein</string>

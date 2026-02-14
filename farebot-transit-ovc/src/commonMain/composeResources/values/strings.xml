@@ -1,5 +1,5 @@
 <resources>
-    <string name="ovc_unknown_format">Unknown (%s)</string>
+    <string name="ovc_unknown_format">Unknown (%1$s)</string>
     <string name="ovc_card_name">OV-Chipkaart</string>
     <string name="ovc_location">Amsterdam, Netherlands</string>
     <string name="ovc_personal">Personal</string>

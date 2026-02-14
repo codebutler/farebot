@@ -52,7 +52,7 @@
     <string name="ndef_wifi_key_is_shareable">Key Is Shareable</string>
     <string name="ndef_wifi_key_is_shareable_yes">Yes</string>
     <string name="ndef_wifi_key_is_shareable_no">No</string>
-    <string name="ndef_wifi_unknown">Unknown (%s)</string>
+    <string name="ndef_wifi_unknown">Unknown (%1$s)</string>
     <string name="ndef_wifi_bitmap_unknown">Unknown bit %d</string>
 
     <!-- Wi-Fi authentication types -->

@@ -1,9 +1,9 @@
 <resources>
     <string name="transit_clipper_card_name">Clipper</string>
     <string name="location_san_francisco">San Francisco, CA</string>
-    <string name="transit_clipper_station_id">Station #0x%s</string>
+    <string name="transit_clipper_station_id">Station #0x%1$s</string>
     <string name="transit_clipper_station_unknown">(Unknown Station)</string>
-    <string name="transit_clipper_station_zone_id">Zone #%s</string>
+    <string name="transit_clipper_station_zone_id">Zone #%1$s</string>
     <string name="transit_clipper_station_eol">(End of line)</string>
     <string name="clipper_ul_card_name">Clipper (Ultralight)</string>
     <string name="clipper_ticket_type">Ticket type</string>
@@ -13,7 +13,7 @@
     <string name="clipper_ticket_type_youth">Youth</string>
     <string name="clipper_single">Single-ride (%1$s)</string>
     <string name="clipper_return">Return (%1$s)</string>
-    <string name="clipper_unknown_agency">0x%s</string>
-    <string name="clipper_zone">Zone %s</string>
+    <string name="clipper_unknown_agency">0x%1$s</string>
+    <string name="clipper_zone">Zone %1$s</string>
     <string name="clipper_unknown_station">0x%1$s/0x%2$s</string>
 </resources>

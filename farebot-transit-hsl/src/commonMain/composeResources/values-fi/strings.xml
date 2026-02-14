@@ -3,7 +3,7 @@
   <string name="hsl_2zone_ticket">Seutulippu</string>
   <string name="hsl_balance_refill">Arvon lataus</string>
   <string name="hsl_pass_is_valid">Kausi voimassa</string>
-  <string name="hsl_person_format">%s henkilö</string>
+  <string name="hsl_person_format">%1$s henkilö</string>
   <string name="hsl_previous_season_ticket">Viime kausilippu</string>
   <string name="hsl_season_ticket">Kausilippu</string>
   <string name="hsl_season_ticket_bought_on">Kausilippu ostettu</string>

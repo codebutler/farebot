@@ -64,6 +64,6 @@
     <string name="felica_process_admission_thirdparty">Admission Payment (3rd Party)</string>
 
     <!-- Fallback strings -->
-    <string name="suica_unknown_console">Console 0x%s</string>
-    <string name="suica_unknown_process">Process 0x%s</string>
+    <string name="suica_unknown_console">Console 0x%1$s</string>
+    <string name="suica_unknown_process">Process 0x%1$s</string>
 </resources>

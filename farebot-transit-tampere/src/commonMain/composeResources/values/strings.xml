@@ -4,5 +4,5 @@
     <string name="tampere_cardholder_name">Cardholder Name</string>
     <string name="tampere_date_of_birth">Date of Birth</string>
     <string name="tampere_issue_date">Issue Date</string>
-    <string name="tampere_subscription">Subscription (%s)</string>
+    <string name="tampere_subscription">Subscription (%1$s)</string>
 </resources>

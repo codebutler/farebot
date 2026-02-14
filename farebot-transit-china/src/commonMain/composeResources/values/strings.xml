@@ -36,8 +36,8 @@
     <!-- Shenzhen -->
     <string name="szt_metro">Shenzhen Metro</string>
     <string name="szt_bus">Shenzhen Bus</string>
-    <string name="szt_station_gate">Gate %s</string>
+    <string name="szt_station_gate">Gate %1$s</string>
 
     <!-- Generic -->
-    <string name="unknown_format">Unknown (%s)</string>
+    <string name="unknown_format">Unknown (%1$s)</string>
 </resources>

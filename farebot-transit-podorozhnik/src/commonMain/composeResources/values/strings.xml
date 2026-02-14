@@ -3,10 +3,10 @@
     <string name="podorozhnik_location">Saint Petersburg</string>
     <string name="podorozhnik_ground_trips">Ground trips</string>
     <string name="podorozhnik_subway_trips">Subway trips</string>
-    <string name="podorozhnik_gate">Gate %s</string>
+    <string name="podorozhnik_gate">Gate %1$s</string>
     <string name="podorozhnik_topup">Metro top-up</string>
     <string name="podorozhnik_led_metro">Saint Petersburg Metro</string>
     <string name="podorozhnik_led_bus">Saint Petersburg Bus</string>
     <string name="podorozhnik_led_shared_taxi">Saint Petersburg Shared Taxi</string>
-    <string name="podorozhnik_unknown_format">Unknown (%s)</string>
+    <string name="podorozhnik_unknown_format">Unknown (%1$s)</string>
 </resources>

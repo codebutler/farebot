@@ -17,7 +17,7 @@
     <string name="rkf_status_action_pending">Action pending</string>
     <string name="rkf_status_temp_disabled">Temporarily disabled</string>
     <string name="rkf_status_not_ok">Not OK</string>
-    <string name="rkf_unknown_format">Unknown (%s)</string>
+    <string name="rkf_unknown_format">Unknown (%1$s)</string>
 
     <!-- Info labels -->
     <string name="rkf_expiry_date">Expiry date</string>

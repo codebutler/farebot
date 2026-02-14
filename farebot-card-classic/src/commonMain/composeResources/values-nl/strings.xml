@@ -1,6 +1,6 @@
 <resources>
-  <string name="classic_block_title_format">Blok: %s</string>
+  <string name="classic_block_title_format">Blok: %1$s</string>
   <string name="classic_invalid_sector_title_format">Sector: 0x%1$s (Ongeldig: %2$s)</string>
-  <string name="classic_sector_title_format">Sector: 0x%s</string>
-  <string name="classic_unauthorized_sector_title_format">Sector: 0x%s (ongeautoriseerd)</string>
+  <string name="classic_sector_title_format">Sector: 0x%1$s</string>
+  <string name="classic_unauthorized_sector_title_format">Sector: 0x%1$s (ongeautoriseerd)</string>
 </resources>

@@ -2,9 +2,9 @@
   <string name="hsl_1zone_ticket">Billet interne</string>
   <string name="hsl_2zone_ticket">Billet régional</string>
   <string name="hsl_balance_refill">Recharge du solde</string>
-  <string name="hsl_mins_format">%s mn</string>
+  <string name="hsl_mins_format">%1$s mn</string>
   <string name="hsl_pass_is_valid">Billet de saison valide</string>
-  <string name="hsl_person_format">%s personnes</string>
+  <string name="hsl_person_format">%1$s personnes</string>
   <string name="hsl_previous_season_ticket">Le précédent ticket saisonnier était</string>
   <string name="hsl_season_ticket">Ticket saisonnier</string>
   <string name="hsl_season_ticket_bought_on">Ticket saisonnier acheté en</string>

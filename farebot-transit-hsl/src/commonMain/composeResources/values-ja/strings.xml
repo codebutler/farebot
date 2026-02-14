@@ -2,9 +2,9 @@
   <string name="hsl_1zone_ticket">内部チケット</string>
   <string name="hsl_2zone_ticket">地域チケット</string>
   <string name="hsl_balance_refill">残高チャージ</string>
-  <string name="hsl_mins_format">%s 分</string>
+  <string name="hsl_mins_format">%1$s 分</string>
   <string name="hsl_pass_is_valid">有効なシーズン チケット</string>
-  <string name="hsl_person_format">%s 人</string>
+  <string name="hsl_person_format">%1$s 人</string>
   <string name="hsl_previous_season_ticket">前のシーズン チケットは</string>
   <string name="hsl_season_ticket">シーズン チケット</string>
   <string name="hsl_season_ticket_bought_on">シーズン チケット購入</string>
