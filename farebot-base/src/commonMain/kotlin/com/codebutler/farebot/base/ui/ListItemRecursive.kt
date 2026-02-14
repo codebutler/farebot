@@ -31,6 +31,7 @@ data class ListItemRecursive(
     override val text1: String?,
     override val text2: String?,
     val subTree: List<ListItemInterface>?,
+    override val category: ListItemCategory = ListItemCategory.NORMAL,
 ) : ListItemInterface() {
     companion object {
         fun collapsedValue(

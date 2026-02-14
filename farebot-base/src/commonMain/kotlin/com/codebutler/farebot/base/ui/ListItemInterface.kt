@@ -24,8 +24,11 @@ package com.codebutler.farebot.base.ui
 
 import kotlinx.serialization.Serializable
 
+enum class ListItemCategory { NORMAL, ADVANCED }
+
 @Serializable
 sealed class ListItemInterface {
     abstract val text1: String?
     abstract val text2: String?
+    abstract val category: ListItemCategory
 }

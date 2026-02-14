@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.ovc
 
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import kotlinx.serialization.Serializable
@@ -42,11 +43,11 @@ data class OVChipIndex internal constructor(
     fun getRawFields(): List<ListItemInterface> =
         listOf(
             HeaderListItem("Recent Slots"),
-            ListItem("Transaction Slot", if (recentTransactionSlot) "B" else "A"),
-            ListItem("Info Slot", if (recentInfoSlot) "B" else "A"),
-            ListItem("Subscription Slot", if (recentSubscriptionSlot) "B" else "A"),
-            ListItem("Travelhistory Slot", if (recentTravelhistorySlot) "B" else "A"),
-            ListItem("Credit Slot", if (recentCreditSlot) "B" else "A"),
+            ListItem("Transaction Slot", if (recentTransactionSlot) "B" else "A", ListItemCategory.ADVANCED),
+            ListItem("Info Slot", if (recentInfoSlot) "B" else "A", ListItemCategory.ADVANCED),
+            ListItem("Subscription Slot", if (recentSubscriptionSlot) "B" else "A", ListItemCategory.ADVANCED),
+            ListItem("Travelhistory Slot", if (recentTravelhistorySlot) "B" else "A", ListItemCategory.ADVANCED),
+            ListItem("Credit Slot", if (recentCreditSlot) "B" else "A", ListItemCategory.ADVANCED),
         )
 
     companion object {

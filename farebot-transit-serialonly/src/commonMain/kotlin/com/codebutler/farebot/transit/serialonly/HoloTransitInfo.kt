@@ -11,6 +11,7 @@
 package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
@@ -40,7 +41,7 @@ class HoloTransitInfo(
                         }
                     },
                 ),
-                ListItem(Res.string.manufacture_id, mManufacturingId),
+                ListItem(Res.string.manufacture_id, mManufacturingId, ListItemCategory.ADVANCED),
             )
 
     override val reason get() = Reason.NOT_STORED

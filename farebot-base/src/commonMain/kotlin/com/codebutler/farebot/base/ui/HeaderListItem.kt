@@ -43,4 +43,7 @@ data class HeaderListItem(
 
     override val text2: String?
         get() = null
+
+    override val category: ListItemCategory
+        get() = ListItemCategory.NORMAL
 }

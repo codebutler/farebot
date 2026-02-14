@@ -23,6 +23,7 @@
 package com.codebutler.farebot.test
 
 import com.codebutler.farebot.base.ui.HeaderListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.shared.serialize.CardImporter
@@ -260,6 +261,9 @@ class SampleTransitDataDumpTest {
         } else {
             sb.appendLine("      - label: ${yamlValue(item.text1)}")
             sb.appendLine("        value: ${yamlValue(item.text2)}")
+            if (item.category != ListItemCategory.NORMAL) {
+                sb.appendLine("        category: ${item.category}")
+            }
         }
     }
 

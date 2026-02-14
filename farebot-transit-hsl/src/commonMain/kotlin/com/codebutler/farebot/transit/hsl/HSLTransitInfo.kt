@@ -25,6 +25,7 @@
 package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -53,9 +54,17 @@ class HSLTransitInfo(
     override val info: List<ListItemInterface>
         get() =
             listOfNotNull(
-                applicationVersion?.let { ListItem(Res.string.hsl_application_version, it.toString()) },
-                applicationKeyVersion?.let { ListItem(Res.string.hsl_application_key_version, it.toString()) },
-                platformType?.let { ListItem(Res.string.hsl_platform_type, it.toString()) },
-                securityLevel?.let { ListItem(Res.string.hsl_security_level, it.toString()) },
+                applicationVersion?.let {
+                    ListItem(Res.string.hsl_application_version, it.toString(), ListItemCategory.ADVANCED)
+                },
+                applicationKeyVersion?.let {
+                    ListItem(Res.string.hsl_application_key_version, it.toString(), ListItemCategory.ADVANCED)
+                },
+                platformType?.let {
+                    ListItem(Res.string.hsl_platform_type, it.toString(), ListItemCategory.ADVANCED)
+                },
+                securityLevel?.let {
+                    ListItem(Res.string.hsl_security_level, it.toString(), ListItemCategory.ADVANCED)
+                },
             )
 }

@@ -24,6 +24,7 @@
 package com.codebutler.farebot.card.ksx6924
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.convertBCDtoInteger
@@ -127,18 +128,18 @@ data class KSX6924PurseInfo(
     fun getInfo(resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver): List<ListItem> =
         listOf(
             ListItem(Res.string.ksx6924_card_type, resolver.resolveCardType(cardType)),
-            ListItem(Res.string.ksx6924_crypto_algorithm, resolver.resolveCryptoAlgo(alg)),
-            ListItem(Res.string.ksx6924_encryption_key_version, vk.hexString),
+            ListItem(Res.string.ksx6924_crypto_algorithm, resolver.resolveCryptoAlgo(alg), ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_encryption_key_version, vk.hexString, ListItemCategory.ADVANCED),
             ListItem(Res.string.ksx6924_card_issuer, resolver.resolveIssuer(idCenter)),
-            ListItem(Res.string.ksx6924_auth_id, idtr.hexString),
-            ListItem(Res.string.ksx6924_ticket_type, resolver.resolveUserCode(userCode)),
+            ListItem(Res.string.ksx6924_auth_id, idtr.hexString, ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_ticket_type, resolver.resolveUserCode(userCode), ListItemCategory.ADVANCED),
             ListItem(Res.string.ksx6924_discount_type, resolver.resolveDisRate(disRate)),
-            ListItem(Res.string.ksx6924_max_balance, balMax.toString()),
-            ListItem(Res.string.ksx6924_branch_code, bra.hexString),
-            ListItem(Res.string.ksx6924_one_time_limit, mmax.toString()),
-            ListItem(Res.string.ksx6924_mobile_carrier, resolver.resolveTCode(tcode)),
-            ListItem(Res.string.ksx6924_financial_institution, resolver.resolveCCode(ccode)),
-            ListItem(Res.string.ksx6924_rfu, rfu.hex()),
+            ListItem(Res.string.ksx6924_max_balance, balMax.toString(), ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_branch_code, bra.hexString, ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_one_time_limit, mmax.toString(), ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_mobile_carrier, resolver.resolveTCode(tcode), ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_financial_institution, resolver.resolveCCode(ccode), ListItemCategory.ADVANCED),
+            ListItem(Res.string.ksx6924_rfu, rfu.hex(), ListItemCategory.ADVANCED),
         )
 
     override fun equals(other: Any?): Boolean {

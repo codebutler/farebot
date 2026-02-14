@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.charlie
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.transit.Subscription
@@ -91,7 +92,13 @@ class CharlieCardTransitInfo internal constructor(
             if (secondSerial == 0L || secondSerial == 0xffffffffL) {
                 null
             } else {
-                listOf(ListItem(Res.string.charlie_2nd_card_number, "A" + NumberUtils.zeroPad(secondSerial, 10)))
+                listOf(
+                    ListItem(
+                        Res.string.charlie_2nd_card_number,
+                        "A" + NumberUtils.zeroPad(secondSerial, 10),
+                        ListItemCategory.ADVANCED,
+                    ),
+                )
             }
 
     companion object {

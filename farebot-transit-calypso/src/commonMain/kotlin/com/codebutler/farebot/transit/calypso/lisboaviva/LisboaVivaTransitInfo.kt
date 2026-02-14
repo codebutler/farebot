@@ -21,6 +21,7 @@
 package com.codebutler.farebot.transit.calypso.lisboaviva
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
@@ -55,7 +56,7 @@ class LisboaVivaTransitInfo internal constructor(
         get() {
             val li = mutableListOf<ListItemInterface>()
             if (tagId != null) {
-                li.add(ListItem(Res.string.calypso_engraved_serial, tagId.toString()))
+                li.add(ListItem(Res.string.calypso_engraved_serial, tagId.toString(), ListItemCategory.ADVANCED))
             }
             if (!holderName.isNullOrEmpty()) {
                 li.add(ListItem(Res.string.calypso_holder_name, holderName))

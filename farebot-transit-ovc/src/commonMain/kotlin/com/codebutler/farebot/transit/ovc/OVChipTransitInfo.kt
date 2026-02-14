@@ -26,6 +26,7 @@ package com.codebutler.farebot.transit.ovc
 
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
@@ -147,8 +148,8 @@ class OVChipTransitInfo(
             // Raw debug fields
             li.addAll(
                 listOf(
-                    ListItem("Credit Slot ID", creditSlotId.toString()),
-                    ListItem("Last Credit ID", creditId.toString()),
+                    ListItem("Credit Slot ID", creditSlotId.toString(), ListItemCategory.ADVANCED),
+                    ListItem("Last Credit ID", creditId.toString(), ListItemCategory.ADVANCED),
                 ) + index.getRawFields(),
             )
 

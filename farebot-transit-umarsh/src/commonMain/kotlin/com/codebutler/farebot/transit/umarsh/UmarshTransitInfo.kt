@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.umarsh
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.transit.Subscription
@@ -71,7 +72,7 @@ class UmarshTransitInfo(
                     if (sec.denomination == UmarshDenomination.RUB) {
                         listOf(
                             ListItem(Res.string.umarsh_last_refill, sec.lastRefill?.toString() ?: ""),
-                            ListItem(Res.string.umarsh_machine_id, sec.machineId.toString()),
+                            ListItem(Res.string.umarsh_machine_id, sec.machineId.toString(), ListItemCategory.ADVANCED),
                         )
                     } else {
                         emptyList()

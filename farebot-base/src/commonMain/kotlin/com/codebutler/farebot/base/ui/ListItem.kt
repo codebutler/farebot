@@ -33,6 +33,7 @@ import org.jetbrains.compose.resources.StringResource
 data class ListItem(
     override val text1: String?,
     override val text2: String?,
+    override val category: ListItemCategory = ListItemCategory.NORMAL,
 ) : ListItemInterface() {
     constructor(name: String) : this(name, null)
 
@@ -44,6 +45,16 @@ data class ListItem(
     constructor(nameRes: StringResource) : this(
         text1 = getStringBlocking(nameRes),
         text2 = null,
+    )
+
+    constructor(
+        nameRes: StringResource,
+        value: String?,
+        category: ListItemCategory,
+    ) : this(
+        text1 = getStringBlocking(nameRes),
+        text2 = value,
+        category = category,
     )
 
     /**

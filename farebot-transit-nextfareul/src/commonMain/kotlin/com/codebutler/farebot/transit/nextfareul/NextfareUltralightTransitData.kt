@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.nextfareul
 
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.ui.ListItemCategory
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
@@ -98,7 +99,13 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
             } else {
                 items.add(ListItem(Res.string.nextfareul_product_type, capsule.mProductCode.toString(16)))
             }
-            items.add(ListItem(Res.string.nextfareul_machine_code, capsule.mMachineCode.toString(16)))
+            items.add(
+                ListItem(
+                    Res.string.nextfareul_machine_code,
+                    capsule.mMachineCode.toString(16),
+                    ListItemCategory.ADVANCED,
+                ),
+            )
             return items
         }
 
