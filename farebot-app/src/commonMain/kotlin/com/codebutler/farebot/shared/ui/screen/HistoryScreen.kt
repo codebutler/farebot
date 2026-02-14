@@ -4,17 +4,27 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MobileOff
+import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.SubtitlesOff
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.codebutler.farebot.card.CardType
 import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.img_home_splash
 import farebot.farebot_app.generated.resources.unknown_card
@@ -34,6 +45,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HistoryContent(
     uiState: HistoryUiState,
+    supportedCardTypes: Set<CardType> = emptySet(),
+    loadedKeyBundles: Set<String> = emptySet(),
     onNavigateToCard: (String) -> Unit,
     onToggleSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -107,15 +120,37 @@ fun HistoryContent(
                                         )
                                     }
                                 },
-                                trailingContent = if (item.scannedTime != null) {
-                                    {
-                                        Text(
-                                            text = item.scannedTime,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
+                                trailingContent = {
+                                    val badges = buildList {
+                                        if (item.cardType != null && item.cardType !in supportedCardTypes) add(Icons.Default.MobileOff)
+                                        if (item.keysRequired && item.keyBundle !in loadedKeyBundles) add(Icons.Default.Lock)
+                                        if (item.serialOnly) add(Icons.Default.SubtitlesOff)
+                                        if (item.preview) add(Icons.Default.Science)
                                     }
-                                } else null,
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        if (badges.isNotEmpty()) {
+                                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                                for (icon in badges) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(16.dp)
+                                                            .background(Color.Black.copy(alpha = 0.6f), CircleShape),
+                                                        contentAlignment = Alignment.Center,
+                                                    ) {
+                                                        Icon(icon, contentDescription = null, modifier = Modifier.size(10.dp), tint = Color.White)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (item.scannedTime != null) {
+                                            Text(
+                                                text = item.scannedTime,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
+                                },
                                 modifier = Modifier.combinedClickable(
                                     onClick = {
                                         if (uiState.isSelectionMode) {

@@ -78,11 +78,20 @@ class HistoryViewModel(
                     var serial = savedCard.serial
                     var parseError: String? = null
                     var brandColor: Int? = null
+                    var keysRequired = false
+                    var keyBundle: String? = null
+                    var preview = false
+                    var serialOnly = false
                     try {
                         val card = rawCard.parse()
+                        val cardInfo = transitFactoryRegistry.findCardInfo(card)
                         val identity = transitFactoryRegistry.parseTransitIdentity(card)
                         cardName = identity?.name
-                        brandColor = transitFactoryRegistry.findBrandColor(card)
+                        brandColor = cardInfo?.brandColor
+                        keysRequired = cardInfo?.keysRequired ?: false
+                        keyBundle = cardInfo?.keyBundle
+                        preview = cardInfo?.preview ?: false
+                        serialOnly = cardInfo?.serialOnly ?: false
                         if (identity?.serialNumber != null) {
                             serial = identity.serialNumber!!
                         }
@@ -109,6 +118,11 @@ class HistoryViewModel(
                         scannedTime = scannedTime,
                         parseError = parseError,
                         brandColor = brandColor,
+                        cardType = savedCard.type,
+                        keysRequired = keysRequired,
+                        keyBundle = keyBundle,
+                        preview = preview,
+                        serialOnly = serialOnly,
                         scanCount = 1,
                         allScanIds = listOf(id),
                     )
