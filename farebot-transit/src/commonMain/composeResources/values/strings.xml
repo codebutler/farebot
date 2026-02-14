@@ -28,6 +28,10 @@
         <item quantity="other">%1$d trips remaining</item>
     </plurals>
 
+    <!-- Unknown format -->
+    <string name="unknown_station_format">Unknown (%1$s)</string>
+    <string name="unknown_station">Unknown</string>
+
     <!-- Payment methods -->
     <string name="payment_method_unknown">Unknown</string>
     <string name="payment_method_cash">Cash</string>

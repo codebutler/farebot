@@ -35,7 +35,7 @@ object RavKavLookup : En1545LookupSTR("ravkav") {
     override val timeZone: TimeZone = TimeZone.of("Asia/Jerusalem")
 
     override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
-        return if (station == 0) null else Station.nameOnly(station.toString())
+        return if (station == 0) null else Station.unknown(station.toString())
     }
 
     override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {

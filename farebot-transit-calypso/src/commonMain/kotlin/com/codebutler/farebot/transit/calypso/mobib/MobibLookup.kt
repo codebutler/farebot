@@ -48,7 +48,7 @@ internal object MobibLookup : En1545LookupSTR("mobib") {
 
     override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
         if (station == 0) return null
-        return Station.nameOnly("0x${station.toString(16)}")
+        return Station.unknown("0x${station.toString(16)}")
     }
 
     override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(

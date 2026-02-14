@@ -64,7 +64,7 @@ abstract class En1545LookupSTR protected constructor(protected val dbName: Strin
             val lng = mdstStation.longitude.takeIf { it != 0f }?.toString()
             return Station.create(name, null, lat, lng)
         }
-        return Station.nameOnly("0x${station.toString(16)}")
+        return Station.unknown("0x${station.toString(16)}")
     }
 
     override fun getMode(agency: Int?, route: Int?): Trip.Mode {

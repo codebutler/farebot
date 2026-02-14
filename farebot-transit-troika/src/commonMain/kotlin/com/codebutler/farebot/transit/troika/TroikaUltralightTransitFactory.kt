@@ -575,7 +575,7 @@ private class TroikaTrip(
                     .longitude(if (result.hasLocation) result.longitude.toString() else null)
                     .build()
             }
-            return Station.nameOnly(validator.toString())
+            return Station.unknown(validator.toString())
         }
 
     // Troika doesn't store monetary price of trip. Only a fare code.
