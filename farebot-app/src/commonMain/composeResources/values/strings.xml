@@ -34,7 +34,8 @@
     <string name="n_selected">%1$d selected</string>
     <string name="nfc">NFC</string>
     <string name="nfc_disabled">NFC is disabled</string>
-    <string name="nfc_listening">Ready to scan — hold your card to the device</string>
+    <string name="nfc_listening_title">Ready to scan</string>
+    <string name="nfc_listening_subtitle">Hold your card to the device</string>
     <string name="nfc_settings">NFC Settings</string>
     <string name="nfc_unavailable">NFC Unavailable</string>
     <string name="no_keys">No keys added yet.</string>
@@ -72,7 +73,8 @@
     <string name="scan_history">Scan History</string>
     <string name="current_scan">Current</string>
     <string name="show">Show</string>
-    <string name="show_all_scans">Show all scans</string>
+    <string name="show_all_scans">All scans</string>
+    <string name="show_latest_scans">Latest scans</string>
     <string name="legend_unsupported">Incompatible</string>
     <string name="legend_keys_required">Locked</string>
     <string name="legend_serial_only">Limited</string>

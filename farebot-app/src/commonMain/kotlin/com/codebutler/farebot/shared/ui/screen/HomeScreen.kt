@@ -8,14 +8,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Explore
@@ -44,6 +54,15 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -78,12 +97,14 @@ import farebot.farebot_app.generated.resources.keys
 import farebot.farebot_app.generated.resources.menu
 import farebot.farebot_app.generated.resources.n_selected
 import farebot.farebot_app.generated.resources.nfc_disabled
-import farebot.farebot_app.generated.resources.nfc_listening
+import farebot.farebot_app.generated.resources.nfc_listening_subtitle
+import farebot.farebot_app.generated.resources.nfc_listening_title
 import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
 import farebot.farebot_app.generated.resources.scan
 import farebot.farebot_app.generated.resources.show
 import farebot.farebot_app.generated.resources.show_all_scans
+import farebot.farebot_app.generated.resources.show_latest_scans
 import farebot.farebot_app.generated.resources.show_experimental_cards
 import farebot.farebot_app.generated.resources.show_keys_required_cards
 import farebot.farebot_app.generated.resources.show_serial_only_cards
@@ -255,16 +276,36 @@ fun HomeScreen(
                             Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
                         }
                         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                            Text(
+                                stringResource(Res.string.show),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            )
                             DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_file)) },
-                                onClick = { menuExpanded = false; onImportFile() }
+                                text = { Text(stringResource(Res.string.show_latest_scans)) },
+                                trailingIcon = {
+                                    Icon(
+                                        if (!historyUiState.showAllScans) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                                        contentDescription = null,
+                                    )
+                                },
+                                onClick = { if (historyUiState.showAllScans) { onToggleShowAllScans() }; menuExpanded = false },
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.show_all_scans)) },
-                                trailingIcon = if (historyUiState.showAllScans) {
-                                    { Icon(Icons.Default.Check, contentDescription = null) }
-                                } else null,
-                                onClick = { onToggleShowAllScans(); menuExpanded = false },
+                                trailingIcon = {
+                                    Icon(
+                                        if (historyUiState.showAllScans) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                                        contentDescription = null,
+                                    )
+                                },
+                                onClick = { if (!historyUiState.showAllScans) { onToggleShowAllScans() }; menuExpanded = false },
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.import_file)) },
+                                onClick = { menuExpanded = false; onImportFile() }
                             )
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
@@ -320,9 +361,12 @@ fun HomeScreen(
                                             Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$unsupportedCount") }
                                         }
                                     },
-                                    trailingIcon = if (showUnsupported) {
-                                        { Icon(Icons.Default.Check, contentDescription = null) }
-                                    } else null,
+                                    trailingIcon = {
+                                        Icon(
+                                            if (showUnsupported) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                            contentDescription = null,
+                                        )
+                                    },
                                     onClick = {
                                     showUnsupported = !showUnsupported
                                     appPreferences.putBoolean(AppPreferences.KEY_SHOW_UNSUPPORTED, showUnsupported)
@@ -337,9 +381,12 @@ fun HomeScreen(
                                         Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$serialOnlyCount") }
                                     }
                                 },
-                                trailingIcon = if (showSerialOnly) {
-                                    { Icon(Icons.Default.Check, contentDescription = null) }
-                                } else null,
+                                trailingIcon = {
+                                    Icon(
+                                        if (showSerialOnly) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                        contentDescription = null,
+                                    )
+                                },
                                 onClick = {
                                     showSerialOnly = !showSerialOnly
                                     appPreferences.putBoolean(AppPreferences.KEY_SHOW_SERIAL_ONLY, showSerialOnly)
@@ -353,9 +400,12 @@ fun HomeScreen(
                                         Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$keysRequiredCount") }
                                     }
                                 },
-                                trailingIcon = if (showKeysRequired) {
-                                    { Icon(Icons.Default.Check, contentDescription = null) }
-                                } else null,
+                                trailingIcon = {
+                                    Icon(
+                                        if (showKeysRequired) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                        contentDescription = null,
+                                    )
+                                },
                                 onClick = {
                                     showKeysRequired = !showKeysRequired
                                     appPreferences.putBoolean(AppPreferences.KEY_SHOW_KEYS_REQUIRED, showKeysRequired)
@@ -369,9 +419,12 @@ fun HomeScreen(
                                         Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant) { Text("$experimentalCount") }
                                     }
                                 },
-                                trailingIcon = if (showExperimental) {
-                                    { Icon(Icons.Default.Check, contentDescription = null) }
-                                } else null,
+                                trailingIcon = {
+                                    Icon(
+                                        if (showExperimental) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                        contentDescription = null,
+                                    )
+                                },
                                 onClick = {
                                     showExperimental = !showExperimental
                                     appPreferences.putBoolean(AppPreferences.KEY_SHOW_EXPERIMENTAL, showExperimental)
@@ -474,13 +527,30 @@ fun HomeScreen(
 
             // NFC listening banner (Android passive scanning, scan tab only)
             if (selectedTab == 0 && !homeUiState.requiresActiveScan && homeUiState.nfcStatus == NfcStatus.AVAILABLE) {
+                val shimmerTransition = rememberInfiniteTransition()
+                val shimmerProgress by shimmerTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse,
+                    ),
+                )
+                val shimmerOffset = -0.5f + shimmerProgress * 1f
+                val containerColor = MaterialTheme.colorScheme.secondaryContainer
+                val shimmerColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.35f)
+                val shimmerBrush = Brush.linearGradient(
+                    colors = listOf(containerColor, shimmerColor, containerColor),
+                    start = Offset(shimmerOffset * 1000f, 0f),
+                    end = Offset((shimmerOffset + 1f) * 1000f, 0f),
+                )
                 Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .background(shimmerBrush)
                             .padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -491,7 +561,13 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = stringResource(Res.string.nfc_listening),
+                            text = buildAnnotatedString {
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(stringResource(Res.string.nfc_listening_title))
+                                }
+                                append("  ")
+                                append(stringResource(Res.string.nfc_listening_subtitle))
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
@@ -508,13 +584,27 @@ fun HomeScreen(
                     }
                 }
             }) {
-                when (selectedTab) {
-                    0 -> HistoryContent(
+                // Both tabs always stay composed so the map doesn't re-initialize on tab switch.
+                // Active tab is drawn on top via zIndex; inactive tab is hidden via alpha.
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .zIndex(if (selectedTab == 0) 1f else 0f)
+                        .alpha(if (selectedTab == 0) 1f else 0f)
+                        .then(if (selectedTab != 0) Modifier.pointerInput(Unit) { awaitPointerEventScope { while (true) { awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() } } } } else Modifier)
+                ) {
+                    HistoryContent(
                         uiState = historyUiState,
                         onNavigateToCard = onNavigateToCard,
                         onToggleSelection = onToggleSelection,
                     )
-                    1 -> ExploreContent(
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .zIndex(if (selectedTab == 1) 1f else 0f)
+                        .alpha(if (selectedTab == 1) 1f else 0f)
+                        .then(if (selectedTab != 1) Modifier.pointerInput(Unit) { awaitPointerEventScope { while (true) { awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() } } } } else Modifier)
+                ) {
+                    ExploreContent(
                         supportedCards = supportedCards,
                         supportedCardTypes = supportedCardTypes,
                         deviceRegion = deviceRegion,
