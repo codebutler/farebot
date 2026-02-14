@@ -56,6 +56,17 @@
     <string name="tag_lost">Card Connection Lost</string>
     <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
     <string name="tap_your_card">Tap your card</string>
+    <string name="trip_mode_bus">Bus</string>
+    <string name="trip_mode_train">Train</string>
+    <string name="trip_mode_tram">Tram</string>
+    <string name="trip_mode_metro">Metro</string>
+    <string name="trip_mode_ferry">Ferry</string>
+    <string name="trip_mode_pos">Purchase</string>
+    <string name="trip_mode_trolleybus">Trolleybus</string>
+    <string name="trip_mode_toll_road">Toll Road</string>
+    <string name="trip_mode_monorail">Monorail</string>
+    <string name="trip_mode_cablecar">Cable Car</string>
+    <string name="trip_mode_other">Transaction</string>
     <string name="trip_map">Trip Map</string>
     <string name="unknown_card">Unknown Card</string>
     <string name="unknown_card_desc">This card is not supported by FareBot</string>

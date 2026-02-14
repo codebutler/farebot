@@ -71,6 +71,17 @@ import farebot.farebot_app.generated.resources.ic_transaction_tvm_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_unknown_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_vend_32dp
 import farebot.farebot_app.generated.resources.refill
+import farebot.farebot_app.generated.resources.trip_mode_bus
+import farebot.farebot_app.generated.resources.trip_mode_cablecar
+import farebot.farebot_app.generated.resources.trip_mode_ferry
+import farebot.farebot_app.generated.resources.trip_mode_metro
+import farebot.farebot_app.generated.resources.trip_mode_monorail
+import farebot.farebot_app.generated.resources.trip_mode_other
+import farebot.farebot_app.generated.resources.trip_mode_pos
+import farebot.farebot_app.generated.resources.trip_mode_toll_road
+import farebot.farebot_app.generated.resources.trip_mode_train
+import farebot.farebot_app.generated.resources.trip_mode_tram
+import farebot.farebot_app.generated.resources.trip_mode_trolleybus
 import farebot.farebot_app.generated.resources.unknown_card
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -196,6 +207,28 @@ fun CardScreen(
                         if (uiState.warning != null) {
                             item {
                                 WarningBanner(uiState.warning)
+                            }
+                        }
+
+                        // Empty state message (e.g., serial-only cards)
+                        if (uiState.emptyStateMessage != null
+                            && uiState.balances.isEmpty()
+                            && uiState.transactions.isEmpty()
+                        ) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillParentMaxHeight(0.6f)
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        text = uiState.emptyStateMessage,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(horizontal = 32.dp),
+                                    )
+                                }
                             }
                         }
 
@@ -424,15 +457,29 @@ private fun TripRow(
     trip: TransactionItem.TripItem,
     onNavigateToTripMap: (String) -> Unit,
 ) {
-    val headline = listOfNotNull(trip.agency, trip.route).joinToString(" ").ifEmpty { null }
+    val agencyRoute = listOfNotNull(trip.agency, trip.route).joinToString(" ").ifEmpty { null }
+    // If no agency/route, promote stations to headline so title isn't blank.
+    // If still nothing, fall back to mode name.
+    val headline: String
+    val stationsInSupporting: Boolean
+    if (agencyRoute != null) {
+        headline = agencyRoute
+        stationsInSupporting = true
+    } else if (trip.stations != null) {
+        headline = trip.stations
+        stationsInSupporting = false
+    } else {
+        headline = tripModeName(trip.mode)
+        stationsInSupporting = false
+    }
     val supportingParts = buildList {
-        if (trip.stations != null) add(trip.stations)
+        if (stationsInSupporting && trip.stations != null) add(trip.stations)
         if (trip.isTransfer) add("Transfer")
         if (trip.isRejected) add("Rejected")
     }
     ListItem(
         headlineContent = {
-            Text(text = headline ?: "")
+            Text(text = headline)
         },
         supportingContent = if (supportingParts.isNotEmpty()) {
             { Text(text = supportingParts.joinToString(" \u00b7 ")) }
@@ -476,6 +523,13 @@ private fun RefillRow(refill: TransactionItem.RefillItem) {
         supportingContent = if (refill.agency != null) {
             { Text(text = refill.agency) }
         } else null,
+        leadingContent = {
+            Image(
+                painter = painterResource(Res.drawable.ic_transaction_tvm_32dp),
+                contentDescription = stringResource(Res.string.refill),
+                modifier = Modifier.size(32.dp),
+            )
+        },
         trailingContent = {
             Column(horizontalAlignment = Alignment.End) {
                 Text(text = refill.amount, style = MaterialTheme.typography.bodyLarge)
@@ -520,4 +574,19 @@ private fun tripModeIcon(mode: Trip.Mode?): DrawableResource = when (mode) {
     Trip.Mode.POS -> Res.drawable.ic_transaction_pos_32dp
     Trip.Mode.BANNED -> Res.drawable.ic_transaction_banned_32dp
     else -> Res.drawable.ic_transaction_unknown_32dp
+}
+
+@Composable
+private fun tripModeName(mode: Trip.Mode?): String = when (mode) {
+    Trip.Mode.BUS -> stringResource(Res.string.trip_mode_bus)
+    Trip.Mode.TRAIN -> stringResource(Res.string.trip_mode_train)
+    Trip.Mode.TRAM -> stringResource(Res.string.trip_mode_tram)
+    Trip.Mode.METRO -> stringResource(Res.string.trip_mode_metro)
+    Trip.Mode.FERRY -> stringResource(Res.string.trip_mode_ferry)
+    Trip.Mode.POS -> stringResource(Res.string.trip_mode_pos)
+    Trip.Mode.TROLLEYBUS -> stringResource(Res.string.trip_mode_trolleybus)
+    Trip.Mode.TOLL_ROAD -> stringResource(Res.string.trip_mode_toll_road)
+    Trip.Mode.MONORAIL -> stringResource(Res.string.trip_mode_monorail)
+    Trip.Mode.CABLECAR -> stringResource(Res.string.trip_mode_cablecar)
+    else -> stringResource(Res.string.trip_mode_other)
 }

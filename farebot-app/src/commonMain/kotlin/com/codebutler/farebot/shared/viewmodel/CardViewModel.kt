@@ -97,6 +97,7 @@ class CardViewModel(
                         transactions = transactions,
                         infoItems = infoItems,
                         warning = transitInfo.warning,
+                        emptyStateMessage = transitInfo.emptyStateMessage,
                         hasAdvancedData = true,
                         isSample = isSample,
                         scanCount = currentScanIds.size.coerceAtLeast(1),
@@ -224,36 +225,59 @@ class CardViewModel(
         } ?: emptyList()
 
         val trips = transitInfo.trips?.map { trip ->
-            val hasLocation = trip.startStation?.hasLocation() == true ||
-                trip.endStation?.hasLocation() == true
-            val tripKey = if (hasLocation) navDataHolder.put(trip) else null
             val ts = trip.startTimestamp?.epochSeconds ?: 0L
-            val stationsStr = buildStationsString(trip)
-            TransactionItem.TripItem(
-                route = trip.routeName,
-                agency = trip.shortAgencyName,
-                fare = trip.fare?.formatCurrencyString() ?: trip.fareString,
-                stations = stationsStr,
-                time = formatTimestamp(ts),
-                mode = trip.mode,
-                hasLocation = hasLocation,
-                tripKey = tripKey,
-                epochSeconds = ts,
-                isTransfer = trip.isTransfer,
-                isRejected = trip.isRejected,
-            )
+            val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString
+
+            // Ticket machine / vending machine with negative fare = refill/top-up
+            val isRefill = trip.mode in listOf(Trip.Mode.TICKET_MACHINE, Trip.Mode.VENDING_MACHINE)
+                && trip.fare?.let { it.currency < 0 } == true
+
+            if (isRefill) {
+                TransactionItem.RefillItem(
+                    agency = trip.shortAgencyName,
+                    amount = fareStr ?: "",
+                    time = formatTimestamp(ts),
+                    epochSeconds = ts,
+                ) as TransactionItem
+            } else {
+                val hasLocation = trip.startStation?.hasLocation() == true ||
+                    trip.endStation?.hasLocation() == true
+                val tripKey = if (hasLocation) navDataHolder.put(trip) else null
+                val stationsStr = buildStationsString(trip)
+                TransactionItem.TripItem(
+                    route = trip.routeName,
+                    agency = trip.shortAgencyName,
+                    fare = fareStr,
+                    stations = stationsStr,
+                    time = formatTimestamp(ts),
+                    mode = trip.mode,
+                    hasLocation = hasLocation,
+                    tripKey = tripKey,
+                    epochSeconds = ts,
+                    isTransfer = trip.isTransfer,
+                    isRejected = trip.isRejected,
+                )
+            }
         } ?: emptyList()
 
         // Sort trips by time descending
         val sortedTimedItems = trips.sortedByDescending { item ->
-            item.epochSeconds
+            when (item) {
+                is TransactionItem.TripItem -> item.epochSeconds
+                is TransactionItem.RefillItem -> item.epochSeconds
+                else -> 0L
+            }
         }
 
         // Group by calendar day and insert date headers
         val withDateHeaders = mutableListOf<TransactionItem>()
         var lastDateStr: String? = null
         for (item in sortedTimedItems) {
-            val epochSec = item.epochSeconds
+            val epochSec = when (item) {
+                is TransactionItem.TripItem -> item.epochSeconds
+                is TransactionItem.RefillItem -> item.epochSeconds
+                else -> 0L
+            }
             if (epochSec > 0L) {
                 val dateStr = try {
                     formatDate(Instant.fromEpochSeconds(epochSec), DateFormatStyle.LONG)
