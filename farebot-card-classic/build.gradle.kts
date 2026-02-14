@@ -28,8 +28,8 @@ kotlin {
             implementation(kotlin("test"))
         }
         commonMain.dependencies {
-            implementation(compose.components.resources)
-            implementation(compose.runtime)
+            implementation(libs.compose.resources)
+            implementation(libs.compose.runtime)
             implementation(project(":farebot-card"))
             implementation(libs.kotlinx.serialization.json)
         }

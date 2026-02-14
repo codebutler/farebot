@@ -53,6 +53,7 @@ koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-view
 # Compose BOM
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 
 # Kotlinx Serialization
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }

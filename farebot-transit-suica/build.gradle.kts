@@ -27,12 +27,12 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.datetime)
-            implementation(compose.components.resources)
+            implementation(libs.compose.resources)
             implementation(project(":farebot-base"))
         }
         commonMain.dependencies {
-            implementation(compose.components.resources)
-            implementation(compose.runtime)
+            implementation(libs.compose.resources)
+            implementation(libs.compose.runtime)
             implementation(project(":farebot-base"))
             implementation(project(":farebot-transit"))
             implementation(project(":farebot-card-felica"))

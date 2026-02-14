@@ -25,8 +25,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.components.resources)
-            implementation(compose.runtime)
+            implementation(libs.compose.resources)
+            implementation(libs.compose.runtime)
             implementation(project(":farebot-base"))
             implementation(project(":farebot-transit"))
             implementation(project(":farebot-card-felica"))
