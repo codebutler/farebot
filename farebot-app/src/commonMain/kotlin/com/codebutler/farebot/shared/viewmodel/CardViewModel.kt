@@ -231,7 +231,7 @@ class CardViewModel(
             val stationsStr = buildStationsString(trip)
             TransactionItem.TripItem(
                 route = trip.routeName,
-                agency = trip.agencyName,
+                agency = trip.shortAgencyName,
                 fare = trip.fare?.formatCurrencyString() ?: trip.fareString,
                 stations = stationsStr,
                 time = formatTimestamp(ts),
