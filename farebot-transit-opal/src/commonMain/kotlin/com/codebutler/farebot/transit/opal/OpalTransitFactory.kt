@@ -104,7 +104,7 @@ class OpalTransitFactory(private val stringResource: StringResource) : TransitFa
             imageRes = Res.drawable.opal_card,
             latitude = -33.8688f,
             longitude = 151.2093f,
-            brandColor = 0x8BC540,
+            brandColor = 0x3298D6,
             credits = listOf("Michael Farrell"),
             sampleDumpFile = "Opal.json",
             extraNoteRes = Res.string.card_note_opal,

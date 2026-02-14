@@ -108,7 +108,7 @@ class OrcaTransitFactory(private val stringResource: StringResource) : TransitFa
             imageRes = Res.drawable.orca_card,
             latitude = 47.6062f,
             longitude = -122.3321f,
-            brandColor = 0x00693E,
+            brandColor = 0x3558A0,
             credits = listOf("Karl Koscher", "Sean CyberKitsune McClenaghan", "Kramer Campbell"),
             sampleDumpFile = "ORCA.nfc",
         )

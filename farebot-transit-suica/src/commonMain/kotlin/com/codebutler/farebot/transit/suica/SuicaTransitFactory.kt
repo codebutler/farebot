@@ -270,7 +270,7 @@ class SuicaTransitFactory(
                 imageRes = Res.drawable.sugoca,
                 latitude = 33.5904f,
                 longitude = 130.4017f,
-                brandColor = 0xD98696,
+                brandColor = 0xE86696,
                 credits = listOf("nfc-felica project", "IC SFCard Fan project"),
             ),
             CardInfo(

@@ -113,9 +113,9 @@ class AdelaideTransitFactory(
             imageRes = Res.drawable.adelaide,
             latitude = -34.9285f,
             longitude = 138.6007f,
-            brandColor = 0xA7CAEA,
+            brandColor = 0x5CB54A,
             credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
-            extraNoteRes = Res.string.card_note_adelaide,
+            preview = true,
         )
 
         private fun getSerial(tagId: ByteArray): Long =

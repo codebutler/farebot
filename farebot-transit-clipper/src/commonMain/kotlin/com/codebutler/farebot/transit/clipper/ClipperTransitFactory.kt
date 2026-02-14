@@ -56,7 +56,7 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
             imageRes = Res.drawable.clipper_card,
             latitude = 37.7749f,
             longitude = -122.4194f,
-            brandColor = 0xF26522,
+            brandColor = 0x274986,
             credits = listOf("Anonymous Contributor", "Bao-Long Nguyen-Trong", "Michael Farrell"),
             sampleDumpFile = "Clipper.nfc",
         )

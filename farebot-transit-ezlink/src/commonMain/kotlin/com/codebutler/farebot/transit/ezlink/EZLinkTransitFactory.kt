@@ -102,7 +102,7 @@ class EZLinkTransitFactory(
                 imageRes = Res.drawable.nets_card,
                 latitude = 1.3521f,
                 longitude = 103.8198f,
-                brandColor = 0xDA253A,
+                brandColor = 0x003DA5,
                 credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
                 extraNoteRes = Res.string.ezlink_card_note,
             ),
