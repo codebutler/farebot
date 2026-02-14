@@ -31,7 +31,7 @@
     <string name="card_location_auckland_new_zealand">Auckland, New Zealand</string>
     <string name="nol_silver">Silver</string>
     <string name="nol_red">Red</string>
-    <string name="unknown_format">Unknown (%s)</string>
+    <string name="unknown_format">Unknown (%1$s)</string>
     <string name="istanbulkart_2nd_card_number">2nd card number</string>
     <string name="strelka_long_serial">Long serial number</string>
     <string name="barcode_serial">Barcode serial</string>

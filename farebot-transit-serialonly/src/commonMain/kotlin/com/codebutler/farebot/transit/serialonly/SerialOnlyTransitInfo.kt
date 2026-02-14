@@ -23,18 +23,13 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_serialonly.generated.resources.Res
-import farebot.farebot_transit_serialonly.generated.resources.card_format
-import farebot.farebot_transit_serialonly.generated.resources.card_serial_number
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_locked
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_more_research
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_not_stored
-import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_header
-import farebot.farebot_transit_serialonly.generated.resources.unknown
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
@@ -45,25 +40,17 @@ abstract class SerialOnlyTransitInfo : TransitInfo() {
 
     protected abstract val reason: Reason
 
-    final override val info: List<ListItemInterface>
-        get() {
-            val li = mutableListOf<ListItemInterface>(
-                ListItem(Res.string.card_format, cardName),
-                ListItem(Res.string.card_serial_number, serialNumber ?: runBlocking { getString(Res.string.unknown) })
-            )
-            li += extraInfo ?: emptyList()
-            li += ListItem(
-                Res.string.serial_only_card_header,
-                runBlocking {
-                    when (reason) {
-                        Reason.NOT_STORED -> getString(Res.string.serial_only_card_description_not_stored)
-                        Reason.LOCKED -> getString(Res.string.serial_only_card_description_locked)
-                        Reason.MORE_RESEARCH_NEEDED -> getString(Res.string.serial_only_card_description_more_research)
-                        else -> getString(Res.string.serial_only_card_description_more_research)
-                    }
-                }
-            )
-            return li
+    final override val info: List<ListItemInterface>?
+        get() = extraInfo
+
+    override val emptyStateMessage: String
+        get() = runBlocking {
+            when (reason) {
+                Reason.NOT_STORED -> getString(Res.string.serial_only_card_description_not_stored)
+                Reason.LOCKED -> getString(Res.string.serial_only_card_description_locked)
+                Reason.MORE_RESEARCH_NEEDED -> getString(Res.string.serial_only_card_description_more_research)
+                else -> getString(Res.string.serial_only_card_description_more_research)
+            }
         }
 
     override val trips: List<Trip>? get() = null

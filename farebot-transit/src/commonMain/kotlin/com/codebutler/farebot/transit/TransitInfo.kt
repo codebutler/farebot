@@ -97,6 +97,13 @@ abstract class TransitInfo {
         get() = null
 
     /**
+     * Message to display as an empty state when the card has no trips, subscriptions, or
+     * other displayable data. Used for serial-only cards to explain why no data is available.
+     */
+    open val emptyStateMessage: String?
+        get() = null
+
+    /**
      * If a [TransitInfo] provider doesn't know some of the stops / stations on a user's card,
      * then it may raise a signal to the user to submit the unknown stations to our web service.
      *

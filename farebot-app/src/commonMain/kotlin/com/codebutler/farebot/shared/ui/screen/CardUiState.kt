@@ -11,6 +11,7 @@ data class CardUiState(
     val transactions: List<TransactionItem> = emptyList(),
     val infoItems: List<InfoItem> = emptyList(),
     val warning: String? = null,
+    val emptyStateMessage: String? = null,
     val error: String? = null,
     val hasAdvancedData: Boolean = false,
     val isSample: Boolean = false,
