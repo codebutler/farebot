@@ -73,19 +73,28 @@ subprojects {
     }
 
     afterEvaluate {
-        if (project.name.contains("farebot")) {
-            tasks.named("check") {
-                dependsOn("checkstyle")
-            }
-            tasks.register<Checkstyle>("checkstyle") {
-                configFile = file("config/checkstyle/checkstyle.xml")
-                source("src")
-                include("**/*.java")
-                exclude("**/gen/**")
-                classpath = files()
-            }
-            extensions.findByType<CheckstyleExtension>()?.apply {
-                isIgnoreFailures = false
+        tasks.named("check") {
+            dependsOn("checkstyle")
+        }
+        tasks.register<Checkstyle>("checkstyle") {
+            configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+            source("src")
+            include("**/*.java")
+            exclude("**/gen/**")
+            classpath = files()
+        }
+        extensions.findByType<CheckstyleExtension>()?.apply {
+            isIgnoreFailures = false
+        }
+    }
+
+    // Pin compose resource package names to match the module path hierarchy
+    // (e.g. :transit:orca → farebot.transit.orca.generated.resources).
+    plugins.withId("org.jetbrains.compose") {
+        extensions.configure<org.jetbrains.compose.ComposeExtension> {
+            val pkg = "farebot" + project.path.replace(":", ".").replace("-", "_") + ".generated.resources"
+            (this as ExtensionAware).extensions.configure<org.jetbrains.compose.resources.ResourcesExtension> {
+                packageOfResClass = pkg
             }
         }
     }
@@ -97,7 +106,7 @@ subprojects {
     plugins.withId("com.android.kotlin.multiplatform.library") {
         plugins.withId("org.jetbrains.compose") {
             plugins.withId("org.jetbrains.kotlin.multiplatform") {
-                val resourceNamespace = "${project.group}.${project.name.replace("-", "_")}.generated.resources"
+                val resourceNamespace = "farebot" + project.path.replace(":", ".").replace("-", "_") + ".generated.resources"
                 val outputBaseDir = layout.buildDirectory.dir("compose-android-classpath-resources")
 
                 val copyTask =

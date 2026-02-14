@@ -6,21 +6,21 @@ IOS_APP_PATH = $(shell ls -d ~/Library/Developer/Xcode/DerivedData/FareBot-*/Bui
 ## Android
 
 android: ## Build Android debug APK
-	./gradlew :farebot-app-android:assembleDebug
+	./gradlew :app:android:assembleDebug
 
 android-install: android ## Build and install on connected Android device
-	adb install -r farebot-app-android/build/outputs/apk/debug/farebot-app-android-debug.apk
+	adb install -r app/android/build/outputs/apk/debug/app-android-debug.apk
 
 ## iOS
 
 ios: ## Build iOS app for physical device
-	./gradlew :farebot-app:linkDebugFrameworkIosArm64
-	xcodebuild -project farebot-app-ios/FareBot.xcodeproj -scheme FareBot \
+	./gradlew :app:linkDebugFrameworkIosArm64
+	xcodebuild -project app/ios/FareBot.xcodeproj -scheme FareBot \
 		-destination 'id=$(IOS_DEVICE_ID)' -allowProvisioningUpdates build
 
 ios-sim: ## Build iOS app for simulator
-	./gradlew :farebot-app:linkDebugFrameworkIosSimulatorArm64
-	xcodebuild -project farebot-app-ios/FareBot.xcodeproj -scheme FareBot \
+	./gradlew :app:linkDebugFrameworkIosSimulatorArm64
+	xcodebuild -project app/ios/FareBot.xcodeproj -scheme FareBot \
 		-destination 'platform=iOS Simulator,name=iPhone 16' build
 
 ios-install: ios ## Build and install on connected iOS device
@@ -29,7 +29,7 @@ ios-install: ios ## Build and install on connected iOS device
 ## Desktop
 
 desktop: ## Run macOS desktop app (experimental)
-	./gradlew :farebot-app-desktop:run
+	./gradlew :app:desktop:run
 
 ## Tests
 
@@ -40,7 +40,7 @@ test: ## Run all tests
 
 clean: ## Clean all build artifacts
 	./gradlew clean
-	xcodebuild -project farebot-app-ios/FareBot.xcodeproj -scheme FareBot clean 2>/dev/null || true
+	xcodebuild -project app/ios/FareBot.xcodeproj -scheme FareBot clean 2>/dev/null || true
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'

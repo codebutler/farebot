@@ -22,7 +22,7 @@ Common regressions to watch for:
 
 Do NOT create stub/skeleton transit implementations that only show a card name and serial number **when Metrodroid has a full implementation available to port**. If Metrodroid has trip parsing, balance reading, subscriptions, or other features for a system, port all of it — never reduce a full implementation to a stub.
 
-For systems where Metrodroid itself only supports identification (card name + serial number) with no further parsing, use `farebot-transit-serialonly/` — matching Metrodroid's `serialonly/` directory. These extend `SerialOnlyTransitInfo` and provide a `Reason` (LOCKED, NOT_STORED, MORE_RESEARCH_NEEDED) explaining why data isn't available.
+For systems where Metrodroid itself only supports identification (card name + serial number) with no further parsing, use `transit/serialonly/` — matching Metrodroid's `serialonly/` directory. These extend `SerialOnlyTransitInfo` and provide a `Reason` (LOCKED, NOT_STORED, MORE_RESEARCH_NEEDED) explaining why data isn't available.
 
 If a full implementation can't be ported yet (e.g., missing infrastructure framework), don't add the system at all until the dependency is ready.
 
@@ -81,7 +81,7 @@ Do NOT hardcode English strings in Kotlin files.
 
 ### 7. Use MDST for station lookups, not SQLite .db3
 
-Station databases should use the MDST (protobuf) format via `MdstStationLookup`, not SQLite .db3 files with SQLDelight. All MDST files live in `farebot-base/src/commonMain/composeResources/files/` and are accessed via `MdstStationLookup.getStation(dbName, stationId)`.
+Station databases should use the MDST (protobuf) format via `MdstStationLookup`, not SQLite .db3 files with SQLDelight. All MDST files live in `base/src/commonMain/composeResources/files/` and are accessed via `MdstStationLookup.getStation(dbName, stationId)`.
 
 Example:
 ```kotlin
@@ -115,25 +115,27 @@ When continuing from a previous session, read these files to recover context rat
 ```bash
 ./gradlew allTests          # Run all tests
 ./gradlew assemble          # Full build (Android + iOS frameworks)
-./gradlew :farebot-app-android:assembleDebug  # Android only
+./gradlew :app:android:assembleDebug  # Android only
 ```
 
 ## Module Structure
 
-- `farebot-base/` — Core utilities, MDST reader, ByteArray extensions
-- `farebot-card-*/` — Card type implementations (classic, desfire, felica, ultralight, iso7816, cepas, vicinity)
-- `farebot-transit-*/` — Transit system implementations (one module per system)
-- `farebot-transit-serialonly/` — Identification-only systems (serial number + reason, matches Metrodroid's `serialonly/`)
-- `farebot-transit/` — Shared transit abstractions (Trip, Station, TransitInfo, TransitCurrency, etc.)
-- `farebot-app/` — KMP app framework (UI, ViewModels, DI, platform code)
-- `farebot-app-android/` — Android app shell (Activities, manifest, resources)
-- `farebot-app-ios/` — iOS app shell (Swift entry point, assets, config)
+- `base/` — Core utilities, MDST reader, ByteArray extensions (`:base`)
+- `card/` — Shared card abstractions (`:card`)
+- `card/*/` — Card type implementations: classic, desfire, felica, ultralight, iso7816, cepas, vicinity (`:card:*`)
+- `transit/` — Shared transit abstractions: Trip, Station, TransitInfo, TransitCurrency (`:transit`)
+- `transit/*/` — Transit system implementations, one per system (`:transit:*`)
+- `transit/serialonly/` — Identification-only systems (serial number + reason, matches Metrodroid's `serialonly/`)
+- `app/` — KMP app framework: UI, ViewModels, DI, platform code (`:app`)
+- `app/android/` — Android app shell: Activities, manifest, resources (`:app:android`)
+- `app/desktop/` — Desktop app shell (`:app:desktop`)
+- `app/ios/` — iOS app shell: Swift entry point, assets, config (Xcode project, not a Gradle module)
 
 ## Registration Checklist for New Transit Modules
 
-1. Create `farebot-transit-{name}/build.gradle.kts`
-2. Add `include(":farebot-transit-{name}")` to `settings.gradle.kts`
-3. Add `api(project(":farebot-transit-{name}"))` to `farebot-app/build.gradle.kts`
+1. Create `transit/{name}/build.gradle.kts`
+2. Add `include(":transit:{name}")` to `settings.gradle.kts`
+3. Add `api(project(":transit:{name}"))` to `app/build.gradle.kts`
 4. Register factory in `TransitFactoryRegistry.kt` (Android)
 5. Register factory in `MainViewController.kt` (iOS, non-Classic cards only)
 6. Add string resources in `composeResources/values/strings.xml`
