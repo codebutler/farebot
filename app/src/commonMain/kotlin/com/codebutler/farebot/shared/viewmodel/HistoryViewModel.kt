@@ -17,6 +17,7 @@ import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.screen.HistoryItem
 import com.codebutler.farebot.shared.ui.screen.HistoryUiState
+import dev.zacsweers.metro.Inject
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.date_today
 import farebot.app.generated.resources.date_yesterday
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.getString
 
+@Inject
 class HistoryViewModel(
     private val cardPersister: CardPersister,
     private val cardSerializer: CardSerializer,

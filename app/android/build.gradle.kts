@@ -36,9 +36,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.appcompat)
 
-    // Koin
-    implementation(libs.koin.android)
-
     // Compose
     implementation(platform(libs.compose.bom))
     implementation("androidx.compose.ui:ui")

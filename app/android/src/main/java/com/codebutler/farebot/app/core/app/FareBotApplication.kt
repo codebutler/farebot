@@ -24,13 +24,12 @@ package com.codebutler.farebot.app.core.app
 
 import android.app.Application
 import android.os.StrictMode
-import com.codebutler.farebot.app.core.di.androidModule
-import com.codebutler.farebot.shared.di.sharedModule
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
+import com.codebutler.farebot.app.core.di.AndroidAppGraph
+import com.codebutler.farebot.app.core.di.createAndroidGraph
 
 class FareBotApplication : Application() {
+
+    lateinit var graph: AndroidAppGraph
 
     override fun onCreate() {
         super.onCreate()
@@ -40,10 +39,6 @@ class FareBotApplication : Application() {
                 .penaltyLog()
                 .build())
 
-        startKoin {
-            androidLogger()
-            androidContext(this@FareBotApplication)
-            modules(sharedModule, androidModule)
-        }
+        graph = createAndroidGraph(this)
     }
 }

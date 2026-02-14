@@ -14,6 +14,7 @@ import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.NfcStatus
 import com.codebutler.farebot.shared.ui.screen.HomeUiState
+import dev.zacsweers.metro.Inject
 import farebot.app.generated.resources.*
 import farebot.app.generated.resources.Res
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,8 +33,9 @@ data class ScanError(
     val cardType: CardType? = null,
 )
 
+@Inject
 class HomeViewModel(
-    private val cardScanner: CardScanner?,
+    private val cardScanner: CardScanner? = null,
     private val cardPersister: CardPersister,
     private val cardSerializer: CardSerializer,
     private val navDataHolder: NavDataHolder,

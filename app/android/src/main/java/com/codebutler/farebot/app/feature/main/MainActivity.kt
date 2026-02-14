@@ -38,16 +38,15 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.codebutler.farebot.app.core.nfc.NfcStream
+import androidx.compose.runtime.CompositionLocalProvider
+import com.codebutler.farebot.app.core.app.FareBotApplication
 import com.codebutler.farebot.app.core.platform.AndroidPlatformActions
 import com.codebutler.farebot.app.feature.home.AndroidCardScanner
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.BuildConfig
 import com.codebutler.farebot.shared.FareBotApp
-import com.codebutler.farebot.shared.nfc.CardScanner
-import com.codebutler.farebot.shared.serialize.CardImporter
+import com.codebutler.farebot.shared.di.LocalAppGraph
 import com.codebutler.farebot.shared.platform.initDeviceRegion
-import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
@@ -63,9 +62,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    private val nfcStream: NfcStream by inject()
-    private val cardScanner: CardScanner by inject()
-    private val cardImporter: CardImporter by inject()
+    private val graph by lazy { (application as FareBotApplication).graph }
 
     private var nfcReceiver: BroadcastReceiver? = null
 
@@ -73,13 +70,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Start observing NFC tags
-        (cardScanner as? AndroidCardScanner)?.startObservingTags()
+        (graph.cardScanner as? AndroidCardScanner)?.startObservingTags()
 
         // Handle initial tag from launch intent
         if (savedInstanceState == null) {
             @Suppress("DEPRECATION")
             intent.getParcelableExtra<Tag>(INTENT_EXTRA_TAG)?.let { tag ->
-                nfcStream.emitTag(tag)
+                graph.nfcStream.emitTag(tag)
             }
             handleFileIntent(intent)
         }
@@ -90,7 +87,7 @@ class MainActivity : ComponentActivity() {
                 @Suppress("DEPRECATION")
                 val tag = intent.getParcelableExtra<Tag>(INTENT_EXTRA_TAG)
                 if (tag != null) {
-                    nfcStream.emitTag(tag)
+                    graph.nfcStream.emitTag(tag)
                 }
             }
         }
@@ -110,11 +107,13 @@ class MainActivity : ComponentActivity() {
         platformActions.registerFilePickerLauncher(this)
 
         setContent {
-            FareBotApp(
-                platformActions = platformActions,
-                supportedCardTypes = supportedCardTypes,
-                isDebug = BuildConfig.DEBUG,
-            )
+            CompositionLocalProvider(LocalAppGraph provides graph) {
+                FareBotApp(
+                    platformActions = platformActions,
+                    supportedCardTypes = supportedCardTypes,
+                    isDebug = BuildConfig.DEBUG,
+                )
+            }
         }
     }
 
@@ -156,7 +155,7 @@ class MainActivity : ComponentActivity() {
             ?: return
         val text = contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
         if (text != null) {
-            cardImporter.submitImport(text)
+            graph.cardImporter.submitImport(text)
         }
     }
 }

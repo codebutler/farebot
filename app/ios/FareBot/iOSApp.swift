@@ -4,7 +4,7 @@ import FareBotKit
 @main
 struct FareBotIOSApp: App {
     init() {
-        MainViewControllerKt.doInitKoin()
+        MainViewControllerKt.doInitGraph()
     }
 
     var body: some Scene {

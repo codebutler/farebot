@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.ui.screen.KeyItem
 import com.codebutler.farebot.shared.ui.screen.KeysUiState
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+@Inject
 class KeysViewModel(
     private val keysPersister: CardKeysPersister,
 ) : ViewModel() {

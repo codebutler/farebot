@@ -25,12 +25,14 @@ import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.UnknownTransitInfo
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
+@Inject
 class CardViewModel(
     private val transitFactoryRegistry: TransitFactoryRegistry,
     private val navDataHolder: NavDataHolder,
