@@ -130,6 +130,7 @@ When continuing from a previous session, read these files to recover context rat
 - `app/android/` — Android app shell: Activities, manifest, resources (`:app:android`)
 - `app/desktop/` — Desktop app shell (`:app:desktop`)
 - `app/ios/` — iOS app shell: Swift entry point, assets, config (Xcode project, not a Gradle module)
+- `tools/mdst/` — JVM CLI for MDST station databases: lookup, dump, compile (`:tools:mdst`)
 
 ## Registration Checklist for New Transit Modules
 
