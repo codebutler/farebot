@@ -2,7 +2,7 @@
 
 Read your remaining balance, recent trips, and other information from contactless public transit cards using your NFC-enabled Android or iOS device.
 
-FareBot is a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) app built with [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/), targeting Android (NFC) and iOS (CoreNFC).
+FareBot is a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) app built with [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/), targeting Android (NFC), iOS (CoreNFC), and macOS (experimental, via PC/SC smart card readers).
 
 ## Platform Compatibility
 
@@ -183,6 +183,7 @@ Some MIFARE Classic cards require encryption keys to read. You can obtain keys u
 
 * **Android:** NFC-enabled device running Android 6.0 (API 23) or later
 * **iOS:** iPhone 7 or later with iOS support for CoreNFC
+* **macOS** (experimental): Mac with a PC/SC-compatible NFC smart card reader
 
 ## Building
 
@@ -199,6 +200,7 @@ $ make              # show all targets
 | `make ios` | Build iOS app for physical device |
 | `make ios-sim` | Build iOS app for simulator |
 | `make ios-install` | Build and install on connected iOS device (auto-detects device) |
+| `make desktop` | Run macOS desktop app (experimental) |
 | `make test` | Run all tests |
 | `make clean` | Clean all build artifacts |
 
@@ -220,6 +222,7 @@ $ make              # show all targets
 - `farebot-app/` — KMP app framework (UI, ViewModels, DI, platform code)
 - `farebot-app-android/` — Android app shell (Activities, manifest, resources)
 - `farebot-app-ios/` — iOS app shell (Swift entry point, assets, config)
+- `farebot-app-desktop/` — macOS desktop app (experimental, PC/SC NFC)
 
 ## Written By
 

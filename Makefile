@@ -1,7 +1,7 @@
 IOS_DEVICE_ID := $(shell xcrun xctrace list devices 2>/dev/null | grep -v Simulator | grep -E '\([0-9A-F-]+\)$$' | grep -v Mac | head -1 | grep -oE '[0-9A-F]{8}-[0-9A-F]{16}')
 IOS_APP_PATH = $(shell ls -d ~/Library/Developer/Xcode/DerivedData/FareBot-*/Build/Products/Debug-iphoneos/FareBot.app 2>/dev/null | head -1)
 
-.PHONY: android android-install ios ios-sim ios-install test clean help
+.PHONY: android android-install ios ios-sim ios-install desktop test clean help
 
 ## Android
 
@@ -25,6 +25,11 @@ ios-sim: ## Build iOS app for simulator
 
 ios-install: ios ## Build and install on connected iOS device
 	xcrun devicectl device install app --device $(IOS_DEVICE_ID) "$(IOS_APP_PATH)"
+
+## Desktop
+
+desktop: ## Run macOS desktop app (experimental)
+	./gradlew :farebot-app-desktop:run
 
 ## Tests
 
