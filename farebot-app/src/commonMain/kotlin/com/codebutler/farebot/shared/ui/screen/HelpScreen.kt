@@ -318,10 +318,11 @@ fun ExploreContent(
                 isKeysRequired = selectedCard.keysRequired && selectedCard.keyBundle !in loadedKeyBundles,
                 onSampleCardTap = if (selectedCard.sampleDumpFile != null && onSampleCardTap != null) {
                     {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        scope.launch {
+                            sheetState.hide()
                             selectedCardKey = null
+                            onSampleCardTap(selectedCard)
                         }
-                        onSampleCardTap(selectedCard)
                     }
                 } else {
                     null
@@ -489,6 +490,7 @@ private fun CardDetailSheet(
         Spacer(Modifier.height(8.dp))
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // Card type chip (always shown)
             NonInteractiveChip {
