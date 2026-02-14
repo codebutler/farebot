@@ -71,7 +71,7 @@ class CardViewModel(
                 // Build scan history entries
                 val scanHistory = buildScanHistory()
                 val currentScan = scanHistory.firstOrNull { it.isCurrent }
-                val currentScanLabel = if (scanHistory.size > 1 && currentScan != null) {
+                val currentScanLabel = if (currentScan != null) {
                     listOfNotNull(currentScan.scannedDate, currentScan.scannedTime.ifEmpty { null })
                         .joinToString(" ")
                 } else null
