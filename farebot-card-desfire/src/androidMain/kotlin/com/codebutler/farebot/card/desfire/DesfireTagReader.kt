@@ -25,16 +25,10 @@ package com.codebutler.farebot.card.desfire
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import com.codebutler.farebot.card.TagReader
-import com.codebutler.farebot.card.desfire.raw.RawDesfireApplication
 import com.codebutler.farebot.card.desfire.raw.RawDesfireCard
-import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
-import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.nfc.AndroidCardTransceiver
 import com.codebutler.farebot.card.nfc.CardTransceiver
 import com.codebutler.farebot.key.CardKeys
-import java.io.IOException
-import java.util.ArrayList
-import kotlin.time.Clock
 
 class DesfireTagReader(
     tagId: ByteArray,
@@ -48,64 +42,5 @@ class DesfireTagReader(
         tag: Tag,
         tech: CardTransceiver,
         cardKeys: CardKeys?,
-    ): RawDesfireCard {
-        val desfireProtocol = DesfireProtocol(tech)
-        val apps = readApplications(desfireProtocol)
-        val manufData = desfireProtocol.getManufacturingData()
-        return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData)
-    }
-
-    @Throws(Exception::class)
-    private fun readApplications(desfireProtocol: DesfireProtocol): List<RawDesfireApplication> {
-        val apps = ArrayList<RawDesfireApplication>()
-        for (appId in desfireProtocol.getAppList()) {
-            desfireProtocol.selectApp(appId)
-            apps.add(RawDesfireApplication.create(appId, readFiles(desfireProtocol)))
-        }
-        return apps
-    }
-
-    @Throws(Exception::class)
-    private fun readFiles(desfireProtocol: DesfireProtocol): List<RawDesfireFile> {
-        val files = ArrayList<RawDesfireFile>()
-        for (fileId in desfireProtocol.getFileList()) {
-            val settings = desfireProtocol.getFileSettings(fileId)
-            files.add(readFile(desfireProtocol, fileId, settings))
-        }
-        return files
-    }
-
-    @Throws(Exception::class)
-    private fun readFile(
-        desfireProtocol: DesfireProtocol,
-        fileId: Int,
-        fileSettings: RawDesfireFileSettings,
-    ): RawDesfireFile =
-        try {
-            val fileData = readFileData(desfireProtocol, fileId, fileSettings)
-            RawDesfireFile.create(fileId, fileSettings, fileData)
-        } catch (ex: DesfireAccessControlException) {
-            RawDesfireFile.createUnauthorized(fileId, fileSettings, ex.message ?: "Access denied")
-        } catch (ex: IOException) {
-            throw ex
-        } catch (ex: Exception) {
-            RawDesfireFile.createInvalid(fileId, fileSettings, ex.toString())
-        }
-
-    @Throws(Exception::class)
-    private fun readFileData(
-        desfireProtocol: DesfireProtocol,
-        fileId: Int,
-        settings: RawDesfireFileSettings,
-    ): ByteArray =
-        when (settings.fileType()) {
-            DesfireFileSettings.STANDARD_DATA_FILE,
-            DesfireFileSettings.BACKUP_DATA_FILE,
-            -> desfireProtocol.readFile(fileId)
-            DesfireFileSettings.VALUE_FILE -> desfireProtocol.getValue(fileId)
-            DesfireFileSettings.CYCLIC_RECORD_FILE,
-            DesfireFileSettings.LINEAR_RECORD_FILE,
-            -> desfireProtocol.readRecord(fileId)
-            else -> throw Exception("Unknown file type")
-        }
+    ): RawDesfireCard = DesfireCardReader.readCard(tagId, tech)
 }

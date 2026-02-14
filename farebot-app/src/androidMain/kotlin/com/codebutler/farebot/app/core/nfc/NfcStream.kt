@@ -36,6 +36,6 @@ class NfcStream {
     fun observe(): Flow<Tag> = tagFlow
 
     fun emitTag(tag: Tag) {
-        _tags.tryEmit(tag)
+        tagFlow.tryEmit(tag)
     }
 }

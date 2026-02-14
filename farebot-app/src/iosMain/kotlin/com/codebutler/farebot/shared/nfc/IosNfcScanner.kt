@@ -23,16 +23,13 @@
 package com.codebutler.farebot.shared.nfc
 
 import com.codebutler.farebot.card.RawCard
-import com.codebutler.farebot.card.cepas.IosCEPASTagReader
-import com.codebutler.farebot.card.china.ChinaRegistry
-import com.codebutler.farebot.card.desfire.IosDesfireTagReader
-import com.codebutler.farebot.card.felica.IosFelicaTagReader
-import com.codebutler.farebot.card.iso7816.ISO7816CardReader
-import com.codebutler.farebot.card.ksx6924.KSX6924Application
+import com.codebutler.farebot.card.cepas.CEPASCardReader
+import com.codebutler.farebot.card.felica.FeliCaReader
+import com.codebutler.farebot.card.felica.IosFeliCaTagAdapter
 import com.codebutler.farebot.card.nfc.IosCardTransceiver
 import com.codebutler.farebot.card.nfc.IosUltralightTechnology
 import com.codebutler.farebot.card.nfc.toByteArray
-import com.codebutler.farebot.card.ultralight.IosUltralightTagReader
+import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -205,7 +202,7 @@ class IosNfcScanner : CardScanner {
 
         private fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()
-            return IosFelicaTagReader(tagId, tag).readTag()
+            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag))
         }
 
         private fun readMiFareTag(tag: NFCMiFareTagProtocol): RawCard<*> {
@@ -213,61 +210,49 @@ class IosNfcScanner : CardScanner {
             return when (tag.mifareFamily) {
                 NFCMiFareDESFire -> {
                     val transceiver = IosCardTransceiver(tag)
-                    // Try ISO7816 applications first (China, KSX6924/T-Money)
-                    tryISO7816(tagId, transceiver) ?: IosDesfireTagReader(tagId, transceiver).readTag()
+                    transceiver.connect()
+                    try {
+                        ISO7816Dispatcher.readCard(tagId, transceiver)
+                    } finally {
+                        if (transceiver.isConnected) {
+                            try {
+                                transceiver.close()
+                            } catch (_: Exception) {
+                            }
+                        }
+                    }
                 }
+
                 NFCMiFareUltralight -> {
                     val tech = IosUltralightTechnology(tag)
-                    IosUltralightTagReader(tagId, tech).readTag()
+                    tech.connect()
+                    try {
+                        UltralightCardReader.readCard(tagId, tech)
+                    } finally {
+                        if (tech.isConnected) {
+                            try {
+                                tech.close()
+                            } catch (_: Exception) {
+                            }
+                        }
+                    }
                 }
+
                 else -> {
                     // Try CEPAS (ISO-DEP) as fallback for unknown MIFARE types
                     val transceiver = IosCardTransceiver(tag)
-                    IosCEPASTagReader(tagId, transceiver).readTag()
+                    transceiver.connect()
+                    try {
+                        CEPASCardReader.readCard(tagId, transceiver)
+                    } finally {
+                        if (transceiver.isConnected) {
+                            try {
+                                transceiver.close()
+                            } catch (_: Exception) {
+                            }
+                        }
+                    }
                 }
-            }
-        }
-
-        private fun tryISO7816(
-            tagId: ByteArray,
-            transceiver: IosCardTransceiver,
-        ): RawCard<*>? {
-            val appConfigs = mutableListOf<ISO7816CardReader.AppConfig>()
-
-            // China transit cards
-            val chinaAppNames = ChinaRegistry.allAppNames
-            if (chinaAppNames.isNotEmpty()) {
-                appConfigs.add(
-                    ISO7816CardReader.AppConfig(
-                        appNames = chinaAppNames,
-                        type = "china",
-                        readBalances = { protocol ->
-                            ISO7816CardReader.readChinaBalances(protocol)
-                        },
-                    ),
-                )
-            }
-
-            // KSX6924 (T-Money, Snapper, Cashbee)
-            appConfigs.add(
-                ISO7816CardReader.AppConfig(
-                    appNames = KSX6924Application.APP_NAMES,
-                    type = KSX6924Application.TYPE,
-                    readBalances = { protocol ->
-                        val balance = ISO7816CardReader.readKSX6924Balance(protocol)
-                        if (balance != null) mapOf(0 to balance) else emptyMap()
-                    },
-                    readExtraData = { protocol ->
-                        val records = ISO7816CardReader.readKSX6924ExtraRecords(protocol)
-                        records.mapIndexed { index, data -> "extra/$index" to data }.toMap()
-                    },
-                ),
-            )
-
-            return try {
-                ISO7816CardReader.readCard(tagId, transceiver, appConfigs)
-            } catch (e: Exception) {
-                null
             }
         }
     }

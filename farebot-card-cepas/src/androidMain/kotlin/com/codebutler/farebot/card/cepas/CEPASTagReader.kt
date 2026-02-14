@@ -26,12 +26,9 @@ import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import com.codebutler.farebot.card.TagReader
 import com.codebutler.farebot.card.cepas.raw.RawCEPASCard
-import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory
-import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse
 import com.codebutler.farebot.card.nfc.AndroidCardTransceiver
 import com.codebutler.farebot.card.nfc.CardTransceiver
 import com.codebutler.farebot.key.CardKeys
-import kotlin.time.Clock
 
 class CEPASTagReader(
     tagId: ByteArray,
@@ -45,31 +42,5 @@ class CEPASTagReader(
         tag: Tag,
         tech: CardTransceiver,
         cardKeys: CardKeys?,
-    ): RawCEPASCard {
-        val purses = arrayOfNulls<RawCEPASPurse>(16)
-        val histories = arrayOfNulls<RawCEPASHistory>(16)
-
-        val protocol = CEPASProtocol(tech)
-
-        for (purseId in purses.indices) {
-            purses[purseId] = protocol.getPurse(purseId)
-        }
-
-        for (historyId in histories.indices) {
-            val rawCEPASPurse = purses[historyId]!!
-            if (rawCEPASPurse.isValid) {
-                val recordCount = Integer.parseInt(rawCEPASPurse.logfileRecordCount().toString())
-                histories[historyId] = protocol.getHistory(historyId, recordCount)
-            } else {
-                histories[historyId] = RawCEPASHistory.create(historyId, "Invalid Purse")
-            }
-        }
-
-        return RawCEPASCard.create(
-            tag.id,
-            Clock.System.now(),
-            purses.toList().filterNotNull(),
-            histories.toList().filterNotNull(),
-        )
-    }
+    ): RawCEPASCard = CEPASCardReader.readCard(tagId, tech)
 }

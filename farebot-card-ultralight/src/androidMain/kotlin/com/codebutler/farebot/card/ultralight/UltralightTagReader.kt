@@ -29,8 +29,6 @@ import com.codebutler.farebot.card.nfc.AndroidUltralightTechnology
 import com.codebutler.farebot.card.nfc.UltralightTechnology
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.key.CardKeys
-import java.util.ArrayList
-import kotlin.time.Clock
 
 class UltralightTagReader(
     tagId: ByteArray,
@@ -44,44 +42,5 @@ class UltralightTagReader(
         tag: Tag,
         tech: UltralightTechnology,
         cardKeys: CardKeys?,
-    ): RawUltralightCard {
-        val size: Int =
-            when (tech.type) {
-                UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
-                UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
-                // unknown
-                else -> throw IllegalArgumentException("Unknown Ultralight type " + tech.type)
-            }
-
-        // Now iterate through the pages and grab all the datas
-        var pageNumber = 0
-        var pageBuffer = ByteArray(0)
-        val pages = ArrayList<UltralightPage>()
-        while (pageNumber <= size) {
-            if (pageNumber % 4 == 0) {
-                // Lets make a new buffer of data. (16 bytes = 4 pages * 4 bytes)
-                pageBuffer = tech.readPages(pageNumber)
-            }
-
-            // Now lets stuff this into some pages.
-            pages.add(
-                UltralightPage.create(
-                    pageNumber,
-                    pageBuffer.copyOfRange(
-                        (pageNumber % 4) * UltralightTechnology.PAGE_SIZE,
-                        ((pageNumber % 4) + 1) * UltralightTechnology.PAGE_SIZE,
-                    ),
-                ),
-            )
-            pageNumber++
-        }
-
-        // Now we have pages to stuff in the card.
-        return RawUltralightCard.create(
-            tagId,
-            Clock.System.now(),
-            pages,
-            tech.type,
-        )
-    }
+    ): RawUltralightCard = UltralightCardReader.readCard(tagId, tech)
 }

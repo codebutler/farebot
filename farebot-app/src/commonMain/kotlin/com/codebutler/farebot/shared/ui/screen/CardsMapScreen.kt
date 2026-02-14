@@ -12,6 +12,8 @@ data class CardsMapMarker(
     val longitude: Double,
 )
 
+expect val platformHasCardsMap: Boolean
+
 @Composable
 expect fun PlatformCardsMap(
     markers: List<CardsMapMarker>,

@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
+actual val platformHasCardsMap: Boolean = false
+
 @Composable
 actual fun PlatformCardsMap(
     markers: List<CardsMapMarker>,

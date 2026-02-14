@@ -17,6 +17,8 @@ import platform.UIKit.UIColor
 import platform.UIKit.UIEdgeInsetsMake
 import platform.darwin.NSObject
 
+actual val platformHasCardsMap: Boolean = true
+
 @OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun PlatformCardsMap(

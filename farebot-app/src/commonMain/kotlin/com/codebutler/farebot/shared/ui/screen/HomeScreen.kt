@@ -21,10 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
@@ -91,7 +95,6 @@ import farebot.farebot_app.generated.resources.delete
 import farebot.farebot_app.generated.resources.delete_selected_cards
 import farebot.farebot_app.generated.resources.ic_cards_stack
 import farebot.farebot_app.generated.resources.ic_launcher
-import farebot.farebot_app.generated.resources.ic_logo_dev
 import farebot.farebot_app.generated.resources.import_file
 import farebot.farebot_app.generated.resources.keys
 import farebot.farebot_app.generated.resources.menu
@@ -298,11 +301,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(Res.string.show_latest_scans)) },
                                 trailingIcon = {
                                     Icon(
-                                        if (!historyUiState.showAllScans) {
-                                            Icons.Default.RadioButtonChecked
-                                        } else {
-                                            Icons.Default.RadioButtonUnchecked
-                                        },
+                                        if (!historyUiState.showAllScans) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
                                         contentDescription = null,
                                     )
                                 },
@@ -318,11 +317,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(Res.string.show_all_scans)) },
                                 trailingIcon = {
                                     Icon(
-                                        if (historyUiState.showAllScans) {
-                                            Icons.Default.RadioButtonChecked
-                                        } else {
-                                            Icons.Default.RadioButtonUnchecked
-                                        },
+                                        if (historyUiState.showAllScans) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
                                         contentDescription = null,
                                     )
                                 },
@@ -345,12 +340,7 @@ fun HomeScreen(
                             if (onAddAllSamples != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.add_all_samples)) },
-                                    trailingIcon = {
-                                        Icon(
-                                            painterResource(Res.drawable.ic_logo_dev),
-                                            contentDescription = null,
-                                        )
-                                    },
+                                    trailingIcon = { Icon(Icons.Default.Code, contentDescription = null) },
                                     onClick = {
                                         menuExpanded = false
                                         onAddAllSamples()
@@ -429,11 +419,7 @@ fun HomeScreen(
                                     },
                                     trailingIcon = {
                                         Icon(
-                                            if (showUnsupported) {
-                                                Icons.Default.CheckBox
-                                            } else {
-                                                Icons.Default.CheckBoxOutlineBlank
-                                            },
+                                            if (showUnsupported) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                                             contentDescription = null,
                                         )
                                     },
@@ -461,11 +447,7 @@ fun HomeScreen(
                                 },
                                 trailingIcon = {
                                     Icon(
-                                        if (showSerialOnly) {
-                                            Icons.Default.CheckBox
-                                        } else {
-                                            Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        if (showSerialOnly) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                                         contentDescription = null,
                                     )
                                 },
@@ -492,11 +474,7 @@ fun HomeScreen(
                                 },
                                 trailingIcon = {
                                     Icon(
-                                        if (showKeysRequired) {
-                                            Icons.Default.CheckBox
-                                        } else {
-                                            Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        if (showKeysRequired) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                                         contentDescription = null,
                                     )
                                 },
@@ -523,11 +501,7 @@ fun HomeScreen(
                                 },
                                 trailingIcon = {
                                     Icon(
-                                        if (showExperimental) {
-                                            Icons.Default.CheckBox
-                                        } else {
-                                            Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        if (showExperimental) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                                         contentDescription = null,
                                     )
                                 },
@@ -602,13 +576,14 @@ fun HomeScreen(
         },
     ) { padding ->
         // On the Explore tab, skip top padding so the map extends behind the translucent top bar
-        val isExploreTab = selectedTab == 1
+        // (only when the platform actually renders a map)
+        val isExploreTabWithMap = selectedTab == 1 && platformHasCardsMap
         Column(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(
-                        top = if (isExploreTab) 0.dp else padding.calculateTopPadding(),
+                        top = if (isExploreTabWithMap) 0.dp else padding.calculateTopPadding(),
                         bottom = padding.calculateBottomPadding(),
                     ),
         ) {
@@ -733,8 +708,6 @@ fun HomeScreen(
                 ) {
                     HistoryContent(
                         uiState = historyUiState,
-                        supportedCardTypes = supportedCardTypes,
-                        loadedKeyBundles = loadedKeyBundles,
                         onNavigateToCard = onNavigateToCard,
                         onToggleSelection = onToggleSelection,
                     )

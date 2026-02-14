@@ -32,3 +32,9 @@ kotlin {
         }
     }
 }
+
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>("compileKotlinJvm") {
+    compilerOptions {
+        freeCompilerArgs.add("-Xadd-modules=java.smartcardio")
+    }
+}

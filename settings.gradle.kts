@@ -15,6 +15,8 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "farebot"
+
 include(":farebot-base")
 include(":farebot-card")
 include(":farebot-card-cepas")
@@ -94,3 +96,4 @@ include(":farebot-transit-ndef")
 include(":farebot-transit-rkf")
 include(":farebot-app")
 include(":farebot-app-android")
+include(":farebot-app-desktop")

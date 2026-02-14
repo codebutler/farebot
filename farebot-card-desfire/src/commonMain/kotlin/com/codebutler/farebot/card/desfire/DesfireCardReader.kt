@@ -1,10 +1,10 @@
 /*
- * IosDesfireTagReader.kt
+ * DesfireCardReader.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2025 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2016 Eric Butler <eric@codebutler.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,60 +29,46 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.nfc.CardTransceiver
 import kotlin.time.Clock
 
-/**
- * iOS implementation of the DESFire tag reader.
- *
- * DESFire cards appear as NFCMiFareTag on iOS. The [CardTransceiver] wraps the
- * iOS tag and provides raw APDU transceive. The actual protocol logic is shared
- * via [DesfireProtocol] in commonMain.
- */
-class IosDesfireTagReader(
-    private val tagId: ByteArray,
-    private val transceiver: CardTransceiver,
-) {
-    fun readTag(): RawDesfireCard {
-        transceiver.connect()
-        try {
-            val protocol = DesfireProtocol(transceiver)
-            val apps = readApplications(protocol)
-            val manufData = protocol.getManufacturingData()
-            return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData)
-        } finally {
-            if (transceiver.isConnected) {
-                try {
-                    transceiver.close()
-                } catch (_: Exception) {
-                }
-            }
-        }
+object DesfireCardReader {
+    @Throws(Exception::class)
+    fun readCard(
+        tagId: ByteArray,
+        tech: CardTransceiver,
+    ): RawDesfireCard {
+        val desfireProtocol = DesfireProtocol(tech)
+        val apps = readApplications(desfireProtocol)
+        val manufData = desfireProtocol.getManufacturingData()
+        return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData)
     }
 
-    private fun readApplications(protocol: DesfireProtocol): List<RawDesfireApplication> {
-        val apps = mutableListOf<RawDesfireApplication>()
-        val appList = protocol.getAppList()
-        for (appId in appList) {
-            protocol.selectApp(appId)
-            apps.add(RawDesfireApplication.create(appId, readFiles(protocol)))
+    @Throws(Exception::class)
+    private fun readApplications(desfireProtocol: DesfireProtocol): List<RawDesfireApplication> {
+        val apps = ArrayList<RawDesfireApplication>()
+        for (appId in desfireProtocol.getAppList()) {
+            desfireProtocol.selectApp(appId)
+            apps.add(RawDesfireApplication.create(appId, readFiles(desfireProtocol)))
         }
         return apps
     }
 
-    private fun readFiles(protocol: DesfireProtocol): List<RawDesfireFile> {
-        val files = mutableListOf<RawDesfireFile>()
-        for (fileId in protocol.getFileList()) {
-            val settings = protocol.getFileSettings(fileId)
-            files.add(readFile(protocol, fileId, settings))
+    @Throws(Exception::class)
+    private fun readFiles(desfireProtocol: DesfireProtocol): List<RawDesfireFile> {
+        val files = ArrayList<RawDesfireFile>()
+        for (fileId in desfireProtocol.getFileList()) {
+            val settings = desfireProtocol.getFileSettings(fileId)
+            files.add(readFile(desfireProtocol, fileId, settings))
         }
         return files
     }
 
+    @Throws(Exception::class)
     private fun readFile(
-        protocol: DesfireProtocol,
+        desfireProtocol: DesfireProtocol,
         fileId: Int,
         fileSettings: RawDesfireFileSettings,
     ): RawDesfireFile =
         try {
-            val fileData = readFileData(protocol, fileId, fileSettings)
+            val fileData = readFileData(desfireProtocol, fileId, fileSettings)
             RawDesfireFile.create(fileId, fileSettings, fileData)
         } catch (ex: DesfireAccessControlException) {
             RawDesfireFile.createUnauthorized(fileId, fileSettings, ex.message ?: "Access denied")
@@ -90,19 +76,23 @@ class IosDesfireTagReader(
             RawDesfireFile.createInvalid(fileId, fileSettings, ex.toString())
         }
 
+    @Throws(Exception::class)
     private fun readFileData(
-        protocol: DesfireProtocol,
+        desfireProtocol: DesfireProtocol,
         fileId: Int,
         settings: RawDesfireFileSettings,
     ): ByteArray =
         when (settings.fileType()) {
             DesfireFileSettings.STANDARD_DATA_FILE,
             DesfireFileSettings.BACKUP_DATA_FILE,
-            -> protocol.readFile(fileId)
-            DesfireFileSettings.VALUE_FILE -> protocol.getValue(fileId)
+            -> desfireProtocol.readFile(fileId)
+
+            DesfireFileSettings.VALUE_FILE -> desfireProtocol.getValue(fileId)
+
             DesfireFileSettings.CYCLIC_RECORD_FILE,
             DesfireFileSettings.LINEAR_RECORD_FILE,
-            -> protocol.readRecord(fileId)
+            -> desfireProtocol.readRecord(fileId)
+
             else -> throw Exception("Unknown file type")
         }
 }
