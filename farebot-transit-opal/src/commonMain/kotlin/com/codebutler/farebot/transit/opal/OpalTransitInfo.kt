@@ -25,13 +25,9 @@
 
 package com.codebutler.farebot.transit.opal
 
-import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.formatDate
-import com.codebutler.farebot.base.util.formatTime
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -41,7 +37,6 @@ import farebot.farebot_transit_opal.generated.resources.*
 import kotlinx.datetime.DateTimeUnit
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
@@ -91,46 +86,26 @@ class OpalTransitInfo(
             return emptyList()
         }
 
-    // Unsupported elements
-    override val trips: List<Trip>? = null
+    override val trips: List<Trip>
+        get() = listOf(
+            OpalTrip(
+                timestamp = lastTransactionTime,
+                transactionMode = lastTransactionMode,
+                transactionType = lastTransaction,
+                stringResource = stringResource,
+            )
+        )
 
     override val onlineServicesPage: String
         get() = "https://m.opal.com.au/"
 
     override val info: List<ListItemInterface>
-        get() {
-            val time = lastTransactionTime
-
-            return listOf(
-                HeaderListItem(stringResource.getString(Res.string.opal_general)),
-                ListItem(
-                    stringResource.getString(Res.string.opal_weekly_trips),
-                    weeklyTrips.toString()
-                ),
-
-                HeaderListItem(stringResource.getString(Res.string.opal_last_transaction)),
-                ListItem(
-                    stringResource.getString(Res.string.opal_transaction_sequence),
-                    lastTransactionNumber.toString()
-                ),
-                ListItem(
-                    stringResource.getString(Res.string.opal_date),
-                    formatDate(time, DateFormatStyle.LONG)
-                ),
-                ListItem(
-                    stringResource.getString(Res.string.opal_time),
-                    formatTime(time, DateFormatStyle.SHORT)
-                ),
-                ListItem(
-                    stringResource.getString(Res.string.opal_vehicle_type),
-                    OpalData.getLocalisedMode(stringResource, lastTransactionMode)
-                ),
-                ListItem(
-                    stringResource.getString(Res.string.opal_transaction_type),
-                    OpalData.getLocalisedAction(stringResource, lastTransaction)
-                ),
-            )
-        }
+        get() = listOf(
+            ListItem(
+                stringResource.getString(Res.string.opal_weekly_trips),
+                weeklyTrips.toString()
+            ),
+        )
 
     val lastTransactionTime: Instant
         get() {
