@@ -28,3 +28,9 @@ metrodroid/
 metrodroid-commits/
 
 *.hprof
+
+# Gradle daemon JVM config (auto-generated)
+gradle/gradle-daemon-jvm.properties
+
+# Stray compiled classes
+*.class
