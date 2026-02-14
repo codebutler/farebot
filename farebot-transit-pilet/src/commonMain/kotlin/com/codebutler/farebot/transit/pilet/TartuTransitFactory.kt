@@ -44,22 +44,22 @@ import farebot.farebot_transit_pilet.generated.resources.*
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/TartuBus
  */
 class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
-
     companion object {
         private const val NDEF_TYPE = "pilet.ee:ekaart:2"
         private const val SERIAL_PREFIX_LEN = 8
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.pilet_tartu_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.ESTONIA,
-            locationRes = Res.string.pilet_location_tartu,
-            imageRes = Res.drawable.tartu,
-            latitude = 58.3780f,
-            longitude = 26.7290f,
-            brandColor = 0xE91B28,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.pilet_tartu_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.ESTONIA,
+                locationRes = Res.string.pilet_location_tartu,
+                imageRes = Res.drawable.tartu,
+                latitude = 58.3780f,
+                longitude = 26.7290f,
+                brandColor = 0xE91B28,
+                credits = listOf("Metrodroid Project"),
+            )
     }
 
     override val allCards: List<CardInfo>
@@ -72,12 +72,22 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
 
         val sector1 = card.getSector(1)
         if (sector1 !is DataClassicSector) return false
-        if (!sector1.getBlock(0).data.sliceOffLen(7, 9)
+        if (!sector1
+                .getBlock(0)
+                .data
+                .sliceOffLen(7, 9)
                 .contentEquals("pilet.ee:".encodeToByteArray())
-        ) return false
-        if (!sector1.getBlock(1).data.sliceOffLen(0, 8)
+        ) {
+            return false
+        }
+        if (!sector1
+                .getBlock(1)
+                .data
+                .sliceOffLen(0, 8)
                 .contentEquals("ekaart:2".encodeToByteArray())
-        ) return false
+        ) {
+            return false
+        }
 
         return true
     }
@@ -92,7 +102,7 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
         return PiletTransitInfo(
             serial = getSerialFromTlv(ndefData),
             cardName = getStringBlocking(Res.string.pilet_tartu_card_name),
-            berTlvData = ndefData
+            berTlvData = ndefData,
         )
     }
 
@@ -116,8 +126,11 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
     /**
      * Collects all data blocks from NDEF sectors into a single byte array.
      */
-    private fun collectNdefData(card: ClassicCard, startSector: Int): ByteArray? {
-        return try {
+    private fun collectNdefData(
+        card: ClassicCard,
+        startSector: Int,
+    ): ByteArray? =
+        try {
             val allData = mutableListOf<Byte>()
             for (sectorIdx in startSector until card.sectors.size) {
                 val sector = card.getSector(sectorIdx) as? DataClassicSector ?: continue
@@ -132,12 +145,14 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
         } catch (_: Exception) {
             null
         }
-    }
 
     /**
      * Simple BER-TLV search: finds a single-byte tag and returns its value as ASCII string.
      */
-    private fun findBerTlvAscii(data: ByteArray, tag: Int): String? {
+    private fun findBerTlvAscii(
+        data: ByteArray,
+        tag: Int,
+    ): String? {
         var i = 0
         while (i < data.size - 2) {
             val t = data[i].toInt() and 0xFF

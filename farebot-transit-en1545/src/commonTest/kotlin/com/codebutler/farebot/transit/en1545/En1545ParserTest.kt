@@ -31,7 +31,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalStdlibApi::class)
 class En1545ParserTest {
-
     @Test
     fun testGetBitsFromBuffer() {
         // 0xAB = 10101011
@@ -66,11 +65,12 @@ class En1545ParserTest {
 
     @Test
     fun testFixedIntegerParsing() {
-        val field = En1545Container(
-            En1545FixedInteger("FieldA", 8),
-            En1545FixedInteger("FieldB", 4),
-            En1545FixedInteger("FieldC", 4)
-        )
+        val field =
+            En1545Container(
+                En1545FixedInteger("FieldA", 8),
+                En1545FixedInteger("FieldB", 4),
+                En1545FixedInteger("FieldC", 4),
+            )
         // 0xAB 0xCD -> FieldA=0xAB, FieldB=0xC, FieldC=0xD
         val data = "abcd".hexToByteArray()
         val parsed = En1545Parser.parse(data, field)
@@ -100,14 +100,15 @@ class En1545ParserTest {
 
     @Test
     fun testContainerParsing() {
-        val field = En1545Container(
-            En1545FixedInteger("First", 8),
+        val field =
             En1545Container(
-                En1545FixedInteger("InnerA", 4),
-                En1545FixedInteger("InnerB", 4)
-            ),
-            En1545FixedInteger("Last", 8)
-        )
+                En1545FixedInteger("First", 8),
+                En1545Container(
+                    En1545FixedInteger("InnerA", 4),
+                    En1545FixedInteger("InnerB", 4),
+                ),
+                En1545FixedInteger("Last", 8),
+            )
         val data = "abcdef".hexToByteArray()
         val parsed = En1545Parser.parse(data, field)
         assertEquals(0xAB, parsed.getInt("First"))
@@ -120,11 +121,12 @@ class En1545ParserTest {
     fun testBitmapParsing() {
         // Bitmap with 3 fields: bit 0, bit 1, bit 2
         // Bitmask = 101 (bits 0 and 2 present, bit 1 absent)
-        val field = En1545Bitmap(
-            En1545FixedInteger("A", 8),
-            En1545FixedInteger("B", 8),
-            En1545FixedInteger("C", 8)
-        )
+        val field =
+            En1545Bitmap(
+                En1545FixedInteger("A", 8),
+                En1545FixedInteger("B", 8),
+                En1545FixedInteger("C", 8),
+            )
         // First 3 bits = 101 = bitmask, then A value (8 bits), then C value (8 bits)
         // 101 AAAAAAAA CCCCCCCC
         // 10111111111 00000000 0 (pad)
@@ -140,17 +142,19 @@ class En1545ParserTest {
 
         // Let me just use a simpler example
         // Bitmask = 111 (all 3 present): bit pattern is 111 + A(8) + B(8) + C(8) = 27 bits
-        val data2 = byteArrayOf(
-            0xFF.toByte(), // 11111111
-            0xFF.toByte(), // 11111111
-            0xFF.toByte(), // 11111111
-            0xF0.toByte()  // 1111
-        )
-        val field2 = En1545Bitmap(
-            En1545FixedInteger("A", 4),
-            En1545FixedInteger("B", 4),
-            En1545FixedInteger("C", 4)
-        )
+        val data2 =
+            byteArrayOf(
+                0xFF.toByte(), // 11111111
+                0xFF.toByte(), // 11111111
+                0xFF.toByte(), // 11111111
+                0xF0.toByte(), // 1111
+            )
+        val field2 =
+            En1545Bitmap(
+                En1545FixedInteger("A", 4),
+                En1545FixedInteger("B", 4),
+                En1545FixedInteger("C", 4),
+            )
         // bits: 111 1111 1111 1111 ...
         // bitmask = 111 (all 3 present)
         // A = bits 3-6 = 1111 = 15
@@ -166,10 +170,11 @@ class En1545ParserTest {
     fun testBitmapPartialPresence() {
         // Bitmask for 2 fields, non-reversed: curbit starts at 1 (LSB).
         // bitmask = 01 (binary) means field A (curbit=1) is present, B (curbit=2) is absent.
-        val field = En1545Bitmap(
-            En1545FixedInteger("A", 8),
-            En1545FixedInteger("B", 8)
-        )
+        val field =
+            En1545Bitmap(
+                En1545FixedInteger("A", 8),
+                En1545FixedInteger("B", 8),
+            )
         // bits: 01 11111111 (bitmask=01, A=0xFF)
         // byte0: 01111111 = 0x7F, byte1: 11xxxxxx = 0xC0
         val data = byteArrayOf(0x7F, 0xC0.toByte())
@@ -228,10 +233,11 @@ class En1545ParserTest {
 
     @Test
     fun testParsedGetTimeStampWithDateAndTime() {
-        val field = En1545Container(
-            En1545FixedInteger.date("Event"),
-            En1545FixedInteger.time("Event")
-        )
+        val field =
+            En1545Container(
+                En1545FixedInteger.date("Event"),
+                En1545FixedInteger.time("Event"),
+            )
         // Date = 100 (14 bits), Time = 120 (11 bits)
         // 100 = 0b00000001100100, 120 = 0b00001111000
         // Pack as big-endian bits: 14 bits for date + 11 bits for time = 25 bits total

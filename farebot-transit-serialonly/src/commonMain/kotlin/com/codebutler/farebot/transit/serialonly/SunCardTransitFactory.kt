@@ -21,21 +21,21 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class SunCardTransitFactory : TransitFactory<ClassicCard, SunCardTransitInfo> {
-
-    override val allCards: List<CardInfo> = listOf(
-        CardInfo(
-            nameRes = Res.string.card_name_sun_card,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.USA,
-            locationRes = Res.string.card_location_orlando_fl,
-            serialOnly = true,
-            imageRes = Res.drawable.suncard,
-            latitude = 28.5383f,
-            longitude = -81.3792f,
-            brandColor = 0xFDC448,
-            credits = listOf("Metrodroid Project"),
+    override val allCards: List<CardInfo> =
+        listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_sun_card,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.USA,
+                locationRes = Res.string.card_location_orlando_fl,
+                serialOnly = true,
+                imageRes = Res.drawable.suncard,
+                latitude = 28.5383f,
+                longitude = -81.3792f,
+                brandColor = 0xFDC448,
+                credits = listOf("Metrodroid Project"),
+            ),
         )
-    )
 
     companion object {
         internal const val NAME = "SunRail SunCard"
@@ -44,7 +44,9 @@ class SunCardTransitFactory : TransitFactory<ClassicCard, SunCardTransitInfo> {
             (card.getSector(0) as DataClassicSector).getBlock(1).data.byteArrayToInt(3, 4)
 
         internal fun formatSerial(serial: Int): String = serial.toString()
+
         internal fun formatLongSerial(serial: Int): String = "637426" + NumberUtils.zeroPad(serial, 10)
+
         internal fun formatBarcodeSerial(serial: Int): String =
             "799366314176000637426" + NumberUtils.zeroPad(serial, 10)
     }
@@ -58,6 +60,5 @@ class SunCardTransitFactory : TransitFactory<ClassicCard, SunCardTransitInfo> {
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(NAME, formatSerial(getSerial(card)))
 
-    override fun parseInfo(card: ClassicCard): SunCardTransitInfo =
-        SunCardTransitInfo(mSerial = getSerial(card))
+    override fun parseInfo(card: ClassicCard): SunCardTransitInfo = SunCardTransitInfo(mSerial = getSerial(card))
 }

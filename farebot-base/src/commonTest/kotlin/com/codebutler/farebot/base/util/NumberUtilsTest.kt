@@ -55,7 +55,7 @@ class NumberUtilsTest {
     fun testDigits() {
         assertContentEquals(
             intArrayOf(1, 2, 3, 4, 5, 6, 7),
-            NumberUtils.digitsOf(1234567)
+            NumberUtils.digitsOf(1234567),
         )
     }
 }

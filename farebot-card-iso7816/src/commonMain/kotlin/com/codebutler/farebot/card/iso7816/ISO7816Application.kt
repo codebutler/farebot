@@ -45,7 +45,7 @@ data class ISO7816Application(
     @Contextual val appFci: ByteArray? = null,
     val files: Map<String, ISO7816File> = emptyMap(),
     val sfiFiles: Map<Int, ISO7816File> = emptyMap(),
-    val type: String = "generic"
+    val type: String = "generic",
 ) {
     /**
      * Extracts the proprietary BER-TLV data (tag A5) from the FCI template.
@@ -68,7 +68,7 @@ data class ISO7816Application(
             appFci: ByteArray? = null,
             files: Map<String, ISO7816File> = emptyMap(),
             sfiFiles: Map<Int, ISO7816File> = emptyMap(),
-            type: String = "generic"
+            type: String = "generic",
         ): ISO7816Application = ISO7816Application(appName, appFci, files, sfiFiles, type)
     }
 }

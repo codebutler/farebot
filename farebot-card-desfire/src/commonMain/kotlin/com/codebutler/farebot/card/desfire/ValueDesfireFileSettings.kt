@@ -40,9 +40,8 @@ data class ValueDesfireFileSettings(
     val lowerLimit: Int,
     val upperLimit: Int,
     val limitedCreditValue: Int,
-    val limitedCreditEnabled: Boolean
+    val limitedCreditEnabled: Boolean,
 ) : DesfireFileSettings() {
-
     companion object {
         fun create(
             fileType: Byte,
@@ -51,15 +50,16 @@ data class ValueDesfireFileSettings(
             lowerLimit: Int,
             upperLimit: Int,
             limitedCreditValue: Int,
-            limitedCreditEnabled: Boolean
-        ): ValueDesfireFileSettings = ValueDesfireFileSettings(
-            fileType,
-            commSetting,
-            accessRights,
-            lowerLimit,
-            upperLimit,
-            limitedCreditValue,
-            limitedCreditEnabled
-        )
+            limitedCreditEnabled: Boolean,
+        ): ValueDesfireFileSettings =
+            ValueDesfireFileSettings(
+                fileType,
+                commSetting,
+                accessRights,
+                lowerLimit,
+                upperLimit,
+                limitedCreditValue,
+                limitedCreditEnabled,
+            )
     }
 }

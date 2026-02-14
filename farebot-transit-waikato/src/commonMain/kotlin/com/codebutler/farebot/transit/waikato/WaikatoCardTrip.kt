@@ -39,9 +39,8 @@ class WaikatoCardTrip private constructor(
     private val cost: Int,
     private val a: Int,
     private val b: Int,
-    override val mode: Mode
+    override val mode: Mode,
 ) : Trip() {
-
     override val startTimestamp: Instant = timestamp
 
     override val fare: TransitCurrency?
@@ -55,7 +54,10 @@ class WaikatoCardTrip private constructor(
          * @param mode The trip mode (BUS for a trip, TICKET_MACHINE for a refill).
          * @return The parsed trip, or null if the record is empty.
          */
-        fun parse(sector: ByteArray, mode: Mode): WaikatoCardTrip? {
+        fun parse(
+            sector: ByteArray,
+            mode: Mode,
+        ): WaikatoCardTrip? {
             if (sector.isAllZero() || sector.isAllFF()) return null
             val timestamp = WaikatoCardTransitFactory.parseTimestamp(sector, 1)
             val cost = sector.byteArrayToIntReversed(5, 2)
@@ -66,7 +68,7 @@ class WaikatoCardTrip private constructor(
                 cost = cost,
                 a = a,
                 b = b,
-                mode = mode
+                mode = mode,
             )
         }
     }

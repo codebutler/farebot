@@ -25,16 +25,17 @@ package com.codebutler.farebot.card.ultralight
 import android.nfc.Tag
 import android.nfc.tech.MifareUltralight
 import com.codebutler.farebot.card.TagReader
-import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.card.nfc.AndroidUltralightTechnology
 import com.codebutler.farebot.card.nfc.UltralightTechnology
+import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.key.CardKeys
 import java.util.ArrayList
 import kotlin.time.Clock
 
-class UltralightTagReader(tagId: ByteArray, tag: Tag) :
-    TagReader<UltralightTechnology, RawUltralightCard, CardKeys>(tagId, tag, null) {
-
+class UltralightTagReader(
+    tagId: ByteArray,
+    tag: Tag,
+) : TagReader<UltralightTechnology, RawUltralightCard, CardKeys>(tagId, tag, null) {
     override fun getTech(tag: Tag): UltralightTechnology = AndroidUltralightTechnology(MifareUltralight.get(tag))
 
     @Throws(Exception::class)
@@ -42,14 +43,15 @@ class UltralightTagReader(tagId: ByteArray, tag: Tag) :
         tagId: ByteArray,
         tag: Tag,
         tech: UltralightTechnology,
-        cardKeys: CardKeys?
+        cardKeys: CardKeys?,
     ): RawUltralightCard {
-        val size: Int = when (tech.type) {
-            UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
-            UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
-            // unknown
-            else -> throw IllegalArgumentException("Unknown Ultralight type " + tech.type)
-        }
+        val size: Int =
+            when (tech.type) {
+                UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
+                UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
+                // unknown
+                else -> throw IllegalArgumentException("Unknown Ultralight type " + tech.type)
+            }
 
         // Now iterate through the pages and grab all the datas
         var pageNumber = 0
@@ -62,9 +64,15 @@ class UltralightTagReader(tagId: ByteArray, tag: Tag) :
             }
 
             // Now lets stuff this into some pages.
-            pages.add(UltralightPage.create(pageNumber, pageBuffer.copyOfRange(
-                (pageNumber % 4) * UltralightTechnology.PAGE_SIZE,
-                ((pageNumber % 4) + 1) * UltralightTechnology.PAGE_SIZE)))
+            pages.add(
+                UltralightPage.create(
+                    pageNumber,
+                    pageBuffer.copyOfRange(
+                        (pageNumber % 4) * UltralightTechnology.PAGE_SIZE,
+                        ((pageNumber % 4) + 1) * UltralightTechnology.PAGE_SIZE,
+                    ),
+                ),
+            )
             pageNumber++
         }
 
@@ -73,6 +81,7 @@ class UltralightTagReader(tagId: ByteArray, tag: Tag) :
             tagId,
             Clock.System.now(),
             pages,
-            tech.type)
+            tech.type,
+        )
     }
 }

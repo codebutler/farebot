@@ -30,22 +30,20 @@ import kotlinx.serialization.Serializable
 data class FelicaService(
     val serviceCode: Int,
     val blocks: List<FelicaBlock>,
-    val skipped: Boolean = false
+    val skipped: Boolean = false,
 ) {
     /**
      * Get a block by its address.
      * Returns null if the block is not found.
      */
-    fun getBlock(address: Int): FelicaBlock? =
-        blocks.firstOrNull { it.address.toInt() == address }
+    fun getBlock(address: Int): FelicaBlock? = blocks.firstOrNull { it.address.toInt() == address }
 
     companion object {
-        fun create(serviceCode: Int, blocks: List<FelicaBlock>): FelicaService {
-            return FelicaService(serviceCode, blocks)
-        }
+        fun create(
+            serviceCode: Int,
+            blocks: List<FelicaBlock>,
+        ): FelicaService = FelicaService(serviceCode, blocks)
 
-        fun skipped(serviceCode: Int): FelicaService {
-            return FelicaService(serviceCode, emptyList(), skipped = true)
-        }
+        fun skipped(serviceCode: Int): FelicaService = FelicaService(serviceCode, emptyList(), skipped = true)
     }
 }

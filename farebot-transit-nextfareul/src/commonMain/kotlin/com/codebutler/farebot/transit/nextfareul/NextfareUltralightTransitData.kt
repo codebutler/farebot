@@ -26,7 +26,6 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getStringBlocking
@@ -44,13 +43,13 @@ import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_product
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_ticket_type
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_ticket_type_concession
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_ticket_type_regular
-import kotlin.time.Instant
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 data class NextfareUltralightTransitDataCapsule(
     val mProductCode: Int,
@@ -60,21 +59,21 @@ data class NextfareUltralightTransitDataCapsule(
     val mMachineCode: Int,
     val mExpiry: Int,
     val mBalance: Int,
-    val trips: List<TransactionTripAbstract>
+    val trips: List<TransactionTripAbstract>,
 )
 
-/* Based on reference at http://www.lenrek.net/experiments/compass-tickets/. */
+// Based on reference at http://www.lenrek.net/experiments/compass-tickets/.
 abstract class NextfareUltralightTransitData : TransitInfo() {
-
     abstract val timeZone: TimeZone
 
     abstract val capsule: NextfareUltralightTransitDataCapsule
 
     override val balance: TransitBalance?
-        get() = TransitBalance(
-            balance = makeCurrency(capsule.mBalance),
-            validTo = parseDateTime(timeZone, capsule.mBaseDate, capsule.mExpiry, 0)
-        )
+        get() =
+            TransitBalance(
+                balance = makeCurrency(capsule.mBalance),
+                validTo = parseDateTime(timeZone, capsule.mBaseDate, capsule.mExpiry, 0),
+            )
 
     override val serialNumber: String?
         get() = formatSerial(capsule.mSerial)
@@ -85,18 +84,20 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
     override val info: List<ListItemInterface>?
         get() {
             val items = mutableListOf<ListItem>()
-            val ticketTypeValue = if (capsule.mType.toInt() == 8) {
-                getStringBlocking(Res.string.nextfareul_ticket_type_concession)
-            } else {
-                getStringBlocking(Res.string.nextfareul_ticket_type_regular)
-            }
+            val ticketTypeValue =
+                if (capsule.mType.toInt() == 8) {
+                    getStringBlocking(Res.string.nextfareul_ticket_type_concession)
+                } else {
+                    getStringBlocking(Res.string.nextfareul_ticket_type_regular)
+                }
             items.add(ListItem(Res.string.nextfareul_ticket_type, ticketTypeValue))
 
             val productName = getProductName(capsule.mProductCode)
-            if (productName != null)
+            if (productName != null) {
                 items.add(ListItem(Res.string.nextfareul_product_type, productName))
-            else
+            } else {
                 items.add(ListItem(Res.string.nextfareul_product_type, capsule.mProductCode.toString(16)))
+            }
             items.add(ListItem(Res.string.nextfareul_machine_code, capsule.mMachineCode.toString(16)))
             return items
         }
@@ -108,7 +109,7 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
     companion object {
         fun parse(
             card: UltralightCard,
-            makeTransaction: (raw: ByteArray, baseDate: Int) -> NextfareUltralightTransaction
+            makeTransaction: (raw: ByteArray, baseDate: Int) -> NextfareUltralightTransaction,
         ): NextfareUltralightTransitDataCapsule {
             val page0 = card.getPage(4).data
             val page1 = card.getPage(5).data
@@ -116,13 +117,16 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
             val lowerBaseDate = page0[3].toInt() and 0xff
             val upperBaseDate = page1[0].toInt() and 0xff
             val mBaseDate = upperBaseDate shl 8 or lowerBaseDate
-            val transactions = listOf(8, 12).filter { isTransactionValid(card, it) }.map {
-                makeTransaction(card.readPages(it, 4), mBaseDate)
-            }
+            val transactions =
+                listOf(8, 12).filter { isTransactionValid(card, it) }.map {
+                    makeTransaction(card.readPages(it, 4), mBaseDate)
+                }
             var trLater: NextfareUltralightTransaction? = null
-            for (tr in transactions)
-                if (trLater == null || tr.isSeqNoGreater(trLater))
+            for (tr in transactions) {
+                if (trLater == null || tr.isSeqNoGreater(trLater)) {
                     trLater = tr
+                }
+            }
             return NextfareUltralightTransitDataCapsule(
                 mExpiry = trLater?.expiry ?: 0,
                 mBalance = trLater?.balance ?: 0,
@@ -131,13 +135,14 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
                 mSerial = getSerial(card),
                 mType = page0[1],
                 mProductCode = page1[2].toInt() and 0x7f,
-                mMachineCode = page3.byteArrayToIntReversed(0, 2)
+                mMachineCode = page3.byteArrayToIntReversed(0, 2),
             )
         }
 
-        private fun isTransactionValid(card: UltralightCard, startPage: Int): Boolean {
-            return !card.readPages(startPage, 3).isAllZero()
-        }
+        private fun isTransactionValid(
+            card: UltralightCard,
+            startPage: Int,
+        ): Boolean = !card.readPages(startPage, 3).isAllZero()
 
         fun getSerial(card: UltralightCard): Long {
             val manufData0 = card.getPage(0).data
@@ -148,11 +153,14 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
             return serial * 10 + luhn
         }
 
-        fun formatSerial(serial: Long): String {
-            return NumberUtils.formatNumber(serial, " ", 4, 4, 4, 4, 4)
-        }
+        fun formatSerial(serial: Long): String = NumberUtils.formatNumber(serial, " ", 4, 4, 4, 4, 4)
 
-        fun parseDateTime(tz: TimeZone, baseDate: Int, date: Int, time: Int): Instant {
+        fun parseDateTime(
+            tz: TimeZone,
+            baseDate: Int,
+            date: Int,
+            time: Int,
+        ): Instant {
             val year = (baseDate shr 9) + 2000
             val month = baseDate shr 5 and 0xf
             val day = baseDate and 0x1f

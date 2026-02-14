@@ -32,9 +32,8 @@ import com.codebutler.farebot.transit.en1545.CalypsoParseResult
  * Base TransitInfo for Calypso/EN1545 cards, wrapping a [CalypsoParseResult].
  */
 abstract class CalypsoTransitInfo(
-    protected val result: CalypsoParseResult
+    protected val result: CalypsoParseResult,
 ) : TransitInfo() {
-
     abstract override val cardName: String
 
     override val balances: List<TransitBalance>?

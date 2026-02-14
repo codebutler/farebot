@@ -35,9 +35,8 @@ import kotlin.time.Instant
 open class ErgTrip(
     val purse: ErgPurseRecord,
     val epochDate: Int,
-    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) }
+    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) },
 ) : Trip() {
-
     override val startTimestamp: Instant
         get() = Instant.fromEpochSeconds(convertTimestamp(epochDate, purse.day, purse.minute))
 
@@ -59,7 +58,10 @@ open class ErgTrip(
          */
         private const val EPOCH_2000 = 946684800L // 2000-01-01T00:00:00Z
 
-        fun convertTimestamp(epochDate: Int, day: Int = 0, minute: Int = 0): Long =
-            EPOCH_2000 + ((epochDate + day).toLong() * 86400L) + (minute.toLong() * 60L)
+        fun convertTimestamp(
+            epochDate: Int,
+            day: Int = 0,
+            minute: Int = 0,
+        ): Long = EPOCH_2000 + ((epochDate + day).toLong() * 86400L) + (minute.toLong() * 60L)
     }
 }

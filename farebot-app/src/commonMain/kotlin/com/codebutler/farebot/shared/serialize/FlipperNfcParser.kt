@@ -31,20 +31,18 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireCard
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
+import com.codebutler.farebot.card.felica.FeliCaIdm
+import com.codebutler.farebot.card.felica.FeliCaPmm
 import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.card.felica.FelicaService
 import com.codebutler.farebot.card.felica.FelicaSystem
-import com.codebutler.farebot.card.felica.FeliCaIdm
-import com.codebutler.farebot.card.felica.FeliCaPmm
 import com.codebutler.farebot.card.felica.raw.RawFelicaCard
 import com.codebutler.farebot.card.ultralight.UltralightPage
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import kotlin.time.Clock
 
 object FlipperNfcParser {
-
-    fun isFlipperFormat(data: String): Boolean =
-        data.trimStart().startsWith("Filetype: Flipper NFC device")
+    fun isFlipperFormat(data: String): Boolean = data.trimStart().startsWith("Filetype: Flipper NFC device")
 
     fun parse(data: String): RawCard<*>? {
         val lines = data.lines()
@@ -99,7 +97,10 @@ object FlipperNfcParser {
 
     // --- DESFire parsing ---
 
-    private fun parseDesfire(headers: Map<String, String>, lines: List<String>): RawDesfireCard? {
+    private fun parseDesfire(
+        headers: Map<String, String>,
+        lines: List<String>,
+    ): RawDesfireCard? {
         val tagId = parseTagId(headers) ?: return null
 
         // Parse PICC Version (28 bytes of manufacturing data)
@@ -113,22 +114,27 @@ object FlipperNfcParser {
         for (i in appIdBytes.indices step 3) {
             if (i + 2 < appIdBytes.size) {
                 // Flipper stores app IDs in big-endian: FF FF FF -> 0xffffff
-                val id = ((appIdBytes[i].toInt() and 0xFF) shl 16) or
-                    ((appIdBytes[i + 1].toInt() and 0xFF) shl 8) or
-                    (appIdBytes[i + 2].toInt() and 0xFF)
+                val id =
+                    ((appIdBytes[i].toInt() and 0xFF) shl 16) or
+                        ((appIdBytes[i + 1].toInt() and 0xFF) shl 8) or
+                        (appIdBytes[i + 2].toInt() and 0xFF)
                 appIds.add(id)
             }
         }
 
         // Parse each application's files
-        val apps = appIds.map { appId ->
-            parseDesfireApplication(appId, lines)
-        }
+        val apps =
+            appIds.map { appId ->
+                parseDesfireApplication(appId, lines)
+            }
 
         return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData)
     }
 
-    private fun parseDesfireApplication(appId: Int, lines: List<String>): RawDesfireApplication {
+    private fun parseDesfireApplication(
+        appId: Int,
+        lines: List<String>,
+    ): RawDesfireApplication {
         val appHex = appId.toString(16).padStart(6, '0')
         val prefix = "Application $appHex"
 
@@ -141,14 +147,19 @@ object FlipperNfcParser {
         val fileIds = fileIdsHex.split(" ").filter { it.isNotEmpty() }.map { it.toInt(16) }
 
         // Parse each file
-        val files = fileIds.map { fileId ->
-            parseDesfireFile(appHex, fileId, lines)
-        }
+        val files =
+            fileIds.map { fileId ->
+                parseDesfireFile(appHex, fileId, lines)
+            }
 
         return RawDesfireApplication.create(appId, files)
     }
 
-    private fun parseDesfireFile(appHex: String, fileId: Int, lines: List<String>): RawDesfireFile {
+    private fun parseDesfireFile(
+        appHex: String,
+        fileId: Int,
+        lines: List<String>,
+    ): RawDesfireFile {
         val prefix = "Application $appHex File $fileId"
 
         // Read file properties
@@ -168,13 +179,16 @@ object FlipperNfcParser {
         when (fileType) {
             0x00, 0x01 -> {
                 // Standard / Backup: [type, comm, ar0, ar1, sizeLE0, sizeLE1, sizeLE2]
-                settingsBytes = byteArrayOf(
-                    fileTypeByte, commByte,
-                    accessRights[0], accessRights[1],
-                    (size and 0xFF).toByte(),
-                    ((size shr 8) and 0xFF).toByte(),
-                    ((size shr 16) and 0xFF).toByte()
-                )
+                settingsBytes =
+                    byteArrayOf(
+                        fileTypeByte,
+                        commByte,
+                        accessRights[0],
+                        accessRights[1],
+                        (size and 0xFF).toByte(),
+                        ((size shr 8) and 0xFF).toByte(),
+                        ((size shr 16) and 0xFF).toByte(),
+                    )
                 // Look for data line
                 fileData = findDesfireFileData(appHex, fileId, lines)
                     ?: ByteArray(size) // Fallback: empty data of declared size
@@ -183,19 +197,22 @@ object FlipperNfcParser {
                 // Linear Record / Cyclic Record
                 val max = findDesfireProperty(lines, prefix, "Max")?.toIntOrNull() ?: 0
                 val cur = findDesfireProperty(lines, prefix, "Cur")?.toIntOrNull() ?: 0
-                settingsBytes = byteArrayOf(
-                    fileTypeByte, commByte,
-                    accessRights[0], accessRights[1],
-                    (size and 0xFF).toByte(),
-                    ((size shr 8) and 0xFF).toByte(),
-                    ((size shr 16) and 0xFF).toByte(),
-                    (max and 0xFF).toByte(),
-                    ((max shr 8) and 0xFF).toByte(),
-                    ((max shr 16) and 0xFF).toByte(),
-                    (cur and 0xFF).toByte(),
-                    ((cur shr 8) and 0xFF).toByte(),
-                    ((cur shr 16) and 0xFF).toByte()
-                )
+                settingsBytes =
+                    byteArrayOf(
+                        fileTypeByte,
+                        commByte,
+                        accessRights[0],
+                        accessRights[1],
+                        (size and 0xFF).toByte(),
+                        ((size shr 8) and 0xFF).toByte(),
+                        ((size shr 16) and 0xFF).toByte(),
+                        (max and 0xFF).toByte(),
+                        ((max shr 8) and 0xFF).toByte(),
+                        ((max shr 16) and 0xFF).toByte(),
+                        (cur and 0xFF).toByte(),
+                        ((cur shr 8) and 0xFF).toByte(),
+                        ((cur shr 16) and 0xFF).toByte(),
+                    )
                 // Flipper cannot dump record files inline, so check for data anyway
                 fileData = findDesfireFileData(appHex, fileId, lines)
                 if (fileData == null) {
@@ -203,37 +220,52 @@ object FlipperNfcParser {
                     return RawDesfireFile.createInvalid(
                         fileId,
                         RawDesfireFileSettings.create(settingsBytes),
-                        "Record file data not available from Flipper dump"
+                        "Record file data not available from Flipper dump",
                     )
                 }
             }
             0x02 -> {
                 // Value file: we don't have full settings from Flipper, create minimal
-                settingsBytes = byteArrayOf(
-                    fileTypeByte, commByte,
-                    accessRights[0], accessRights[1],
-                    0, 0, 0, 0, // lowerLimit
-                    0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0x7F, // upperLimit
-                    0, 0, 0, 0, // limitedCreditValue
-                    0 // limitedCreditEnabled
-                )
+                settingsBytes =
+                    byteArrayOf(
+                        fileTypeByte,
+                        commByte,
+                        accessRights[0],
+                        accessRights[1],
+                        0,
+                        0,
+                        0,
+                        0, // lowerLimit
+                        0xFF.toByte(),
+                        0xFF.toByte(),
+                        0xFF.toByte(),
+                        0x7F, // upperLimit
+                        0,
+                        0,
+                        0,
+                        0, // limitedCreditValue
+                        0, // limitedCreditEnabled
+                    )
                 fileData = findDesfireFileData(appHex, fileId, lines)
                 if (fileData == null) {
                     return RawDesfireFile.createInvalid(
                         fileId,
                         RawDesfireFileSettings.create(settingsBytes),
-                        "Value file data not available from Flipper dump"
+                        "Value file data not available from Flipper dump",
                     )
                 }
             }
             else -> {
-                settingsBytes = byteArrayOf(
-                    fileTypeByte, commByte,
-                    accessRights[0], accessRights[1],
-                    (size and 0xFF).toByte(),
-                    ((size shr 8) and 0xFF).toByte(),
-                    ((size shr 16) and 0xFF).toByte()
-                )
+                settingsBytes =
+                    byteArrayOf(
+                        fileTypeByte,
+                        commByte,
+                        accessRights[0],
+                        accessRights[1],
+                        (size and 0xFF).toByte(),
+                        ((size shr 8) and 0xFF).toByte(),
+                        ((size shr 16) and 0xFF).toByte(),
+                    )
                 fileData = findDesfireFileData(appHex, fileId, lines)
                     ?: ByteArray(size)
             }
@@ -242,17 +274,25 @@ object FlipperNfcParser {
         return RawDesfireFile.create(
             fileId,
             RawDesfireFileSettings.create(settingsBytes),
-            fileData
+            fileData,
         )
     }
 
-    private fun findDesfireProperty(lines: List<String>, prefix: String, property: String): String? {
+    private fun findDesfireProperty(
+        lines: List<String>,
+        prefix: String,
+        property: String,
+    ): String? {
         val key = "$prefix $property:"
         val line = lines.firstOrNull { it.startsWith(key) } ?: return null
         return line.substringAfter("$property:").trim()
     }
 
-    private fun findDesfireFileData(appHex: String, fileId: Int, lines: List<String>): ByteArray? {
+    private fun findDesfireFileData(
+        appHex: String,
+        fileId: Int,
+        lines: List<String>,
+    ): ByteArray? {
         // Data line is "Application {hex} File {id}: XX XX XX ..." with no property keyword
         // Property lines have "File N Type:", "File N Size:", etc.
         val dataPrefix = "Application $appHex File $fileId:"
@@ -272,7 +312,10 @@ object FlipperNfcParser {
 
     // --- FeliCa parsing ---
 
-    private fun parseFelica(headers: Map<String, String>, lines: List<String>): RawFelicaCard? {
+    private fun parseFelica(
+        headers: Map<String, String>,
+        lines: List<String>,
+    ): RawFelicaCard? {
         val tagId = parseTagId(headers) ?: return null
 
         // Parse IDm and PMm
@@ -302,11 +345,12 @@ object FlipperNfcParser {
 
         for ((entryIndex, entry) in systemEntries.withIndex()) {
             val (startLine, systemCode) = entry
-            val endLine = if (entryIndex + 1 < systemEntries.size) {
-                systemEntries[entryIndex + 1].first
-            } else {
-                lines.size
-            }
+            val endLine =
+                if (entryIndex + 1 < systemEntries.size) {
+                    systemEntries[entryIndex + 1].first
+                } else {
+                    lines.size
+                }
 
             val systemLines = lines.subList(startLine, endLine)
 
@@ -329,15 +373,17 @@ object FlipperNfcParser {
                     val blockIndex = blockMatch.groupValues[2].toInt(16)
                     val dataHex = blockMatch.groupValues[3]
                     val data = parseHexBytes(dataHex)
-                    serviceBlocks.getOrPut(serviceCode) { mutableListOf() }
+                    serviceBlocks
+                        .getOrPut(serviceCode) { mutableListOf() }
                         .add(FelicaBlock.create(blockIndex.toByte(), data))
                 }
             }
 
             // Build services from block data
-            val services = serviceBlocks.map { (serviceCode, blocks) ->
-                FelicaService.create(serviceCode, blocks.sortedBy { it.address })
-            }
+            val services =
+                serviceBlocks.map { (serviceCode, blocks) ->
+                    FelicaService.create(serviceCode, blocks.sortedBy { it.address })
+                }
 
             systems.add(FelicaSystem.create(systemCode, services, allServiceCodes))
         }
@@ -347,15 +393,19 @@ object FlipperNfcParser {
 
     // --- Classic parsing ---
 
-    private fun parseClassic(headers: Map<String, String>, lines: List<String>): RawClassicCard? {
+    private fun parseClassic(
+        headers: Map<String, String>,
+        lines: List<String>,
+    ): RawClassicCard? {
         val tagId = parseTagId(headers) ?: return null
         val classicType = headers["Mifare Classic type"]
-        val totalSectors = when (classicType) {
-            "4K" -> 40
-            "1K" -> 16
-            "Mini" -> 5
-            else -> 16
-        }
+        val totalSectors =
+            when (classicType) {
+                "4K" -> 40
+                "1K" -> 16
+                "Mini" -> 5
+                else -> 16
+            }
 
         // Parse all block lines
         val blockDataMap = mutableMapOf<Int, String>()
@@ -374,19 +424,21 @@ object FlipperNfcParser {
             val sectorBlockIndices = (currentBlock until currentBlock + blocksPerSector)
 
             // Check if ALL blocks in this sector are unread
-            val allUnread = sectorBlockIndices.all { blockIdx ->
-                val hex = blockDataMap[blockIdx]
-                hex == null || isAllUnread(hex)
-            }
+            val allUnread =
+                sectorBlockIndices.all { blockIdx ->
+                    val hex = blockDataMap[blockIdx]
+                    hex == null || isAllUnread(hex)
+                }
 
             if (allUnread) {
                 sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
             } else {
-                val blocks = sectorBlockIndices.map { blockIdx ->
-                    val hex = blockDataMap[blockIdx]
-                    val data = if (hex != null) parseHexBytes(hex) else ByteArray(16)
-                    RawClassicBlock.create(blockIdx, data)
-                }
+                val blocks =
+                    sectorBlockIndices.map { blockIdx ->
+                        val hex = blockDataMap[blockIdx]
+                        val data = if (hex != null) parseHexBytes(hex) else ByteArray(16)
+                        RawClassicBlock.create(blockIdx, data)
+                    }
                 sectors.add(RawClassicSector.createData(sectorIndex, blocks))
             }
 
@@ -398,7 +450,10 @@ object FlipperNfcParser {
 
     // --- Ultralight parsing ---
 
-    private fun parseUltralight(headers: Map<String, String>, lines: List<String>): RawUltralightCard? {
+    private fun parseUltralight(
+        headers: Map<String, String>,
+        lines: List<String>,
+    ): RawUltralightCard? {
         val tagId = parseTagId(headers) ?: return null
 
         // Parse page lines
@@ -418,25 +473,29 @@ object FlipperNfcParser {
         return RawUltralightCard.create(tagId, Clock.System.now(), pages, ultralightType)
     }
 
-    private fun mapUltralightType(type: String?): Int = when (type) {
-        "NTAG213" -> 2
-        "NTAG215" -> 4
-        "NTAG216" -> 6
-        "Ultralight" -> 0
-        "Ultralight C" -> 1
-        "Ultralight EV1 11" -> 0
-        "Ultralight EV1 21" -> 0
-        "NTAG203" -> 0
-        "NTAGI2C 1K" -> 0
-        "NTAGI2C 2K" -> 0
-        "NTAGI2C Plus 1K" -> 0
-        "NTAGI2C Plus 2K" -> 0
-        else -> 0
-    }
+    private fun mapUltralightType(type: String?): Int =
+        when (type) {
+            "NTAG213" -> 2
+            "NTAG215" -> 4
+            "NTAG216" -> 6
+            "Ultralight" -> 0
+            "Ultralight C" -> 1
+            "Ultralight EV1 11" -> 0
+            "Ultralight EV1 21" -> 0
+            "NTAG203" -> 0
+            "NTAGI2C 1K" -> 0
+            "NTAGI2C 2K" -> 0
+            "NTAGI2C Plus 1K" -> 0
+            "NTAGI2C Plus 2K" -> 0
+            else -> 0
+        }
 
     private val BLOCK_REGEX = Regex("""Block (\d+): (.+)""")
     private val PAGE_REGEX = Regex("""Page (\d+): (.+)""")
     private val SYSTEM_REGEX = Regex("""System (\d+): ([0-9A-Fa-f]{4})""")
     private val FELICA_SERVICE_REGEX = Regex("""Service [0-9A-Fa-f]+: \| Code ([0-9A-Fa-f]{4}) \|.*""")
-    private val FELICA_BLOCK_REGEX = Regex("""Block [0-9A-Fa-f]+: \| Service code ([0-9A-Fa-f]{4}) \| Block index ([0-9A-Fa-f]{2}) \| Data: ((?:[0-9A-Fa-f]{2} )*[0-9A-Fa-f]{2}) \|""")
+    private val FELICA_BLOCK_REGEX =
+        Regex(
+            """Block [0-9A-Fa-f]+: \| Service code ([0-9A-Fa-f]{4}) \| Block index ([0-9A-Fa-f]{2}) \| Data: ((?:[0-9A-Fa-f]{2} )*[0-9A-Fa-f]{2}) \|""",
+        )
 }

@@ -49,9 +49,8 @@ import org.jetbrains.compose.resources.StringResource
 class PiletTransitInfo(
     private val serial: String?,
     override val cardName: String,
-    private val berTlvData: ByteArray?
+    private val berTlvData: ByteArray?,
 ) : TransitInfo() {
-
     override val serialNumber: String?
         get() = serial
 
@@ -76,14 +75,15 @@ class PiletTransitInfo(
          * Tag map matching Metrodroid's PiletTransitData.TAG_MAP.
          * Maps BER-TLV tag numbers to (string resource, content type).
          */
-        private val TAG_MAP: Map<Int, Pair<StringResource, TagContents>> = mapOf(
-            TAG_PAN to Pair(Res.string.pilet_full_serial_number, TagContents.ASCII),
-            TAG_ISSUER_COUNTRY to Pair(Res.string.pilet_issuer_country, TagContents.ASCII_NUM_COUNTRY),
-            TAG_CARD_EXPIRATION_DATE to Pair(Res.string.pilet_card_expiration_date, TagContents.ASCII),
-            TAG_CARD_EFFECTIVE to Pair(Res.string.pilet_card_effective_date, TagContents.ASCII),
-            TAG_INTERCHANGE_PROTOCOL to Pair(Res.string.pilet_interchange_control, TagContents.ASCII),
-            TAG_KYIV_DIGITAL_UID to Pair(Res.string.pilet_kiev_digital_uid, TagContents.DUMP_SHORT),
-        )
+        private val TAG_MAP: Map<Int, Pair<StringResource, TagContents>> =
+            mapOf(
+                TAG_PAN to Pair(Res.string.pilet_full_serial_number, TagContents.ASCII),
+                TAG_ISSUER_COUNTRY to Pair(Res.string.pilet_issuer_country, TagContents.ASCII_NUM_COUNTRY),
+                TAG_CARD_EXPIRATION_DATE to Pair(Res.string.pilet_card_expiration_date, TagContents.ASCII),
+                TAG_CARD_EFFECTIVE to Pair(Res.string.pilet_card_effective_date, TagContents.ASCII),
+                TAG_INTERCHANGE_PROTOCOL to Pair(Res.string.pilet_interchange_control, TagContents.ASCII),
+                TAG_KYIV_DIGITAL_UID to Pair(Res.string.pilet_kiev_digital_uid, TagContents.DUMP_SHORT),
+            )
 
         /**
          * Simple BER-TLV parser that extracts known tags and returns ListItems.
@@ -136,11 +136,12 @@ class PiletTransitInfo(
                 val desc = TAG_MAP[tag] ?: continue
                 val (labelRes, contents) = desc
 
-                val displayValue = when (contents) {
-                    TagContents.ASCII -> value.readASCII()
-                    TagContents.ASCII_NUM_COUNTRY -> value.readASCII()
-                    TagContents.DUMP_SHORT -> value.toHexDump()
-                }
+                val displayValue =
+                    when (contents) {
+                        TagContents.ASCII -> value.readASCII()
+                        TagContents.ASCII_NUM_COUNTRY -> value.readASCII()
+                        TagContents.DUMP_SHORT -> value.toHexDump()
+                    }
 
                 if (displayValue.isNotEmpty()) {
                     results.add(ListItem(labelRes, displayValue))

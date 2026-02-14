@@ -29,9 +29,9 @@ import com.codebutler.farebot.card.ksx6924.KSX6924Utils
 import com.codebutler.farebot.card.ksx6924.KSX6924Utils.INVALID_DATETIME
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Represents a trip or transaction on a T-Money card.
@@ -55,17 +55,17 @@ data class TMoneyTrip(
     private val type: Int,
     private val cost: Int,
     private val time: Long,
-    private val balanceAfter: Int
+    private val balanceAfter: Int,
 ) : Trip() {
-
     override val fare: TransitCurrency
         get() = TransitCurrency.KRW(cost)
 
     override val mode: Mode
-        get() = when (type) {
-            TYPE_TOP_UP -> Mode.TICKET_MACHINE
-            else -> Mode.OTHER
-        }
+        get() =
+            when (type) {
+                TYPE_TOP_UP -> Mode.TICKET_MACHINE
+                else -> Mode.OTHER
+            }
 
     override val startTimestamp: Instant?
         get() = KSX6924Utils.parseHexDateTime(time, TZ)

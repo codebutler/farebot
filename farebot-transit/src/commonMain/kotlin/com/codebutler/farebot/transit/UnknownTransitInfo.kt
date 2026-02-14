@@ -28,14 +28,14 @@ package com.codebutler.farebot.transit
 class UnknownTransitInfo(
     private val cardTypeName: String,
     private val tagIdHex: String,
-    private val isPartialRead: Boolean = false
+    private val isPartialRead: Boolean = false,
 ) : TransitInfo() {
-
     override val serialNumber: String = tagIdHex
 
-    override val cardName: String = if (isPartialRead) {
-        "$cardTypeName (Partial Read)"
-    } else {
-        "$cardTypeName (Unrecognized)"
-    }
+    override val cardName: String =
+        if (isPartialRead) {
+            "$cardTypeName (Partial Read)"
+        } else {
+            "$cardTypeName (Unrecognized)"
+        }
 }

@@ -9,5 +9,5 @@ data class SavedKey(
     val cardId: String,
     val cardType: CardType,
     val keyData: String,
-    val createdAt: Instant = Clock.System.now()
+    val createdAt: Instant = Clock.System.now(),
 )

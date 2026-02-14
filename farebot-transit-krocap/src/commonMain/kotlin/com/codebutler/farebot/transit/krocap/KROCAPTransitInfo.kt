@@ -38,9 +38,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class KROCAPTransitInfo(
-    private val pdata: ByteArray
+    private val pdata: ByteArray,
 ) : SerialOnlyTransitInfo() {
-
     override val reason: Reason
         get() = Reason.MORE_RESEARCH_NEEDED
 
@@ -60,9 +59,7 @@ data class KROCAPTransitInfo(
         return pdata.contentEquals(other.pdata)
     }
 
-    override fun hashCode(): Int {
-        return pdata.contentHashCode()
-    }
+    override fun hashCode(): Int = pdata.contentHashCode()
 
     companion object {
         const val NAME = "One Card All Pass"

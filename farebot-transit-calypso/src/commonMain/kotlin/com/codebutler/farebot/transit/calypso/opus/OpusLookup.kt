@@ -33,20 +33,30 @@ object OpusLookup : En1545LookupSTR("opus") {
     override val timeZone: TimeZone = TimeZone.of("America/Montreal")
 
     // For opus we ignore transport
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
         if (routeNumber == null || routeNumber == 0) return null
         return super.getRouteName(routeNumber or ((agency ?: 0) shl 16), routeVariant, agency, transport)
     }
 
     // Opus doesn't store stations
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? = null
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? = null
 
     override fun parseCurrency(price: Int) = TransitCurrency(price, "CAD")
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        0xb1 to Res.string.opus_monthly_subscription,
-        0xb2 to Res.string.opus_weekly_subscription,
-        0xc9 to Res.string.opus_weekly_subscription,
-        0x1c7 to Res.string.opus_single_trips
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            0xb1 to Res.string.opus_monthly_subscription,
+            0xb2 to Res.string.opus_weekly_subscription,
+            0xc9 to Res.string.opus_weekly_subscription,
+            0x1c7 to Res.string.opus_single_trips,
+        )
 }

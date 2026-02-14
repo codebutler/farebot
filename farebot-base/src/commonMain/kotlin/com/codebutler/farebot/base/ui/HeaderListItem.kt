@@ -32,13 +32,13 @@ import org.jetbrains.compose.resources.StringResource
 @SerialName("header")
 data class HeaderListItem(
     override val text1: String?,
-    val headingLevel: Int = 2
+    val headingLevel: Int = 2,
 ) : ListItemInterface() {
     constructor(title: String) : this(title, 2)
 
     constructor(titleRes: StringResource) : this(
         text1 = getStringBlocking(titleRes),
-        headingLevel = 2
+        headingLevel = 2,
     )
 
     override val text2: String?

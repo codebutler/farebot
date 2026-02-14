@@ -31,9 +31,10 @@ import com.codebutler.farebot.card.nfc.AndroidNfcFTechnology
 import com.codebutler.farebot.card.nfc.NfcFTechnology
 import com.codebutler.farebot.key.CardKeys
 
-class FelicaTagReader(tagId: ByteArray, tag: Tag) :
-    TagReader<NfcFTechnology, RawFelicaCard, CardKeys>(tagId, tag, null) {
-
+class FelicaTagReader(
+    tagId: ByteArray,
+    tag: Tag,
+) : TagReader<NfcFTechnology, RawFelicaCard, CardKeys>(tagId, tag, null) {
     override fun getTech(tag: Tag): NfcFTechnology = AndroidNfcFTechnology(NfcF.get(tag))
 
     @Throws(Exception::class)
@@ -41,7 +42,7 @@ class FelicaTagReader(tagId: ByteArray, tag: Tag) :
         tagId: ByteArray,
         tag: Tag,
         tech: NfcFTechnology,
-        cardKeys: CardKeys?
+        cardKeys: CardKeys?,
     ): RawFelicaCard {
         val adapter = AndroidFeliCaTagAdapter(tag)
         return FeliCaReader.readTag(tagId, adapter)

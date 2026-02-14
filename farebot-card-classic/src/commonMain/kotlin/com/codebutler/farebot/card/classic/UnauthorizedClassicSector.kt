@@ -27,11 +27,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UnauthorizedClassicSector(
-    override val index: Int
+    override val index: Int,
 ) : ClassicSector {
-
     companion object {
-        fun create(sectorIndex: Int): UnauthorizedClassicSector =
-            UnauthorizedClassicSector(sectorIndex)
+        fun create(sectorIndex: Int): UnauthorizedClassicSector = UnauthorizedClassicSector(sectorIndex)
     }
 }

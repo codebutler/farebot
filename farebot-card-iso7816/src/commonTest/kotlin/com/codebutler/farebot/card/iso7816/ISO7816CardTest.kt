@@ -22,12 +22,12 @@
 
 package com.codebutler.farebot.card.iso7816
 
-import kotlin.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Tests for ISO7816 card structure and parsing.
@@ -35,7 +35,6 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's ISO7816Test.kt
  */
 class ISO7816CardTest {
-
     private val testTime = Instant.fromEpochMilliseconds(1264982400000)
     private val testTagId = byteArrayOf(0x01, 0x02, 0x03, 0x04)
 
@@ -43,10 +42,11 @@ class ISO7816CardTest {
     @Test
     fun testCardCreation() {
         val appName = "A000000004101001".hexToByteArray() // Sample Mastercard AID
-        val app = ISO7816Application.create(
-            appName = appName,
-            type = "emv"
-        )
+        val app =
+            ISO7816Application.create(
+                appName = appName,
+                type = "emv",
+            )
 
         val card = ISO7816Card.create(testTagId, testTime, listOf(app))
 
@@ -58,18 +58,21 @@ class ISO7816CardTest {
     @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testCardWithMultipleApplications() {
-        val emvApp = ISO7816Application.create(
-            appName = "A000000004101001".hexToByteArray(),
-            type = "emv"
-        )
-        val calypsoApp = ISO7816Application.create(
-            appName = "315449432E494341".hexToByteArray(),
-            type = "calypso"
-        )
-        val androidHceApp = ISO7816Application.create(
-            appName = null,
-            type = "androidhce"
-        )
+        val emvApp =
+            ISO7816Application.create(
+                appName = "A000000004101001".hexToByteArray(),
+                type = "emv",
+            )
+        val calypsoApp =
+            ISO7816Application.create(
+                appName = "315449432E494341".hexToByteArray(),
+                type = "calypso",
+            )
+        val androidHceApp =
+            ISO7816Application.create(
+                appName = null,
+                type = "androidhce",
+            )
 
         val card = ISO7816Card.create(testTagId, testTime, listOf(emvApp, calypsoApp, androidHceApp))
 
@@ -83,10 +86,11 @@ class ISO7816CardTest {
     @Test
     fun testGetApplicationByName() {
         val appName = "A000000004101001".hexToByteArray()
-        val app = ISO7816Application.create(
-            appName = appName,
-            type = "emv"
-        )
+        val app =
+            ISO7816Application.create(
+                appName = appName,
+                type = "emv",
+            )
 
         val card = ISO7816Card.create(testTagId, testTime, listOf(app))
 
@@ -106,24 +110,29 @@ class ISO7816CardTest {
     @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testApplicationWithFiles() {
-        val file1 = ISO7816File.create(
-            binaryData = "hello world".encodeToByteArray()
-        )
-        val file2 = ISO7816File.create(
-            records = mapOf(
-                1 to "record1".encodeToByteArray(),
-                2 to "record2".encodeToByteArray()
+        val file1 =
+            ISO7816File.create(
+                binaryData = "hello world".encodeToByteArray(),
             )
-        )
+        val file2 =
+            ISO7816File.create(
+                records =
+                    mapOf(
+                        1 to "record1".encodeToByteArray(),
+                        2 to "record2".encodeToByteArray(),
+                    ),
+            )
 
-        val app = ISO7816Application.create(
-            appName = "A000000004101001".hexToByteArray(),
-            files = mapOf(
-                "3F00:0001" to file1,
-                "3F00:0002" to file2
-            ),
-            type = "test"
-        )
+        val app =
+            ISO7816Application.create(
+                appName = "A000000004101001".hexToByteArray(),
+                files =
+                    mapOf(
+                        "3F00:0001" to file1,
+                        "3F00:0002" to file2,
+                    ),
+                type = "test",
+            )
 
         val card = ISO7816Card.create(testTagId, testTime, listOf(app))
 
@@ -144,26 +153,32 @@ class ISO7816CardTest {
     @Test
     fun testApplicationWithSfiFiles() {
         // SFI (Short File Identifier) is used in Calypso and other cards
-        val ticketingEnvFile = ISO7816File.create(
-            records = mapOf(
-                1 to "environment_data".encodeToByteArray()
+        val ticketingEnvFile =
+            ISO7816File.create(
+                records =
+                    mapOf(
+                        1 to "environment_data".encodeToByteArray(),
+                    ),
             )
-        )
-        val ticketingContractFile = ISO7816File.create(
-            records = mapOf(
-                1 to "contract1".encodeToByteArray(),
-                2 to "contract2".encodeToByteArray()
+        val ticketingContractFile =
+            ISO7816File.create(
+                records =
+                    mapOf(
+                        1 to "contract1".encodeToByteArray(),
+                        2 to "contract2".encodeToByteArray(),
+                    ),
             )
-        )
 
-        val app = ISO7816Application.create(
-            appName = "315449432E494341".hexToByteArray(),
-            sfiFiles = mapOf(
-                0x07 to ticketingEnvFile,  // Ticketing Environment
-                0x09 to ticketingContractFile // Contracts
-            ),
-            type = "calypso"
-        )
+        val app =
+            ISO7816Application.create(
+                appName = "315449432E494341".hexToByteArray(),
+                sfiFiles =
+                    mapOf(
+                        0x07 to ticketingEnvFile, // Ticketing Environment
+                        0x09 to ticketingContractFile, // Contracts
+                    ),
+                type = "calypso",
+            )
 
         val card = ISO7816Card.create(testTagId, testTime, listOf(app))
 
@@ -184,14 +199,16 @@ class ISO7816CardTest {
     @Test
     fun testFileRecordList() {
         // Records may not be stored in order, but recordList should return them sorted
-        val file = ISO7816File.create(
-            records = mapOf(
-                5 to "record5".encodeToByteArray(),
-                2 to "record2".encodeToByteArray(),
-                8 to "record8".encodeToByteArray(),
-                1 to "record1".encodeToByteArray()
+        val file =
+            ISO7816File.create(
+                records =
+                    mapOf(
+                        5 to "record5".encodeToByteArray(),
+                        2 to "record2".encodeToByteArray(),
+                        8 to "record8".encodeToByteArray(),
+                        1 to "record1".encodeToByteArray(),
+                    ),
             )
-        )
 
         val recordList = file.recordList
         assertEquals(4, recordList.size)
@@ -206,11 +223,12 @@ class ISO7816CardTest {
     fun testApplicationWithFci() {
         // FCI (File Control Information) is returned when selecting an application
         val fci = "6F1A840E315449432E49434180014F8702FF00A50CC0000000000000000000".hexToByteArray()
-        val app = ISO7816Application.create(
-            appName = "315449432E494341".hexToByteArray(),
-            appFci = fci,
-            type = "calypso"
-        )
+        val app =
+            ISO7816Application.create(
+                appName = "315449432E494341".hexToByteArray(),
+                appFci = fci,
+                type = "calypso",
+            )
 
         val card = ISO7816Card.create(testTagId, testTime, listOf(app))
 
@@ -225,10 +243,11 @@ class ISO7816CardTest {
     fun testFileWithFci() {
         // File FCI contains information about the file structure
         val fileFci = "6207820200118306020200000000".hexToByteArray()
-        val file = ISO7816File.create(
-            binaryData = ByteArray(32),
-            fci = fileFci
-        )
+        val file =
+            ISO7816File.create(
+                binaryData = ByteArray(32),
+                fci = fileFci,
+            )
 
         assertNotNull(file.fci)
         assertTrue(file.fci.contentEquals(fileFci))
@@ -237,10 +256,11 @@ class ISO7816CardTest {
     @Test
     fun testAndroidHceApplication() {
         // Android HCE apps may not have an AID
-        val app = ISO7816Application.create(
-            appName = null,
-            type = "androidhce"
-        )
+        val app =
+            ISO7816Application.create(
+                appName = null,
+                type = "androidhce",
+            )
 
         assertEquals("androidhce", app.type)
         assertNull(app.appName)

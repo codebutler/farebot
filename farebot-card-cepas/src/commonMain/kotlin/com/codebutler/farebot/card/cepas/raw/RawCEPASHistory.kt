@@ -22,15 +22,15 @@
 
 package com.codebutler.farebot.card.cepas.raw
 
+import com.codebutler.farebot.card.cepas.CEPASHistory
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import com.codebutler.farebot.card.cepas.CEPASHistory
 
 @Serializable
 data class RawCEPASHistory(
     val id: Int,
     @Contextual val data: ByteArray?,
-    val errorMessage: String?
+    val errorMessage: String?,
 ) {
     fun parse(): CEPASHistory {
         val data = data
@@ -41,12 +41,14 @@ data class RawCEPASHistory(
     }
 
     companion object {
-        fun create(id: Int, data: ByteArray): RawCEPASHistory {
-            return RawCEPASHistory(id, data, null)
-        }
+        fun create(
+            id: Int,
+            data: ByteArray,
+        ): RawCEPASHistory = RawCEPASHistory(id, data, null)
 
-        fun create(id: Int, errorMessage: String): RawCEPASHistory {
-            return RawCEPASHistory(id, null, errorMessage)
-        }
+        fun create(
+            id: Int,
+            errorMessage: String,
+        ): RawCEPASHistory = RawCEPASHistory(id, null, errorMessage)
     }
 }

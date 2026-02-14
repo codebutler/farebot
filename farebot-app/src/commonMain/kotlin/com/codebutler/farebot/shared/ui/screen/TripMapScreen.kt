@@ -53,14 +53,16 @@ fun TripMapScreen(
 ) {
     val startName = uiState.startStation?.shortStationNameRaw ?: uiState.startStation?.stationName
     val endName = uiState.endStation?.shortStationNameRaw ?: uiState.endStation?.stationName
-    val title = if (startName != null && endName != null) {
-        "$startName \u2192 $endName"
-    } else {
-        uiState.routeName ?: stringResource(Res.string.trip_map)
-    }
-    val subtitle = listOfNotNull(uiState.agencyName, uiState.routeName)
-        .joinToString(" ")
-        .takeIf { it.isNotBlank() }
+    val title =
+        if (startName != null && endName != null) {
+            "$startName \u2192 $endName"
+        } else {
+            uiState.routeName ?: stringResource(Res.string.trip_map)
+        }
+    val subtitle =
+        listOfNotNull(uiState.agencyName, uiState.routeName)
+            .joinToString(" ")
+            .takeIf { it.isNotBlank() }
 
     Scaffold(
         topBar = {
@@ -72,7 +74,7 @@ fun TripMapScreen(
                             Text(
                                 text = subtitle,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
                             )
                         }
                     }
@@ -83,13 +85,14 @@ fun TripMapScreen(
                     }
                 },
             )
-        }
+        },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp),
         ) {
             val hasStart = uiState.startStation?.hasLocation() == true
             val hasEnd = uiState.endStation?.hasLocation() == true
@@ -108,7 +111,7 @@ fun TripMapScreen(
                     // Visual connector between stations
                     Row(
                         modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Canvas(modifier = Modifier.size(width = 2.dp, height = 32.dp)) {
                             drawLine(
@@ -138,7 +141,7 @@ fun TripMapScreen(
             } else {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = stringResource(Res.string.no_location_data),
@@ -160,10 +163,11 @@ private fun StationCard(
     color: Color,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Canvas(modifier = Modifier.size(24.dp)) {
             drawCircle(color = color, radius = size.minDimension / 2)

@@ -43,8 +43,9 @@ import platform.darwin.dispatch_semaphore_wait
  * which is safe because tag reading runs on a background thread.
  */
 @OptIn(ExperimentalForeignApi::class)
-class IosCardTransceiver(private val tag: NFCMiFareTagProtocol) : CardTransceiver {
-
+class IosCardTransceiver(
+    private val tag: NFCMiFareTagProtocol,
+) : CardTransceiver {
     private var _isConnected = false
 
     override fun connect() {

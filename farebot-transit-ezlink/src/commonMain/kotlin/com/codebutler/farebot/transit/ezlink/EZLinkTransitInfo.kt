@@ -35,7 +35,6 @@ class EZLinkTransitInfo(
     override val trips: List<Trip>,
     private val stringResource: StringResource,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = EZLinkData.getCardIssuer(serialNumber, stringResource)
 

@@ -26,9 +26,9 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * NFC-V (ISO 15693) Vicinity card.
@@ -42,9 +42,8 @@ data class VicinityCard(
     override val scannedAt: Instant,
     val pages: List<VicinityPage>,
     @Contextual val sysInfo: ByteArray? = null,
-    val isPartialRead: Boolean = false
+    val isPartialRead: Boolean = false,
 ) : Card() {
-
     override val cardType: CardType = CardType.Vicinity
 
     fun getPage(index: Int): VicinityPage = pages[index]
@@ -52,7 +51,10 @@ data class VicinityCard(
     /**
      * Read contiguous pages and concatenate their data.
      */
-    fun readPages(startPage: Int, pageCount: Int): ByteArray {
+    fun readPages(
+        startPage: Int,
+        pageCount: Int,
+    ): ByteArray {
         val result = mutableListOf<Byte>()
         for (i in startPage until startPage + pageCount) {
             result.addAll(pages[i].data.toList())
@@ -63,7 +65,10 @@ data class VicinityCard(
     /**
      * Read arbitrary byte ranges across page boundaries.
      */
-    fun readBytes(start: Int, len: Int): ByteArray {
+    fun readBytes(
+        start: Int,
+        len: Int,
+    ): ByteArray {
         val pageSize = pages.firstOrNull()?.data?.size ?: 4
         val startPage = start / pageSize
         val startOffset = start % pageSize
@@ -76,14 +81,17 @@ data class VicinityCard(
     override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
         val builder = FareBotUiTree.builder(stringResource)
         if (sysInfo != null) {
-            builder.item()
+            builder
+                .item()
                 .title("System Info")
                 .value(sysInfo)
         }
         val pagesBuilder = builder.item().title("Pages")
         for (page in pages) {
-            val pageBuilder = pagesBuilder.item()
-                .title("Page ${page.index}")
+            val pageBuilder =
+                pagesBuilder
+                    .item()
+                    .title("Page ${page.index}")
             if (page.isUnauthorized) {
                 pageBuilder.value("Unauthorized")
             } else {
@@ -99,7 +107,7 @@ data class VicinityCard(
             scannedAt: Instant,
             pages: List<VicinityPage>,
             sysInfo: ByteArray? = null,
-            isPartialRead: Boolean = false
+            isPartialRead: Boolean = false,
         ): VicinityCard = VicinityCard(tagId, scannedAt, pages, sysInfo, isPartialRead)
     }
 }

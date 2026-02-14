@@ -25,7 +25,6 @@ package com.codebutler.farebot.card.ksx6924
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.util.NumberUtils
-import farebot.farebot_card_ksx6924.generated.resources.*
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.base.util.convertBCDtoLong
@@ -36,6 +35,7 @@ import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ksx6924.KSX6924Utils.parseHexDate
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
+import farebot.farebot_card_ksx6924.generated.resources.*
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.Contextual
@@ -48,9 +48,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class KSX6924PurseInfo(
-    @Contextual val purseInfoData: ByteArray
+    @Contextual val purseInfoData: ByteArray,
 ) {
-
     val cardType: Byte
         get() = purseInfoData[0]
 
@@ -113,32 +112,34 @@ data class KSX6924PurseInfo(
     fun buildTransitBalance(
         balance: TransitCurrency,
         tz: TimeZone,
-        label: String? = null
-    ): TransitBalance = TransitBalance(
-        balance = balance,
-        name = label,
-        validFrom = issueDate?.let { KSX6924Utils.localDateToInstant(it, tz) },
-        validTo = expiryDate?.let { KSX6924Utils.localDateToInstant(it, tz) }
-    )
+        label: String? = null,
+    ): TransitBalance =
+        TransitBalance(
+            balance = balance,
+            name = label,
+            validFrom = issueDate?.let { KSX6924Utils.localDateToInstant(it, tz) },
+            validTo = expiryDate?.let { KSX6924Utils.localDateToInstant(it, tz) },
+        )
 
     /**
      * Returns a list of [ListItem] for displaying the purse info fields.
      */
-    fun getInfo(resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver): List<ListItem> = listOf(
-        ListItem(Res.string.ksx6924_card_type, resolver.resolveCardType(cardType)),
-        ListItem(Res.string.ksx6924_crypto_algorithm, resolver.resolveCryptoAlgo(alg)),
-        ListItem(Res.string.ksx6924_encryption_key_version, vk.hexString),
-        ListItem(Res.string.ksx6924_card_issuer, resolver.resolveIssuer(idCenter)),
-        ListItem(Res.string.ksx6924_auth_id, idtr.hexString),
-        ListItem(Res.string.ksx6924_ticket_type, resolver.resolveUserCode(userCode)),
-        ListItem(Res.string.ksx6924_discount_type, resolver.resolveDisRate(disRate)),
-        ListItem(Res.string.ksx6924_max_balance, balMax.toString()),
-        ListItem(Res.string.ksx6924_branch_code, bra.hexString),
-        ListItem(Res.string.ksx6924_one_time_limit, mmax.toString()),
-        ListItem(Res.string.ksx6924_mobile_carrier, resolver.resolveTCode(tcode)),
-        ListItem(Res.string.ksx6924_financial_institution, resolver.resolveCCode(ccode)),
-        ListItem(Res.string.ksx6924_rfu, rfu.hex())
-    )
+    fun getInfo(resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver): List<ListItem> =
+        listOf(
+            ListItem(Res.string.ksx6924_card_type, resolver.resolveCardType(cardType)),
+            ListItem(Res.string.ksx6924_crypto_algorithm, resolver.resolveCryptoAlgo(alg)),
+            ListItem(Res.string.ksx6924_encryption_key_version, vk.hexString),
+            ListItem(Res.string.ksx6924_card_issuer, resolver.resolveIssuer(idCenter)),
+            ListItem(Res.string.ksx6924_auth_id, idtr.hexString),
+            ListItem(Res.string.ksx6924_ticket_type, resolver.resolveUserCode(userCode)),
+            ListItem(Res.string.ksx6924_discount_type, resolver.resolveDisRate(disRate)),
+            ListItem(Res.string.ksx6924_max_balance, balMax.toString()),
+            ListItem(Res.string.ksx6924_branch_code, bra.hexString),
+            ListItem(Res.string.ksx6924_one_time_limit, mmax.toString()),
+            ListItem(Res.string.ksx6924_mobile_carrier, resolver.resolveTCode(tcode)),
+            ListItem(Res.string.ksx6924_financial_institution, resolver.resolveCCode(ccode)),
+            ListItem(Res.string.ksx6924_rfu, rfu.hex()),
+        )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -48,7 +48,6 @@ class SmartRiderTransitInfo(
     private val mAutoloadValue: Int,
     private val stringResource: StringResource,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = stringResource.getString(mSmartRiderType.friendlyName)
 
@@ -65,52 +64,57 @@ class SmartRiderTransitInfo(
                         balance = aud,
                         name = tokenType,
                         validFrom = convertDate(mIssueDate),
-                        validTo = convertDate(mTokenExpiryDate)
+                        validTo = convertDate(mTokenExpiryDate),
                     )
                 mIssueDate > 0 ->
                     TransitBalance(
                         balance = aud,
                         name = tokenType,
-                        validFrom = convertDate(mIssueDate)
+                        validFrom = convertDate(mIssueDate),
                     )
                 mTokenExpiryDate > 0 ->
                     TransitBalance(
                         balance = aud,
                         name = tokenType,
-                        validTo = convertDate(mTokenExpiryDate)
+                        validTo = convertDate(mTokenExpiryDate),
                     )
                 else -> TransitBalance(balance = aud, name = tokenType)
             }
         }
 
     private val localisedTokenType: String?
-        get() = when (mSmartRiderType) {
-            SmartRiderType.SMARTRIDER -> when (mTokenType) {
-                0x1 -> stringResource.getString(Res.string.smartrider_fare_standard)
-                0x2 -> stringResource.getString(Res.string.smartrider_fare_student)
-                0x4 -> stringResource.getString(Res.string.smartrider_fare_tertiary)
-                0x6 -> stringResource.getString(Res.string.smartrider_fare_senior)
-                0x7 -> stringResource.getString(Res.string.smartrider_fare_concession)
-                0xe -> stringResource.getString(Res.string.smartrider_fare_staff)
-                0xf -> stringResource.getString(Res.string.smartrider_fare_pensioner)
-                0x10 -> stringResource.getString(Res.string.smartrider_fare_convention)
+        get() =
+            when (mSmartRiderType) {
+                SmartRiderType.SMARTRIDER ->
+                    when (mTokenType) {
+                        0x1 -> stringResource.getString(Res.string.smartrider_fare_standard)
+                        0x2 -> stringResource.getString(Res.string.smartrider_fare_student)
+                        0x4 -> stringResource.getString(Res.string.smartrider_fare_tertiary)
+                        0x6 -> stringResource.getString(Res.string.smartrider_fare_senior)
+                        0x7 -> stringResource.getString(Res.string.smartrider_fare_concession)
+                        0xe -> stringResource.getString(Res.string.smartrider_fare_staff)
+                        0xf -> stringResource.getString(Res.string.smartrider_fare_pensioner)
+                        0x10 -> stringResource.getString(Res.string.smartrider_fare_convention)
+                        else -> null
+                    }
                 else -> null
             }
-            else -> null
-        }
 
     override val subscriptions: List<Subscription>? = null
 
     override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
         val uiBuilder = FareBotUiTree.builder(stringResource)
-        uiBuilder.item()
+        uiBuilder
+            .item()
             .title(Res.string.smartrider_ticket_type)
             .value(mTokenType.toString())
         if (mSmartRiderType == SmartRiderType.SMARTRIDER) {
-            uiBuilder.item()
+            uiBuilder
+                .item()
                 .title(Res.string.smartrider_autoload_threshold)
                 .value(TransitCurrency.AUD(mAutoloadThreshold).formatCurrencyString(true))
-            uiBuilder.item()
+            uiBuilder
+                .item()
                 .title(Res.string.smartrider_autoload_value)
                 .value(TransitCurrency.AUD(mAutoloadValue).formatCurrencyString(true))
         }

@@ -40,13 +40,10 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_tampere.generated.resources.*
 
 class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(TampereTransitInfo.APP_ID) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(TampereTransitInfo.APP_ID) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         val serialNumber = getSerialNumber(card)
@@ -66,34 +63,41 @@ class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
         val subs = mutableListOf<TampereSubscription>()
 
         if (file2Data != null && file2Data.size >= 96) {
-            val blockPtr = if ((file2Data.byteArrayToInt(0, 1) - file2Data.byteArrayToInt(48, 1)) and 0xff > 0x80)
-                48
-            else
-                0
+            val blockPtr =
+                if ((file2Data.byteArrayToInt(0, 1) - file2Data.byteArrayToInt(48, 1)) and 0xff > 0x80) {
+                    48
+                } else {
+                    0
+                }
             for (i in 0..2) {
                 val contractRaw = file2Data.sliceOffLen(blockPtr + 4 + 12 * i, 12)
                 val type = contractRaw.byteArrayToInt(2, 1)
                 when (type) {
                     0 -> continue
-                    0x3 -> subs += TampereSubscription(
-                        mStart = null,
-                        mEnd = contractRaw.byteArrayToInt(6, 2),
-                        mType = type
-                    )
+                    0x3 ->
+                        subs +=
+                            TampereSubscription(
+                                mStart = null,
+                                mEnd = contractRaw.byteArrayToInt(6, 2),
+                                mType = type,
+                            )
                     7 -> balance = contractRaw.byteArrayToInt(7, 2)
-                    0xf -> subs += TampereSubscription(
-                        mStart = contractRaw.byteArrayToInt(6, 2),
-                        mEnd = contractRaw.byteArrayToInt(8, 2),
-                        mType = type
-                    )
+                    0xf ->
+                        subs +=
+                            TampereSubscription(
+                                mStart = contractRaw.byteArrayToInt(6, 2),
+                                mEnd = contractRaw.byteArrayToInt(8, 2),
+                                mType = type,
+                            )
                     else -> subs += TampereSubscription(mType = type)
                 }
             }
         }
 
-        val trips = (app?.getFile(0x03) as? RecordDesfireFile)?.records?.map { record ->
-            TampereTrip.parse(record.data)
-        }
+        val trips =
+            (app?.getFile(0x03) as? RecordDesfireFile)?.records?.map { record ->
+                TampereTrip.parse(record.data)
+            }
 
         val fallbackBalance = (app?.getFile(0x01) as? StandardDesfireFile)?.data?.byteArrayToIntReversed()
 
@@ -104,7 +108,7 @@ class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
             mHolderName = holderName,
             mHolderBirthDate = holderBirthDate,
             mIssueDate = issueDate,
-            subscriptions = subs.ifEmpty { null }
+            subscriptions = subs.ifEmpty { null },
         )
     }
 
@@ -118,16 +122,17 @@ class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.tampere_card_name,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.FINLAND,
-            locationRes = Res.string.tampere_location,
-            imageRes = Res.drawable.tampere,
-            latitude = 61.4978f,
-            longitude = 23.7610f,
-            brandColor = 0xA8C9E6,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.tampere_card_name,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.FINLAND,
+                locationRes = Res.string.tampere_location,
+                imageRes = Res.drawable.tampere,
+                latitude = 61.4978f,
+                longitude = 23.7610f,
+                brandColor = 0xA8C9E6,
+                credits = listOf("Metrodroid Project"),
+            )
     }
 }

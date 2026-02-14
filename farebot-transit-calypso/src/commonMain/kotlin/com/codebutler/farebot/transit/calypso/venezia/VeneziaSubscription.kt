@@ -26,33 +26,37 @@ import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
-import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Parsed
+import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Subscription
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
 internal class VeneziaSubscription(
     override val parsed: En1545Parsed,
     override val stringResource: StringResource,
-    private val counter: Int?
+    private val counter: Int?,
 ) : En1545Subscription() {
-
     override val lookup get() = VeneziaLookup
 
     override val remainingTripCount: Int?
         get() = counter?.div(256)
 
     companion object {
-        private val SUBSCRIPTION_FIELDS = En1545Container(
-            En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 6),
-            En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
-            En1545FixedInteger("IdCounter", 8),
-            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 82),
-            En1545FixedInteger.datePacked(En1545Subscription.CONTRACT_SALE),
-            En1545FixedInteger.timePacked11Local(En1545Subscription.CONTRACT_SALE)
-        )
+        private val SUBSCRIPTION_FIELDS =
+            En1545Container(
+                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 6),
+                En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
+                En1545FixedInteger("IdCounter", 8),
+                En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 82),
+                En1545FixedInteger.datePacked(En1545Subscription.CONTRACT_SALE),
+                En1545FixedInteger.timePacked11Local(En1545Subscription.CONTRACT_SALE),
+            )
 
-        fun parse(data: ByteArray, stringResource: StringResource, counter: Int?): VeneziaSubscription? {
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+            counter: Int?,
+        ): VeneziaSubscription? {
             if (data.getBitsFromBuffer(0, 22) == 0) {
                 return null
             }

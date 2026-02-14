@@ -34,9 +34,8 @@ import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_card_na
 import kotlinx.datetime.TimeZone
 
 class NextfareUnknownUltralightTransitInfo(
-    override val capsule: NextfareUltralightTransitDataCapsule
+    override val capsule: NextfareUltralightTransitDataCapsule,
 ) : NextfareUltralightTransitData() {
-
     override val timeZone: TimeZone
         get() = TZ
 
@@ -52,7 +51,6 @@ class NextfareUnknownUltralightTransitInfo(
 
         val FACTORY: TransitFactory<UltralightCard, NextfareUnknownUltralightTransitInfo> =
             object : TransitFactory<UltralightCard, NextfareUnknownUltralightTransitInfo> {
-
                 override val allCards: List<CardInfo> = emptyList()
 
                 override fun check(card: UltralightCard): Boolean {
@@ -60,20 +58,18 @@ class NextfareUnknownUltralightTransitInfo(
                     return head == 0x0a0400 || head == 0x0a0800
                 }
 
-                override fun parseInfo(card: UltralightCard): NextfareUnknownUltralightTransitInfo {
-                    return NextfareUnknownUltralightTransitInfo(
-                        NextfareUltralightTransitData.parse(card, ::NextfareUnknownUltralightTransaction)
+                override fun parseInfo(card: UltralightCard): NextfareUnknownUltralightTransitInfo =
+                    NextfareUnknownUltralightTransitInfo(
+                        NextfareUltralightTransitData.parse(card, ::NextfareUnknownUltralightTransaction),
                     )
-                }
 
-                override fun parseIdentity(card: UltralightCard): TransitIdentity {
-                    return TransitIdentity(
+                override fun parseIdentity(card: UltralightCard): TransitIdentity =
+                    TransitIdentity(
                         getStringBlocking(Res.string.nextfareul_card_name),
                         NextfareUltralightTransitData.formatSerial(
-                            NextfareUltralightTransitData.getSerial(card)
-                        )
+                            NextfareUltralightTransitData.getSerial(card),
+                        ),
                     )
-                }
             }
     }
 }

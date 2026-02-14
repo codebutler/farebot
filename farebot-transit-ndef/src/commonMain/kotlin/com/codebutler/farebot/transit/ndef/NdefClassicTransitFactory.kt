@@ -30,11 +30,9 @@ import com.codebutler.farebot.transit.TransitIdentity
 class NdefClassicTransitFactory : TransitFactory<ClassicCard, NdefData> {
     override val allCards: List<CardInfo> = emptyList()
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity =
-        TransitIdentity.create(NdefData.NAME, null)
+    override fun parseIdentity(card: ClassicCard): TransitIdentity = TransitIdentity.create(NdefData.NAME, null)
 
-    override fun parseInfo(card: ClassicCard): NdefData =
-        NdefData.parseClassic(card) ?: NdefData(emptyList())
+    override fun parseInfo(card: ClassicCard): NdefData = NdefData.parseClassic(card) ?: NdefData(emptyList())
 
     override fun check(card: ClassicCard): Boolean = NdefData.checkClassic(card)
 

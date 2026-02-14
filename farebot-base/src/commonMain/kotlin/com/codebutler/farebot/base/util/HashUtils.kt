@@ -24,7 +24,6 @@
 package com.codebutler.farebot.base.util
 
 object HashUtils {
-
     // --- CRC tables ---
 
     private val CRC16_IBM_TABLE by lazy { getCRCTableReversed(0xa001) }
@@ -32,41 +31,58 @@ object HashUtils {
     const val CRC8_NXP_INITIAL = 0xc7
 
     private fun getCRCTableReversed(poly: Int) =
-        (0..255).map { v ->
-            (0..7).fold(v) { cur, _ ->
-                if ((cur and 1) != 0)
-                    (cur shr 1) xor poly
-                else
-                    (cur shr 1)
-            }
-        }.toIntArray()
+        (0..255)
+            .map { v ->
+                (0..7).fold(v) { cur, _ ->
+                    if ((cur and 1) != 0) {
+                        (cur shr 1) xor poly
+                    } else {
+                        (cur shr 1)
+                    }
+                }
+            }.toIntArray()
 
-    private fun getCRCTableDirect(poly: Int, bits: Int): IntArray {
+    private fun getCRCTableDirect(
+        poly: Int,
+        bits: Int,
+    ): IntArray {
         val extPoly = poly or (1 shl bits)
         val mask = 1 shl (bits - 1)
-        return (0..255).map { v ->
-            (0..7).fold(v) { cur, _ ->
-                if ((cur and mask) != 0)
-                    (cur shl 1) xor extPoly
-                else
-                    (cur shl 1)
-            }
-        }.toIntArray()
+        return (0..255)
+            .map { v ->
+                (0..7).fold(v) { cur, _ ->
+                    if ((cur and mask) != 0) {
+                        (cur shl 1) xor extPoly
+                    } else {
+                        (cur shl 1)
+                    }
+                }
+            }.toIntArray()
     }
 
     // --- CRC calculation ---
 
-    private fun calculateCRCReversed(data: ByteArray, init: Int, table: IntArray) =
-        data.fold(init) { cur1, b -> (cur1 shr 8) xor table[(cur1 xor b.toInt()) and 0xff] }
+    private fun calculateCRCReversed(
+        data: ByteArray,
+        init: Int,
+        table: IntArray,
+    ) = data.fold(init) { cur1, b -> (cur1 shr 8) xor table[(cur1 xor b.toInt()) and 0xff] }
 
-    private fun calculateCRC8(data: ByteArray, init: Int, table: IntArray) =
-        data.fold(init) { cur1, b -> table[(cur1 xor b.toInt()) and 0xff] }
+    private fun calculateCRC8(
+        data: ByteArray,
+        init: Int,
+        table: IntArray,
+    ) = data.fold(init) { cur1, b -> table[(cur1 xor b.toInt()) and 0xff] }
 
-    fun calculateCRC16IBM(data: ByteArray, crc: Int = 0) =
-        calculateCRCReversed(data, crc, CRC16_IBM_TABLE)
+    fun calculateCRC16IBM(
+        data: ByteArray,
+        crc: Int = 0,
+    ) = calculateCRCReversed(data, crc, CRC16_IBM_TABLE)
 
-    fun calculateCRC8NXP(data: ByteArray, crc: Int = CRC8_NXP_INITIAL): Int =
-        calculateCRC8(data, crc, CRC8_NXP_TABLE)
+    fun calculateCRC8NXP(
+        data: ByteArray,
+        crc: Int = CRC8_NXP_INITIAL,
+    ): Int = calculateCRC8(data, crc, CRC8_NXP_TABLE)
 
     fun calculateCRC8NXP(vararg data: ByteArray): Int =
         data.fold(CRC8_NXP_INITIAL) { crc, block -> calculateCRC8NXP(block, crc) }
@@ -83,7 +99,11 @@ object HashUtils {
      * @param expectedHashes Expected hash values to match against
      * @return Index of matching hash in expectedHashes, or -1 if no match
      */
-    fun checkKeyHash(key: ByteArray, salt: String, vararg expectedHashes: String): Int {
+    fun checkKeyHash(
+        key: ByteArray,
+        salt: String,
+        vararg expectedHashes: String,
+    ): Int {
         if (expectedHashes.isEmpty()) return -1
 
         val saltBytes = salt.encodeToByteArray()
@@ -102,7 +122,12 @@ object HashUtils {
      * @param expectedHashes Expected hash values to match against
      * @return Index of matching hash, or -1 if no match
      */
-    fun checkKeyHash(keyA: ByteArray?, keyB: ByteArray?, salt: String, vararg expectedHashes: String): Int {
+    fun checkKeyHash(
+        keyA: ByteArray?,
+        keyB: ByteArray?,
+        salt: String,
+        vararg expectedHashes: String,
+    ): Int {
         if (keyA != null) {
             val a = checkKeyHash(keyA, salt, *expectedHashes)
             if (a != -1) return a

@@ -17,31 +17,31 @@ import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.last_transaction
 import farebot.farebot_transit_serialonly.generated.resources.manufacture_id
 import farebot.farebot_transit_serialonly.generated.resources.never
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 class HoloTransitInfo(
     private val mSerial: Int?,
     private val mLastTransactionTimestamp: Int,
-    private val mManufacturingId: String
+    private val mManufacturingId: String,
 ) : SerialOnlyTransitInfo() {
-
     override val extraInfo: List<ListItemInterface>
-        get() = listOf(
-            ListItem(
-                Res.string.last_transaction,
-                when (mLastTransactionTimestamp) {
-                    0 -> getStringBlocking(Res.string.never)
-                    else -> {
-                        val instant = Instant.fromEpochSeconds(mLastTransactionTimestamp.toLong())
-                        val local = instant.toLocalDateTime(TimeZone.of("Pacific/Honolulu"))
-                        "${local.date} ${local.hour}:${local.minute.toString().padStart(2, '0')}"
-                    }
-                }
-            ),
-            ListItem(Res.string.manufacture_id, mManufacturingId)
-        )
+        get() =
+            listOf(
+                ListItem(
+                    Res.string.last_transaction,
+                    when (mLastTransactionTimestamp) {
+                        0 -> getStringBlocking(Res.string.never)
+                        else -> {
+                            val instant = Instant.fromEpochSeconds(mLastTransactionTimestamp.toLong())
+                            val local = instant.toLocalDateTime(TimeZone.of("Pacific/Honolulu"))
+                            "${local.date} ${local.hour}:${local.minute.toString().padStart(2, '0')}"
+                        }
+                    },
+                ),
+                ListItem(Res.string.manufacture_id, mManufacturingId),
+            )
 
     override val reason get() = Reason.NOT_STORED
     override val cardName get() = HoloTransitFactory.NAME

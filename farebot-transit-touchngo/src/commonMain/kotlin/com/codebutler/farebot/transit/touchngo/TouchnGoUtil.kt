@@ -28,11 +28,11 @@ package com.codebutler.farebot.transit.touchngo
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.classic.DataClassicSector
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 internal const val TNG_STR = "touchngo"
 
@@ -49,7 +49,10 @@ private val TZ_KUALA_LUMPUR = TimeZone.of("Asia/Kuala_Lumpur")
  * - 4 bits: month (1-based)
  * - 5 bits: day
  */
-internal fun parseTimestamp(input: ByteArray, off: Int): Instant {
+internal fun parseTimestamp(
+    input: ByteArray,
+    off: Int,
+): Instant {
     val hour = input.getBitsFromBuffer(off * 8, 5)
     val min = input.getBitsFromBuffer(off * 8 + 5, 6)
     val sec = input.getBitsFromBuffer(off * 8 + 11, 6)
@@ -69,7 +72,10 @@ internal fun parseTimestamp(input: ByteArray, off: Int): Instant {
  * - 4 bits: month (1-based)
  * - 5 bits: day
  */
-internal fun parseDaystamp(input: ByteArray, off: Int): LocalDate {
+internal fun parseDaystamp(
+    input: ByteArray,
+    off: Int,
+): LocalDate {
     val y = input.getBitsFromBuffer(off * 8 + 1, 6) + 1990
     val month = input.getBitsFromBuffer(off * 8 + 7, 4)
     val d = input.getBitsFromBuffer(off * 8 + 11, 5)
@@ -79,6 +85,4 @@ internal fun parseDaystamp(input: ByteArray, off: Int): LocalDate {
 /**
  * Checks if a transit trip is currently in progress (tap-on without tap-off).
  */
-internal fun isTripInProgress(sector: DataClassicSector): Boolean {
-    return sector.getBlock(1).data.byteArrayToInt(2, 4) != 0
-}
+internal fun isTripInProgress(sector: DataClassicSector): Boolean = sector.getBlock(1).data.byteArrayToInt(2, 4) != 0

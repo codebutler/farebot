@@ -21,7 +21,6 @@
 
 package com.codebutler.farebot.transit
 
-import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,11 +33,11 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's TransitDataSerializedTest.kt
  */
 class TransitSerializationTest {
-
-    private val json = Json {
-        prettyPrint = true
-        ignoreUnknownKeys = true
-    }
+    private val json =
+        Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
 
     @Test
     fun testTransitCurrencySerializationRoundTrip() {
@@ -68,13 +67,14 @@ class TransitSerializationTest {
 
     @Test
     fun testStationSerializationRoundTrip() {
-        val original = Station(
-            stationNameRaw = "Powell Street",
-            companyName = "BART",
-            latitude = 37.78447f,
-            longitude = -122.40797f,
-            humanReadableId = "BART:0001"
-        )
+        val original =
+            Station(
+                stationNameRaw = "Powell Street",
+                companyName = "BART",
+                latitude = 37.78447f,
+                longitude = -122.40797f,
+                humanReadableId = "BART:0001",
+            )
 
         val jsonString = json.encodeToString(Station.serializer(), original)
         assertTrue(jsonString.contains("Powell Street"))
@@ -89,12 +89,13 @@ class TransitSerializationTest {
 
     @Test
     fun testStationWithNullCoordinates() {
-        val original = Station(
-            stationNameRaw = "Unknown Station",
-            companyName = null,
-            latitude = null,
-            longitude = null
-        )
+        val original =
+            Station(
+                stationNameRaw = "Unknown Station",
+                companyName = null,
+                latitude = null,
+                longitude = null,
+            )
 
         val jsonString = json.encodeToString(Station.serializer(), original)
         val deserialized = json.decodeFromString(Station.serializer(), jsonString)
@@ -107,10 +108,11 @@ class TransitSerializationTest {
 
     @Test
     fun testTransitBalanceSerializationRoundTrip() {
-        val original = TransitBalance(
-            balance = TransitCurrency.AUD(500),
-            name = "Main Purse"
-        )
+        val original =
+            TransitBalance(
+                balance = TransitCurrency.AUD(500),
+                name = "Main Purse",
+            )
 
         val jsonString = json.encodeToString(TransitBalance.serializer(), original)
         assertTrue(jsonString.contains("AUD"))
@@ -123,10 +125,11 @@ class TransitSerializationTest {
 
     @Test
     fun testTransitBalanceWithoutName() {
-        val original = TransitBalance(
-            balance = TransitCurrency.JPY(1000),
-            name = null
-        )
+        val original =
+            TransitBalance(
+                balance = TransitCurrency.JPY(1000),
+                name = null,
+            )
 
         val jsonString = json.encodeToString(TransitBalance.serializer(), original)
         val deserialized = json.decodeFromString(TransitBalance.serializer(), jsonString)
@@ -137,10 +140,11 @@ class TransitSerializationTest {
 
     @Test
     fun testTransitIdentitySerializationRoundTrip() {
-        val original = TransitIdentity(
-            name = "Clipper",
-            serialNumber = "572691763"
-        )
+        val original =
+            TransitIdentity(
+                name = "Clipper",
+                serialNumber = "572691763",
+            )
 
         val jsonString = json.encodeToString(TransitIdentity.serializer(), original)
         assertTrue(jsonString.contains("Clipper"))
@@ -174,13 +178,14 @@ class TransitSerializationTest {
 
     @Test
     fun testMultipleCurrenciesInSerialization() {
-        val currencies = listOf(
-            TransitCurrency.USD(100),
-            TransitCurrency.AUD(200),
-            TransitCurrency.EUR(300),
-            TransitCurrency.JPY(1000),
-            TransitCurrency.GBP(500)
-        )
+        val currencies =
+            listOf(
+                TransitCurrency.USD(100),
+                TransitCurrency.AUD(200),
+                TransitCurrency.EUR(300),
+                TransitCurrency.JPY(1000),
+                TransitCurrency.GBP(500),
+            )
 
         for (original in currencies) {
             val jsonString = json.encodeToString(TransitCurrency.serializer(), original)
@@ -201,12 +206,13 @@ class TransitSerializationTest {
 
     @Test
     fun testStationNameWithSpecialCharacters() {
-        val original = Station(
-            stationNameRaw = "San Jos\u00e9 Diridon", // é
-            companyName = "Caltrain",
-            latitude = 37.3298f,
-            longitude = -121.9027f
-        )
+        val original =
+            Station(
+                stationNameRaw = "San Jos\u00e9 Diridon", // é
+                companyName = "Caltrain",
+                latitude = 37.3298f,
+                longitude = -121.9027f,
+            )
 
         val jsonString = json.encodeToString(Station.serializer(), original)
         val deserialized = json.decodeFromString(Station.serializer(), jsonString)

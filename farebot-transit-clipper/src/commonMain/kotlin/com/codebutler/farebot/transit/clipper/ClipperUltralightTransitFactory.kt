@@ -31,7 +31,6 @@ import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
-import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_clipper.generated.resources.Res
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_adult
@@ -41,12 +40,9 @@ import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_y
 import farebot.farebot_transit_clipper.generated.resources.clipper_ul_card_name
 
 class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
-    override fun check(card: UltralightCard): Boolean {
-        return card.getPage(4).data[0].toInt() == 0x13
-    }
+    override fun check(card: UltralightCard): Boolean = card.getPage(4).data[0].toInt() == 0x13
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
         val cardName = getStringBlocking(Res.string.clipper_ul_card_name)
@@ -57,9 +53,12 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
         val page1 = card.getPage(5).data
         val baseDate = byteArrayToInt(page1, 2, 2)
 
-        val rawTrips = listOf(6, 11).map { offset ->
-            card.readPages(offset, 5)
-        }.filter { !isAllZero(it) }.map { ClipperUltralightTrip(it, baseDate) }
+        val rawTrips =
+            listOf(6, 11)
+                .map { offset ->
+                    card.readPages(offset, 5)
+                }.filter { !isAllZero(it) }
+                .map { ClipperUltralightTrip(it, baseDate) }
 
         var trLast: ClipperUltralightTrip? = null
         for (tr in rawTrips) {
@@ -68,12 +67,13 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
             }
         }
 
-        val subscription = ClipperUltralightSubscription(
-            product = byteArrayToInt(page1, 0, 2),
-            tripsRemaining = trLast?.tripsRemaining ?: -1,
-            transferExpiry = trLast?.transferExpiryTime ?: 0,
-            baseDate = baseDate
-        )
+        val subscription =
+            ClipperUltralightSubscription(
+                product = byteArrayToInt(page1, 0, 2),
+                tripsRemaining = trLast?.tripsRemaining ?: -1,
+                transferExpiry = trLast?.transferExpiryTime ?: 0,
+                baseDate = baseDate,
+            )
 
         val type = card.getPage(4).data[1].toInt() and 0xff
 
@@ -82,7 +82,7 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
             trips = rawTrips.filter { !it.isHidden },
             subscription = subscription,
             ticketType = type,
-            baseDate = baseDate
+            baseDate = baseDate,
         )
     }
 
@@ -91,7 +91,11 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
         return byteArrayToLong(otp, 0, 4)
     }
 
-    private fun byteArrayToInt(data: ByteArray, offset: Int, length: Int): Int {
+    private fun byteArrayToInt(
+        data: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         var result = 0
         for (i in 0 until length) {
             result = result shl 8
@@ -100,7 +104,11 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
         return result
     }
 
-    private fun byteArrayToLong(data: ByteArray, offset: Int, length: Int): Long {
+    private fun byteArrayToLong(
+        data: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Long {
         var result = 0L
         for (i in 0 until length) {
             result = result shl 8
@@ -117,9 +125,8 @@ class ClipperUltralightTransitInfo(
     override val trips: List<ClipperUltralightTrip>,
     private val subscription: ClipperUltralightSubscription,
     private val ticketType: Int,
-    private val baseDate: Int
+    private val baseDate: Int,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.clipper_ul_card_name)
 
@@ -128,13 +135,14 @@ class ClipperUltralightTransitInfo(
     override val subscriptions: List<Subscription> = listOf(subscription)
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            when (ticketType) {
-                0x04 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_adult)
-                0x44 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_senior)
-                0x84 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_rtc)
-                0xc4 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_youth)
-                else -> ListItem(Res.string.clipper_ticket_type, ticketType.toString(16))
-            }
-        )
+        get() =
+            listOf(
+                when (ticketType) {
+                    0x04 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_adult)
+                    0x44 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_senior)
+                    0x84 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_rtc)
+                    0xc4 -> ListItem(Res.string.clipper_ticket_type, Res.string.clipper_ticket_type_youth)
+                    else -> ListItem(Res.string.clipper_ticket_type, ticketType.toString(16))
+                },
+            )
 }

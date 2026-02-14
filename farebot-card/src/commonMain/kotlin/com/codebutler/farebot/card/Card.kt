@@ -27,7 +27,6 @@ import com.codebutler.farebot.base.util.StringResource
 import kotlin.time.Instant
 
 abstract class Card {
-
     abstract val cardType: CardType
 
     abstract val tagId: ByteArray
@@ -35,5 +34,4 @@ abstract class Card {
     abstract val scannedAt: Instant
 
     abstract fun getAdvancedUi(stringResource: StringResource): FareBotUiTree
-
 }

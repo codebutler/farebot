@@ -24,11 +24,11 @@
 package com.codebutler.farebot.transit.tmoney
 
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfo
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfoResolver
-import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -51,21 +51,21 @@ open class TMoneyTransitInfo protected constructor(
     protected val mBalance: Int,
     protected val mPurseInfo: KSX6924PurseInfo?,
     private val mTrips: List<TMoneyTrip>,
-    private val mSerialNumber: String?
+    private val mSerialNumber: String?,
 ) : TransitInfo() {
-
     override val serialNumber: String?
         get() = mPurseInfo?.serial ?: mSerialNumber
 
     override val balance: TransitBalance?
-        get() = mPurseInfo?.buildTransitBalance(
-            balance = TransitCurrency.KRW(mBalance),
-            tz = TZ
-        ) ?: if (mBalance != 0) {
-            TransitBalance(TransitCurrency.KRW(mBalance))
-        } else {
-            null
-        }
+        get() =
+            mPurseInfo?.buildTransitBalance(
+                balance = TransitCurrency.KRW(mBalance),
+                tz = TZ,
+            ) ?: if (mBalance != 0) {
+                TransitBalance(TransitCurrency.KRW(mBalance))
+            } else {
+                null
+            }
 
     override val cardName: String
         get() = getCardName()
@@ -96,28 +96,29 @@ open class TMoneyTransitInfo protected constructor(
 
             val balance = card.balance.byteArrayToInt()
 
-            val trips = card.transactionRecords?.mapNotNull { record ->
-                TMoneyTrip.parseTrip(record)
-            }.orEmpty()
+            val trips =
+                card.transactionRecords
+                    ?.mapNotNull { record ->
+                        TMoneyTrip.parseTrip(record)
+                    }.orEmpty()
 
             return TMoneyTransitInfo(
                 mBalance = balance,
                 mPurseInfo = purseInfo,
                 mTrips = trips,
-                mSerialNumber = null
+                mSerialNumber = null,
             )
         }
 
         /**
          * Creates an empty [TMoneyTransitInfo] for when full card data is not available.
          */
-        fun createEmpty(serialNumber: String? = null): TMoneyTransitInfo {
-            return TMoneyTransitInfo(
+        fun createEmpty(serialNumber: String? = null): TMoneyTransitInfo =
+            TMoneyTransitInfo(
                 mBalance = 0,
                 mPurseInfo = null,
                 mTrips = emptyList(),
-                mSerialNumber = serialNumber
+                mSerialNumber = serialNumber,
             )
-        }
     }
 }

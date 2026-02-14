@@ -26,7 +26,6 @@ package com.codebutler.farebot.card.classic.key
  * They enable reading cards from common transit systems out of the box.
  */
 object ClassicStaticKeys {
-
     /** Factory default key (all 0xFF) */
     val KEY_DEFAULT = hexToBytes("FFFFFFFFFFFF")
 
@@ -43,12 +42,13 @@ object ClassicStaticKeys {
      * Returns a list of well-known keys to try when authenticating a sector.
      * These are tried in addition to any user-provided keys.
      */
-    fun getWellKnownKeys(): List<ByteArray> = listOf(
-        KEY_DEFAULT,
-        KEY_ZERO,
-        KEY_MAD,
-        KEY_NFC_FORUM
-    )
+    fun getWellKnownKeys(): List<ByteArray> =
+        listOf(
+            KEY_DEFAULT,
+            KEY_ZERO,
+            KEY_MAD,
+            KEY_NFC_FORUM,
+        )
 
     /**
      * Creates a ClassicCardKeys with default keys for all sectors.
@@ -57,12 +57,13 @@ object ClassicStaticKeys {
      * @param sectorCount Number of sectors on the card (typically 16 for 1K, 40 for 4K)
      */
     fun defaultKeysForSectorCount(sectorCount: Int): ClassicCardKeys {
-        val keys = (0 until sectorCount).map {
-            ClassicSectorKey.create(KEY_DEFAULT, KEY_DEFAULT)
-        }
+        val keys =
+            (0 until sectorCount).map {
+                ClassicSectorKey.create(KEY_DEFAULT, KEY_DEFAULT)
+            }
         return ClassicCardKeys(
             cardType = com.codebutler.farebot.card.CardType.MifareClassic,
-            keys = keys
+            keys = keys,
         )
     }
 

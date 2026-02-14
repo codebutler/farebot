@@ -22,8 +22,6 @@
 
 package com.codebutler.farebot.card.desfire.raw
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.card.desfire.DesfireFileSettings
 import com.codebutler.farebot.card.desfire.DesfireFileSettings.Companion.BACKUP_DATA_FILE
@@ -34,10 +32,12 @@ import com.codebutler.farebot.card.desfire.DesfireFileSettings.Companion.VALUE_F
 import com.codebutler.farebot.card.desfire.RecordDesfireFileSettings
 import com.codebutler.farebot.card.desfire.StandardDesfireFileSettings
 import com.codebutler.farebot.card.desfire.ValueDesfireFileSettings
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class RawDesfireFileSettings(
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
     fun fileType(): Byte = data[0]
 
@@ -69,7 +69,7 @@ data class RawDesfireFileSettings(
         commSetting: Byte,
         accessRights: ByteArray,
         bytes: ByteArray,
-        startOffset: Int
+        startOffset: Int,
     ): StandardDesfireFileSettings {
         val buf = ByteArray(3)
         bytes.copyInto(buf, 0, startOffset, startOffset + buf.size)
@@ -83,7 +83,7 @@ data class RawDesfireFileSettings(
         commSetting: Byte,
         accessRights: ByteArray,
         bytes: ByteArray,
-        startOffset: Int
+        startOffset: Int,
     ): RecordDesfireFileSettings {
         var offset = startOffset
         var buf = ByteArray(3)
@@ -109,7 +109,7 @@ data class RawDesfireFileSettings(
             accessRights,
             recordSize,
             maxRecords,
-            curRecords
+            curRecords,
         )
     }
 
@@ -118,7 +118,7 @@ data class RawDesfireFileSettings(
         commSetting: Byte,
         accessRights: ByteArray,
         bytes: ByteArray,
-        startOffset: Int
+        startOffset: Int,
     ): ValueDesfireFileSettings {
         var offset = startOffset
         var buf = ByteArray(4)
@@ -148,12 +148,11 @@ data class RawDesfireFileSettings(
             lowerLimit,
             upperLimit,
             limitedCreditValue,
-            limitedCreditEnabled
+            limitedCreditEnabled,
         )
     }
 
     companion object {
-        fun create(data: ByteArray): RawDesfireFileSettings =
-            RawDesfireFileSettings(data)
+        fun create(data: ByteArray): RawDesfireFileSettings = RawDesfireFileSettings(data)
     }
 }

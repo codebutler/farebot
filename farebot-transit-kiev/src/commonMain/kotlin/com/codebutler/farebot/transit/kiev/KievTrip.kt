@@ -30,19 +30,18 @@ import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_kiev.generated.resources.Res
 import farebot.farebot_transit_kiev.generated.resources.kiev_agency_metro
 import farebot.farebot_transit_kiev.generated.resources.kiev_agency_unknown
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class KievTrip(
     override val startTimestamp: Instant?,
     private val mTransactionType: String?,
     private val mCounter1: Int,
     private val mCounter2: Int,
-    private val mValidator: Int
+    private val mValidator: Int,
 ) : Trip() {
-
     override val startStation: Station?
         get() = Station.unknown(mValidator.toString())
 
@@ -53,23 +52,26 @@ class KievTrip(
         get() = if (mTransactionType == "84/04/40/53") Mode.METRO else Mode.OTHER
 
     override val agencyName: String?
-        get() = when {
-            mTransactionType == "84/04/40/53" -> getStringBlocking(Res.string.kiev_agency_metro)
-            mTransactionType != null -> getStringBlocking(Res.string.kiev_agency_unknown, mTransactionType)
-            else -> null
-        }
+        get() =
+            when {
+                mTransactionType == "84/04/40/53" -> getStringBlocking(Res.string.kiev_agency_metro)
+                mTransactionType != null -> getStringBlocking(Res.string.kiev_agency_unknown, mTransactionType)
+                else -> null
+            }
 
     constructor(data: ByteArray) : this(
         startTimestamp = parseTimestamp(data),
         // This is a shameless plug. We have no idea which field
         // means what. But metro transport is always 84/04/40/53
-        mTransactionType = (data.getHexString(0, 1)
-            + "/" + data.getHexString(6, 1)
-            + "/" + data.getHexString(8, 1)
-            + "/" + data.getBitsFromBuffer(88, 10).toString(16)),
+        mTransactionType = (
+            data.getHexString(0, 1) +
+                "/" + data.getHexString(6, 1) +
+                "/" + data.getHexString(8, 1) +
+                "/" + data.getBitsFromBuffer(88, 10).toString(16)
+        ),
         mValidator = data.getBitsFromBuffer(56, 8),
         mCounter1 = data.getBitsFromBuffer(72, 16),
-        mCounter2 = data.getBitsFromBuffer(98, 16)
+        mCounter2 = data.getBitsFromBuffer(98, 16),
     )
 
     companion object {

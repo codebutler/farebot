@@ -28,21 +28,21 @@ import farebot.farebot_transit_calypso.generated.resources.*
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 internal object IntercodeLookupPassPass : IntercodeLookupSTR("passpass"), IntercodeLookupSingle {
-
     override val cardName: String = getStringBlocking(Res.string.card_name_passpass)
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        24577 to Res.string.ilevia_trajet_unitaire,
-        24578 to Res.string.ilevia_trajet_unitaire_x10,
-        25738 to Res.string.ilevia_mensuel,
-        25743 to Res.string.ilevia_10mois
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            24577 to Res.string.ilevia_trajet_unitaire,
+            24578 to Res.string.ilevia_trajet_unitaire_x10,
+            25738 to Res.string.ilevia_mensuel,
+            25743 to Res.string.ilevia_10mois,
+        )
 
     override fun getRouteName(
         routeNumber: Int?,
         routeVariant: Int?,
         agency: Int?,
-        transport: Int?
+        transport: Int?,
     ): String? {
         if (agency == ILEVIA && routeNumber != null) {
             val reader = MdstStationTableReader.getReader("passpass")

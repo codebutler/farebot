@@ -24,16 +24,15 @@
 package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_locked
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_more_research
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_not_stored
-import com.codebutler.farebot.base.util.getStringBlocking
 
 abstract class SerialOnlyTransitInfo : TransitInfo() {
-
     protected open val extraInfo: List<ListItemInterface>?
         get() = null
 
@@ -43,12 +42,13 @@ abstract class SerialOnlyTransitInfo : TransitInfo() {
         get() = extraInfo
 
     override val emptyStateMessage: String
-        get() = when (reason) {
-            Reason.NOT_STORED -> getStringBlocking(Res.string.serial_only_card_description_not_stored)
-            Reason.LOCKED -> getStringBlocking(Res.string.serial_only_card_description_locked)
-            Reason.MORE_RESEARCH_NEEDED -> getStringBlocking(Res.string.serial_only_card_description_more_research)
-            else -> getStringBlocking(Res.string.serial_only_card_description_more_research)
-        }
+        get() =
+            when (reason) {
+                Reason.NOT_STORED -> getStringBlocking(Res.string.serial_only_card_description_not_stored)
+                Reason.LOCKED -> getStringBlocking(Res.string.serial_only_card_description_locked)
+                Reason.MORE_RESEARCH_NEEDED -> getStringBlocking(Res.string.serial_only_card_description_more_research)
+                else -> getStringBlocking(Res.string.serial_only_card_description_more_research)
+            }
 
     override val trips: List<Trip>? get() = null
 
@@ -56,6 +56,6 @@ abstract class SerialOnlyTransitInfo : TransitInfo() {
         UNSPECIFIED,
         NOT_STORED,
         LOCKED,
-        MORE_RESEARCH_NEEDED
+        MORE_RESEARCH_NEEDED,
     }
 }

@@ -45,9 +45,8 @@ import farebot.farebot_transit_gautrain.generated.resources.*
  * with EN1545 field encoding for transactions and subscriptions.
  */
 class GautrainTransitFactory(
-    private val stringResource: StringResource = DefaultStringResource()
+    private val stringResource: StringResource = DefaultStringResource(),
 ) : TransitFactory<ClassicCard, GautrainTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -62,7 +61,7 @@ class GautrainTransitFactory(
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(
             getStringBlocking(Res.string.gautrain_card_name),
-            GautrainTransitInfo.formatSerial(getSerial(card))
+            GautrainTransitInfo.formatSerial(getSerial(card)),
         )
 
     override fun parseInfo(card: ClassicCard): GautrainTransitInfo {
@@ -73,34 +72,37 @@ class GautrainTransitFactory(
         val index = GautrainIndex.parse(indexData)
 
         // Parse transactions from sectors 35-38 (7 transactions per sector, 2 blocks each)
-        val transactions = (35..38).flatMap { sectorIdx ->
-            val sector = card.getSector(sectorIdx) as? DataClassicSector ?: return@flatMap emptyList()
-            (0..12 step 2).mapNotNull { block ->
-                val data = sector.readBlocks(block, 2)
-                GautrainTransaction.parse(data)
+        val transactions =
+            (35..38).flatMap { sectorIdx ->
+                val sector = card.getSector(sectorIdx) as? DataClassicSector ?: return@flatMap emptyList()
+                (0..12 step 2).mapNotNull { block ->
+                    val data = sector.readBlocks(block, 2)
+                    GautrainTransaction.parse(data)
+                }
             }
-        }
         val trips = TransactionTripLastPrice.merge(transactions)
 
         // Parse subscriptions using OVChip index
         val subIndexData = sector39.readBlocks(if (index.recentSubscriptionSlot) 3 else 1, 2)
         val subCount = subIndexData.getBitsFromBuffer(0, 4)
-        val subscriptions = (0 until subCount).map { i ->
-            val bits = subIndexData.getBitsFromBuffer(4 + i * 21, 21)
-            val type1 = NumberUtils.getBitsFromInteger(bits, 13, 8)
-            val used = NumberUtils.getBitsFromInteger(bits, 6, 1)
-            val subscriptionIndexId = NumberUtils.getBitsFromInteger(bits, 0, 4)
-            val subscriptionAddress = index.subscriptionIndex[subscriptionIndexId - 1]
-            val subSector = card.getSector(32 + subscriptionAddress / 5) as DataClassicSector
-            val subData = subSector.readBlocks(subscriptionAddress % 5 * 3, 3)
-            GautrainSubscription.parse(subData, stringResource, type1, used)
-        }
+        val subscriptions =
+            (0 until subCount).map { i ->
+                val bits = subIndexData.getBitsFromBuffer(4 + i * 21, 21)
+                val type1 = NumberUtils.getBitsFromInteger(bits, 13, 8)
+                val used = NumberUtils.getBitsFromInteger(bits, 6, 1)
+                val subscriptionIndexId = NumberUtils.getBitsFromInteger(bits, 0, 4)
+                val subscriptionAddress = index.subscriptionIndex[subscriptionIndexId - 1]
+                val subSector = card.getSector(32 + subscriptionAddress / 5) as DataClassicSector
+                val subData = subSector.readBlocks(subscriptionAddress % 5 * 3, 3)
+                GautrainSubscription.parse(subData, stringResource, type1, used)
+            }
 
         // Parse balance blocks from sector 39 blocks 9-10
-        val balances = listOf(
-            sector39.getBlock(9).data,
-            sector39.getBlock(10).data
-        ).map { GautrainBalanceBlock.parse(it) }
+        val balances =
+            listOf(
+                sector39.getBlock(9).data,
+                sector39.getBlock(10).data,
+            ).map { GautrainBalanceBlock.parse(it) }
 
         // Parse expiry date from sector 0 block 1
         val expdate = (card.getSector(0) as DataClassicSector).getBlock(1).data.getBitsFromBuffer(88, 20)
@@ -110,28 +112,38 @@ class GautrainTransitFactory(
             trips = trips,
             subscriptions = subscriptions,
             expdate = expdate,
-            mBalanceBlocks = balances
+            mBalanceBlocks = balances,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.gautrain_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.SOUTH_AFRICA,
-            locationRes = Res.string.transit_gautrain_location,
-            imageRes = Res.drawable.gautrain,
-            latitude = -26.2041f,
-            longitude = 28.0473f,
-            brandColor = 0xA2813C,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.gautrain_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.SOUTH_AFRICA,
+                locationRes = Res.string.transit_gautrain_location,
+                imageRes = Res.drawable.gautrain,
+                latitude = -26.2041f,
+                longitude = 28.0473f,
+                brandColor = 0xA2813C,
+                credits = listOf("Metrodroid Project"),
+            )
 
-        private val MAGIC_HEADER = byteArrayOf(
-            0xb1.toByte(), 0x80.toByte(), 0x00, 0x00, 0x06,
-            0xb5.toByte(), 0x5c, 0x00, 0x13,
-            0xae.toByte(), 0xe4.toByte()
-        )
+        private val MAGIC_HEADER =
+            byteArrayOf(
+                0xb1.toByte(),
+                0x80.toByte(),
+                0x00,
+                0x00,
+                0x06,
+                0xb5.toByte(),
+                0x5c,
+                0x00,
+                0x13,
+                0xae.toByte(),
+                0xe4.toByte(),
+            )
 
         private fun getSerial(card: ClassicCard): Long =
             (card.getSector(0) as DataClassicSector).getBlock(0).data.byteArrayToLong(0, 4)

@@ -28,10 +28,18 @@ package com.codebutler.farebot.transit.en1545
  * A repeated field consists of a counter (fixed integer) containing the number of repetitions,
  * followed by the field values.
  */
-class En1545Repeat(private val ctrLen: Int, private val field: En1545Field) : En1545Field {
-
+class En1545Repeat(
+    private val ctrLen: Int,
+    private val field: En1545Field,
+) : En1545Field {
     @Suppress("NAME_SHADOWING")
-    override fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int {
+    override fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int {
         var off = off
         val ctr: Int
         try {
@@ -41,8 +49,9 @@ class En1545Repeat(private val ctrLen: Int, private val field: En1545Field) : En
         }
 
         off += ctrLen
-        for (i in 0 until ctr)
+        for (i in 0 until ctr) {
             off = field.parseField(b, off, "$path/$i", holder, bitParser)
+        }
         return off
     }
 }

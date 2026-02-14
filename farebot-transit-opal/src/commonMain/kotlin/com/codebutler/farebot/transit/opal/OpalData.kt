@@ -30,7 +30,6 @@ import farebot.farebot_transit_opal.generated.resources.*
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 object OpalData {
-
     // Opal travel modes
     const val MODE_RAIL = 0x00
     private const val MODE_FERRY_LR = 0x01 // Ferry and Light Rail
@@ -51,34 +50,42 @@ object OpalData {
     private const val ACTION_TAP_ON_REVERSAL = 0x0b
     private const val ACTION_TAP_ON_REJECTED = 0x0c
 
-    private val MODES: Map<Int, ComposeStringResource> = mapOf(
-        MODE_RAIL to Res.string.opal_vehicle_rail,
-        MODE_FERRY_LR to Res.string.opal_vehicle_ferry_lr,
-        MODE_BUS to Res.string.opal_vehicle_bus
-    )
+    private val MODES: Map<Int, ComposeStringResource> =
+        mapOf(
+            MODE_RAIL to Res.string.opal_vehicle_rail,
+            MODE_FERRY_LR to Res.string.opal_vehicle_ferry_lr,
+            MODE_BUS to Res.string.opal_vehicle_bus,
+        )
 
-    private val ACTIONS: Map<Int, ComposeStringResource> = mapOf(
-        ACTION_NONE to Res.string.opal_action_none,
-        ACTION_NEW_JOURNEY to Res.string.opal_action_new_journey,
-        ACTION_TRANSFER_SAME_MODE to Res.string.opal_action_transfer_same_mode,
-        ACTION_TRANSFER_DIFF_MODE to Res.string.opal_action_transfer_diff_mode,
-        ACTION_MANLY_NEW_JOURNEY to Res.string.opal_action_manly_new_journey,
-        ACTION_MANLY_TRANSFER_SAME_MODE to Res.string.opal_action_manly_transfer_same_mode,
-        ACTION_MANLY_TRANSFER_DIFF_MODE to Res.string.opal_action_manly_transfer_diff_mode,
-        ACTION_JOURNEY_COMPLETED_DISTANCE to Res.string.opal_action_journey_completed_distance,
-        ACTION_JOURNEY_COMPLETED_FLAT_RATE to Res.string.opal_action_journey_completed_flat_rate,
-        ACTION_JOURNEY_COMPLETED_AUTO_OFF to Res.string.opal_action_journey_completed_auto_off,
-        ACTION_JOURNEY_COMPLETED_AUTO_ON to Res.string.opal_action_journey_completed_auto_on,
-        ACTION_TAP_ON_REVERSAL to Res.string.opal_action_tap_on_reversal,
-        ACTION_TAP_ON_REJECTED to Res.string.opal_action_tap_on_rejected
-    )
+    private val ACTIONS: Map<Int, ComposeStringResource> =
+        mapOf(
+            ACTION_NONE to Res.string.opal_action_none,
+            ACTION_NEW_JOURNEY to Res.string.opal_action_new_journey,
+            ACTION_TRANSFER_SAME_MODE to Res.string.opal_action_transfer_same_mode,
+            ACTION_TRANSFER_DIFF_MODE to Res.string.opal_action_transfer_diff_mode,
+            ACTION_MANLY_NEW_JOURNEY to Res.string.opal_action_manly_new_journey,
+            ACTION_MANLY_TRANSFER_SAME_MODE to Res.string.opal_action_manly_transfer_same_mode,
+            ACTION_MANLY_TRANSFER_DIFF_MODE to Res.string.opal_action_manly_transfer_diff_mode,
+            ACTION_JOURNEY_COMPLETED_DISTANCE to Res.string.opal_action_journey_completed_distance,
+            ACTION_JOURNEY_COMPLETED_FLAT_RATE to Res.string.opal_action_journey_completed_flat_rate,
+            ACTION_JOURNEY_COMPLETED_AUTO_OFF to Res.string.opal_action_journey_completed_auto_off,
+            ACTION_JOURNEY_COMPLETED_AUTO_ON to Res.string.opal_action_journey_completed_auto_on,
+            ACTION_TAP_ON_REVERSAL to Res.string.opal_action_tap_on_reversal,
+            ACTION_TAP_ON_REJECTED to Res.string.opal_action_tap_on_rejected,
+        )
 
-    fun getLocalisedMode(stringResource: StringResource, mode: Int): String {
+    fun getLocalisedMode(
+        stringResource: StringResource,
+        mode: Int,
+    ): String {
         MODES[mode]?.let { return stringResource.getString(it) }
         return stringResource.getString(Res.string.opal_unknown_format, "0x${mode.toString(16)}")
     }
 
-    fun getLocalisedAction(stringResource: StringResource, action: Int): String {
+    fun getLocalisedAction(
+        stringResource: StringResource,
+        action: Int,
+    ): String {
         ACTIONS[action]?.let { return stringResource.getString(it) }
         return stringResource.getString(Res.string.opal_unknown_format, "0x${action.toString(16)}")
     }

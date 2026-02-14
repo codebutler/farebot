@@ -38,21 +38,21 @@ import farebot.farebot_transit_metroq.generated.resources.*
 import kotlinx.datetime.LocalDate
 
 class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
-
     companion object {
         private const val METRO_Q_ID = 0x5420
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.metroq_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.QATAR,
-            locationRes = Res.string.metroq_location,
-            imageRes = Res.drawable.metroq,
-            latitude = 25.2854f,
-            longitude = 51.5310f,
-            brandColor = 0xFC4337,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.metroq_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.QATAR,
+                locationRes = Res.string.metroq_location,
+                imageRes = Res.drawable.metroq,
+                latitude = 25.2854f,
+                longitude = 51.5310f,
+                brandColor = 0xFC4337,
+                credits = listOf("Metrodroid Project"),
+            )
     }
 
     override val allCards: List<CardInfo>
@@ -78,7 +78,7 @@ class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
         val cardName = getStringBlocking(Res.string.metroq_card_name)
         return TransitIdentity.create(
             cardName,
-            NumberUtils.zeroPad(serial, 8)
+            NumberUtils.zeroPad(serial, 8),
         )
     }
 
@@ -86,13 +86,14 @@ class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
         val balanceSector = card.getSector(8) as DataClassicSector
         val balanceBlock0 = balanceSector.getBlock(0)
         val balanceBlock1 = balanceSector.getBlock(1)
-        val balanceBlock = if (balanceBlock0.data.getBitsFromBuffer(93, 8) >
-            balanceBlock1.data.getBitsFromBuffer(93, 8)
-        ) {
-            balanceBlock0
-        } else {
-            balanceBlock1
-        }
+        val balanceBlock =
+            if (balanceBlock0.data.getBitsFromBuffer(93, 8) >
+                balanceBlock1.data.getBitsFromBuffer(93, 8)
+            ) {
+                balanceBlock0
+            } else {
+                balanceBlock1
+            }
 
         val sector1Block0 = (card.getSector(1) as DataClassicSector).getBlock(0).data
 
@@ -101,18 +102,20 @@ class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
             balanceValue = balanceBlock.data.getBitsFromBuffer(77, 16),
             product = balanceBlock.data.getBitsFromBuffer(8, 12),
             expiryDate = parseTimestamp(sector1Block0, 0),
-            date1 = parseTimestamp(sector1Block0, 24)
+            date1 = parseTimestamp(sector1Block0, 24),
         )
     }
 
-    private fun parseTimestamp(data: ByteArray, off: Int): LocalDate {
+    private fun parseTimestamp(
+        data: ByteArray,
+        off: Int,
+    ): LocalDate {
         val year = data.getBitsFromBuffer(off, 8) + 2000
         val month = data.getBitsFromBuffer(off + 8, 4)
         val day = data.getBitsFromBuffer(off + 12, 5)
         return LocalDate(year, month, day)
     }
 
-    private fun getSerial(card: ClassicCard): Long {
-        return (card.getSector(1) as DataClassicSector).getBlock(2).data.byteArrayToLong(0, 4)
-    }
+    private fun getSerial(card: ClassicCard): Long =
+        (card.getSector(1) as DataClassicSector).getBlock(2).data.byteArrayToLong(0, 4)
 }

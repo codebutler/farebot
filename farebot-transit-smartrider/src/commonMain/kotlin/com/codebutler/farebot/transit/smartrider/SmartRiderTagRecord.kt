@@ -23,19 +23,19 @@
 package com.codebutler.farebot.transit.smartrider
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
+import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.isASCII
 import com.codebutler.farebot.base.util.readASCII
-import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_smartrider.generated.resources.*
-import com.codebutler.farebot.base.util.StringResource
 import kotlin.time.Instant
 
 /**
@@ -53,7 +53,6 @@ class SmartRiderTagRecord(
     private val mZone: Int = 0,
     private val stringResource: StringResource,
 ) : Transaction() {
-
     val isValid: Boolean
         get() = mTimestamp != 0L
 
@@ -70,27 +69,31 @@ class SmartRiderTagRecord(
         get() = listOf(mRoute)
 
     override val station: Station?
-        get() = when {
-            mStopId == 0 -> null
-            mSmartRiderType == SmartRiderType.SMARTRIDER && mode == Trip.Mode.TRAIN ->
-                lookupMdstStation(SMARTRIDER_STR, mStopId)
-            // TODO: Handle other modes of transit. Stops there are a combination of the
-            // route + Stop (ie: route A stop 3 != route B stop 3)
-            else -> Station.unknown(mStopId.toString())
-        }
+        get() =
+            when {
+                mStopId == 0 -> null
+                mSmartRiderType == SmartRiderType.SMARTRIDER && mode == Trip.Mode.TRAIN ->
+                    lookupMdstStation(SMARTRIDER_STR, mStopId)
+                // TODO: Handle other modes of transit. Stops there are a combination of the
+                // route + Stop (ie: route A stop 3 != route B stop 3)
+                else -> Station.unknown(mStopId.toString())
+            }
 
     override fun shouldBeMerged(other: Transaction): Boolean =
         // Are the two trips within 90 minutes of each other (sanity check)
-        (other is SmartRiderTagRecord
-            && other.mTimestamp - mTimestamp <= 5400
-            && super.shouldBeMerged(other))
+        (
+            other is SmartRiderTagRecord &&
+                other.mTimestamp - mTimestamp <= 5400 &&
+                super.shouldBeMerged(other)
+        )
 
     override val agencyName: String?
-        get() = when (mSmartRiderType) {
-            SmartRiderType.MYWAY -> stringResource.getString(Res.string.agency_name_action)
-            SmartRiderType.SMARTRIDER -> stringResource.getString(Res.string.agency_name_transperth)
-            else -> stringResource.getString(Res.string.unknown)
-        }
+        get() =
+            when (mSmartRiderType) {
+                SmartRiderType.MYWAY -> stringResource.getString(Res.string.agency_name_action)
+                SmartRiderType.SMARTRIDER -> stringResource.getString(Res.string.agency_name_transperth)
+                else -> stringResource.getString(Res.string.unknown)
+            }
 
     override fun isSameTrip(other: Transaction): Boolean =
         // SmartRider only ever records route names.
@@ -103,15 +106,26 @@ class SmartRiderTagRecord(
     fun enrichWithRecentData(other: SmartRiderTagRecord): SmartRiderTagRecord {
         require(other.mTimestamp == mTimestamp) { "trip timestamps must be equal" }
         return SmartRiderTagRecord(
-            mTimestamp = mTimestamp, isTapOn = isTapOn, mSmartRiderType = mSmartRiderType,
-            cost = cost, mRoute = mRoute, mode = mode, isTransfer = isTransfer,
-            mZone = other.mZone, mStopId = other.mStopId, stringResource = stringResource
+            mTimestamp = mTimestamp,
+            isTapOn = isTapOn,
+            mSmartRiderType = mSmartRiderType,
+            cost = cost,
+            mRoute = mRoute,
+            mode = mode,
+            isTransfer = isTransfer,
+            mZone = other.mZone,
+            mStopId = other.mStopId,
+            stringResource = stringResource,
         )
     }
 
-    private fun lookupMdstStation(dbName: String, stationId: Int): Station? {
+    private fun lookupMdstStation(
+        dbName: String,
+        stationId: Int,
+    ): Station? {
         val result = MdstStationLookup.getStation(dbName, stationId) ?: return null
-        return Station.Builder()
+        return Station
+            .Builder()
             .stationName(result.stationName)
             .shortStationName(result.shortStationName)
             .companyName(result.companyName)
@@ -125,8 +139,9 @@ class SmartRiderTagRecord(
         private fun routeName(input: ByteArray): String {
             val cleaned = input.filter { it != 0.toByte() }.toByteArray()
             try {
-                if (cleaned.isASCII())
+                if (cleaned.isASCII()) {
                     return cleaned.readASCII()
+                }
             } catch (_: Exception) {
             }
             return cleaned.hex()
@@ -176,9 +191,16 @@ class SmartRiderTagRecord(
             // 13 unknown
 
             return SmartRiderTagRecord(
-                mTimestamp = timestamp, isTapOn = false, mSmartRiderType = smartRiderType,
-                cost = 0, mRoute = route, mStopId = stopId, mZone = zone, mode = Trip.Mode.OTHER,
-                isTransfer = false, stringResource = stringResource
+                mTimestamp = timestamp,
+                isTapOn = false,
+                mSmartRiderType = smartRiderType,
+                cost = 0,
+                mRoute = route,
+                mStopId = stopId,
+                mZone = zone,
+                mode = Trip.Mode.OTHER,
+                isTransfer = false,
+                stringResource = stringResource,
             )
         }
     }

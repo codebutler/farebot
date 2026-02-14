@@ -15,12 +15,12 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,13 +37,13 @@ import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.card.CardType
 import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.add_key
+import farebot.farebot_app.generated.resources.back
 import farebot.farebot_app.generated.resources.card_id
 import farebot.farebot_app.generated.resources.card_type
-import farebot.farebot_app.generated.resources.key_data
-import farebot.farebot_app.generated.resources.back
 import farebot.farebot_app.generated.resources.enter_manually
 import farebot.farebot_app.generated.resources.hold_nfc_card
 import farebot.farebot_app.generated.resources.import_file_button
+import farebot.farebot_app.generated.resources.key_data
 import farebot.farebot_app.generated.resources.nfc
 import farebot.farebot_app.generated.resources.tap_your_card
 import org.jetbrains.compose.resources.stringResource
@@ -78,14 +78,15 @@ fun AddKeyScreen(
     }
     var cardTypeExpanded by remember { mutableStateOf(false) }
 
-    val cardTypes = remember {
-        listOf(
-            CardType.MifareClassic,
-            CardType.MifareDesfire,
-            CardType.FeliCa,
-            CardType.CEPAS,
-        )
-    }
+    val cardTypes =
+        remember {
+            listOf(
+                CardType.MifareClassic,
+                CardType.MifareDesfire,
+                CardType.FeliCa,
+                CardType.CEPAS,
+            )
+        }
 
     Scaffold(
         topBar = {
@@ -97,18 +98,19 @@ fun AddKeyScreen(
                     }
                 },
             )
-        }
+        },
     ) { padding ->
         Crossfade(targetState = uiState.detectedTagId != null) { showForm ->
             if (!showForm && uiState.hasNfc) {
                 // NFC splash - waiting for tag
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Icon(
                         Icons.Default.Nfc,
@@ -119,7 +121,7 @@ fun AddKeyScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(Res.string.tap_your_card),
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -135,10 +137,11 @@ fun AddKeyScreen(
             } else {
                 // Key entry form
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(16.dp),
                 ) {
                     OutlinedTextField(
                         value = cardId,
@@ -161,9 +164,10 @@ fun AddKeyScreen(
                             readOnly = true,
                             label = { Text(stringResource(Res.string.card_type)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cardTypeExpanded) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                         )
                         if (!isAutoDetected) {
                             ExposedDropdownMenu(

@@ -26,13 +26,16 @@ package com.codebutler.farebot.transit.en1545
  * Extract bits from a byte array in big-endian bit order.
  * Bit 0 = MSB of byte 0, bit 7 = LSB of byte 0, bit 8 = MSB of byte 1, etc.
  */
-fun ByteArray.getBitsFromBuffer(startBit: Int, length: Int): Int {
+fun ByteArray.getBitsFromBuffer(
+    startBit: Int,
+    length: Int,
+): Int {
     if (length <= 0 || length > 32) throw IllegalArgumentException("Invalid bit length: $length")
     var result = 0
     for (i in startBit until startBit + length) {
         val byteIndex = i / 8
         val bitIndex = 7 - (i % 8)
-        if (byteIndex >= size) throw IndexOutOfBoundsException("Bit $i out of bounds for ${size}-byte array")
+        if (byteIndex >= size) throw IndexOutOfBoundsException("Bit $i out of bounds for $size-byte array")
         result = (result shl 1) or ((this[byteIndex].toInt() shr bitIndex) and 1)
     }
     return result
@@ -42,14 +45,17 @@ fun ByteArray.getBitsFromBuffer(startBit: Int, length: Int): Int {
  * Extract bits from a byte array in little-endian bit order.
  * Bit 0 = LSB of byte 0, bit 7 = MSB of byte 0, bit 8 = LSB of byte 1, etc.
  */
-fun ByteArray.getBitsFromBufferLeBits(startBit: Int, length: Int): Int {
+fun ByteArray.getBitsFromBufferLeBits(
+    startBit: Int,
+    length: Int,
+): Int {
     if (length <= 0 || length > 32) throw IllegalArgumentException("Invalid bit length: $length")
     var result = 0
     for (i in 0 until length) {
         val bitPos = startBit + i
         val byteIndex = bitPos / 8
         val bitIndex = bitPos % 8
-        if (byteIndex >= size) throw IndexOutOfBoundsException("Bit $bitPos out of bounds for ${size}-byte array")
+        if (byteIndex >= size) throw IndexOutOfBoundsException("Bit $bitPos out of bounds for $size-byte array")
         result = result or (((this[byteIndex].toInt() shr bitIndex) and 1) shl i)
     }
     return result

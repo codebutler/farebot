@@ -33,20 +33,18 @@ import farebot.farebot_transit_magnacarta.generated.resources.Res
 import farebot.farebot_transit_magnacarta.generated.resources.magnacarta_card_name
 
 class MagnaCartaTransitFactory : TransitFactory<DesfireCard, MagnaCartaTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(MagnaCartaTransitInfo.APP_ID_BALANCE) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(MagnaCartaTransitInfo.APP_ID_BALANCE) != null
 
-    override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        return TransitIdentity.create(getStringBlocking(Res.string.magnacarta_card_name), null)
-    }
+    override fun parseIdentity(card: DesfireCard): TransitIdentity =
+        TransitIdentity.create(getStringBlocking(Res.string.magnacarta_card_name), null)
 
     override fun parseInfo(card: DesfireCard): MagnaCartaTransitInfo {
-        val file2 = card.getApplication(MagnaCartaTransitInfo.APP_ID_BALANCE)
-            ?.getFile(2) as? StandardDesfireFile
+        val file2 =
+            card
+                .getApplication(MagnaCartaTransitInfo.APP_ID_BALANCE)
+                ?.getFile(2) as? StandardDesfireFile
         val balance = file2?.data?.byteArrayToInt(6, 2)
         return MagnaCartaTransitInfo(mBalance = balance)
     }

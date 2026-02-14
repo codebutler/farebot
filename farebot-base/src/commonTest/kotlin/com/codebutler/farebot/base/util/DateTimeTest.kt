@@ -23,7 +23,6 @@
 package com.codebutler.farebot.base.util
 
 import kotlinx.datetime.DatePeriod
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
@@ -36,6 +35,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Tests for date/time utilities using kotlinx.datetime.
@@ -43,21 +43,18 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's DateTest.kt and TimeTest.kt
  */
 class DateTimeTest {
-
     private val epochDate = LocalDate(1970, Month.JANUARY, 1)
 
     /**
      * Calculate days from epoch to January 1st of the given year.
      * This is similar to Metrodroid's yearToDays function.
      */
-    private fun yearToDays(year: Int): Int =
-        epochDate.daysUntil(LocalDate(year, Month.JANUARY, 1))
+    private fun yearToDays(year: Int): Int = epochDate.daysUntil(LocalDate(year, Month.JANUARY, 1))
 
     /**
      * Check if a year is a leap year (bissextile).
      */
-    private fun isLeapYear(year: Int): Boolean =
-        year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+    private fun isLeapYear(year: Int): Boolean = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 
     @Test
     fun testYearToDays() {
@@ -72,7 +69,7 @@ class DateTimeTest {
             assertEquals(
                 expected = expectedD,
                 actual = d,
-                message = "Wrong days for year $year: $d vs $expectedD"
+                message = "Wrong days for year $year: $d vs $expectedD",
             )
         }
     }
@@ -101,17 +98,17 @@ class DateTimeTest {
                     assertEquals(
                         expected = year,
                         actual = localDate.year,
-                        message = "Wrong year for $year-$month-$day vs $localDate"
+                        message = "Wrong year for $year-$month-$day vs $localDate",
                     )
                     assertEquals(
                         expected = month,
                         actual = localDate.month.ordinal + 1,
-                        message = "Wrong month for $year-$month-$day vs $localDate"
+                        message = "Wrong month for $year-$month-$day vs $localDate",
                     )
                     assertEquals(
                         expected = day,
                         actual = localDate.day,
-                        message = "Wrong day for $year-$month-$day vs $localDate"
+                        message = "Wrong day for $year-$month-$day vs $localDate",
                     )
                 }
             }
@@ -128,7 +125,7 @@ class DateTimeTest {
             assertEquals(
                 expected = days,
                 actual = roundTrippedDays,
-                message = "Wrong roundtrip $days vs $roundTrippedDays"
+                message = "Wrong roundtrip $days vs $roundTrippedDays",
             )
         }
     }

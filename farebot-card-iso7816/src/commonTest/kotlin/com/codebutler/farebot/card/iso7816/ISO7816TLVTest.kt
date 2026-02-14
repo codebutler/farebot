@@ -31,7 +31,6 @@ import kotlin.test.assertNull
  */
 @OptIn(ExperimentalStdlibApi::class)
 class ISO7816TLVTest {
-
     // --- BER-TLV tests (from Metrodroid BERTLVTest.kt) ---
 
     @Test
@@ -79,9 +78,10 @@ class ISO7816TLVTest {
     fun testFindDefinite126() {
         // tag 50 (parent, definite long, 126 bytes)
         // -> tag 51: "hello world"
-        val d = "50fe".hexToByteArray() +
-            ByteArray(125) +
-            "0e510b68656c6c6f20776f726c64".hexToByteArray()
+        val d =
+            "50fe".hexToByteArray() +
+                ByteArray(125) +
+                "0e510b68656c6c6f20776f726c64".hexToByteArray()
         val e = "hello world".encodeToByteArray()
 
         assertEquals(e.toList(), ISO7816TLV.findBERTLV(d, "51")?.toList())
@@ -91,9 +91,10 @@ class ISO7816TLVTest {
     fun testFindDefiniteReallyLong() {
         // tag 50 (parent, definite long, 0xffffffffffffffff bytes)
         // -> tag 51: "hello world"
-        val d = "5088".hexToByteArray() +
-            ByteArray(8) { 0xff.toByte() } +
-            "0e510b68656c6c6f20776f726c64".hexToByteArray()
+        val d =
+            "5088".hexToByteArray() +
+                ByteArray(8) { 0xff.toByte() } +
+                "0e510b68656c6c6f20776f726c64".hexToByteArray()
 
         // Should fail
         assertNull(ISO7816TLV.findBERTLV(d, "51"))
@@ -129,12 +130,13 @@ class ISO7816TLVTest {
     @Test
     fun testSimpleTlvWithNulls() {
         val i = "0100020100ff00fe03112233".hexToByteArray()
-        val expected = listOf(
-            // Empty tag: 01
-            Pair(0x02, "00".hexToByteArray()),
-            // Empty tag: FF
-            Pair(0xfe, "112233".hexToByteArray())
-        )
+        val expected =
+            listOf(
+                // Empty tag: 01
+                Pair(0x02, "00".hexToByteArray()),
+                // Empty tag: FF
+                Pair(0xfe, "112233".hexToByteArray()),
+            )
 
         val result = ISO7816TLV.simpleTlvIterate(i).toList()
         assertEquals(expected.size, result.size)
@@ -147,14 +149,15 @@ class ISO7816TLVTest {
     @Test
     fun testSimpleTlvLongLength() {
         val i = "0fff00031122330a000b0211220cff00000d0122".hexToByteArray()
-        val expected = listOf(
-            // Long length = 3 bytes
-            Pair(0x0f, "112233".hexToByteArray()),
-            // Empty tag: 0A
-            Pair(0x0b, "1122".hexToByteArray()),
-            // Empty long tag: 0C
-            Pair(0x0d, "22".hexToByteArray())
-        )
+        val expected =
+            listOf(
+                // Long length = 3 bytes
+                Pair(0x0f, "112233".hexToByteArray()),
+                // Empty tag: 0A
+                Pair(0x0b, "1122".hexToByteArray()),
+                // Empty long tag: 0C
+                Pair(0x0d, "22".hexToByteArray()),
+            )
 
         val result = ISO7816TLV.simpleTlvIterate(i).toList()
         assertEquals(expected.size, result.size)

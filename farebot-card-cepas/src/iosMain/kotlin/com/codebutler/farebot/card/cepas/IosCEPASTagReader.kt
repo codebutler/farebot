@@ -39,7 +39,6 @@ class IosCEPASTagReader(
     private val tagId: ByteArray,
     private val transceiver: CardTransceiver,
 ) {
-
     fun readTag(): RawCEPASCard {
         transceiver.connect()
         try {
@@ -63,7 +62,8 @@ class IosCEPASTagReader(
             }
 
             return RawCEPASCard.create(
-                tagId, Clock.System.now(),
+                tagId,
+                Clock.System.now(),
                 purses.toList() as List<RawCEPASPurse>,
                 histories.toList() as List<RawCEPASHistory>,
             )

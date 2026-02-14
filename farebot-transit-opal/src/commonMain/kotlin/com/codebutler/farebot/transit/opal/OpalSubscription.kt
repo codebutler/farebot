@@ -31,10 +31,10 @@ import farebot.farebot_transit_opal.generated.resources.Res
 import farebot.farebot_transit_opal.generated.resources.opal_agency_tfnsw
 import farebot.farebot_transit_opal.generated.resources.opal_agency_tfnsw_short
 import farebot.farebot_transit_opal.generated.resources.opal_automatic_top_up
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Instant
 
 /**
  * Class describing auto-topup on Opal.
@@ -45,7 +45,6 @@ import kotlinx.datetime.atStartOfDayIn
  * Dates given are not valid.
  */
 internal class OpalSubscription private constructor() : Subscription() {
-
     companion object {
         val instance = OpalSubscription()
     }

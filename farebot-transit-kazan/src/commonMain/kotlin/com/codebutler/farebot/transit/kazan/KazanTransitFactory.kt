@@ -35,33 +35,31 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_kazan.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector8 = card.getSector(8) as? DataClassicSector ?: return false
         return HashUtils.checkKeyHash(
-            sector8.keyA, sector8.keyB, "kazan",
+            sector8.keyA,
+            sector8.keyB,
+            "kazan",
             "0f30386921b6558b133f0f49081b932d",
-            "ec1b1988a2021019074d4304b4aea772"
+            "ec1b1988a2021019074d4304b4aea772",
         ) >= 0
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(
+    override fun parseIdentity(card: ClassicCard): TransitIdentity =
+        TransitIdentity.create(
             getStringBlocking(Res.string.card_name_kazan),
-            NumberUtils.zeroPad(getSerial(card), 10)
+            NumberUtils.zeroPad(getSerial(card), 10),
         )
-    }
 
     override fun parseInfo(card: ClassicCard): KazanTransitInfo {
         val sector8 = card.getSector(8) as DataClassicSector
@@ -71,36 +69,40 @@ class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
 
         return KazanTransitInfo(
             mSerial = getSerial(card),
-            mSub = KazanSubscription(
-                mType = block80[6].toInt() and 0xff,
-                validFrom = parseDate(block80, 7),
-                validTo = parseDate(block80, 10),
-                mCounter = sector9.getBlock(0).data.byteArrayToIntReversed(0, 4)
-            ),
-            mTrip = KazanTrip.parse(block82)
+            mSub =
+                KazanSubscription(
+                    mType = block80[6].toInt() and 0xff,
+                    validFrom = parseDate(block80, 7),
+                    validTo = parseDate(block80, 10),
+                    mCounter = sector9.getBlock(0).data.byteArrayToIntReversed(0, 4),
+                ),
+            mTrip = KazanTrip.parse(block82),
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_kazan,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.RUSSIA,
-            locationRes = Res.string.location_kazan,
-            imageRes = Res.drawable.kazan,
-            latitude = 55.7963f,
-            longitude = 49.1089f,
-            brandColor = 0x014797,
-            credits = listOf("Metrodroid Project"),
-            keysRequired = true,
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_kazan,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.location_kazan,
+                imageRes = Res.drawable.kazan,
+                latitude = 55.7963f,
+                longitude = 49.1089f,
+                brandColor = 0x014797,
+                credits = listOf("Metrodroid Project"),
+                keysRequired = true,
+            )
 
         private val TZ = TimeZone.of("Europe/Moscow")
 
-        private fun getSerial(card: ClassicCard): Long =
-            card.tagId.byteArrayToLongReversed()
+        private fun getSerial(card: ClassicCard): Long = card.tagId.byteArrayToLongReversed()
 
-        private fun parseDate(raw: ByteArray, off: Int): Instant? {
+        private fun parseDate(
+            raw: ByteArray,
+            off: Int,
+        ): Instant? {
             if (raw.byteArrayToInt(off, 3) == 0) return null
             val year = (raw[off].toInt() and 0xff) + 2000
             val month = raw[off + 1].toInt() and 0xff

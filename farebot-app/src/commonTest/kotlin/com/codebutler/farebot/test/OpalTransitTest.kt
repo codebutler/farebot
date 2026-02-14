@@ -31,24 +31,25 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.opal.OpalData
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 class OpalTransitTest {
-
     private val stringResource = TestStringResource()
     private val factory = OpalTransitFactory(stringResource)
 
-    private fun createOpalCard(fileData: ByteArray) = desfireCard(
-        applications = listOf(
-            desfireApp(0x314553, listOf(standardFile(0x07, fileData)))
+    private fun createOpalCard(fileData: ByteArray) =
+        desfireCard(
+            applications =
+                listOf(
+                    desfireApp(0x314553, listOf(standardFile(0x07, fileData))),
+                ),
         )
-    )
 
     @Test
     fun testOpalCheck() {
@@ -58,11 +59,13 @@ class OpalTransitTest {
 
     @Test
     fun testOpalCheckNegative() {
-        val card = desfireCard(
-            applications = listOf(
-                desfireApp(0x123456, listOf(standardFile(0x01, ByteArray(16))))
+        val card =
+            desfireCard(
+                applications =
+                    listOf(
+                        desfireApp(0x123456, listOf(standardFile(0x01, ByteArray(16)))),
+                    ),
             )
-        )
         assertTrue(!factory.check(card))
     }
 
@@ -107,23 +110,26 @@ class OpalTransitTest {
         // Let's construct data where balance = 500 cents ($5.00 AUD).
         // This requires careful bit manipulation. For a simpler approach,
         // construct OpalTransitInfo directly.
-        val info = OpalTransitInfo(
-            serialNumber = "3085 2200 0000 0015",
-            balanceValue = 500, // 500 cents = $5.00
-            checksum = 0,
-            weeklyTrips = 0,
-            autoTopup = false,
-            lastTransaction = 0x01, // tap on
-            lastTransactionMode = 0x00, // rail
-            minute = 0,
-            day = 0,
-            lastTransactionNumber = 0,
-            stringResource = stringResource,
-        )
+        val info =
+            OpalTransitInfo(
+                serialNumber = "3085 2200 0000 0015",
+                balanceValue = 500, // 500 cents = $5.00
+                checksum = 0,
+                weeklyTrips = 0,
+                autoTopup = false,
+                lastTransaction = 0x01, // tap on
+                lastTransactionMode = 0x00, // rail
+                minute = 0,
+                day = 0,
+                lastTransactionNumber = 0,
+                stringResource = stringResource,
+            )
         val balanceStr = info.formatBalanceString()
         // Should contain AUD formatting, not USD
-        assertTrue(balanceStr.contains("5.00") || balanceStr.contains("5,00"),
-            "Balance should format as $5.00 AUD, got: $balanceStr")
+        assertTrue(
+            balanceStr.contains("5.00") || balanceStr.contains("5,00"),
+            "Balance should format as $5.00 AUD, got: $balanceStr",
+        )
         assertTrue(!balanceStr.contains("USD"), "Balance should not contain USD, got: $balanceStr")
     }
 
@@ -186,8 +192,11 @@ class OpalTransitTest {
         var card = createOpalCard(hexToBytes("85D25E07230520A70044DA380419FFFF"))
         var info = factory.parseInfo(card) as OpalTransitInfo
         var expectedTime = Instant.parse("2018-03-30T22:00:00Z")
-        assertEquals(expectedTime, info.lastTransactionTime,
-            "Time before DST transition should be 2018-03-30 22:00 UTC")
+        assertEquals(
+            expectedTime,
+            info.lastTransactionTime,
+            "Time before DST transition should be 2018-03-30 22:00 UTC",
+        )
 
         // DST transition is at 2018-04-01 03:00 AEDT -> 02:00 AEST
 
@@ -196,8 +205,11 @@ class OpalTransitTest {
         card = createOpalCard(hexToBytes("85D25E07430520A70048DA380419FFFF"))
         info = factory.parseInfo(card) as OpalTransitInfo
         expectedTime = Instant.parse("2018-03-31T23:00:00Z")
-        assertEquals(expectedTime, info.lastTransactionTime,
-            "Time after DST transition should be 2018-03-31 23:00 UTC")
+        assertEquals(
+            expectedTime,
+            info.lastTransactionTime,
+            "Time after DST transition should be 2018-03-31 23:00 UTC",
+        )
     }
 
     /**
@@ -205,7 +217,10 @@ class OpalTransitTest {
      */
     private fun Instant.isoDateTimeFormat(): String {
         val local = this.toLocalDateTime(TimeZone.UTC)
-        return "${local.year}-${(local.month.ordinal + 1).toString().padStart(2, '0')}-${local.day.toString().padStart(2, '0')} " +
+        return "${local.year}-${(local.month.ordinal + 1).toString().padStart(
+            2,
+            '0',
+        )}-${local.day.toString().padStart(2, '0')} " +
             "${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"
     }
 }

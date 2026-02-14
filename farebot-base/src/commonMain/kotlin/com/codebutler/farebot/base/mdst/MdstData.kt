@@ -24,8 +24,8 @@ package com.codebutler.farebot.base.mdst
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.protobuf.ProtoPacked
 import kotlinx.serialization.protobuf.ProtoNumber
+import kotlinx.serialization.protobuf.ProtoPacked
 
 /**
  * @Serializable data classes matching the MdST stations.proto schema.
@@ -46,7 +46,7 @@ enum class TransportType {
     BANNED,
     TROLLEYBUS,
     TOLL_ROAD,
-    MONORAIL
+    MONORAIL,
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -55,21 +55,21 @@ data class Names(
     @ProtoNumber(1) val english: String = "",
     @ProtoNumber(2) val local: String = "",
     @ProtoNumber(3) val englishShort: String = "",
-    @ProtoNumber(4) val localShort: String = ""
+    @ProtoNumber(4) val localShort: String = "",
 )
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Operator(
     @ProtoNumber(3) val name: Names = Names(),
-    @ProtoNumber(4) val defaultTransport: Int = 0
+    @ProtoNumber(4) val defaultTransport: Int = 0,
 )
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Line(
     @ProtoNumber(3) val name: Names = Names(),
-    @ProtoNumber(4) val transport: Int = 0
+    @ProtoNumber(4) val transport: Int = 0,
 )
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -80,7 +80,7 @@ data class MdstStation(
     @ProtoNumber(4) val latitude: Float = 0f,
     @ProtoNumber(5) val longitude: Float = 0f,
     @ProtoNumber(6) val operatorId: Int = 0,
-    @ProtoNumber(7) @ProtoPacked val lineId: List<Int> = emptyList()
+    @ProtoNumber(7) @ProtoPacked val lineId: List<Int> = emptyList(),
 )
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -91,11 +91,11 @@ data class StationDb(
     @ProtoNumber(3) val operators: Map<Int, Operator> = emptyMap(),
     @ProtoNumber(4) val lines: Map<Int, Line> = emptyMap(),
     @ProtoNumber(5) val ttsHintLanguage: String = "",
-    @ProtoNumber(6) val licenseNotice: String = ""
+    @ProtoNumber(6) val licenseNotice: String = "",
 )
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class StationIndex(
-    @ProtoNumber(1) val stationMap: Map<Int, Int> = emptyMap()
+    @ProtoNumber(1) val stationMap: Map<Int, Int> = emptyMap(),
 )

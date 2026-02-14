@@ -40,7 +40,6 @@ import com.codebutler.farebot.transit.TransitIdentity
  * Reference: https://github.com/micolous/metrodroid/wiki/South-Korea#a0000004520001
  */
 class KROCAPTransitFactory : TransitFactory<ISO7816Card, KROCAPTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: ISO7816Card): Boolean {
@@ -54,19 +53,23 @@ class KROCAPTransitFactory : TransitFactory<ISO7816Card, KROCAPTransitInfo> {
     }
 
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
-        val app = getKROCAPConfigDFApplication(card)
-            ?: throw IllegalArgumentException("Not a KR-OCAP card")
-        val pdata = app.appProprietaryBerTlv
-            ?: throw IllegalArgumentException("Missing FCI data")
+        val app =
+            getKROCAPConfigDFApplication(card)
+                ?: throw IllegalArgumentException("Not a KR-OCAP card")
+        val pdata =
+            app.appProprietaryBerTlv
+                ?: throw IllegalArgumentException("Missing FCI data")
         val serial = getSerial(pdata)
         return TransitIdentity.create(KROCAPTransitInfo.NAME, serial)
     }
 
     override fun parseInfo(card: ISO7816Card): KROCAPTransitInfo {
-        val app = getKROCAPConfigDFApplication(card)
-            ?: throw IllegalArgumentException("Not a KR-OCAP card")
-        val pdata = app.appProprietaryBerTlv
-            ?: throw IllegalArgumentException("Missing FCI data")
+        val app =
+            getKROCAPConfigDFApplication(card)
+                ?: throw IllegalArgumentException("Not a KR-OCAP card")
+        val pdata =
+            app.appProprietaryBerTlv
+                ?: throw IllegalArgumentException("Missing FCI data")
         return KROCAPTransitInfo(pdata)
     }
 
@@ -81,12 +84,13 @@ class KROCAPTransitFactory : TransitFactory<ISO7816Card, KROCAPTransitInfo> {
          * KSX6924-compatible application AIDs.
          */
         @OptIn(ExperimentalStdlibApi::class)
-        private val KSX6924_AIDS = listOf(
-            "d4100000030001".hexToByteArray(),  // T-Money, Snapper
-            "d4100000140001".hexToByteArray(),  // Cashbee / eB
-            "d4100000300001".hexToByteArray(),  // MOIBA
-            "d4106509900020".hexToByteArray()   // K-Cash
-        )
+        private val KSX6924_AIDS =
+            listOf(
+                "d4100000030001".hexToByteArray(), // T-Money, Snapper
+                "d4100000140001".hexToByteArray(), // Cashbee / eB
+                "d4100000300001".hexToByteArray(), // MOIBA
+                "d4106509900020".hexToByteArray(), // K-Cash
+            )
 
         private fun hasKSX6924Application(card: ISO7816Card): Boolean {
             return card.applications.any { app ->
@@ -95,7 +99,9 @@ class KROCAPTransitFactory : TransitFactory<ISO7816Card, KROCAPTransitInfo> {
             }
         }
 
-        private fun getKROCAPConfigDFApplication(card: ISO7816Card): com.codebutler.farebot.card.iso7816.ISO7816Application? {
+        private fun getKROCAPConfigDFApplication(
+            card: ISO7816Card,
+        ): com.codebutler.farebot.card.iso7816.ISO7816Application? {
             return card.applications.firstOrNull { app ->
                 val appName = app.appName ?: return@firstOrNull false
                 appName.contentEquals(KROCAP_CONFIG_DF_AID)

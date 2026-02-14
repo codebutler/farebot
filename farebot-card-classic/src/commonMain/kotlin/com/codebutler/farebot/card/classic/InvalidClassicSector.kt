@@ -28,11 +28,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class InvalidClassicSector(
     override val index: Int,
-    val error: String
+    val error: String,
 ) : ClassicSector {
-
     companion object {
-        fun create(index: Int, error: String): InvalidClassicSector =
-            InvalidClassicSector(index, error)
+        fun create(
+            index: Int,
+            error: String,
+        ): InvalidClassicSector = InvalidClassicSector(index, error)
     }
 }

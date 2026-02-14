@@ -28,7 +28,6 @@ package com.codebutler.farebot.test
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.Test
@@ -36,6 +35,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Tests for EasyCard transit parsing using the deadbeef.mfc dump.
@@ -49,7 +49,6 @@ import kotlin.test.assertTrue
  * or filesystem (iOS native).
  */
 class EasyCardTransitTest : CardDumpTest() {
-
     private val stringResource = TestStringResource()
     private val factory = EasyCardTransitFactory(stringResource)
 

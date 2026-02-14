@@ -36,9 +36,8 @@ import farebot.farebot_transit_erg.generated.resources.erg_card_name
 open class ErgRefill(
     val purse: ErgPurseRecord,
     val epochDate: Int,
-    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) }
+    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) },
 ) : Refill() {
-
     override fun getTimestamp(): Long = ErgTrip.convertTimestamp(epochDate, purse.day, purse.minute)
 
     override fun getAgencyName(stringResource: StringResource): String = getStringBlocking(Res.string.erg_card_name)

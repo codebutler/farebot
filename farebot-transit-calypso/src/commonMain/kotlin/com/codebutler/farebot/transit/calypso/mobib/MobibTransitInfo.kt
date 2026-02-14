@@ -26,8 +26,8 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.transit.CardInfo
@@ -66,7 +66,6 @@ class MobibTransitInfo internal constructor(
     private val purchase: Int,
     private val totalTrips: Int,
 ) : TransitInfo() {
-
     override val cardName: String = NAME
 
     override val info: List<ListItemInterface>
@@ -111,8 +110,9 @@ class MobibTransitInfo internal constructor(
         val TZ = TimeZone.of("Europe/Brussels")
     }
 
-    class Factory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+    class Factory(
+        stringResource: StringResource,
+    ) : CalypsoTransitFactory(stringResource) {
         override val allCards: List<CardInfo>
             get() = listOf(CARD_INFO)
 
@@ -124,13 +124,16 @@ class MobibTransitInfo internal constructor(
         }
 
         override fun getSerial(app: ISO7816Application): String? {
-            val holder = app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]
-                ?.records?.get(1) ?: return null
+            val holder =
+                app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]
+                    ?.records
+                    ?.get(1) ?: return null
             return try {
                 NumberUtils.zeroPad(NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(18 + 80, 24)), 6) + " / " +
                     NumberUtils.zeroPad(NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(42 + 80, 24)), 6) +
                     NumberUtils.zeroPad(NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(66 + 80, 16)), 4) +
-                    NumberUtils.zeroPad(NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(82 + 80, 8)), 2) + " / " +
+                    NumberUtils.zeroPad(NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(82 + 80, 8)), 2) +
+                    " / " +
                     NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(90 + 80, 4)).toString()
             } catch (_: Exception) {
                 null
@@ -139,27 +142,37 @@ class MobibTransitInfo internal constructor(
 
         override fun parseTransitInfo(
             app: ISO7816Application,
-            serial: String?
+            serial: String?,
         ): TransitInfo {
             // Parse ticket env with version-dependent fields
-            val rawTicketEnvRecords = Calypso1545TransitData.getSfiRecords(
-                app, CalypsoConstants.SFI_TICKETING_ENVIRONMENT
-            )
+            val rawTicketEnvRecords =
+                Calypso1545TransitData.getSfiRecords(
+                    app,
+                    CalypsoConstants.SFI_TICKETING_ENVIRONMENT,
+                )
             val rawTicketEnv = rawTicketEnvRecords.fold(byteArrayOf()) { acc, bytes -> acc + bytes }
             val version = if (rawTicketEnv.isNotEmpty()) rawTicketEnv.getBitsFromBuffer(0, 6) else 0
-            val ticketEnv = if (rawTicketEnv.isEmpty()) En1545Parsed()
-            else En1545Parser.parse(rawTicketEnv, ticketEnvFields(version))
+            val ticketEnv =
+                if (rawTicketEnv.isEmpty()) {
+                    En1545Parsed()
+                } else {
+                    En1545Parser.parse(rawTicketEnv, ticketEnvFields(version))
+                }
 
             // Parse contracts (first 7 only)
-            val allContracts = Calypso1545TransitData.getSfiRecords(
-                app, CalypsoConstants.SFI_TICKETING_CONTRACTS_1
-            )
+            val allContracts =
+                Calypso1545TransitData.getSfiRecords(
+                    app,
+                    CalypsoConstants.SFI_TICKETING_CONTRACTS_1,
+                )
             val contracts = if (allContracts.size > 7) allContracts.subList(0, 7) else allContracts
             val subscriptions = mutableListOf<En1545Subscription>()
             val balances = mutableListOf<TransitCurrency>()
 
             for ((idx, record) in contracts.withIndex()) {
-                val sub = MobibSubscription.parse(record, stringResource, Calypso1545TransitData.getCounter(app, idx + 1)) ?: continue
+                val sub =
+                    MobibSubscription.parse(record, stringResource, Calypso1545TransitData.getCounter(app, idx + 1))
+                        ?: continue
                 val bal = sub.cost
                 if (bal != null) {
                     balances.add(bal)
@@ -169,31 +182,44 @@ class MobibTransitInfo internal constructor(
             }
 
             // Parse trips - try main log first, then fallback SFI 0x17
-            val ticketLogRecords = Calypso1545TransitData.getSfiRecords(
-                app, CalypsoConstants.SFI_TICKETING_LOG
-            ).ifEmpty {
-                Calypso1545TransitData.getSfiRecords(app, 0x17)
-            }
+            val ticketLogRecords =
+                Calypso1545TransitData
+                    .getSfiRecords(
+                        app,
+                        CalypsoConstants.SFI_TICKETING_LOG,
+                    ).ifEmpty {
+                        Calypso1545TransitData.getSfiRecords(app, 0x17)
+                    }
             val transactions = ticketLogRecords.mapNotNull { MobibTransaction.parse(it) }
             val trips = TransactionTrip.merge(transactions)
             val totalTrips = transactions.maxOfOrNull { it.transactionNumber } ?: 0
 
             // Parse extended holder (SFI 0x1E = HOLDER_EXTENDED)
             val holderFile = Calypso1545TransitData.getSfiFile(app, 0x1E)
-            val extHolderParsed = if (holderFile != null) {
-                val holder = (holderFile.records[1] ?: ByteArray(0)) +
-                    (holderFile.records[2] ?: ByteArray(0))
-                if (holder.isNotEmpty()) En1545Parser.parse(holder, extHolderFields)
-                else null
-            } else {
-                null
-            }
+            val extHolderParsed =
+                if (holderFile != null) {
+                    val holder =
+                        (holderFile.records[1] ?: ByteArray(0)) +
+                            (holderFile.records[2] ?: ByteArray(0))
+                    if (holder.isNotEmpty()) {
+                        En1545Parser.parse(holder, extHolderFields)
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
 
             // Parse purchase date from EP_LOAD_LOG (SFI 0x14)
             val epLoadLog = Calypso1545TransitData.getSfiFile(app, 0x14)
-            val purchase = epLoadLog?.records?.get(1)?.let {
-                try { it.getBitsFromBuffer(2, 14) } catch (_: Exception) { 0 }
-            } ?: 0
+            val purchase =
+                epLoadLog?.records?.get(1)?.let {
+                    try {
+                        it.getBitsFromBuffer(2, 14)
+                    } catch (_: Exception) {
+                        0
+                    }
+                } ?: 0
 
             return MobibTransitInfo(
                 serialNumber = serial,
@@ -207,58 +233,63 @@ class MobibTransitInfo internal constructor(
         }
 
         companion object {
-            private val CARD_INFO = CardInfo(
-                nameRes = Res.string.card_name_mobib,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.BELGIUM,
-                locationRes = Res.string.card_location_brussels_belgium,
-                imageRes = Res.drawable.mobib_card,
-                latitude = 50.8503f,
-                longitude = 4.3517f,
-                sampleDumpFile = "Mobib.json",
-                brandColor = 0x9CBC17,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            )
-
-            private fun ticketEnvFields(version: Int) = when {
-                version <= 2 -> En1545Container(
-                    En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 6),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_A, 7),
-                    En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 24),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_B, 9),
-                    En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_C, 6),
-                    En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
-                    En1545FixedHex(En1545TransitData.ENV_CARD_SERIAL, 76),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_D, 5),
-                    En1545FixedInteger(En1545TransitData.HOLDER_INT_POSTAL_CODE, 14),
-                    En1545FixedHex(En1545TransitData.ENV_UNKNOWN_E, 34)
+            private val CARD_INFO =
+                CardInfo(
+                    nameRes = Res.string.card_name_mobib,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.BELGIUM,
+                    locationRes = Res.string.card_location_brussels_belgium,
+                    imageRes = Res.drawable.mobib_card,
+                    latitude = 50.8503f,
+                    longitude = 4.3517f,
+                    sampleDumpFile = "Mobib.json",
+                    brandColor = 0x9CBC17,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
                 )
-                else -> En1545Container(
-                    En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 6),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_A, 7),
-                    En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 24),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_B, 5),
-                    En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_C, 10),
-                    En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
-                    En1545FixedHex(En1545TransitData.ENV_CARD_SERIAL, 76),
-                    En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_D, 5),
-                    En1545FixedInteger(En1545TransitData.HOLDER_INT_POSTAL_CODE, 14),
-                    En1545FixedHex(En1545TransitData.ENV_UNKNOWN_E, 34)
-                )
-            }
 
-            private val extHolderFields = En1545Container(
-                En1545FixedInteger(EXT_HOLDER_UNKNOWN_A, 18),
-                En1545FixedHex(EXT_HOLDER_CARD_SERIAL, 76),
-                En1545FixedInteger(EXT_HOLDER_UNKNOWN_B, 16),
-                En1545FixedHex(EXT_HOLDER_UNKNOWN_C, 58),
-                En1545FixedInteger(EXT_HOLDER_DATE_OF_BIRTH, 32),
-                En1545FixedInteger(EXT_HOLDER_GENDER, 2),
-                En1545FixedInteger(EXT_HOLDER_UNKNOWN_D, 3),
-                En1545FixedString(EXT_HOLDER_NAME, 259)
-            )
+            private fun ticketEnvFields(version: Int) =
+                when {
+                    version <= 2 ->
+                        En1545Container(
+                            En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 6),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_A, 7),
+                            En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 24),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_B, 9),
+                            En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_C, 6),
+                            En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+                            En1545FixedHex(En1545TransitData.ENV_CARD_SERIAL, 76),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_D, 5),
+                            En1545FixedInteger(En1545TransitData.HOLDER_INT_POSTAL_CODE, 14),
+                            En1545FixedHex(En1545TransitData.ENV_UNKNOWN_E, 34),
+                        )
+                    else ->
+                        En1545Container(
+                            En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 6),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_A, 7),
+                            En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 24),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_B, 5),
+                            En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_C, 10),
+                            En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+                            En1545FixedHex(En1545TransitData.ENV_CARD_SERIAL, 76),
+                            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_D, 5),
+                            En1545FixedInteger(En1545TransitData.HOLDER_INT_POSTAL_CODE, 14),
+                            En1545FixedHex(En1545TransitData.ENV_UNKNOWN_E, 34),
+                        )
+                }
+
+            private val extHolderFields =
+                En1545Container(
+                    En1545FixedInteger(EXT_HOLDER_UNKNOWN_A, 18),
+                    En1545FixedHex(EXT_HOLDER_CARD_SERIAL, 76),
+                    En1545FixedInteger(EXT_HOLDER_UNKNOWN_B, 16),
+                    En1545FixedHex(EXT_HOLDER_UNKNOWN_C, 58),
+                    En1545FixedInteger(EXT_HOLDER_DATE_OF_BIRTH, 32),
+                    En1545FixedInteger(EXT_HOLDER_GENDER, 2),
+                    En1545FixedInteger(EXT_HOLDER_UNKNOWN_D, 3),
+                    En1545FixedString(EXT_HOLDER_NAME, 259),
+                )
         }
     }
 }

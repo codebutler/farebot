@@ -26,7 +26,10 @@ import com.codebutler.farebot.persist.db.model.SavedCard
 
 interface CardPersister {
     fun getCards(): List<SavedCard>
+
     fun getCard(id: Long): SavedCard?
+
     fun insertCard(card: SavedCard): Long
+
     fun deleteCard(card: SavedCard)
 }

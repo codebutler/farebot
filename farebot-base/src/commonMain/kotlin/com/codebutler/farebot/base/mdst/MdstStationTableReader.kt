@@ -43,7 +43,7 @@ class MdstStationTableReader private constructor(
     private val data: ByteArray,
     private val stationDb: StationDb,
     private val stationsStart: Int,
-    private val stationsLength: Int
+    private val stationsLength: Int,
 ) {
     private val stationIndex: Map<Int, Int> by lazy {
         val indexStart = stationsStart + stationsLength
@@ -101,11 +101,12 @@ class MdstStationTableReader private constructor(
         fun getReader(dbName: String): MdstStationTableReader? {
             readers[dbName]?.let { return it }
 
-            val bytes = try {
-                ResourceAccessor.openMdstFile(dbName)
-            } catch (e: Exception) {
-                return null
-            } ?: return null
+            val bytes =
+                try {
+                    ResourceAccessor.openMdstFile(dbName)
+                } catch (e: Exception) {
+                    return null
+                } ?: return null
 
             return try {
                 val reader = fromByteArray(bytes)
@@ -147,18 +148,23 @@ class MdstStationTableReader private constructor(
             return MdstStationTableReader(data, stationDb, stationsStart, stationsLength)
         }
 
-        private fun readUint32BE(data: ByteArray, offset: Int): Int {
-            return ((data[offset].toInt() and 0xFF) shl 24) or
+        private fun readUint32BE(
+            data: ByteArray,
+            offset: Int,
+        ): Int =
+            ((data[offset].toInt() and 0xFF) shl 24) or
                 ((data[offset + 1].toInt() and 0xFF) shl 16) or
                 ((data[offset + 2].toInt() and 0xFF) shl 8) or
                 (data[offset + 3].toInt() and 0xFF)
-        }
 
         /**
          * Read a varint-delimited protobuf message from byte array.
          * Returns the message bytes and the offset after the message.
          */
-        private fun readDelimitedBytes(data: ByteArray, offset: Int): Pair<ByteArray, Int> {
+        private fun readDelimitedBytes(
+            data: ByteArray,
+            offset: Int,
+        ): Pair<ByteArray, Int> {
             var pos = offset
             var length = 0
             var shift = 0
@@ -173,7 +179,10 @@ class MdstStationTableReader private constructor(
             return Pair(bytes, pos + length)
         }
 
-        private inline fun <reified T> readDelimitedProto(data: ByteArray, offset: Int): T {
+        private inline fun <reified T> readDelimitedProto(
+            data: ByteArray,
+            offset: Int,
+        ): T {
             val (bytes, _) = readDelimitedBytes(data, offset)
             return ProtoBuf.decodeFromByteArray(bytes)
         }
@@ -220,8 +229,11 @@ class MdstStationTableReader private constructor(
                         if (entryWire == 0) { // varint
                             val (v, vNext) = readVarint(bytes, entryPos)
                             entryPos = vNext
-                            if (entryField == 1) key = v
-                            else if (entryField == 2) value = v
+                            if (entryField == 1) {
+                                key = v
+                            } else if (entryField == 2) {
+                                value = v
+                            }
                         } else {
                             break // unexpected wire type
                         }
@@ -236,7 +248,10 @@ class MdstStationTableReader private constructor(
             return map
         }
 
-        private fun readVarint(data: ByteArray, offset: Int): Pair<Int, Int> {
+        private fun readVarint(
+            data: ByteArray,
+            offset: Int,
+        ): Pair<Int, Int> {
             var pos = offset
             var result = 0
             var shift = 0
@@ -250,8 +265,12 @@ class MdstStationTableReader private constructor(
             return Pair(result, pos)
         }
 
-        private fun skipField(data: ByteArray, offset: Int, wireType: Int): Int {
-            return when (wireType) {
+        private fun skipField(
+            data: ByteArray,
+            offset: Int,
+            wireType: Int,
+        ): Int =
+            when (wireType) {
                 0 -> readVarint(data, offset).second // varint
                 1 -> offset + 8 // 64-bit
                 2 -> { // length-delimited
@@ -261,8 +280,9 @@ class MdstStationTableReader private constructor(
                 5 -> offset + 4 // 32-bit
                 else -> data.size // unknown, skip to end
             }
-        }
     }
 
-    class InvalidHeaderException(message: String) : Exception(message)
+    class InvalidHeaderException(
+        message: String,
+    ) : Exception(message)
 }

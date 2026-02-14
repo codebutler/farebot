@@ -32,13 +32,11 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_myki.generated.resources.*
 
 class MykiTransitFactory : TransitFactory<DesfireCard, MykiTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return (card.getApplication(4594) != null) && (card.getApplication(15732978) != null)
-    }
+    override fun check(card: DesfireCard): Boolean =
+        (card.getApplication(4594) != null) && (card.getApplication(15732978) != null)
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         var data = (card.getApplication(4594)!!.getFile(15) as StandardDesfireFile).data
@@ -62,22 +60,29 @@ class MykiTransitFactory : TransitFactory<DesfireCard, MykiTransitInfo> {
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.myki_card_name,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.AUSTRALIA,
-            locationRes = Res.string.myki_location,
-            imageRes = Res.drawable.myki_card,
-            latitude = -37.8136f,
-            longitude = 144.9631f,
-            brandColor = 0x89961C,
-            credits = listOf("Michael Farrell"),
-            serialOnly = true,
-            sampleDumpFile = "Myki.json",
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.myki_card_name,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.AUSTRALIA,
+                locationRes = Res.string.myki_location,
+                imageRes = Res.drawable.myki_card,
+                latitude = -37.8136f,
+                longitude = 144.9631f,
+                brandColor = 0x89961C,
+                credits = listOf("Michael Farrell"),
+                serialOnly = true,
+                sampleDumpFile = "Myki.json",
+            )
 
-        private fun formatSerialNumber(serialNumber1: Long, serialNumber2: Long): String {
-            val formattedSerial = "${serialNumber1.toString().padStart(6, '0')}${serialNumber2.toString().padStart(8, '0')}"
+        private fun formatSerialNumber(
+            serialNumber1: Long,
+            serialNumber2: Long,
+        ): String {
+            val formattedSerial = "${serialNumber1.toString().padStart(
+                6,
+                '0',
+            )}${serialNumber2.toString().padStart(8, '0')}"
             return formattedSerial + Luhn.calculateLuhn(formattedSerial)
         }
     }

@@ -40,7 +40,6 @@ import kotlinx.serialization.Serializable
  * This factory should be registered LAST in the Classic factory list.
  */
 class UnauthorizedClassicTransitFactory : TransitFactory<ClassicCard, UnauthorizedClassicTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     /**
@@ -63,27 +62,29 @@ class UnauthorizedClassicTransitFactory : TransitFactory<ClassicCard, Unauthoriz
     override fun parseInfo(card: ClassicCard): UnauthorizedClassicTransitInfo {
         // Standard MIFARE Classic cards can be unlocked with keys
         // MIFARE Plus / DESFire emulation cannot be unlocked this way
-        val isUnlockable = true  // TODO: Detect MIFARE Plus when subType info is available
+        val isUnlockable = true // TODO: Detect MIFARE Plus when subType info is available
         return UnauthorizedClassicTransitInfo(isUnlockable = isUnlockable)
     }
 }
 
 @Serializable
 data class UnauthorizedClassicTransitInfo(
-    val isUnlockable: Boolean = false
+    val isUnlockable: Boolean = false,
 ) : TransitInfo() {
     override val cardName: String = getStringBlocking(Res.string.locked_mfc_card)
 
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.fully_locked_title),
-            ListItem(
-                if (isUnlockable)
-                    Res.string.fully_locked_desc_unlockable
-                else
-                    Res.string.fully_locked_desc
+        get() =
+            listOf(
+                HeaderListItem(Res.string.fully_locked_title),
+                ListItem(
+                    if (isUnlockable) {
+                        Res.string.fully_locked_desc_unlockable
+                    } else {
+                        Res.string.fully_locked_desc
+                    },
+                ),
             )
-        )
 }

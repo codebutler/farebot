@@ -32,13 +32,12 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_cifial.generated.resources.Res
 import farebot.farebot_transit_cifial.generated.resources.cifial_card_name
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: ClassicCard): Boolean {
@@ -46,9 +45,8 @@ class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
         return checkSector0(sector0)
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(getStringBlocking(Res.string.cifial_card_name), null)
-    }
+    override fun parseIdentity(card: ClassicCard): TransitIdentity =
+        TransitIdentity.create(getStringBlocking(Res.string.cifial_card_name), null)
 
     override fun parseInfo(card: ClassicCard): CifialTransitInfo {
         val sector0 = card.getSector(0) as DataClassicSector
@@ -57,7 +55,7 @@ class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
         return CifialTransitInfo(
             mRoomNumber = b1.getHexString(12, 2),
             mCheckIn = parseDateTime(b2, 5),
-            mCheckOut = parseDateTime(b2, 10)
+            mCheckOut = parseDateTime(b2, 10),
         )
     }
 
@@ -66,11 +64,15 @@ class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
         val block1 = sector0.getBlock(1).data
         val block2 = sector0.getBlock(2).data
         return block1[0] == 0x47.toByte() &&
-            validateDate(block2, 5) && validateDate(block2, 10)
+            validateDate(block2, 5) &&
+            validateDate(block2, 10)
     }
 
     companion object {
-        private fun validateDate(b: ByteArray, off: Int): Boolean {
+        private fun validateDate(
+            b: ByteArray,
+            off: Int,
+        ): Boolean {
             if (off + 5 > b.size) return false
             val hexStr = b.getHexString(off, 5)
             return hexStr.all { it in '0'..'9' } &&
@@ -80,7 +82,10 @@ class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
                 b.byteArrayToInt(off + 3, 1) in 1..0x12
         }
 
-        private fun parseDateTime(b: ByteArray, off: Int): Instant {
+        private fun parseDateTime(
+            b: ByteArray,
+            off: Int,
+        ): Instant {
             val min = NumberUtils.convertBCDtoInteger(b[off])
             val hour = NumberUtils.convertBCDtoInteger(b[off + 1])
             val day = NumberUtils.convertBCDtoInteger(b[off + 2])

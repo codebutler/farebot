@@ -26,24 +26,23 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
-import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_waikato.generated.resources.*
-import com.codebutler.farebot.base.util.getStringBlocking
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 /**
  * Transit factory for Waikato-region cards (BUSIT / SmartRide Rotorua, New Zealand).
@@ -55,7 +54,6 @@ import kotlinx.datetime.toInstant
  * Ported from Metrodroid.
  */
 class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -96,14 +94,16 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
         val balBlock1Data = balSector1.getBlock(1).data
         val tripBlock0Data = balSector2.getBlock(0).data
 
-        val lastTrip = WaikatoCardTrip.parse(
-            tripBlock0Data.sliceOffLen(0, 7),
-            Trip.Mode.BUS
-        )
-        val lastRefill = WaikatoCardTrip.parse(
-            tripBlock0Data.sliceOffLen(7, 7),
-            Trip.Mode.TICKET_MACHINE
-        )
+        val lastTrip =
+            WaikatoCardTrip.parse(
+                tripBlock0Data.sliceOffLen(0, 7),
+                Trip.Mode.BUS,
+            )
+        val lastRefill =
+            WaikatoCardTrip.parse(
+                tripBlock0Data.sliceOffLen(7, 7),
+                Trip.Mode.TICKET_MACHINE,
+            )
 
         val balance = balBlock1Data.byteArrayToIntReversed(9, 2)
         val lastTransactionDate = parseDate(balBlock1Data, 7)
@@ -113,23 +113,24 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
             cardNameValue = name,
             balanceValue = balance,
             tripList = listOfNotNull(lastRefill, lastTrip),
-            lastTransactionDate = lastTransactionDate
+            lastTransactionDate = lastTransactionDate,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.waikato_card_name_busit,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.NEW_ZEALAND,
-            locationRes = Res.string.waikato_location,
-            imageRes = Res.drawable.busitcard,
-            latitude = -37.7870f,
-            longitude = 175.2793f,
-            brandColor = 0x2675AB,
-            credits = listOf("Metrodroid Project"),
-            preview = true,
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.waikato_card_name_busit,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.NEW_ZEALAND,
+                locationRes = Res.string.waikato_location,
+                imageRes = Res.drawable.busitcard,
+                latitude = -37.7870f,
+                longitude = 175.2793f,
+                brandColor = 0x2675AB,
+                credits = listOf("Metrodroid Project"),
+                preview = true,
+            )
 
         private val TIME_ZONE = TimeZone.of("Pacific/Auckland")
 
@@ -140,7 +141,12 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
 
         private fun getName(card: ClassicCard): String {
             val sector0 = card.getSector(0) as DataClassicSector
-            val header = sector0.getBlock(1).data.copyOfRange(0, 5).readASCII()
+            val header =
+                sector0
+                    .getBlock(1)
+                    .data
+                    .copyOfRange(0, 5)
+                    .readASCII()
             return if (header == "Panda") {
                 getStringBlocking(Res.string.waikato_card_name_busit)
             } else {
@@ -150,22 +156,29 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
 
         private fun formatSerial(serial: Long): String = serial.toString(16)
 
-        internal fun parseTimestamp(input: ByteArray, off: Int): Instant {
+        internal fun parseTimestamp(
+            input: ByteArray,
+            off: Int,
+        ): Instant {
             val d = input.getBitsFromBuffer(off * 8, 5)
             val m = input.getBitsFromBuffer(off * 8 + 5, 4)
             val y = input.getBitsFromBuffer(off * 8 + 9, 4) + 2007
             val hm = input.getBitsFromBuffer(off * 8 + 13, 11)
-            val localDateTime = LocalDateTime(
-                year = y,
-                month = m,
-                day = d,
-                hour = hm / 60,
-                minute = hm % 60
-            )
+            val localDateTime =
+                LocalDateTime(
+                    year = y,
+                    month = m,
+                    day = d,
+                    hour = hm / 60,
+                    minute = hm % 60,
+                )
             return localDateTime.toInstant(TIME_ZONE)
         }
 
-        internal fun parseDate(input: ByteArray, off: Int): LocalDate {
+        internal fun parseDate(
+            input: ByteArray,
+            off: Int,
+        ): LocalDate {
             val d = input.getBitsFromBuffer(off * 8, 5)
             val m = input.getBitsFromBuffer(off * 8 + 5, 4)
             val y = input.getBitsFromBuffer(off * 8 + 9, 7) + 1991

@@ -52,7 +52,6 @@ class SuicaTransitInfo(
     override val subscriptions: List<Subscription>?,
     override val cardName: String = getStringBlocking(Res.string.card_name_suica),
 ) : TransitInfo() {
-
     override val balance: TransitBalance?
         get() {
             if (trips.isNotEmpty()) {
@@ -62,7 +61,7 @@ class SuicaTransitInfo(
                     val expiry = lastTs?.plus(10, DateTimeUnit.YEAR, TimeZone.of("Asia/Tokyo"))
                     return TransitBalance(
                         balance = TransitCurrency.JPY(suicaTrip.balance),
-                        validTo = expiry
+                        validTo = expiry,
                     )
                 }
             }

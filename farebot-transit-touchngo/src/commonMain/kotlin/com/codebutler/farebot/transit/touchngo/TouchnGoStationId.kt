@@ -38,7 +38,7 @@ import farebot.farebot_transit_touchngo.generated.resources.touchngo_machine
  */
 internal data class TouchnGoStationId(
     val station: Int,
-    val machine: Int
+    val machine: Int,
 ) {
     /**
      * Resolves this station ID to a [Station] using the MDST database,
@@ -46,28 +46,31 @@ internal data class TouchnGoStationId(
      */
     fun resolve(): Station {
         val result = MdstStationLookup.getStation(TNG_STR, station)
-        val baseStation = if (result != null) {
-            Station(
-                stationNameRaw = result.stationName,
-                shortStationNameRaw = result.shortStationName,
-                companyName = result.companyName,
-                lineNames = result.lineNames,
-                latitude = if (result.hasLocation) result.latitude else null,
-                longitude = if (result.hasLocation) result.longitude else null
-            )
-        } else {
-            Station.unknown(station.toString())
-        }
+        val baseStation =
+            if (result != null) {
+                Station(
+                    stationNameRaw = result.stationName,
+                    shortStationNameRaw = result.shortStationName,
+                    companyName = result.companyName,
+                    lineNames = result.lineNames,
+                    latitude = if (result.hasLocation) result.latitude else null,
+                    longitude = if (result.hasLocation) result.longitude else null,
+                )
+            } else {
+                Station.unknown(station.toString())
+            }
         val machineAttr = getStringBlocking(Res.string.touchngo_machine, machine)
         return baseStation.addAttribute(machineAttr)
     }
 
     companion object {
-        fun parse(raw: ByteArray, off: Int): TouchnGoStationId {
-            return TouchnGoStationId(
+        fun parse(
+            raw: ByteArray,
+            off: Int,
+        ): TouchnGoStationId =
+            TouchnGoStationId(
                 station = raw.byteArrayToInt(off, 2),
-                machine = raw.byteArrayToInt(off + 2, 2)
+                machine = raw.byteArrayToInt(off + 2, 2),
             )
-        }
     }
 }

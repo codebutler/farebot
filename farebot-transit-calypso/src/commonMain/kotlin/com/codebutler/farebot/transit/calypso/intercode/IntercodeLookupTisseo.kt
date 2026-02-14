@@ -33,15 +33,16 @@ internal object IntercodeLookupTisseo : IntercodeLookupSTR("tisseo"), IntercodeL
     @Suppress("unused")
     private const val AGENCY_TISSEO = 1
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        300 to Res.string.tisseo_10_tickets,
-        307 to Res.string.tisseo_1_ticket,
-        335 to Res.string.tisseo_mensuel,
-        336 to Res.string.tisseo_mensuel,
-        455 to Res.string.tisseo_annuel,
-        672 to Res.string.tisseo_annuel_26,
-        674 to Res.string.tisseo_mensuel_26,
-        676 to Res.string.tisseo_10_tickets_26,
-        950 to Res.string.tisseo_velo,
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            300 to Res.string.tisseo_10_tickets,
+            307 to Res.string.tisseo_1_ticket,
+            335 to Res.string.tisseo_mensuel,
+            336 to Res.string.tisseo_mensuel,
+            455 to Res.string.tisseo_annuel,
+            672 to Res.string.tisseo_annuel_26,
+            674 to Res.string.tisseo_mensuel_26,
+            676 to Res.string.tisseo_10_tickets_26,
+            950 to Res.string.tisseo_velo,
+        )
 }

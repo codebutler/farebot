@@ -29,9 +29,8 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 
 internal class IntercodeTransitInfo(
-    result: CalypsoParseResult
+    result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-
     override val cardName: String
         get() {
             val networkId = result.ticketEnv.getIntOrZero(En1545TransitData.ENV_NETWORK_ID)
@@ -47,30 +46,33 @@ internal class IntercodeTransitInfo(
         // NOTE: Many French smart-cards don't have a brand name, and are simply referred to as a
         // "titre de transport" (ticket). Here they take the name of the transit agency.
 
-        private val NETWORKS: Map<Int, IntercodeLookup> = mapOf(
-            0x250000 to IntercodeLookupPassPass,
-            0x250064 to IntercodeLookupUnknown("TaM"),
-            0x250502 to IntercodeLookupOura,
-            NETWORK_NAVIGO to IntercodeLookupNavigo,
-            0x250908 to IntercodeLookupUnknown("KorriGo"),
-            NETWORK_TISSEO to IntercodeLookupTisseo,
-            0x250920 to IntercodeLookupUnknown("Envibus"),
-            0x250921 to IntercodeLookupGironde
-        )
+        private val NETWORKS: Map<Int, IntercodeLookup> =
+            mapOf(
+                0x250000 to IntercodeLookupPassPass,
+                0x250064 to IntercodeLookupUnknown("TaM"),
+                0x250502 to IntercodeLookupOura,
+                NETWORK_NAVIGO to IntercodeLookupNavigo,
+                0x250908 to IntercodeLookupUnknown("KorriGo"),
+                NETWORK_TISSEO to IntercodeLookupTisseo,
+                0x250920 to IntercodeLookupUnknown("Envibus"),
+                0x250921 to IntercodeLookupGironde,
+            )
 
-        fun getLookup(networkId: Int): IntercodeLookup =
-            NETWORKS[networkId] ?: IntercodeLookupUnknown(null)
+        fun getLookup(networkId: Int): IntercodeLookup = NETWORKS[networkId] ?: IntercodeLookupUnknown(null)
 
-        fun isIntercode(networkId: Int): Boolean =
-            NETWORKS[networkId] != null || COUNTRY_ID_FRANCE == networkId shr 12
+        fun isIntercode(networkId: Int): Boolean = NETWORKS[networkId] != null || COUNTRY_ID_FRANCE == networkId shr 12
 
         internal fun fallbackCardName(networkId: Int): String =
-            if (networkId shr 12 == COUNTRY_ID_FRANCE)
+            if (networkId shr 12 == COUNTRY_ID_FRANCE) {
                 "Intercode-France-" + (networkId and 0xfff).toString(16)
-            else
+            } else {
                 "Intercode-" + networkId.toString(16)
+            }
 
-        internal fun getCardName(networkId: Int, env: ByteArray): String =
+        internal fun getCardName(
+            networkId: Int,
+            env: ByteArray,
+        ): String =
             getLookup(networkId).cardName { parseTicketEnv(env) }
                 ?: fallbackCardName(networkId)
 

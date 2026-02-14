@@ -37,7 +37,6 @@ package com.codebutler.farebot.card.china
  * - Wuhan Tong
  */
 object ChinaRegistry {
-
     /**
      * Mutable list for factory registration.
      */
@@ -83,6 +82,5 @@ object ChinaRegistry {
      * Find a factory that can handle the given ChinaCard.
      * Returns the first matching factory or null if none match.
      */
-    fun findFactory(card: ChinaCard): ChinaCardTransitFactory? =
-        allFactories.find { it.check(card) }
+    fun findFactory(card: ChinaCard): ChinaCardTransitFactory? = allFactories.find { it.check(card) }
 }

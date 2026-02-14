@@ -35,9 +35,8 @@ import farebot.farebot_transit_nextfare.generated.resources.nextfare_agency_name
  */
 open class NextfareRefill(
     private val record: NextfareTopupRecord,
-    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) }
+    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) },
 ) : Refill() {
-
     override fun getTimestamp(): Long = record.timestamp.epochSeconds
 
     override fun getAgencyName(stringResource: StringResource): String =

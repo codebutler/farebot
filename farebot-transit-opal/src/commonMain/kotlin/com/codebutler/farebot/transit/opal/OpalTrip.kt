@@ -35,15 +35,15 @@ class OpalTrip(
     private val transactionType: Int,
     private val stringResource: StringResource,
 ) : Trip() {
-
     override val startTimestamp: Instant = timestamp
 
     override val mode: Mode
-        get() = when (transactionMode) {
-            OpalData.MODE_RAIL -> Mode.TRAIN
-            OpalData.MODE_BUS -> Mode.BUS
-            else -> Mode.FERRY // MODE_FERRY_LR
-        }
+        get() =
+            when (transactionMode) {
+                OpalData.MODE_RAIL -> Mode.TRAIN
+                OpalData.MODE_BUS -> Mode.BUS
+                else -> Mode.FERRY // MODE_FERRY_LR
+            }
 
     override val agencyName: String
         get() = stringResource.getString(Res.string.opal_agency_tfnsw)
@@ -55,12 +55,14 @@ class OpalTrip(
         get() = OpalData.getLocalisedAction(stringResource, transactionType)
 
     override val isTransfer: Boolean
-        get() = transactionType in listOf(
-            0x02, // ACTION_TRANSFER_SAME_MODE
-            0x03, // ACTION_TRANSFER_DIFF_MODE
-            0x05, // ACTION_MANLY_TRANSFER_SAME_MODE
-            0x06, // ACTION_MANLY_TRANSFER_DIFF_MODE
-        )
+        get() =
+            transactionType in
+                listOf(
+                    0x02, // ACTION_TRANSFER_SAME_MODE
+                    0x03, // ACTION_TRANSFER_DIFF_MODE
+                    0x05, // ACTION_MANLY_TRANSFER_SAME_MODE
+                    0x06, // ACTION_MANLY_TRANSFER_DIFF_MODE
+                )
 
     override val isRejected: Boolean
         get() = transactionType == 0x0c // ACTION_TAP_ON_REJECTED

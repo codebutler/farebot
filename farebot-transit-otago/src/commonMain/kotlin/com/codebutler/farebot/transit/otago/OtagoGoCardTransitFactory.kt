@@ -28,7 +28,6 @@ import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.hex
-import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -38,26 +37,26 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_otago.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class OtagoGoCardTransitFactory : TransitFactory<ClassicCard, OtagoGoCardTransitInfo> {
-
     companion object {
         private val TZ = TimeZone.of("Pacific/Auckland")
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.otago_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.NEW_ZEALAND,
-            locationRes = Res.string.otago_location,
-            imageRes = Res.drawable.otago_gocard,
-            latitude = -45.8788f,
-            longitude = 170.5028f,
-            brandColor = 0x01275C,
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.otago_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.NEW_ZEALAND,
+                locationRes = Res.string.otago_location,
+                imageRes = Res.drawable.otago_gocard,
+                latitude = -45.8788f,
+                longitude = 170.5028f,
+                brandColor = 0x01275C,
+            )
     }
 
     override val allCards: List<CardInfo>
@@ -90,10 +89,11 @@ class OtagoGoCardTransitFactory : TransitFactory<ClassicCard, OtagoGoCardTransit
         val balSecPlus2 = card.getSector(balSec + 2) as DataClassicSector
         val tripData = balSecPlus1.readBlocks(1, 2) + balSecPlus2.readBlocks(0, 3)
 
-        val trips = (0..3).mapNotNull { i ->
-            val slice = tripData.sliceOffLen(i * 17, 17)
-            parseTripFromData(slice)
-        }
+        val trips =
+            (0..3).mapNotNull { i ->
+                val slice = tripData.sliceOffLen(i * 17, 17)
+                parseTripFromData(slice)
+            }
 
         val balanceSector = card.getSector(balSec) as DataClassicSector
         val balanceValue = balanceSector.getBlock(2).data.byteArrayToIntReversed(8, 3)
@@ -105,11 +105,14 @@ class OtagoGoCardTransitFactory : TransitFactory<ClassicCard, OtagoGoCardTransit
             serial = getSerial(card),
             balanceValue = balanceValue,
             refill = refill,
-            tripList = trips
+            tripList = trips,
         )
     }
 
-    private fun parseTimestamp(input: ByteArray, off: Int): Instant {
+    private fun parseTimestamp(
+        input: ByteArray,
+        off: Int,
+    ): Instant {
         val d = input.getBitsFromBuffer(off * 8, 5)
         val m = input.getBitsFromBuffer(off * 8 + 5, 4)
         val y = input.getBitsFromBuffer(off * 8 + 9, 4) + 2007
@@ -135,11 +138,10 @@ class OtagoGoCardTransitFactory : TransitFactory<ClassicCard, OtagoGoCardTransit
         return OtagoGoCardRefill(
             timestamp = timestamp,
             amount = amount,
-            machine = machineId
+            machine = machineId,
         )
     }
 
-    private fun getSerial(card: ClassicCard): Long {
-        return (card.getSector(1) as DataClassicSector).getBlock(0).data.byteArrayToLong(4, 4)
-    }
+    private fun getSerial(card: ClassicCard): Long =
+        (card.getSector(1) as DataClassicSector).getBlock(0).data.byteArrayToLong(4, 4)
 }

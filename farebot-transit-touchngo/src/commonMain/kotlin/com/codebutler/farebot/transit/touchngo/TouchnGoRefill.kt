@@ -40,9 +40,8 @@ import kotlin.time.Instant
  * Represents a Touch 'n Go top-up / refill transaction.
  */
 internal class TouchnGoRefill(
-    private val header: ByteArray
+    private val header: ByteArray,
 ) : Trip() {
-
     private val agencyRaw: ByteArray
         get() = header.sliceOffLen(2, 4)
 

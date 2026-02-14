@@ -28,8 +28,14 @@ plugins {
 kotlin {
     androidLibrary {
         namespace = "com.codebutler.farebot.transit.krocap"
-        compileSdk = libs.versions.compileSdk.get().toInt()
-        minSdk = libs.versions.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.minSdk
+                .get()
+                .toInt()
     }
 
     iosX64()

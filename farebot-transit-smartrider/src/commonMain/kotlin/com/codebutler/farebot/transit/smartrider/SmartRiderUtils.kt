@@ -23,12 +23,12 @@
 package com.codebutler.farebot.transit.smartrider
 
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 /**
  * SmartRider and MyWay cards store timestamps as seconds since 2000-01-01 00:00:00 LOCAL time.
@@ -42,8 +42,7 @@ import kotlin.time.Duration.Companion.days
  *   MYWAY_EPOCH = Epoch.utc(2000, MetroTimeZone.SYDNEY, -11 * 60)
  */
 
-/** Unix epoch seconds for 2000-01-01T00:00:00 UTC */
-private const val EPOCH_2000_UTC = 946684800L
+private const val EPOCH_2000_UTC = 946684800L // Unix epoch seconds for 2000-01-01T00:00:00 UTC
 
 /** Seconds in an hour */
 private const val HOUR_IN_SECONDS = 3600L
@@ -73,13 +72,17 @@ val SYDNEY_TIMEZONE = TimeZone.of("Australia/Sydney")
  * Converts a card timestamp (seconds since 2000-01-01 local time) to an [Instant].
  * Uses the appropriate epoch offset based on the card type.
  */
-fun convertTime(epochTime: Long, smartRiderType: SmartRiderType): Instant? {
+fun convertTime(
+    epochTime: Long,
+    smartRiderType: SmartRiderType,
+): Instant? {
     if (epochTime == 0L) return null
-    val epoch = when (smartRiderType) {
-        SmartRiderType.MYWAY -> MYWAY_EPOCH
-        SmartRiderType.SMARTRIDER -> SMARTRIDER_EPOCH
-        SmartRiderType.UNKNOWN -> SMARTRIDER_EPOCH
-    }
+    val epoch =
+        when (smartRiderType) {
+            SmartRiderType.MYWAY -> MYWAY_EPOCH
+            SmartRiderType.SMARTRIDER -> SMARTRIDER_EPOCH
+            SmartRiderType.UNKNOWN -> SMARTRIDER_EPOCH
+        }
     return Instant.fromEpochSeconds(epoch + epochTime)
 }
 
@@ -94,24 +97,28 @@ fun convertDate(days: Int): Instant {
 /**
  * Bitfield parser for SmartRider trip records.
  */
-class SmartRiderTripBitfield(smartRiderType: SmartRiderType, bitfield: Int) {
-    val mode: Trip.Mode = when (bitfield and 0x03) {
-        0x00 -> Trip.Mode.BUS
-        0x01 -> when (smartRiderType) {
-            SmartRiderType.MYWAY -> Trip.Mode.TRAM
-            else -> Trip.Mode.TRAIN
+class SmartRiderTripBitfield(
+    smartRiderType: SmartRiderType,
+    bitfield: Int,
+) {
+    val mode: Trip.Mode =
+        when (bitfield and 0x03) {
+            0x00 -> Trip.Mode.BUS
+            0x01 ->
+                when (smartRiderType) {
+                    SmartRiderType.MYWAY -> Trip.Mode.TRAM
+                    else -> Trip.Mode.TRAIN
+                }
+            0x02 -> Trip.Mode.FERRY
+            else -> Trip.Mode.OTHER
         }
-        0x02 -> Trip.Mode.FERRY
-        else -> Trip.Mode.OTHER
-    }
     val isSynthetic = bitfield and 0x04 == 0x04
     val isTransfer = bitfield and 0x08 == 0x08
     val isTapOn = bitfield and 0x10 == 0x10
     val isAutoLoadDiscount = bitfield and 0x40 == 0x40
     val isBalanceNegative = bitfield and 0x80 == 0x80
 
-    override fun toString(): String {
-        return "mode=$mode, isSynthetic=$isSynthetic, isTransfer=$isTransfer, isTapOn=$isTapOn, " +
+    override fun toString(): String =
+        "mode=$mode, isSynthetic=$isSynthetic, isTransfer=$isTransfer, isTapOn=$isTapOn, " +
             "isAutoLoadDiscount=$isAutoLoadDiscount, isBalanceNegative=$isBalanceNegative"
-    }
 }

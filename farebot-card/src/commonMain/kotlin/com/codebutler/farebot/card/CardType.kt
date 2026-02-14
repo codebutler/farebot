@@ -30,16 +30,18 @@ enum class CardType {
     FeliCa,
     ISO7816,
     Vicinity,
-    Sample;
+    Sample,
+    ;
 
-    override fun toString(): String = when (this) {
-        MifareClassic -> "MIFARE Classic"
-        MifareUltralight -> "MIFARE Ultralight"
-        MifareDesfire -> "MIFARE DESFire"
-        CEPAS -> "CEPAS"
-        FeliCa -> "FeliCa"
-        ISO7816 -> "ISO 7816"
-        Vicinity -> "NFC-V (Vicinity)"
-        Sample -> "Sample Card"
-    }
+    override fun toString(): String =
+        when (this) {
+            MifareClassic -> "MIFARE Classic"
+            MifareUltralight -> "MIFARE Ultralight"
+            MifareDesfire -> "MIFARE DESFire"
+            CEPAS -> "CEPAS"
+            FeliCa -> "FeliCa"
+            ISO7816 -> "ISO 7816"
+            Vicinity -> "NFC-V (Vicinity)"
+            Sample -> "Sample Card"
+        }
 }

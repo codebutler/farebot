@@ -39,9 +39,8 @@ class HafilatTransitInfo(
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>?,
     private val purse: HafilatSubscription?,
-    private val serial: Long
+    private val serial: Long,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = formatSerial(serial)
 

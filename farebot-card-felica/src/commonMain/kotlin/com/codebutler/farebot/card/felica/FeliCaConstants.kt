@@ -26,7 +26,6 @@ package com.codebutler.farebot.card.felica
  * Migrated from net.kazzz.felica.lib.FeliCaLib.
  */
 object FeliCaConstants {
-
     // Command codes
     const val COMMAND_POLLING: Byte = 0x00
     const val RESPONSE_POLLING: Byte = 0x01

@@ -27,8 +27,12 @@ import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 
 abstract class En1545LookupUnknown : En1545Lookup {
-
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
         if (routeNumber == null) return null
         var routeReadable = routeNumber.toString()
         if (routeVariant != null) {
@@ -37,16 +41,25 @@ abstract class En1545LookupUnknown : En1545Lookup {
         return routeReadable
     }
 
-    override fun getAgencyName(agency: Int?, isShort: Boolean): String? {
-        return if (agency == null || agency == 0) null else agency.toString()
-    }
+    override fun getAgencyName(
+        agency: Int?,
+        isShort: Boolean,
+    ): String? = if (agency == null || agency == 0) null else agency.toString()
 
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
-        return if (station == 0) null else Station.unknown(station.toString())
-    }
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? = if (station == 0) null else Station.unknown(station.toString())
 
-    override fun getSubscriptionName(stringResource: StringResource, agency: Int?, contractTariff: Int?): String? =
-        contractTariff?.toString()
+    override fun getSubscriptionName(
+        stringResource: StringResource,
+        agency: Int?,
+        contractTariff: Int?,
+    ): String? = contractTariff?.toString()
 
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode = Trip.Mode.OTHER
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
 }

@@ -40,9 +40,8 @@ import kotlin.time.Instant
 
 class UmarshTransitInfo(
     private val sectors: List<UmarshSector>,
-    private val validation: UmarshTrip?
+    private val validation: UmarshTrip?,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = formatSerial(sectors.first().serialNumber)
 
@@ -62,29 +61,34 @@ class UmarshTransitInfo(
         }
 
     override val info: List<ListItemInterface>
-        get() = sectors.flatMap { sec ->
-            listOf(
-                ListItem(Res.string.umarsh_refill_counter, sec.refillCounter.toString()),
-                ListItem(Res.string.umarsh_expiry_date, sec.cardExpiry?.toString() ?: ""),
-                ListItem(Res.string.umarsh_region, RussiaTaxCodes.codeToName(sec.region))
-            ) + if (sec.denomination == UmarshDenomination.RUB) {
+        get() =
+            sectors.flatMap { sec ->
                 listOf(
-                    ListItem(Res.string.umarsh_last_refill, sec.lastRefill?.toString() ?: ""),
-                    ListItem(Res.string.umarsh_machine_id, sec.machineId.toString())
-                )
-            } else emptyList()
-        }
+                    ListItem(Res.string.umarsh_refill_counter, sec.refillCounter.toString()),
+                    ListItem(Res.string.umarsh_expiry_date, sec.cardExpiry?.toString() ?: ""),
+                    ListItem(Res.string.umarsh_region, RussiaTaxCodes.codeToName(sec.region)),
+                ) +
+                    if (sec.denomination == UmarshDenomination.RUB) {
+                        listOf(
+                            ListItem(Res.string.umarsh_last_refill, sec.lastRefill?.toString() ?: ""),
+                            ListItem(Res.string.umarsh_machine_id, sec.machineId.toString()),
+                        )
+                    } else {
+                        emptyList()
+                    }
+            }
 
     override val trips: List<Trip>?
         get() = validation?.let { listOf(it) }
 
     companion object {
-        private fun formatSerial(sn: Int): String =
-            NumberUtils.formatNumber(sn.toLong(), " ", 3, 3, 3)
+        private fun formatSerial(sn: Int): String = NumberUtils.formatNumber(sn.toLong(), " ", 3, 3, 3)
     }
 }
 
-private class UmarshSubscription(private val sector: UmarshSector) : Subscription() {
+private class UmarshSubscription(
+    private val sector: UmarshSector,
+) : Subscription() {
     override val subscriptionName: String?
         get() = sector.subscriptionName
 

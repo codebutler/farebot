@@ -48,9 +48,8 @@ import kotlinx.serialization.Serializable
 data class KSX6924Application(
     val application: ISO7816Application,
     @Contextual val balance: ByteArray,
-    val extraRecords: List<@Contextual ByteArray> = emptyList()
+    val extraRecords: List<@Contextual ByteArray> = emptyList(),
 ) {
-
     /**
      * Returns the transaction records from the card.
      */
@@ -72,9 +71,10 @@ data class KSX6924Application(
      * Returns the purse info data from the FCI.
      */
     private val purseInfoData: ByteArray?
-        get() = application.appFci?.let { fci ->
-            ISO7816TLV.findBERTLV(fci, TAG_PURSE_INFO, false)
-        }
+        get() =
+            application.appFci?.let { fci ->
+                ISO7816TLV.findBERTLV(fci, TAG_PURSE_INFO, false)
+            }
 
     /**
      * Returns the parsed purse info.
@@ -98,11 +98,12 @@ data class KSX6924Application(
 
             for (i in extraRecords.indices) {
                 val d = extraRecords[i]
-                val title = if (d.isAllZero() || d.isAllFF()) {
-                    "Record $i (empty)"
-                } else {
-                    "Record $i"
-                }
+                val title =
+                    if (d.isAllZero() || d.isAllFF()) {
+                        "Record $i (empty)"
+                    } else {
+                        "Record $i"
+                    }
                 sli.add(ListItemRecursive.collapsedValue(title, d.toHexDump()))
             }
 
@@ -136,16 +137,17 @@ data class KSX6924Application(
          * Application names (AIDs) that identify a KSX6924 card.
          */
         @OptIn(ExperimentalStdlibApi::class)
-        val APP_NAMES: List<ByteArray> = listOf(
-            // T-Money, Snapper
-            "d4100000030001".hexToByteArray(),
-            // Cashbee / eB
-            "d4100000140001".hexToByteArray(),
-            // MOIBA (untested)
-            "d4100000300001".hexToByteArray(),
-            // K-Cash (untested)
-            "d4106509900020".hexToByteArray()
-        )
+        val APP_NAMES: List<ByteArray> =
+            listOf(
+                // T-Money, Snapper
+                "d4100000030001".hexToByteArray(),
+                // Cashbee / eB
+                "d4100000140001".hexToByteArray(),
+                // MOIBA (untested)
+                "d4100000300001".hexToByteArray(),
+                // K-Cash (untested)
+                "d4106509900020".hexToByteArray(),
+            )
 
         @OptIn(ExperimentalStdlibApi::class)
         val FILE_NAME: ByteArray = "d4100000030001".hexToByteArray()

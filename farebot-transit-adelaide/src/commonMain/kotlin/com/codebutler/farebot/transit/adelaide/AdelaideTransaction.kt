@@ -27,8 +27,9 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 
-class AdelaideTransaction(override val parsed: En1545Parsed) : En1545Transaction() {
-
+class AdelaideTransaction(
+    override val parsed: En1545Parsed,
+) : En1545Transaction() {
     override val lookup: En1545Lookup
         get() = AdelaideLookup
 

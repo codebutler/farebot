@@ -26,8 +26,8 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Capsule data class holding the parsed trip data from a China card record.
@@ -37,7 +37,7 @@ data class ChinaTripCapsule(
     val mTime: Long,
     val mCost: Int,
     val mType: Int,
-    val mStation: Long
+    val mStation: Long,
 ) {
     constructor(data: ByteArray) : this(
         // 2 bytes counter
@@ -46,7 +46,7 @@ data class ChinaTripCapsule(
         mCost = data.byteArrayToInt(5, 4),
         mType = data[9].toInt() and 0xff,
         mStation = data.byteArrayToLong(10, 6),
-        mTime = data.byteArrayToLong(16, 7)
+        mTime = data.byteArrayToLong(16, 7),
     )
 }
 
@@ -95,6 +95,8 @@ abstract class ChinaTripAbstract : Trip() {
  * Generic China trip implementation for cards without specific station/route knowledge.
  */
 @Serializable
-class ChinaTrip(override val capsule: ChinaTripCapsule) : ChinaTripAbstract() {
+class ChinaTrip(
+    override val capsule: ChinaTripCapsule,
+) : ChinaTripAbstract() {
     constructor(data: ByteArray) : this(ChinaTripCapsule(data))
 }

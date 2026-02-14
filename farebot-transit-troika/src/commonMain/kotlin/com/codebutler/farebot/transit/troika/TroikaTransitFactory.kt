@@ -40,7 +40,6 @@ import farebot.farebot_transit_troika.generated.resources.*
  * checking the header magic bytes on sector 8 and sector 4.
  */
 class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
-
     // TroikaHybridTransitFactory is the registered factory; this is an internal helper.
     override val allCards: List<CardInfo>
         get() = emptyList()
@@ -50,11 +49,13 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
         if (card.sectors.size >= 2) {
             val sector1 = card.getSector(1)
             if (sector1 is DataClassicSector) {
-                val keyMatch = HashUtils.checkKeyHash(
-                    sector1.keyA, sector1.keyB,
-                    TROIKA_KEY_SALT,
-                    TROIKA_KEY_HASH
-                )
+                val keyMatch =
+                    HashUtils.checkKeyHash(
+                        sector1.keyA,
+                        sector1.keyB,
+                        TROIKA_KEY_SALT,
+                        TROIKA_KEY_HASH,
+                    )
                 if (keyMatch >= 0) return true
             }
         }
@@ -72,27 +73,29 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        val block = MAIN_BLOCKS.firstNotNullOfOrNull { idx ->
-            if (idx >= card.sectors.size) return@firstNotNullOfOrNull null
-            val sector = card.getSector(idx) as? DataClassicSector ?: return@firstNotNullOfOrNull null
-            try {
-                val data = sector.readBlocks(0, 3)
-                if (TroikaBlock.check(data)) data else null
-            } catch (_: Exception) {
-                null
-            }
-        } ?: throw RuntimeException("No valid Troika sector found")
+        val block =
+            MAIN_BLOCKS.firstNotNullOfOrNull { idx ->
+                if (idx >= card.sectors.size) return@firstNotNullOfOrNull null
+                val sector = card.getSector(idx) as? DataClassicSector ?: return@firstNotNullOfOrNull null
+                try {
+                    val data = sector.readBlocks(0, 3)
+                    if (TroikaBlock.check(data)) data else null
+                } catch (_: Exception) {
+                    null
+                }
+            } ?: throw RuntimeException("No valid Troika sector found")
 
         return TransitIdentity.create(
             getStringBlocking(Res.string.card_name_troika),
-            TroikaBlock.formatSerial(TroikaBlock.getSerial(block))
+            TroikaBlock.formatSerial(TroikaBlock.getSerial(block)),
         )
     }
 
     override fun parseInfo(card: ClassicCard): TroikaTransitInfo {
-        val blocks = SECTOR_ORDER.mapNotNull { idx ->
-            decodeSector(card, idx)?.let { idx to it }
-        }
+        val blocks =
+            SECTOR_ORDER.mapNotNull { idx ->
+                decodeSector(card, idx)?.let { idx to it }
+            }
         return TroikaTransitInfo(blocks)
     }
 
@@ -119,7 +122,10 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
         private const val TROIKA_KEY_SALT = "troika"
         private const val TROIKA_KEY_HASH = "0045ccfe4749673d77273162e8d53015"
 
-        private fun decodeSector(card: ClassicCard, idx: Int): TroikaBlock? {
+        private fun decodeSector(
+            card: ClassicCard,
+            idx: Int,
+        ): TroikaBlock? {
             return try {
                 if (idx >= card.sectors.size) return null
                 val sector = card.getSector(idx) as? DataClassicSector ?: return null

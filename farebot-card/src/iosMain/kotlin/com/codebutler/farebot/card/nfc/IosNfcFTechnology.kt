@@ -31,8 +31,9 @@ import platform.CoreNFC.NFCFeliCaTagProtocol
  * The [NFCFeliCaTag] protocol provides the system code and supports polling,
  * service enumeration, and block reads used by the FeliCa tag reader.
  */
-class IosNfcFTechnology(private val tag: NFCFeliCaTagProtocol) : NfcFTechnology {
-
+class IosNfcFTechnology(
+    private val tag: NFCFeliCaTagProtocol,
+) : NfcFTechnology {
     private var _isConnected = false
 
     override fun connect() {

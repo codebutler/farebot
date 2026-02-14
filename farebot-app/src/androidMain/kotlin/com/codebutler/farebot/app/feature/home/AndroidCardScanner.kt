@@ -11,7 +11,6 @@ import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ScannedTag
-import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 /**
  * Android implementation of [CardScanner] that wraps [NfcStream] and [TagReaderFactory].
@@ -35,7 +35,6 @@ class AndroidCardScanner(
     private val cardKeysPersister: CardKeysPersister,
     private val json: Json,
 ) : CardScanner {
-
     override val requiresActiveScan: Boolean get() = false
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -95,5 +94,4 @@ class AndroidCardScanner(
             else -> null
         }
     }
-
 }

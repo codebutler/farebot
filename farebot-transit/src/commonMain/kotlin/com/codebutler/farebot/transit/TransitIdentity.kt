@@ -27,11 +27,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TransitIdentity(
     val name: String,
-    val serialNumber: String?
+    val serialNumber: String?,
 ) {
     companion object {
-        fun create(name: String, serialNumber: String?): TransitIdentity {
-            return TransitIdentity(name, serialNumber)
-        }
+        fun create(
+            name: String,
+            serialNumber: String?,
+        ): TransitIdentity = TransitIdentity(name, serialNumber)
     }
 }

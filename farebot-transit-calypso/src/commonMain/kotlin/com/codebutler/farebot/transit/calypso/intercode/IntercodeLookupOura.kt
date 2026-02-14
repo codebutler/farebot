@@ -31,7 +31,8 @@ import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 internal object IntercodeLookupOura : IntercodeLookupSTR("oura"), IntercodeLookupSingle {
     override val cardName: String = getStringBlocking(Res.string.card_name_oura)
 
-    override val subscriptionMapByAgency: Map<Pair<Int?, Int>, ComposeStringResource> = mapOf(
-        Pair(2, 0x6601) to Res.string.oura_billet_tarif_normal
-    )
+    override val subscriptionMapByAgency: Map<Pair<Int?, Int>, ComposeStringResource> =
+        mapOf(
+            Pair(2, 0x6601) to Res.string.oura_billet_tarif_normal,
+        )
 }

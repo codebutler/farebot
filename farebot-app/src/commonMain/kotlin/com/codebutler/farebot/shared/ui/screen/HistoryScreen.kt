@@ -52,7 +52,7 @@ fun HistoryContent(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         when {
             uiState.isLoading -> {
@@ -62,10 +62,11 @@ fun HistoryContent(
                 Image(
                     painter = painterResource(Res.drawable.img_home_splash),
                     contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxSize()
-                        .padding(80.dp),
+                    modifier =
+                        Modifier
+                            .align(Alignment.Center)
+                            .fillMaxSize()
+                            .padding(80.dp),
                 )
             }
             else -> {
@@ -78,24 +79,27 @@ fun HistoryContent(
                                     text = date,
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
                                 )
                             }
                         }
                         items(items, key = { it.id }) { item ->
                             val isSelected = uiState.selectedIds.contains(item.id)
-                            val dotColor = if (item.brandColor != null) {
-                                Color(0xFF000000.toInt() or item.brandColor)
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            }
-                            val supportingParts = buildList {
-                                add(item.serial)
-                                if (item.parseError != null) add(item.parseError)
-                            }
+                            val dotColor =
+                                if (item.brandColor != null) {
+                                    Color(0xFF000000.toInt() or item.brandColor)
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                }
+                            val supportingParts =
+                                buildList {
+                                    add(item.serial)
+                                    if (item.parseError != null) add(item.parseError)
+                                }
                             ListItem(
                                 headlineContent = {
                                     Text(text = item.cardName ?: stringResource(Res.string.unknown_card))
@@ -114,30 +118,49 @@ fun HistoryContent(
                                         )
                                     } else {
                                         Box(
-                                            modifier = Modifier
-                                                .size(width = 14.dp, height = 10.dp)
-                                                .background(dotColor, RoundedCornerShape(2.dp))
+                                            modifier =
+                                                Modifier
+                                                    .size(width = 14.dp, height = 10.dp)
+                                                    .background(dotColor, RoundedCornerShape(2.dp)),
                                         )
                                     }
                                 },
                                 trailingContent = {
-                                    val badges = buildList {
-                                        if (item.cardType != null && item.cardType !in supportedCardTypes) add(Icons.Default.MobileOff)
-                                        if (item.keysRequired && item.keyBundle !in loadedKeyBundles) add(Icons.Default.Lock)
-                                        if (item.serialOnly) add(Icons.Default.SubtitlesOff)
-                                        if (item.preview) add(Icons.Default.Science)
-                                    }
+                                    val badges =
+                                        buildList {
+                                            if (item.cardType != null &&
+                                                item.cardType !in supportedCardTypes
+                                            ) {
+                                                add(Icons.Default.MobileOff)
+                                            }
+                                            if (item.keysRequired &&
+                                                item.keyBundle !in loadedKeyBundles
+                                            ) {
+                                                add(Icons.Default.Lock)
+                                            }
+                                            if (item.serialOnly) add(Icons.Default.SubtitlesOff)
+                                            if (item.preview) add(Icons.Default.Science)
+                                        }
                                     Column(horizontalAlignment = Alignment.End) {
                                         if (badges.isNotEmpty()) {
                                             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                                                 for (icon in badges) {
                                                     Box(
-                                                        modifier = Modifier
-                                                            .size(16.dp)
-                                                            .background(Color.Black.copy(alpha = 0.6f), CircleShape),
+                                                        modifier =
+                                                            Modifier
+                                                                .size(16.dp)
+                                                                .background(
+                                                                    Color.Black.copy(alpha = 0.6f),
+                                                                    CircleShape,
+                                                                ),
                                                         contentAlignment = Alignment.Center,
                                                     ) {
-                                                        Icon(icon, contentDescription = null, modifier = Modifier.size(10.dp), tint = Color.White)
+                                                        Icon(
+                                                            icon,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(10.dp),
+                                                            tint = Color.White,
+                                                        )
                                                     }
                                                 }
                                             }
@@ -151,18 +174,19 @@ fun HistoryContent(
                                         }
                                     }
                                 },
-                                modifier = Modifier.combinedClickable(
-                                    onClick = {
-                                        if (uiState.isSelectionMode) {
+                                modifier =
+                                    Modifier.combinedClickable(
+                                        onClick = {
+                                            if (uiState.isSelectionMode) {
+                                                onToggleSelection(item.id)
+                                            } else {
+                                                onNavigateToCard(item.id)
+                                            }
+                                        },
+                                        onLongClick = {
                                             onToggleSelection(item.id)
-                                        } else {
-                                            onNavigateToCard(item.id)
-                                        }
-                                    },
-                                    onLongClick = {
-                                        onToggleSelection(item.id)
-                                    },
-                                ),
+                                        },
+                                    ),
                             )
                             HorizontalDivider()
                         }

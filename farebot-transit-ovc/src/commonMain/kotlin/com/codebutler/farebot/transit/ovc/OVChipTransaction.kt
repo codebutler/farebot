@@ -36,7 +36,9 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
-class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction() {
+class OVChipTransaction(
+    override val parsed: En1545Parsed,
+) : En1545Transaction() {
     private val date: Int
         get() = parsed.getIntOrZero(En1545FixedInteger.dateName(EVENT))
 
@@ -59,20 +61,23 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
     override val isTapOff get() = transfer == PROCESS_CHECKOUT
 
     override fun isSameTrip(other: Transaction): Boolean {
-        if (other !is OVChipTransaction)
+        if (other !is OVChipTransaction) {
             return false
+        }
         /*
          * Information about checking in and out:
          * http://www.chipinfo.nl/inchecken/
          */
 
-        if (company != other.company)
+        if (company != other.company) {
             return false
+        }
         if (date == other.date) {
             return true
         }
-        if (date != other.date - 1)
+        if (date != other.date - 1) {
             return false
+        }
 
         // All NS trips get reset at 4 AM (except if it's a night train, but that's out of our scope).
         if (company == AGENCY_NS) {
@@ -92,8 +97,8 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
         val startStationId = stationId ?: 0
 
         // FIXME: Clean this up
-        //mIsBusOrTram = (company == AGENCY_GVB || company == AGENCY_HTM || company == AGENCY_RET && (!mIsMetro));
-        //mIsBusOrTrain = company == AGENCY_VEOLIA || company == AGENCY_SYNTUS;
+        // mIsBusOrTram = (company == AGENCY_GVB || company == AGENCY_HTM || company == AGENCY_RET && (!mIsMetro));
+        // mIsBusOrTrain = company == AGENCY_VEOLIA || company == AGENCY_SYNTUS;
 
         when (transfer) {
             PROCESS_BANNED -> return Trip.Mode.BANNED
@@ -109,12 +114,13 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
             AGENCY_GVB -> if (startStationId < 3000) Trip.Mode.METRO else Trip.Mode.BUS
             // TODO: Needs verification!
             AGENCY_RET -> if (startStationId < 3000) Trip.Mode.METRO else Trip.Mode.BUS
-            AGENCY_ARRIVA -> when (startStationId) {
-                in 0..800 -> Trip.Mode.TRAIN
-                // TODO: Needs verification!
-                in 4601..4699 -> Trip.Mode.FERRY
-                else -> Trip.Mode.BUS
-            }
+            AGENCY_ARRIVA ->
+                when (startStationId) {
+                    in 0..800 -> Trip.Mode.TRAIN
+                    // TODO: Needs verification!
+                    in 4601..4699 -> Trip.Mode.FERRY
+                    else -> Trip.Mode.BUS
+                }
             // Everything else will be a bus, although this is not correct.
             // The only way to determine them would be to collect every single 'ovcid' out there :(
             else -> Trip.Mode.BUS
@@ -135,7 +141,9 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
         private const val AGENCY_NS = 0x04
         private const val AGENCY_RET = 0x05
         private const val AGENCY_ARRIVA = 0x08
-        private const val AGENCY_DUO = 0x0C    // Could also be 2C though... ( http://www.ov-chipkaart.me/forum/viewtopic.php?f=10&t=299 )
+
+        // Could also be 2C though... ( http://www.ov-chipkaart.me/forum/viewtopic.php?f=10&t=299 )
+        private const val AGENCY_DUO = 0x0C
         private const val AGENCY_STORE = 0x19
         private const val AGENCY_GVB_FLEX = 0x2711
 
@@ -145,10 +153,11 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
 
         private fun neverSeenField(i: Int) = En1545FixedInteger(neverSeen(i), 8)
 
-        fun tripFields(reversed: Boolean = false) = En1545Bitmap.infixBitmap(
+        fun tripFields(reversed: Boolean = false) =
+            En1545Bitmap.infixBitmap(
                 En1545Container(
-                        En1545FixedInteger.date(EVENT),
-                        En1545FixedInteger.timeLocal(EVENT)
+                    En1545FixedInteger.date(EVENT),
+                    En1545FixedInteger.timeLocal(EVENT),
                 ),
                 neverSeenField(1),
                 En1545FixedInteger(EVENT_UNKNOWN_A, 24),
@@ -179,10 +188,11 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
                 En1545FixedInteger(EVENT_UNKNOWN_C, 10),
                 neverSeenField(27),
                 En1545FixedInteger("EventExtra", 0),
-                reversed = reversed
-        )
+                reversed = reversed,
+            )
 
-        private val OVC_UL_TRIP_FIELDS = En1545Container(
+        private val OVC_UL_TRIP_FIELDS =
+            En1545Container(
                 En1545FixedInteger("A", 8),
                 En1545FixedInteger(EVENT_SERIAL_NUMBER, 12),
                 En1545FixedInteger(EVENT_SERVICE_PROVIDER, 12),
@@ -190,23 +200,27 @@ class OVChipTransaction(override val parsed: En1545Parsed) : En1545Transaction()
                 En1545FixedInteger.date(EVENT),
                 En1545FixedInteger.timeLocal(EVENT),
                 En1545FixedInteger("balseqno", 4),
-                En1545FixedHex("D", 64)
-        )
+                En1545FixedHex("D", 64),
+            )
 
         fun parseClassic(data: ByteArray): OVChipTransaction? {
-            if (data.getBitsFromBuffer(0, 28) == 0)
+            if (data.getBitsFromBuffer(0, 28) == 0) {
                 return null
+            }
             val parsed = En1545Parser.parse(data, tripFields())
             // 27 is not critical, ignore if ever
-            for (i in 1..23)
-                if (parsed.contains(neverSeen(i)))
+            for (i in 1..23) {
+                if (parsed.contains(neverSeen(i))) {
                     return null
+                }
+            }
             return OVChipTransaction(parsed)
         }
 
         fun parseUltralight(data: ByteArray): OVChipTransaction? {
-            if (data.isAllZero())
+            if (data.isAllZero()) {
                 return null
+            }
             return OVChipTransaction(En1545Parser.parse(data, OVC_UL_TRIP_FIELDS))
         }
     }

@@ -35,17 +35,17 @@ import kotlin.time.Instant
 class CifialTransitInfo(
     private val mRoomNumber: String,
     private val mCheckIn: Instant,
-    private val mCheckOut: Instant
+    private val mCheckOut: Instant,
 ) : TransitInfo() {
-
     override val serialNumber: String? get() = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            ListItem(Res.string.cifial_hotel_room_number, mRoomNumber.trimStart('0')),
-            ListItem(Res.string.cifial_hotel_checkin, mCheckIn.toString()),
-            ListItem(Res.string.cifial_hotel_checkout, mCheckOut.toString())
-        )
+        get() =
+            listOf(
+                ListItem(Res.string.cifial_hotel_room_number, mRoomNumber.trimStart('0')),
+                ListItem(Res.string.cifial_hotel_checkin, mCheckIn.toString()),
+                ListItem(Res.string.cifial_hotel_checkout, mCheckOut.toString()),
+            )
 
     override val cardName: String get() = getStringBlocking(Res.string.cifial_card_name)
 }

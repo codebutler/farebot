@@ -37,15 +37,12 @@ import farebot.farebot_transit_myki.generated.resources.myki_card_name
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Myki
  */
 class MykiTransitInfo(
-    private val serialNumberValue: String
+    private val serialNumberValue: String,
 ) : SerialOnlyTransitInfo() {
-
     companion object {
         const val NAME = "Myki"
 
-        fun create(serialNumber: String): MykiTransitInfo {
-            return MykiTransitInfo(serialNumber)
-        }
+        fun create(serialNumber: String): MykiTransitInfo = MykiTransitInfo(serialNumber)
     }
 
     override val reason: Reason = Reason.LOCKED

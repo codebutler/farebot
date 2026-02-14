@@ -32,14 +32,14 @@ import kotlin.time.Instant
 
 class WarsawSubscription(
     private val validToInstant: Instant,
-    private val ticketType: Int
+    private val ticketType: Int,
 ) : Subscription() {
-
     override val validTo: Instant get() = validToInstant
 
     override val subscriptionName: String
-        get() = when (ticketType) {
-            0xbf6 -> getStringBlocking(Res.string.warsaw_90_days)
-            else -> getStringBlocking(Res.string.warsaw_unknown, ticketType.hexString)
-        }
+        get() =
+            when (ticketType) {
+                0xbf6 -> getStringBlocking(Res.string.warsaw_90_days)
+                else -> getStringBlocking(Res.string.warsaw_unknown, ticketType.hexString)
+            }
 }

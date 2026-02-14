@@ -38,7 +38,6 @@ import farebot.farebot_transit_clipper.generated.resources.clipper_zone
 import farebot.farebot_transit_clipper.generated.resources.transit_clipper_station_eol
 
 internal object ClipperData {
-
     private const val CLIPPER_STR = "clipper"
 
     const val AGENCY_ACTRAN = 0x01
@@ -66,11 +65,16 @@ internal object ClipperData {
         return getStringBlocking(Res.string.clipper_unknown_agency, agency.toString(16))
     }
 
-    fun getStation(agency: Int, stationId: Int, isEnd: Boolean): Station? {
+    fun getStation(
+        agency: Int,
+        stationId: Int,
+        isEnd: Boolean,
+    ): Station? {
         val id = (agency shl 16) or stationId
         val result = MdstStationLookup.getStation(CLIPPER_STR, id)
         if (result != null) {
-            return Station.Builder()
+            return Station
+                .Builder()
                 .stationName(result.stationName)
                 .shortStationName(result.shortStationName)
                 .companyName(result.companyName)
@@ -80,17 +84,19 @@ internal object ClipperData {
                 .build()
         }
 
-        if (agency == AGENCY_GGT
-            || agency == AGENCY_CALTRAIN
-            || agency == AGENCY_GG_FERRY
-            || agency == AGENCY_SMART
+        if (agency == AGENCY_GGT ||
+            agency == AGENCY_CALTRAIN ||
+            agency == AGENCY_GG_FERRY ||
+            agency == AGENCY_SMART
         ) {
-            if (stationId == 0xffff) return Station.nameOnly(
-                getStringBlocking(Res.string.transit_clipper_station_eol)
-            )
+            if (stationId == 0xffff) {
+                return Station.nameOnly(
+                    getStringBlocking(Res.string.transit_clipper_station_eol),
+                )
+            }
             if (agency != AGENCY_GG_FERRY) {
                 return Station.nameOnly(
-                    getStringBlocking(Res.string.clipper_zone, stationId.toString())
+                    getStringBlocking(Res.string.clipper_zone, stationId.toString()),
                 )
             }
         }
@@ -98,18 +104,24 @@ internal object ClipperData {
         // Placeholders
         if (stationId == (if (isEnd) 0xffff else 0)) return null
         return Station.nameOnly(
-            getStringBlocking(Res.string.clipper_unknown_station, agency.toString(16), stationId.toString(16))
+            getStringBlocking(Res.string.clipper_unknown_station, agency.toString(16), stationId.toString(16)),
         )
     }
 
-    fun getRouteName(agency: Int, routeId: Int): String? {
+    fun getRouteName(
+        agency: Int,
+        routeId: Int,
+    ): String? {
         val id = (agency shl 16) or routeId
         val result = MdstStationLookup.getLineName(CLIPPER_STR, id)
         return result
     }
 
-    fun getMode(agency: Int, transportCode: Int): Trip.Mode {
-        return when (transportCode) {
+    fun getMode(
+        agency: Int,
+        transportCode: Int,
+    ): Trip.Mode =
+        when (transportCode) {
             0x62 -> {
                 when (agency) {
                     AGENCY_SF_BAY_FERRY, AGENCY_GG_FERRY -> Trip.Mode.FERRY
@@ -124,7 +136,6 @@ internal object ClipperData {
             0x78 -> Trip.Mode.TRAIN
             else -> Trip.Mode.OTHER
         }
-    }
 
     /**
      * Get the default mode for an agency from MDST operator data.
@@ -135,19 +146,20 @@ internal object ClipperData {
         return transportType?.toTripMode() ?: Trip.Mode.OTHER
     }
 
-    private fun TransportType.toTripMode(): Trip.Mode = when (this) {
-        TransportType.BUS -> Trip.Mode.BUS
-        TransportType.TRAIN -> Trip.Mode.TRAIN
-        TransportType.TRAM -> Trip.Mode.TRAM
-        TransportType.METRO -> Trip.Mode.METRO
-        TransportType.FERRY -> Trip.Mode.FERRY
-        TransportType.TICKET_MACHINE -> Trip.Mode.TICKET_MACHINE
-        TransportType.VENDING_MACHINE -> Trip.Mode.VENDING_MACHINE
-        TransportType.POS -> Trip.Mode.POS
-        TransportType.BANNED -> Trip.Mode.BANNED
-        TransportType.TROLLEYBUS -> Trip.Mode.TROLLEYBUS
-        TransportType.TOLL_ROAD -> Trip.Mode.TOLL_ROAD
-        TransportType.MONORAIL -> Trip.Mode.MONORAIL
-        TransportType.UNKNOWN, TransportType.OTHER -> Trip.Mode.OTHER
-    }
+    private fun TransportType.toTripMode(): Trip.Mode =
+        when (this) {
+            TransportType.BUS -> Trip.Mode.BUS
+            TransportType.TRAIN -> Trip.Mode.TRAIN
+            TransportType.TRAM -> Trip.Mode.TRAM
+            TransportType.METRO -> Trip.Mode.METRO
+            TransportType.FERRY -> Trip.Mode.FERRY
+            TransportType.TICKET_MACHINE -> Trip.Mode.TICKET_MACHINE
+            TransportType.VENDING_MACHINE -> Trip.Mode.VENDING_MACHINE
+            TransportType.POS -> Trip.Mode.POS
+            TransportType.BANNED -> Trip.Mode.BANNED
+            TransportType.TROLLEYBUS -> Trip.Mode.TROLLEYBUS
+            TransportType.TOLL_ROAD -> Trip.Mode.TOLL_ROAD
+            TransportType.MONORAIL -> Trip.Mode.MONORAIL
+            TransportType.UNKNOWN, TransportType.OTHER -> Trip.Mode.OTHER
+        }
 }

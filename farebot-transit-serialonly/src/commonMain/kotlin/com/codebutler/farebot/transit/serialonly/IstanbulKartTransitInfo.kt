@@ -17,9 +17,8 @@ import farebot.farebot_transit_serialonly.generated.resources.istanbulkart_2nd_c
 
 class IstanbulKartTransitInfo(
     private val mSerial: String,
-    private val mSerial2: String
+    private val mSerial2: String,
 ) : SerialOnlyTransitInfo() {
-
     override val extraInfo: List<ListItemInterface>
         get() = listOf(ListItem(Res.string.istanbulkart_2nd_card_number, mSerial2))
 

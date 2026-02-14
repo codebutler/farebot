@@ -32,25 +32,25 @@ class NorticTransitInfo(
     private val mValidityEndDate: Int,
     private val mOwnerCompany: Int,
     private val mRetailerCompany: Int,
-    private val mCardKeyVersion: Int
+    private val mCardKeyVersion: Int,
 ) : SerialOnlyTransitInfo() {
-
     override val extraInfo: List<ListItemInterface>
         get() {
             // Convert validity end date: days since 1997-01-01
-            val expiryStr = try {
-                val epoch = LocalDate(1997, 1, 1)
-                val expiryDate = epoch.toEpochDays() + mValidityEndDate
-                LocalDate.fromEpochDays(expiryDate).toString()
-            } catch (_: Exception) {
-                "Day $mValidityEndDate since 1997-01-01"
-            }
+            val expiryStr =
+                try {
+                    val epoch = LocalDate(1997, 1, 1)
+                    val expiryDate = epoch.toEpochDays() + mValidityEndDate
+                    LocalDate.fromEpochDays(expiryDate).toString()
+                } catch (_: Exception) {
+                    "Day $mValidityEndDate since 1997-01-01"
+                }
 
             return listOf(
                 ListItem(Res.string.country, getStringBlocking(Res.string.country_code_format, mCountry)),
                 ListItem(Res.string.expiry_date, expiryStr),
                 ListItem(Res.string.owner_company, getCompanyName(mOwnerCompany)),
-                ListItem(Res.string.retailer_company, getCompanyName(mRetailerCompany))
+                ListItem(Res.string.retailer_company, getCompanyName(mRetailerCompany)),
             )
         }
 
@@ -59,42 +59,52 @@ class NorticTransitInfo(
     override val serialNumber get() = formatSerial(mOwnerCompany, mSerial)
 
     companion object {
-        private val operators = mapOf(
-            1 to "Ruter",
-            120 to "Länstrafiken Norrbotten",
-            121 to "LLT Luleå Lokaltrafik",
-            160 to "AtB",
-            190 to "Troms fylkestraffikk"
-        )
+        private val operators =
+            mapOf(
+                1 to "Ruter",
+                120 to "Länstrafiken Norrbotten",
+                121 to "LLT Luleå Lokaltrafik",
+                160 to "AtB",
+                190 to "Troms fylkestraffikk",
+            )
 
         private fun getCompanyName(company: Int): String =
             operators[company] ?: getStringBlocking(Res.string.unknown_company, company)
 
-        internal fun getName(ownerCompany: Int): String = when (ownerCompany) {
-            1 -> "Ruter Travelcard"
-            120 -> "Norrbotten Bus Pass"
-            121 -> "LLT Bus Pass"
-            160 -> "t:card"
-            190 -> "Tromskortet"
-            else -> "Nortic"
-        }
+        internal fun getName(ownerCompany: Int): String =
+            when (ownerCompany) {
+                1 -> "Ruter Travelcard"
+                120 -> "Norrbotten Bus Pass"
+                121 -> "LLT Bus Pass"
+                160 -> "t:card"
+                190 -> "Tromskortet"
+                else -> "Nortic"
+            }
 
-        internal fun formatSerial(ownerCompany: Int, serial: Long): String = when (ownerCompany) {
-            1 -> {
-                val luhn = Luhn.calculateLuhn(serial.toString())
-                NumberUtils.groupString(
-                    "02003" + NumberUtils.zeroPad(serial, 10) + luhn,
-                    " ", 4, 4, 4
-                )
+        internal fun formatSerial(
+            ownerCompany: Int,
+            serial: Long,
+        ): String =
+            when (ownerCompany) {
+                1 -> {
+                    val luhn = Luhn.calculateLuhn(serial.toString())
+                    NumberUtils.groupString(
+                        "02003" + NumberUtils.zeroPad(serial, 10) + luhn,
+                        " ",
+                        4,
+                        4,
+                        4,
+                    )
+                }
+                160, 190 -> {
+                    val partial =
+                        NumberUtils.zeroPad(ownerCompany / 10, 2) +
+                            NumberUtils.zeroPad(ownerCompany, 3) +
+                            NumberUtils.zeroPad(serial, 10)
+                    val luhn = Luhn.calculateLuhn(partial)
+                    NumberUtils.groupString(partial + luhn, " ", 4, 4, 4)
+                }
+                else -> serial.toString()
             }
-            160, 190 -> {
-                val partial = NumberUtils.zeroPad(ownerCompany / 10, 2) +
-                    NumberUtils.zeroPad(ownerCompany, 3) +
-                    NumberUtils.zeroPad(serial, 10)
-                val luhn = Luhn.calculateLuhn(partial)
-                NumberUtils.groupString(partial + luhn, " ", 4, 4, 4)
-            }
-            else -> serial.toString()
-        }
     }
 }

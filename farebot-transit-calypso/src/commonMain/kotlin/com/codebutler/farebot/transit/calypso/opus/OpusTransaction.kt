@@ -30,9 +30,8 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 
 internal class OpusTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
-
     override val lookup: En1545Lookup
         get() = OpusLookup
 
@@ -53,29 +52,30 @@ internal class OpusTransaction(
         private const val EVENT_UNKNOWN_H = "EventUnknownH"
         private const val EVENT_UNKNOWN_I = "EventUnknownI"
 
-        val FIELDS = En1545Container(
-            En1545FixedInteger.date(EVENT),
-            En1545FixedInteger.timeLocal(EVENT),
-            En1545FixedInteger("UnknownX", 19),
-            En1545Bitmap(
-                En1545FixedInteger(EVENT_UNKNOWN_A, 8),
-                En1545FixedInteger(EVENT_UNKNOWN_B, 8),
-                En1545FixedInteger(EVENT_SERVICE_PROVIDER, 8),
-                En1545FixedInteger(EVENT_UNKNOWN_C, 16),
-                En1545FixedInteger(EVENT_ROUTE_NUMBER, 16),
-                En1545FixedInteger(EVENT_UNKNOWN_D, 16),
-                En1545FixedInteger(EVENT_UNKNOWN_E, 16),
-                En1545FixedInteger(EVENT_CONTRACT_POINTER, 5),
+        val FIELDS =
+            En1545Container(
+                En1545FixedInteger.date(EVENT),
+                En1545FixedInteger.timeLocal(EVENT),
+                En1545FixedInteger("UnknownX", 19),
                 En1545Bitmap(
-                    En1545FixedInteger.date(EVENT_FIRST_STAMP),
-                    En1545FixedInteger.timeLocal(EVENT_FIRST_STAMP),
-                    En1545FixedInteger(EVENT_DATA_SIMULATION, 1),
-                    En1545FixedInteger(EVENT_UNKNOWN_F, 4),
-                    En1545FixedInteger(EVENT_UNKNOWN_G, 4),
-                    En1545FixedInteger(EVENT_UNKNOWN_H, 4),
-                    En1545FixedInteger(EVENT_UNKNOWN_I, 4)
-                )
+                    En1545FixedInteger(EVENT_UNKNOWN_A, 8),
+                    En1545FixedInteger(EVENT_UNKNOWN_B, 8),
+                    En1545FixedInteger(EVENT_SERVICE_PROVIDER, 8),
+                    En1545FixedInteger(EVENT_UNKNOWN_C, 16),
+                    En1545FixedInteger(EVENT_ROUTE_NUMBER, 16),
+                    En1545FixedInteger(EVENT_UNKNOWN_D, 16),
+                    En1545FixedInteger(EVENT_UNKNOWN_E, 16),
+                    En1545FixedInteger(EVENT_CONTRACT_POINTER, 5),
+                    En1545Bitmap(
+                        En1545FixedInteger.date(EVENT_FIRST_STAMP),
+                        En1545FixedInteger.timeLocal(EVENT_FIRST_STAMP),
+                        En1545FixedInteger(EVENT_DATA_SIMULATION, 1),
+                        En1545FixedInteger(EVENT_UNKNOWN_F, 4),
+                        En1545FixedInteger(EVENT_UNKNOWN_G, 4),
+                        En1545FixedInteger(EVENT_UNKNOWN_H, 4),
+                        En1545FixedInteger(EVENT_UNKNOWN_I, 4),
+                    ),
+                ),
             )
-        )
     }
 }

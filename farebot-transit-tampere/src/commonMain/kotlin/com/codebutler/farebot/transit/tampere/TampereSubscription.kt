@@ -31,9 +31,8 @@ import kotlin.time.Instant
 class TampereSubscription(
     private val mStart: Int? = null,
     private val mEnd: Int? = null,
-    private val mType: Int
+    private val mType: Int,
 ) : Subscription() {
-
     override val validFrom: Instant?
         get() = mStart?.let { TampereTransitInfo.parseDaystamp(it) }
 

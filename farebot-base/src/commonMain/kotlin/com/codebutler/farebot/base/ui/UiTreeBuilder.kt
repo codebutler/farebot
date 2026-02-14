@@ -28,34 +28,44 @@ import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 @DslMarker
 private annotation class UiTreeBuilderMarker
 
-fun uiTree(stringResource: StringResource, init: TreeScope.() -> Unit): FareBotUiTree {
+fun uiTree(
+    stringResource: StringResource,
+    init: TreeScope.() -> Unit,
+): FareBotUiTree {
     val uiBuilder = FareBotUiTree.builder(stringResource)
     TreeScope(stringResource, uiBuilder).init()
     return uiBuilder.build()
 }
 
 @UiTreeBuilderMarker
-class TreeScope(private val stringResource: StringResource, private val uiBuilder: FareBotUiTree.Builder) {
+class TreeScope(
+    private val stringResource: StringResource,
+    private val uiBuilder: FareBotUiTree.Builder,
+) {
     fun item(init: ItemScope.() -> Unit) {
         ItemScope(stringResource, uiBuilder.item()).init()
     }
 }
 
 @UiTreeBuilderMarker
-class ItemScope(private val stringResource: StringResource, private val item: FareBotUiTree.Item.Builder) {
-
+class ItemScope(
+    private val stringResource: StringResource,
+    private val item: FareBotUiTree.Item.Builder,
+) {
     var title: Any? = null
         set(value) {
             item.title(
                 when (value) {
                     is ComposeStringResource -> stringResource.getString(value)
                     else -> value.toString()
-                }
+                },
             )
         }
 
     var value: Any? = null
-        set(value) { item.value(value) }
+        set(value) {
+            item.value(value)
+        }
 
     fun item(init: ItemScope.() -> Unit) {
         ItemScope(stringResource, item.item()).init()

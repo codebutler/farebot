@@ -23,14 +23,12 @@
 package com.codebutler.farebot.base.mdst
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 
 /**
  * Tests for MdstStationTableReader and MdstStationLookup (MdST file format).
@@ -50,7 +48,6 @@ import kotlin.test.assertFalse
  * are not available in the test environment.
  */
 class MdstStationTableReaderTest {
-
     // Test constants matching SEQ Go database
     private companion object {
         const val SEQ_GO_STR = "seq_go"
@@ -58,10 +55,9 @@ class MdstStationTableReaderTest {
         const val AMIIBO_STR = "amiibo"
     }
 
-    private fun requireMdstFile(dbName: String): MdstStationTableReader {
-        return MdstStationTableReader.getReader(dbName)
+    private fun requireMdstFile(dbName: String): MdstStationTableReader =
+        MdstStationTableReader.getReader(dbName)
             ?: throw AssertionError("MDST file '$dbName' not available")
-    }
 
     /**
      * Tests that the SEQ Go database can be loaded and stations can be looked up.
@@ -72,8 +68,11 @@ class MdstStationTableReaderTest {
 
         val station = MdstStationLookup.getStation(SEQ_GO_STR, DOMESTIC_AIRPORT)
         assertNotNull(station, "Station should be found in SEQ Go database")
-        assertEquals("Domestic Airport", station.stationName,
-            "Station name should be 'Domestic Airport'")
+        assertEquals(
+            "Domestic Airport",
+            station.stationName,
+            "Station name should be 'Domestic Airport'",
+        )
     }
 
     /**
@@ -113,7 +112,7 @@ class MdstStationTableReaderTest {
         println("Shinjuku: english=${shinjuku.name.english}, local=${shinjuku.name.local}")
         assertTrue(
             shinjuku.name.english.contains("Shinjuku") || shinjuku.name.local.contains("新宿"),
-            "Station should be Shinjuku, got: ${shinjuku.name}"
+            "Station should be Shinjuku, got: ${shinjuku.name}",
         )
     }
 
@@ -173,8 +172,10 @@ class MdstStationTableReaderTest {
 
         val notice = reader.notice
         assertNotNull(notice, "License notice should not be null")
-        assertTrue(notice.contains("Translink"),
-            "License notice should mention Translink")
+        assertTrue(
+            notice.contains("Translink"),
+            "License notice should mention Translink",
+        )
     }
 
     /**
@@ -221,8 +222,10 @@ class MdstStationTableReaderTest {
             exception = e
         }
         assertNotNull(exception, "Should throw exception for small data")
-        assertTrue(exception.message!!.contains("too small"),
-            "Exception message should mention size")
+        assertTrue(
+            exception.message!!.contains("too small"),
+            "Exception message should mention size",
+        )
 
         // Test with wrong magic
         exception = null
@@ -232,8 +235,10 @@ class MdstStationTableReaderTest {
             exception = e
         }
         assertNotNull(exception, "Should throw exception for wrong magic")
-        assertTrue(exception.message!!.contains("magic"),
-            "Exception message should mention magic")
+        assertTrue(
+            exception.message!!.contains("magic"),
+            "Exception message should mention magic",
+        )
     }
 
     /**
@@ -261,8 +266,10 @@ class MdstStationTableReaderTest {
             exception = e
         }
         assertNotNull(exception, "Should throw exception for wrong version")
-        assertTrue(exception.message!!.contains("version") || exception.message!!.contains("99"),
-            "Exception message should mention version")
+        assertTrue(
+            exception.message!!.contains("version") || exception.message!!.contains("99"),
+            "Exception message should mention version",
+        )
     }
 
     /**
@@ -278,10 +285,14 @@ class MdstStationTableReaderTest {
         val stationWithLocation = MdstStationLookup.getStation(SEQ_GO_STR, DOMESTIC_AIRPORT)
         assertNotNull(stationWithLocation)
         // SEQ Go Domestic Airport has coordinates
-        assertTrue(stationWithLocation.hasLocation,
-            "SEQ Go Domestic Airport should have location data")
-        assertTrue(stationWithLocation.latitude != 0f || stationWithLocation.longitude != 0f,
-            "Location should have non-zero coordinates")
+        assertTrue(
+            stationWithLocation.hasLocation,
+            "SEQ Go Domestic Airport should have location data",
+        )
+        assertTrue(
+            stationWithLocation.latitude != 0f || stationWithLocation.longitude != 0f,
+            "Location should have non-zero coordinates",
+        )
     }
 
     /**
@@ -327,47 +338,51 @@ class MdstStationTableReaderTest {
     @Test
     fun testMdstStationResultHasLocation() {
         // Test with (0,0) - no location
-        val noLocation = MdstStationResult(
-            stationName = "Test",
-            shortStationName = null,
-            companyName = null,
-            lineNames = emptyList(),
-            latitude = 0f,
-            longitude = 0f
-        )
+        val noLocation =
+            MdstStationResult(
+                stationName = "Test",
+                shortStationName = null,
+                companyName = null,
+                lineNames = emptyList(),
+                latitude = 0f,
+                longitude = 0f,
+            )
         assertFalse(noLocation.hasLocation, "(0,0) should report no location")
 
         // Test with non-zero latitude
-        val hasLatitude = MdstStationResult(
-            stationName = "Test",
-            shortStationName = null,
-            companyName = null,
-            lineNames = emptyList(),
-            latitude = 1.0f,
-            longitude = 0f
-        )
+        val hasLatitude =
+            MdstStationResult(
+                stationName = "Test",
+                shortStationName = null,
+                companyName = null,
+                lineNames = emptyList(),
+                latitude = 1.0f,
+                longitude = 0f,
+            )
         assertTrue(hasLatitude.hasLocation, "Non-zero latitude should have location")
 
         // Test with non-zero longitude
-        val hasLongitude = MdstStationResult(
-            stationName = "Test",
-            shortStationName = null,
-            companyName = null,
-            lineNames = emptyList(),
-            latitude = 0f,
-            longitude = 1.0f
-        )
+        val hasLongitude =
+            MdstStationResult(
+                stationName = "Test",
+                shortStationName = null,
+                companyName = null,
+                lineNames = emptyList(),
+                latitude = 0f,
+                longitude = 1.0f,
+            )
         assertTrue(hasLongitude.hasLocation, "Non-zero longitude should have location")
 
         // Test with both non-zero
-        val hasBoth = MdstStationResult(
-            stationName = "Test",
-            shortStationName = null,
-            companyName = null,
-            lineNames = emptyList(),
-            latitude = -33.8688f,
-            longitude = 151.2093f
-        )
+        val hasBoth =
+            MdstStationResult(
+                stationName = "Test",
+                shortStationName = null,
+                companyName = null,
+                lineNames = emptyList(),
+                latitude = -33.8688f,
+                longitude = 151.2093f,
+            )
         assertTrue(hasBoth.hasLocation, "Non-zero lat/lon should have location")
     }
 
@@ -452,12 +467,13 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSelectNamePrefersEnglishForNonLocalDevice() {
-        val names = Names(
-            english = "Tokyo Station",
-            local = "\u6771\u4eac\u99c5",
-            englishShort = "Tokyo",
-            localShort = "\u6771\u4eac"
-        )
+        val names =
+            Names(
+                english = "Tokyo Station",
+                local = "\u6771\u4eac\u99c5",
+                englishShort = "Tokyo",
+                localShort = "\u6771\u4eac",
+            )
         val localLanguages = listOf("ja")
 
         // English device should see English name
@@ -470,12 +486,13 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSelectNamePrefersLocalForMatchingDevice() {
-        val names = Names(
-            english = "Tokyo Station",
-            local = "\u6771\u4eac\u99c5",
-            englishShort = "Tokyo",
-            localShort = "\u6771\u4eac"
-        )
+        val names =
+            Names(
+                english = "Tokyo Station",
+                local = "\u6771\u4eac\u99c5",
+                englishShort = "Tokyo",
+                localShort = "\u6771\u4eac",
+            )
         val localLanguages = listOf("ja")
 
         // Japanese device should see Japanese name
@@ -488,12 +505,13 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSelectNameFallsBackToEnglishWhenLocalEmpty() {
-        val names = Names(
-            english = "Central Station",
-            local = "",
-            englishShort = "Central",
-            localShort = ""
-        )
+        val names =
+            Names(
+                english = "Central Station",
+                local = "",
+                englishShort = "Central",
+                localShort = "",
+            )
         val localLanguages = listOf("ja")
 
         // Even with Japanese device, should fall back to English since local is empty
@@ -506,12 +524,13 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSelectNameFallsBackToLocalWhenEnglishEmpty() {
-        val names = Names(
-            english = "",
-            local = "\u6771\u4eac\u99c5",
-            englishShort = "",
-            localShort = "\u6771\u4eac"
-        )
+        val names =
+            Names(
+                english = "",
+                local = "\u6771\u4eac\u99c5",
+                englishShort = "",
+                localShort = "\u6771\u4eac",
+            )
         val localLanguages = listOf("ja")
 
         // English device should fall back to local name since English is empty
@@ -546,12 +565,13 @@ class MdstStationTableReaderTest {
     fun testChineseLocaleForEasyCard() {
         // EasyCard uses zh-TW as local language
         val localLanguages = listOf("zh-TW")
-        val names = Names(
-            english = "Taipei Main Station",
-            local = "\u53f0\u5317\u8eca\u7ad9",
-            englishShort = "Taipei",
-            localShort = "\u53f0\u5317"
-        )
+        val names =
+            Names(
+                english = "Taipei Main Station",
+                local = "\u53f0\u5317\u8eca\u7ad9",
+                englishShort = "Taipei",
+                localShort = "\u53f0\u5317",
+            )
 
         // Traditional Chinese device (zh-TW) should see Chinese
         assertEquals("\u53f0\u5317\u8eca\u7ad9", MdstStationLookup.selectName(names, localLanguages, "zh-TW", false))
@@ -571,12 +591,13 @@ class MdstStationTableReaderTest {
     fun testBaseLanguageMatchesRegionalVariants() {
         // Database specifies just "zh" as local language
         val localLanguages = listOf("zh")
-        val names = Names(
-            english = "Beijing Station",
-            local = "\u5317\u4eac\u7ad9",
-            englishShort = "Beijing",
-            localShort = "\u5317\u4eac"
-        )
+        val names =
+            Names(
+                english = "Beijing Station",
+                local = "\u5317\u4eac\u7ad9",
+                englishShort = "Beijing",
+                localShort = "\u5317\u4eac",
+            )
 
         // Any Chinese device should match "zh"
         assertEquals("\u5317\u4eac\u7ad9", MdstStationLookup.selectName(names, localLanguages, "zh", false))

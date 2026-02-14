@@ -4,16 +4,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.UIKitView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.CoreGraphics.CGRectMake
 import platform.CoreLocation.CLLocationCoordinate2DMake
+import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKCoordinateRegionMakeWithDistance
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
-import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKPointAnnotation
-import platform.CoreGraphics.CGRectMake
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
 import platform.darwin.NSObject
@@ -37,21 +37,27 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
     UIKitView(
         factory = {
             MKMapView().apply {
-                val startAnnotation = if (hasStart) {
-                    MKPointAnnotation().apply {
-                        setCoordinate(CLLocationCoordinate2DMake(startLat, startLng))
-                        setTitle(startStation.stationName ?: "Start")
-                        setSubtitle(startStation.companyName)
+                val startAnnotation =
+                    if (hasStart) {
+                        MKPointAnnotation().apply {
+                            setCoordinate(CLLocationCoordinate2DMake(startLat, startLng))
+                            setTitle(startStation.stationName ?: "Start")
+                            setSubtitle(startStation.companyName)
+                        }
+                    } else {
+                        null
                     }
-                } else null
 
-                val endAnnotation = if (hasEnd) {
-                    MKPointAnnotation().apply {
-                        setCoordinate(CLLocationCoordinate2DMake(endLat, endLng))
-                        setTitle(endStation.stationName ?: "End")
-                        setSubtitle(endStation.companyName)
+                val endAnnotation =
+                    if (hasEnd) {
+                        MKPointAnnotation().apply {
+                            setCoordinate(CLLocationCoordinate2DMake(endLat, endLng))
+                            setTitle(endStation.stationName ?: "End")
+                            setSubtitle(endStation.companyName)
+                        }
+                    } else {
+                        null
                     }
-                } else null
 
                 val annotations = listOfNotNull(startAnnotation, endAnnotation)
                 addAnnotations(annotations)
@@ -83,9 +89,10 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
                 delegate = MapViewDelegate(startAnnotation, endAnnotation)
             }
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(300.dp),
     )
 }
 
@@ -93,7 +100,8 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
 private class MapViewDelegate(
     private val startAnnotation: MKPointAnnotation?,
     private val endAnnotation: MKPointAnnotation?,
-) : NSObject(), MKMapViewDelegateProtocol {
+) : NSObject(),
+    MKMapViewDelegateProtocol {
     override fun mapView(
         mapView: MKMapView,
         viewForAnnotation: platform.MapKit.MKAnnotationProtocol,
@@ -102,23 +110,25 @@ private class MapViewDelegate(
         val dotSize = 20.0
         val innerSize = dotSize / 2.0
         val innerInset = dotSize / 4.0
-        val dotView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
-            ?: MKAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier).apply {
-                canShowCallout = true
-                setBounds(CGRectMake(0.0, 0.0, dotSize, dotSize))
-                layer.cornerRadius = dotSize / 2.0
-                val innerView = UIView(frame = CGRectMake(innerInset, innerInset, innerSize, innerSize))
-                innerView.backgroundColor = UIColor.whiteColor
-                innerView.layer.cornerRadius = innerSize / 2.0
-                innerView.userInteractionEnabled = false
-                addSubview(innerView)
-            }
+        val dotView =
+            mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+                ?: MKAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier).apply {
+                    canShowCallout = true
+                    setBounds(CGRectMake(0.0, 0.0, dotSize, dotSize))
+                    layer.cornerRadius = dotSize / 2.0
+                    val innerView = UIView(frame = CGRectMake(innerInset, innerInset, innerSize, innerSize))
+                    innerView.backgroundColor = UIColor.whiteColor
+                    innerView.layer.cornerRadius = innerSize / 2.0
+                    innerView.userInteractionEnabled = false
+                    addSubview(innerView)
+                }
         dotView.annotation = viewForAnnotation
-        dotView.backgroundColor = when (viewForAnnotation) {
-            startAnnotation -> UIColor.blueColor
-            endAnnotation -> UIColor.redColor
-            else -> UIColor.redColor
-        }
+        dotView.backgroundColor =
+            when (viewForAnnotation) {
+                startAnnotation -> UIColor.blueColor
+                endAnnotation -> UIColor.redColor
+                else -> UIColor.redColor
+            }
         return dotView
     }
 }

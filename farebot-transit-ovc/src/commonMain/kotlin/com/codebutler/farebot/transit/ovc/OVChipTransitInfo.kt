@@ -54,18 +54,20 @@ class OVChipTransitInfo(
     override val subscriptions: List<Subscription>,
     private val stringResource: StringResource,
 ) : TransitInfo() {
-
     override val cardName: String = NAME
 
     override val balance: TransitBalance
-        get() = TransitBalance(
-            balance = TransitCurrency.EUR(credit),
-            name = if (type == 2)
-                getStringBlocking(Res.string.card_type_personal)
-            else
-                getStringBlocking(Res.string.card_type_anonymous),
-            validTo = convertDate(expdate)
-        )
+        get() =
+            TransitBalance(
+                balance = TransitCurrency.EUR(credit),
+                name =
+                    if (type == 2) {
+                        getStringBlocking(Res.string.card_type_personal)
+                    } else {
+                        getStringBlocking(Res.string.card_type_anonymous)
+                    },
+                validTo = convertDate(expdate),
+            )
 
     override val serialNumber: String? get() = null
 
@@ -79,47 +81,76 @@ class OVChipTransitInfo(
             // EN1545 standard info fields
             if (parsed.contains(En1545FixedInteger.dateBCDName(En1545TransitData.HOLDER_BIRTH_DATE))) {
                 parsed.getTimeStamp(En1545TransitData.HOLDER_BIRTH_DATE, tz)?.let {
-                    li.add(ListItem(
-                        Res.string.ovc_birthdate,
-                        com.codebutler.farebot.base.util.formatDate(it, com.codebutler.farebot.base.util.DateFormatStyle.LONG)
-                    ))
+                    li.add(
+                        ListItem(
+                            Res.string.ovc_birthdate,
+                            com.codebutler.farebot.base.util.formatDate(
+                                it,
+                                com.codebutler.farebot.base.util.DateFormatStyle.LONG,
+                            ),
+                        ),
+                    )
                 }
             }
 
             if (parsed.getIntOrZero(En1545TransitData.ENV_APPLICATION_ISSUER_ID) != 0) {
-                val issuerName = lookup.getAgencyName(
-                    parsed.getIntOrZero(En1545TransitData.ENV_APPLICATION_ISSUER_ID), false
-                )
+                val issuerName =
+                    lookup.getAgencyName(
+                        parsed.getIntOrZero(En1545TransitData.ENV_APPLICATION_ISSUER_ID),
+                        false,
+                    )
                 if (issuerName != null) {
                     li.add(ListItem(Res.string.ovc_issuer, issuerName))
                 }
             }
 
             // OVC-specific info
-            li.add(ListItem(Res.string.ovc_banned,
-                if (banbits and 0xC0 == 0xC0)
-                    getStringBlocking(Res.string.ovc_yes)
-                else
-                    getStringBlocking(Res.string.ovc_no)))
+            li.add(
+                ListItem(
+                    Res.string.ovc_banned,
+                    if (banbits and 0xC0 == 0xC0) {
+                        getStringBlocking(Res.string.ovc_yes)
+                    } else {
+                        getStringBlocking(Res.string.ovc_no)
+                    },
+                ),
+            )
 
             li.add(HeaderListItem(Res.string.ovc_autocharge_information))
-            li.add(ListItem(Res.string.ovc_autocharge,
-                    if (parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_ACTIVE) == 0x05)
+            li.add(
+                ListItem(
+                    Res.string.ovc_autocharge,
+                    if (parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_ACTIVE) == 0x05) {
                         getStringBlocking(Res.string.ovc_yes)
-                    else
-                        getStringBlocking(Res.string.ovc_no)))
-            li.add(ListItem(Res.string.ovc_autocharge_limit,
-                    TransitCurrency.EUR(parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_LIMIT))
-                            .formatCurrencyString(true)))
-            li.add(ListItem(Res.string.ovc_autocharge_charge,
-                    TransitCurrency.EUR(parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_CHARGE))
-                            .formatCurrencyString(true)))
+                    } else {
+                        getStringBlocking(Res.string.ovc_no)
+                    },
+                ),
+            )
+            li.add(
+                ListItem(
+                    Res.string.ovc_autocharge_limit,
+                    TransitCurrency
+                        .EUR(parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_LIMIT))
+                        .formatCurrencyString(true),
+                ),
+            )
+            li.add(
+                ListItem(
+                    Res.string.ovc_autocharge_charge,
+                    TransitCurrency
+                        .EUR(parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_CHARGE))
+                        .formatCurrencyString(true),
+                ),
+            )
 
             // Raw debug fields
-            li.addAll(listOf(
-                ListItem("Credit Slot ID", creditSlotId.toString()),
-                ListItem("Last Credit ID", creditId.toString())
-            ) + index.getRawFields())
+            li.addAll(
+                listOf(
+                    ListItem("Credit Slot ID", creditSlotId.toString()),
+                    ListItem("Last Credit ID", creditId.toString()),
+                ) + index.getRawFields(),
+            )
 
             return li
         }

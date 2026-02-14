@@ -25,9 +25,6 @@ package com.codebutler.farebot.transit.calypso.lisboaviva
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
-import farebot.farebot_transit_calypso.generated.resources.Res
-import farebot.farebot_transit_calypso.generated.resources.lisboa_route_cascais
-import farebot.farebot_transit_calypso.generated.resources.lisboa_route_sado
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
@@ -35,12 +32,14 @@ import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
+import farebot.farebot_transit_calypso.generated.resources.Res
+import farebot.farebot_transit_calypso.generated.resources.lisboa_route_cascais
+import farebot.farebot_transit_calypso.generated.resources.lisboa_route_sado
 
 internal class LisboaVivaTransaction private constructor(
     override val parsed: En1545Parsed,
-    override val lookup: En1545Lookup
+    override val lookup: En1545Lookup,
 ) : En1545Transaction() {
-
     override val isTapOn: Boolean
         get() = parsed.getIntOrZero(TRANSITION) == 1
 
@@ -63,16 +62,18 @@ internal class LisboaVivaTransaction private constructor(
             return super.routeNames
         }
 
-    override fun getStation(station: Int?): Station? = station?.let {
-        lookup.getStation(it, agency, parsed.getIntOrZero(EVENT_ROUTE_NUMBER))
-    }
+    override fun getStation(station: Int?): Station? =
+        station?.let {
+            lookup.getStation(it, agency, parsed.getIntOrZero(EVENT_ROUTE_NUMBER))
+        }
 
     override fun isSameTrip(other: Transaction): Boolean {
-        if (other !is En1545Transaction)
+        if (other !is En1545Transaction) {
             return false
+        }
         // Metro transfers don't involve tap-off/tap-on
-        if (parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) == LisboaVivaLookup.AGENCY_METRO
-            && other.parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) == LisboaVivaLookup.AGENCY_METRO
+        if (parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) == LisboaVivaLookup.AGENCY_METRO &&
+            other.parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) == LisboaVivaLookup.AGENCY_METRO
         ) {
             return true
         }
@@ -83,22 +84,23 @@ internal class LisboaVivaTransaction private constructor(
         private const val CONTRACTS_USED_BITMAP = "ContractsUsedBitmap"
         private const val TRANSITION = "Transition"
 
-        private val TRIP_FIELDS = En1545Container(
-            En1545FixedInteger.dateTimeLocal(EVENT),
-            En1545FixedInteger(EVENT_UNKNOWN_A, 3),
-            En1545FixedInteger.dateTimeLocal(EVENT_FIRST_STAMP),
-            En1545FixedInteger(EVENT_UNKNOWN_B, 5),
-            En1545FixedInteger(CONTRACTS_USED_BITMAP, 4),
-            En1545FixedHex(EVENT_UNKNOWN_C, 29),
-            En1545FixedInteger(TRANSITION, 3),
-            En1545FixedInteger(EVENT_SERVICE_PROVIDER, 5),
-            En1545FixedInteger(EVENT_VEHICLE_ID, 16),
-            En1545FixedInteger(EVENT_UNKNOWN_D, 4),
-            En1545FixedInteger(EVENT_DEVICE_ID, 16),
-            En1545FixedInteger(EVENT_ROUTE_NUMBER, 16),
-            En1545FixedInteger(EVENT_LOCATION_ID, 8),
-            En1545FixedHex(EVENT_UNKNOWN_E, 63)
-        )
+        private val TRIP_FIELDS =
+            En1545Container(
+                En1545FixedInteger.dateTimeLocal(EVENT),
+                En1545FixedInteger(EVENT_UNKNOWN_A, 3),
+                En1545FixedInteger.dateTimeLocal(EVENT_FIRST_STAMP),
+                En1545FixedInteger(EVENT_UNKNOWN_B, 5),
+                En1545FixedInteger(CONTRACTS_USED_BITMAP, 4),
+                En1545FixedHex(EVENT_UNKNOWN_C, 29),
+                En1545FixedInteger(TRANSITION, 3),
+                En1545FixedInteger(EVENT_SERVICE_PROVIDER, 5),
+                En1545FixedInteger(EVENT_VEHICLE_ID, 16),
+                En1545FixedInteger(EVENT_UNKNOWN_D, 4),
+                En1545FixedInteger(EVENT_DEVICE_ID, 16),
+                En1545FixedInteger(EVENT_ROUTE_NUMBER, 16),
+                En1545FixedInteger(EVENT_LOCATION_ID, 8),
+                En1545FixedHex(EVENT_UNKNOWN_E, 63),
+            )
 
         fun parse(data: ByteArray): LisboaVivaTransaction? {
             if (data.all { it == 0.toByte() }) return null

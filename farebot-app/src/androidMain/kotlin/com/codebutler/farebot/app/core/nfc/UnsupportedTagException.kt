@@ -22,8 +22,10 @@
 
 package com.codebutler.farebot.app.core.nfc
 
-class UnsupportedTagException(private val techList: Array<String>, private val tagId: String) : Exception() {
-
+class UnsupportedTagException(
+    private val techList: Array<String>,
+    private val tagId: String,
+) : Exception() {
     override val message: String?
         get() {
             val techs = techList.map { tech -> tech.replace("android.nfc.tech.", "") }.joinToString { "\n " }

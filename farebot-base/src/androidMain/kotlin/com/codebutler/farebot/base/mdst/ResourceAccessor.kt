@@ -25,13 +25,12 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 actual object ResourceAccessor {
     @OptIn(ExperimentalResourceApi::class)
-    actual fun openMdstFile(dbName: String): ByteArray? {
-        return try {
+    actual fun openMdstFile(dbName: String): ByteArray? =
+        try {
             runBlocking {
                 Res.readBytes("files/$dbName.mdst")
             }
         } catch (e: Exception) {
             null
         }
-    }
 }

@@ -29,11 +29,13 @@ import kotlinx.serialization.Serializable
 data class StandardDesfireFile(
     override val id: Int,
     @Contextual override val fileSettings: DesfireFileSettings,
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) : DesfireFile {
-
     companion object {
-        fun create(fileId: Int, fileSettings: DesfireFileSettings, fileData: ByteArray): DesfireFile =
-            StandardDesfireFile(fileId, fileSettings, fileData)
+        fun create(
+            fileId: Int,
+            fileSettings: DesfireFileSettings,
+            fileData: ByteArray,
+        ): DesfireFile = StandardDesfireFile(fileId, fileSettings, fileData)
     }
 }

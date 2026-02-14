@@ -28,8 +28,8 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.base.util.getStringBlocking
-import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitBalance
@@ -62,20 +62,21 @@ class TUnionTransitInfo(
     private val mBalance: Int,
     override val trips: List<ChinaTrip>?,
     val validityStart: Int?,
-    val validityEnd: Int?
+    val validityEnd: Int?,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.card_name_tunion)
 
     override val balance: TransitBalance
-        get() = TransitBalance(
-            balance = TransitCurrency.CNY(
-                if (mBalance > 0) mBalance else mBalance - mNegativeBalance
-            ),
-            validFrom = ChinaTransitData.parseHexDate(validityStart),
-            validTo = ChinaTransitData.parseHexDate(validityEnd)
-        )
+        get() =
+            TransitBalance(
+                balance =
+                    TransitCurrency.CNY(
+                        if (mBalance > 0) mBalance else mBalance - mNegativeBalance,
+                    ),
+                validFrom = ChinaTransitData.parseHexDate(validityStart),
+                validTo = ChinaTransitData.parseHexDate(validityEnd),
+            )
 
     companion object {
         @OptIn(ExperimentalStdlibApi::class)
@@ -87,30 +88,46 @@ class TUnionTransitInfo(
                 validityEnd = file15.byteArrayToInt(24, 4),
                 trips = ChinaTransitData.parseTrips(card) { ChinaTrip(it) },
                 mBalance = card.getBalance(0)?.getBitsFromBuffer(1, 31) ?: 0,
-                mNegativeBalance = card.getBalance(1)?.getBitsFromBuffer(1, 31) ?: 0
+                mNegativeBalance = card.getBalance(1)?.getBitsFromBuffer(1, 31) ?: 0,
             )
         }
 
         @OptIn(ExperimentalStdlibApi::class)
-        val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
-            override val allCards: List<CardInfo> = listOf(
-                CardInfo(nameRes = Res.string.card_name_t_union, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_china, imageRes = Res.drawable.tunion, latitude = 39.9042f, longitude = 116.4074f, brandColor = 0xFD0026, credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib"))
-            )
+        val FACTORY: ChinaCardTransitFactory =
+            object : ChinaCardTransitFactory {
+                override val allCards: List<CardInfo> =
+                    listOf(
+                        CardInfo(
+                            nameRes = Res.string.card_name_t_union,
+                            cardType = CardType.ISO7816,
+                            region = TransitRegion.CHINA,
+                            locationRes = Res.string.card_location_china,
+                            imageRes = Res.drawable.tunion,
+                            latitude = 39.9042f,
+                            longitude = 116.4074f,
+                            brandColor = 0xFD0026,
+                            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib"),
+                        ),
+                    )
 
-            override val appNames: List<ByteArray>
-                get() = listOf("A000000632010105".hexToByteArray())
+                override val appNames: List<ByteArray>
+                    get() = listOf("A000000632010105".hexToByteArray())
 
-            override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
-                TransitIdentity(
-                    getStringBlocking(Res.string.card_name_tunion),
-                    parseSerial(card)
-                )
+                override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
+                    TransitIdentity(
+                        getStringBlocking(Res.string.card_name_tunion),
+                        parseSerial(card),
+                    )
 
-            override fun parseTransitData(card: ChinaCard): TransitInfo =
-                parse(card) ?: throw IllegalStateException("Failed to parse T-Union card")
-        }
+                override fun parseTransitData(card: ChinaCard): TransitInfo =
+                    parse(card) ?: throw IllegalStateException("Failed to parse T-Union card")
+            }
 
         private fun parseSerial(card: ChinaCard): String? =
-            ChinaTransitData.getFile(card, 0x15)?.binaryData?.getHexString(10, 10)?.substring(1)
+            ChinaTransitData
+                .getFile(card, 0x15)
+                ?.binaryData
+                ?.getHexString(10, 10)
+                ?.substring(1)
     }
 }

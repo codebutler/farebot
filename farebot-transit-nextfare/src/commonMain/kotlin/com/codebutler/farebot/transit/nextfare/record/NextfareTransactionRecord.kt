@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit.nextfare.record
 
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 /**
  * Tap record type
@@ -37,9 +37,9 @@ data class NextfareTransactionRecord(
     val station: Int,
     val value: Int,
     val checksum: Int,
-    val isContinuation: Boolean
-) : NextfareRecord, Comparable<NextfareTransactionRecord> {
-
+    val isContinuation: Boolean,
+) : NextfareRecord,
+    Comparable<NextfareTransactionRecord> {
     override fun compareTo(other: NextfareTransactionRecord): Int {
         // Group by journey, then by timestamp.
         return if (other.journey == this.journey) {
@@ -55,28 +55,33 @@ data class NextfareTransactionRecord(
         TRAVEL_PASS_TRIP,
         TRAVEL_PASS_SALE,
         STORED_VALUE_TRIP,
-        STORED_VALUE_SALE;
+        STORED_VALUE_SALE,
+        ;
 
         val isSale get() = (this == TRAVEL_PASS_SALE || this == STORED_VALUE_SALE)
     }
 
     companion object {
-        private val TRIP_TYPES = mapOf(
-            // SEQ, LAX: 0x05 for "Travel Pass" trips.
-            0x05 to Type.TRAVEL_PASS_TRIP,
-            // SEQ, LAX: 0x31 for "Stored Value" trips / transfers
-            0x31 to Type.STORED_VALUE_TRIP,
-            // SEQ, LAX: 0x41 for "Travel Pass" sale.
-            0x41 to Type.TRAVEL_PASS_SALE,
-            // LAX: 0x71 for "Stored Value" sale -- effectively recorded twice (ignored)
-            0x71 to Type.IGNORE,
-            // SEQ, LAX: 0x79 for "Stored Value" sale (ignored)
-            0x79 to Type.IGNORE,
-            // Minneapolis: 0x89 unknown transaction type, no date, only a small number around 100
-            0x89 to Type.IGNORE
-        )
+        private val TRIP_TYPES =
+            mapOf(
+                // SEQ, LAX: 0x05 for "Travel Pass" trips.
+                0x05 to Type.TRAVEL_PASS_TRIP,
+                // SEQ, LAX: 0x31 for "Stored Value" trips / transfers
+                0x31 to Type.STORED_VALUE_TRIP,
+                // SEQ, LAX: 0x41 for "Travel Pass" sale.
+                0x41 to Type.TRAVEL_PASS_SALE,
+                // LAX: 0x71 for "Stored Value" sale -- effectively recorded twice (ignored)
+                0x71 to Type.IGNORE,
+                // SEQ, LAX: 0x79 for "Stored Value" sale (ignored)
+                0x79 to Type.IGNORE,
+                // Minneapolis: 0x89 unknown transaction type, no date, only a small number around 100
+                0x89 to Type.IGNORE,
+            )
 
-        fun recordFromBytes(input: ByteArray, timeZone: TimeZone): NextfareTransactionRecord? {
+        fun recordFromBytes(
+            input: ByteArray,
+            timeZone: TimeZone,
+        ): NextfareTransactionRecord? {
             val transhead = input[0].toInt() and 0xFF
             val transType = TRIP_TYPES[transhead] ?: Type.UNKNOWN
 
@@ -110,7 +115,7 @@ data class NextfareTransactionRecord(
                 station = station,
                 value = value,
                 checksum = checksum,
-                isContinuation = continuation
+                isContinuation = continuation,
             )
         }
     }

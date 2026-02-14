@@ -40,7 +40,9 @@ import farebot.farebot_transit_ndef.generated.resources.ndef_card_name
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
+data class NdefData(
+    val entries: List<NdefEntry>,
+) : TransitInfo() {
     override val serialNumber: String?
         get() = null
 
@@ -53,33 +55,38 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
     fun getEntryExtType(type: ByteArray): NdefExtType? =
         entries.filterIsInstance<NdefExtType>().firstOrNull { type.contentEquals(it.type) }
 
-    fun getEntryExtType(type: String): NdefExtType? =
-        getEntryExtType(type.encodeToByteArray())
+    fun getEntryExtType(type: String): NdefExtType? = getEntryExtType(type.encodeToByteArray())
 
     companion object {
         val NAME: String
             get() = getStringBlocking(Res.string.ndef_card_name)
 
         fun checkClassic(card: ClassicCard): Boolean =
-            MifareClassicAccessDirectory.parse(card)
+            MifareClassicAccessDirectory
+                .parse(card)
                 ?.contains(MifareClassicAccessDirectory.NFC_AID) == true
 
         fun parseClassic(
             card: ClassicCard,
-            aid: Int = MifareClassicAccessDirectory.NFC_AID
+            aid: Int = MifareClassicAccessDirectory.NFC_AID,
         ): NdefData? {
             val mad = MifareClassicAccessDirectory.parse(card) ?: return null
             val sectors = mad.getContiguous(aid)
 
-            if (sectors.isEmpty())
+            if (sectors.isEmpty()) {
                 return null
+            }
 
-            val allData = sectors.flatMap { sectorIndex ->
-                val sector = card.getSector(sectorIndex) as? DataClassicSector
-                    ?: return@flatMap emptyList()
-                sector.blocks.filter { it.type != ClassicBlock.TYPE_TRAILER }
-                    .flatMap { it.data.toList() }
-            }.toByteArray()
+            val allData =
+                sectors
+                    .flatMap { sectorIndex ->
+                        val sector =
+                            card.getSector(sectorIndex) as? DataClassicSector
+                                ?: return@flatMap emptyList()
+                        sector.blocks
+                            .filter { it.type != ClassicBlock.TYPE_TRAILER }
+                            .flatMap { it.data.toList() }
+                    }.toByteArray()
 
             return parseTLVNDEF(allData)
         }
@@ -88,12 +95,15 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
             try {
                 val cc = card.getPage(3).data
 
-                if (cc[0] != 0xe1.toByte())
+                if (cc[0] != 0xe1.toByte()) {
                     return false
-                if (cc[1].toInt() !in listOf(0x10, 0x11))
+                }
+                if (cc[1].toInt() !in listOf(0x10, 0x11)) {
                     return false
-                if (cc[3].toInt() and 0xf0 != 0)
+                }
+                if (cc[3].toInt() and 0xf0 != 0) {
                     return false
+                }
                 return true
             } catch (e: Exception) {
                 return false
@@ -104,22 +114,25 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
             try {
                 var cc = card.getPage(0).data
 
-                if (cc[0].toInt() and 0xff !in listOf(0xe1, 0xe2))
+                if (cc[0].toInt() and 0xff !in listOf(0xe1, 0xe2)) {
                     return null
-                if (cc[1].toInt() and 0xfc != 0x40)
+                }
+                if (cc[1].toInt() and 0xfc != 0x40) {
                     return null
-                if (cc[2].toInt() != 0)
+                }
+                if (cc[2].toInt() != 0) {
                     return Pair(4, cc[2].toInt() and 0xff)
-                if (cc.size < 8)
+                }
+                if (cc.size < 8) {
                     cc = cc + card.getPage(1).data
+                }
                 return Pair(8, cc.byteArrayToInt(6, 2))
             } catch (e: Exception) {
                 return null
             }
         }
 
-        fun checkVicinity(card: VicinityCard): Boolean =
-            getLenFromCCVicinity(card) != null
+        fun checkVicinity(card: VicinityCard): Boolean = getLenFromCCVicinity(card) != null
 
         fun parseVicinity(card: VicinityCard): NdefData? {
             val l = getLenFromCCVicinity(card) ?: return null
@@ -128,21 +141,26 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
 
         private fun getFelicaSystem(card: FelicaCard): FelicaSystem? {
             val ndefService = card.getSystem(FeliCaConstants.SYSTEMCODE_NDEF)
-            if (ndefService != null)
+            if (ndefService != null) {
                 return ndefService
+            }
             val liteService = card.getSystem(FeliCaConstants.SYSTEMCODE_FELICA_LITE) ?: return null
-            val mc = liteService.getService(FeliCaConstants.SERVICE_FELICA_LITE_READONLY)
-                ?.getBlock(FeliCaConstants.FELICA_LITE_BLOCK_MC) ?: return null
-            if (mc.data[3] == 0x01.toByte())
+            val mc =
+                liteService
+                    .getService(FeliCaConstants.SERVICE_FELICA_LITE_READONLY)
+                    ?.getBlock(FeliCaConstants.FELICA_LITE_BLOCK_MC) ?: return null
+            if (mc.data[3] == 0x01.toByte()) {
                 return liteService
+            }
             return null
         }
 
         fun checkFelica(card: FelicaCard): Boolean {
             val service = getFelicaSystem(card)?.getService(0xb) ?: return false
             val attributes = service.getBlock(0)?.data ?: return false
-            if (attributes[0].toInt() !in listOf(0x10, 0x11))
+            if (attributes[0].toInt() !in listOf(0x10, 0x11)) {
                 return false
+            }
             val checksum =
                 attributes.sliceOffLen(0, 14).map { it.toInt() and 0xff }.sum()
             val storedChecksum = attributes.byteArrayToInt(14, 2)
@@ -156,9 +174,12 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
             if (ln == 0) {
                 return NdefData(emptyList())
             }
-            val allData = (1..(ln + 15) / 16).flatMap {
-                service.getBlock(it)?.data?.toList() ?: emptyList()
-            }.toByteArray().sliceOffLen(0, ln)
+            val allData =
+                (1..(ln + 15) / 16)
+                    .flatMap {
+                        service.getBlock(it)?.data?.toList() ?: emptyList()
+                    }.toByteArray()
+                    .sliceOffLen(0, ln)
             return parseNDEF(allData)
         }
 
@@ -187,10 +208,12 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
                 var ptr = 0
                 while (ptr < data.size) {
                     val t = data[ptr++]
-                    if (t == 0xfe.toByte())
+                    if (t == 0xfe.toByte()) {
                         break
-                    if (t == 0.toByte())
+                    }
+                    if (t == 0.toByte()) {
                         continue
+                    }
                     var l = data[ptr++].toInt() and 0xff
                     if (l == 0xff) {
                         l = data.byteArrayToInt(ptr, 2)
@@ -211,21 +234,25 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
             while (ptr < data.size) {
                 val (entry, sz, isLast) = parseEntry(data, ptr)
 
-                if (entry == null)
+                if (entry == null) {
                     break
+                }
 
                 entries += entry
                 ptr += sz
 
-                if (isLast)
+                if (isLast) {
                     break
+                }
             }
 
             return NdefData(entries)
         }
 
-        private fun parseEntry(data: ByteArray, ptrStart: Int):
-            Triple<NdefEntry?, Int, Boolean> {
+        private fun parseEntry(
+            data: ByteArray,
+            ptrStart: Int,
+        ): Triple<NdefEntry?, Int, Boolean> {
             var ptr = ptrStart
             val head = NdefHead.parse(data, ptr) ?: return Triple(null, 0, true)
             ptr += head.headLen
@@ -244,14 +271,16 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
                     payload = payload + data.sliceOffLen(ptr, head.payloadLen)
                     ptr += head.payloadLen
                     me = subHead.me
-                    if (!subHead.cf)
+                    if (!subHead.cf) {
                         break
+                    }
                 }
             }
 
             return Triple(
-                payloadToEntry(head.tnf, type, id, payload), ptr - ptrStart,
-                me
+                payloadToEntry(head.tnf, type, id, payload),
+                ptr - ptrStart,
+                me,
             )
         }
 
@@ -264,30 +293,34 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
             tnf: Int,
             type: ByteArray,
             id: ByteArray?,
-            payload: ByteArray
+            payload: ByteArray,
         ): NdefEntry? =
             when (tnf) {
                 0 -> NdefEmpty(tnf, type, id, payload)
-                1 -> when {
-                    type.contentEquals(TYPE_T) -> NdefText(tnf, type, id, payload)
-                    type.contentEquals(TYPE_U) -> NdefUri(tnf, type, id, payload)
-                    else -> NdefUnknownRTD(tnf, type, id, payload)
-                }
-                2 -> when {
-                    type.contentEquals(WIFI_MIME) -> NdefWifi(tnf, type, id, payload)
-                    else -> NdefUnknownMIME(tnf, type, id, payload)
-                }
+                1 ->
+                    when {
+                        type.contentEquals(TYPE_T) -> NdefText(tnf, type, id, payload)
+                        type.contentEquals(TYPE_U) -> NdefUri(tnf, type, id, payload)
+                        else -> NdefUnknownRTD(tnf, type, id, payload)
+                    }
+                2 ->
+                    when {
+                        type.contentEquals(WIFI_MIME) -> NdefWifi(tnf, type, id, payload)
+                        else -> NdefUnknownMIME(tnf, type, id, payload)
+                    }
                 3 -> NdefUriType(tnf, type, id, payload)
-                4 -> when {
-                    type.contentEquals(ANDROID_PKG_TYPE) -> NdefAndroidPkg(tnf, type, id, payload)
-                    else -> NdefUnknownExtType(tnf, type, id, payload)
-                }
+                4 ->
+                    when {
+                        type.contentEquals(ANDROID_PKG_TYPE) -> NdefAndroidPkg(tnf, type, id, payload)
+                        else -> NdefUnknownExtType(tnf, type, id, payload)
+                    }
                 5 -> NdefBinaryType(tnf, type, id, payload)
                 else -> NdefInvalidType(tnf, type, id, payload)
             }
     }
 
-    private operator fun plus(second: NdefData) = NdefData(
-        entries = this.entries + second.entries
-    )
+    private operator fun plus(second: NdefData) =
+        NdefData(
+            entries = this.entries + second.entries,
+        )
 }

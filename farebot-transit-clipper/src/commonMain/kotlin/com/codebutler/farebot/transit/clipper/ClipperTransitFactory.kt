@@ -40,38 +40,37 @@ import farebot.farebot_transit_clipper.generated.resources.*
 import kotlin.time.Instant
 
 class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
-
     companion object {
         private const val RECORD_LENGTH = 32
 
         // Seconds per day for converting day-based expiry to timestamp
         private const val SECONDS_PER_DAY = 86400L
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.transit_clipper_card_name,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.USA,
-            locationRes = Res.string.location_san_francisco,
-            imageRes = Res.drawable.clipper_card,
-            latitude = 37.7749f,
-            longitude = -122.4194f,
-            brandColor = 0x274986,
-            credits = listOf("Anonymous Contributor", "Bao-Long Nguyen-Trong", "Michael Farrell"),
-            sampleDumpFile = "Clipper.nfc",
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.transit_clipper_card_name,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.USA,
+                locationRes = Res.string.location_san_francisco,
+                imageRes = Res.drawable.clipper_card,
+                latitude = 37.7749f,
+                longitude = -122.4194f,
+                brandColor = 0x274986,
+                credits = listOf("Anonymous Contributor", "Bao-Long Nguyen-Trong", "Michael Farrell"),
+                sampleDumpFile = "Clipper.nfc",
+            )
     }
 
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(0x9011f2) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(0x9011f2) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         try {
-            val file = card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
-                ?: throw RuntimeException("Clipper file 0x08 is not readable")
+            val file =
+                card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
+                    ?: throw RuntimeException("Clipper file 0x08 is not readable")
             val cardName = getStringBlocking(Res.string.transit_clipper_card_name)
             return TransitIdentity.create(cardName, ByteUtils.byteArrayToLong(file.data, 1, 4).toString())
         } catch (ex: Exception) {
@@ -81,12 +80,14 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
 
     override fun parseInfo(card: DesfireCard): ClipperTransitInfo {
         try {
-            val serialFile = card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
-                ?: throw RuntimeException("Clipper file 0x08 is not readable")
+            val serialFile =
+                card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
+                    ?: throw RuntimeException("Clipper file 0x08 is not readable")
             val serialNumber = ByteUtils.byteArrayToLong(serialFile.data, 1, 4)
 
-            val balanceFile = card.getApplication(0x9011f2)!!.getFile(0x02) as? StandardDesfireFile
-                ?: throw RuntimeException("Clipper file 0x02 is not readable")
+            val balanceFile =
+                card.getApplication(0x9011f2)!!.getFile(0x02) as? StandardDesfireFile
+                    ?: throw RuntimeException("Clipper file 0x02 is not readable")
             var data = balanceFile.data
             // Read as unsigned, then convert to Short for sign extension, then to Int
             // This handles negative balances correctly
@@ -94,18 +95,23 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
 
             // Read expiry date from file 0x01, offset 8 (2 bytes)
             // The expiry value is stored as days since Clipper epoch
-            val expiryTimestamp = try {
-                val expiryData = (card.getApplication(0x9011f2)!!.getFile(0x01) as? StandardDesfireFile)?.data
-                if (expiryData != null && expiryData.size > 9) {
-                    val expiryDays = ByteUtils.byteArrayToInt(expiryData, 8, 2)
-                    if (expiryDays > 0) {
-                        // Convert days since Clipper epoch to Unix timestamp
-                        clipperTimestampToInstant(expiryDays.toLong() * SECONDS_PER_DAY)
-                    } else null
-                } else null
-            } catch (e: Exception) {
-                null // Expiry date not available
-            }
+            val expiryTimestamp =
+                try {
+                    val expiryData = (card.getApplication(0x9011f2)!!.getFile(0x01) as? StandardDesfireFile)?.data
+                    if (expiryData != null && expiryData.size > 9) {
+                        val expiryDays = ByteUtils.byteArrayToInt(expiryData, 8, 2)
+                        if (expiryDays > 0) {
+                            // Convert days since Clipper epoch to Unix timestamp
+                            clipperTimestampToInstant(expiryDays.toLong() * SECONDS_PER_DAY)
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    }
+                } catch (e: Exception) {
+                    null // Expiry date not available
+                }
 
             val refills = parseRefills(card)
             val rawTrips = parseTrips(card)
@@ -118,7 +124,7 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
                 serialNumber.toString(),
                 allTrips,
                 balance,
-                expiryTimestamp
+                expiryTimestamp,
             )
         } catch (ex: Exception) {
             throw RuntimeException("Error parsing Clipper data", ex)
@@ -137,7 +143,7 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
     private fun computeBalances(
         balance: Long,
         trips: List<ClipperTrip>,
-        refills: List<ClipperRefill>
+        refills: List<ClipperRefill>,
     ): List<ClipperTrip> {
         var currentBalance = balance
         val tripsWithBalance = MutableList<ClipperTrip?>(trips.size) { null }
@@ -164,8 +170,9 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
     }
 
     private fun parseTrips(card: DesfireCard): List<ClipperTrip> {
-        val file = card.getApplication(0x9011f2)!!.getFile(0x0e) as? StandardDesfireFile
-            ?: return emptyList()
+        val file =
+            card.getApplication(0x9011f2)!!.getFile(0x0e) as? StandardDesfireFile
+                ?: return emptyList()
         /*
          *  This file reads very much like a record file but it professes to
          *  be only a regular file.  As such, we'll need to extract the records
@@ -215,7 +222,8 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
             return null
         }
 
-        return ClipperTrip.builder()
+        return ClipperTrip
+            .builder()
             .timestamp(timestamp)
             .exitTimestamp(exitTimestamp)
             .fare(fare)
@@ -230,8 +238,9 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
     }
 
     private fun parseRefills(card: DesfireCard): List<ClipperRefill> {
-        val file = card.getApplication(0x9011f2)!!.getFile(0x04) as? StandardDesfireFile
-            ?: return emptyList()
+        val file =
+            card.getApplication(0x9011f2)!!.getFile(0x04) as? StandardDesfireFile
+                ?: return emptyList()
 
         /*
          *  This file reads very much like a record file but it professes to

@@ -27,15 +27,18 @@ package com.codebutler.farebot.card.felica
  *
  * Contains a 2-byte manufacture code and 6-byte card identification.
  */
-class FeliCaIdm(bytes: ByteArray) {
+class FeliCaIdm(
+    bytes: ByteArray,
+) {
     val manufactureCode: ByteArray = byteArrayOf(bytes[0], bytes[1])
     val cardIdentification: ByteArray =
         byteArrayOf(bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])
 
     /** Manufacture code as a 16-bit integer. */
     val manufactureCodeInt: Int
-        get() = ((manufactureCode[0].toInt() and 0xFF) shl 8) or
-            (manufactureCode[1].toInt() and 0xFF)
+        get() =
+            ((manufactureCode[0].toInt() and 0xFF) shl 8) or
+                (manufactureCode[1].toInt() and 0xFF)
 
     /** Card identification number as a 48-bit long. */
     val cardIdentificationLong: Long
@@ -49,7 +52,5 @@ class FeliCaIdm(bytes: ByteArray) {
 
     fun getBytes(): ByteArray = manufactureCode + cardIdentification
 
-    override fun toString(): String {
-        return "IDm: " + FeliCaUtil.getHexString(getBytes())
-    }
+    override fun toString(): String = "IDm: " + FeliCaUtil.getHexString(getBytes())
 }

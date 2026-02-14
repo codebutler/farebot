@@ -25,7 +25,6 @@ package com.codebutler.farebot.card.serialize
 import com.codebutler.farebot.card.RawCard
 
 interface CardSerializer {
-
     fun serialize(card: RawCard<*>): String
 
     fun deserialize(data: String): RawCard<*>

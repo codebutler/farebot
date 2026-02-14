@@ -24,7 +24,6 @@
 package com.codebutler.farebot.base.util
 
 object NumberUtils {
-
     // --- Hex formatting ---
 
     fun byteToHex(v: Byte): String = "0x" + (v.toInt() and 0xff).toString(16)
@@ -37,8 +36,9 @@ object NumberUtils {
 
     fun convertBCDtoInteger(data: Int): Int {
         var res = 0
-        for (i in 0..7)
+        for (i in 0..7) {
             res = res * 10 + ((data shr (4 * (7 - i))) and 0xf)
+        }
         return res
     }
 
@@ -62,22 +62,36 @@ object NumberUtils {
         return res
     }
 
-    fun isValidBCD(data: Int): Boolean = (0..7).all {
-        ((data shr (4 * it)) and 0xf) in 0..9
-    }
+    fun isValidBCD(data: Int): Boolean =
+        (0..7).all {
+            ((data shr (4 * it)) and 0xf) in 0..9
+        }
 
     // --- String formatting ---
 
-    fun zeroPad(value: String, minDigits: Int): String {
+    fun zeroPad(
+        value: String,
+        minDigits: Int,
+    ): String {
         if (value.length >= minDigits) return value
         return CharArray(minDigits - value.length) { '0' }.concatToString() + value
     }
 
-    fun zeroPad(value: Int, minDigits: Int): String = zeroPad(value.toString(), minDigits)
+    fun zeroPad(
+        value: Int,
+        minDigits: Int,
+    ): String = zeroPad(value.toString(), minDigits)
 
-    fun zeroPad(value: Long, minDigits: Int): String = zeroPad(value.toString(), minDigits)
+    fun zeroPad(
+        value: Long,
+        minDigits: Int,
+    ): String = zeroPad(value.toString(), minDigits)
 
-    fun groupString(value: String, separator: String, vararg groups: Int): String {
+    fun groupString(
+        value: String,
+        separator: String,
+        vararg groups: Int,
+    ): String {
         val ret = StringBuilder()
         var ptr = 0
         for (g in groups) {
@@ -88,7 +102,11 @@ object NumberUtils {
         return ret.toString()
     }
 
-    fun formatNumber(value: Long, separator: String, vararg groups: Int): String {
+    fun formatNumber(
+        value: Long,
+        separator: String,
+        vararg groups: Int,
+    ): String {
         val minDigit = groups.sum()
         val unformatted = zeroPad(value, minDigit)
         val numDigit = unformatted.length
@@ -114,15 +132,20 @@ object NumberUtils {
         return digsum
     }
 
-    fun digitsOf(integer: Long): IntArray =
-        integer.toString().map { it.digitToInt() }.toIntArray()
+    fun digitsOf(integer: Long): IntArray = integer.toString().map { it.digitToInt() }.toIntArray()
 
-    fun getBitsFromInteger(buffer: Int, iStartBit: Int, iLength: Int): Int =
-        (buffer shr iStartBit) and ((1 shl iLength) - 1)
+    fun getBitsFromInteger(
+        buffer: Int,
+        iStartBit: Int,
+        iLength: Int,
+    ): Int = (buffer shr iStartBit) and ((1 shl iLength) - 1)
 
     // --- Power / log ---
 
-    fun pow(a: Int, b: Int): Long {
+    fun pow(
+        a: Int,
+        b: Int,
+    ): Long {
         var ret: Long = 1
         repeat(b) {
             ret *= a.toLong()

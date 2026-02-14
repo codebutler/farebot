@@ -1,7 +1,6 @@
 package com.codebutler.farebot.shared
 
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.transit.TransitInfo
 
 /**
  * Main entry point for the FareBot SDK.

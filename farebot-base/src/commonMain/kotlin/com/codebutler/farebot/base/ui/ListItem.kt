@@ -32,18 +32,18 @@ import org.jetbrains.compose.resources.StringResource
 @SerialName("normal")
 data class ListItem(
     override val text1: String?,
-    override val text2: String?
+    override val text2: String?,
 ) : ListItemInterface() {
     constructor(name: String) : this(name, null)
 
     constructor(nameRes: StringResource, value: String?) : this(
         text1 = getStringBlocking(nameRes),
-        text2 = value
+        text2 = value,
     )
 
     constructor(nameRes: StringResource) : this(
         text1 = getStringBlocking(nameRes),
-        text2 = null
+        text2 = null,
     )
 
     /**
@@ -52,7 +52,7 @@ data class ListItem(
      */
     constructor(nameRes: StringResource, value: String?, vararg formatArgs: Any) : this(
         text1 = getStringBlocking(nameRes, *formatArgs),
-        text2 = value
+        text2 = value,
     )
 
     /**
@@ -60,6 +60,6 @@ data class ListItem(
      */
     constructor(nameRes: StringResource, valueRes: StringResource) : this(
         text1 = getStringBlocking(nameRes),
-        text2 = getStringBlocking(valueRes)
+        text2 = getStringBlocking(valueRes),
     )
 }

@@ -24,8 +24,9 @@ package com.codebutler.farebot.card.nfc
 
 import android.nfc.tech.NfcF
 
-class AndroidNfcFTechnology(private val nfcF: NfcF) : NfcFTechnology {
-
+class AndroidNfcFTechnology(
+    private val nfcF: NfcF,
+) : NfcFTechnology {
     override fun connect() {
         nfcF.connect()
     }

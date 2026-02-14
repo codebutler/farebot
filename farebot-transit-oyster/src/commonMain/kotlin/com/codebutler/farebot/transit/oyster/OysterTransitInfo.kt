@@ -43,9 +43,8 @@ class OysterTransitInfo internal constructor(
     private val purse: OysterPurse?,
     private val transactions: List<OysterTransaction>,
     private val refills: List<OysterRefill>,
-    private val passes: List<OysterTravelPass>
+    private val passes: List<OysterTravelPass>,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.oyster_card_name)
 

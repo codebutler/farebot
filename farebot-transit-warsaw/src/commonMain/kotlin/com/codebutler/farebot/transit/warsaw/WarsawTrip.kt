@@ -28,9 +28,8 @@ import kotlin.time.Instant
 
 class WarsawTrip(
     private val timestamp: Instant,
-    private val tripType: Int
+    private val tripType: Int,
 ) : Trip() {
-
     override val startTimestamp: Instant get() = timestamp
 
     override val fare: TransitCurrency? get() = null

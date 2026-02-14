@@ -23,31 +23,33 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class StrelkaTransitFactory : TransitFactory<ClassicCard, StrelkaTransitInfo> {
-
-    override val allCards: List<CardInfo> = listOf(
-        CardInfo(
-            nameRes = Res.string.card_name_strelka,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.RUSSIA,
-            locationRes = Res.string.card_location_moscow_region_russia,
-            serialOnly = true,
-            imageRes = Res.drawable.strelka_card,
-            latitude = 55.7558f,
-            longitude = 37.6173f,
-            brandColor = 0x154477,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
+    override val allCards: List<CardInfo> =
+        listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_strelka,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.card_location_moscow_region_russia,
+                serialOnly = true,
+                imageRes = Res.drawable.strelka_card,
+                latitude = 55.7558f,
+                longitude = 37.6173f,
+                brandColor = 0x154477,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
+            ),
         )
-    )
 
     companion object {
         internal const val NAME = "Strelka"
 
         internal fun getSerial(card: ClassicCard): String =
-            (card.getSector(12) as DataClassicSector).getBlock(0).data
-                .getHexString(2, 10).substring(0, 19)
+            (card.getSector(12) as DataClassicSector)
+                .getBlock(0)
+                .data
+                .getHexString(2, 10)
+                .substring(0, 19)
 
-        internal fun formatShortSerial(serial: String): String =
-            NumberUtils.groupString(serial.substring(8), " ", 4, 4)
+        internal fun formatShortSerial(serial: String): String = NumberUtils.groupString(serial.substring(8), " ", 4, 4)
     }
 
     override fun check(card: ClassicCard): Boolean {
@@ -64,6 +66,5 @@ class StrelkaTransitFactory : TransitFactory<ClassicCard, StrelkaTransitInfo> {
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(NAME, formatShortSerial(getSerial(card)))
 
-    override fun parseInfo(card: ClassicCard): StrelkaTransitInfo =
-        StrelkaTransitInfo(mSerial = getSerial(card))
+    override fun parseInfo(card: ClassicCard): StrelkaTransitInfo = StrelkaTransitInfo(mSerial = getSerial(card))
 }

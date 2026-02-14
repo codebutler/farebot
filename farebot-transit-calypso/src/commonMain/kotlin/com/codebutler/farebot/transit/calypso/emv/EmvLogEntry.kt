@@ -31,18 +31,17 @@ import com.codebutler.farebot.card.iso7816.ISO7816TLV
 import com.codebutler.farebot.card.iso7816.UNKNOWN_TAG
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 /**
  * Represents a single EMV transaction log entry.
  */
 class EmvLogEntry(
-    private val values: Map<String, ByteArray>
+    private val values: Map<String, ByteArray>,
 ) : Trip() {
-
     override val startTimestamp: Instant?
         get() {
             val dateBin = values[EmvData.TAG_TRANSACTION_DATE] ?: return null
@@ -66,8 +65,9 @@ class EmvLogEntry(
             val amountBin = values[EmvData.TAG_AMOUNT_AUTHORISED] ?: return null
             val amount = amountBin.convertBCDtoInteger()
 
-            val codeBin = values[EmvData.TAG_TRANSACTION_CURRENCY_CODE]
-                ?: return TransitCurrency.XXX(amount)
+            val codeBin =
+                values[EmvData.TAG_TRANSACTION_CURRENCY_CODE]
+                    ?: return TransitCurrency.XXX(amount)
             val code = NumberUtils.convertBCDtoInteger(codeBin.byteArrayToInt())
 
             val currencyStr = EmvData.numericCodeToString(code)
@@ -82,25 +82,31 @@ class EmvLogEntry(
 
     override val routeName: String?
         get() {
-            val extras = values.entries.filter {
-                !HANDLED_TAGS.contains(it.key)
-            }.mapNotNull {
-                val tag = EmvData.TAGMAP[it.key] ?: UNKNOWN_TAG
-                val v = tag.interpretTagString(it.value)
-                if (v.isEmpty()) null else "${tag.name}=$v"
-            }
+            val extras =
+                values.entries
+                    .filter {
+                        !HANDLED_TAGS.contains(it.key)
+                    }.mapNotNull {
+                        val tag = EmvData.TAGMAP[it.key] ?: UNKNOWN_TAG
+                        val v = tag.interpretTagString(it.value)
+                        if (v.isEmpty()) null else "${tag.name}=$v"
+                    }
             return extras.joinToString().ifEmpty { null }
         }
 
     companion object {
-        private val HANDLED_TAGS = listOf(
-            EmvData.TAG_AMOUNT_AUTHORISED,
-            EmvData.TAG_TRANSACTION_CURRENCY_CODE,
-            EmvData.TAG_TRANSACTION_TIME,
-            EmvData.TAG_TRANSACTION_DATE
-        )
+        private val HANDLED_TAGS =
+            listOf(
+                EmvData.TAG_AMOUNT_AUTHORISED,
+                EmvData.TAG_TRANSACTION_CURRENCY_CODE,
+                EmvData.TAG_TRANSACTION_TIME,
+                EmvData.TAG_TRANSACTION_DATE,
+            )
 
-        fun parseEmvTrip(record: ByteArray, format: ByteArray): EmvLogEntry? {
+        fun parseEmvTrip(
+            record: ByteArray,
+            format: ByteArray,
+        ): EmvLogEntry? {
             val values = mutableMapOf<String, ByteArray>()
             var p = 0
             val dol = ISO7816TLV.removeTlvHeader(format)

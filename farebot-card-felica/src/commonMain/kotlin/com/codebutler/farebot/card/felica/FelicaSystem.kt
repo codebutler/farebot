@@ -31,9 +31,8 @@ data class FelicaSystem(
     val code: Int,
     val services: List<FelicaService>,
     val skipped: Boolean = false,
-    val allServiceCodes: Set<Int> = emptySet()
+    val allServiceCodes: Set<Int> = emptySet(),
 ) {
-
     private val servicesByCode: Map<Int, FelicaService> by lazy {
         services.associateBy { it.serviceCode }
     }
@@ -44,13 +43,9 @@ data class FelicaSystem(
         fun create(
             code: Int,
             services: List<FelicaService>,
-            allServiceCodes: Set<Int> = emptySet()
-        ): FelicaSystem {
-            return FelicaSystem(code, services, allServiceCodes = allServiceCodes)
-        }
+            allServiceCodes: Set<Int> = emptySet(),
+        ): FelicaSystem = FelicaSystem(code, services, allServiceCodes = allServiceCodes)
 
-        fun skipped(code: Int): FelicaSystem {
-            return FelicaSystem(code, emptyList(), skipped = true)
-        }
+        fun skipped(code: Int): FelicaSystem = FelicaSystem(code, emptyList(), skipped = true)
     }
 }

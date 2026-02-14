@@ -43,9 +43,8 @@ class BipTransitInfo(
     private val mBalance: Int,
     override val trips: List<Trip>,
     private val mHolderId: Int,
-    private val mHolderName: String?
+    private val mHolderName: String?,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = mSerial.toString()
 
@@ -56,24 +55,25 @@ class BipTransitInfo(
         get() = TransitBalance(balance = TransitCurrency.CLP(mBalance))
 
     override val info: List<ListItemInterface>
-        get() = listOfNotNull(
-            ListItem(
-                Res.string.bip_card_type,
-                if (mHolderId == 0) {
-                    getStringBlocking(Res.string.bip_card_type_anonymous)
+        get() =
+            listOfNotNull(
+                ListItem(
+                    Res.string.bip_card_type,
+                    if (mHolderId == 0) {
+                        getStringBlocking(Res.string.bip_card_type_anonymous)
+                    } else {
+                        getStringBlocking(Res.string.bip_card_type_personal)
+                    },
+                ),
+                if (mHolderName != null) {
+                    ListItem(Res.string.bip_card_holders_name, mHolderName)
                 } else {
-                    getStringBlocking(Res.string.bip_card_type_personal)
-                }
-            ),
-            if (mHolderName != null) {
-                ListItem(Res.string.bip_card_holders_name, mHolderName)
-            } else {
-                null
-            },
-            if (mHolderId != 0) {
-                ListItem(Res.string.bip_card_holders_id, mHolderId.toString())
-            } else {
-                null
-            }
-        )
+                    null
+                },
+                if (mHolderId != 0) {
+                    ListItem(Res.string.bip_card_holders_id, mHolderId.toString())
+                } else {
+                    null
+                },
+            )
 }

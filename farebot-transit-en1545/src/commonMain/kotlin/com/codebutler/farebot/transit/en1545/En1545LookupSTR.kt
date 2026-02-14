@@ -34,9 +34,15 @@ import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 /**
  * Base class for EN1545 lookups that use an MDST station table.
  */
-abstract class En1545LookupSTR protected constructor(protected val dbName: String) : En1545Lookup {
-
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
+abstract class En1545LookupSTR protected constructor(
+    protected val dbName: String,
+) : En1545Lookup {
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
         if (routeNumber == null) return null
         val routeId = routeNumber or ((agency ?: 0) shl 16) or ((transport ?: 0) shl 24)
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
@@ -44,22 +50,33 @@ abstract class En1545LookupSTR protected constructor(protected val dbName: Strin
         return line?.name?.english ?: getHumanReadableRouteId(routeNumber, routeVariant, agency, transport)
     }
 
-    override fun getAgencyName(agency: Int?, isShort: Boolean): String? {
+    override fun getAgencyName(
+        agency: Int?,
+        isShort: Boolean,
+    ): String? {
         if (agency == null || agency == 0) return null
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val operator = reader.getOperator(agency)
-        return if (isShort) operator?.name?.englishShort ?: operator?.name?.english
-        else operator?.name?.english
+        return if (isShort) {
+            operator?.name?.englishShort ?: operator?.name?.english
+        } else {
+            operator?.name?.english
+        }
     }
 
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? {
         if (station == 0) return null
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val stationId = station or ((agency ?: 0) shl 16)
         val mdstStation = reader.getStationById(stationId)
         if (mdstStation != null) {
-            val name = mdstStation.name.english.takeIf { it.isNotEmpty() }
-                ?: "0x${station.toString(16)}"
+            val name =
+                mdstStation.name.english.takeIf { it.isNotEmpty() }
+                    ?: "0x${station.toString(16)}"
             val lat = mdstStation.latitude.takeIf { it != 0f }?.toString()
             val lng = mdstStation.longitude.takeIf { it != 0f }?.toString()
             return Station.create(name, null, lat, lng)
@@ -67,7 +84,10 @@ abstract class En1545LookupSTR protected constructor(protected val dbName: Strin
         return Station.unknown("0x${station.toString(16)}")
     }
 
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode {
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode {
         if (route != null) {
             val reader = MdstStationTableReader.getReader(dbName)
             if (reader != null) {
@@ -86,10 +106,15 @@ abstract class En1545LookupSTR protected constructor(protected val dbName: Strin
         return Trip.Mode.OTHER
     }
 
-    override fun getSubscriptionName(stringResource: StringResource, agency: Int?, contractTariff: Int?): String? {
+    override fun getSubscriptionName(
+        stringResource: StringResource,
+        agency: Int?,
+        contractTariff: Int?,
+    ): String? {
         if (contractTariff == null) return null
-        val res = subscriptionMapByAgency[Pair(agency, contractTariff)]
-            ?: subscriptionMap[contractTariff]
+        val res =
+            subscriptionMapByAgency[Pair(agency, contractTariff)]
+                ?: subscriptionMap[contractTariff]
         return if (res != null) {
             stringResource.getString(res)
         } else {
@@ -104,15 +129,16 @@ abstract class En1545LookupSTR protected constructor(protected val dbName: Strin
         get() = emptyMap()
 
     companion object {
-        fun transportTypeToMode(type: TransportType): Trip.Mode = when (type) {
-            TransportType.BUS -> Trip.Mode.BUS
-            TransportType.TRAIN -> Trip.Mode.TRAIN
-            TransportType.TRAM -> Trip.Mode.TRAM
-            TransportType.METRO -> Trip.Mode.METRO
-            TransportType.FERRY -> Trip.Mode.FERRY
-            TransportType.TROLLEYBUS -> Trip.Mode.TROLLEYBUS
-            TransportType.MONORAIL -> Trip.Mode.MONORAIL
-            else -> Trip.Mode.OTHER
-        }
+        fun transportTypeToMode(type: TransportType): Trip.Mode =
+            when (type) {
+                TransportType.BUS -> Trip.Mode.BUS
+                TransportType.TRAIN -> Trip.Mode.TRAIN
+                TransportType.TRAM -> Trip.Mode.TRAM
+                TransportType.METRO -> Trip.Mode.METRO
+                TransportType.FERRY -> Trip.Mode.FERRY
+                TransportType.TROLLEYBUS -> Trip.Mode.TROLLEYBUS
+                TransportType.MONORAIL -> Trip.Mode.MONORAIL
+                else -> Trip.Mode.OTHER
+            }
     }
 }

@@ -21,8 +21,8 @@
 package com.codebutler.farebot.transit.kmt
 
 import com.codebutler.farebot.base.util.getStringBlocking
-import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.card.felica.FeliCaUtil
+import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -37,18 +37,18 @@ class KMTTrip(
     private val sequenceNumber: Int,
     private val timestampData: Instant,
     private val transactionAmount: Int,
-    private val endStationData: Int
+    private val endStationData: Int,
 ) : Trip() {
-
     override val startTimestamp: Instant get() = timestampData
 
     override val mode: Mode
-        get() = when (processType) {
-            0 -> Mode.TICKET_MACHINE
-            1 -> Mode.TRAIN
-            2 -> Mode.POS
-            else -> Mode.OTHER
-        }
+        get() =
+            when (processType) {
+                0 -> Mode.TICKET_MACHINE
+                1 -> Mode.TRAIN
+                2 -> Mode.POS
+                else -> Mode.OTHER
+            }
 
     override val fare: TransitCurrency
         get() {
@@ -71,18 +71,24 @@ class KMTTrip(
         get() = getStringBlocking(Res.string.kmt_defroute)
 
     override val startStation: Station?
-        get() = if (processType != 1) {
-            // Top-ups use startStation
-            KMTData.getStation(endStationData)
-                ?: Station.unknown("0x${endStationData.toString(16)}")
-        } else null
+        get() =
+            if (processType != 1) {
+                // Top-ups use startStation
+                KMTData.getStation(endStationData)
+                    ?: Station.unknown("0x${endStationData.toString(16)}")
+            } else {
+                null
+            }
 
     override val endStation: Station?
-        get() = if (processType == 1) {
-            // Train rides use endStation
-            KMTData.getStation(endStationData)
-                ?: Station.unknown("0x${endStationData.toString(16)}")
-        } else null
+        get() =
+            if (processType == 1) {
+                // Train rides use endStation
+                KMTData.getStation(endStationData)
+                    ?: Station.unknown("0x${endStationData.toString(16)}")
+            } else {
+                null
+            }
 
     fun getProcessType(): Int = processType
 

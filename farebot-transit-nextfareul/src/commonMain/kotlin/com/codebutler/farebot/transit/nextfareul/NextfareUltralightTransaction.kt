@@ -28,17 +28,15 @@ import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
-import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_nextfareul.generated.resources.Res
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_unknown_route
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 abstract class NextfareUltralightTransaction(
     raw: ByteArray,
-    private val baseDate: Int
+    private val baseDate: Int,
 ) : Transaction() {
-
     private val mTime: Int
     private val mDate: Int
     protected val mRoute: Int
@@ -67,9 +65,12 @@ abstract class NextfareUltralightTransaction(
         get() = listOf(getStringBlocking(Res.string.nextfareul_unknown_route, mRoute.toString(16)))
 
     override val station: Station?
-        get() = if (mLocation == 0) {
-            null
-        } else Station.unknown(mLocation.toString())
+        get() =
+            if (mLocation == 0) {
+                null
+            } else {
+                Station.unknown(mLocation.toString())
+            }
 
     override val timestamp: Instant?
         get() = NextfareUltralightTransitData.parseDateTime(timezone, baseDate, mDate, mTime)
@@ -82,27 +83,35 @@ abstract class NextfareUltralightTransaction(
         get() = mRecordType == 6 && !isBus
 
     override val isTapOn: Boolean
-        get() = (mRecordType == 2
-                || mRecordType == 4
-                || mRecordType == 6 && isBus
-                || mRecordType == 0x12
-                || mRecordType == 0x16)
+        get() = (
+            mRecordType == 2 ||
+                mRecordType == 4 ||
+                mRecordType == 6 &&
+                isBus ||
+                mRecordType == 0x12 ||
+                mRecordType == 0x16
+        )
 
     override val fare: TransitCurrency?
         get() = null
 
     // handle wraparound correctly
-    fun isSeqNoGreater(other: NextfareUltralightTransaction) =
-        mSeqNo - other.mSeqNo and 0x7f < 0x3f
+    fun isSeqNoGreater(other: NextfareUltralightTransaction) = mSeqNo - other.mSeqNo and 0x7f < 0x3f
 
-    override fun shouldBeMerged(other: Transaction) = (other is NextfareUltralightTransaction
-            && other.mSeqNo == mSeqNo + 1 and 0x7f
-            && super.shouldBeMerged(other))
+    override fun shouldBeMerged(other: Transaction) =
+        (
+            other is NextfareUltralightTransaction &&
+                other.mSeqNo == mSeqNo + 1 and 0x7f &&
+                super.shouldBeMerged(other)
+        )
 
     override fun isSameTrip(other: Transaction) =
-        (other is NextfareUltralightTransaction
-                && !isBus && !other.isBus
-                && mRoute == other.mRoute)
+        (
+            other is NextfareUltralightTransaction &&
+                !isBus &&
+                !other.isBus &&
+                mRoute == other.mRoute
+        )
 
     override val agencyName: String?
         get() = null

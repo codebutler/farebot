@@ -38,7 +38,6 @@ import farebot.farebot_transit_vicinity.generated.resources.*
  * Detects blank NFC-V cards.
  */
 class BlankVicinityTransitFactory : TransitFactory<VicinityCard, BlankVicinityTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     /**
@@ -55,9 +54,7 @@ class BlankVicinityTransitFactory : TransitFactory<VicinityCard, BlankVicinityTr
         return TransitIdentity.create(name, null)
     }
 
-    override fun parseInfo(card: VicinityCard): BlankVicinityTransitInfo {
-        return BlankVicinityTransitInfo()
-    }
+    override fun parseInfo(card: VicinityCard): BlankVicinityTransitInfo = BlankVicinityTransitInfo()
 }
 
 class BlankVicinityTransitInfo : TransitInfo() {
@@ -66,8 +63,9 @@ class BlankVicinityTransitInfo : TransitInfo() {
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.fully_blank_title),
-            ListItem(Res.string.fully_blank_desc)
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.fully_blank_title),
+                ListItem(Res.string.fully_blank_desc),
+            )
 }

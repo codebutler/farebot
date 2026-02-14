@@ -31,8 +31,8 @@ import farebot.farebot_transit_china.generated.resources.szt_bus
 import farebot.farebot_transit_china.generated.resources.szt_metro
 import farebot.farebot_transit_china.generated.resources.szt_station_gate
 import farebot.farebot_transit_china.generated.resources.unknown_format
-import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Trip implementation for Shenzhen Tong (深圳通) cards.
@@ -40,37 +40,40 @@ import kotlinx.serialization.Serializable
  * Supports station lookup for metro stations and route names for buses.
  */
 @Serializable
-class NewShenzhenTrip(override val capsule: ChinaTripCapsule) : ChinaTripAbstract() {
-
+class NewShenzhenTrip(
+    override val capsule: ChinaTripCapsule,
+) : ChinaTripAbstract() {
     override val endStation: Station?
-        get() = when (transport) {
-            SZT_METRO -> {
-                val stationId = (mStation and 0xffffff00).toInt()
-                val result = MdstStationLookup.getStation(SHENZHEN_STR, stationId)
-                if (result != null) {
-                    val gate = (mStation and 0xff).toString(16)
-                    val gateAttr = getStringBlocking(Res.string.szt_station_gate, gate)
-                    Station(
-                        stationNameRaw = result.stationName,
-                        shortStationNameRaw = result.shortStationName,
-                        companyName = result.companyName,
-                        lineNames = result.lineNames,
-                        latitude = if (result.hasLocation) result.latitude else null,
-                        longitude = if (result.hasLocation) result.longitude else null,
-                        humanReadableId = (mStation shr 8).toString(16),
-                        attributes = listOf(gateAttr)
-                    )
-                } else {
-                    Station.unknown((mStation shr 8).toString(16))
+        get() =
+            when (transport) {
+                SZT_METRO -> {
+                    val stationId = (mStation and 0xffffff00).toInt()
+                    val result = MdstStationLookup.getStation(SHENZHEN_STR, stationId)
+                    if (result != null) {
+                        val gate = (mStation and 0xff).toString(16)
+                        val gateAttr = getStringBlocking(Res.string.szt_station_gate, gate)
+                        Station(
+                            stationNameRaw = result.stationName,
+                            shortStationNameRaw = result.shortStationName,
+                            companyName = result.companyName,
+                            lineNames = result.lineNames,
+                            latitude = if (result.hasLocation) result.latitude else null,
+                            longitude = if (result.hasLocation) result.longitude else null,
+                            humanReadableId = (mStation shr 8).toString(16),
+                            attributes = listOf(gateAttr),
+                        )
+                    } else {
+                        Station.unknown((mStation shr 8).toString(16))
+                    }
                 }
+                else -> null
             }
-            else -> null
-        }
 
     override val mode: Mode
         get() {
-            if (isTopup)
+            if (isTopup) {
                 return Mode.TICKET_MACHINE
+            }
             return when (transport) {
                 SZT_METRO -> Mode.METRO
                 SZT_BUS -> Mode.BUS
@@ -79,19 +82,21 @@ class NewShenzhenTrip(override val capsule: ChinaTripCapsule) : ChinaTripAbstrac
         }
 
     override val routeName: String?
-        get() = when (transport) {
-            SZT_BUS -> {
-                MdstStationLookup.getLineName(SHENZHEN_STR, mStation.toInt())
-                    ?: mStation.toString()
+        get() =
+            when (transport) {
+                SZT_BUS -> {
+                    MdstStationLookup.getLineName(SHENZHEN_STR, mStation.toInt())
+                        ?: mStation.toString()
+                }
+                else -> null
             }
-            else -> null
-        }
 
     override val humanReadableRouteID: String?
-        get() = when (transport) {
-            SZT_BUS -> NumberUtils.intToHex(mStation.toInt())
-            else -> null
-        }
+        get() =
+            when (transport) {
+                SZT_BUS -> NumberUtils.intToHex(mStation.toInt())
+                else -> null
+            }
 
     override val startTimestamp: Instant?
         get() = if (transport == SZT_METRO) null else timestamp
@@ -102,11 +107,12 @@ class NewShenzhenTrip(override val capsule: ChinaTripCapsule) : ChinaTripAbstrac
     constructor(data: ByteArray) : this(ChinaTripCapsule(data))
 
     override val agencyName: String?
-        get() = when (transport) {
-            SZT_METRO -> getStringBlocking(Res.string.szt_metro)
-            SZT_BUS -> getStringBlocking(Res.string.szt_bus)
-            else -> getStringBlocking(Res.string.unknown_format, transport.toString())
-        }
+        get() =
+            when (transport) {
+                SZT_METRO -> getStringBlocking(Res.string.szt_metro)
+                SZT_BUS -> getStringBlocking(Res.string.szt_bus)
+                else -> getStringBlocking(Res.string.unknown_format, transport.toString())
+            }
 
     companion object {
         private const val SZT_BUS = 3

@@ -9,7 +9,10 @@ import java.io.File
 import java.util.Properties
 
 actual class BundledDatabaseDriverFactory {
-    actual fun createDriver(dbName: String, schema: SqlSchema<QueryResult.Value<Unit>>): SqlDriver {
+    actual fun createDriver(
+        dbName: String,
+        schema: SqlSchema<QueryResult.Value<Unit>>,
+    ): SqlDriver {
         val tmpDir = System.getProperty("java.io.tmpdir")
         val dbFile = File(tmpDir, "farebot-$dbName")
         if (!dbFile.exists()) {
@@ -22,21 +25,25 @@ actual class BundledDatabaseDriverFactory {
                 }
             }
         }
-        val noOpSchema = object : SqlSchema<QueryResult.Value<Unit>> {
-            override val version: Long = schema.version
-            override fun create(driver: SqlDriver): QueryResult.Value<Unit> = QueryResult.Unit
-            override fun migrate(
-                driver: SqlDriver,
-                oldVersion: Long,
-                newVersion: Long,
-                vararg callbacks: AfterVersion
-            ): QueryResult.Value<Unit> = QueryResult.Unit
-        }
-        val url = if (dbFile.exists()) {
-            "jdbc:sqlite:${dbFile.absolutePath}"
-        } else {
-            JdbcSqliteDriver.IN_MEMORY
-        }
+        val noOpSchema =
+            object : SqlSchema<QueryResult.Value<Unit>> {
+                override val version: Long = schema.version
+
+                override fun create(driver: SqlDriver): QueryResult.Value<Unit> = QueryResult.Unit
+
+                override fun migrate(
+                    driver: SqlDriver,
+                    oldVersion: Long,
+                    newVersion: Long,
+                    vararg callbacks: AfterVersion,
+                ): QueryResult.Value<Unit> = QueryResult.Unit
+            }
+        val url =
+            if (dbFile.exists()) {
+                "jdbc:sqlite:${dbFile.absolutePath}"
+            } else {
+                JdbcSqliteDriver.IN_MEMORY
+            }
         return JdbcSqliteDriver(url, properties = Properties(), schema = noOpSchema)
     }
 }

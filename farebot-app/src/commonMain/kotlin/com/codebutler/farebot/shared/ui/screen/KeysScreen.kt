@@ -39,14 +39,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import farebot.farebot_app.generated.resources.Res
-import farebot.farebot_app.generated.resources.delete
-import farebot.farebot_app.generated.resources.keys
-import farebot.farebot_app.generated.resources.no_keys
 import farebot.farebot_app.generated.resources.add_key
 import farebot.farebot_app.generated.resources.back
 import farebot.farebot_app.generated.resources.cancel
+import farebot.farebot_app.generated.resources.delete
 import farebot.farebot_app.generated.resources.delete_selected_keys
+import farebot.farebot_app.generated.resources.keys
 import farebot.farebot_app.generated.resources.n_selected
+import farebot.farebot_app.generated.resources.no_keys
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -98,19 +98,23 @@ fun KeysScreen(
                             Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
                 )
             } else {
                 TopAppBar(
                     title = { Text(stringResource(Res.string.keys)) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(Res.string.back),
+                            )
                         }
                     },
                     actions = {
@@ -120,12 +124,13 @@ fun KeysScreen(
                     },
                 )
             }
-        }
+        },
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
         ) {
             when {
                 uiState.isLoading -> {
@@ -135,9 +140,10 @@ fun KeysScreen(
                     Text(
                         text = stringResource(Res.string.no_keys),
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(16.dp)
+                        modifier =
+                            Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
                     )
                 }
                 else -> {
@@ -145,20 +151,20 @@ fun KeysScreen(
                         items(uiState.keys) { keyItem ->
                             val isSelected = uiState.selectedIds.contains(keyItem.id)
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            if (uiState.isSelectionMode) {
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .combinedClickable(
+                                            onClick = {
+                                                if (uiState.isSelectionMode) {
+                                                    onToggleSelection(keyItem.id)
+                                                }
+                                            },
+                                            onLongClick = {
                                                 onToggleSelection(keyItem.id)
-                                            }
-                                        },
-                                        onLongClick = {
-                                            onToggleSelection(keyItem.id)
-                                        },
-                                    )
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                            },
+                                        ).padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 if (uiState.isSelectionMode) {
                                     Checkbox(
@@ -170,12 +176,12 @@ fun KeysScreen(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = keyItem.cardId,
-                                        style = MaterialTheme.typography.bodyLarge
+                                        style = MaterialTheme.typography.bodyLarge,
                                     )
                                     Text(
                                         text = keyItem.cardType,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
                                 if (!uiState.isSelectionMode) {
@@ -184,7 +190,7 @@ fun KeysScreen(
                                         Icon(
                                             Icons.Default.Delete,
                                             contentDescription = stringResource(Res.string.delete),
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
                                 }

@@ -17,8 +17,9 @@ import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.card_name_strelka
 import farebot.farebot_transit_serialonly.generated.resources.strelka_long_serial
 
-class StrelkaTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() {
-
+class StrelkaTransitInfo(
+    private val mSerial: String,
+) : SerialOnlyTransitInfo() {
     public override val extraInfo: List<ListItemInterface>
         get() = listOf(ListItem(Res.string.strelka_long_serial, mSerial))
 

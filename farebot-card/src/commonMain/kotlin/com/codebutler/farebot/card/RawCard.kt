@@ -25,7 +25,6 @@ package com.codebutler.farebot.card
 import kotlin.time.Instant
 
 interface RawCard<T : Card> {
-
     fun cardType(): CardType
 
     fun tagId(): ByteArray

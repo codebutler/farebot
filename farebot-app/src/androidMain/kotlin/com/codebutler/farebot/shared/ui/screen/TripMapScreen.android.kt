@@ -30,16 +30,18 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
     val startStation = uiState.startStation
     val endStation = uiState.endStation
 
-    val startLatLng = startStation?.let {
-        val lat = it.latitude?.toDouble()
-        val lng = it.longitude?.toDouble()
-        if (lat != null && lng != null) LatLng(lat, lng) else null
-    }
-    val endLatLng = endStation?.let {
-        val lat = it.latitude?.toDouble()
-        val lng = it.longitude?.toDouble()
-        if (lat != null && lng != null) LatLng(lat, lng) else null
-    }
+    val startLatLng =
+        startStation?.let {
+            val lat = it.latitude?.toDouble()
+            val lng = it.longitude?.toDouble()
+            if (lat != null && lng != null) LatLng(lat, lng) else null
+        }
+    val endLatLng =
+        endStation?.let {
+            val lat = it.latitude?.toDouble()
+            val lng = it.longitude?.toDouble()
+            if (lat != null && lng != null) LatLng(lat, lng) else null
+        }
 
     if (startLatLng == null && endLatLng == null) return
 
@@ -47,26 +49,33 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
     val errorColor = MaterialTheme.colorScheme.error.toArgb()
     val density = LocalDensity.current.density
-    val startIcon = remember(primaryColor, density) {
-        MapsInitializer.initialize(context)
-        createBullseyeBitmapDescriptor(primaryColor, 20f, density)
-    }
-    val endIcon = remember(errorColor, density) {
-        createBullseyeBitmapDescriptor(errorColor, 20f, density)
-    }
+    val startIcon =
+        remember(primaryColor, density) {
+            MapsInitializer.initialize(context)
+            createBullseyeBitmapDescriptor(primaryColor, 20f, density)
+        }
+    val endIcon =
+        remember(errorColor, density) {
+            createBullseyeBitmapDescriptor(errorColor, 20f, density)
+        }
 
-    val cameraPositionState = rememberCameraPositionState {
-        val bounds = LatLngBounds.Builder().apply {
-            startLatLng?.let { include(it) }
-            endLatLng?.let { include(it) }
-        }.build()
-        position = CameraPosition.fromLatLngZoom(bounds.center, 13f)
-    }
+    val cameraPositionState =
+        rememberCameraPositionState {
+            val bounds =
+                LatLngBounds
+                    .Builder()
+                    .apply {
+                        startLatLng?.let { include(it) }
+                        endLatLng?.let { include(it) }
+                    }.build()
+            position = CameraPosition.fromLatLngZoom(bounds.center, 13f)
+        }
 
     GoogleMap(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(300.dp),
         cameraPositionState = cameraPositionState,
     ) {
         if (startLatLng != null) {
@@ -100,16 +109,18 @@ private fun createBullseyeBitmapDescriptor(
     val canvas = Canvas(bitmap)
     val center = sizePx / 2f
     // Outer colored circle
-    val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        this.color = color
-        style = Paint.Style.FILL
-    }
+    val fillPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = color
+            style = Paint.Style.FILL
+        }
     canvas.drawCircle(center, center, sizePx / 2f, fillPaint)
     // Inner white circle (half the radius, matching StationCard)
-    val whitePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        this.color = android.graphics.Color.WHITE
-        style = Paint.Style.FILL
-    }
+    val whitePaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = android.graphics.Color.WHITE
+            style = Paint.Style.FILL
+        }
     canvas.drawCircle(center, center, sizePx / 4f, whitePaint)
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }

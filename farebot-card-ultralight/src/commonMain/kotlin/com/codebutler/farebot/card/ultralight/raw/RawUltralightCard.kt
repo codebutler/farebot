@@ -26,18 +26,17 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.card.ultralight.UltralightPage
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawUltralightCard(
     @Contextual private val _tagId: ByteArray,
     private val _scannedAt: Instant,
     val pages: List<UltralightPage>,
-    val ultralightType: Int
+    val ultralightType: Int,
 ) : RawCard<UltralightCard> {
-
     override fun cardType(): CardType = CardType.MifareUltralight
 
     override fun tagId(): ByteArray = _tagId
@@ -46,15 +45,14 @@ data class RawUltralightCard(
 
     override fun isUnauthorized(): Boolean = false
 
-    override fun parse(): UltralightCard =
-        UltralightCard.create(tagId(), scannedAt(), pages, ultralightType)
+    override fun parse(): UltralightCard = UltralightCard.create(tagId(), scannedAt(), pages, ultralightType)
 
     companion object {
         fun create(
             tagId: ByteArray,
             scannedAt: Instant,
             pages: List<UltralightPage>,
-            type: Int
+            type: Int,
         ): RawUltralightCard = RawUltralightCard(tagId, scannedAt, pages, type)
     }
 }

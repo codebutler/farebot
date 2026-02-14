@@ -34,7 +34,6 @@ import com.codebutler.farebot.transit.TransitInfo
  * Implementations should be registered with [KSX6924Registry].
  */
 interface KSX6924CardTransitFactory {
-
     /**
      * Checks if this factory can handle the given KSX6924 application.
      *

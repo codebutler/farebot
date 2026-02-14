@@ -40,9 +40,8 @@ class WaikatoCardTransitInfo(
     private val cardNameValue: String,
     private val balanceValue: Int,
     private val tripList: List<WaikatoCardTrip>,
-    private val lastTransactionDate: LocalDate
+    private val lastTransactionDate: LocalDate,
 ) : TransitInfo() {
-
     override val cardName: String = cardNameValue
 
     override val serialNumber: String = serialNumberValue

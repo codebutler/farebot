@@ -27,7 +27,9 @@ package com.codebutler.farebot.card.felica
  *
  * Contains a 2-byte IC code and 6-byte maximum response time.
  */
-class FeliCaPmm(bytes: ByteArray) {
+class FeliCaPmm(
+    bytes: ByteArray,
+) {
     val icCode: ByteArray = byteArrayOf(bytes[0], bytes[1])
     val maximumResponseTime: ByteArray =
         byteArrayOf(bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7])
@@ -42,7 +44,5 @@ class FeliCaPmm(bytes: ByteArray) {
 
     fun getBytes(): ByteArray = icCode + maximumResponseTime
 
-    override fun toString(): String {
-        return "PMm: " + FeliCaUtil.getHexString(getBytes())
-    }
+    override fun toString(): String = "PMm: " + FeliCaUtil.getHexString(getBytes())
 }

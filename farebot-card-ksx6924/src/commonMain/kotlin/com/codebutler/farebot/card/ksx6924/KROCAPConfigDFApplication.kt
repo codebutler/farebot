@@ -40,9 +40,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class KROCAPConfigDFApplication(
-    val application: ISO7816Application
+    val application: ISO7816Application,
 ) {
-
     companion object {
         const val TYPE = "kr_ocap_configdf"
         const val NAME = "KR-OCAP"
@@ -68,8 +67,7 @@ data class KROCAPConfigDFApplication(
          * This is used to determine whether to use the KR-OCAP Config DF
          * or defer to the KSX6924 application for parsing.
          */
-        fun hasKSX6924Application(card: ISO7816Card): Boolean {
-            return card.applications.any { KSX6924Application.isKSX6924(it) }
-        }
+        fun hasKSX6924Application(card: ISO7816Card): Boolean =
+            card.applications.any { KSX6924Application.isKSX6924(it) }
     }
 }

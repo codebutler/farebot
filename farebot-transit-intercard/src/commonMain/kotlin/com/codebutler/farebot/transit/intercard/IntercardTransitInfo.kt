@@ -34,16 +34,16 @@ import farebot.farebot_transit_intercard.generated.resources.last_transaction
 class IntercardTransitInfo(
     private val mSerialNumber: Long,
     private val mBalance: Int?, // 10th of cents
-    private val mLastTransaction: Int?
+    private val mLastTransaction: Int?,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.card_name_intercard)
 
     override val balance: TransitBalance?
-        get() = mBalance?.let {
-            TransitBalance(balance = parseCurrency(it))
-        }
+        get() =
+            mBalance?.let {
+                TransitBalance(balance = parseCurrency(it))
+            }
 
     override val serialNumber: String
         get() = mSerialNumber.toString()
@@ -55,8 +55,8 @@ class IntercardTransitInfo(
                 items.add(
                     ListItem(
                         Res.string.last_transaction,
-                        parseCurrency(it).formatCurrencyString(true)
-                    )
+                        parseCurrency(it).formatCurrencyString(true),
+                    ),
                 )
             }
             return items.ifEmpty { null }

@@ -28,11 +28,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FelicaBlock(
     val address: Byte,
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
     companion object {
-        fun create(addr: Byte, data: ByteArray): FelicaBlock {
-            return FelicaBlock(addr, data)
-        }
+        fun create(
+            addr: Byte,
+            data: ByteArray,
+        ): FelicaBlock = FelicaBlock(addr, data)
     }
 }

@@ -25,5 +25,5 @@ package com.codebutler.farebot.transit.hsl
 enum class HSLVariant {
     HSL_V1,
     HSL_V2,
-    WALTTI
+    WALTTI,
 }

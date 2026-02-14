@@ -14,8 +14,8 @@ import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.NfcStatus
 import com.codebutler.farebot.shared.ui.screen.HomeUiState
-import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.*
+import farebot.farebot_app.generated.resources.Res
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -39,13 +39,13 @@ class HomeViewModel(
     private val navDataHolder: NavDataHolder,
     private val analytics: Analytics,
 ) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(
-        HomeUiState(
-            nfcStatus = if (cardScanner != null) NfcStatus.AVAILABLE else NfcStatus.UNAVAILABLE,
-            requiresActiveScan = cardScanner?.requiresActiveScan ?: true,
+    private val _uiState =
+        MutableStateFlow(
+            HomeUiState(
+                nfcStatus = if (cardScanner != null) NfcStatus.AVAILABLE else NfcStatus.UNAVAILABLE,
+                requiresActiveScan = cardScanner?.requiresActiveScan ?: true,
+            ),
         )
-    )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private val _navigateToCard = MutableSharedFlow<String>()
@@ -79,10 +79,13 @@ class HomeViewModel(
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
                 val scanError = categorizeError(error)
-                analytics.logEvent("scan_card_error", mapOf(
-                    "error_type" to error::class.simpleName.orEmpty(),
-                    "error_message" to (error.message ?: "Unknown"),
-                ))
+                analytics.logEvent(
+                    "scan_card_error",
+                    mapOf(
+                        "error_type" to error::class.simpleName.orEmpty(),
+                        "error_message" to (error.message ?: "Unknown"),
+                    ),
+                )
                 _errorMessage.value = scanError
             }
         }
@@ -96,24 +99,26 @@ class HomeViewModel(
         _errorMessage.value = null
     }
 
-    private suspend fun categorizeError(error: Throwable): ScanError {
-        return when {
-            error is CardUnauthorizedException -> ScanError(
-                title = getString(Res.string.locked_card),
-                message = getString(Res.string.keys_required),
-                tagIdHex = error.tagId.hex(),
-                cardType = error.cardType,
-            )
-            error.message?.contains("Tag was lost", ignoreCase = true) == true -> ScanError(
-                title = getString(Res.string.tag_lost),
-                message = getString(Res.string.tag_lost_message),
-            )
-            else -> ScanError(
-                title = getString(Res.string.error),
-                message = error.message ?: getString(Res.string.unknown_error),
-            )
+    private suspend fun categorizeError(error: Throwable): ScanError =
+        when {
+            error is CardUnauthorizedException ->
+                ScanError(
+                    title = getString(Res.string.locked_card),
+                    message = getString(Res.string.keys_required),
+                    tagIdHex = error.tagId.hex(),
+                    cardType = error.cardType,
+                )
+            error.message?.contains("Tag was lost", ignoreCase = true) == true ->
+                ScanError(
+                    title = getString(Res.string.tag_lost),
+                    message = getString(Res.string.tag_lost_message),
+                )
+            else ->
+                ScanError(
+                    title = getString(Res.string.error),
+                    message = error.message ?: getString(Res.string.unknown_error),
+                )
         }
-    }
 
     private suspend fun processScannedCard(rawCard: RawCard<*>) {
         try {
@@ -122,18 +127,22 @@ class HomeViewModel(
                     type = rawCard.cardType(),
                     serial = rawCard.tagId().hex(),
                     data = cardSerializer.serialize(rawCard),
-                )
+                ),
             )
-            analytics.logEvent("scan_card", mapOf(
-                "card_type" to rawCard.cardType().toString(),
-            ))
+            analytics.logEvent(
+                "scan_card",
+                mapOf(
+                    "card_type" to rawCard.cardType().toString(),
+                ),
+            )
             val key = navDataHolder.put(rawCard)
             _navigateToCard.emit(key)
         } catch (e: Exception) {
-            _errorMessage.value = ScanError(
-                title = getString(Res.string.error),
-                message = e.message ?: getString(Res.string.failed_to_process_card),
-            )
+            _errorMessage.value =
+                ScanError(
+                    title = getString(Res.string.error),
+                    message = e.message ?: getString(Res.string.failed_to_process_card),
+                )
         }
     }
 }

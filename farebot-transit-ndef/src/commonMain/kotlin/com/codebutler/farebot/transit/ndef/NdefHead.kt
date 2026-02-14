@@ -31,15 +31,19 @@ data class NdefHead(
     val typeLen: Int,
     val payloadLen: Int,
     val idLen: Int?,
-    val headLen: Int
+    val headLen: Int,
 ) {
     companion object {
-        fun parse(data: ByteArray, ptrStart: Int): NdefHead? {
+        fun parse(
+            data: ByteArray,
+            ptrStart: Int,
+        ): NdefHead? {
             var ptr = ptrStart
             val head = data[ptr]
             val mb = (head.toInt() and 0x80) != 0
-            if (mb != (ptr == 0))
+            if (mb != (ptr == 0)) {
                 return null
+            }
             val me = (head.toInt() and 0x40) != 0
             val cf = (head.toInt() and 0x20) != 0
             val sr = (head.toInt() and 0x10) != 0
@@ -58,7 +62,7 @@ data class NdefHead(
                 typeLen = typeLen,
                 payloadLen = payloadLen,
                 idLen = idLen,
-                headLen = ptr - ptrStart
+                headLen = ptr - ptrStart,
             )
         }
     }

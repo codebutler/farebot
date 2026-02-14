@@ -29,20 +29,26 @@ import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 object HafilatLookup : En1545LookupSTR("hafilat") {
-
     override val timeZone: TimeZone
         get() = TimeZone.of("Asia/Dubai")
 
     override fun parseCurrency(price: Int): TransitCurrency = TransitCurrency(price, "AED")
 
-    internal fun isPurseTariff(agency: Int?, contractTariff: Int?): Boolean =
-        agency == 1 && contractTariff in listOf(0x2710)
+    internal fun isPurseTariff(
+        agency: Int?,
+        contractTariff: Int?,
+    ): Boolean = agency == 1 && contractTariff in listOf(0x2710)
 
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? =
-        routeNumber?.toString()
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? = routeNumber?.toString()
 
     override val subscriptionMap: Map<Int, ComposeStringResource>
-        get() = mapOf(
-            0x2710 to Res.string.hafilat_subscription_regular
-        )
+        get() =
+            mapOf(
+                0x2710 to Res.string.hafilat_subscription_regular,
+            )
 }

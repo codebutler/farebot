@@ -28,9 +28,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RawDesfireApplication(
     val appId: Int,
-    val files: List<RawDesfireFile>
+    val files: List<RawDesfireFile>,
 ) {
     fun appId(): Int = appId
+
     fun files(): List<RawDesfireFile> = files
 
     fun parse(): DesfireApplication {
@@ -39,7 +40,9 @@ data class RawDesfireApplication(
     }
 
     companion object {
-        fun create(appId: Int, rawDesfireFiles: List<RawDesfireFile>): RawDesfireApplication =
-            RawDesfireApplication(appId, rawDesfireFiles)
+        fun create(
+            appId: Int,
+            rawDesfireFiles: List<RawDesfireFile>,
+        ): RawDesfireApplication = RawDesfireApplication(appId, rawDesfireFiles)
     }
 }

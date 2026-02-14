@@ -41,42 +41,44 @@ data class TransitCurrency(
     @SerialName("currencyCode")
     val currencyCode: String,
     @SerialName("divisor")
-    val divisor: Int = DEFAULT_DIVISOR
+    val divisor: Int = DEFAULT_DIVISOR,
 ) {
     constructor(currency: Int, currencyCode: String) : this(currency, currencyCode, DEFAULT_DIVISOR)
 
-    fun formatCurrencyString(isBalance: Boolean = false): String {
-        return CurrencyFormatter.formatAmount(currency.toLong(), currencyCode, divisor)
-    }
+    fun formatCurrencyString(isBalance: Boolean = false): String =
+        CurrencyFormatter.formatAmount(currency.toLong(), currencyCode, divisor)
 
     fun negate(): TransitCurrency = TransitCurrency(-currency, currencyCode, divisor)
 
-    operator fun plus(other: TransitCurrency?): TransitCurrency {
-        return when {
+    operator fun plus(other: TransitCurrency?): TransitCurrency =
+        when {
             other == null -> this
             currencyCode != other.currencyCode ->
                 throw IllegalArgumentException("Currency codes must be the same")
-            divisor != other.divisor -> when {
-                divisor > other.divisor && (divisor % other.divisor == 0) ->
-                    TransitCurrency(
-                        currency + (other.currency * (divisor / other.divisor)),
-                        currencyCode, divisor
-                    )
-                other.divisor > divisor && (other.divisor % divisor == 0) ->
-                    TransitCurrency(
-                        other.currency + (currency * (other.divisor / divisor)),
-                        currencyCode, other.divisor
-                    )
-                else ->
-                    TransitCurrency(
-                        (currency * other.divisor) + (other.currency * divisor),
-                        currencyCode, divisor * other.divisor
-                    )
-            }
+            divisor != other.divisor ->
+                when {
+                    divisor > other.divisor && (divisor % other.divisor == 0) ->
+                        TransitCurrency(
+                            currency + (other.currency * (divisor / other.divisor)),
+                            currencyCode,
+                            divisor,
+                        )
+                    other.divisor > divisor && (other.divisor % divisor == 0) ->
+                        TransitCurrency(
+                            other.currency + (currency * (other.divisor / divisor)),
+                            currencyCode,
+                            other.divisor,
+                        )
+                    else ->
+                        TransitCurrency(
+                            (currency * other.divisor) + (other.currency * divisor),
+                            currencyCode,
+                            divisor * other.divisor,
+                        )
+                }
             else ->
                 TransitCurrency(currency + other.currency, currencyCode, divisor)
         }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is TransitCurrency) return false
@@ -99,25 +101,48 @@ data class TransitCurrency(
         private const val DEFAULT_DIVISOR = 100
 
         fun AUD(cents: Int) = TransitCurrency(cents, "AUD")
+
         fun BRL(centavos: Int) = TransitCurrency(centavos, "BRL")
+
         fun CAD(cents: Int) = TransitCurrency(cents, "CAD")
+
         fun CLP(pesos: Int) = TransitCurrency(pesos, "CLP", 1)
+
         fun CNY(fen: Int) = TransitCurrency(fen, "CNY")
+
         fun DKK(ore: Int) = TransitCurrency(ore, "DKK")
+
         fun EUR(cents: Int) = TransitCurrency(cents, "EUR")
+
         fun GBP(pence: Int) = TransitCurrency(pence, "GBP")
+
         fun HKD(cents: Int) = TransitCurrency(cents, "HKD")
+
         fun IDR(cents: Int) = TransitCurrency(cents, "IDR", 1)
+
         fun ILS(agorot: Int) = TransitCurrency(agorot, "ILS")
+
         fun JPY(yen: Int) = TransitCurrency(yen, "JPY", 1)
+
         fun KRW(won: Int) = TransitCurrency(won, "KRW", 1)
+
         fun MYR(sen: Int) = TransitCurrency(sen, "MYR")
+
         fun NZD(cents: Int) = TransitCurrency(cents, "NZD")
+
         fun RUB(kopeyka: Int) = TransitCurrency(kopeyka, "RUB")
+
         fun SGD(cents: Int) = TransitCurrency(cents, "SGD")
+
         fun TWD(cents: Int) = TransitCurrency(cents, "TWD", 1)
+
         fun USD(cents: Int) = TransitCurrency(cents, "USD")
+
         fun XXX(cents: Int) = TransitCurrency(cents, UNKNOWN_CURRENCY_CODE)
-        fun XXX(cents: Int, divisor: Int) = TransitCurrency(cents, UNKNOWN_CURRENCY_CODE, divisor)
+
+        fun XXX(
+            cents: Int,
+            divisor: Int,
+        ) = TransitCurrency(cents, UNKNOWN_CURRENCY_CODE, divisor)
     }
 }

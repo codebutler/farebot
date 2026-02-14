@@ -32,11 +32,11 @@ import com.codebutler.farebot.transit.orca.OrcaTransitFactory
 import com.codebutler.farebot.transit.orca.OrcaTransitInfo
 import kotlin.math.abs
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlin.test.assertContains
 
 /**
  * Tests for Orca card.
@@ -44,34 +44,41 @@ import kotlin.test.assertContains
  * Ported from Metrodroid's OrcaTest.kt.
  */
 class OrcaTransitTest {
-
     private val stringResource = TestStringResource()
     private val factory = OrcaTransitFactory(stringResource)
 
-    private fun assertNear(expected: Double, actual: Double, epsilon: Double) {
-        assertTrue(abs(expected - actual) < epsilon,
-            "Expected $expected but got $actual (difference > $epsilon)")
+    private fun assertNear(
+        expected: Double,
+        actual: Double,
+        epsilon: Double,
+    ) {
+        assertTrue(
+            abs(expected - actual) < epsilon,
+            "Expected $expected but got $actual (difference > $epsilon)",
+        )
     }
 
     private fun constructOrcaCard(): com.codebutler.farebot.card.desfire.DesfireCard {
         val recordSize = 48
-        val records = listOf(
-            hexToBytes(record0),
-            hexToBytes(record1),
-            hexToBytes(record2),
-            hexToBytes(record3),
-            hexToBytes(record4)
-        )
+        val records =
+            listOf(
+                hexToBytes(RECORD_0),
+                hexToBytes(RECORD_1),
+                hexToBytes(RECORD_2),
+                hexToBytes(RECORD_3),
+                hexToBytes(RECORD_4),
+            )
 
-        val f4 = standardFile(0x04, hexToBytes(testFile0x4))
+        val f4 = standardFile(0x04, hexToBytes(TEST_FILE_0X4))
         val f2 = recordFile(0x02, recordSize, records)
-        val ff = standardFile(0x0f, hexToBytes(testFile0xf))
+        val ff = standardFile(0x0f, hexToBytes(TEST_FILE_0XF))
 
         return desfireCard(
-            applications = listOf(
-                desfireApp(0x3010f2, listOf(f2, f4)),
-                desfireApp(0xffffff, listOf(ff))
-            )
+            applications =
+                listOf(
+                    desfireApp(0x3010f2, listOf(f2, f4)),
+                    desfireApp(0xffffff, listOf(ff)),
+                ),
         )
     }
 
@@ -133,7 +140,7 @@ class OrcaTransitTest {
             val trip2RouteName = trips[2].routeName
             assertTrue(
                 trip2RouteName == "Link 1 Line" || trip2RouteName == "Link Light Rail",
-                "Route name should be 'Link 1 Line' (from MDST) or 'Link Light Rail' (fallback), got: $trip2RouteName"
+                "Route name should be 'Link 1 Line' (from MDST) or 'Link Light Rail' (fallback), got: $trip2RouteName",
             )
             assertNotNull(trips[2].startStation?.latitude)
             assertNotNull(trips[2].startStation?.longitude)
@@ -159,13 +166,13 @@ class OrcaTransitTest {
             // MDST is available with full station data
             assertTrue(
                 trip3StationName == "King Street" || trip3StationName == "King St",
-                "Station name should be 'King Street' or 'King St', got: $trip3StationName"
+                "Station name should be 'King Street' or 'King St', got: $trip3StationName",
             )
             // Route name comes from MDST line name or falls back to string resource
             val trip3RouteName = trips[3].routeName
             assertTrue(
                 trip3RouteName == "Sounder N Line" || trip3RouteName == "Sounder Train",
-                "Route name should be 'Sounder N Line' (from MDST) or 'Sounder Train' (fallback), got: $trip3RouteName"
+                "Route name should be 'Sounder N Line' (from MDST) or 'Sounder Train' (fallback), got: $trip3RouteName",
             )
             assertNotNull(trips[3].startStation?.latitude)
             assertNotNull(trips[3].startStation?.longitude)
@@ -192,7 +199,7 @@ class OrcaTransitTest {
             // MDST is available with full station data
             assertTrue(
                 trip4StationName == "Seattle Terminal" || trip4StationName == "Seattle",
-                "Station name should be 'Seattle Terminal' or 'Seattle', got: $trip4StationName"
+                "Station name should be 'Seattle Terminal' or 'Seattle', got: $trip4StationName",
             )
             assertNotNull(trips[4].startStation?.latitude)
             assertNotNull(trips[4].startStation?.longitude)
@@ -204,14 +211,20 @@ class OrcaTransitTest {
 
     companion object {
         // mocked data
-        private const val record0 = "00000025a4aadc6800076260000000042c00000000000000000000000000" + "000000000000000000000000000000000000"
-        private const val record1 = "000000f5a4aacc6800076360000000024200000000000000000000000000" + "000000000000000000000000000000000000"
-        private const val record2 = "00000075a4aabc6fb00338d0000000016600000000000000000000000000" + "000000000000000000000000000000000000"
-        private const val record3 = "00000075a4aaac6090000030000000016400000000000000000000000000" + "000000000000000000000000000000000000"
-        private const val record4 = "00000085a4aa9c6080027750000000016200000000000000000000000000" + "000000000000000000000000000000000000"
-        private const val testFile0x4 = "000000000000000000000000000000000000000000000000000000000000" +
+        private const val RECORD_0 =
+            "00000025a4aadc6800076260000000042c00000000000000000000000000" + "000000000000000000000000000000000000"
+        private const val RECORD_1 =
+            "000000f5a4aacc6800076360000000024200000000000000000000000000" + "000000000000000000000000000000000000"
+        private const val RECORD_2 =
+            "00000075a4aabc6fb00338d0000000016600000000000000000000000000" + "000000000000000000000000000000000000"
+        private const val RECORD_3 =
+            "00000075a4aaac6090000030000000016400000000000000000000000000" + "000000000000000000000000000000000000"
+        private const val RECORD_4 =
+            "00000085a4aa9c6080027750000000016200000000000000000000000000" + "000000000000000000000000000000000000"
+        private const val TEST_FILE_0X4 =
+            "000000000000000000000000000000000000000000000000000000000000" +
                 "0000000000000000000000" +
                 "5b88" + "000000000000000000000000000000000000000000"
-        private const val testFile0xf = "0000000000b792a100"
+        private const val TEST_FILE_0XF = "0000000000b792a100"
     }
 }

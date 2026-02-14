@@ -38,7 +38,6 @@ import farebot.farebot_transit_serialonly.generated.resources.*
  * This factory should be registered near the END of the Ultralight factory list.
  */
 class BlankUltralightTransitFactory : TransitFactory<UltralightCard, BlankUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     /**
@@ -75,41 +74,62 @@ class BlankUltralightTransitFactory : TransitFactory<UltralightCard, BlankUltral
             if (model.startsWith("NTAG21")) {
                 // Factory-set data on NTAG
                 if (model == "NTAG213") {
-                    if (idx == 0x03 && data.contentEquals(
-                            byteArrayOf(0xE1.toByte(), 0x10, 0x12, 0)
+                    if (idx == 0x03 &&
+                        data.contentEquals(
+                            byteArrayOf(0xE1.toByte(), 0x10, 0x12, 0),
                         )
-                    ) continue
-                    if (idx == 0x04 && data.contentEquals(
-                            byteArrayOf(0x01, 0x03, 0xA0.toByte(), 0x0C)
+                    ) {
+                        continue
+                    }
+                    if (idx == 0x04 &&
+                        data.contentEquals(
+                            byteArrayOf(0x01, 0x03, 0xA0.toByte(), 0x0C),
                         )
-                    ) continue
-                    if (idx == 0x05 && data.contentEquals(
-                            byteArrayOf(0x34, 0x03, 0, 0xFE.toByte())
+                    ) {
+                        continue
+                    }
+                    if (idx == 0x05 &&
+                        data.contentEquals(
+                            byteArrayOf(0x34, 0x03, 0, 0xFE.toByte()),
                         )
-                    ) continue
+                    ) {
+                        continue
+                    }
                 }
 
                 if (model == "NTAG215") {
-                    if (idx == 0x03 && data.contentEquals(
-                            byteArrayOf(0xE1.toByte(), 0x10, 0x3E, 0)
+                    if (idx == 0x03 &&
+                        data.contentEquals(
+                            byteArrayOf(0xE1.toByte(), 0x10, 0x3E, 0),
                         )
-                    ) continue
-                    if (idx == 0x04 && data.contentEquals(
-                            byteArrayOf(0x03, 0, 0xFE.toByte(), 0)
+                    ) {
+                        continue
+                    }
+                    if (idx == 0x04 &&
+                        data.contentEquals(
+                            byteArrayOf(0x03, 0, 0xFE.toByte(), 0),
                         )
-                    ) continue
+                    ) {
+                        continue
+                    }
                     // Page 5 is all null
                 }
 
                 if (model == "NTAG216") {
-                    if (idx == 0x03 && data.contentEquals(
-                            byteArrayOf(0xE1.toByte(), 0x10, 0x6D, 0)
+                    if (idx == 0x03 &&
+                        data.contentEquals(
+                            byteArrayOf(0xE1.toByte(), 0x10, 0x6D, 0),
                         )
-                    ) continue
-                    if (idx == 0x04 && data.contentEquals(
-                            byteArrayOf(0x03, 0, 0xFE.toByte(), 0)
+                    ) {
+                        continue
+                    }
+                    if (idx == 0x04 &&
+                        data.contentEquals(
+                            byteArrayOf(0x03, 0, 0xFE.toByte(), 0),
                         )
-                    ) continue
+                    ) {
+                        continue
+                    }
                     // Page 5 is all null
                 }
 
@@ -168,22 +188,19 @@ class BlankUltralightTransitFactory : TransitFactory<UltralightCard, BlankUltral
         return TransitIdentity.create(name, null)
     }
 
-    override fun parseInfo(card: UltralightCard): BlankUltralightTransitInfo {
-        return BlankUltralightTransitInfo()
-    }
+    override fun parseInfo(card: UltralightCard): BlankUltralightTransitInfo = BlankUltralightTransitInfo()
 
     /**
      * Get the card model name from the Ultralight card type.
      * Returns empty string if unknown.
      */
-    private fun getCardModel(card: UltralightCard): String {
-        return when (card.ultralightType) {
+    private fun getCardModel(card: UltralightCard): String =
+        when (card.ultralightType) {
             UltralightCard.UltralightType.NTAG213.ordinal -> "NTAG213"
             UltralightCard.UltralightType.NTAG215.ordinal -> "NTAG215"
             UltralightCard.UltralightType.NTAG216.ordinal -> "NTAG216"
             else -> ""
         }
-    }
 }
 
 class BlankUltralightTransitInfo : TransitInfo() {
@@ -192,8 +209,9 @@ class BlankUltralightTransitInfo : TransitInfo() {
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.fully_blank_title),
-            ListItem(Res.string.fully_blank_desc)
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.fully_blank_title),
+                ListItem(Res.string.fully_blank_desc),
+            )
 }

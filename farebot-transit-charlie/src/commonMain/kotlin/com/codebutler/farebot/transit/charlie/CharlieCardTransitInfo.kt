@@ -29,15 +29,14 @@ import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
-import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_charlie.generated.resources.Res
 import farebot.farebot_transit_charlie.generated.resources.charlie_2nd_card_number
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 /**
  * CharlieCard, Boston, USA (MBTA).
@@ -46,10 +45,9 @@ import kotlinx.datetime.atStartOfDayIn
  * Timestamps are in minutes from this epoch.
  */
 
-// 2003-01-01 midnight in New York
-private val CHARLIE_EPOCH: Instant =
+private val CHARLIE_EPOCH: Instant = // 2003-01-01 midnight in New York
     Instant.fromEpochMilliseconds(
-        LocalDate(2003, 1, 1).atStartOfDayIn(TimeZone.of("America/New_York")).toEpochMilliseconds()
+        LocalDate(2003, 1, 1).atStartOfDayIn(TimeZone.of("America/New_York")).toEpochMilliseconds(),
     )
 
 class CharlieCardTransitInfo internal constructor(
@@ -57,9 +55,8 @@ class CharlieCardTransitInfo internal constructor(
     private val secondSerial: Long,
     private val mBalance: Int,
     private val startDate: Int,
-    override val trips: List<CharlieCardTrip>
+    override val trips: List<CharlieCardTrip>,
 ) : TransitInfo() {
-
     override val cardName: String = CharlieCardTransitFactory.NAME
 
     override val serialNumber: String = CharlieCardTransitFactory.formatSerial(serial)
@@ -80,8 +77,8 @@ class CharlieCardTransitInfo internal constructor(
                 TransitBalance(
                     balance = TransitCurrency.USD(mBalance),
                     validFrom = start,
-                    validTo = effectiveExpiry
-                )
+                    validTo = effectiveExpiry,
+                ),
             )
         }
 
@@ -90,11 +87,14 @@ class CharlieCardTransitInfo internal constructor(
     override val hasUnknownStations: Boolean = true
 
     override val info: List<ListItemInterface>?
-        get() = if (secondSerial == 0L || secondSerial == 0xffffffffL) null
-        else listOf(ListItem(Res.string.charlie_2nd_card_number, "A" + NumberUtils.zeroPad(secondSerial, 10)))
+        get() =
+            if (secondSerial == 0L || secondSerial == 0xffffffffL) {
+                null
+            } else {
+                listOf(ListItem(Res.string.charlie_2nd_card_number, "A" + NumberUtils.zeroPad(secondSerial, 10)))
+            }
 
     companion object {
-        internal fun parseTimestamp(timestamp: Int): Instant =
-            CHARLIE_EPOCH + timestamp.minutes
+        internal fun parseTimestamp(timestamp: Int): Instant = CHARLIE_EPOCH + timestamp.minutes
     }
 }

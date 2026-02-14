@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.shared.sample
 
-import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -35,41 +35,43 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 
 class SampleTransitInfo : TransitInfo() {
-
     override val balance: TransitBalance = TransitBalance(balance = TransitCurrency.USD(4250))
 
     override val serialNumber: String? = "1234567890"
 
-    override val trips: List<Trip> = listOf<Trip>(
+    override val trips: List<Trip> =
+        listOf<Trip>(
             SampleTrip(LocalDateTime(2017, 6, 4, 19, 0).toInstant(TimeZone.currentSystemDefault()).epochSeconds),
             SampleTrip(LocalDateTime(2017, 6, 5, 8, 0).toInstant(TimeZone.currentSystemDefault()).epochSeconds),
             SampleTrip(LocalDateTime(2017, 6, 5, 16, 9).toInstant(TimeZone.currentSystemDefault()).epochSeconds),
-    )
+        )
 
-    override val subscriptions: List<Subscription> = listOf(
-            SampleSubscription()
-    )
+    override val subscriptions: List<Subscription> =
+        listOf(
+            SampleSubscription(),
+        )
 
     override val cardName: String = "Sample Transit"
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree = uiTree(stringResource) {
-        item {
-            title = "Sample Card Section 1"
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree =
+        uiTree(stringResource) {
             item {
-                title = "Example Item 1"
-                value = "Value"
+                title = "Sample Card Section 1"
+                item {
+                    title = "Example Item 1"
+                    value = "Value"
+                }
+                item {
+                    title = "Example Item 2"
+                    value = "Value"
+                }
             }
             item {
-                title = "Example Item 2"
-                value = "Value"
+                title = "Sample Card Section 2"
+                item {
+                    title = "Example Item 3"
+                    value = "Value"
+                }
             }
         }
-        item {
-            title = "Sample Card Section 2"
-            item {
-                title = "Example Item 3"
-                value = "Value"
-            }
-        }
-    }
 }

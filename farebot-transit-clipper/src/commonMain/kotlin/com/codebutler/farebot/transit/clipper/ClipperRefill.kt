@@ -37,9 +37,8 @@ class ClipperRefill(
     override val startTimestamp: Instant?,
     private val amount: Int,
     private val agency: Int,
-    override val machineID: String?
+    override val machineID: String?,
 ) : Trip() {
-
     override val fare: TransitCurrency?
         get() = TransitCurrency.USD(-amount)
 
@@ -53,12 +52,17 @@ class ClipperRefill(
         get() = ClipperData.getShortAgencyName(agency)
 
     companion object {
-        fun create(timestamp: Long, amount: Long, agency: Long, machineId: Long): ClipperRefill =
+        fun create(
+            timestamp: Long,
+            amount: Long,
+            agency: Long,
+            machineId: Long,
+        ): ClipperRefill =
             ClipperRefill(
                 startTimestamp = if (timestamp != 0L) Instant.fromEpochSeconds(timestamp) else null,
                 amount = amount.toInt(),
                 agency = agency.toInt(),
-                machineID = machineId.toString()
+                machineID = machineId.toString(),
             )
     }
 }

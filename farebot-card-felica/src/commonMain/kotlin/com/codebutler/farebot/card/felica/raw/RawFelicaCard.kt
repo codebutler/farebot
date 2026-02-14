@@ -28,9 +28,9 @@ import com.codebutler.farebot.card.felica.FeliCaIdm
 import com.codebutler.farebot.card.felica.FeliCaPmm
 import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.felica.FelicaSystem
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawFelicaCard(
@@ -38,9 +38,8 @@ data class RawFelicaCard(
     private val _scannedAt: Instant,
     @Contextual val idm: FeliCaIdm,
     @Contextual val pmm: FeliCaPmm,
-    val systems: List<FelicaSystem>
+    val systems: List<FelicaSystem>,
 ) : RawCard<FelicaCard> {
-
     override fun cardType(): CardType = CardType.FeliCa
 
     override fun tagId(): ByteArray = _tagId
@@ -49,9 +48,7 @@ data class RawFelicaCard(
 
     override fun isUnauthorized(): Boolean = false
 
-    override fun parse(): FelicaCard {
-        return FelicaCard.create(_tagId, _scannedAt, idm, pmm, systems)
-    }
+    override fun parse(): FelicaCard = FelicaCard.create(_tagId, _scannedAt, idm, pmm, systems)
 
     companion object {
         fun create(
@@ -59,9 +56,7 @@ data class RawFelicaCard(
             scannedAt: Instant,
             idm: FeliCaIdm,
             pmm: FeliCaPmm,
-            systems: List<FelicaSystem>
-        ): RawFelicaCard {
-            return RawFelicaCard(tagId, scannedAt, idm, pmm, systems)
-        }
+            systems: List<FelicaSystem>,
+        ): RawFelicaCard = RawFelicaCard(tagId, scannedAt, idm, pmm, systems)
     }
 }

@@ -41,7 +41,6 @@ import kotlin.experimental.and
 private const val NAME = "bip!"
 
 class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -50,10 +49,11 @@ class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
         val sector0 = card.getSector(0)
         if (sector0 !is DataClassicSector) return false
         return HashUtils.checkKeyHash(
-            sector0.keyA, sector0.keyB,
+            sector0.keyA,
+            sector0.keyB,
             "chilebip",
             "201d3ae5a9e52edd4e8efbfb1e75b42c",
-            "23f0d2cfb56e189553c46af1e2ff3faf"
+            "23f0d2cfb56e189553c46af1e2ff3faf",
         ) >= 0
     }
 
@@ -64,46 +64,56 @@ class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
 
     override fun parseInfo(card: ClassicCard): BipTransitInfo {
         val balanceBlock = (card.getSector(8) as DataClassicSector).getBlock(1).data
-        val balance = balanceBlock.byteArrayToIntReversed(0, 3).let {
-            if (balanceBlock[3] and 0x7f != 0.toByte())
-                -it
-            else
-                it
-        }
+        val balance =
+            balanceBlock.byteArrayToIntReversed(0, 3).let {
+                if (balanceBlock[3] and 0x7f != 0.toByte()) {
+                    -it
+                } else {
+                    it
+                }
+            }
 
         val nameBlock = (card.getSector(3) as DataClassicSector).getBlock(0).data
-        val holderName = if (nameBlock[14] != 0.toByte()) {
-            nameBlock.sliceOffLen(1, 14).reverseBuffer().readASCII()
-        } else {
-            null
-        }
+        val holderName =
+            if (nameBlock[14] != 0.toByte()) {
+                nameBlock.sliceOffLen(1, 14).reverseBuffer().readASCII()
+            } else {
+                null
+            }
 
         return BipTransitInfo(
             mSerial = getSerial(card),
             mBalance = balance,
             mHolderName = holderName,
-            mHolderId = (card.getSector(3) as DataClassicSector).getBlock(1).data
-                .byteArrayToIntReversed(3, 4),
-            trips = (0..2).mapNotNull { BipTrip.parse((card.getSector(11) as DataClassicSector).getBlock(it).data) } +
-                    (0..2).mapNotNull { BipRefill.parse((card.getSector(10) as DataClassicSector).getBlock(it).data) }
+            mHolderId =
+                (card.getSector(3) as DataClassicSector)
+                    .getBlock(1)
+                    .data
+                    .byteArrayToIntReversed(3, 4),
+            trips =
+                (0..2).mapNotNull { BipTrip.parse((card.getSector(11) as DataClassicSector).getBlock(it).data) } +
+                    (0..2).mapNotNull { BipRefill.parse((card.getSector(10) as DataClassicSector).getBlock(it).data) },
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.bip_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.CHILE,
-            locationRes = Res.string.bip_location,
-            imageRes = Res.drawable.chilebip,
-            latitude = -33.4489f,
-            longitude = -70.6693f,
-            brandColor = 0x214B87,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.bip_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.CHILE,
+                locationRes = Res.string.bip_location,
+                imageRes = Res.drawable.chilebip,
+                latitude = -33.4489f,
+                longitude = -70.6693f,
+                brandColor = 0x214B87,
+                credits = listOf("Metrodroid Project"),
+            )
 
         private fun getSerial(card: ClassicCard): Long =
-            (card.getSector(0) as DataClassicSector).getBlock(1).data
+            (card.getSector(0) as DataClassicSector)
+                .getBlock(1)
+                .data
                 .byteArrayToLongReversed(4, 4)
 
         private fun formatSerial(serial: Long): String = serial.toString()

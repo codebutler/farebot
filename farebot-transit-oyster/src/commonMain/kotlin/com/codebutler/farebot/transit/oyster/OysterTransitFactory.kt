@@ -43,7 +43,6 @@ import farebot.farebot_transit_oyster.generated.resources.*
  * Reference: https://github.com/micolous/metrodroid/wiki/Oyster
  */
 class OysterTransitFactory : TransitFactory<ClassicCard, OysterTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -71,30 +70,46 @@ class OysterTransitFactory : TransitFactory<ClassicCard, OysterTransitInfo> {
             purse = purse,
             transactions = transactions,
             refills = refills,
-            passes = passes
+            passes = passes,
         )
     }
 
     companion object {
         private const val NAME = "Oyster"
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.oyster_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.UK,
-            locationRes = Res.string.oyster_location,
-            imageRes = Res.drawable.oyster_card,
-            latitude = 51.5074f,
-            longitude = -0.1278f,
-            brandColor = 0x67A8EB,
-            credits = listOf("Metrodroid Project", "Michael Farrell"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.oyster_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.UK,
+                locationRes = Res.string.oyster_location,
+                imageRes = Res.drawable.oyster_card,
+                latitude = 51.5074f,
+                longitude = -0.1278f,
+                brandColor = 0x67A8EB,
+                credits = listOf("Metrodroid Project", "Michael Farrell"),
+            )
 
         // From Metrodroid: ImmutableByteArray.fromHex("964142434445464748494A4B4C4D0101")
-        private val MAGIC_BLOCK1 = byteArrayOf(
-            0x96.toByte(), 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
-            0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x01, 0x01
-        )
+        private val MAGIC_BLOCK1 =
+            byteArrayOf(
+                0x96.toByte(),
+                0x41,
+                0x42,
+                0x43,
+                0x44,
+                0x45,
+                0x46,
+                0x47,
+                0x48,
+                0x49,
+                0x4A,
+                0x4B,
+                0x4C,
+                0x4D,
+                0x01,
+                0x01,
+            )
 
         internal fun formatSerial(serial: Int) = NumberUtils.zeroPad(serial.toLong(), 10)
 

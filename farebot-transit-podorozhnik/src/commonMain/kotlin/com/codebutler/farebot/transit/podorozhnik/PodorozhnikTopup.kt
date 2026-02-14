@@ -38,7 +38,6 @@ internal class PodorozhnikTopup(
     private val mTopupMachine: Int,
     private val stringResource: StringResource,
 ) : Trip() {
-
     override val startTimestamp: Instant?
         get() = PodorozhnikTransitInfo.convertDate(mTimestamp)
 
@@ -64,14 +63,19 @@ internal class PodorozhnikTopup(
         }
 
     override val agencyName: String?
-        get() = when (mAgency) {
-            1 -> stringResource.getString(Res.string.podorozhnik_topup)
-            else -> stringResource.getString(Res.string.podorozhnik_unknown_format, mAgency.toString())
-        }
+        get() =
+            when (mAgency) {
+                1 -> stringResource.getString(Res.string.podorozhnik_topup)
+                else -> stringResource.getString(Res.string.podorozhnik_unknown_format, mAgency.toString())
+            }
 
-    private fun lookupMdstStation(dbName: String, stationId: Int): Station? {
+    private fun lookupMdstStation(
+        dbName: String,
+        stationId: Int,
+    ): Station? {
         val result = MdstStationLookup.getStation(dbName, stationId) ?: return null
-        return Station.Builder()
+        return Station
+            .Builder()
             .stationName(result.stationName)
             .shortStationName(result.shortStationName)
             .companyName(result.companyName)

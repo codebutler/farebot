@@ -30,18 +30,23 @@ data class CEPASHistory(
     val id: Int,
     val transactions: List<CEPASTransaction>?,
     val isValid: Boolean,
-    val errorMessage: String?
+    val errorMessage: String?,
 ) {
     companion object {
-        fun create(id: Int, transactions: List<CEPASTransaction>): CEPASHistory {
-            return CEPASHistory(id, transactions, true, null)
-        }
+        fun create(
+            id: Int,
+            transactions: List<CEPASTransaction>,
+        ): CEPASHistory = CEPASHistory(id, transactions, true, null)
 
-        fun create(purseId: Int, errorMessage: String): CEPASHistory {
-            return CEPASHistory(purseId, null, false, errorMessage)
-        }
+        fun create(
+            purseId: Int,
+            errorMessage: String,
+        ): CEPASHistory = CEPASHistory(purseId, null, false, errorMessage)
 
-        fun create(purseId: Int, historyData: ByteArray?): CEPASHistory {
+        fun create(
+            purseId: Int,
+            historyData: ByteArray?,
+        ): CEPASHistory {
             if (historyData == null) {
                 return CEPASHistory(purseId, emptyList(), false, null)
             }

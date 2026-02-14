@@ -10,7 +10,9 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-class PrestoTransitInfo(private val mSerial: Int?) : SerialOnlyTransitInfo() {
+class PrestoTransitInfo(
+    private val mSerial: Int?,
+) : SerialOnlyTransitInfo() {
     override val reason get() = Reason.LOCKED
     override val serialNumber get() = PrestoTransitFactory.formatSerial(mSerial)
     override val cardName get() = PrestoTransitFactory.NAME

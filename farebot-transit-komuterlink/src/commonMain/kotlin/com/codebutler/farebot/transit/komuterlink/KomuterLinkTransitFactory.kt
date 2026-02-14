@@ -38,13 +38,12 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_komuterlink.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -61,7 +60,7 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
         val serial = sector0.getBlock(0).data.byteArrayToLongReversed(0, 4)
         return TransitIdentity.create(
             getStringBlocking(Res.string.komuterlink_card_name),
-            NumberUtils.zeroPad(serial, 10)
+            NumberUtils.zeroPad(serial, 10),
         )
     }
 
@@ -74,7 +73,10 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
 
         val tz = TimeZone.of("Asia/Kuala_Lumpur")
 
-        fun parseTimestamp(data: ByteArray, off: Int): Instant {
+        fun parseTimestamp(
+            data: ByteArray,
+            off: Int,
+        ): Instant {
             val hour = data.getBitsFromBuffer(off * 8, 5)
             val min = data.getBitsFromBuffer(off * 8 + 5, 6)
             val y = data.getBitsFromBuffer(off * 8 + 17, 6) + 2000
@@ -84,10 +86,11 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
             return ldt.toInstant(tz)
         }
 
-        val trips = listOfNotNull(
-            KomuterLinkTrip.parse(sector4, -1, Trip.Mode.TICKET_MACHINE),
-            KomuterLinkTrip.parse(sector7, +1, Trip.Mode.TRAIN)
-        )
+        val trips =
+            listOfNotNull(
+                KomuterLinkTrip.parse(sector4, -1, Trip.Mode.TICKET_MACHINE),
+                KomuterLinkTrip.parse(sector7, +1, Trip.Mode.TRAIN),
+            )
 
         return KomuterLinkTransitInfo(
             trips = trips,
@@ -95,21 +98,22 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
             mSerial = sector0.getBlock(0).data.byteArrayToLongReversed(0, 4),
             mIssueTimestamp = parseTimestamp(sector1.getBlock(0).data, 5),
             mCardNo = sector0.getBlock(2).data.byteArrayToInt(4, 4),
-            mStoredLuhn = sector0.getBlock(2).data[8].toInt() and 0xff
+            mStoredLuhn = sector0.getBlock(2).data[8].toInt() and 0xff,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.komuterlink_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.MALAYSIA,
-            locationRes = Res.string.komuterlink_location,
-            imageRes = Res.drawable.komuterlink,
-            latitude = 3.1390f,
-            longitude = 101.6869f,
-            brandColor = 0x563281,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.komuterlink_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.MALAYSIA,
+                locationRes = Res.string.komuterlink_location,
+                imageRes = Res.drawable.komuterlink,
+                latitude = 3.1390f,
+                longitude = 101.6869f,
+                brandColor = 0x563281,
+                credits = listOf("Metrodroid Project"),
+            )
     }
 }

@@ -28,9 +28,8 @@ import kotlinx.datetime.TimeZone
 
 class VentraUltralightTransaction(
     raw: ByteArray,
-    baseDate: Int
+    baseDate: Int,
 ) : NextfareUltralightTransaction(raw, baseDate) {
-
     override val timezone: TimeZone
         get() = VentraUltralightTransitInfo.TZ
 
@@ -39,8 +38,9 @@ class VentraUltralightTransaction(
 
     override val mode: Trip.Mode
         get() {
-            if (isBus)
+            if (isBus) {
                 return Trip.Mode.BUS
+            }
             return if (mRoute == 0) Trip.Mode.TICKET_MACHINE else Trip.Mode.OTHER
         }
 }

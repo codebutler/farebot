@@ -36,13 +36,13 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
 import com.codebutler.farebot.card.ultralight.UltralightPage
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
-import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Tests for card serialization round-trip.
@@ -50,11 +50,11 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's CardTest.kt
  */
 class CardSerializationTest {
-
-    private val json = Json {
-        prettyPrint = true
-        ignoreUnknownKeys = true
-    }
+    private val json =
+        Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
 
     private val serializer = KotlinxCardSerializer(json)
 
@@ -65,17 +65,18 @@ class CardSerializationTest {
         val scannedAt = Instant.fromEpochMilliseconds(1264982400000) // 2010-02-01T00:00:00Z
 
         // Create a simple Classic card with empty sectors
-        val sectors = listOf(
-            RawClassicSector.createData(
-                0,
-                listOf(
-                    RawClassicBlock.create(0, ByteArray(16)),
-                    RawClassicBlock.create(1, ByteArray(16)),
-                    RawClassicBlock.create(2, ByteArray(16)),
-                    RawClassicBlock.create(3, ByteArray(16))
-                )
+        val sectors =
+            listOf(
+                RawClassicSector.createData(
+                    0,
+                    listOf(
+                        RawClassicBlock.create(0, ByteArray(16)),
+                        RawClassicBlock.create(1, ByteArray(16)),
+                        RawClassicBlock.create(2, ByteArray(16)),
+                        RawClassicBlock.create(3, ByteArray(16)),
+                    ),
+                ),
             )
-        )
 
         val card = RawClassicCard.create(tagId, scannedAt, sectors)
 
@@ -99,48 +100,54 @@ class CardSerializationTest {
         val scannedAt = Instant.fromEpochMilliseconds(1264982400000)
 
         // Manufacturing data is stored as raw bytes (28 bytes total)
-        val manufDataBytes = ByteArray(28).also { bytes ->
-            bytes[0] = 0x04  // hwVendorID
-            bytes[1] = 0x01  // hwType
-            bytes[2] = 0x01  // hwSubType
-            bytes[3] = 0x01  // hwMajorVersion
-            bytes[4] = 0x00  // hwMinorVersion
-            bytes[5] = 0x18  // hwStorageSize
-            bytes[6] = 0x05  // hwProtocol
-            bytes[7] = 0x04  // swVendorID
-            bytes[8] = 0x01  // swType
-            bytes[9] = 0x01  // swSubType
-            bytes[10] = 0x01 // swMajorVersion
-            bytes[11] = 0x00 // swMinorVersion
-            bytes[12] = 0x18 // swStorageSize
-            bytes[13] = 0x05 // swProtocol
-            // bytes 14-20: uid (7 bytes)
-            // bytes 21-25: batchNo (5 bytes)
-            bytes[26] = 0x01 // weekProd
-            bytes[27] = 0x14 // yearProd (20 = 2020)
-        }
+        val manufDataBytes =
+            ByteArray(28).also { bytes ->
+                bytes[0] = 0x04 // hwVendorID
+                bytes[1] = 0x01 // hwType
+                bytes[2] = 0x01 // hwSubType
+                bytes[3] = 0x01 // hwMajorVersion
+                bytes[4] = 0x00 // hwMinorVersion
+                bytes[5] = 0x18 // hwStorageSize
+                bytes[6] = 0x05 // hwProtocol
+                bytes[7] = 0x04 // swVendorID
+                bytes[8] = 0x01 // swType
+                bytes[9] = 0x01 // swSubType
+                bytes[10] = 0x01 // swMajorVersion
+                bytes[11] = 0x00 // swMinorVersion
+                bytes[12] = 0x18 // swStorageSize
+                bytes[13] = 0x05 // swProtocol
+                // bytes 14-20: uid (7 bytes)
+                // bytes 21-25: batchNo (5 bytes)
+                bytes[26] = 0x01 // weekProd
+                bytes[27] = 0x14 // yearProd (20 = 2020)
+            }
         val manufData = RawDesfireManufacturingData.create(manufDataBytes)
 
         // File settings for standard file (7 bytes): fileType(1) + commSetting(1) + accessRights(2) + fileSize(3)
-        val fileSettingsData = byteArrayOf(
-            0x00, // STANDARD_DATA_FILE
-            0x00, // commSetting
-            0x00, 0x00, // accessRights
-            0x05, 0x00, 0x00 // fileSize = 5 (little endian)
-        )
-
-        val apps = listOf(
-            RawDesfireApplication.create(
-                0x123456,
-                listOf(
-                    RawDesfireFile.create(
-                        0x01,
-                        RawDesfireFileSettings.create(fileSettingsData),
-                        "68656c6c6f".hexToByteArray() // "hello"
-                    )
-                )
+        val fileSettingsData =
+            byteArrayOf(
+                0x00, // STANDARD_DATA_FILE
+                0x00, // commSetting
+                0x00,
+                0x00, // accessRights
+                0x05,
+                0x00,
+                0x00, // fileSize = 5 (little endian)
             )
-        )
+
+        val apps =
+            listOf(
+                RawDesfireApplication.create(
+                    0x123456,
+                    listOf(
+                        RawDesfireFile.create(
+                            0x01,
+                            RawDesfireFileSettings.create(fileSettingsData),
+                            "68656c6c6f".hexToByteArray(), // "hello"
+                        ),
+                    ),
+                ),
+            )
 
         val card = RawDesfireCard.create(tagId, scannedAt, apps, manufData)
 
@@ -162,12 +169,13 @@ class CardSerializationTest {
         val tagId = "00123456789abcde".hexToByteArray()
         val scannedAt = Instant.fromEpochMilliseconds(1264982400000)
 
-        val pages = listOf(
-            UltralightPage.create(0, "00123456".hexToByteArray()),
-            UltralightPage.create(1, "789abcde".hexToByteArray()),
-            UltralightPage.create(2, "ff000000".hexToByteArray()),
-            UltralightPage.create(3, "ffffffff".hexToByteArray())
-        )
+        val pages =
+            listOf(
+                UltralightPage.create(0, "00123456".hexToByteArray()),
+                UltralightPage.create(1, "789abcde".hexToByteArray()),
+                UltralightPage.create(2, "ff000000".hexToByteArray()),
+                UltralightPage.create(3, "ffffffff".hexToByteArray()),
+            )
 
         val card = RawUltralightCard.create(tagId, scannedAt, pages, 1)
 
@@ -190,18 +198,19 @@ class CardSerializationTest {
 
         // Build pages for Ultralight card - first 4 pages readable, rest unauthorized
         // Page 0-3 are configuration pages, user data starts at page 4
-        val pages = buildList {
-            // Configuration pages (readable)
-            add(UltralightPage.create(0, byteArrayOf(0x00, 0x12, 0x34, 0x56)))
-            add(UltralightPage.create(1, byteArrayOf(0x78, 0x9a.toByte(), 0xbc.toByte(), 0xde.toByte())))
-            add(UltralightPage.create(2, byteArrayOf(0xff.toByte(), 0x00, 0x00, 0x00)))
-            add(UltralightPage.create(3, byteArrayOf(0xff.toByte(), 0xff.toByte(), 0xff.toByte(), 0xff.toByte())))
+        val pages =
+            buildList {
+                // Configuration pages (readable)
+                add(UltralightPage.create(0, byteArrayOf(0x00, 0x12, 0x34, 0x56)))
+                add(UltralightPage.create(1, byteArrayOf(0x78, 0x9a.toByte(), 0xbc.toByte(), 0xde.toByte())))
+                add(UltralightPage.create(2, byteArrayOf(0xff.toByte(), 0x00, 0x00, 0x00)))
+                add(UltralightPage.create(3, byteArrayOf(0xff.toByte(), 0xff.toByte(), 0xff.toByte(), 0xff.toByte())))
 
-            // User memory pages 4-43 (40 pages for Ultralight C)
-            for (i in 4 until 44) {
-                add(UltralightPage.create(i, ByteArray(4)))  // Empty/zero pages
+                // User memory pages 4-43 (40 pages for Ultralight C)
+                for (i in 4 until 44) {
+                    add(UltralightPage.create(i, ByteArray(4))) // Empty/zero pages
+                }
             }
-        }
 
         val card = RawUltralightCard.create(tagId, scannedAt, pages, 2)
         val parsed = card.parse()
@@ -216,9 +225,10 @@ class CardSerializationTest {
         val scannedAt = Instant.fromEpochMilliseconds(1264982400000)
 
         // Build a card with all unauthorized sectors
-        val sectors = (0 until 16).map { index ->
-            RawClassicSector.createUnauthorized(index)
-        }
+        val sectors =
+            (0 until 16).map { index ->
+                RawClassicSector.createUnauthorized(index)
+            }
 
         val card = RawClassicCard.create(tagId, scannedAt, sectors)
 
@@ -238,20 +248,22 @@ class CardSerializationTest {
         val testData = "6d6574726f64726f6964436c61737369".hexToByteArray() // "metrodroidClassi"
 
         // Build a card with some readable sectors
-        val sectors = (0 until 16).map { index ->
-            if (index == 2) {
-                // Sector 2 is readable
-                val blocks = listOf(
-                    RawClassicBlock.create(0, testData),
-                    RawClassicBlock.create(1, testData),
-                    RawClassicBlock.create(2, testData),
-                    RawClassicBlock.create(3, testData)
-                )
-                RawClassicSector.createData(index, blocks)
-            } else {
-                RawClassicSector.createUnauthorized(index)
+        val sectors =
+            (0 until 16).map { index ->
+                if (index == 2) {
+                    // Sector 2 is readable
+                    val blocks =
+                        listOf(
+                            RawClassicBlock.create(0, testData),
+                            RawClassicBlock.create(1, testData),
+                            RawClassicBlock.create(2, testData),
+                            RawClassicBlock.create(3, testData),
+                        )
+                    RawClassicSector.createData(index, blocks)
+                } else {
+                    RawClassicSector.createUnauthorized(index)
+                }
             }
-        }
 
         val card = RawClassicCard.create(tagId, scannedAt, sectors)
 
@@ -277,32 +289,38 @@ class CardSerializationTest {
         val otherBlock = ByteArray(16) { (it + 1).toByte() }
 
         // Test card with all 0x00 blocks
-        val all00Sectors = (0 until 16).map { sectorIndex ->
-            val blocks = (0 until 4).map { blockIndex ->
-                RawClassicBlock.create(blockIndex, all00Block)
+        val all00Sectors =
+            (0 until 16).map { sectorIndex ->
+                val blocks =
+                    (0 until 4).map { blockIndex ->
+                        RawClassicBlock.create(blockIndex, all00Block)
+                    }
+                RawClassicSector.createData(sectorIndex, blocks)
             }
-            RawClassicSector.createData(sectorIndex, blocks)
-        }
         val all00Card = RawClassicCard.create(tagId, scannedAt, all00Sectors)
         assertFalse(all00Card.isUnauthorized())
 
         // Test card with all 0xFF blocks
-        val allFFSectors = (0 until 16).map { sectorIndex ->
-            val blocks = (0 until 4).map { blockIndex ->
-                RawClassicBlock.create(blockIndex, allFFBlock)
+        val allFFSectors =
+            (0 until 16).map { sectorIndex ->
+                val blocks =
+                    (0 until 4).map { blockIndex ->
+                        RawClassicBlock.create(blockIndex, allFFBlock)
+                    }
+                RawClassicSector.createData(sectorIndex, blocks)
             }
-            RawClassicSector.createData(sectorIndex, blocks)
-        }
         val allFFCard = RawClassicCard.create(tagId, scannedAt, allFFSectors)
         assertFalse(allFFCard.isUnauthorized())
 
         // Test card with other data - also not unauthorized
-        val otherSectors = (0 until 16).map { sectorIndex ->
-            val blocks = (0 until 4).map { blockIndex ->
-                RawClassicBlock.create(blockIndex, otherBlock)
+        val otherSectors =
+            (0 until 16).map { sectorIndex ->
+                val blocks =
+                    (0 until 4).map { blockIndex ->
+                        RawClassicBlock.create(blockIndex, otherBlock)
+                    }
+                RawClassicSector.createData(sectorIndex, blocks)
             }
-            RawClassicSector.createData(sectorIndex, blocks)
-        }
         val otherCard = RawClassicCard.create(tagId, scannedAt, otherSectors)
         assertFalse(otherCard.isUnauthorized())
     }
@@ -319,46 +337,56 @@ class CardSerializationTest {
         assertTrue(emptyCard.isUnauthorized())
 
         // File settings for standard file
-        val fileSettingsData = byteArrayOf(
-            0x00, // STANDARD_DATA_FILE
-            0x00, // commSetting
-            0x00, 0x00, // accessRights
-            0x00, 0x00, 0x00 // fileSize = 0
-        )
+        val fileSettingsData =
+            byteArrayOf(
+                0x00, // STANDARD_DATA_FILE
+                0x00, // commSetting
+                0x00,
+                0x00, // accessRights
+                0x00,
+                0x00,
+                0x00, // fileSize = 0
+            )
 
         // Card with only unauthorized files
-        val unauthorizedApp = RawDesfireApplication.create(
-            0x6472,
-            listOf(
-                RawDesfireFile.createUnauthorized(
-                    0x6f69,
-                    RawDesfireFileSettings.create(fileSettingsData),
-                    "Authentication error: 64"
-                )
+        val unauthorizedApp =
+            RawDesfireApplication.create(
+                0x6472,
+                listOf(
+                    RawDesfireFile.createUnauthorized(
+                        0x6f69,
+                        RawDesfireFileSettings.create(fileSettingsData),
+                        "Authentication error: 64",
+                    ),
+                ),
             )
-        )
         val unauthorizedCard = RawDesfireCard.create(tagId, scannedAt, listOf(unauthorizedApp), emptyManufData)
         assertTrue(unauthorizedCard.isUnauthorized())
 
         // File settings with actual file size
-        val fileSettingsWithSize = byteArrayOf(
-            0x00, // STANDARD_DATA_FILE
-            0x00, // commSetting
-            0x00, 0x00, // accessRights
-            0x08, 0x00, 0x00 // fileSize = 8 (little endian)
-        )
+        val fileSettingsWithSize =
+            byteArrayOf(
+                0x00, // STANDARD_DATA_FILE
+                0x00, // commSetting
+                0x00,
+                0x00, // accessRights
+                0x08,
+                0x00,
+                0x00, // fileSize = 8 (little endian)
+            )
 
         // Card with readable file - not unauthorized
-        val authorizedApp = RawDesfireApplication.create(
-            0x6472,
-            listOf(
-                RawDesfireFile.create(
-                    0x6f69,
-                    RawDesfireFileSettings.create(fileSettingsWithSize),
-                    "6d69636f6c6f7573".hexToByteArray() // "micolous"
-                )
+        val authorizedApp =
+            RawDesfireApplication.create(
+                0x6472,
+                listOf(
+                    RawDesfireFile.create(
+                        0x6f69,
+                        RawDesfireFileSettings.create(fileSettingsWithSize),
+                        "6d69636f6c6f7573".hexToByteArray(), // "micolous"
+                    ),
+                ),
             )
-        )
         val authorizedCard = RawDesfireCard.create(tagId, scannedAt, listOf(authorizedApp), emptyManufData)
         assertFalse(authorizedCard.isUnauthorized())
     }

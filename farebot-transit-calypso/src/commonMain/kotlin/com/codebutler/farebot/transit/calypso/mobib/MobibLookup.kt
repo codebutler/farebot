@@ -30,7 +30,6 @@ import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 internal object MobibLookup : En1545LookupSTR("mobib") {
-
     private const val BUS = 0xf
     private const val TRAM = 0x16
 
@@ -38,7 +37,12 @@ internal object MobibLookup : En1545LookupSTR("mobib") {
 
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
 
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
         if (routeNumber == null) return null
         return when (agency) {
             BUS, TRAM -> routeNumber.toString()
@@ -46,15 +50,20 @@ internal object MobibLookup : En1545LookupSTR("mobib") {
         }
     }
 
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? {
         if (station == 0) return null
         return Station.unknown("0x${station.toString(16)}")
     }
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        0x2801 to Res.string.mobib_jump_1_trip,
-        0x2803 to Res.string.mobib_jump_10_trips,
-        0x0805 to Res.string.mobib_airport_bus,
-        0x303d to Res.string.mobib_jump_24h_bus_airport
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            0x2801 to Res.string.mobib_jump_1_trip,
+            0x2803 to Res.string.mobib_jump_10_trips,
+            0x0805 to Res.string.mobib_airport_bus,
+            0x303d to Res.string.mobib_jump_24h_bus_airport,
+        )
 }

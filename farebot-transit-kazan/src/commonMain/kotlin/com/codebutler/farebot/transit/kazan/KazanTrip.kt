@@ -24,15 +24,14 @@ package com.codebutler.farebot.transit.kazan
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class KazanTrip(
-    override val startTimestamp: Instant
+    override val startTimestamp: Instant,
 ) : Trip() {
-
     override val mode: Mode
         get() = Mode.OTHER
 
@@ -47,7 +46,10 @@ class KazanTrip(
             return KazanTrip(parseTime(raw, 1))
         }
 
-        private fun parseTime(raw: ByteArray, off: Int): Instant {
+        private fun parseTime(
+            raw: ByteArray,
+            off: Int,
+        ): Instant {
             val year = raw[off].toInt() and 0xff
             val month = raw[off + 1].toInt() and 0xff
             val day = raw[off + 2].toInt() and 0xff

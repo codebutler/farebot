@@ -28,8 +28,8 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getStringBlocking
-import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
 import com.codebutler.farebot.transit.CardInfo
@@ -60,9 +60,8 @@ class NewShenzhenTransitInfo(
     val validityEnd: Int?,
     private val mSerial: Int,
     override val trips: List<NewShenzhenTrip>?,
-    val mBalance: Int?
+    val mBalance: Int?,
 ) : TransitInfo() {
-
     override val serialNumber: String?
         get() = formatSerial(mSerial)
 
@@ -70,14 +69,16 @@ class NewShenzhenTransitInfo(
         get() = getStringBlocking(Res.string.card_name_szt)
 
     override val balance: TransitBalance?
-        get() = if (mBalance != null)
-            TransitBalance(
-                balance = TransitCurrency.CNY(mBalance),
-                validFrom = ChinaTransitData.parseHexDate(validityStart),
-                validTo = ChinaTransitData.parseHexDate(validityEnd)
-            )
-        else
-            null
+        get() =
+            if (mBalance != null) {
+                TransitBalance(
+                    balance = TransitCurrency.CNY(mBalance),
+                    validFrom = ChinaTransitData.parseHexDate(validityStart),
+                    validTo = ChinaTransitData.parseHexDate(validityEnd),
+                )
+            } else {
+                null
+            }
 
     companion object {
         private fun parse(card: ChinaCard): NewShenzhenTransitInfo {
@@ -88,26 +89,38 @@ class NewShenzhenTransitInfo(
                 validityEnd = szttag?.byteArrayToInt(24, 4),
                 trips = ChinaTransitData.parseTrips(card) { NewShenzhenTrip(it) },
                 mSerial = parseSerial(card),
-                mBalance = ChinaTransitData.parseBalance(card)
+                mBalance = ChinaTransitData.parseBalance(card),
             )
         }
 
-        val FACTORY: ChinaCardTransitFactory = object : ChinaCardTransitFactory {
-            override val allCards: List<CardInfo> = listOf(
-                CardInfo(nameRes = Res.string.card_name_shenzhen_tong, cardType = CardType.ISO7816, region = TransitRegion.CHINA, locationRes = Res.string.card_location_shenzhen_china, imageRes = Res.drawable.szt_card, latitude = 22.5431f, longitude = 114.0579f, brandColor = 0xA8CC01, credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib"))
-            )
+        val FACTORY: ChinaCardTransitFactory =
+            object : ChinaCardTransitFactory {
+                override val allCards: List<CardInfo> =
+                    listOf(
+                        CardInfo(
+                            nameRes = Res.string.card_name_shenzhen_tong,
+                            cardType = CardType.ISO7816,
+                            region = TransitRegion.CHINA,
+                            locationRes = Res.string.card_location_shenzhen_china,
+                            imageRes = Res.drawable.szt_card,
+                            latitude = 22.5431f,
+                            longitude = 114.0579f,
+                            brandColor = 0xA8CC01,
+                            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Sinpo Lib"),
+                        ),
+                    )
 
-            override val appNames: List<ByteArray>
-                get() = listOf("PAY.SZT".encodeToByteArray())
+                override val appNames: List<ByteArray>
+                    get() = listOf("PAY.SZT".encodeToByteArray())
 
-            override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
-                TransitIdentity(
-                    getStringBlocking(Res.string.card_name_szt),
-                    formatSerial(parseSerial(card))
-                )
+                override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
+                    TransitIdentity(
+                        getStringBlocking(Res.string.card_name_szt),
+                        formatSerial(parseSerial(card)),
+                    )
 
-            override fun parseTransitData(card: ChinaCard): TransitInfo = parse(card)
-        }
+                override fun parseTransitData(card: ChinaCard): TransitInfo = parse(card)
+            }
 
         private fun formatSerial(sn: Int): String {
             val digsum = NumberUtils.getDigitSum(sn.toLong())
@@ -118,13 +131,13 @@ class NewShenzhenTransitInfo(
 
         private fun getTagInfo(card: ChinaCard): ByteArray? {
             val file15 = ChinaTransitData.getFile(card, 0x15)
-            if (file15 != null)
+            if (file15 != null) {
                 return file15.binaryData
+            }
             val szttag = card.appProprietaryBerTlv ?: return null
             return ISO7816TLV.findBERTLV(szttag, "8c", false)
         }
 
-        private fun parseSerial(card: ChinaCard): Int =
-            getTagInfo(card)?.byteArrayToIntReversed(16, 4) ?: 0
+        private fun parseSerial(card: ChinaCard): Int = getTagInfo(card)?.byteArrayToIntReversed(16, 4) ?: 0
     }
 }

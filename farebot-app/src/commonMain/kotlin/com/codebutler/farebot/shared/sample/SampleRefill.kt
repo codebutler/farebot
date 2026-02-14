@@ -25,8 +25,9 @@ package com.codebutler.farebot.shared.sample
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Refill
 
-class SampleRefill(private val epochSeconds: Long) : Refill() {
-
+class SampleRefill(
+    private val epochSeconds: Long,
+) : Refill() {
     override fun getTimestamp(): Long = epochSeconds
 
     override fun getAgencyName(stringResource: StringResource): String = "Agency"

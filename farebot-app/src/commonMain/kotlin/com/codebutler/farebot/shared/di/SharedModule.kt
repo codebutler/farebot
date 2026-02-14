@@ -14,15 +14,16 @@ import com.codebutler.farebot.shared.viewmodel.KeysViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-val sharedModule = module {
-    single { NavDataHolder() }
-    single { CardImporter(get(), get()) }
-    single<Analytics> { NoOpAnalytics() }
-    single<AppPreferences> { InMemoryAppPreferences() }
+val sharedModule =
+    module {
+        single { NavDataHolder() }
+        single { CardImporter(get(), get()) }
+        single<Analytics> { NoOpAnalytics() }
+        single<AppPreferences> { InMemoryAppPreferences() }
 
-    viewModel { HomeViewModel(getOrNull(), get(), get(), get(), get()) }
-    viewModel { CardViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
-    viewModel { KeysViewModel(get()) }
-    viewModel { AddKeyViewModel(get(), getOrNull()) }
-}
+        viewModel { HomeViewModel(getOrNull(), get(), get(), get(), get()) }
+        viewModel { CardViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
+        viewModel { KeysViewModel(get()) }
+        viewModel { AddKeyViewModel(get(), getOrNull()) }
+    }

@@ -40,7 +40,6 @@ class IosDesfireTagReader(
     private val tagId: ByteArray,
     private val transceiver: CardTransceiver,
 ) {
-
     fun readTag(): RawDesfireCard {
         transceiver.connect()
         try {
@@ -81,8 +80,8 @@ class IosDesfireTagReader(
         protocol: DesfireProtocol,
         fileId: Int,
         fileSettings: RawDesfireFileSettings,
-    ): RawDesfireFile {
-        return try {
+    ): RawDesfireFile =
+        try {
             val fileData = readFileData(protocol, fileId, fileSettings)
             RawDesfireFile.create(fileId, fileSettings, fileData)
         } catch (ex: DesfireAccessControlException) {
@@ -90,20 +89,20 @@ class IosDesfireTagReader(
         } catch (ex: Exception) {
             RawDesfireFile.createInvalid(fileId, fileSettings, ex.toString())
         }
-    }
 
     private fun readFileData(
         protocol: DesfireProtocol,
         fileId: Int,
         settings: RawDesfireFileSettings,
-    ): ByteArray {
-        return when (settings.fileType()) {
+    ): ByteArray =
+        when (settings.fileType()) {
             DesfireFileSettings.STANDARD_DATA_FILE,
-            DesfireFileSettings.BACKUP_DATA_FILE -> protocol.readFile(fileId)
+            DesfireFileSettings.BACKUP_DATA_FILE,
+            -> protocol.readFile(fileId)
             DesfireFileSettings.VALUE_FILE -> protocol.getValue(fileId)
             DesfireFileSettings.CYCLIC_RECORD_FILE,
-            DesfireFileSettings.LINEAR_RECORD_FILE -> protocol.readRecord(fileId)
+            DesfireFileSettings.LINEAR_RECORD_FILE,
+            -> protocol.readRecord(fileId)
             else -> throw Exception("Unknown file type")
         }
-    }
 }

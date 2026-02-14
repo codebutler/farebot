@@ -45,9 +45,10 @@ class CrcTest {
         assertEquals(expected = 0x7b, actual = HashUtils.calculateCRC8NXP(byteArrayOf(1)))
         assertEquals(
             expected = 0xb0,
-            actual = HashUtils.calculateCRC8NXP(
-                "0003e103e103e103e103e103e1000000000000000000000000000000000000".hexToByteArray()
-            )
+            actual =
+                HashUtils.calculateCRC8NXP(
+                    "0003e103e103e103e103e103e1000000000000000000000000000000000000".hexToByteArray(),
+                ),
         )
     }
 }

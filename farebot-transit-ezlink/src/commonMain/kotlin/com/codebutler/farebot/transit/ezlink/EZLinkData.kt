@@ -28,7 +28,6 @@ import com.codebutler.farebot.transit.Station
 import farebot.farebot_transit_ezlink.generated.resources.*
 
 internal object EZLinkData {
-
     private const val EZLINK_STR = "ezlink"
 
     /**
@@ -53,7 +52,8 @@ internal object EZLinkData {
         val result = MdstStationLookup.getStation(EZLINK_STR, stationId)
 
         if (result != null) {
-            return Station.Builder()
+            return Station
+                .Builder()
                 .stationName(result.stationName)
                 .shortStationName(result.shortStationName)
                 .companyName(result.companyName)
@@ -67,9 +67,13 @@ internal object EZLinkData {
         return Station.unknown(code)
     }
 
-    fun getCardIssuer(canNo: String?, stringResource: StringResource): String = when (canNo?.substring(0, 3)) {
-        "100" -> stringResource.getString(Res.string.ezlink_issuer_ezlink)
-        "111" -> stringResource.getString(Res.string.ezlink_issuer_nets)
-        else -> stringResource.getString(Res.string.ezlink_issuer_cepas)
-    }
+    fun getCardIssuer(
+        canNo: String?,
+        stringResource: StringResource,
+    ): String =
+        when (canNo?.substring(0, 3)) {
+            "100" -> stringResource.getString(Res.string.ezlink_issuer_ezlink)
+            "111" -> stringResource.getString(Res.string.ezlink_issuer_nets)
+            else -> stringResource.getString(Res.string.ezlink_issuer_cepas)
+        }
 }

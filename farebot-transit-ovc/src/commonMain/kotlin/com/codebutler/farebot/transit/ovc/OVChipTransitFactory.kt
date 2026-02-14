@@ -45,9 +45,8 @@ import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.farebot_transit_ovc.generated.resources.*
 
 class OVChipTransitFactory(
-    private val stringResource: StringResource
+    private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, OVChipTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -58,37 +57,39 @@ class OVChipTransitFactory(
         return blockData.size >= 11 && blockData.copyOfRange(0, 11).contentEquals(OVC_HEADER)
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(NAME, null)
-    }
+    override fun parseIdentity(card: ClassicCard): TransitIdentity = TransitIdentity.create(NAME, null)
 
     override fun parseInfo(card: ClassicCard): OVChipTransitInfo {
-        val index = OVChipIndex.parse(
-            (card.getSector(39) as DataClassicSector).readBlocks(11, 4)
-        )
-        val credit = (card.getSector(39) as DataClassicSector)
-            .readBlocks(if (index.recentCreditSlot) 10 else 9, 1)
-        val mTicketEnvParsed = En1545Parser.parse(
-            (card.getSector(if (index.recentInfoSlot) 23 else 22) as DataClassicSector).readBlocks(0, 3),
-            En1545Container(
-                En1545FixedHex("EnvUnknown1", 48),
-                En1545FixedInteger(En1545TransitData.ENV_APPLICATION_ISSUER_ID, 5), // Could be 4 bits though
-                En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-                En1545FixedHex("EnvUnknown2", 43),
-                En1545Bitmap(
-                    En1545FixedHex("NeverSeen1", 8),
-                    En1545Container(
-                        En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
-                        En1545FixedHex("EnvUnknown3", 32),
-                        En1545FixedInteger(AUTOCHARGE_ACTIVE, 3),
-                        En1545FixedInteger(AUTOCHARGE_LIMIT, 16),
-                        En1545FixedInteger(AUTOCHARGE_CHARGE, 16),
-                        En1545FixedInteger(AUTOCHARGE_UNKNOWN, 16)
-                    )
-                )
-            ))
+        val index =
+            OVChipIndex.parse(
+                (card.getSector(39) as DataClassicSector).readBlocks(11, 4),
+            )
+        val credit =
+            (card.getSector(39) as DataClassicSector)
+                .readBlocks(if (index.recentCreditSlot) 10 else 9, 1)
+        val mTicketEnvParsed =
+            En1545Parser.parse(
+                (card.getSector(if (index.recentInfoSlot) 23 else 22) as DataClassicSector).readBlocks(0, 3),
+                En1545Container(
+                    En1545FixedHex("EnvUnknown1", 48),
+                    En1545FixedInteger(En1545TransitData.ENV_APPLICATION_ISSUER_ID, 5), // Could be 4 bits though
+                    En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+                    En1545FixedHex("EnvUnknown2", 43),
+                    En1545Bitmap(
+                        En1545FixedHex("NeverSeen1", 8),
+                        En1545Container(
+                            En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+                            En1545FixedHex("EnvUnknown3", 32),
+                            En1545FixedInteger(AUTOCHARGE_ACTIVE, 3),
+                            En1545FixedInteger(AUTOCHARGE_LIMIT, 16),
+                            En1545FixedInteger(AUTOCHARGE_CHARGE, 16),
+                            En1545FixedInteger(AUTOCHARGE_UNKNOWN, 16),
+                        ),
+                    ),
+                ),
+            )
 
-        //byte 0-11:unknown const
+        // byte 0-11:unknown const
         val sector0block1 = (card.getSector(0) as DataClassicSector).getBlock(1).data
         val mExpdate = sector0block1.getBitsFromBuffer(88, 20)
         // last bytes: unknown const
@@ -119,32 +120,45 @@ class OVChipTransitFactory(
     }
 
     private fun getTrips(card: ClassicCard): List<com.codebutler.farebot.transit.TransactionTripAbstract> {
-        val transactions = (0..27).mapNotNull { transactionId ->
-            OVChipTransaction.parseClassic(
-                (card.getSector(35 + transactionId / 7) as DataClassicSector)
-                    .readBlocks(transactionId % 7 * 2, 2)
-            )
-        }
-        val taggedTransactions = transactions.filter {
-            !it.isTransparent   // don't include Reload transactions when grouping, which might have conflicting IDs
-        }.groupingBy { it.id }.reduce { _, transaction, nextTransaction ->
-            if (transaction.isTapOff)
-            // check for two consecutive (duplicate) logouts, skip the second one
-                transaction
-            else
-            // handle two consecutive (duplicate) logins, skip the first one
-                nextTransaction
-        }.values
-        val fullTransactions = taggedTransactions + transactions.filter {
-            it.isTransparent
-        }
+        val transactions =
+            (0..27).mapNotNull { transactionId ->
+                OVChipTransaction.parseClassic(
+                    (card.getSector(35 + transactionId / 7) as DataClassicSector)
+                        .readBlocks(transactionId % 7 * 2, 2),
+                )
+            }
+        val taggedTransactions =
+            transactions
+                .filter {
+                    // don't include Reload transactions when grouping,
+                    // which might have conflicting IDs
+                    !it.isTransparent
+                }.groupingBy { it.id }
+                .reduce { _, transaction, nextTransaction ->
+                    if (transaction.isTapOff) {
+                        // check for two consecutive (duplicate) logouts, skip the second one
+                        transaction
+                    } else {
+                        // handle two consecutive (duplicate) logins, skip the first one
+                        nextTransaction
+                    }
+                }.values
+        val fullTransactions =
+            taggedTransactions +
+                transactions.filter {
+                    it.isTransparent
+                }
 
         return TransactionTripLastPrice.merge(fullTransactions.toMutableList())
     }
 
-    private fun getSubscriptions(card: ClassicCard, index: OVChipIndex): List<OVChipSubscription> {
-        val data = (card.getSector(39) as DataClassicSector)
-            .readBlocks(if (index.recentSubscriptionSlot) 3 else 1, 2)
+    private fun getSubscriptions(
+        card: ClassicCard,
+        index: OVChipIndex,
+    ): List<OVChipSubscription> {
+        val data =
+            (card.getSector(39) as DataClassicSector)
+                .readBlocks(if (index.recentSubscriptionSlot) 3 else 1, 2)
 
         /*
          * TODO / FIXME
@@ -165,43 +179,56 @@ class OVChipTransitFactory(
          * English: http://ov-chipkaart.pc-active.nl/Indexes
          */
         val count = data.getBitsFromBuffer(0, 4)
-        return (0 until count).map {
-            val bits = data.getBitsFromBuffer(4 + it * 21, 21)
+        return (0 until count)
+            .map {
+                val bits = data.getBitsFromBuffer(4 + it * 21, 21)
 
-            /* Based on info from ovc-tools by ocsr ( https://github.com/ocsrunl/ ) */
-            val type1 = NumberUtils.getBitsFromInteger(bits, 13, 8)
-            //val type2 = NumberUtils.getBitsFromInteger(bits, 7, 6)
-            val used = NumberUtils.getBitsFromInteger(bits, 6, 1)
-            //val rest = NumberUtils.getBitsFromInteger(bits, 4, 2)
-            val subscriptionIndexId = NumberUtils.getBitsFromInteger(bits, 0, 4)
-            val subscriptionAddress = index.subscriptionIndex[subscriptionIndexId - 1]
-            val subData = (card.getSector(32 + subscriptionAddress / 5) as DataClassicSector)
-                .readBlocks(subscriptionAddress % 5 * 3, 3)
+                // Based on info from ovc-tools by ocsr ( https://github.com/ocsrunl/ )
+                val type1 = NumberUtils.getBitsFromInteger(bits, 13, 8)
+                // val type2 = NumberUtils.getBitsFromInteger(bits, 7, 6)
+                val used = NumberUtils.getBitsFromInteger(bits, 6, 1)
+                // val rest = NumberUtils.getBitsFromInteger(bits, 4, 2)
+                val subscriptionIndexId = NumberUtils.getBitsFromInteger(bits, 0, 4)
+                val subscriptionAddress = index.subscriptionIndex[subscriptionIndexId - 1]
+                val subData =
+                    (card.getSector(32 + subscriptionAddress / 5) as DataClassicSector)
+                        .readBlocks(subscriptionAddress % 5 * 3, 3)
 
-            OVChipSubscription.parse(subData, type1, used, stringResource)
-        }.sortedWith { s1, s2 -> (s1.id ?: 0).compareTo(s2.id ?: 0) }
+                OVChipSubscription.parse(subData, type1, used, stringResource)
+            }.sortedWith { s1, s2 -> (s1.id ?: 0).compareTo(s2.id ?: 0) }
     }
 
     companion object {
         private const val NAME = "OV-chipkaart"
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.ovc_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.NETHERLANDS,
-            locationRes = Res.string.ovc_location,
-            imageRes = Res.drawable.ovchip_card,
-            latitude = 52.3676f,
-            longitude = 4.9041f,
-            brandColor = 0x84ABC7,
-            credits = listOf("Wilbert Duijvenvoorde"),
-            keysRequired = true,
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.ovc_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.NETHERLANDS,
+                locationRes = Res.string.ovc_location,
+                imageRes = Res.drawable.ovchip_card,
+                latitude = 52.3676f,
+                longitude = 4.9041f,
+                brandColor = 0x84ABC7,
+                credits = listOf("Wilbert Duijvenvoorde"),
+                keysRequired = true,
+            )
 
-        private val OVC_HEADER = byteArrayOf(
-            0x84.toByte(), 0x00, 0x00, 0x00, 0x06, 0x03,
-            0xA0.toByte(), 0x00, 0x13, 0xAE.toByte(), 0xE4.toByte()
-        )
+        private val OVC_HEADER =
+            byteArrayOf(
+                0x84.toByte(),
+                0x00,
+                0x00,
+                0x00,
+                0x06,
+                0x03,
+                0xA0.toByte(),
+                0x00,
+                0x13,
+                0xAE.toByte(),
+                0xE4.toByte(),
+            )
 
         internal const val AUTOCHARGE_ACTIVE = "AutochargeActive"
         internal const val AUTOCHARGE_LIMIT = "AutochargeLimit"

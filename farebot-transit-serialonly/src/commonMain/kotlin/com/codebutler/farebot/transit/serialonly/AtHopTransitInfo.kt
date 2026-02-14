@@ -9,7 +9,9 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-class AtHopTransitInfo(private val mSerial: Int?) : SerialOnlyTransitInfo() {
+class AtHopTransitInfo(
+    private val mSerial: Int?,
+) : SerialOnlyTransitInfo() {
     override val reason get() = Reason.LOCKED
     override val serialNumber get() = AtHopTransitFactory.formatSerial(mSerial)
     override val cardName get() = AtHopTransitFactory.NAME

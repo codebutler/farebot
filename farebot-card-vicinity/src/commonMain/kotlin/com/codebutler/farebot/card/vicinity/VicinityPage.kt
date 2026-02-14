@@ -32,13 +32,14 @@ import kotlinx.serialization.Serializable
 data class VicinityPage(
     val index: Int,
     @Contextual val data: ByteArray,
-    val isUnauthorized: Boolean = false
+    val isUnauthorized: Boolean = false,
 ) {
     companion object {
-        fun create(index: Int, data: ByteArray): VicinityPage =
-            VicinityPage(index, data)
+        fun create(
+            index: Int,
+            data: ByteArray,
+        ): VicinityPage = VicinityPage(index, data)
 
-        fun unauthorized(index: Int): VicinityPage =
-            VicinityPage(index, ByteArray(0), isUnauthorized = true)
+        fun unauthorized(index: Int): VicinityPage = VicinityPage(index, ByteArray(0), isUnauthorized = true)
     }
 }

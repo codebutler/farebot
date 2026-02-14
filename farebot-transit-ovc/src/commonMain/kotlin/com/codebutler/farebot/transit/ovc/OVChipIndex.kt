@@ -32,12 +32,12 @@ import kotlinx.serialization.Serializable
 @ConsistentCopyVisibility
 @Serializable
 data class OVChipIndex internal constructor(
-    val recentTransactionSlot: Boolean,  // Most recent transaction slot (0xFB0 (false) or 0xFD0 (true))
-    val recentInfoSlot: Boolean,  // Most recent card information index slot (0x5C0 (true) or 0x580(false))
-    val recentSubscriptionSlot: Boolean,   // Most recent subscription index slot (0xF10 (false) or 0xF30(true))
+    val recentTransactionSlot: Boolean, // Most recent transaction slot (0xFB0 (false) or 0xFD0 (true))
+    val recentInfoSlot: Boolean, // Most recent card information index slot (0x5C0 (true) or 0x580(false))
+    val recentSubscriptionSlot: Boolean, // Most recent subscription index slot (0xF10 (false) or 0xF30(true))
     val recentTravelhistorySlot: Boolean, // Most recent travel history index slot (0xF50 (false) or 0xF70 (true))
-    val recentCreditSlot: Boolean,         // Most recent credit index slot (0xF90(false) or 0xFA0(true))
-    val subscriptionIndex: List<Int>
+    val recentCreditSlot: Boolean, // Most recent credit index slot (0xF90(false) or 0xFA0(true))
+    val subscriptionIndex: List<Int>,
 ) {
     fun getRawFields(): List<ListItemInterface> =
         listOf(
@@ -46,7 +46,8 @@ data class OVChipIndex internal constructor(
             ListItem("Info Slot", if (recentInfoSlot) "B" else "A"),
             ListItem("Subscription Slot", if (recentSubscriptionSlot) "B" else "A"),
             ListItem("Travelhistory Slot", if (recentTravelhistorySlot) "B" else "A"),
-            ListItem("Credit Slot", if (recentCreditSlot) "B" else "A"))
+            ListItem("Credit Slot", if (recentCreditSlot) "B" else "A"),
+        )
 
     companion object {
         fun parse(data: ByteArray): OVChipIndex {
@@ -62,12 +63,14 @@ data class OVChipIndex internal constructor(
 
             val subscriptionIndex = (0..11).map { i -> buffer.getBitsFromBuffer(108 + i * 4, 4) }
 
-            return OVChipIndex(recentTransactionSlot = iIDb3 <= iIDa3,
-                    recentSubscriptionSlot = indexes and 0x04 != 0x00,
-                    recentTravelhistorySlot = indexes and 0x02 != 0x00,
-                    recentCreditSlot = indexes and 0x01 != 0x00,
-                    recentInfoSlot = buffer[3].toInt() shr 5 and 0x01 != 0,
-                    subscriptionIndex = subscriptionIndex)
+            return OVChipIndex(
+                recentTransactionSlot = iIDb3 <= iIDa3,
+                recentSubscriptionSlot = indexes and 0x04 != 0x00,
+                recentTravelhistorySlot = indexes and 0x02 != 0x00,
+                recentCreditSlot = indexes and 0x01 != 0x00,
+                recentInfoSlot = buffer[3].toInt() shr 5 and 0x01 != 0,
+                subscriptionIndex = subscriptionIndex,
+            )
         }
     }
 }

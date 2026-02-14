@@ -41,16 +41,17 @@ import farebot.farebot_transit_charlie.generated.resources.*
  * Card detection requires MBTA-specific keys.
  */
 class CharlieCardTransitFactory : TransitFactory<ClassicCard, CharlieCardTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
         return HashUtils.checkKeyHash(
-            sector0.keyA, sector0.keyB, "charlie",
+            sector0.keyA,
+            sector0.keyB,
+            "charlie",
             "63ee95c7340fceb524cae7aab66fb1f9",
-            "2114a2414d6b378e36a4e9540d1adc9f"
+            "2114a2414d6b378e36a4e9540d1adc9f",
         ) >= 0
     }
 
@@ -62,47 +63,57 @@ class CharlieCardTransitFactory : TransitFactory<ClassicCard, CharlieCardTransit
         val sector3 = card.getSector(3) as DataClassicSector
         val balanceSector: DataClassicSector =
             if (sector2.getBlock(0).data.getBitsFromBuffer(81, 16)
-                > sector3.getBlock(0).data.getBitsFromBuffer(81, 16))
+                > sector3.getBlock(0).data.getBitsFromBuffer(81, 16)
+            ) {
                 sector2
-            else
+            } else {
                 sector3
+            }
 
         val trips = mutableListOf<CharlieCardTrip>()
         for (i in 0..11) {
             val sector = card.getSector(6 + i / 6) as? DataClassicSector ?: continue
             val block = sector.getBlock(i / 2 % 3)
-            if (block.data.byteArrayToInt(7 * (i % 2), 4) == 0)
+            if (block.data.byteArrayToInt(7 * (i % 2), 4) == 0) {
                 continue
+            }
             trips.add(CharlieCardTrip.parse(block.data, 7 * (i % 2)))
         }
 
         return CharlieCardTransitInfo(
             serial = getSerial(card),
-            secondSerial = (card.getSector(8) as? DataClassicSector)
-                ?.getBlock(0)?.data?.byteArrayToLong(0, 4) ?: 0L,
+            secondSerial =
+                (card.getSector(8) as? DataClassicSector)
+                    ?.getBlock(0)
+                    ?.data
+                    ?.byteArrayToLong(0, 4) ?: 0L,
             mBalance = getPrice(balanceSector.getBlock(1).data, 5),
             startDate = balanceSector.getBlock(0).data.byteArrayToInt(6, 3),
-            trips = trips
+            trips = trips,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.charlie_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.USA,
-            locationRes = Res.string.charlie_location_boston,
-            imageRes = Res.drawable.charlie_card,
-            latitude = 42.3601f,
-            longitude = -71.0589f,
-            brandColor = 0x47A64A,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.charlie_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.USA,
+                locationRes = Res.string.charlie_location_boston,
+                imageRes = Res.drawable.charlie_card,
+                latitude = 42.3601f,
+                longitude = -71.0589f,
+                brandColor = 0x47A64A,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+            )
 
         internal val NAME: String
             get() = getStringBlocking(Res.string.charlie_card_name)
 
-        internal fun getPrice(data: ByteArray, off: Int): Int {
+        internal fun getPrice(
+            data: ByteArray,
+            off: Int,
+        ): Int {
             var value = data.byteArrayToInt(off, 2)
             if (value and 0x8000 != 0) {
                 value = -(value and 0x7fff)

@@ -30,30 +30,39 @@ import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 object AdelaideLookup : En1545LookupSTR("adelaide") {
-
     override val timeZone: TimeZone
         get() = TimeZone.of("Australia/Adelaide")
 
     override fun parseCurrency(price: Int): TransitCurrency = TransitCurrency(price, "AUD")
 
-    internal fun isPurseTariff(agency: Int?, contractTariff: Int?): Boolean {
+    internal fun isPurseTariff(
+        agency: Int?,
+        contractTariff: Int?,
+    ): Boolean {
         if (agency == null || agency != AGENCY_ADL_METRO || contractTariff == null) {
             return false
         }
         return contractTariff in subscriptionMap
     }
 
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
-        if (routeNumber == 0)
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
+        if (routeNumber == 0) {
             return null
+        }
         return super.getRouteName(routeNumber, routeVariant, agency, transport)
     }
 
     private const val AGENCY_ADL_METRO = 1
 
     override val subscriptionMap: Map<Int, ComposeStringResource>
-        get() = mapOf(
-            0x804 to Res.string.adelaide_ticket_type_regular,
-            0x808 to Res.string.adelaide_ticket_type_concession
-        )
+        get() =
+            mapOf(
+                0x804 to Res.string.adelaide_ticket_type_regular,
+                0x808 to Res.string.adelaide_ticket_type_concession,
+            )
 }

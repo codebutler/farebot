@@ -22,9 +22,9 @@
 
 package com.codebutler.farebot.shared.serialize
 
+import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlinx.serialization.Serializable
 
 /**
  * Metadata included in exported card data files.
@@ -36,22 +36,18 @@ data class ExportMetadata(
      * Application name that created the export.
      */
     val appName: String = APP_NAME,
-
     /**
      * Application version code (numeric).
      */
     val versionCode: Int = 1,
-
     /**
      * Application version name (human-readable).
      */
     val versionName: String = "1.0.0",
-
     /**
      * ISO 8601 timestamp of when the export was created.
      */
     val exportedAt: Instant = Clock.System.now(),
-
     /**
      * Export format version for forward/backward compatibility.
      */
@@ -61,12 +57,16 @@ data class ExportMetadata(
         const val APP_NAME = "FareBot"
         const val FORMAT_VERSION = 1
 
-        fun create(versionCode: Int, versionName: String): ExportMetadata = ExportMetadata(
-            appName = APP_NAME,
-            versionCode = versionCode,
-            versionName = versionName,
-            exportedAt = Clock.System.now(),
-            formatVersion = FORMAT_VERSION,
-        )
+        fun create(
+            versionCode: Int,
+            versionName: String,
+        ): ExportMetadata =
+            ExportMetadata(
+                appName = APP_NAME,
+                versionCode = versionCode,
+                versionName = versionName,
+                exportedAt = Clock.System.now(),
+                formatVersion = FORMAT_VERSION,
+            )
     }
 }

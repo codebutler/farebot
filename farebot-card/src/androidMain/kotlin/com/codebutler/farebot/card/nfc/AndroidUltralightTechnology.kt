@@ -24,8 +24,9 @@ package com.codebutler.farebot.card.nfc
 
 import android.nfc.tech.MifareUltralight
 
-class AndroidUltralightTechnology(private val mifareUltralight: MifareUltralight) : UltralightTechnology {
-
+class AndroidUltralightTechnology(
+    private val mifareUltralight: MifareUltralight,
+) : UltralightTechnology {
     override fun connect() {
         mifareUltralight.connect()
     }
@@ -40,6 +41,5 @@ class AndroidUltralightTechnology(private val mifareUltralight: MifareUltralight
     override val type: Int
         get() = mifareUltralight.type
 
-    override fun readPages(pageOffset: Int): ByteArray =
-        mifareUltralight.readPages(pageOffset)
+    override fun readPages(pageOffset: Int): ByteArray = mifareUltralight.readPages(pageOffset)
 }

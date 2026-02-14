@@ -13,7 +13,9 @@ import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.card_name_tpf
 
-class TPFCardTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() {
+class TPFCardTransitInfo(
+    private val mSerial: String,
+) : SerialOnlyTransitInfo() {
     override val reason get() = Reason.LOCKED
     override val serialNumber get() = mSerial
     override val cardName get() = NAME

@@ -33,17 +33,20 @@ data class ClassicManufacturingInfo(
     val sak: Int?,
     val atqa: Int?,
     val manufactureWeek: Int?,
-    val manufactureYear: Int?
+    val manufactureYear: Int?,
 ) {
     enum class Manufacturer {
         NXP,
         FUDAN,
-        UNKNOWN
+        UNKNOWN,
     }
 
     companion object {
         @OptIn(ExperimentalStdlibApi::class)
-        fun parse(block0: ByteArray, tagId: ByteArray): ClassicManufacturingInfo? {
+        fun parse(
+            block0: ByteArray,
+            tagId: ByteArray,
+        ): ClassicManufacturingInfo? {
             if (block0.size < 16) return null
 
             // Detect Fudan Microelectronics FM11RF08
@@ -54,7 +57,7 @@ data class ClassicManufacturingInfo(
                     sak = block0[5].toInt() and 0xFF,
                     atqa = ((block0[6].toInt() and 0xFF) shl 8) or (block0[7].toInt() and 0xFF),
                     manufactureWeek = null,
-                    manufactureYear = null
+                    manufactureYear = null,
                 )
             }
 
@@ -74,10 +77,12 @@ data class ClassicManufacturingInfo(
             // Manufacturing date from bytes 14-15 (BCD-encoded week and year)
             val weekRaw = block0[14].toInt() and 0xFF
             val yearRaw = block0[15].toInt() and 0xFF
-            val validBcd = weekRaw in 0x01..0x53 &&
-                (weekRaw and 0xF) in 0..9 &&
-                (yearRaw and 0xF) in 0..9 &&
-                yearRaw > 0 && yearRaw < 0x25
+            val validBcd =
+                weekRaw in 0x01..0x53 &&
+                    (weekRaw and 0xF) in 0..9 &&
+                    (yearRaw and 0xF) in 0..9 &&
+                    yearRaw > 0 &&
+                    yearRaw < 0x25
 
             val week: Int?
             val year: Int?
@@ -94,12 +99,10 @@ data class ClassicManufacturingInfo(
                 sak = sak,
                 atqa = atqa,
                 manufactureWeek = week,
-                manufactureYear = year
+                manufactureYear = year,
             )
         }
 
-        private fun convertBcdToInt(bcd: Int): Int {
-            return ((bcd shr 4) and 0xF) * 10 + (bcd and 0xF)
-        }
+        private fun convertBcdToInt(bcd: Int): Int = ((bcd shr 4) and 0xF) * 10 + (bcd and 0xF)
     }
 }

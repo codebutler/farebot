@@ -33,9 +33,8 @@ import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
 internal class MobibTransaction private constructor(
     override val parsed: En1545Parsed,
-    override val lookup: En1545Lookup
+    override val lookup: En1545Lookup,
 ) : En1545Transaction() {
-
     val transactionNumber: Int = parsed.getIntOrZero(En1545Transaction.EVENT_SERIAL_NUMBER)
 
     companion object {
@@ -56,60 +55,61 @@ internal class MobibTransaction private constructor(
             if (data.all { it == 0.toByte() }) return null
 
             val version = data.getBitsFromBuffer(0, 6)
-            val fields = if (version <= 2) {
-                En1545Container(
-                    En1545FixedInteger(EVENT_VERSION, 6),
-                    En1545FixedInteger.date(En1545Transaction.EVENT),
-                    En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
-                    En1545FixedInteger(EVENT_UNKNOWN_B, 21),
-                    En1545FixedInteger(En1545Transaction.EVENT_PASSENGER_COUNT, 5),
-                    En1545FixedInteger(EVENT_UNKNOWN_C, 14),
-                    En1545FixedInteger(EVENT_LOCATION_ID_BUS, 12),
-                    En1545FixedInteger(En1545Transaction.EVENT_ROUTE_NUMBER, 16),
-                    En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 5),
-                    En1545FixedInteger(En1545Transaction.EVENT_LOCATION_ID, 17),
-                    En1545FixedInteger(EVENT_UNKNOWN_E, 10),
-                    En1545FixedInteger(EVENT_UNKNOWN_F, 7),
-                    En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 24),
-                    En1545FixedInteger(EVENT_TRANSFER_NUMBER, 24),
-                    En1545FixedInteger.date(En1545Transaction.EVENT_FIRST_STAMP),
-                    En1545FixedInteger.timeLocal(En1545Transaction.EVENT_FIRST_STAMP),
-                    En1545FixedInteger(EVENT_UNKNOWN_G, 21)
-                )
-            } else {
-                En1545Container(
-                    En1545FixedInteger(EVENT_VERSION, 6),
-                    En1545FixedInteger.date(En1545Transaction.EVENT),
-                    En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
-                    En1545FixedInteger(EVENT_UNKNOWN_B + "1", 31),
-                    En1545Bitmap(
-                        En1545Container(
-                            En1545FixedInteger(EVENT_UNKNOWN_B + "2", 4),
-                            En1545FixedInteger(EVENT_LOCATION_ID_BUS, 12)
-                        ),
+            val fields =
+                if (version <= 2) {
+                    En1545Container(
+                        En1545FixedInteger(EVENT_VERSION, 6),
+                        En1545FixedInteger.date(En1545Transaction.EVENT),
+                        En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
+                        En1545FixedInteger(EVENT_UNKNOWN_B, 21),
+                        En1545FixedInteger(En1545Transaction.EVENT_PASSENGER_COUNT, 5),
+                        En1545FixedInteger(EVENT_UNKNOWN_C, 14),
+                        En1545FixedInteger(EVENT_LOCATION_ID_BUS, 12),
                         En1545FixedInteger(En1545Transaction.EVENT_ROUTE_NUMBER, 16),
-                        En1545FixedInteger(NEVER_SEEN_2, 16),
-                        En1545FixedInteger(NEVER_SEEN_3, 16),
-                        En1545Container(
-                            En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 5),
-                            En1545FixedInteger(En1545Transaction.EVENT_LOCATION_ID, 17),
-                            En1545FixedInteger(EVENT_UNKNOWN_E + "1", 10)
-                        )
-                    ),
-                    En1545Bitmap(
+                        En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 5),
+                        En1545FixedInteger(En1545Transaction.EVENT_LOCATION_ID, 17),
+                        En1545FixedInteger(EVENT_UNKNOWN_E, 10),
+                        En1545FixedInteger(EVENT_UNKNOWN_F, 7),
                         En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 24),
-                        En1545FixedInteger(EVENT_UNKNOWN_F, 16),
-                        En1545FixedInteger(EVENT_TRANSFER_NUMBER, 8),
-                        En1545FixedInteger(NEVER_SEEN_A3, 16),
-                        En1545Container(
-                            En1545FixedInteger.date(En1545Transaction.EVENT_FIRST_STAMP),
-                            En1545FixedInteger.timeLocal(En1545Transaction.EVENT_FIRST_STAMP)
+                        En1545FixedInteger(EVENT_TRANSFER_NUMBER, 24),
+                        En1545FixedInteger.date(En1545Transaction.EVENT_FIRST_STAMP),
+                        En1545FixedInteger.timeLocal(En1545Transaction.EVENT_FIRST_STAMP),
+                        En1545FixedInteger(EVENT_UNKNOWN_G, 21),
+                    )
+                } else {
+                    En1545Container(
+                        En1545FixedInteger(EVENT_VERSION, 6),
+                        En1545FixedInteger.date(En1545Transaction.EVENT),
+                        En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
+                        En1545FixedInteger(EVENT_UNKNOWN_B + "1", 31),
+                        En1545Bitmap(
+                            En1545Container(
+                                En1545FixedInteger(EVENT_UNKNOWN_B + "2", 4),
+                                En1545FixedInteger(EVENT_LOCATION_ID_BUS, 12),
+                            ),
+                            En1545FixedInteger(En1545Transaction.EVENT_ROUTE_NUMBER, 16),
+                            En1545FixedInteger(NEVER_SEEN_2, 16),
+                            En1545FixedInteger(NEVER_SEEN_3, 16),
+                            En1545Container(
+                                En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 5),
+                                En1545FixedInteger(En1545Transaction.EVENT_LOCATION_ID, 17),
+                                En1545FixedInteger(EVENT_UNKNOWN_E + "1", 10),
+                            ),
                         ),
-                        En1545FixedInteger(NEVER_SEEN_A5, 16)
-                    ),
-                    En1545FixedInteger(EVENT_UNKNOWN_G, 21)
-                )
-            }
+                        En1545Bitmap(
+                            En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 24),
+                            En1545FixedInteger(EVENT_UNKNOWN_F, 16),
+                            En1545FixedInteger(EVENT_TRANSFER_NUMBER, 8),
+                            En1545FixedInteger(NEVER_SEEN_A3, 16),
+                            En1545Container(
+                                En1545FixedInteger.date(En1545Transaction.EVENT_FIRST_STAMP),
+                                En1545FixedInteger.timeLocal(En1545Transaction.EVENT_FIRST_STAMP),
+                            ),
+                            En1545FixedInteger(NEVER_SEEN_A5, 16),
+                        ),
+                        En1545FixedInteger(EVENT_UNKNOWN_G, 21),
+                    )
+                }
 
             val parsed = En1545Parser.parse(data, fields)
             return MobibTransaction(parsed, MobibLookup)

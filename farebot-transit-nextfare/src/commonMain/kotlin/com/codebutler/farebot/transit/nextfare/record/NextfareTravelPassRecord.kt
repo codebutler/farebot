@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit.nextfare.record
 
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 /**
  * Travel pass record type
@@ -32,15 +32,18 @@ import kotlinx.datetime.TimeZone
 data class NextfareTravelPassRecord(
     val version: Int,
     val timestamp: Instant,
-    val checksum: Int
-) : NextfareRecord, Comparable<NextfareTravelPassRecord> {
-
+    val checksum: Int,
+) : NextfareRecord,
+    Comparable<NextfareTravelPassRecord> {
     override fun compareTo(other: NextfareTravelPassRecord): Int =
         // Reverse order so highest version number is first
         other.version.compareTo(this.version)
 
     companion object {
-        fun recordFromBytes(input: ByteArray, timeZone: TimeZone): NextfareTravelPassRecord? {
+        fun recordFromBytes(
+            input: ByteArray,
+            timeZone: TimeZone,
+        ): NextfareTravelPassRecord? {
             if (NextfareRecord.byteArrayToInt(input, 2, 4) == 0) {
                 // Timestamp is null, ignore.
                 return null
@@ -55,7 +58,7 @@ data class NextfareTravelPassRecord(
             return NextfareTravelPassRecord(
                 version = version,
                 timestamp = NextfareRecord.unpackDate(input, 2, timeZone),
-                checksum = NextfareRecord.byteArrayToIntReversed(input, 14, 2)
+                checksum = NextfareRecord.byteArrayToIntReversed(input, 14, 2),
             )
         }
     }

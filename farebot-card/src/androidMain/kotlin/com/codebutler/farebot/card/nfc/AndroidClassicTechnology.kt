@@ -24,8 +24,9 @@ package com.codebutler.farebot.card.nfc
 
 import android.nfc.tech.MifareClassic
 
-class AndroidClassicTechnology(private val mifareClassic: MifareClassic) : ClassicTechnology {
-
+class AndroidClassicTechnology(
+    private val mifareClassic: MifareClassic,
+) : ClassicTechnology {
     override fun connect() {
         mifareClassic.connect()
     }
@@ -40,18 +41,19 @@ class AndroidClassicTechnology(private val mifareClassic: MifareClassic) : Class
     override val sectorCount: Int
         get() = mifareClassic.sectorCount
 
-    override fun authenticateSectorWithKeyA(sectorIndex: Int, key: ByteArray): Boolean =
-        mifareClassic.authenticateSectorWithKeyA(sectorIndex, key)
+    override fun authenticateSectorWithKeyA(
+        sectorIndex: Int,
+        key: ByteArray,
+    ): Boolean = mifareClassic.authenticateSectorWithKeyA(sectorIndex, key)
 
-    override fun authenticateSectorWithKeyB(sectorIndex: Int, key: ByteArray): Boolean =
-        mifareClassic.authenticateSectorWithKeyB(sectorIndex, key)
+    override fun authenticateSectorWithKeyB(
+        sectorIndex: Int,
+        key: ByteArray,
+    ): Boolean = mifareClassic.authenticateSectorWithKeyB(sectorIndex, key)
 
-    override fun readBlock(blockIndex: Int): ByteArray =
-        mifareClassic.readBlock(blockIndex)
+    override fun readBlock(blockIndex: Int): ByteArray = mifareClassic.readBlock(blockIndex)
 
-    override fun sectorToBlock(sectorIndex: Int): Int =
-        mifareClassic.sectorToBlock(sectorIndex)
+    override fun sectorToBlock(sectorIndex: Int): Int = mifareClassic.sectorToBlock(sectorIndex)
 
-    override fun getBlockCountInSector(sectorIndex: Int): Int =
-        mifareClassic.getBlockCountInSector(sectorIndex)
+    override fun getBlockCountInSector(sectorIndex: Int): Int = mifareClassic.getBlockCountInSector(sectorIndex)
 }

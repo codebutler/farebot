@@ -25,9 +25,9 @@ package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getPluralStringBlocking
 import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit.generated.resources.*
-import com.codebutler.farebot.base.util.getPluralStringBlocking
 import kotlin.time.Instant
 
 /**
@@ -42,7 +42,6 @@ import kotlin.time.Instant
  * be used to "top-up" or "refill" a card in the event a trip takes the balance below $0.
  */
 abstract class Subscription {
-
     /**
      * An identifier for the subscription number.
      * If null, this will not be displayed.
@@ -228,7 +227,14 @@ abstract class Subscription {
             zones?.let { z ->
                 if (z.isNotEmpty()) {
                     val zonesString = z.joinToString(", ")
-                    val label = if (z.size == 1) Res.string.subscription_travel_zone else Res.string.subscription_travel_zones
+                    val label =
+                        if (z.size ==
+                            1
+                        ) {
+                            Res.string.subscription_travel_zone
+                        } else {
+                            Res.string.subscription_travel_zones
+                        }
                     items.add(ListItem(label, zonesString))
                 }
             }
@@ -242,7 +248,12 @@ abstract class Subscription {
 
         return when {
             remainingTrips != null && totalTrips != null ->
-                getPluralStringBlocking(Res.plurals.subscription_trips_remaining_total, remainingTrips, remainingTrips, totalTrips)
+                getPluralStringBlocking(
+                    Res.plurals.subscription_trips_remaining_total,
+                    remainingTrips,
+                    remainingTrips,
+                    totalTrips,
+                )
             remainingTrips != null ->
                 getPluralStringBlocking(Res.plurals.subscription_trips_remaining, remainingTrips, remainingTrips)
             else -> null
@@ -253,7 +264,12 @@ abstract class Subscription {
         val from = validFrom
         val to = validTo
         return when {
-            from != null && to != null -> getStringBlocking(Res.string.subscription_valid_format, from.toString(), to.toString())
+            from != null && to != null ->
+                getStringBlocking(
+                    Res.string.subscription_valid_format,
+                    from.toString(),
+                    to.toString(),
+                )
             to != null -> getStringBlocking(Res.string.subscription_valid_to_format, to.toString())
             from != null -> getStringBlocking(Res.string.subscription_valid_from_format, from.toString())
             else -> null
@@ -263,31 +279,41 @@ abstract class Subscription {
     enum class SubscriptionState {
         /** No state is known, display no UI for the state. */
         UNKNOWN,
+
         /** The subscription is present on the card, but currently disabled. */
         INACTIVE,
+
         /** The subscription has been purchased, but never used. */
         UNUSED,
+
         /** The subscription has been purchased, and has started. */
         STARTED,
+
         /** The subscription has been "used up". */
         USED,
+
         /** The subscription has expired. */
-        EXPIRED
+        EXPIRED,
     }
 
     /**
      * Describes payment methods for a [Subscription].
      */
-    enum class PaymentMethod(val descriptionRes: org.jetbrains.compose.resources.StringResource) {
+    enum class PaymentMethod(
+        val descriptionRes: org.jetbrains.compose.resources.StringResource,
+    ) {
         UNKNOWN(Res.string.payment_method_unknown),
         CASH(Res.string.payment_method_cash),
         CREDIT_CARD(Res.string.payment_method_credit_card),
         DEBIT_CARD(Res.string.payment_method_debit_card),
         CHEQUE(Res.string.payment_method_cheque),
+
         /** The payment is made using stored balance on the transit card itself. */
         TRANSIT_CARD(Res.string.payment_method_transit_card),
+
         /** The subscription costs nothing (gratis). */
-        FREE(Res.string.payment_method_free);
+        FREE(Res.string.payment_method_free),
+        ;
 
         val description: String get() = getStringBlocking(descriptionRes)
     }

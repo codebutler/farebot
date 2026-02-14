@@ -29,16 +29,20 @@ import com.codebutler.farebot.transit.Trip
 import kotlinx.datetime.TimeZone
 
 interface En1545Lookup {
-
     val timeZone: TimeZone
 
-    fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String?
+    fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String?
 
     fun getHumanReadableRouteId(
         routeNumber: Int?,
         routeVariant: Int?,
         agency: Int?,
-        transport: Int?
+        transport: Int?,
     ): String? {
         if (routeNumber == null) return null
         var routeReadable = "0x${routeNumber.toString(16)}"
@@ -48,13 +52,27 @@ interface En1545Lookup {
         return routeReadable
     }
 
-    fun getAgencyName(agency: Int?, isShort: Boolean): String?
+    fun getAgencyName(
+        agency: Int?,
+        isShort: Boolean,
+    ): String?
 
-    fun getStation(station: Int, agency: Int?, transport: Int?): Station?
+    fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station?
 
-    fun getSubscriptionName(stringResource: StringResource, agency: Int?, contractTariff: Int?): String?
+    fun getSubscriptionName(
+        stringResource: StringResource,
+        agency: Int?,
+        contractTariff: Int?,
+    ): String?
 
     fun parseCurrency(price: Int): TransitCurrency
 
-    fun getMode(agency: Int?, route: Int?): Trip.Mode
+    fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode
 }

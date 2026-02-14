@@ -22,8 +22,6 @@
 
 package com.codebutler.farebot.transit
 
-import kotlin.time.Clock
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -31,8 +29,10 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 /**
  * Obfuscates trip data for privacy when sharing card exports.
@@ -80,7 +80,10 @@ object TripObfuscator {
      * @param tz The timezone to use for date calculations
      * @return Obfuscated date as an Instant at start of day
      */
-    private fun obfuscateDate(input: Instant, tz: TimeZone): Instant {
+    private fun obfuscateDate(
+        input: Instant,
+        tz: TimeZone,
+    ): Instant {
         val localDate = input.toLocalDateTime(tz).date
         var year = localDate.year
         var dayOfYear = localDate.dayOfYear
@@ -90,17 +93,22 @@ object TripObfuscator {
         }
         // If out of range, just use the original (shouldn't happen normally)
 
-        val today = Clock.System.now().toLocalDateTime(tz).date
+        val today =
+            Clock.System
+                .now()
+                .toLocalDateTime(tz)
+                .date
 
         // Create the new date from year and day of year
         val newDate = LocalDate(year, 1, 1).plusDays(dayOfYear - 1)
 
         // Adjust for the time of year - if the obfuscated date is in the future, move it back a year
-        val adjustedDate = if (newDate > today) {
-            LocalDate(year - 1, 1, 1).plusDays(dayOfYear - 1)
-        } else {
-            newDate
-        }
+        val adjustedDate =
+            if (newDate > today) {
+                LocalDate(year - 1, 1, 1).plusDays(dayOfYear - 1)
+            } else {
+                newDate
+            }
 
         return adjustedDate.atStartOfDayIn(tz)
     }
@@ -118,7 +126,7 @@ object TripObfuscator {
         input: Instant,
         obfuscateDates: Boolean,
         obfuscateTimes: Boolean,
-        tz: TimeZone = TimeZone.currentSystemDefault()
+        tz: TimeZone = TimeZone.currentSystemDefault(),
     ): Instant {
         if (!obfuscateDates && !obfuscateTimes) {
             return input
@@ -132,15 +140,16 @@ object TripObfuscator {
             // Preserve the time-of-day from the original
             val originalLocalDateTime = input.toLocalDateTime(tz)
             val obfuscatedLocalDate = obfuscatedDate.toLocalDateTime(tz).date
-            val newLocalDateTime = LocalDateTime(
-                obfuscatedLocalDate.year,
-                obfuscatedLocalDate.month,
-                obfuscatedLocalDate.day,
-                originalLocalDateTime.hour,
-                originalLocalDateTime.minute,
-                originalLocalDateTime.second,
-                originalLocalDateTime.nanosecond
-            )
+            val newLocalDateTime =
+                LocalDateTime(
+                    obfuscatedLocalDate.year,
+                    obfuscatedLocalDate.month,
+                    obfuscatedLocalDate.day,
+                    originalLocalDateTime.hour,
+                    originalLocalDateTime.minute,
+                    originalLocalDateTime.second,
+                    originalLocalDateTime.nanosecond,
+                )
             result = newLocalDateTime.toInstant(tz)
         }
 
@@ -153,15 +162,16 @@ object TripObfuscator {
                 minute = 0
                 hour = (hour + 1) % 24
             }
-            val roundedLocalDateTime = LocalDateTime(
-                localDateTime.year,
-                localDateTime.month,
-                localDateTime.day,
-                hour,
-                minute,
-                0, // zero out seconds
-                0  // zero out nanoseconds
-            )
+            val roundedLocalDateTime =
+                LocalDateTime(
+                    localDateTime.year,
+                    localDateTime.month,
+                    localDateTime.day,
+                    hour,
+                    minute,
+                    0, // zero out seconds
+                    0, // zero out nanoseconds
+                )
             result = roundedLocalDateTime.toInstant(tz)
 
             // Add a deviation of up to 350 minutes (5.5 hours) earlier or later
@@ -186,7 +196,7 @@ object TripObfuscator {
         startTimestamp: Instant?,
         obfuscateDates: Boolean,
         obfuscateTimes: Boolean,
-        tz: TimeZone = TimeZone.currentSystemDefault()
+        tz: TimeZone = TimeZone.currentSystemDefault(),
     ): Long {
         if (startTimestamp == null) return 0L
 
@@ -201,7 +211,10 @@ object TripObfuscator {
      * @param deltaMillis The time delta in milliseconds
      * @return The adjusted timestamp, or null if input was null
      */
-    fun applyTimeDelta(timestamp: Instant?, deltaMillis: Long): Instant? {
+    fun applyTimeDelta(
+        timestamp: Instant?,
+        deltaMillis: Long,
+    ): Instant? {
         if (timestamp == null) return null
         return Instant.fromEpochMilliseconds(timestamp.toEpochMilliseconds() + deltaMillis)
     }
@@ -221,7 +234,7 @@ object TripObfuscator {
         obfuscateDates: Boolean,
         obfuscateTimes: Boolean,
         obfuscateFares: Boolean,
-        tz: TimeZone = TimeZone.currentSystemDefault()
+        tz: TimeZone = TimeZone.currentSystemDefault(),
     ): ObfuscatedTrip {
         val timeDelta = calculateTimeDelta(trip.startTimestamp, obfuscateDates, obfuscateTimes, tz)
         return ObfuscatedTrip(trip, timeDelta, obfuscateFares, randomSource)
@@ -242,10 +255,8 @@ object TripObfuscator {
         obfuscateDates: Boolean,
         obfuscateTimes: Boolean,
         obfuscateFares: Boolean,
-        tz: TimeZone = TimeZone.currentSystemDefault()
-    ): List<ObfuscatedTrip> {
-        return trips.map { obfuscateTrip(it, obfuscateDates, obfuscateTimes, obfuscateFares, tz) }
-    }
+        tz: TimeZone = TimeZone.currentSystemDefault(),
+    ): List<ObfuscatedTrip> = trips.map { obfuscateTrip(it, obfuscateDates, obfuscateTimes, obfuscateFares, tz) }
 
     /**
      * Obfuscates a currency value by adding a random offset and multiplying by a random factor.
@@ -255,7 +266,10 @@ object TripObfuscator {
      * @param random Random source for obfuscation
      * @return Obfuscated currency value
      */
-    fun obfuscateCurrency(currency: TransitCurrency, random: Random = randomSource): TransitCurrency {
+    fun obfuscateCurrency(
+        currency: TransitCurrency,
+        random: Random = randomSource,
+    ): TransitCurrency {
         val fareOffset = random.nextInt(100) - 50
         val fareMultiplier = random.nextDouble() * 0.4 + 0.8 // 0.8 to 1.2
 
@@ -279,4 +293,3 @@ private fun LocalDate.plusDays(days: Int): LocalDate {
     val newInstant = instant.plus(days.days)
     return newInstant.toLocalDateTime(TimeZone.UTC).date
 }
-

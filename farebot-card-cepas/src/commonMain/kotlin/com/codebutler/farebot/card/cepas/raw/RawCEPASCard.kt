@@ -22,23 +22,22 @@
 
 package com.codebutler.farebot.card.cepas.raw
 
-import kotlin.time.Instant
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCard
 import com.codebutler.farebot.card.cepas.CEPASHistory
 import com.codebutler.farebot.card.cepas.CEPASPurse
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawCEPASCard(
     @Contextual private val tagId: ByteArray,
     private val scannedAt: Instant,
     val purses: List<RawCEPASPurse>,
-    val histories: List<RawCEPASHistory>
+    val histories: List<RawCEPASHistory>,
 ) : RawCard<CEPASCard> {
-
     override fun cardType(): CardType = CardType.CEPAS
 
     override fun tagId(): ByteArray = tagId
@@ -58,9 +57,7 @@ data class RawCEPASCard(
             tagId: ByteArray,
             scannedAt: Instant,
             purses: List<RawCEPASPurse>,
-            histories: List<RawCEPASHistory>
-        ): RawCEPASCard {
-            return RawCEPASCard(tagId, scannedAt, purses, histories)
-        }
+            histories: List<RawCEPASHistory>,
+        ): RawCEPASCard = RawCEPASCard(tagId, scannedAt, purses, histories)
     }
 }

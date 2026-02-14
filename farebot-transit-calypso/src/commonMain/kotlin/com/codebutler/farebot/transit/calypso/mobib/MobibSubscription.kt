@@ -37,9 +37,8 @@ internal class MobibSubscription private constructor(
     override val parsed: En1545Parsed,
     override val lookup: En1545Lookup,
     override val stringResource: StringResource,
-    private val counter: Int?
+    private val counter: Int?,
 ) : En1545Subscription() {
-
     private val counterUse: Int? = contractTariff?.shr(10)?.and(7)
 
     override val remainingTripCount: Int? = if (counterUse == 4) null else counter
@@ -51,41 +50,46 @@ internal class MobibSubscription private constructor(
         private const val NEVER_SEEN_1 = "NeverSeen1"
         private const val NEVER_SEEN_4 = "NeverSeen4"
 
-        fun parse(data: ByteArray, stringResource: StringResource, counter: Int?): MobibSubscription? {
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+            counter: Int?,
+        ): MobibSubscription? {
             if (data.all { it == 0.toByte() }) return null
 
             val version = data.getBitsFromBuffer(0, 6)
-            val fields = if (version <= 3) {
-                En1545Container(
-                    En1545FixedInteger(CONTRACT_VERSION, 6),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_B, 35 - 14),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 14),
-                    En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
-                    En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_C, 48),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_PRICE_AMOUNT, 16),
-                    En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_D, 113)
-                )
-            } else {
-                En1545Container(
-                    En1545FixedInteger(CONTRACT_VERSION, 6),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 19),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 14),
-                    En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 50),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_PRICE_AMOUNT, 16),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_C, 6),
-                    En1545Bitmap(
-                        En1545FixedInteger(NEVER_SEEN_0, 5),
-                        En1545FixedInteger(NEVER_SEEN_1, 5),
+            val fields =
+                if (version <= 3) {
+                    En1545Container(
+                        En1545FixedInteger(CONTRACT_VERSION, 6),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_B, 35 - 14),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 14),
                         En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
-                        En1545Container(
-                            En1545FixedInteger(DURATION_UNITS, 2),
-                            En1545FixedInteger(En1545Subscription.CONTRACT_DURATION, 8)
+                        En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_C, 48),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_PRICE_AMOUNT, 16),
+                        En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_D, 113),
+                    )
+                } else {
+                    En1545Container(
+                        En1545FixedInteger(CONTRACT_VERSION, 6),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 19),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 14),
+                        En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 50),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_PRICE_AMOUNT, 16),
+                        En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_C, 6),
+                        En1545Bitmap(
+                            En1545FixedInteger(NEVER_SEEN_0, 5),
+                            En1545FixedInteger(NEVER_SEEN_1, 5),
+                            En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
+                            En1545Container(
+                                En1545FixedInteger(DURATION_UNITS, 2),
+                                En1545FixedInteger(En1545Subscription.CONTRACT_DURATION, 8),
+                            ),
+                            En1545FixedInteger(NEVER_SEEN_4, 8),
                         ),
-                        En1545FixedInteger(NEVER_SEEN_4, 8)
-                    ),
-                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_D, 24)
-                )
-            }
+                        En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_D, 24),
+                    )
+                }
 
             val parsed = En1545Parser.parse(data, fields)
             return MobibSubscription(parsed, MobibLookup, stringResource, counter)

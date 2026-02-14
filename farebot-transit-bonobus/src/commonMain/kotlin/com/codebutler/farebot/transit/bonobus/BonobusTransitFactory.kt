@@ -35,22 +35,22 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_bonobus.generated.resources.*
 
 class BonobusTransitFactory : TransitFactory<ClassicCard, BonobusTransitInfo> {
-
     companion object {
         val NAME: String
             get() = getStringBlocking(Res.string.card_name_bonobus)
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_bonobus,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.SPAIN,
-            locationRes = Res.string.location_cadiz,
-            imageRes = Res.drawable.cadizcard,
-            latitude = 36.5271f,
-            longitude = -6.2886f,
-            brandColor = 0x1781C7,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_bonobus,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.SPAIN,
+                locationRes = Res.string.location_cadiz,
+                imageRes = Res.drawable.cadizcard,
+                latitude = 36.5271f,
+                longitude = -6.2886f,
+                brandColor = 0x1781C7,
+                credits = listOf("Metrodroid Project"),
+            )
     }
 
     override val allCards: List<CardInfo>
@@ -60,20 +60,22 @@ class BonobusTransitFactory : TransitFactory<ClassicCard, BonobusTransitInfo> {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
         // KeyB is readable and so doesn't act as a key
         return HashUtils.checkKeyHash(
-            sector0.keyA, sector0.keyB, "cadiz",
-            "cc2f0d405a4968f95100f776161929f6"
+            sector0.keyA,
+            sector0.keyB,
+            "cadiz",
+            "cc2f0d405a4968f95100f776161929f6",
         ) >= 0
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(NAME, getSerial(card).toString())
-    }
+    override fun parseIdentity(card: ClassicCard): TransitIdentity =
+        TransitIdentity.create(NAME, getSerial(card).toString())
 
     override fun parseInfo(card: ClassicCard): BonobusTransitInfo {
-        val trips = (7..15).flatMap { sec ->
-            val sector = card.getSector(sec) as? DataClassicSector ?: return@flatMap emptyList()
-            sector.blocks.dropLast(1).mapNotNull { BonobusTrip.parse(it.data) }
-        }
+        val trips =
+            (7..15).flatMap { sec ->
+                val sector = card.getSector(sec) as? DataClassicSector ?: return@flatMap emptyList()
+                sector.blocks.dropLast(1).mapNotNull { BonobusTrip.parse(it.data) }
+            }
 
         val sector0 = card.getSector(0) as DataClassicSector
         val sector4 = card.getSector(4) as DataClassicSector
@@ -82,9 +84,14 @@ class BonobusTransitFactory : TransitFactory<ClassicCard, BonobusTransitInfo> {
         return BonobusTransitInfo(
             mSerial = getSerial(card),
             trips = trips,
-            mBalance = sector4.getBlock(0).data.byteArrayToLongReversed(0, 4).toInt(),
+            mBalance =
+                sector4
+                    .getBlock(0)
+                    .data
+                    .byteArrayToLongReversed(0, 4)
+                    .toInt(),
             mIssueDate = block02.byteArrayToInt(10, 2),
-            mExpiryDate = block02.byteArrayToInt(12, 2)
+            mExpiryDate = block02.byteArrayToInt(12, 2),
         )
     }
 

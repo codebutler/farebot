@@ -27,8 +27,9 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import kotlin.time.Instant
 
-class SampleTrip(private val epochSeconds: Long) : Trip() {
-
+class SampleTrip(
+    private val epochSeconds: Long,
+) : Trip() {
     override val startTimestamp: Instant get() = Instant.fromEpochSeconds(epochSeconds)
 
     override val endTimestamp: Instant get() = Instant.fromEpochSeconds(epochSeconds)

@@ -41,7 +41,6 @@ import com.codebutler.farebot.transit.TransitInfo
  * - [parseInfo]: Parse the full transit information
  */
 interface ChinaCardTransitFactory : TransitFactory<ISO7816Card, TransitInfo> {
-
     /**
      * List of Application Identifier (AID) byte arrays that this factory handles.
      * A card matches if its application name equals one of these AIDs.
@@ -70,8 +69,9 @@ interface ChinaCardTransitFactory : TransitFactory<ISO7816Card, TransitInfo> {
      * Parse transit identity from an ISO7816Card.
      */
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
-        val chinaCard = ChinaCard.fromISO7816Card(card)
-            ?: throw IllegalArgumentException("Not a valid China card")
+        val chinaCard =
+            ChinaCard.fromISO7816Card(card)
+                ?: throw IllegalArgumentException("Not a valid China card")
         return parseTransitIdentity(chinaCard)
     }
 
@@ -84,8 +84,9 @@ interface ChinaCardTransitFactory : TransitFactory<ISO7816Card, TransitInfo> {
      * Parse full transit info from an ISO7816Card.
      */
     override fun parseInfo(card: ISO7816Card): TransitInfo {
-        val chinaCard = ChinaCard.fromISO7816Card(card)
-            ?: throw IllegalArgumentException("Not a valid China card")
+        val chinaCard =
+            ChinaCard.fromISO7816Card(card)
+                ?: throw IllegalArgumentException("Not a valid China card")
         return parseTransitData(chinaCard)
     }
 

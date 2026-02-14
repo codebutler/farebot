@@ -48,7 +48,6 @@ class TroikaHybridTransitInfo(
     private val podorozhnik: PodorozhnikTransitInfo?,
     private val strelka: StrelkaTransitInfo?,
 ) : TransitInfo() {
-
     override val serialNumber: String?
         get() = troika.serialNumber
 

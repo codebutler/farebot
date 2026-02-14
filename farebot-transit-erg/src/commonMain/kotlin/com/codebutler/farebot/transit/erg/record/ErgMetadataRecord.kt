@@ -30,9 +30,8 @@ package com.codebutler.farebot.transit.erg.record
 data class ErgMetadataRecord(
     val cardSerial: ByteArray,
     val epochDate: Int,
-    val agencyId: Int
+    val agencyId: Int,
 ) : ErgRecord {
-
     companion object {
         fun recordFromBytes(input: ByteArray): ErgMetadataRecord {
             val agencyId = ErgRecord.byteArrayToInt(input, 2, 2)

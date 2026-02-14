@@ -35,9 +35,8 @@ import kotlinx.datetime.TimeZone
 class YarGorTransitInfo(
     private val mSerial: Long,
     private val mLastTrip: YarGorTrip?,
-    private val mSub: YarGorSubscription
+    private val mSub: YarGorSubscription,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = formatSerial(mSerial)
 
@@ -53,13 +52,12 @@ class YarGorTransitInfo(
     companion object {
         val TZ: TimeZone = TimeZone.of("Europe/Moscow")
 
-        fun parse(card: ClassicCard): YarGorTransitInfo {
-            return YarGorTransitInfo(
+        fun parse(card: ClassicCard): YarGorTransitInfo =
+            YarGorTransitInfo(
                 mSub = YarGorSubscription.parse(card.getSector(10) as DataClassicSector),
                 mLastTrip = YarGorTrip.parse((card.getSector(12) as DataClassicSector).getBlock(0).data),
-                mSerial = getSerial(card)
+                mSerial = getSerial(card),
             )
-        }
 
         fun getSerial(card: ClassicCard): Long = card.tagId.byteArrayToLongReversed()
 
@@ -71,7 +69,11 @@ class YarGorTransitInfo(
         /**
          * Groups a string by inserting a separator every [groupSize] characters.
          */
-        private fun groupString(value: String, separator: String, groupSize: Int): String {
+        private fun groupString(
+            value: String,
+            separator: String,
+            groupSize: Int,
+        ): String {
             val ret = StringBuilder()
             var ptr = 0
             while (ptr + groupSize < value.length) {

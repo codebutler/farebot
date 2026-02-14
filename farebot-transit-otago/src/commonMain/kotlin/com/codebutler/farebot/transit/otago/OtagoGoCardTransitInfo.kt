@@ -34,9 +34,8 @@ class OtagoGoCardTransitInfo(
     private val serial: Long,
     private val balanceValue: Int,
     private val refill: OtagoGoCardRefill?,
-    private val tripList: List<OtagoGoCardTrip>
+    private val tripList: List<OtagoGoCardTrip>,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = serial.toString(16)
 

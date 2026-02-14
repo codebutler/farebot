@@ -23,20 +23,25 @@
 package com.codebutler.farebot.transit.en1545
 
 object En1545Parser {
+    fun parse(
+        data: ByteArray,
+        off: Int,
+        field: En1545Field,
+    ): En1545Parsed = En1545Parsed().append(data, off, field)
 
-    fun parse(data: ByteArray, off: Int, field: En1545Field): En1545Parsed {
-        return En1545Parsed().append(data, off, field)
-    }
+    fun parse(
+        data: ByteArray,
+        field: En1545Field,
+    ): En1545Parsed = parse(data, 0, field)
 
-    fun parse(data: ByteArray, field: En1545Field): En1545Parsed {
-        return parse(data, 0, field)
-    }
+    fun parseLeBits(
+        data: ByteArray,
+        off: Int,
+        field: En1545Field,
+    ): En1545Parsed = En1545Parsed().appendLeBits(data, off, field)
 
-    fun parseLeBits(data: ByteArray, off: Int, field: En1545Field): En1545Parsed {
-        return En1545Parsed().appendLeBits(data, off, field)
-    }
-
-    fun parseLeBits(data: ByteArray, field: En1545Field): En1545Parsed {
-        return parseLeBits(data, 0, field)
-    }
+    fun parseLeBits(
+        data: ByteArray,
+        field: En1545Field,
+    ): En1545Parsed = parseLeBits(data, 0, field)
 }

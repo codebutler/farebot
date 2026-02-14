@@ -41,9 +41,9 @@ import farebot.farebot_transit_snapper.generated.resources.*
  * Snapper uses the KSX6924 (T-Money compatible) protocol over ISO 7816.
  * Ported from Metrodroid.
  */
-class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
+class SnapperTransitFactory :
+    TransitFactory<ISO7816Card, SnapperTransitInfo>,
     KSX6924CardTransitFactory {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -53,10 +53,11 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun check(card: ISO7816Card): Boolean {
-        val app = card.applications.firstOrNull { app ->
-            val aidHex = app.appName?.toHexString()?.lowercase()
-            aidHex != null && aidHex in KSX6924_AIDS
-        } ?: return false
+        val app =
+            card.applications.firstOrNull { app ->
+                val aidHex = app.appName?.toHexString()?.lowercase()
+                aidHex != null && aidHex in KSX6924_AIDS
+            } ?: return false
 
         // Snapper cards have a slightly different record format from other KSX6924 cards:
         // SFI 4 records are 46 bytes and bytes 26..46 are all 0xFF.
@@ -67,14 +68,16 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
     }
 
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
-        val ksx6924App = extractKSX6924Application(card)
-            ?: return TransitIdentity.create(SnapperTransitInfo.getCardName(), null)
+        val ksx6924App =
+            extractKSX6924Application(card)
+                ?: return TransitIdentity.create(SnapperTransitInfo.getCardName(), null)
         return parseTransitIdentity(ksx6924App)
     }
 
     override fun parseInfo(card: ISO7816Card): SnapperTransitInfo {
-        val ksx6924App = extractKSX6924Application(card)
-            ?: return SnapperTransitInfo.createEmpty()
+        val ksx6924App =
+            extractKSX6924Application(card)
+                ?: return SnapperTransitInfo.createEmpty()
         return parseTransitData(ksx6924App)
     }
 
@@ -90,13 +93,10 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
         }
     }
 
-    override fun parseTransitIdentity(app: KSX6924Application): TransitIdentity {
-        return TransitIdentity.create(SnapperTransitInfo.getCardName(), app.serial)
-    }
+    override fun parseTransitIdentity(app: KSX6924Application): TransitIdentity =
+        TransitIdentity.create(SnapperTransitInfo.getCardName(), app.serial)
 
-    override fun parseTransitData(app: KSX6924Application): SnapperTransitInfo {
-        return SnapperTransitInfo.create(app)
-    }
+    override fun parseTransitData(app: KSX6924Application): SnapperTransitInfo = SnapperTransitInfo.create(app)
 
     // ========================================================================
     // Private helpers
@@ -104,47 +104,51 @@ class SnapperTransitFactory : TransitFactory<ISO7816Card, SnapperTransitInfo>,
 
     @OptIn(ExperimentalStdlibApi::class)
     private fun extractKSX6924Application(card: ISO7816Card): KSX6924Application? {
-        val app = card.applications.firstOrNull { app ->
-            val aidHex = app.appName?.toHexString()?.lowercase()
-            aidHex != null && aidHex in KSX6924_AIDS
-        } ?: return null
+        val app =
+            card.applications.firstOrNull { app ->
+                val aidHex = app.appName?.toHexString()?.lowercase()
+                aidHex != null && aidHex in KSX6924_AIDS
+            } ?: return null
 
         // Extract balance data stored by ISO7816CardReader with "balance/0" key
         val balanceData = app.getFile("balance/0")?.binaryData ?: ByteArray(4) { 0 }
 
         // Extract extra records stored with "extra/N" keys
-        val extraRecords = (0..0xf).mapNotNull { i ->
-            app.getFile("extra/$i")?.binaryData
-        }
+        val extraRecords =
+            (0..0xf).mapNotNull { i ->
+                app.getFile("extra/$i")?.binaryData
+            }
 
         return KSX6924Application(
             application = app,
             balance = balanceData,
-            extraRecords = extraRecords
+            extraRecords = extraRecords,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_snapper,
-            cardType = CardType.ISO7816,
-            region = TransitRegion.NEW_ZEALAND,
-            locationRes = Res.string.card_location_wellington_new_zealand,
-            imageRes = Res.drawable.snapperplus,
-            latitude = -41.2865f,
-            longitude = 174.7762f,
-            brandColor = 0xD52726,
-            credits = listOf("Metrodroid Project", "Michael Farrell"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_snapper,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.NEW_ZEALAND,
+                locationRes = Res.string.card_location_wellington_new_zealand,
+                imageRes = Res.drawable.snapperplus,
+                latitude = -41.2865f,
+                longitude = 174.7762f,
+                brandColor = 0xD52726,
+                credits = listOf("Metrodroid Project", "Michael Farrell"),
+            )
 
         /**
          * KSX6924-compatible application AIDs.
          */
-        private val KSX6924_AIDS = listOf(
-            "d4100000030001",
-            "d4100000140001",
-            "d4100000300001",
-            "d4106509900020"
-        )
+        private val KSX6924_AIDS =
+            listOf(
+                "d4100000030001",
+                "d4100000140001",
+                "d4100000300001",
+                "d4106509900020",
+            )
     }
 }

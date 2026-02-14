@@ -22,10 +22,10 @@
 
 package com.codebutler.farebot.transit.nextfare.record
 
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 /**
  * Represents a record on a Nextfare (Cubic) card.
@@ -39,9 +39,9 @@ interface NextfareRecord {
             input: ByteArray,
             sectorIndex: Int,
             blockIndex: Int,
-            timeZone: TimeZone
-        ): NextfareRecord? {
-            return when {
+            timeZone: TimeZone,
+        ): NextfareRecord? =
+            when {
                 sectorIndex == 1 && blockIndex <= 1 ->
                     NextfareBalanceRecord.recordFromBytes(input)
                 sectorIndex == 1 && blockIndex == 2 ->
@@ -54,7 +54,6 @@ interface NextfareRecord {
                     NextfareTransactionRecord.recordFromBytes(input, timeZone)
                 else -> null
             }
-        }
 
         /**
          * Unpack Nextfare date/time format.
@@ -64,7 +63,11 @@ interface NextfareRecord {
          *
          * Little-endian 4-byte integer.
          */
-        fun unpackDate(input: ByteArray, offset: Int, timeZone: TimeZone): Instant {
+        fun unpackDate(
+            input: ByteArray,
+            offset: Int,
+            timeZone: TimeZone,
+        ): Instant {
             val timestamp = byteArrayToIntReversed(input, offset, 4)
             val minute = getBitsFromInteger(timestamp, 16, 11)
             val year = getBitsFromInteger(timestamp, 9, 7) + 2000
@@ -79,7 +82,11 @@ interface NextfareRecord {
             return ldt.toInstant(timeZone)
         }
 
-        fun byteArrayToIntReversed(data: ByteArray, offset: Int, length: Int): Int {
+        fun byteArrayToIntReversed(
+            data: ByteArray,
+            offset: Int,
+            length: Int,
+        ): Int {
             var result = 0
             for (i in 0 until length) {
                 result = result or ((data[offset + i].toInt() and 0xFF) shl (i * 8))
@@ -87,7 +94,11 @@ interface NextfareRecord {
             return result
         }
 
-        fun byteArrayToLongReversed(data: ByteArray, offset: Int, length: Int): Long {
+        fun byteArrayToLongReversed(
+            data: ByteArray,
+            offset: Int,
+            length: Int,
+        ): Long {
             var result = 0L
             for (i in 0 until length) {
                 result = result or ((data[offset + i].toLong() and 0xFF) shl (i * 8))
@@ -95,7 +106,11 @@ interface NextfareRecord {
             return result
         }
 
-        fun byteArrayToInt(data: ByteArray, offset: Int, length: Int): Int {
+        fun byteArrayToInt(
+            data: ByteArray,
+            offset: Int,
+            length: Int,
+        ): Int {
             var result = 0
             for (i in 0 until length) {
                 result = (result shl 8) or (data[offset + i].toInt() and 0xFF)
@@ -103,7 +118,11 @@ interface NextfareRecord {
             return result
         }
 
-        fun byteArrayToLong(data: ByteArray, offset: Int, length: Int): Long {
+        fun byteArrayToLong(
+            data: ByteArray,
+            offset: Int,
+            length: Int,
+        ): Long {
             var result = 0L
             for (i in 0 until length) {
                 result = (result shl 8) or (data[offset + i].toLong() and 0xFF)
@@ -111,8 +130,10 @@ interface NextfareRecord {
             return result
         }
 
-        private fun getBitsFromInteger(value: Int, startBit: Int, length: Int): Int {
-            return (value shr startBit) and ((1 shl length) - 1)
-        }
+        private fun getBitsFromInteger(
+            value: Int,
+            startBit: Int,
+            length: Int,
+        ): Int = (value shr startBit) and ((1 shl length) - 1)
     }
 }

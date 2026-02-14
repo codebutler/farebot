@@ -23,25 +23,23 @@
 package com.codebutler.farebot.transit.octopus
 
 import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.felica.FeliCaConstants
+import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_octopus.generated.resources.*
-import com.codebutler.farebot.base.util.getStringBlocking
 
 class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: FelicaCard): Boolean {
-        return (card.getSystem(FeliCaConstants.SYSTEMCODE_OCTOPUS) != null)
-                || (card.getSystem(FeliCaConstants.SYSTEMCODE_SZT) != null)
-    }
+    override fun check(card: FelicaCard): Boolean =
+        (card.getSystem(FeliCaConstants.SYSTEMCODE_OCTOPUS) != null) ||
+            (card.getSystem(FeliCaConstants.SYSTEMCODE_SZT) != null)
 
     override fun parseIdentity(card: FelicaCard): TransitIdentity =
         if (card.getSystem(FeliCaConstants.SYSTEMCODE_SZT) != null) {
@@ -87,22 +85,23 @@ class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
             octopusBalance,
             shenzhenBalance,
             hasOctopus = octopusBalance != null,
-            hasShenzen = shenzhenBalance != null
+            hasShenzen = shenzhenBalance != null,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.octopus_card_name,
-            cardType = CardType.FeliCa,
-            region = TransitRegion.HONG_KONG,
-            locationRes = Res.string.location_hong_kong,
-            imageRes = Res.drawable.octopus_card,
-            latitude = 22.3193f,
-            longitude = 114.1694f,
-            brandColor = 0xFDB813,
-            credits = listOf("Michael Farrell", "Sinpo Wei"),
-            sampleDumpFile = "Octopus.json",
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.octopus_card_name,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.HONG_KONG,
+                locationRes = Res.string.location_hong_kong,
+                imageRes = Res.drawable.octopus_card,
+                latitude = 22.3193f,
+                longitude = 114.1694f,
+                brandColor = 0xFDB813,
+                credits = listOf("Michael Farrell", "Sinpo Wei"),
+                sampleDumpFile = "Octopus.json",
+            )
     }
 }

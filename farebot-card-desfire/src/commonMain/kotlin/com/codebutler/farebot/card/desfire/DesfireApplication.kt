@@ -27,13 +27,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DesfireApplication(
     val id: Int,
-    val files: List<DesfireFile>
+    val files: List<DesfireFile>,
 ) {
-    fun getFile(fileId: Int): DesfireFile? =
-        files.firstOrNull { it.id == fileId }
+    fun getFile(fileId: Int): DesfireFile? = files.firstOrNull { it.id == fileId }
 
     companion object {
-        fun create(id: Int, files: List<DesfireFile>): DesfireApplication =
-            DesfireApplication(id, files)
+        fun create(
+            id: Int,
+            files: List<DesfireFile>,
+        ): DesfireApplication = DesfireApplication(id, files)
     }
 }

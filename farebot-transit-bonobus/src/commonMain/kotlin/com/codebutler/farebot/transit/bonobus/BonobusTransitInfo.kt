@@ -24,8 +24,6 @@ package com.codebutler.farebot.transit.bonobus
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
-import com.codebutler.farebot.transit.Trip
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -36,9 +34,8 @@ class BonobusTransitInfo(
     private val mBalance: Int,
     override val trips: List<BonobusTrip>,
     private val mIssueDate: Int,
-    private val mExpiryDate: Int
+    private val mExpiryDate: Int,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = mSerial.toString()
 
@@ -52,7 +49,7 @@ class BonobusTransitInfo(
             return TransitBalance(
                 balance = TransitCurrency.EUR(mBalance),
                 validFrom = validFrom,
-                validTo = validTo
+                validTo = validTo,
             )
         }
 

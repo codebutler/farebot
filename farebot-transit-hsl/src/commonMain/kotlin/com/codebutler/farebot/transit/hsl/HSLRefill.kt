@@ -36,7 +36,7 @@ import com.codebutler.farebot.transit.en1545.En1545Transaction
 import farebot.farebot_transit_hsl.generated.resources.*
 
 class HSLRefill private constructor(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
     override val lookup: En1545Lookup
         get() = HSLLookup
@@ -51,19 +51,21 @@ class HSLRefill private constructor(
         get() = getStringBlocking(Res.string.hsl_balance_refill)
 
     companion object {
-        private val FIELDS_V1_V2 = En1545Container(
-            En1545FixedInteger("CurrentValue", 20),
-            En1545FixedInteger.date(EVENT),
-            En1545FixedInteger.timeLocal(EVENT),
-            En1545FixedInteger(EVENT_PRICE_AMOUNT, 20),
-            En1545FixedInteger("LoadingOrganisationID", 14),
-            En1545FixedInteger(EVENT_DEVICE_ID, 14)
-        )
+        private val FIELDS_V1_V2 =
+            En1545Container(
+                En1545FixedInteger("CurrentValue", 20),
+                En1545FixedInteger.date(EVENT),
+                En1545FixedInteger.timeLocal(EVENT),
+                En1545FixedInteger(EVENT_PRICE_AMOUNT, 20),
+                En1545FixedInteger("LoadingOrganisationID", 14),
+                En1545FixedInteger(EVENT_DEVICE_ID, 14),
+            )
 
         fun parse(data: ByteArray): HSLRefill? {
             val ret = En1545Parser.parse(data, FIELDS_V1_V2)
-            if (ret.getIntOrZero(En1545FixedInteger.dateName(EVENT)) == 0)
+            if (ret.getIntOrZero(En1545FixedInteger.dateName(EVENT)) == 0) {
                 return null
+            }
             return HSLRefill(ret)
         }
     }

@@ -30,33 +30,39 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.en1545.CalypsoConstants
-import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
 /**
  * Base class for Calypso ISO 7816 transit system factories.
  * Subclasses implement [checkTenv] to match on the ticket environment data.
  */
-abstract class CalypsoTransitFactory(protected val stringResource: StringResource) : TransitFactory<ISO7816Card, TransitInfo> {
-
+abstract class CalypsoTransitFactory(
+    protected val stringResource: StringResource,
+) : TransitFactory<ISO7816Card, TransitInfo> {
     override val allCards: List<CardInfo> = emptyList()
 
     abstract val name: String
 
     abstract fun checkTenv(tenv: ByteArray): Boolean
 
-    abstract fun parseTransitInfo(app: ISO7816Application, serial: String?): TransitInfo
+    abstract fun parseTransitInfo(
+        app: ISO7816Application,
+        serial: String?,
+    ): TransitInfo
 
     open fun getSerial(app: ISO7816Application): String? = null
 
-    protected fun findCalypsoApp(card: ISO7816Card): ISO7816Application? {
-        return card.getApplication("calypso")
+    protected fun findCalypsoApp(card: ISO7816Card): ISO7816Application? =
+        card.getApplication("calypso")
             ?: card.applications.firstOrNull { it.sfiFiles.isNotEmpty() }
-    }
 
     override fun check(card: ISO7816Card): Boolean {
         val app = findCalypsoApp(card) ?: return false
         val file = app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT] ?: return false
-        val tenv = file.records.entries.sortedBy { it.key }.firstOrNull()?.value ?: return false
+        val tenv =
+            file.records.entries
+                .sortedBy { it.key }
+                .firstOrNull()
+                ?.value ?: return false
         return try {
             checkTenv(tenv)
         } catch (_: Exception) {

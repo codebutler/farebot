@@ -60,12 +60,13 @@ object CalypsoConstants {
     /** Special events log */
     const val SFI_TICKETING_SPECIAL_EVENTS = 0x1D
 
-    private val COUNTER_SFIS = intArrayOf(
-        SFI_TICKETING_COUNTERS_1,
-        SFI_TICKETING_COUNTERS_2,
-        SFI_TICKETING_COUNTERS_3,
-        SFI_TICKETING_COUNTERS_4
-    )
+    private val COUNTER_SFIS =
+        intArrayOf(
+            SFI_TICKETING_COUNTERS_1,
+            SFI_TICKETING_COUNTERS_2,
+            SFI_TICKETING_COUNTERS_3,
+            SFI_TICKETING_COUNTERS_4,
+        )
 
     fun getCounterSfi(recordNum: Int): Int? {
         if (recordNum < 1 || recordNum > 4) return null

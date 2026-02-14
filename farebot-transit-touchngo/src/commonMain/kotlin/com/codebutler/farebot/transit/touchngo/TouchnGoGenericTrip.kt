@@ -42,9 +42,8 @@ import kotlin.time.Instant
 internal class TouchnGoGenericTrip(
     private val header: ByteArray,
     override val routeName: String?,
-    override val mode: Mode
+    override val mode: Mode,
 ) : Trip() {
-
     private val agencyRaw: ByteArray
         get() = header.sliceOffLen(2, 4)
 
@@ -65,14 +64,18 @@ internal class TouchnGoGenericTrip(
         }
 
     companion object {
-        fun parse(sector: DataClassicSector, mode: Mode, routeName: String? = null): TouchnGoGenericTrip? {
+        fun parse(
+            sector: DataClassicSector,
+            mode: Mode,
+            routeName: String? = null,
+        ): TouchnGoGenericTrip? {
             if (sector.getBlock(0).isEmpty && sector.getBlock(1).isEmpty && sector.getBlock(2).isEmpty) {
                 return null
             }
             return TouchnGoGenericTrip(
                 header = sector.getBlock(0).data,
                 mode = mode,
-                routeName = routeName
+                routeName = routeName,
             )
         }
     }

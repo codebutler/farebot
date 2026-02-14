@@ -26,7 +26,6 @@ package com.codebutler.farebot.card.felica
  * Migrated from net.kazzz.felica.lib.Util.
  */
 object FeliCaUtil {
-
     fun toBytes(a: Int): ByteArray {
         val bs = ByteArray(4)
         bs[3] = (0x000000ff and a).toByte()
@@ -39,8 +38,9 @@ object FeliCaUtil {
     fun toInt(vararg b: Byte): Int {
         require(b.isNotEmpty())
 
-        if (b.size == 1)
+        if (b.size == 1) {
             return b[0].toInt() and 0xFF
+        }
         if (b.size == 2) {
             var i = 0
             i = i or (b[0].toInt() and 0xFF)
@@ -66,42 +66,46 @@ object FeliCaUtil {
         return result
     }
 
-    fun getHexString(data: Byte): String {
-        return getHexString(byteArrayOf(data))
-    }
+    fun getHexString(data: Byte): String = getHexString(byteArrayOf(data))
 
-    fun getHexString(byteArray: ByteArray, vararg split: Int): String {
+    fun getHexString(
+        byteArray: ByteArray,
+        vararg split: Int,
+    ): String {
         val builder = StringBuilder()
-        val target: ByteArray = if (split.size <= 1) {
-            byteArray
-        } else if (split.size < 2) {
-            byteArray.copyOfRange(0, 0 + split[0])
-        } else {
-            byteArray.copyOfRange(split[0], split[0] + split[1])
-        }
+        val target: ByteArray =
+            if (split.size <= 1) {
+                byteArray
+            } else if (split.size < 2) {
+                byteArray.copyOfRange(0, 0 + split[0])
+            } else {
+                byteArray.copyOfRange(split[0], split[0] + split[1])
+            }
         for (b in target) {
             builder.append((b.toInt() and 0xFF).toString(16).padStart(2, '0').uppercase())
         }
         return builder.toString()
     }
 
-    fun getBinString(data: Byte): String {
-        return getBinString(byteArrayOf(data))
-    }
+    fun getBinString(data: Byte): String = getBinString(byteArrayOf(data))
 
-    fun getBinString(byteArray: ByteArray, vararg split: Int): String {
+    fun getBinString(
+        byteArray: ByteArray,
+        vararg split: Int,
+    ): String {
         val builder = StringBuilder()
-        val target: ByteArray = if (split.size <= 1) {
-            byteArray
-        } else if (split.size < 2) {
-            byteArray.copyOfRange(0, 0 + split[0])
-        } else {
-            byteArray.copyOfRange(split[0], split[0] + split[1])
-        }
+        val target: ByteArray =
+            if (split.size <= 1) {
+                byteArray
+            } else if (split.size < 2) {
+                byteArray.copyOfRange(0, 0 + split[0])
+            } else {
+                byteArray.copyOfRange(split[0], split[0] + split[1])
+            }
 
         for (b in target) {
             builder.append(
-                (b.toInt() and 0xFF).toString(2).padStart(8, '0')
+                (b.toInt() and 0xFF).toString(2).padStart(8, '0'),
             )
         }
         return builder.toString()

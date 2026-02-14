@@ -24,6 +24,7 @@ package com.codebutler.farebot.card.nfc
 
 interface UltralightTechnology : NfcTechnology {
     val type: Int
+
     fun readPages(pageOffset: Int): ByteArray
 
     companion object {

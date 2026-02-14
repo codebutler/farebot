@@ -41,9 +41,8 @@ class MetroMoneyTransitInfo(
     private val mDate1: String,
     private val mDate2: String,
     private val mDate3: String,
-    private val mDate4: String
+    private val mDate4: String,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = NumberUtils.zeroPad(mSerial, 10)
 

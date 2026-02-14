@@ -36,8 +36,8 @@ import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_touchngo.generated.resources.Res
 import farebot.farebot_transit_touchngo.generated.resources.touchngo_cardno
 import farebot.farebot_transit_touchngo.generated.resources.touchngo_transaction_counter
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
 
 class TouchnGoTransitInfo(
     private val balanceValue: Int,
@@ -51,7 +51,6 @@ class TouchnGoTransitInfo(
     private val issueDate: LocalDate,
     private val expiryDate: LocalDate,
 ) : TransitInfo() {
-
     override val cardName: String = TouchnGoTransitFactory.NAME
 
     override val serialNumber: String
@@ -65,16 +64,17 @@ class TouchnGoTransitInfo(
                 balance = TransitCurrency.MYR(balanceValue),
                 name = null,
                 validFrom = issueInstant,
-                validTo = expiryInstant
+                validTo = expiryInstant,
             )
         }
 
     override val subscriptions: List<Subscription>?
-        get() = if (isTravelPass) {
-            listOf(TouchnGoTravelPass(localDateToInstant(issueDate)))
-        } else {
-            null
-        }
+        get() =
+            if (isTravelPass) {
+                listOf(TouchnGoTravelPass(localDateToInstant(issueDate)))
+            } else {
+                null
+            }
 
     override val info: List<ListItemInterface>
         get() {
@@ -82,7 +82,7 @@ class TouchnGoTransitInfo(
             val cardNoFull = partialCardNo + calculateLuhn(partialCardNo)
             return listOf(
                 ListItem(Res.string.touchngo_cardno, cardNoFull),
-                ListItem(Res.string.touchngo_transaction_counter, txnCounter.toString())
+                ListItem(Res.string.touchngo_transaction_counter, txnCounter.toString()),
             )
         }
 

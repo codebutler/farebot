@@ -47,7 +47,6 @@ import kotlin.time.Instant
  * asserting on exact trip data, balances, fares, timestamps, stations, and modes.
  */
 class FlipperIntegrationTest {
-
     private val stringResource = TestStringResource()
 
     private fun loadFlipperDump(name: String): String {

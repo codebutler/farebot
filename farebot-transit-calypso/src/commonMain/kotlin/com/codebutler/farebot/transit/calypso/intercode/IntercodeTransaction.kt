@@ -31,9 +31,8 @@ import com.codebutler.farebot.transit.en1545.En1545Transaction
 
 internal class IntercodeTransaction(
     private val networkId: Int,
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
-
     override val lookup: En1545Lookup
         get() = IntercodeTransitInfo.getLookup(networkId)
 
@@ -48,11 +47,14 @@ internal class IntercodeTransaction(
         }
 
     companion object {
-        fun parse(data: ByteArray, networkId: Int): IntercodeTransaction {
+        fun parse(
+            data: ByteArray,
+            networkId: Int,
+        ): IntercodeTransaction {
             val parsed = En1545Parser.parse(data, IntercodeFields.TRIP_FIELDS_LOCAL)
             return IntercodeTransaction(
                 parsed.getInt(EVENT_NETWORK_ID) ?: networkId,
-                parsed
+                parsed,
             )
         }
     }

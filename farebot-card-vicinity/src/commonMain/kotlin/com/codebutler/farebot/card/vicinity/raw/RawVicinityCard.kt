@@ -26,9 +26,9 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.vicinity.VicinityCard
 import com.codebutler.farebot.card.vicinity.VicinityPage
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawVicinityCard(
@@ -36,9 +36,8 @@ data class RawVicinityCard(
     private val _scannedAt: Instant,
     val pages: List<VicinityPage>,
     @Contextual val sysInfo: ByteArray? = null,
-    val isPartialRead: Boolean = false
+    val isPartialRead: Boolean = false,
 ) : RawCard<VicinityCard> {
-
     override fun cardType(): CardType = CardType.Vicinity
 
     override fun tagId(): ByteArray = _tagId
@@ -47,8 +46,7 @@ data class RawVicinityCard(
 
     override fun isUnauthorized(): Boolean = false
 
-    override fun parse(): VicinityCard =
-        VicinityCard.create(tagId(), scannedAt(), pages, sysInfo, isPartialRead)
+    override fun parse(): VicinityCard = VicinityCard.create(tagId(), scannedAt(), pages, sysInfo, isPartialRead)
 
     companion object {
         fun create(
@@ -56,7 +54,7 @@ data class RawVicinityCard(
             scannedAt: Instant,
             pages: List<VicinityPage>,
             sysInfo: ByteArray? = null,
-            isPartialRead: Boolean = false
+            isPartialRead: Boolean = false,
         ): RawVicinityCard = RawVicinityCard(tagId, scannedAt, pages, sysInfo, isPartialRead)
     }
 }

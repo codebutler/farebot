@@ -33,61 +33,70 @@ import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.RecordDesfireFile
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.transit.CardInfo
-import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
-import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_hsl.generated.resources.*
 
 class HSLTransitFactory(
-    private val stringResource: StringResource
+    private val stringResource: StringResource,
 ) : TransitFactory<DesfireCard, HSLTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return ALL_IDS.any { card.getApplication(it) != null }
-    }
+    override fun check(card: DesfireCard): Boolean = ALL_IDS.any { card.getApplication(it) != null }
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        val dataHSL = card.getApplication(APP_ID_V1)?.getFile(0x08)?.let { it as? StandardDesfireFile }?.data
-            ?: card.getApplication(APP_ID_V2)?.getFile(0x08)?.let { it as? StandardDesfireFile }?.data
+        val dataHSL =
+            card
+                .getApplication(APP_ID_V1)
+                ?.getFile(0x08)
+                ?.let { it as? StandardDesfireFile }
+                ?.data
+                ?: card
+                    .getApplication(APP_ID_V2)
+                    ?.getFile(0x08)
+                    ?.let { it as? StandardDesfireFile }
+                    ?.data
         if (dataHSL != null) {
             return TransitIdentity.create(CARD_NAME_HSL, formatSerial(dataHSL.hex().substring(2, 20)))
         }
-        val dataWaltti = card.getApplication(APP_ID_WALTTI)?.getFile(0x08)?.let { it as? StandardDesfireFile }?.data
+        val dataWaltti =
+            card
+                .getApplication(APP_ID_WALTTI)
+                ?.getFile(0x08)
+                ?.let { it as? StandardDesfireFile }
+                ?.data
         if (dataWaltti != null) {
             return TransitIdentity.create(CARD_NAME_WALTTI, formatSerial(dataWaltti.hex().substring(2, 20)))
         }
         return TransitIdentity.create(CARD_NAME_HSL, null)
     }
 
-    override fun parseInfo(card: DesfireCard): HSLTransitInfo {
-        return card.getApplication(APP_ID_V1)?.let { parse(it, HSLVariant.HSL_V1) }
+    override fun parseInfo(card: DesfireCard): HSLTransitInfo =
+        card.getApplication(APP_ID_V1)?.let { parse(it, HSLVariant.HSL_V1) }
             ?: card.getApplication(APP_ID_V2)?.let { parse(it, HSLVariant.HSL_V2) }
             ?: card.getApplication(APP_ID_WALTTI)?.let { parse(it, HSLVariant.WALTTI) }
             ?: throw RuntimeException("No HSL/Waltti application found")
-    }
 
     companion object {
         private const val CARD_NAME_HSL = "HSL"
         private const val CARD_NAME_WALTTI = "Waltti"
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.hsl_card_name,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.FINLAND,
-            locationRes = Res.string.hsl_location,
-            imageRes = Res.drawable.hsl_card,
-            latitude = 60.1699f,
-            longitude = 24.9384f,
-            brandColor = 0xB7EC13,
-            credits = listOf("Lauri Andler"),
-            sampleDumpFile = "HSL.json",
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.hsl_card_name,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.FINLAND,
+                locationRes = Res.string.hsl_location,
+                imageRes = Res.drawable.hsl_card,
+                latitude = 60.1699f,
+                longitude = 24.9384f,
+                brandColor = 0xB7EC13,
+                credits = listOf("Lauri Andler"),
+                sampleDumpFile = "HSL.json",
+            )
 
         private const val APP_ID_V1 = 0x1120ef
         internal const val APP_ID_V2 = 0x1420ef
@@ -99,13 +108,16 @@ class HSLTransitFactory(
 
         private fun parseTrips(
             app: com.codebutler.farebot.card.desfire.DesfireApplication,
-            version: HSLVariant
+            version: HSLVariant,
         ): List<HSLTransaction> {
             val recordFile = app.getFile(0x04) as? RecordDesfireFile ?: return emptyList()
             return recordFile.records.mapNotNull { HSLTransaction.parseLog(it.data, version) }
         }
 
-        private fun addEmbedTransaction(trips: MutableList<HSLTransaction>, embed: HSLTransaction) {
+        private fun addEmbedTransaction(
+            trips: MutableList<HSLTransaction>,
+            embed: HSLTransaction,
+        ) {
             val sameIdx = trips.indices.find { idx -> trips[idx].timestamp == embed.timestamp }
             if (sameIdx != null) {
                 val same = trips[sameIdx]
@@ -118,12 +130,13 @@ class HSLTransitFactory(
 
         private fun parse(
             app: com.codebutler.farebot.card.desfire.DesfireApplication,
-            version: HSLVariant
+            version: HSLVariant,
         ): HSLTransitInfo {
             val appInfo = (app.getFile(0x08) as? StandardDesfireFile)?.data
-            val serialNumber = appInfo?.hex()?.let {
-                if (it.length >= 20) formatSerial(it.substring(2, 20)) else null
-            }
+            val serialNumber =
+                appInfo?.hex()?.let {
+                    if (it.length >= 20) formatSerial(it.substring(2, 20)) else null
+                }
 
             val balData = (app.getFile(0x02) as? StandardDesfireFile)?.data
             val mBalance = balData?.getBitsFromBuffer(0, 20) ?: 0
@@ -151,7 +164,7 @@ class HSLTransitFactory(
                 platformType = appInfo?.getBitsFromBuffer(80, 3),
                 securityLevel = appInfo?.getBitsFromBuffer(83, 1),
                 trips = TransactionTrip.merge(trips + listOfNotNull(mLastRefill)),
-                cardNameOverride = cardName
+                cardNameOverride = cardName,
             )
         }
     }

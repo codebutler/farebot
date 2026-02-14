@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.ovc
 
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
@@ -35,7 +36,6 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
@@ -49,7 +49,6 @@ private const val NAME = "OV-chipkaart (single-use)"
  * Ported from Metrodroid.
  */
 class OVChipUltralightTransitFactory : TransitFactory<UltralightCard, OVChipUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
@@ -57,29 +56,28 @@ class OVChipUltralightTransitFactory : TransitFactory<UltralightCard, OVChipUltr
         return firstByte == 0xc0.toByte() || firstByte == 0xc8.toByte()
     }
 
-    override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        return TransitIdentity.create(NAME, null)
-    }
+    override fun parseIdentity(card: UltralightCard): TransitIdentity = TransitIdentity.create(NAME, null)
 
     override fun parseInfo(card: UltralightCard): OVChipUltralightTransitInfo {
-        val trips = listOf(4, 8).mapNotNull { offset ->
-            OvcUltralightTransaction.parse(card.readPages(offset, 4))
-        }
+        val trips =
+            listOf(4, 8).mapNotNull { offset ->
+                OvcUltralightTransaction.parse(card.readPages(offset, 4))
+            }
         return OVChipUltralightTransitInfo(
-            trips = TransactionTrip.merge(trips)
+            trips = TransactionTrip.merge(trips),
         )
     }
 }
 
 class OVChipUltralightTransitInfo(
-    override val trips: List<Trip> = emptyList()
+    override val trips: List<Trip> = emptyList(),
 ) : TransitInfo() {
     override val cardName: String = NAME
     override val serialNumber: String? = null
 }
 
 private class OvcUltralightTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
     override val lookup: En1545Lookup = OvcUltralightLookup
 
@@ -107,11 +105,12 @@ private class OvcUltralightTransaction(
                 AGENCY_TLS, AGENCY_DUO, AGENCY_STORE -> Trip.Mode.OTHER
                 AGENCY_GVB -> if (startStationId < 3000) Trip.Mode.METRO else Trip.Mode.BUS
                 AGENCY_RET -> if (startStationId < 3000) Trip.Mode.METRO else Trip.Mode.BUS
-                AGENCY_ARRIVA -> when (startStationId) {
-                    in 0..800 -> Trip.Mode.TRAIN
-                    in 4601..4699 -> Trip.Mode.FERRY
-                    else -> Trip.Mode.BUS
-                }
+                AGENCY_ARRIVA ->
+                    when (startStationId) {
+                        in 0..800 -> Trip.Mode.TRAIN
+                        in 4601..4699 -> Trip.Mode.FERRY
+                        else -> Trip.Mode.BUS
+                    }
                 else -> Trip.Mode.BUS
             }
         }
@@ -148,16 +147,17 @@ private class OvcUltralightTransaction(
         private const val AGENCY_DUO = 0x0C
         private const val AGENCY_STORE = 0x19
 
-        private val TRIP_FIELDS = En1545Container(
-            En1545FixedInteger("A", 8),
-            En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 12),
-            En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 12),
-            En1545FixedInteger(TRANSACTION_TYPE, 3),
-            En1545FixedInteger.date(En1545Transaction.EVENT),
-            En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
-            En1545FixedInteger("balseqno", 4),
-            En1545FixedHex("D", 64)
-        )
+        private val TRIP_FIELDS =
+            En1545Container(
+                En1545FixedInteger("A", 8),
+                En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 12),
+                En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 12),
+                En1545FixedInteger(TRANSACTION_TYPE, 3),
+                En1545FixedInteger.date(En1545Transaction.EVENT),
+                En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
+                En1545FixedInteger("balseqno", 4),
+                En1545FixedHex("D", 64),
+            )
 
         fun parse(data: ByteArray): OvcUltralightTransaction? {
             if (data.all { it == 0.toByte() }) return null
@@ -168,15 +168,40 @@ private class OvcUltralightTransaction(
 
 private object OvcUltralightLookup : En1545Lookup {
     override val timeZone: TimeZone = TimeZone.of("Europe/Amsterdam")
+
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? = null
-    override fun getAgencyName(agency: Int?, isShort: Boolean): String? = null
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
+
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? = null
+
+    override fun getAgencyName(
+        agency: Int?,
+        isShort: Boolean,
+    ): String? = null
+
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? {
         if (station == 0 || agency == null) return null
         val companyCodeShort = agency and 0xFFFF
         if (companyCodeShort == 0) return null
         return Station.nameOnly("$companyCodeShort/$station")
     }
-    override fun getSubscriptionName(stringResource: StringResource, agency: Int?, contractTariff: Int?): String? = null
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode = Trip.Mode.OTHER
+
+    override fun getSubscriptionName(
+        stringResource: StringResource,
+        agency: Int?,
+        contractTariff: Int?,
+    ): String? = null
+
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
 }

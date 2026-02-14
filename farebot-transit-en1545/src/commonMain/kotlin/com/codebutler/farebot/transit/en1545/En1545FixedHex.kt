@@ -22,9 +22,17 @@
 
 package com.codebutler.farebot.transit.en1545
 
-class En1545FixedHex(private val name: String, private val len: Int) : En1545Field {
-
-    override fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int {
+class En1545FixedHex(
+    private val name: String,
+    private val len: Int,
+) : En1545Field {
+    override fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int {
         var res = ""
         try {
             var i = len

@@ -23,7 +23,6 @@
 package com.codebutler.farebot.card.desfire
 
 interface DesfireFile {
-
     val id: Int
 
     val fileSettings: DesfireFileSettings

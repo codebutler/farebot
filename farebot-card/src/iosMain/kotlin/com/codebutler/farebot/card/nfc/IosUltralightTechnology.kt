@@ -40,8 +40,9 @@ import platform.darwin.dispatch_semaphore_wait
  * [sendMiFareCommand], which returns 16 bytes (4 pages of 4 bytes each).
  */
 @OptIn(ExperimentalForeignApi::class)
-class IosUltralightTechnology(private val tag: NFCMiFareTagProtocol) : UltralightTechnology {
-
+class IosUltralightTechnology(
+    private val tag: NFCMiFareTagProtocol,
+) : UltralightTechnology {
     private var _isConnected = false
 
     override fun connect() {
@@ -56,10 +57,11 @@ class IosUltralightTechnology(private val tag: NFCMiFareTagProtocol) : Ultraligh
         get() = _isConnected
 
     override val type: Int
-        get() = when (tag.mifareFamily) {
-            NFCMiFareUltralight -> UltralightTechnology.TYPE_ULTRALIGHT
-            else -> UltralightTechnology.TYPE_ULTRALIGHT
-        }
+        get() =
+            when (tag.mifareFamily) {
+                NFCMiFareUltralight -> UltralightTechnology.TYPE_ULTRALIGHT
+                else -> UltralightTechnology.TYPE_ULTRALIGHT
+            }
 
     override fun readPages(pageOffset: Int): ByteArray {
         // MIFARE Ultralight READ command: 0x30 followed by the page number.

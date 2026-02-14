@@ -24,9 +24,9 @@
 package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.base.util.StringResource
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Wrapper around Refills to make them like Trips, so Trips become like history. This is similar
@@ -35,9 +35,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RefillTrip(
     @Contextual val refill: Refill,
-    private val stringResource: StringResource
+    private val stringResource: StringResource,
 ) : Trip() {
-
     override val startTimestamp: Instant?
         get() {
             val ts = refill.getTimestamp()
@@ -60,6 +59,9 @@ data class RefillTrip(
     override val mode: Mode get() = Mode.TICKET_MACHINE
 
     companion object {
-        fun create(refill: Refill, stringResource: StringResource): RefillTrip = RefillTrip(refill, stringResource)
+        fun create(
+            refill: Refill,
+            stringResource: StringResource,
+        ): RefillTrip = RefillTrip(refill, stringResource)
     }
 }

@@ -22,8 +22,16 @@
 
 package com.codebutler.farebot.transit.en1545
 
-class En1545Container(private vararg val fields: En1545Field) : En1545Field {
-    override fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int {
+class En1545Container(
+    private vararg val fields: En1545Field,
+) : En1545Field {
+    override fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int {
         var currentOffset = off
         for (el in fields) {
             currentOffset = el.parseField(b, currentOffset, path, holder, bitParser)

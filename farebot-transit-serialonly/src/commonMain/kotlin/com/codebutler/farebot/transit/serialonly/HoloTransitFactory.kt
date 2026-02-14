@@ -12,8 +12,8 @@ package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.convertBCDtoInteger
-import com.codebutler.farebot.card.desfire.DesfireApplication
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.card.desfire.DesfireApplication
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.transit.CardInfo
@@ -23,22 +23,22 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class HoloTransitFactory : TransitFactory<DesfireCard, HoloTransitInfo> {
-
-    override val allCards: List<CardInfo> = listOf(
-        CardInfo(
-            nameRes = Res.string.card_name_holo,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.USA,
-            locationRes = Res.string.card_location_oahu_hawaii,
-            serialOnly = true,
-            imageRes = Res.drawable.holo_card,
-            latitude = 21.3069f,
-            longitude = -157.8583f,
-            brandColor = 0x00A8C4,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell", "Trevor Nielsen"),
-            sampleDumpFile = "Holo.json",
+    override val allCards: List<CardInfo> =
+        listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_holo,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.USA,
+                locationRes = Res.string.card_location_oahu_hawaii,
+                serialOnly = true,
+                imageRes = Res.drawable.holo_card,
+                latitude = 21.3069f,
+                longitude = -157.8583f,
+                brandColor = 0x00A8C4,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell", "Trevor Nielsen"),
+                sampleDumpFile = "Holo.json",
+            ),
         )
-    )
 
     companion object {
         internal const val APP_ID = 0x6013f2
@@ -49,12 +49,10 @@ class HoloTransitFactory : TransitFactory<DesfireCard, HoloTransitInfo> {
             return data.convertBCDtoInteger(0xe, 2)
         }
 
-        internal fun formatSerial(ser: Int?): String? =
-            if (ser != null) "31059300 1 ***** *$ser" else null
+        internal fun formatSerial(ser: Int?): String? = if (ser != null) "31059300 1 ***** *$ser" else null
     }
 
-    override fun check(card: DesfireCard): Boolean =
-        card.getApplication(APP_ID) != null
+    override fun check(card: DesfireCard): Boolean = card.getApplication(APP_ID) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity =
         TransitIdentity.create(NAME, formatSerial(parseSerial(card.getApplication(APP_ID))))
@@ -65,17 +63,18 @@ class HoloTransitFactory : TransitFactory<DesfireCard, HoloTransitInfo> {
         val file1 = (app.getFile(1) as? StandardDesfireFile)?.data
         val serial = parseSerial(app)
 
-        val mfgId = if (file0 != null) {
-            "1-001-${file0.convertBCDtoInteger(8, 3)}${file0.byteArrayToInt(0xb, 3)}-XA"
-        } else {
-            ""
-        }
+        val mfgId =
+            if (file0 != null) {
+                "1-001-${file0.convertBCDtoInteger(8, 3)}${file0.byteArrayToInt(0xb, 3)}-XA"
+            } else {
+                ""
+            }
         val lastTransactionTimestamp = file1?.byteArrayToInt(8, 4) ?: 0
 
         return HoloTransitInfo(
             mSerial = serial,
             mLastTransactionTimestamp = lastTransactionTimestamp,
-            mManufacturingId = mfgId
+            mManufacturingId = mfgId,
         )
     }
 }

@@ -32,7 +32,6 @@ import kotlin.test.assertTrue
 import kotlin.time.Instant
 
 class ExportImportTest {
-
     @Test
     fun testExportFormatFromExtension() {
         assertEquals(ExportFormat.JSON, ExportFormat.fromExtension("json"))

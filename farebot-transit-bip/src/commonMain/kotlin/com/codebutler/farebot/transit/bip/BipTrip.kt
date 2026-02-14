@@ -27,8 +27,8 @@ import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class BipTrip(
@@ -39,23 +39,24 @@ data class BipTrip(
     private val mB: Int,
     private val mD: Int,
     private val mE: Int,
-    private val mHash: Byte
+    private val mHash: Byte,
 ) : Trip() {
-
     override val mode: Mode
-        get() = when (mType) {
-            0x45 -> Mode.METRO
-            0x46 -> Mode.BUS
-            else -> Mode.OTHER
-        }
+        get() =
+            when (mType) {
+                0x45 -> Mode.METRO
+                0x46 -> Mode.BUS
+                else -> Mode.OTHER
+            }
 
     override val fare: TransitCurrency
         get() = TransitCurrency.CLP(mFare)
 
     companion object {
         fun parse(raw: ByteArray): BipTrip? {
-            if (raw.sliceOffLen(1, 14).isAllZero())
+            if (raw.sliceOffLen(1, 14).isAllZero()) {
                 return null
+            }
             return BipTrip(
                 mType = raw[8].toInt(),
                 startTimestamp = parseTimestamp(raw),
@@ -64,7 +65,7 @@ data class BipTrip(
                 mD = raw.getBitsFromBufferLeBits(70, 10),
                 mE = raw.getBitsFromBufferLeBits(98, 22),
                 mHash = raw[15],
-                mFare = raw.getBitsFromBufferLeBits(82, 16)
+                mFare = raw.getBitsFromBufferLeBits(82, 16),
             )
         }
     }

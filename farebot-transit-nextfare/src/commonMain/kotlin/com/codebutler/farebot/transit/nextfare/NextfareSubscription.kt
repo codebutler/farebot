@@ -37,15 +37,14 @@ import kotlin.time.Instant
  */
 class NextfareSubscription private constructor(
     private val validToValue: Instant?,
-    private val isActive: Boolean
+    private val isActive: Boolean,
 ) : Subscription() {
-
     /**
      * Create from a travel pass record (active subscription).
      */
     constructor(record: NextfareTravelPassRecord) : this(
         validToValue = record.timestamp,
-        isActive = true
+        isActive = true,
     )
 
     /**
@@ -54,7 +53,7 @@ class NextfareSubscription private constructor(
     @Suppress("UNUSED_PARAMETER")
     constructor(record: NextfareBalanceRecord) : this(
         validToValue = null,
-        isActive = false
+        isActive = false,
     )
 
     override val id: Int = 0
@@ -71,6 +70,10 @@ class NextfareSubscription private constructor(
     override val machineId: Int = 0
 
     override val subscriptionName: String
-        get() = if (isActive) getStringBlocking(Res.string.nextfare_travel_pass)
-            else getStringBlocking(Res.string.nextfare_travel_pass_unused)
+        get() =
+            if (isActive) {
+                getStringBlocking(Res.string.nextfare_travel_pass)
+            } else {
+                getStringBlocking(Res.string.nextfare_travel_pass_unused)
+            }
 }

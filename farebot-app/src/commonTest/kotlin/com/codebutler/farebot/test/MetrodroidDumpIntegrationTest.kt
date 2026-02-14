@@ -51,7 +51,6 @@ import kotlin.time.Instant
  */
 @OptIn(ExperimentalStdlibApi::class)
 class MetrodroidDumpIntegrationTest {
-
     // --- Ventra (Ultralight) ---
     // Source: https://github.com/metrodroid/metrodroid/issues/855
     // Card: Ventra disposable 1-day pass, scanned 2024-02-15
@@ -59,35 +58,37 @@ class MetrodroidDumpIntegrationTest {
 
     @Test
     fun testVentraUltralight() {
-        val pages = listOf(
-            UltralightPage.create(0, "04898386".hexToByteArray()),
-            UltralightPage.create(1, "ba8a1494".hexToByteArray()),
-            UltralightPage.create(2, "b0480000".hexToByteArray()),
-            UltralightPage.create(3, "00000000".hexToByteArray()),
-            UltralightPage.create(4, "0a04009a".hexToByteArray()),
-            UltralightPage.create(5, "30013f00".hexToByteArray()),
-            UltralightPage.create(6, "000000a4".hexToByteArray()),
-            UltralightPage.create(7, "7b7b1681".hexToByteArray()),
-            UltralightPage.create(8, "00000000".hexToByteArray()),
-            UltralightPage.create(9, "83690100".hexToByteArray()),
-            UltralightPage.create(10, "59300001".hexToByteArray()),
-            UltralightPage.create(11, "00001940".hexToByteArray()),
-            UltralightPage.create(12, "665a5a07".hexToByteArray()),
-            UltralightPage.create(13, "82690100".hexToByteArray()),
-            UltralightPage.create(14, "593d0001".hexToByteArray()),
-            UltralightPage.create(15, "00009e4f".hexToByteArray()),
-            UltralightPage.create(16, "000000ff".hexToByteArray()),
-            UltralightPage.create(17, "00050000".hexToByteArray()),
-            UltralightPage.create(18, "00000000".hexToByteArray()),
-            UltralightPage.create(19, "00000000".hexToByteArray()),
-        )
+        val pages =
+            listOf(
+                UltralightPage.create(0, "04898386".hexToByteArray()),
+                UltralightPage.create(1, "ba8a1494".hexToByteArray()),
+                UltralightPage.create(2, "b0480000".hexToByteArray()),
+                UltralightPage.create(3, "00000000".hexToByteArray()),
+                UltralightPage.create(4, "0a04009a".hexToByteArray()),
+                UltralightPage.create(5, "30013f00".hexToByteArray()),
+                UltralightPage.create(6, "000000a4".hexToByteArray()),
+                UltralightPage.create(7, "7b7b1681".hexToByteArray()),
+                UltralightPage.create(8, "00000000".hexToByteArray()),
+                UltralightPage.create(9, "83690100".hexToByteArray()),
+                UltralightPage.create(10, "59300001".hexToByteArray()),
+                UltralightPage.create(11, "00001940".hexToByteArray()),
+                UltralightPage.create(12, "665a5a07".hexToByteArray()),
+                UltralightPage.create(13, "82690100".hexToByteArray()),
+                UltralightPage.create(14, "593d0001".hexToByteArray()),
+                UltralightPage.create(15, "00009e4f".hexToByteArray()),
+                UltralightPage.create(16, "000000ff".hexToByteArray()),
+                UltralightPage.create(17, "00050000".hexToByteArray()),
+                UltralightPage.create(18, "00000000".hexToByteArray()),
+                UltralightPage.create(19, "00000000".hexToByteArray()),
+            )
 
-        val rawCard = RawUltralightCard.create(
-            tagId = "048983ba8a1494".hexToByteArray(),
-            scannedAt = Instant.fromEpochMilliseconds(1708017434025),
-            pages = pages,
-            type = 1 // EV1
-        )
+        val rawCard =
+            RawUltralightCard.create(
+                tagId = "048983ba8a1494".hexToByteArray(),
+                scannedAt = Instant.fromEpochMilliseconds(1708017434025),
+                pages = pages,
+                type = 1, // EV1
+            )
 
         val card = rawCard.parse()
         assertTrue(card is UltralightCard, "Expected UltralightCard")
@@ -121,12 +122,13 @@ class MetrodroidDumpIntegrationTest {
 
     @Test
     fun testTroikaClassicE3() {
-        val card = buildTroikaClassicCard(
-            // Sector 8 data: layout E, sublayout 3, balance 0 kopeks
-            sector8Block0 = "45DB101958FBCE19768AA40000000000".hexToByteArray(),
-            sector8Block1 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
-            sector8Block2 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
-        )
+        val card =
+            buildTroikaClassicCard(
+                // Sector 8 data: layout E, sublayout 3, balance 0 kopeks
+                sector8Block0 = "45DB101958FBCE19768AA40000000000".hexToByteArray(),
+                sector8Block1 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
+                sector8Block2 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
+            )
 
         val factory = TroikaTransitFactory()
         assertTrue(factory.check(card), "Troika factory should recognize this card (E/3)")
@@ -152,12 +154,13 @@ class MetrodroidDumpIntegrationTest {
 
     @Test
     fun testTroikaClassicE5() {
-        val card = buildTroikaClassicCard(
-            // Sector 8 data: layout E, sublayout 5, balance 5000 kopeks (50 RUB)
-            sector8Block0 = "45DB101958FBCE2A4915216AA1A00800".hexToByteArray(),
-            sector8Block1 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
-            sector8Block2 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
-        )
+        val card =
+            buildTroikaClassicCard(
+                // Sector 8 data: layout E, sublayout 5, balance 5000 kopeks (50 RUB)
+                sector8Block0 = "45DB101958FBCE2A4915216AA1A00800".hexToByteArray(),
+                sector8Block1 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
+                sector8Block2 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
+            )
 
         val factory = TroikaTransitFactory()
         assertTrue(factory.check(card), "Troika factory should recognize this card (E/5)")
@@ -189,34 +192,36 @@ class MetrodroidDumpIntegrationTest {
         val emptyBlock = ByteArray(16)
         val sectorTrailer = ByteArray(16) { 0xFF.toByte() }
 
-        val sectors = (0 until 16).map { sectorIndex ->
-            if (sectorIndex == 8) {
-                RawClassicSector.createData(
-                    sectorIndex,
-                    listOf(
-                        RawClassicBlock.create(0, sector8Block0),
-                        RawClassicBlock.create(1, sector8Block1),
-                        RawClassicBlock.create(2, sector8Block2),
-                        RawClassicBlock.create(3, sectorTrailer),
+        val sectors =
+            (0 until 16).map { sectorIndex ->
+                if (sectorIndex == 8) {
+                    RawClassicSector.createData(
+                        sectorIndex,
+                        listOf(
+                            RawClassicBlock.create(0, sector8Block0),
+                            RawClassicBlock.create(1, sector8Block1),
+                            RawClassicBlock.create(2, sector8Block2),
+                            RawClassicBlock.create(3, sectorTrailer),
+                        ),
                     )
-                )
-            } else {
-                RawClassicSector.createData(
-                    sectorIndex,
-                    listOf(
-                        RawClassicBlock.create(0, emptyBlock),
-                        RawClassicBlock.create(1, emptyBlock),
-                        RawClassicBlock.create(2, emptyBlock),
-                        RawClassicBlock.create(3, sectorTrailer),
+                } else {
+                    RawClassicSector.createData(
+                        sectorIndex,
+                        listOf(
+                            RawClassicBlock.create(0, emptyBlock),
+                            RawClassicBlock.create(1, emptyBlock),
+                            RawClassicBlock.create(2, emptyBlock),
+                            RawClassicBlock.create(3, sectorTrailer),
+                        ),
                     )
-                )
+                }
             }
-        }
 
-        return RawClassicCard.create(
-            tagId = byteArrayOf(0xDE.toByte(), 0xAD.toByte(), 0xBE.toByte(), 0xEF.toByte()),
-            scannedAt = Instant.fromEpochSeconds(1590969600), // 2020-06-01T00:00:00Z
-            sectors = sectors,
-        ).parse()
+        return RawClassicCard
+            .create(
+                tagId = byteArrayOf(0xDE.toByte(), 0xAD.toByte(), 0xBE.toByte(), 0xEF.toByte()),
+                scannedAt = Instant.fromEpochSeconds(1590969600), // 2020-06-01T00:00:00Z
+                sectors = sectors,
+            ).parse()
     }
 }

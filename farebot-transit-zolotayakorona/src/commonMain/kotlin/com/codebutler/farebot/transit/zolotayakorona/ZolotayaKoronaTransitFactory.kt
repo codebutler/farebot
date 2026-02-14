@@ -38,7 +38,6 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_zolotayakorona.generated.resources.*
 
 class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
 
@@ -48,7 +47,7 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
         val toc = sector0.getBlock(1).data
         // Check toc entries for sectors 10,12,13,14 and 15
         return toc.byteArrayToInt(8, 2) == 0x18ee &&
-                toc.byteArrayToInt(12, 2) == 0x18ee
+            toc.byteArrayToInt(12, 2) == 0x18ee
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
@@ -56,15 +55,19 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
         val serial = getSerial(card)
         return TransitIdentity.create(
             ZolotayaKoronaTransitInfo.nameCard(cardType),
-            ZolotayaKoronaTransitInfo.formatSerial(serial)
+            ZolotayaKoronaTransitInfo.formatSerial(serial),
         )
     }
 
     override fun parseInfo(card: ClassicCard): ZolotayaKoronaTransitInfo {
         val cardType = getCardType(card)
 
-        val balance = if (card.getSector(6) is UnauthorizedClassicSector) null
-        else (card.getSector(6) as DataClassicSector).getBlock(0).data.byteArrayToIntReversed(0, 4)
+        val balance =
+            if (card.getSector(6) is UnauthorizedClassicSector) {
+                null
+            } else {
+                (card.getSector(6) as DataClassicSector).getBlock(0).data.byteArrayToIntReversed(0, 4)
+            }
 
         val sector4 = card.getSector(4) as DataClassicSector
         val infoBlock = sector4.getBlock(0).data
@@ -83,13 +86,17 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
             status = infoBlock.getBitsFromBuffer(60, 4),
             sequenceCtr = infoBlock.byteArrayToInt(8, 2),
             discountCode = infoBlock[10].toInt() and 0xff,
-            tail = infoBlock.sliceOffLen(11, 5)
+            tail = infoBlock.sliceOffLen(11, 5),
         )
     }
 
     private fun getSerial(card: ClassicCard): String {
         val sector15 = card.getSector(15) as DataClassicSector
-        return sector15.getBlock(2).data.getHexString(4, 10).substring(0, 19)
+        return sector15
+            .getBlock(2)
+            .data
+            .getHexString(4, 10)
+            .substring(0, 19)
     }
 
     private fun getCardType(card: ClassicCard): Int {
@@ -98,72 +105,73 @@ class ZolotayaKoronaTransitFactory : TransitFactory<ClassicCard, ZolotayaKoronaT
     }
 
     companion object {
-        private val ALL_CARDS = listOf(
-            CardInfo(
-                nameRes = Res.string.card_name_zolotaya_korona,
-                cardType = CardType.MifareClassic,
-                region = TransitRegion.RUSSIA,
-                locationRes = Res.string.card_location_russia,
-                keysRequired = true,
-                preview = true,
-                imageRes = Res.drawable.zolotayakorona,
-                latitude = 55.0084f,
-                longitude = 82.9357f,
-                brandColor = 0xE0002D,
-                credits = listOf("Metrodroid Project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_krasnodar_etk,
-                cardType = CardType.MifareClassic,
-                region = TransitRegion.RUSSIA,
-                locationRes = Res.string.card_location_krasnodar_russia,
-                keysRequired = true,
-                preview = true,
-                imageRes = Res.drawable.krasnodar_etk,
-                latitude = 45.0355f,
-                longitude = 38.9753f,
-                brandColor = 0x4B75B8,
-                credits = listOf("Metrodroid Project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_orenburg_ekg,
-                cardType = CardType.MifareClassic,
-                region = TransitRegion.RUSSIA,
-                locationRes = Res.string.card_location_orenburg_russia,
-                keysRequired = true,
-                preview = true,
-                imageRes = Res.drawable.orenburg_ekg,
-                latitude = 51.7727f,
-                longitude = 55.0988f,
-                brandColor = 0xFED653,
-                credits = listOf("Metrodroid Project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_samara_etk,
-                cardType = CardType.MifareClassic,
-                region = TransitRegion.RUSSIA,
-                locationRes = Res.string.card_location_samara_russia,
-                keysRequired = true,
-                preview = true,
-                imageRes = Res.drawable.samara_etk,
-                latitude = 53.1959f,
-                longitude = 50.1001f,
-                brandColor = 0xE6213A,
-                credits = listOf("Metrodroid Project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_yaroslavl_etk,
-                cardType = CardType.MifareClassic,
-                region = TransitRegion.RUSSIA,
-                locationRes = Res.string.card_location_yaroslavl_russia,
-                keysRequired = true,
-                preview = true,
-                imageRes = Res.drawable.yaroslavl_etk,
-                latitude = 57.6261f,
-                longitude = 39.8845f,
-                brandColor = 0x1C3778,
-                credits = listOf("Metrodroid Project"),
-            ),
-        )
+        private val ALL_CARDS =
+            listOf(
+                CardInfo(
+                    nameRes = Res.string.card_name_zolotaya_korona,
+                    cardType = CardType.MifareClassic,
+                    region = TransitRegion.RUSSIA,
+                    locationRes = Res.string.card_location_russia,
+                    keysRequired = true,
+                    preview = true,
+                    imageRes = Res.drawable.zolotayakorona,
+                    latitude = 55.0084f,
+                    longitude = 82.9357f,
+                    brandColor = 0xE0002D,
+                    credits = listOf("Metrodroid Project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_krasnodar_etk,
+                    cardType = CardType.MifareClassic,
+                    region = TransitRegion.RUSSIA,
+                    locationRes = Res.string.card_location_krasnodar_russia,
+                    keysRequired = true,
+                    preview = true,
+                    imageRes = Res.drawable.krasnodar_etk,
+                    latitude = 45.0355f,
+                    longitude = 38.9753f,
+                    brandColor = 0x4B75B8,
+                    credits = listOf("Metrodroid Project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_orenburg_ekg,
+                    cardType = CardType.MifareClassic,
+                    region = TransitRegion.RUSSIA,
+                    locationRes = Res.string.card_location_orenburg_russia,
+                    keysRequired = true,
+                    preview = true,
+                    imageRes = Res.drawable.orenburg_ekg,
+                    latitude = 51.7727f,
+                    longitude = 55.0988f,
+                    brandColor = 0xFED653,
+                    credits = listOf("Metrodroid Project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_samara_etk,
+                    cardType = CardType.MifareClassic,
+                    region = TransitRegion.RUSSIA,
+                    locationRes = Res.string.card_location_samara_russia,
+                    keysRequired = true,
+                    preview = true,
+                    imageRes = Res.drawable.samara_etk,
+                    latitude = 53.1959f,
+                    longitude = 50.1001f,
+                    brandColor = 0xE6213A,
+                    credits = listOf("Metrodroid Project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_yaroslavl_etk,
+                    cardType = CardType.MifareClassic,
+                    region = TransitRegion.RUSSIA,
+                    locationRes = Res.string.card_location_yaroslavl_russia,
+                    keysRequired = true,
+                    preview = true,
+                    imageRes = Res.drawable.yaroslavl_etk,
+                    latitude = 57.6261f,
+                    longitude = 39.8845f,
+                    brandColor = 0x1C3778,
+                    credits = listOf("Metrodroid Project"),
+                ),
+            )
     }
 }

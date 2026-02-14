@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
@@ -38,18 +39,19 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_hsl.generated.resources.*
-import com.codebutler.farebot.base.util.getStringBlocking
 
 private fun getNameUL(city: Int) =
-    if (city == HSLLookup.CITY_UL_TAMPERE) getStringBlocking(Res.string.tampere_ultralight_card_name)
-    else getStringBlocking(Res.string.hsl_ultralight_card_name)
+    if (city == HSLLookup.CITY_UL_TAMPERE) {
+        getStringBlocking(Res.string.tampere_ultralight_card_name)
+    } else {
+        getStringBlocking(Res.string.hsl_ultralight_card_name)
+    }
 
 /**
  * HSL (Helsinki) and Tampere Ultralight transit cards.
  * Ported from Metrodroid.
  */
 class HSLUltralightTransitFactory : TransitFactory<UltralightCard, HSLUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
@@ -62,7 +64,7 @@ class HSLUltralightTransitFactory : TransitFactory<UltralightCard, HSLUltralight
         val city = card.pages[5].data.getBitsFromBuffer(0, 8)
         return TransitIdentity.create(
             getNameUL(city),
-            formatSerial(getSerial(card))
+            formatSerial(getSerial(card)),
         )
     }
 
@@ -81,7 +83,7 @@ class HSLUltralightTransitFactory : TransitFactory<UltralightCard, HSLUltralight
             platformType = card.pages[5].data.getBitsFromBuffer(20, 3),
             securityLevel = card.pages[5].data.getBitsFromBuffer(23, 1),
             trips = TransactionTrip.merge(listOfNotNull(arvo?.lastTransaction)),
-            city = city
+            city = city,
         )
     }
 
@@ -110,15 +112,16 @@ class HSLUltralightTransitInfo internal constructor(
     val applicationKeyVersion: Int,
     val platformType: Int,
     val securityLevel: Int,
-    val city: Int
+    val city: Int,
 ) : TransitInfo() {
     override val cardName: String get() = getNameUL(city)
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            ListItem(Res.string.hsl_application_version, applicationVersion.toString()),
-            ListItem(Res.string.hsl_application_key_version, applicationKeyVersion.toString()),
-            ListItem(Res.string.hsl_platform_type, platformType.toString()),
-            ListItem(Res.string.hsl_security_level, securityLevel.toString())
-        )
+        get() =
+            listOf(
+                ListItem(Res.string.hsl_application_version, applicationVersion.toString()),
+                ListItem(Res.string.hsl_application_key_version, applicationKeyVersion.toString()),
+                ListItem(Res.string.hsl_platform_type, platformType.toString()),
+                ListItem(Res.string.hsl_security_level, securityLevel.toString()),
+            )
 }

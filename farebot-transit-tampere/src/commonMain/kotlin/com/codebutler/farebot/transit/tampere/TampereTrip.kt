@@ -40,23 +40,24 @@ class TampereTrip(
     private val mRoute: Int,
     private val mEventCode: Int, // 3 = topup, 5 = first tap, 11 = transfer
     private val mFlags: Int,
-    override val passengerCount: Int
+    override val passengerCount: Int,
 ) : Trip() {
-
     override val startTimestamp: Instant
         get() = TampereTransitInfo.parseTimestamp(mDay, mMinute)
 
     override val fare: TransitCurrency
-        get() = TransitCurrency.EUR(
-            if (mEventCode == 3) -mFare else mFare
-        )
+        get() =
+            TransitCurrency.EUR(
+                if (mEventCode == 3) -mFare else mFare,
+            )
 
     override val mode: Mode
-        get() = when (mEventCode) {
-            5, 11 -> if (mRoute / 100 in listOf(1, 3) && mDay >= 0xad7f) Mode.TRAM else Mode.BUS
-            3 -> Mode.TICKET_MACHINE
-            else -> Mode.OTHER
-        }
+        get() =
+            when (mEventCode) {
+                5, 11 -> if (mRoute / 100 in listOf(1, 3) && mDay >= 0xad7f) Mode.TRAM else Mode.BUS
+                3 -> Mode.TICKET_MACHINE
+                else -> Mode.OTHER
+            }
 
     override val isTransfer: Boolean
         get() = (mFlags and 0x4) != 0
@@ -89,7 +90,7 @@ class TampereTrip(
                 mE = raw.byteArrayToIntReversed(12, 1),
                 passengerCount = raw.getBitsFromBuffer(13 * 8, 4),
                 mF = raw.getBitsFromBuffer(13 * 8 + 4, 4),
-                mFlags = raw.byteArrayToIntReversed(14, 1)
+                mFlags = raw.byteArrayToIntReversed(14, 1),
                 // Last byte: CRC-8-maxim checksum of the record
             )
         }

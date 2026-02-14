@@ -27,8 +27,8 @@ import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class BipRefill(
@@ -38,9 +38,8 @@ data class BipRefill(
     private val mB: Int,
     private val mD: Int,
     private val mE: Int,
-    private val mHash: Byte
+    private val mHash: Byte,
 ) : Trip() {
-
     override val mode: Mode
         get() = Mode.TICKET_MACHINE
 
@@ -49,8 +48,9 @@ data class BipRefill(
 
     companion object {
         fun parse(raw: ByteArray): BipRefill? {
-            if (raw.sliceOffLen(1, 14).isAllZero())
+            if (raw.sliceOffLen(1, 14).isAllZero()) {
                 return null
+            }
             return BipRefill(
                 mFare = raw.getBitsFromBufferLeBits(74, 16),
                 mA = raw.getBitsFromBufferLeBits(0, 6),
@@ -58,7 +58,7 @@ data class BipRefill(
                 mD = raw.getBitsFromBufferLeBits(56, 18),
                 mE = raw.getBitsFromBufferLeBits(90, 30),
                 mHash = raw[15],
-                startTimestamp = parseTimestamp(raw)
+                startTimestamp = parseTimestamp(raw),
             )
         }
     }

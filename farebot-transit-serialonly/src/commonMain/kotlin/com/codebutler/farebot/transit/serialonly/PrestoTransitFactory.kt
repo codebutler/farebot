@@ -23,29 +23,30 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class PrestoTransitFactory : TransitFactory<DesfireCard, PrestoTransitInfo> {
-
-    override val allCards: List<CardInfo> = listOf(
-        CardInfo(
-            nameRes = Res.string.card_name_presto,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.CANADA,
-            locationRes = Res.string.card_location_ontario_canada,
-            serialOnly = true,
-            imageRes = Res.drawable.presto_card,
-            latitude = 43.6532f,
-            longitude = -79.3832f,
-            brandColor = 0x728452,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell", "Philip Duncan"),
+    override val allCards: List<CardInfo> =
+        listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_presto,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.CANADA,
+                locationRes = Res.string.card_location_ontario_canada,
+                serialOnly = true,
+                imageRes = Res.drawable.presto_card,
+                latitude = 43.6532f,
+                longitude = -79.3832f,
+                brandColor = 0x728452,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell", "Philip Duncan"),
+            ),
         )
-    )
 
     companion object {
         private const val APP_ID_SERIAL = 0xff30ff
         internal const val NAME = "PRESTO"
 
         internal fun getSerial(card: DesfireCard): Int? {
-            val file = card.getApplication(APP_ID_SERIAL)?.getFile(8) as? StandardDesfireFile
-                ?: return null
+            val file =
+                card.getApplication(APP_ID_SERIAL)?.getFile(8) as? StandardDesfireFile
+                    ?: return null
             return file.data.getBitsFromBuffer(85, 24)
         }
 
@@ -62,6 +63,5 @@ class PrestoTransitFactory : TransitFactory<DesfireCard, PrestoTransitInfo> {
     override fun parseIdentity(card: DesfireCard): TransitIdentity =
         TransitIdentity.create(NAME, formatSerial(getSerial(card)))
 
-    override fun parseInfo(card: DesfireCard): PrestoTransitInfo =
-        PrestoTransitInfo(mSerial = getSerial(card))
+    override fun parseInfo(card: DesfireCard): PrestoTransitInfo = PrestoTransitInfo(mSerial = getSerial(card))
 }

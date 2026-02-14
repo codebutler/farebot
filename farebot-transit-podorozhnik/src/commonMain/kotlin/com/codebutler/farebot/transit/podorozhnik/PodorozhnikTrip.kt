@@ -38,22 +38,23 @@ internal class PodorozhnikTrip(
     private val mLastValidator: Int,
     private val stringResource: StringResource,
 ) : Trip() {
-
     override val startTimestamp: Instant?
         get() = PodorozhnikTransitInfo.convertDate(mTimestamp)
 
     override val fare: TransitCurrency?
-        get() = if (mFare != null) {
-            TransitCurrency.RUB(mFare)
-        } else {
-            null
-        }
+        get() =
+            if (mFare != null) {
+                TransitCurrency.RUB(mFare)
+            } else {
+                null
+            }
 
     // TODO: Handle trams
     override val mode: Mode
         get() {
-            if (mLastTransport == TRANSPORT_METRO && mLastValidator == 0)
+            if (mLastTransport == TRANSPORT_METRO && mLastValidator == 0) {
                 return Mode.BUS
+            }
             return if (mLastTransport == TRANSPORT_METRO) Mode.METRO else Mode.BUS
         }
 
@@ -61,15 +62,16 @@ internal class PodorozhnikTrip(
     override val startStation: Station?
         get() {
             var stationId = mLastValidator or (mLastTransport shl 16)
-            if (mLastTransport == TRANSPORT_METRO && mLastValidator == 0)
+            if (mLastTransport == TRANSPORT_METRO && mLastValidator == 0) {
                 return null
+            }
             if (mLastTransport == TRANSPORT_METRO) {
                 val gate = stationId and 0x3f
                 stationId = stationId and 0x3f.inv()
                 val result = lookupMdstStation(PODOROZHNIK_STR, stationId)
                 return if (result != null) {
                     result.addAttribute(
-                        stringResource.getString(Res.string.podorozhnik_gate, gate.toString())
+                        stringResource.getString(Res.string.podorozhnik_gate, gate.toString()),
                     )
                 } else {
                     Station.unknown((mLastValidator shr 6).toString())
@@ -86,20 +88,25 @@ internal class PodorozhnikTrip(
             when (mLastTransport) {
                 // Some validators are misconfigured and show up as Metro, station 0, gate 0.
                 // Assume bus.
-                TRANSPORT_METRO -> if (mLastValidator == 0) {
-                    stringResource.getString(Res.string.podorozhnik_led_bus)
-                } else {
-                    stringResource.getString(Res.string.podorozhnik_led_metro)
-                }
+                TRANSPORT_METRO ->
+                    if (mLastValidator == 0) {
+                        stringResource.getString(Res.string.podorozhnik_led_bus)
+                    } else {
+                        stringResource.getString(Res.string.podorozhnik_led_metro)
+                    }
                 TRANSPORT_BUS, TRANSPORT_BUS_MOBILE -> stringResource.getString(Res.string.podorozhnik_led_bus)
                 TRANSPORT_SHARED_TAXI -> stringResource.getString(Res.string.podorozhnik_led_shared_taxi)
                 // TODO: Handle trams
                 else -> stringResource.getString(Res.string.podorozhnik_unknown_format, mLastTransport.toString())
             }
 
-    private fun lookupMdstStation(dbName: String, stationId: Int): Station? {
+    private fun lookupMdstStation(
+        dbName: String,
+        stationId: Int,
+    ): Station? {
         val result = MdstStationLookup.getStation(dbName, stationId) ?: return null
-        return Station.Builder()
+        return Station
+            .Builder()
             .stationName(result.stationName)
             .shortStationName(result.shortStationName)
             .companyName(result.companyName)
@@ -112,6 +119,7 @@ internal class PodorozhnikTrip(
     companion object {
         const val PODOROZHNIK_STR = "podorozhnik"
         const val TRANSPORT_METRO = 1
+
         // Some buses use fixed validators while others
         // have a mobile validator and they have different codes
         private const val TRANSPORT_BUS_MOBILE = 3

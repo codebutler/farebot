@@ -59,10 +59,14 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 }
 
-fun askPassword(): String {
-    return Runtime.getRuntime().exec(arrayOf("security", "-q", "find-generic-password", "-w", "-g", "-l", "farebot-release"))
-        .inputStream.bufferedReader().readText().trim()
-}
+fun askPassword(): String =
+    Runtime
+        .getRuntime()
+        .exec(arrayOf("security", "-q", "find-generic-password", "-w", "-g", "-l", "farebot-release"))
+        .inputStream
+        .bufferedReader()
+        .readText()
+        .trim()
 
 gradle.taskGraph.whenReady {
     if (hasTask(":farebot-app-android:packageRelease")) {
@@ -73,12 +77,21 @@ gradle.taskGraph.whenReady {
 }
 
 android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk =
+        libs.versions.compileSdk
+            .get()
+            .toInt()
     namespace = "com.codebutler.farebot"
 
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
+        minSdk =
+            libs.versions.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.targetSdk
+                .get()
+                .toInt()
         versionCode = 29
         versionName = "3.1.1"
         multiDexEnabled = true
@@ -102,7 +115,10 @@ android {
         release {
             isShrinkResources = false
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "../config/proguard/proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "../config/proguard/proguard-rules.pro",
+            )
             signingConfig = signingConfigs.getByName("release")
         }
     }

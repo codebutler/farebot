@@ -1,8 +1,15 @@
 package com.codebutler.farebot.shared.platform
 
 interface AppPreferences {
-    fun getBoolean(key: String, default: Boolean): Boolean
-    fun putBoolean(key: String, value: Boolean)
+    fun getBoolean(
+        key: String,
+        default: Boolean,
+    ): Boolean
+
+    fun putBoolean(
+        key: String,
+        value: Boolean,
+    )
 
     companion object {
         const val KEY_SHOW_UNSUPPORTED = "explore_show_unsupported"
@@ -16,10 +23,15 @@ interface AppPreferences {
 class InMemoryAppPreferences : AppPreferences {
     private val map = mutableMapOf<String, Boolean>()
 
-    override fun getBoolean(key: String, default: Boolean): Boolean =
-        map[key] ?: default
+    override fun getBoolean(
+        key: String,
+        default: Boolean,
+    ): Boolean = map[key] ?: default
 
-    override fun putBoolean(key: String, value: Boolean) {
+    override fun putBoolean(
+        key: String,
+        value: Boolean,
+    ) {
         map[key] = value
     }
 }

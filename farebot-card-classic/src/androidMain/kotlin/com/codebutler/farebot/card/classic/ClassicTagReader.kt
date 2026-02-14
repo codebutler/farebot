@@ -40,9 +40,8 @@ import kotlin.time.Clock
 class ClassicTagReader(
     tagId: ByteArray,
     tag: Tag,
-    cardKeys: ClassicCardKeys?
+    cardKeys: ClassicCardKeys?,
 ) : TagReader<ClassicTechnology, RawClassicCard, ClassicCardKeys>(tagId, tag, cardKeys) {
-
     override fun getTech(tag: Tag): ClassicTechnology = AndroidClassicTechnology(MifareClassic.get(tag))
 
     @Throws(Exception::class)
@@ -50,7 +49,7 @@ class ClassicTagReader(
         tagId: ByteArray,
         tag: Tag,
         tech: ClassicTechnology,
-        cardKeys: ClassicCardKeys?
+        cardKeys: ClassicCardKeys?,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
 
@@ -92,12 +91,18 @@ class ClassicTagReader(
                                 continue
                             }
 
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex,
-                                keys[keyIndex].keyA)
+                            authSuccess =
+                                tech.authenticateSectorWithKeyA(
+                                    sectorIndex,
+                                    keys[keyIndex].keyA,
+                                )
 
                             if (!authSuccess) {
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex,
-                                    keys[keyIndex].keyB)
+                                authSuccess =
+                                    tech.authenticateSectorWithKeyB(
+                                        sectorIndex,
+                                        keys[keyIndex].keyB,
+                                    )
                             }
 
                             if (authSuccess) {
@@ -131,13 +136,14 @@ class ClassicTagReader(
     }
 
     companion object {
-        private val PREAMBLE_KEY = byteArrayOf(
-            0x00.toByte(),
-            0x00.toByte(),
-            0x00.toByte(),
-            0x00.toByte(),
-            0x00.toByte(),
-            0x00.toByte()
-        )
+        private val PREAMBLE_KEY =
+            byteArrayOf(
+                0x00.toByte(),
+                0x00.toByte(),
+                0x00.toByte(),
+                0x00.toByte(),
+                0x00.toByte(),
+                0x00.toByte(),
+            )
     }
 }

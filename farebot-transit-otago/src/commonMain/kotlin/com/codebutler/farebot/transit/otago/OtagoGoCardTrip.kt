@@ -29,9 +29,8 @@ import kotlin.time.Instant
 class OtagoGoCardTrip(
     private val timestamp: Instant,
     private val cost: Int,
-    private val machine: String
+    private val machine: String,
 ) : Trip() {
-
     override val startTimestamp: Instant get() = timestamp
 
     override val fare: TransitCurrency get() = TransitCurrency.NZD(cost)

@@ -39,18 +39,18 @@ import com.codebutler.farebot.card.china.ChinaRegistry
  * - Wuhan Tong (武汉通)
  */
 object ChinaTransitRegistry {
-
     /**
      * All available China transit card factories.
      */
-    val allFactories: List<ChinaCardTransitFactory> = listOf(
-        // Order matters - more specific factories should come first
-        NewShenzhenTransitInfo.FACTORY,
-        WuhanTongTransitInfo.FACTORY,
-        TUnionTransitInfo.FACTORY,
-        CityUnionTransitInfo.FACTORY,
-        BeijingTransitInfo.FACTORY  // Most generic, check last
-    )
+    val allFactories: List<ChinaCardTransitFactory> =
+        listOf(
+            // Order matters - more specific factories should come first
+            NewShenzhenTransitInfo.FACTORY,
+            WuhanTongTransitInfo.FACTORY,
+            TUnionTransitInfo.FACTORY,
+            CityUnionTransitInfo.FACTORY,
+            BeijingTransitInfo.FACTORY, // Most generic, check last
+        )
 
     /**
      * Register all China transit factories with the ChinaRegistry.

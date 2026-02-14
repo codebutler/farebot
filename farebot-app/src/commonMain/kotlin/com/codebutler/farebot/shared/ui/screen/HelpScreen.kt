@@ -27,23 +27,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.MobileOff
+import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.SubtitlesOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,10 +53,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -66,14 +66,14 @@ import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.card_experimental
-import farebot.farebot_app.generated.resources.legend_keys_required
-import farebot.farebot_app.generated.resources.legend_serial_only
-import farebot.farebot_app.generated.resources.legend_experimental
 import farebot.farebot_app.generated.resources.chip_keys_required_info
 import farebot.farebot_app.generated.resources.chip_preview_info
 import farebot.farebot_app.generated.resources.chip_serial_only_info
 import farebot.farebot_app.generated.resources.chip_unsupported_info
 import farebot.farebot_app.generated.resources.credits
+import farebot.farebot_app.generated.resources.legend_experimental
+import farebot.farebot_app.generated.resources.legend_keys_required
+import farebot.farebot_app.generated.resources.legend_serial_only
 import farebot.farebot_app.generated.resources.legend_unsupported
 import farebot.farebot_app.generated.resources.view_sample
 import kotlinx.coroutines.launch
@@ -105,105 +105,125 @@ fun ExploreContent(
     var selectedCardKey by remember { mutableStateOf<String?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val displayedCards = remember(supportedCards, supportedCardTypes, loadedKeyBundles, showUnsupported, showSerialOnly, showKeysRequired, showExperimental) {
-        supportedCards.filter { card ->
-            (showUnsupported || card.cardType in supportedCardTypes) &&
-                (showSerialOnly || !card.serialOnly) &&
-                (showKeysRequired || !card.keysRequired || card.keyBundle in loadedKeyBundles) &&
-                (showExperimental || !card.preview)
+    val displayedCards =
+        remember(
+            supportedCards,
+            supportedCardTypes,
+            loadedKeyBundles,
+            showUnsupported,
+            showSerialOnly,
+            showKeysRequired,
+            showExperimental,
+        ) {
+            supportedCards.filter { card ->
+                (showUnsupported || card.cardType in supportedCardTypes) &&
+                    (showSerialOnly || !card.serialOnly) &&
+                    (showKeysRequired || !card.keysRequired || card.keyBundle in loadedKeyBundles) &&
+                    (showExperimental || !card.preview)
+            }
         }
-    }
 
     // Pre-resolve card names and locations for search
-    val cardNames = remember(displayedCards) {
-        displayedCards.associate { card ->
-            card.nameRes.key to getStringBlocking(card.nameRes)
-        }
-    }
-    val cardLocations = remember(displayedCards) {
-        displayedCards.associate { card ->
-            card.nameRes.key to getStringBlocking(card.locationRes)
-        }
-    }
-
-    val regionComparator = remember(deviceRegion) {
-        TransitRegion.DeviceRegionComparator(deviceRegion)
-    }
-
-    val groupedCards = remember(displayedCards, regionComparator, searchQuery, cardNames, cardLocations) {
-        val filtered = if (searchQuery.isBlank()) {
-            displayedCards
-        } else {
-            displayedCards.filter { card ->
-                val name = cardNames[card.nameRes.key] ?: ""
-                val location = cardLocations[card.nameRes.key] ?: ""
-                name.contains(searchQuery, ignoreCase = true) ||
-                    location.contains(searchQuery, ignoreCase = true) ||
-                    card.region.translatedName.contains(searchQuery, ignoreCase = true)
+    val cardNames =
+        remember(displayedCards) {
+            displayedCards.associate { card ->
+                card.nameRes.key to getStringBlocking(card.nameRes)
             }
         }
-        filtered
-            .groupBy { it.region }
-            .entries
-            .sortedWith(compareBy(regionComparator) { it.key })
-            .associate { it.key to it.value }
-    }
+    val cardLocations =
+        remember(displayedCards) {
+            displayedCards.associate { card ->
+                card.nameRes.key to getStringBlocking(card.locationRes)
+            }
+        }
+
+    val regionComparator =
+        remember(deviceRegion) {
+            TransitRegion.DeviceRegionComparator(deviceRegion)
+        }
+
+    val groupedCards =
+        remember(displayedCards, regionComparator, searchQuery, cardNames, cardLocations) {
+            val filtered =
+                if (searchQuery.isBlank()) {
+                    displayedCards
+                } else {
+                    displayedCards.filter { card ->
+                        val name = cardNames[card.nameRes.key] ?: ""
+                        val location = cardLocations[card.nameRes.key] ?: ""
+                        name.contains(searchQuery, ignoreCase = true) ||
+                            location.contains(searchQuery, ignoreCase = true) ||
+                            card.region.translatedName.contains(searchQuery, ignoreCase = true)
+                    }
+                }
+            filtered
+                .groupBy { it.region }
+                .entries
+                .sortedWith(compareBy(regionComparator) { it.key })
+                .associate { it.key to it.value }
+        }
 
     // Build index-to-region mapping for the grid
-    val indexToRegion = remember(groupedCards) {
-        buildList {
-            var index = 0
-            groupedCards.forEach { (region, cards) ->
-                add(index to region)
-                index += 1 + cards.size // header + cards
+    val indexToRegion =
+        remember(groupedCards) {
+            buildList {
+                var index = 0
+                groupedCards.forEach { (region, cards) ->
+                    add(index to region)
+                    index += 1 + cards.size // header + cards
+                }
             }
         }
-    }
 
     // Build flat index mapping card name keys to their position in the grid
-    val cardKeyToIndex = remember(groupedCards) {
-        val map = mutableMapOf<String, Int>()
-        var index = 0
-        groupedCards.forEach { (_, cards) ->
-            index++ // header
-            cards.forEach { card ->
-                map[card.nameRes.key] = index
-                index++
+    val cardKeyToIndex =
+        remember(groupedCards) {
+            val map = mutableMapOf<String, Int>()
+            var index = 0
+            groupedCards.forEach { (_, cards) ->
+                index++ // header
+                cards.forEach { card ->
+                    map[card.nameRes.key] = index
+                    index++
+                }
             }
+            map
         }
-        map
-    }
 
     // Track which region is currently visible based on the center of the viewport
     val currentRegion by remember {
         derivedStateOf {
             val layoutInfo = gridState.layoutInfo
             val viewportCenter = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
-            val centerItem = layoutInfo.visibleItemsInfo.minByOrNull { item ->
-                val itemCenter = item.offset.y + item.size.height / 2
-                kotlin.math.abs(itemCenter - viewportCenter)
-            }
+            val centerItem =
+                layoutInfo.visibleItemsInfo.minByOrNull { item ->
+                    val itemCenter = item.offset.y + item.size.height / 2
+                    kotlin.math.abs(itemCenter - viewportCenter)
+                }
             val centerIndex = centerItem?.index ?: gridState.firstVisibleItemIndex
             indexToRegion.lastOrNull { (startIndex, _) -> startIndex <= centerIndex }?.second
         }
     }
 
     // Filter map markers to only show cards visible in the list
-    val displayedCardNames = remember(displayedCards, cardNames) {
-        displayedCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
-    }
-    val visibleMarkers = remember(mapMarkers, displayedCardNames) {
-        mapMarkers.filter { it.name in displayedCardNames }
-    }
+    val displayedCardNames =
+        remember(displayedCards, cardNames) {
+            displayedCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
+        }
+    val visibleMarkers =
+        remember(mapMarkers, displayedCardNames) {
+            mapMarkers.filter { it.name in displayedCardNames }
+        }
 
     // Compute focus markers for the current visible region
-    val focusMarkers = remember(currentRegion, groupedCards, cardNames, visibleMarkers) {
-        val region = currentRegion ?: return@remember visibleMarkers
-        val regionCards = groupedCards[region] ?: return@remember visibleMarkers
-        val regionCardNames = regionCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
-        val filtered = visibleMarkers.filter { it.name in regionCardNames }
-        filtered.ifEmpty { visibleMarkers }
-    }
+    val focusMarkers =
+        remember(currentRegion, groupedCards, cardNames, visibleMarkers) {
+            val region = currentRegion ?: return@remember visibleMarkers
+            val regionCards = groupedCards[region] ?: return@remember visibleMarkers
+            val regionCardNames = regionCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
+            val filtered = visibleMarkers.filter { it.name in regionCardNames }
+            filtered.ifEmpty { visibleMarkers }
+        }
 
     Column(modifier = modifier.fillMaxSize()) {
         // Fixed map (stays visible while list scrolls)
@@ -212,9 +232,10 @@ fun ExploreContent(
                 markers = visibleMarkers,
                 focusMarkers = focusMarkers,
                 onMarkerTap = { markerName ->
-                    val matchingCard = displayedCards.find { card ->
-                        cardNames[card.nameRes.key] == markerName
-                    }
+                    val matchingCard =
+                        displayedCards.find { card ->
+                            cardNames[card.nameRes.key] == markerName
+                        }
                     if (matchingCard != null) {
                         val targetIndex = cardKeyToIndex[matchingCard.nameRes.key]
                         if (targetIndex != null) {
@@ -225,9 +246,10 @@ fun ExploreContent(
                     }
                 },
                 topPadding = topBarHeight,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp + topBarHeight),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(180.dp + topBarHeight),
             )
         }
 
@@ -248,10 +270,11 @@ fun ExploreContent(
                     Text(
                         text = "$flag ${region.translatedName}",
                         style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
                     )
                 }
                 items(cards, key = { it.nameRes.key }) { card ->
@@ -272,10 +295,11 @@ fun ExploreContent(
         if (showUnsupported || showKeysRequired || showSerialOnly || showExperimental) {
             HorizontalDivider()
             FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
@@ -308,9 +332,10 @@ fun ExploreContent(
     }
 
     // Bottom sheet for selected card details
-    val selectedCard = selectedCardKey?.let { key ->
-        supportedCards.find { it.nameRes.key == key }
-    }
+    val selectedCard =
+        selectedCardKey?.let { key ->
+            supportedCards.find { it.nameRes.key == key }
+        }
     if (selectedCard != null) {
         ModalBottomSheet(
             onDismissRequest = { selectedCardKey = null },
@@ -323,24 +348,28 @@ fun ExploreContent(
                 isSupported = selectedCard.cardType in supportedCardTypes,
                 isKeysRequired = selectedCard.keysRequired && selectedCard.keyBundle !in loadedKeyBundles,
                 onStatusChipTap = onStatusChipTap,
-                onSampleCardTap = if (selectedCard.sampleDumpFile != null && onSampleCardTap != null) {
-                    {
-                        scope.launch {
-                            sheetState.hide()
-                            selectedCardKey = null
-                            onSampleCardTap(selectedCard)
+                onSampleCardTap =
+                    if (selectedCard.sampleDumpFile != null && onSampleCardTap != null) {
+                        {
+                            scope.launch {
+                                sheetState.hide()
+                                selectedCardKey = null
+                                onSampleCardTap(selectedCard)
+                            }
                         }
-                    }
-                } else {
-                    null
-                },
+                    } else {
+                        null
+                    },
             )
         }
     }
 }
 
 @Composable
-private fun LegendEntry(icon: ImageVector, label: String) {
+private fun LegendEntry(
+    icon: ImageVector,
+    label: String,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -368,10 +397,11 @@ private fun CardImageTile(
     onTap: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .aspectRatio(1.586f)
-            .clip(RoundedCornerShape(8.dp))
-            .clickable { onTap() },
+        modifier =
+            Modifier
+                .aspectRatio(1.586f)
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onTap() },
     ) {
         val imageRes = card.imageRes
         if (imageRes != null) {
@@ -384,9 +414,10 @@ private fun CardImageTile(
         } else {
             // Placeholder for cards without images
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -399,24 +430,27 @@ private fun CardImageTile(
         }
 
         // Status badge icons (top-right corner)
-        val badges = buildList {
-            if (!isSupported) add(Icons.Default.MobileOff)
-            if (isKeysRequired) add(Icons.Default.Lock)
-            if (card.serialOnly) add(Icons.Default.SubtitlesOff)
-            if (card.preview) add(Icons.Default.Science)
-        }
+        val badges =
+            buildList {
+                if (!isSupported) add(Icons.Default.MobileOff)
+                if (isKeysRequired) add(Icons.Default.Lock)
+                if (card.serialOnly) add(Icons.Default.SubtitlesOff)
+                if (card.preview) add(Icons.Default.Science)
+            }
         if (badges.isNotEmpty()) {
             Row(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 for (icon in badges) {
                     Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .background(Color.Black.copy(alpha = 0.6f), CircleShape),
+                        modifier =
+                            Modifier
+                                .size(20.dp)
+                                .background(Color.Black.copy(alpha = 0.6f), CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -444,16 +478,18 @@ private fun CardDetailSheet(
     onSampleCardTap: (() -> Unit)? = null,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
     ) {
         // Card image
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1.586f)
-                .clip(RoundedCornerShape(12.dp)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1.586f)
+                    .clip(RoundedCornerShape(12.dp)),
         ) {
             val imageRes = card.imageRes
             if (imageRes != null) {
@@ -465,9 +501,10 @@ private fun CardDetailSheet(
                 )
             } else {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -515,7 +552,13 @@ private fun CardDetailSheet(
                     SuggestionChip(
                         onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.legend_unsupported)) },
-                        icon = { Icon(Icons.Default.MobileOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        icon = {
+                            Icon(
+                                Icons.Default.MobileOff,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        },
                     )
                 }
                 if (isKeysRequired) {
@@ -531,7 +574,13 @@ private fun CardDetailSheet(
                     SuggestionChip(
                         onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.legend_serial_only)) },
-                        icon = { Icon(Icons.Default.SubtitlesOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        icon = {
+                            Icon(
+                                Icons.Default.SubtitlesOff,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        },
                     )
                 }
                 if (card.preview) {
@@ -539,7 +588,13 @@ private fun CardDetailSheet(
                     SuggestionChip(
                         onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.card_experimental)) },
-                        icon = { Icon(Icons.Default.Science, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        icon = {
+                            Icon(
+                                Icons.Default.Science,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        },
                     )
                 }
             }
@@ -599,9 +654,10 @@ private fun CardDetailSheet(
                         contentDescription = null,
                     )
                 },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable { onSampleCardTap() },
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onSampleCardTap() },
             )
         }
 
@@ -612,14 +668,15 @@ private fun CardDetailSheet(
 @Composable
 private fun NonInteractiveChip(content: @Composable () -> Unit) {
     Box(
-        modifier = Modifier.pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                    event.changes.forEach { it.consume() }
+        modifier =
+            Modifier.pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        event.changes.forEach { it.consume() }
+                    }
                 }
-            }
-        },
+            },
     ) {
         content()
     }

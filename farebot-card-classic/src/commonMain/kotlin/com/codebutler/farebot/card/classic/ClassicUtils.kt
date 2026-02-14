@@ -24,7 +24,6 @@
 package com.codebutler.farebot.card.classic
 
 object ClassicUtils {
-
     fun convertBytePointerToBlock(index: Int): Int {
         var idx = index
         var block: Int
@@ -40,19 +39,17 @@ object ClassicUtils {
         return block
     }
 
-    fun sectorToBlock(sectorIndex: Int): Int {
-        return if (sectorIndex < 32) {
+    fun sectorToBlock(sectorIndex: Int): Int =
+        if (sectorIndex < 32) {
             sectorIndex * 4
         } else {
             32 * 4 + (sectorIndex - 32) * 16
         }
-    }
 
-    fun blockToSector(blockIndex: Int): Int {
-        return if (blockIndex < 32 * 4) {
+    fun blockToSector(blockIndex: Int): Int =
+        if (blockIndex < 32 * 4) {
             blockIndex / 4
         } else {
             32 + (blockIndex - 32 * 4) / 16
         }
-    }
 }

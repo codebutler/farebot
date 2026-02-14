@@ -34,11 +34,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UltralightPage(
     val index: Int,
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
     companion object {
-        fun create(index: Int, data: ByteArray): UltralightPage {
-            return UltralightPage(index, data)
-        }
+        fun create(
+            index: Int,
+            data: ByteArray,
+        ): UltralightPage = UltralightPage(index, data)
     }
 }

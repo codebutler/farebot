@@ -29,7 +29,6 @@ package com.codebutler.farebot.card.felica
  * Utilities for working with FeliCa cards.
  */
 object FelicaUtils {
-
     /**
      * Translates the System name to something human readable.
      *
@@ -39,32 +38,40 @@ object FelicaUtils {
      * @param systemCode FeliCa system code to translate.
      * @return English string describing the operator of that System.
      */
-    fun getFriendlySystemName(systemCode: Int): String = when (systemCode) {
-        FeliCaConstants.SYSTEMCODE_SUICA -> "Suica"
-        FeliCaConstants.SYSTEMCODE_EDY -> "Common / Edy"
-        FeliCaConstants.SYSTEMCODE_FELICA_LITE -> "FeliCa Lite"
-        FeliCaConstants.SYSTEMCODE_OCTOPUS -> "Octopus"
-        else -> "Unknown"
-    }
-
-    fun getFriendlyServiceName(systemCode: Int, serviceCode: Int): String = when (systemCode) {
-        FeliCaConstants.SYSTEMCODE_SUICA -> when (serviceCode) {
-            FeliCaConstants.SERVICE_SUICA_HISTORY -> "Suica History"
-            FeliCaConstants.SERVICE_SUICA_INOUT -> "Suica In/Out"
+    fun getFriendlySystemName(systemCode: Int): String =
+        when (systemCode) {
+            FeliCaConstants.SYSTEMCODE_SUICA -> "Suica"
+            FeliCaConstants.SYSTEMCODE_EDY -> "Common / Edy"
+            FeliCaConstants.SYSTEMCODE_FELICA_LITE -> "FeliCa Lite"
+            FeliCaConstants.SYSTEMCODE_OCTOPUS -> "Octopus"
             else -> "Unknown"
         }
 
-        FeliCaConstants.SYSTEMCODE_FELICA_LITE -> when (serviceCode) {
-            FeliCaConstants.SERVICE_FELICA_LITE_READONLY -> "FeliCa Lite Read-only"
-            FeliCaConstants.SERVICE_FELICA_LITE_READWRITE -> "Felica Lite Read-write"
+    fun getFriendlyServiceName(
+        systemCode: Int,
+        serviceCode: Int,
+    ): String =
+        when (systemCode) {
+            FeliCaConstants.SYSTEMCODE_SUICA ->
+                when (serviceCode) {
+                    FeliCaConstants.SERVICE_SUICA_HISTORY -> "Suica History"
+                    FeliCaConstants.SERVICE_SUICA_INOUT -> "Suica In/Out"
+                    else -> "Unknown"
+                }
+
+            FeliCaConstants.SYSTEMCODE_FELICA_LITE ->
+                when (serviceCode) {
+                    FeliCaConstants.SERVICE_FELICA_LITE_READONLY -> "FeliCa Lite Read-only"
+                    FeliCaConstants.SERVICE_FELICA_LITE_READWRITE -> "Felica Lite Read-write"
+                    else -> "Unknown"
+                }
+
+            FeliCaConstants.SYSTEMCODE_OCTOPUS ->
+                when (serviceCode) {
+                    FeliCaConstants.SERVICE_OCTOPUS -> "Octopus Metadata"
+                    else -> "Unknown"
+                }
+
             else -> "Unknown"
         }
-
-        FeliCaConstants.SYSTEMCODE_OCTOPUS -> when (serviceCode) {
-            FeliCaConstants.SERVICE_OCTOPUS -> "Octopus Metadata"
-            else -> "Unknown"
-        }
-
-        else -> "Unknown"
-    }
 }

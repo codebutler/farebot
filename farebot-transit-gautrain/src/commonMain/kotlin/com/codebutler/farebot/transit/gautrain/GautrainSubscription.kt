@@ -24,7 +24,6 @@
 
 package com.codebutler.farebot.transit.gautrain
 
-import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -41,64 +40,72 @@ private fun neverSeenField(i: Int) = En1545FixedInteger("NeverSeen$i", 8)
  * EN1545 subscription fields for OVChip-format subscriptions (reversed bitmap).
  * Matches Metrodroid's OVChipSubscription.fields(reversed = true).
  */
-internal val GAUTRAIN_SUB_FIELDS = En1545Container(
-    En1545Bitmap(
-        neverSeenField(1),
-        En1545FixedInteger(En1545Subscription.CONTRACT_PROVIDER, 16),
-        En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
-        En1545FixedInteger(En1545Subscription.CONTRACT_SERIAL_NUMBER, 32),
-        neverSeenField(5),
-        En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 10),
-        neverSeenField(7),
-        neverSeenField(8),
-        neverSeenField(9),
-        neverSeenField(10),
-        neverSeenField(11),
-        neverSeenField(12),
-        neverSeenField(13),
+internal val GAUTRAIN_SUB_FIELDS =
+    En1545Container(
         En1545Bitmap(
-            En1545FixedInteger.date(En1545Subscription.CONTRACT_START),
-            En1545FixedInteger.timeLocal(En1545Subscription.CONTRACT_START),
-            En1545FixedInteger.date(En1545Subscription.CONTRACT_END),
-            En1545FixedInteger.timeLocal(En1545Subscription.CONTRACT_END),
-            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_C, 53),
-            En1545FixedInteger("NeverSeenB", 8),
-            En1545FixedInteger("NeverSeenC", 8),
-            En1545FixedInteger("NeverSeenD", 8),
-            En1545FixedInteger("NeverSeenE", 8),
-            reversed = true
+            neverSeenField(1),
+            En1545FixedInteger(En1545Subscription.CONTRACT_PROVIDER, 16),
+            En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
+            En1545FixedInteger(En1545Subscription.CONTRACT_SERIAL_NUMBER, 32),
+            neverSeenField(5),
+            En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 10),
+            neverSeenField(7),
+            neverSeenField(8),
+            neverSeenField(9),
+            neverSeenField(10),
+            neverSeenField(11),
+            neverSeenField(12),
+            neverSeenField(13),
+            En1545Bitmap(
+                En1545FixedInteger.date(En1545Subscription.CONTRACT_START),
+                En1545FixedInteger.timeLocal(En1545Subscription.CONTRACT_START),
+                En1545FixedInteger.date(En1545Subscription.CONTRACT_END),
+                En1545FixedInteger.timeLocal(En1545Subscription.CONTRACT_END),
+                En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_C, 53),
+                En1545FixedInteger("NeverSeenB", 8),
+                En1545FixedInteger("NeverSeenC", 8),
+                En1545FixedInteger("NeverSeenD", 8),
+                En1545FixedInteger("NeverSeenE", 8),
+                reversed = true,
+            ),
+            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_D, 40),
+            En1545FixedInteger(En1545Subscription.CONTRACT_SALE_DEVICE, 24),
+            neverSeenField(16),
+            neverSeenField(17),
+            neverSeenField(18),
+            neverSeenField(19),
+            reversed = true,
         ),
-        En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_D, 40),
-        En1545FixedInteger(En1545Subscription.CONTRACT_SALE_DEVICE, 24),
-        neverSeenField(16),
-        neverSeenField(17),
-        neverSeenField(18),
-        neverSeenField(19),
-        reversed = true
     )
-)
 
 class GautrainSubscription(
     override val parsed: En1545Parsed,
     override val stringResource: StringResource,
     private val mType1: Int,
-    private val mUsed: Int
+    private val mUsed: Int,
 ) : En1545Subscription() {
-
     override val subscriptionState: SubscriptionState
-        get() = if (mType1 != 0) {
-            if (mUsed != 0) SubscriptionState.USED else SubscriptionState.STARTED
-        } else SubscriptionState.INACTIVE
+        get() =
+            if (mType1 != 0) {
+                if (mUsed != 0) SubscriptionState.USED else SubscriptionState.STARTED
+            } else {
+                SubscriptionState.INACTIVE
+            }
 
     override val lookup: En1545Lookup = GautrainLookup
 
     companion object {
-        fun parse(data: ByteArray, stringResource: StringResource, type1: Int, used: Int): GautrainSubscription =
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+            type1: Int,
+            used: Int,
+        ): GautrainSubscription =
             GautrainSubscription(
                 parsed = En1545Parser.parse(data, GAUTRAIN_SUB_FIELDS),
                 stringResource = stringResource,
                 mType1 = type1,
-                mUsed = used
+                mUsed = used,
             )
     }
 }

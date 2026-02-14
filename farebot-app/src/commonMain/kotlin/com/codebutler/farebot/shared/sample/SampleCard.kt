@@ -22,41 +22,43 @@
 
 package com.codebutler.farebot.shared.sample
 
-import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlin.time.Instant
 
-class SampleCard(private val rawCard: RawSampleCard) : Card() {
-
+class SampleCard(
+    private val rawCard: RawSampleCard,
+) : Card() {
     override val cardType: CardType = rawCard.cardType()
 
     override val tagId: ByteArray = rawCard.tagId()
 
     override val scannedAt: Instant = rawCard.scannedAt()
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree = uiTree(stringResource) {
-        item {
-            title = "Sample Transit Section 1"
+    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree =
+        uiTree(stringResource) {
             item {
-                title = "Example Item 1"
-                value = "Value 1"
-            }
-            item {
-                title = "Example Item 2"
-                value = "Value 2"
-            }
-        }
-        item {
-            title = "Sample Transit Section 2"
-            for (i in 1..10) {
+                title = "Sample Transit Section 1"
                 item {
-                    title = "Example Item $i"
-                    value = "Value $i"
+                    title = "Example Item 1"
+                    value = "Value 1"
+                }
+                item {
+                    title = "Example Item 2"
+                    value = "Value 2"
+                }
+            }
+            item {
+                title = "Sample Transit Section 2"
+                for (i in 1..10) {
+                    item {
+                        title = "Example Item $i"
+                        value = "Value $i"
+                    }
                 }
             }
         }
-    }
 }

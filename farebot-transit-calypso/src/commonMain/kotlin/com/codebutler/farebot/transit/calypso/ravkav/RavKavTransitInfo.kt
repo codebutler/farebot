@@ -45,9 +45,8 @@ import farebot.farebot_transit_calypso.generated.resources.*
 
 // Reference: https://github.com/L1L1/cardpeek/blob/master/dot_cardpeek_dir/scripts/calypso/c376n3.lua
 internal class RavKavTransitInfo(
-    result: CalypsoParseResult
+    result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-
     override val cardName: String = NAME
 
     override val info: List<ListItemInterface>
@@ -68,22 +67,24 @@ internal class RavKavTransitInfo(
         const val NETWORK_ID_1 = 0x37602
         const val NETWORK_ID_2 = 0x37603
 
-        val TICKET_ENV_FIELDS = En1545Container(
-            En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 3),
-            En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 20),
-            En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_A, 26),
-            En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_ISSUE),
-            En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-            En1545FixedInteger("PayMethod", 3),
-            En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
-            En1545FixedHex(En1545TransitData.ENV_UNKNOWN_B, 44),
-            En1545FixedInteger(En1545TransitData.HOLDER_ID_NUMBER, 30)
-        )
+        val TICKET_ENV_FIELDS =
+            En1545Container(
+                En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 3),
+                En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 20),
+                En1545FixedInteger(En1545TransitData.ENV_UNKNOWN_A, 26),
+                En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_ISSUE),
+                En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+                En1545FixedInteger("PayMethod", 3),
+                En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+                En1545FixedHex(En1545TransitData.ENV_UNKNOWN_B, 44),
+                En1545FixedInteger(En1545TransitData.HOLDER_ID_NUMBER, 30),
+            )
     }
 }
 
-class RavKavTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+class RavKavTransitFactory(
+    stringResource: StringResource,
+) : CalypsoTransitFactory(stringResource) {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -103,31 +104,39 @@ class RavKavTransitFactory(stringResource: StringResource) : CalypsoTransitFacto
         return c7.byteArrayToLong(4, 4).toString()
     }
 
-    override fun parseTransitInfo(app: ISO7816Application, serial: String?): TransitInfo {
-        val result = Calypso1545TransitData.parse(
-            app = app,
-            ticketEnvFields = RavKavTransitInfo.TICKET_ENV_FIELDS,
-            contractListFields = null,
-            serial = serial,
-            createSubscription = { data, ctr, _, _ ->
-                RavKavSubscription(
-                    parsed = En1545Parser.parse(data, RavKavSubscription.FIELDS),
-                    stringResource = stringResource,
-                    counter = ctr
-                )
-            },
-            createTrip = { data ->
-                val transaction = RavKavTransaction(
-                    parsed = En1545Parser.parse(data, RavKavTransaction.FIELDS)
-                )
-                if (transaction.shouldBeDropped()) null else transaction
-            }
-        )
+    override fun parseTransitInfo(
+        app: ISO7816Application,
+        serial: String?,
+    ): TransitInfo {
+        val result =
+            Calypso1545TransitData.parse(
+                app = app,
+                ticketEnvFields = RavKavTransitInfo.TICKET_ENV_FIELDS,
+                contractListFields = null,
+                serial = serial,
+                createSubscription = { data, ctr, _, _ ->
+                    RavKavSubscription(
+                        parsed = En1545Parser.parse(data, RavKavSubscription.FIELDS),
+                        stringResource = stringResource,
+                        counter = ctr,
+                    )
+                },
+                createTrip = { data ->
+                    val transaction =
+                        RavKavTransaction(
+                            parsed = En1545Parser.parse(data, RavKavTransaction.FIELDS),
+                        )
+                    if (transaction.shouldBeDropped()) null else transaction
+                },
+            )
 
         return RavKavTransitInfo(result)
     }
 
-    private fun ByteArray.byteArrayToLong(offset: Int, length: Int): Long {
+    private fun ByteArray.byteArrayToLong(
+        offset: Int,
+        length: Int,
+    ): Long {
         var result = 0L
         for (i in 0 until length) {
             result = (result shl 8) or (this[offset + i].toLong() and 0xFF)
@@ -136,16 +145,17 @@ class RavKavTransitFactory(stringResource: StringResource) : CalypsoTransitFacto
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_ravkav,
-            cardType = CardType.ISO7816,
-            region = TransitRegion.ISRAEL,
-            locationRes = Res.string.card_location_israel,
-            imageRes = Res.drawable.ravkav_card,
-            latitude = 32.0853f,
-            longitude = 34.7818f,
-            brandColor = 0x99A400,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_ravkav,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.ISRAEL,
+                locationRes = Res.string.card_location_israel,
+                imageRes = Res.drawable.ravkav_card,
+                latitude = 32.0853f,
+                longitude = 34.7818f,
+                brandColor = 0x99A400,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+            )
     }
 }

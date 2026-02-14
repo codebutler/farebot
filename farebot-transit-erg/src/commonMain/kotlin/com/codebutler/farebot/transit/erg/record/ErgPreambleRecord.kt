@@ -31,26 +31,30 @@ import com.codebutler.farebot.transit.erg.ErgTransitInfo
  * https://github.com/micolous/metrodroid/wiki/ERG-MFC#preamble-record
  */
 data class ErgPreambleRecord(
-    val cardSerial: String?
+    val cardSerial: String?,
 ) : ErgRecord {
-
     companion object {
         private val OLD_CARD_ID = byteArrayOf(0x00, 0x00, 0x00)
 
         fun recordFromBytes(input: ByteArray): ErgPreambleRecord {
-            if (!input.copyOfRange(0, ErgTransitInfo.SIGNATURE.size)
-                    .contentEquals(ErgTransitInfo.SIGNATURE)) {
+            if (!input
+                    .copyOfRange(0, ErgTransitInfo.SIGNATURE.size)
+                    .contentEquals(ErgTransitInfo.SIGNATURE)
+            ) {
                 throw IllegalArgumentException("Preamble signature does not match")
             }
 
             val serialBytes = input.copyOfRange(10, 13)
-            val cardSerial = if (serialBytes.contentEquals(OLD_CARD_ID)) {
-                null
-            } else {
-                input.copyOfRange(10, 14).joinToString("") {
-                    (it.toInt() and 0xFF).toString(16).padStart(2, '0')
-                }.uppercase()
-            }
+            val cardSerial =
+                if (serialBytes.contentEquals(OLD_CARD_ID)) {
+                    null
+                } else {
+                    input
+                        .copyOfRange(10, 14)
+                        .joinToString("") {
+                            (it.toInt() and 0xFF).toString(16).padStart(2, '0')
+                        }.uppercase()
+                }
 
             return ErgPreambleRecord(cardSerial)
         }

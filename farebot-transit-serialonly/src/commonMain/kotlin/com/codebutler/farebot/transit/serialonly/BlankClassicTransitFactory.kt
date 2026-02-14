@@ -42,7 +42,6 @@ import farebot.farebot_transit_serialonly.generated.resources.*
  * just before UnauthorizedClassicTransitFactory.
  */
 class BlankClassicTransitFactory : TransitFactory<ClassicCard, BlankClassicTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     /**
@@ -93,9 +92,7 @@ class BlankClassicTransitFactory : TransitFactory<ClassicCard, BlankClassicTrans
         return TransitIdentity.create(name, null)
     }
 
-    override fun parseInfo(card: ClassicCard): BlankClassicTransitInfo {
-        return BlankClassicTransitInfo()
-    }
+    override fun parseInfo(card: ClassicCard): BlankClassicTransitInfo = BlankClassicTransitInfo()
 }
 
 class BlankClassicTransitInfo : TransitInfo() {
@@ -104,8 +101,9 @@ class BlankClassicTransitInfo : TransitInfo() {
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.fully_blank_title),
-            ListItem(Res.string.fully_blank_desc)
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.fully_blank_title),
+                ListItem(Res.string.fully_blank_desc),
+            )
 }

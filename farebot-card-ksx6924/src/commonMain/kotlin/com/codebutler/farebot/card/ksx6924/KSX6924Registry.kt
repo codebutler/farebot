@@ -35,7 +35,6 @@ import com.codebutler.farebot.transit.TransitInfo
  * When parsing a card, factories are tried in order until one succeeds.
  */
 object KSX6924Registry {
-
     /**
      * All registered KSX6924 transit factories.
      *

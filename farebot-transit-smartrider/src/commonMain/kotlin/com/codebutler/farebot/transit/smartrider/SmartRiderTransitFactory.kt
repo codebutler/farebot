@@ -48,22 +48,22 @@ import farebot.farebot_transit_smartrider.generated.resources.*
 class SmartRiderTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, SmartRiderTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_smartrider,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.AUSTRALIA,
-            locationRes = Res.string.smartrider_location,
-            imageRes = Res.drawable.smartrider_card,
-            latitude = -31.9505f,
-            longitude = 115.8605f,
-            brandColor = 0x158736,
-            credits = listOf("Metrodroid Project", "Michael Farrell"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_smartrider,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.AUSTRALIA,
+                locationRes = Res.string.smartrider_location,
+                imageRes = Res.drawable.smartrider_card,
+                latitude = -31.9505f,
+                longitude = 115.8605f,
+                brandColor = 0x158736,
+                credits = listOf("Metrodroid Project", "Michael Farrell"),
+            )
 
         // Unfortunately, there's no way to reliably identify these cards except for the
         // "standard" keys which are used for some empty sectors. It is not enough to read
@@ -91,8 +91,10 @@ class SmartRiderTransitFactory(
 
                 // Check for MyWay key
                 if (HashUtils.checkKeyHash(
-                        sector.keyA, sector.keyB,
-                        MYWAY_KEY_SALT, MYWAY_KEY_DIGEST
+                        sector.keyA,
+                        sector.keyB,
+                        MYWAY_KEY_SALT,
+                        MYWAY_KEY_DIGEST,
                     ) >= 0
                 ) {
                     return SmartRiderType.MYWAY
@@ -100,9 +102,11 @@ class SmartRiderTransitFactory(
 
                 // Check for SmartRider key
                 if (HashUtils.checkKeyHash(
-                        sector.keyA, sector.keyB,
+                        sector.keyA,
+                        sector.keyB,
                         SMARTRIDER_KEY_SALT,
-                        SMARTRIDER_KEY2_DIGEST, SMARTRIDER_KEY3_DIGEST
+                        SMARTRIDER_KEY2_DIGEST,
+                        SMARTRIDER_KEY3_DIGEST,
                     ) >= 0
                 ) {
                     return SmartRiderType.SMARTRIDER
@@ -126,9 +130,7 @@ class SmartRiderTransitFactory(
         }
     }
 
-    override fun check(card: ClassicCard): Boolean {
-        return detectKeyType(card) != SmartRiderType.UNKNOWN
-    }
+    override fun check(card: ClassicCard): Boolean = detectKeyType(card) != SmartRiderType.UNKNOWN
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val type = detectKeyType(card)
@@ -157,25 +159,28 @@ class SmartRiderTransitFactory(
         val balance = sortedBalances[0].balance
 
         // Read trips from sectors 10-13 (3 data blocks each, excluding trailer)
-        val tagRecords = (10..13).flatMap { s ->
-            val sector = card.getSector(s)
-            if (sector !is DataClassicSector) return@flatMap emptyList()
-            (0..2).map { b -> sector.getBlock(b).data }
-        }.map { blockData ->
-            SmartRiderTagRecord.parse(cardType, blockData, stringResource)
-        }.filter { it.isValid }.map { record ->
-            // Check the Balances for a recent transaction with more data.
-            for (b in sortedBalances) {
-                if (b.recentTagOn.isValid && b.recentTagOn.mTimestamp == record.mTimestamp) {
-                    return@map record.enrichWithRecentData(b.recentTagOn)
+        val tagRecords =
+            (10..13)
+                .flatMap { s ->
+                    val sector = card.getSector(s)
+                    if (sector !is DataClassicSector) return@flatMap emptyList()
+                    (0..2).map { b -> sector.getBlock(b).data }
+                }.map { blockData ->
+                    SmartRiderTagRecord.parse(cardType, blockData, stringResource)
+                }.filter { it.isValid }
+                .map { record ->
+                    // Check the Balances for a recent transaction with more data.
+                    for (b in sortedBalances) {
+                        if (b.recentTagOn.isValid && b.recentTagOn.mTimestamp == record.mTimestamp) {
+                            return@map record.enrichWithRecentData(b.recentTagOn)
+                        }
+                        if (b.firstTagOn.isValid && b.firstTagOn.mTimestamp == record.mTimestamp) {
+                            return@map record.enrichWithRecentData(b.firstTagOn)
+                        }
+                    }
+                    // There was no extra data available.
+                    record
                 }
-                if (b.firstTagOn.isValid && b.firstTagOn.mTimestamp == record.mTimestamp) {
-                    return@map record.enrichWithRecentData(b.firstTagOn)
-                }
-            }
-            // There was no extra data available.
-            record
-        }
 
         // Build the Tag events into trips.
         val trips = TransactionTrip.merge(tagRecords)

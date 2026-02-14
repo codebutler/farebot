@@ -9,5 +9,5 @@ data class SavedCard(
     val type: CardType,
     val serial: String,
     val data: String,
-    val scannedAt: Instant = Clock.System.now()
+    val scannedAt: Instant = Clock.System.now(),
 )

@@ -24,6 +24,7 @@
 
 package com.codebutler.farebot.transit.tmoney
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfoResolver
 import farebot.farebot_transit_tmoney.generated.resources.Res
 import farebot.farebot_transit_tmoney.generated.resources.none
@@ -64,7 +65,6 @@ import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_regula
 import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_senior
 import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_test
 import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_youth
-import com.codebutler.farebot.base.util.getStringBlocking
 
 /**
  * [KSX6924PurseInfoResolver] singleton for T-Money.
@@ -74,23 +74,22 @@ import com.codebutler.farebot.base.util.getStringBlocking
  * See https://github.com/micolous/metrodroid/wiki/T-Money for more information.
  */
 object TMoneyPurseInfoResolver : KSX6924PurseInfoResolver() {
-
     override val issuers: Map<Int, String> by lazy {
         mapOf(
-            //0x00: reserved
+            // 0x00: reserved
             0x01 to getStringBlocking(Res.string.tmoney_issuer_kftci),
-            //0x02: A-CASH (에이캐시) (Also used by Snapper)
+            // 0x02: A-CASH (에이캐시) (Also used by Snapper)
             0x03 to getStringBlocking(Res.string.tmoney_issuer_mybi),
-            //0x04: reserved
-            //0x05: V-Cash (브이캐시)
+            // 0x04: reserved
+            // 0x05: V-Cash (브이캐시)
             0x06 to getStringBlocking(Res.string.tmoney_issuer_mondex),
             0x07 to getStringBlocking(Res.string.tmoney_issuer_kec),
             0x08 to getStringBlocking(Res.string.tmoney_issuer_kscc),
             0x09 to getStringBlocking(Res.string.tmoney_issuer_korail),
-            //0x0a: reserved
+            // 0x0a: reserved
             0x0b to getStringBlocking(Res.string.tmoney_issuer_eb),
             0x0c to getStringBlocking(Res.string.tmoney_issuer_seoul_bus),
-            0x0d to getStringBlocking(Res.string.tmoney_issuer_cardnet)
+            0x0d to getStringBlocking(Res.string.tmoney_issuer_cardnet),
         )
     }
 
@@ -98,17 +97,17 @@ object TMoneyPurseInfoResolver : KSX6924PurseInfoResolver() {
         mapOf(
             0x01 to getStringBlocking(Res.string.tmoney_usercode_regular),
             0x02 to getStringBlocking(Res.string.tmoney_usercode_child),
-            //TTAK.KO 12.0240 disagrees
+            // TTAK.KO 12.0240 disagrees
             0x03 to getStringBlocking(Res.string.tmoney_usercode_youth),
-            //TTAK.KO 12.0240 disagrees
+            // TTAK.KO 12.0240 disagrees
             0x04 to getStringBlocking(Res.string.tmoney_usercode_senior),
-            //TTAK.KO 12.0240 disagrees
+            // TTAK.KO 12.0240 disagrees
             0x05 to getStringBlocking(Res.string.tmoney_usercode_disabled),
-            //Only in TTAK.KO 12.0240
+            // Only in TTAK.KO 12.0240
             0x0f to getStringBlocking(Res.string.tmoney_usercode_test),
             0x11 to getStringBlocking(Res.string.tmoney_usercode_bus),
             0x12 to getStringBlocking(Res.string.tmoney_usercode_lorry),
-            0xff to getStringBlocking(Res.string.tmoney_usercode_inactive)
+            0xff to getStringBlocking(Res.string.tmoney_usercode_inactive),
         )
     }
 
@@ -117,10 +116,10 @@ object TMoneyPurseInfoResolver : KSX6924PurseInfoResolver() {
             0x00 to getStringBlocking(Res.string.tmoney_disrate_none),
             0x10 to getStringBlocking(Res.string.tmoney_disrate_disabled_basic),
             0x11 to getStringBlocking(Res.string.tmoney_disrate_disabled_companion),
-            //0x12 - 0x1f: reserved
+            // 0x12 - 0x1f: reserved
             0x20 to getStringBlocking(Res.string.tmoney_disrate_veteran_basic),
-            0x21 to getStringBlocking(Res.string.tmoney_disrate_veteran_companion)
-            //0x22 - 0x2f: reserved
+            0x21 to getStringBlocking(Res.string.tmoney_disrate_veteran_companion),
+            // 0x22 - 0x2f: reserved
         )
     }
 
@@ -129,7 +128,7 @@ object TMoneyPurseInfoResolver : KSX6924PurseInfoResolver() {
             0x00 to getStringBlocking(Res.string.none),
             0x01 to getStringBlocking(Res.string.tmoney_tcode_sk),
             0x02 to getStringBlocking(Res.string.tmoney_tcode_kt),
-            0x03 to getStringBlocking(Res.string.tmoney_tcode_lg)
+            0x03 to getStringBlocking(Res.string.tmoney_tcode_lg),
         )
     }
 
@@ -146,7 +145,7 @@ object TMoneyPurseInfoResolver : KSX6924PurseInfoResolver() {
             0x08 to getStringBlocking(Res.string.tmoney_ccode_exchange),
             0x09 to getStringBlocking(Res.string.tmoney_ccode_woori),
             0x0a to getStringBlocking(Res.string.tmoney_ccode_hana_sk),
-            0x0b to getStringBlocking(Res.string.tmoney_ccode_hyundai)
+            0x0b to getStringBlocking(Res.string.tmoney_ccode_hyundai),
         )
     }
 }

@@ -29,7 +29,7 @@ import com.codebutler.farebot.transit.TransitCurrency
 import kotlin.time.Instant
 
 class OysterTransaction(
-    override val timestamp: Instant
+    override val timestamp: Instant,
 ) : Transaction() {
     // TODO: implement
     override val isTapOff: Boolean
@@ -57,8 +57,8 @@ class OysterTransaction(
                     try {
                         result.add(
                             OysterTransaction(
-                                OysterUtils.parseTimestamp(sec.getBlock(block).data, 6)
-                            )
+                                OysterUtils.parseTimestamp(sec.getBlock(block).data, 6),
+                            ),
                         )
                     } catch (_: Exception) {
                     }

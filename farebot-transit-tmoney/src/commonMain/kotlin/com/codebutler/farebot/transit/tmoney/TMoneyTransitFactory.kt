@@ -46,9 +46,9 @@ import farebot.farebot_transit_tmoney.generated.resources.*
  *
  * See https://github.com/micolous/metrodroid/wiki/T-Money for more information.
  */
-class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
+class TMoneyTransitFactory :
+    TransitFactory<ISO7816Card, TMoneyTransitInfo>,
     KSX6924CardTransitFactory {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -58,10 +58,11 @@ class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun check(card: ISO7816Card): Boolean {
-        val app = card.applications.firstOrNull { app ->
-            val aidHex = app.appName?.toHexString()?.lowercase()
-            aidHex != null && aidHex in KSX6924_AIDS
-        } ?: return false
+        val app =
+            card.applications.firstOrNull { app ->
+                val aidHex = app.appName?.toHexString()?.lowercase()
+                aidHex != null && aidHex in KSX6924_AIDS
+            } ?: return false
 
         // T-Money records are 46 bytes but the last 20 bytes are NOT all 0xFF
         // (unlike Snapper which has all 0xFF in bytes 26..46)
@@ -72,14 +73,16 @@ class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
     }
 
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
-        val ksx6924App = extractKSX6924Application(card)
-            ?: return TransitIdentity.create(TMoneyTransitInfo.getCardName(), null)
+        val ksx6924App =
+            extractKSX6924Application(card)
+                ?: return TransitIdentity.create(TMoneyTransitInfo.getCardName(), null)
         return parseTransitIdentity(ksx6924App)
     }
 
     override fun parseInfo(card: ISO7816Card): TMoneyTransitInfo {
-        val ksx6924App = extractKSX6924Application(card)
-            ?: return TMoneyTransitInfo.createEmpty()
+        val ksx6924App =
+            extractKSX6924Application(card)
+                ?: return TMoneyTransitInfo.createEmpty()
         return parseTransitData(ksx6924App) ?: TMoneyTransitInfo.createEmpty()
     }
 
@@ -93,13 +96,10 @@ class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
         return true
     }
 
-    override fun parseTransitIdentity(app: KSX6924Application): TransitIdentity {
-        return TransitIdentity.create(TMoneyTransitInfo.getCardName(), app.serial)
-    }
+    override fun parseTransitIdentity(app: KSX6924Application): TransitIdentity =
+        TransitIdentity.create(TMoneyTransitInfo.getCardName(), app.serial)
 
-    override fun parseTransitData(app: KSX6924Application): TMoneyTransitInfo? {
-        return TMoneyTransitInfo.create(app)
-    }
+    override fun parseTransitData(app: KSX6924Application): TMoneyTransitInfo? = TMoneyTransitInfo.create(app)
 
     // ========================================================================
     // Private helpers
@@ -107,48 +107,52 @@ class TMoneyTransitFactory : TransitFactory<ISO7816Card, TMoneyTransitInfo>,
 
     @OptIn(ExperimentalStdlibApi::class)
     private fun extractKSX6924Application(card: ISO7816Card): KSX6924Application? {
-        val app = card.applications.firstOrNull { app ->
-            val aidHex = app.appName?.toHexString()?.lowercase()
-            aidHex != null && aidHex in KSX6924_AIDS
-        } ?: return null
+        val app =
+            card.applications.firstOrNull { app ->
+                val aidHex = app.appName?.toHexString()?.lowercase()
+                aidHex != null && aidHex in KSX6924_AIDS
+            } ?: return null
 
         // Extract balance data stored by ISO7816CardReader with "balance/0" key
         val balanceData = app.getFile("balance/0")?.binaryData ?: ByteArray(4) { 0 }
 
         // Extract extra records stored with "extra/N" keys
-        val extraRecords = (0..0xf).mapNotNull { i ->
-            app.getFile("extra/$i")?.binaryData
-        }
+        val extraRecords =
+            (0..0xf).mapNotNull { i ->
+                app.getFile("extra/$i")?.binaryData
+            }
 
         return KSX6924Application(
             application = app,
             balance = balanceData,
-            extraRecords = extraRecords
+            extraRecords = extraRecords,
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_t_money,
-            cardType = CardType.ISO7816,
-            region = TransitRegion.SOUTH_KOREA,
-            locationRes = Res.string.card_location_seoul_south_korea,
-            imageRes = Res.drawable.tmoney_card,
-            latitude = 37.5665f,
-            longitude = 126.9780f,
-            sampleDumpFile = "TMoney.json",
-            brandColor = 0x1B3389,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_t_money,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.SOUTH_KOREA,
+                locationRes = Res.string.card_location_seoul_south_korea,
+                imageRes = Res.drawable.tmoney_card,
+                latitude = 37.5665f,
+                longitude = 126.9780f,
+                sampleDumpFile = "TMoney.json",
+                brandColor = 0x1B3389,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
+            )
 
         /**
          * KSX6924-compatible application AIDs.
          */
-        private val KSX6924_AIDS = listOf(
-            "d4100000030001",  // T-Money, Snapper
-            "d4100000140001",  // Cashbee / eB
-            "d4100000300001",  // MOIBA (untested)
-            "d4106509900020"   // K-Cash (untested)
-        )
+        private val KSX6924_AIDS =
+            listOf(
+                "d4100000030001", // T-Money, Snapper
+                "d4100000140001", // Cashbee / eB
+                "d4100000300001", // MOIBA (untested)
+                "d4106509900020", // K-Cash (untested)
+            )
     }
 }

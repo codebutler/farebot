@@ -56,29 +56,36 @@ class SmartRiderBalanceRecord(
 
     val transactionNumber = b.byteArrayToIntReversed(3, 2)
 
-    val firstTagOn = SmartRiderTagRecord.parseRecentTransaction(
-        smartRiderType, b.sliceOffLen(5, 14), stringResource
-    )
-    val recentTagOn = SmartRiderTagRecord.parseRecentTransaction(
-        smartRiderType, b.sliceOffLen(19, 14), stringResource
-    )
+    val firstTagOn =
+        SmartRiderTagRecord.parseRecentTransaction(
+            smartRiderType,
+            b.sliceOffLen(5, 14),
+            stringResource,
+        )
+    val recentTagOn =
+        SmartRiderTagRecord.parseRecentTransaction(
+            smartRiderType,
+            b.sliceOffLen(19, 14),
+            stringResource,
+        )
 
     val totalFarePaid = b.byteArrayToIntReversed(33, 2)
     val defaultFare = b.byteArrayToIntReversed(35, 2)
     val remainingChargableFare = b.byteArrayToIntReversed(37, 2)
-    val balance = b.byteArrayToIntReversed(39, 2) * if (bitfield.isBalanceNegative) {
-        -1
-    } else {
-        1
-    }
+    val balance =
+        b.byteArrayToIntReversed(39, 2) *
+            if (bitfield.isBalanceNegative) {
+                -1
+            } else {
+                1
+            }
     val journeyNumber = b.byteArrayToIntReversed(43, 2)
     val zoneBitfield = b.byteArrayToInt(45, 1)
 
-    override fun toString(): String {
-        return "bitfield=[$bitfield], " +
+    override fun toString(): String =
+        "bitfield=[$bitfield], " +
             "transactionNumber=$transactionNumber, totalFarePaid=$totalFarePaid, " +
             "defaultFare=$defaultFare, remainingChargableFare=$remainingChargableFare, " +
             "balance=$balance, journeyNumber=$journeyNumber\n" +
             "  trip1=[$firstTagOn]\n  trip2=[$recentTagOn]\n"
-    }
 }

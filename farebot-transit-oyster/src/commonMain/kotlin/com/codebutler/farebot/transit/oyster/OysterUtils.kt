@@ -23,19 +23,22 @@
 package com.codebutler.farebot.transit.oyster
 
 import com.codebutler.farebot.base.util.getBitsFromBufferLeBits
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 object OysterUtils {
     // Oyster epoch: 1980-01-01 midnight in London
     private val EPOCH: Instant =
         LocalDate(1980, 1, 1).atStartOfDayIn(TimeZone.of("Europe/London"))
 
-    fun parseTimestamp(buf: ByteArray, offset: Int = 0): Instant {
+    fun parseTimestamp(
+        buf: ByteArray,
+        offset: Int = 0,
+    ): Instant {
         val day = buf.getBitsFromBufferLeBits(offset, 15)
         val minute = buf.getBitsFromBufferLeBits(offset + 15, 11)
         return EPOCH + day.days + minute.minutes

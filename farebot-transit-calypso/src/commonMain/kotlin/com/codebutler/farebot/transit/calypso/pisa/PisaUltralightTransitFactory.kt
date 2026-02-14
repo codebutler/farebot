@@ -54,7 +54,6 @@ private val NAME by lazy { getStringBlocking(Res.string.pisa_ultralight_card_nam
  * Ported from Metrodroid's PisaUltralightTransitData.kt.
  */
 class PisaUltralightTransitFactory : TransitFactory<UltralightCard, PisaUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
@@ -63,18 +62,17 @@ class PisaUltralightTransitFactory : TransitFactory<UltralightCard, PisaUltralig
         return networkId == PISA_NETWORK_ID
     }
 
-    override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        return TransitIdentity.create(NAME, null)
-    }
+    override fun parseIdentity(card: UltralightCard): TransitIdentity = TransitIdentity.create(NAME, null)
 
     override fun parseInfo(card: UltralightCard): PisaUltralightTransitInfo {
-        val trips = listOf(8, 12).mapNotNull { offset ->
-            PisaUltralightTransaction.parse(card.readPages(offset, 4))
-        }
+        val trips =
+            listOf(8, 12).mapNotNull { offset ->
+                PisaUltralightTransaction.parse(card.readPages(offset, 4))
+            }
         return PisaUltralightTransitInfo(
             mA = card.getPage(4).data[3].toInt() and 0xFF,
             mB = card.readPages(6, 2).byteArrayToLong(),
-            trips = TransactionTrip.merge(trips)
+            trips = TransactionTrip.merge(trips),
         )
     }
 
@@ -86,33 +84,35 @@ class PisaUltralightTransitFactory : TransitFactory<UltralightCard, PisaUltralig
 class PisaUltralightTransitInfo(
     private val mA: Int,
     private val mB: Long,
-    override val trips: List<Trip> = emptyList()
+    override val trips: List<Trip> = emptyList(),
 ) : TransitInfo() {
     override val cardName: String = NAME
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            ListItem(Res.string.pisa_field_a, mA.toString()),
-            ListItem(Res.string.pisa_field_b, mB.toString(16))
-        )
+        get() =
+            listOf(
+                ListItem(Res.string.pisa_field_a, mA.toString()),
+                ListItem(Res.string.pisa_field_b, mB.toString(16)),
+            )
 }
 
 private class PisaUltralightTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
     override val lookup: En1545Lookup = PisaUltralightLookup
 
     companion object {
-        private val TRIP_FIELDS = En1545Container(
-            En1545FixedInteger.date(En1545Transaction.EVENT),
-            En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
-            En1545FixedInteger(En1545Transaction.EVENT_UNKNOWN_A, 18),
-            En1545FixedInteger("ValueB", 16),
-            En1545FixedInteger("ValueA", 16),
-            En1545FixedHex(En1545Transaction.EVENT_UNKNOWN_B, 37),
-            En1545FixedInteger(En1545Transaction.EVENT_AUTHENTICATOR, 16)
-        )
+        private val TRIP_FIELDS =
+            En1545Container(
+                En1545FixedInteger.date(En1545Transaction.EVENT),
+                En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
+                En1545FixedInteger(En1545Transaction.EVENT_UNKNOWN_A, 18),
+                En1545FixedInteger("ValueB", 16),
+                En1545FixedInteger("ValueA", 16),
+                En1545FixedHex(En1545Transaction.EVENT_UNKNOWN_B, 37),
+                En1545FixedInteger(En1545Transaction.EVENT_AUTHENTICATOR, 16),
+            )
 
         fun parse(data: ByteArray): PisaUltralightTransaction? {
             val first4 = data.byteArrayToInt(0, 4)
@@ -124,10 +124,35 @@ private class PisaUltralightTransaction(
 
 private object PisaUltralightLookup : En1545Lookup {
     override val timeZone: TimeZone = TimeZone.of("Europe/Rome")
+
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? = null
-    override fun getAgencyName(agency: Int?, isShort: Boolean): String? = null
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? = null
-    override fun getSubscriptionName(stringResource: StringResource, agency: Int?, contractTariff: Int?): String? = null
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode = Trip.Mode.OTHER
+
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? = null
+
+    override fun getAgencyName(
+        agency: Int?,
+        isShort: Boolean,
+    ): String? = null
+
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? = null
+
+    override fun getSubscriptionName(
+        stringResource: StringResource,
+        agency: Int?,
+        contractTariff: Int?,
+    ): String? = null
+
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
 }

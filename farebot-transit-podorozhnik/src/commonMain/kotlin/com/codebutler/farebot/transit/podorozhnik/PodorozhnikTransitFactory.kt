@@ -42,7 +42,6 @@ import farebot.farebot_transit_podorozhnik.generated.resources.*
 class PodorozhnikTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, PodorozhnikTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -57,7 +56,7 @@ class PodorozhnikTransitFactory(
         val serial = if (block0Data != null) getSerial(block0Data) else null
         return TransitIdentity(
             stringResource.getString(Res.string.podorozhnik_card_name),
-            serial
+            serial,
         )
     }
 
@@ -81,7 +80,7 @@ class PodorozhnikTransitFactory(
                     mAgency = sector4Data.lastTopupAgency,
                     mTopupMachine = sector4Data.lastTopupMachine,
                     stringResource = stringResource,
-                )
+                ),
             )
         }
         if (sector5Data != null && sector5Data.lastTripTime != 0) {
@@ -92,7 +91,7 @@ class PodorozhnikTransitFactory(
                     mLastTransport = sector5Data.lastTransport,
                     mLastValidator = sector5Data.lastValidator,
                     stringResource = stringResource,
-                )
+                ),
             )
         }
         for (timestamp in sector5Data?.extraTripTimes.orEmpty()) {
@@ -120,7 +119,7 @@ class PodorozhnikTransitFactory(
             lastTopupTime = block2.byteArrayToIntReversed(2, 3),
             lastTopupAgency = block2[5].toInt(),
             lastTopupMachine = block2.byteArrayToIntReversed(6, 2),
-            lastTopup = block2.byteArrayToIntReversed(8, 3)
+            lastTopup = block2.byteArrayToIntReversed(8, 3),
         )
     }
 
@@ -146,10 +145,11 @@ class PodorozhnikTransitFactory(
             groundCounter = block1[1].toInt() and 0xff
         }
 
-        val extraTripTimes = listOf(
-            block1.byteArrayToIntReversed(2, 3),
-            block2.byteArrayToIntReversed(2, 3)
-        ).filter { it != lastTripTime }.distinct()
+        val extraTripTimes =
+            listOf(
+                block1.byteArrayToIntReversed(2, 3),
+                block2.byteArrayToIntReversed(2, 3),
+            ).filter { it != lastTripTime }.distinct()
 
         return Sector5Data(
             lastTripTime = lastTripTime,
@@ -158,7 +158,7 @@ class PodorozhnikTransitFactory(
             extraTripTimes = extraTripTimes,
             lastTransport = block0[3].toInt() and 0xff,
             lastValidator = block0.byteArrayToIntReversed(4, 2),
-            lastFare = block0.byteArrayToIntReversed(6, 4)
+            lastFare = block0.byteArrayToIntReversed(6, 4),
         )
     }
 
@@ -181,30 +181,39 @@ class PodorozhnikTransitFactory(
     )
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.podorozhnik_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.RUSSIA,
-            locationRes = Res.string.podorozhnik_location,
-            imageRes = Res.drawable.podorozhnik_card,
-            latitude = 59.9343f,
-            longitude = 30.3351f,
-            brandColor = 0x7CA22C,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.podorozhnik_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.podorozhnik_location,
+                imageRes = Res.drawable.podorozhnik_card,
+                latitude = 59.9343f,
+                longitude = 30.3351f,
+                brandColor = 0x7CA22C,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
+            )
 
         // We don't want to actually include these keys in the program, so include a hashed version of
         // this key.
         private const val KEY_SALT = "podorozhnik"
+
         // md5sum of Salt + Common Key + Salt, used on sector 4.
         private const val KEY_DIGEST_A = "f3267ff451b1fc3076ba12dcee2bf803"
         private const val KEY_DIGEST_B = "3823b5f0b45f3519d0ce4a8b5b9f1437"
 
         private fun getSerial(sec0: ByteArray): String {
-            var sn = "9643 3078 " + NumberUtils.formatNumber(
-                sec0.byteArrayToLongReversed(0, 7),
-                " ", 4, 4, 4, 4, 1
-            )
+            var sn =
+                "9643 3078 " +
+                    NumberUtils.formatNumber(
+                        sec0.byteArrayToLongReversed(0, 7),
+                        " ",
+                        4,
+                        4,
+                        4,
+                        4,
+                        1,
+                    )
             sn += Luhn.calculateLuhn(sn.replace(" ", "")) // last digit is luhn
             return sn
         }

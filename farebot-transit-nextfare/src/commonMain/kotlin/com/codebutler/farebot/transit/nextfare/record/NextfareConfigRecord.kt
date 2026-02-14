@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit.nextfare.record
 
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 /**
  * Represents a configuration record on Nextfare MFC.
@@ -31,11 +31,13 @@ import kotlinx.datetime.TimeZone
  */
 data class NextfareConfigRecord(
     val ticketType: Int,
-    val expiry: Instant
+    val expiry: Instant,
 ) : NextfareRecord {
-
     companion object {
-        fun recordFromBytes(input: ByteArray, timeZone: TimeZone): NextfareConfigRecord? {
+        fun recordFromBytes(
+            input: ByteArray,
+            timeZone: TimeZone,
+        ): NextfareConfigRecord? {
             // Check if date bytes are all zero (no config data)
             if (NextfareRecord.byteArrayToInt(input, 4, 4) == 0) {
                 return null

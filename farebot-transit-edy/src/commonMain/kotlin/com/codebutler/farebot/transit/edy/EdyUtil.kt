@@ -22,14 +22,13 @@
 
 package com.codebutler.farebot.transit.edy
 
-import kotlin.time.Instant
+import com.codebutler.farebot.card.felica.FeliCaUtil
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import com.codebutler.farebot.card.felica.FeliCaUtil
+import kotlin.time.Instant
 
 internal object EdyUtil {
-
     private val EDY_EPOCH: Instant = LocalDateTime(2000, 1, 1, 0, 0, 0).toInstant(TimeZone.of("Asia/Tokyo"))
 
     fun extractDate(data: ByteArray): Instant? {

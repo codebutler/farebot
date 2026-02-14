@@ -32,16 +32,15 @@ import com.codebutler.farebot.transit.TransitCurrency
 class OysterPurse(
     val value: Int,
     private val sequence: Int,
-    private val subsequence: Int
+    private val subsequence: Int,
 ) : Comparable<OysterPurse> {
-
     val balance: TransitCurrency
         get() = TransitCurrency.GBP(value)
 
     constructor(record: ByteArray) : this(
         subsequence = record.getBitsFromBuffer(4, 4),
         sequence = record.byteArrayToInt(1, 1),
-        value = record.getBitsFromBufferSignedLeBits(25, 15)
+        value = record.getBitsFromBufferSignedLeBits(25, 15),
     )
 
     override fun compareTo(other: OysterPurse): Int {
@@ -53,7 +52,10 @@ class OysterPurse(
     }
 
     companion object {
-        internal fun parse(a: ByteArray?, b: ByteArray?): OysterPurse? {
+        internal fun parse(
+            a: ByteArray?,
+            b: ByteArray?,
+        ): OysterPurse? {
             val purseA = a?.let { OysterPurse(it) }
             val purseB = b?.let { OysterPurse(it) }
             return when {

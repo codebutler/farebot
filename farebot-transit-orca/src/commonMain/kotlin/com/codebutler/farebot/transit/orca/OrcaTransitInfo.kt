@@ -40,7 +40,6 @@ class OrcaTransitInfo(
     private val serialNumberData: Int,
     private val balanceValue: Int,
 ) : TransitInfo() {
-
     override val cardName: String = getStringBlocking(Res.string.transit_orca_card_name)
 
     override val balance: TransitBalance

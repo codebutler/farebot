@@ -37,9 +37,8 @@ class ClassicCard(
     override val tagId: ByteArray,
     override val scannedAt: Instant,
     val sectors: List<ClassicSector>,
-    val isPartialRead: Boolean = false
+    val isPartialRead: Boolean = false,
 ) : Card() {
-
     override val cardType: CardType = CardType.MifareClassic
 
     fun getSector(index: Int): ClassicSector = sectors[index]
@@ -65,26 +64,35 @@ class ClassicCard(
             when (sector) {
                 is UnauthorizedClassicSector -> {
                     sectorUiBuilder.title(
-                        stringResource.getString(Res.string.classic_unauthorized_sector_title_format, sectorIndexString)
+                        stringResource.getString(
+                            Res.string.classic_unauthorized_sector_title_format,
+                            sectorIndexString,
+                        ),
                     )
                 }
                 is InvalidClassicSector -> {
                     sectorUiBuilder.title(
-                        stringResource.getString(Res.string.classic_invalid_sector_title_format, sectorIndexString, sector.error)
+                        stringResource.getString(
+                            Res.string.classic_invalid_sector_title_format,
+                            sectorIndexString,
+                            sector.error,
+                        ),
                     )
                 }
                 else -> {
                     val dataClassicSector = sector as DataClassicSector
-                    sectorUiBuilder.title(stringResource.getString(Res.string.classic_sector_title_format, sectorIndexString))
+                    sectorUiBuilder.title(
+                        stringResource.getString(Res.string.classic_sector_title_format, sectorIndexString),
+                    )
                     for (block in dataClassicSector.blocks) {
-                        sectorUiBuilder.item()
+                        sectorUiBuilder
+                            .item()
                             .title(
                                 stringResource.getString(
                                     Res.string.classic_block_title_format,
-                                    block.index.toString()
-                                )
-                            )
-                            .value(block.data)
+                                    block.index.toString(),
+                                ),
+                            ).value(block.data)
                     }
                 }
             }
@@ -97,8 +105,7 @@ class ClassicCard(
             tagId: ByteArray,
             scannedAt: Instant,
             sectors: List<ClassicSector>,
-            isPartialRead: Boolean = false
-        ): ClassicCard =
-            ClassicCard(tagId, scannedAt, sectors, isPartialRead)
+            isPartialRead: Boolean = false,
+        ): ClassicCard = ClassicCard(tagId, scannedAt, sectors, isPartialRead)
     }
 }

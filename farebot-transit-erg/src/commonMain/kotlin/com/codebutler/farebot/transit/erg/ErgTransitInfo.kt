@@ -36,7 +36,6 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.erg.record.ErgBalanceRecord
 import com.codebutler.farebot.transit.erg.record.ErgIndexRecord
 import com.codebutler.farebot.transit.erg.record.ErgMetadataRecord
-import com.codebutler.farebot.transit.erg.record.ErgPreambleRecord
 import com.codebutler.farebot.transit.erg.record.ErgPurseRecord
 import com.codebutler.farebot.transit.erg.record.ErgRecord
 import farebot.farebot_transit_erg.generated.resources.Res
@@ -51,7 +50,7 @@ data class ErgTransitInfoCapsule(
     val agencyId: Int,
     val balance: Int,
     val trips: List<Trip>,
-    val refills: List<Refill>
+    val refills: List<Refill>,
 )
 
 /**
@@ -63,16 +62,17 @@ data class ErgTransitInfoCapsule(
  */
 open class ErgTransitInfo(
     val capsule: ErgTransitInfoCapsule,
-    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) }
+    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) },
 ) : TransitInfo() {
-
     override val balance: TransitBalance
         get() = TransitBalance(balance = currencyFactory(capsule.balance))
 
     override val serialNumber: String?
-        get() = capsule.cardSerial?.joinToString("") {
-            (it.toInt() and 0xFF).toString(16).padStart(2, '0')
-        }?.uppercase()
+        get() =
+            capsule.cardSerial
+                ?.joinToString("") {
+                    (it.toInt() and 0xFF).toString(16).padStart(2, '0')
+                }?.uppercase()
 
     override val trips: List<Trip> get() = capsule.trips
 
@@ -106,7 +106,7 @@ open class ErgTransitInfo(
         fun parse(
             card: ClassicCard,
             newTrip: (ErgPurseRecord, Int) -> Trip = { purse, epoch -> ErgTrip(purse, epoch) },
-            newRefill: (ErgPurseRecord, Int) -> Refill = { purse, epoch -> ErgRefill(purse, epoch) }
+            newRefill: (ErgPurseRecord, Int) -> Refill = { purse, epoch -> ErgRefill(purse, epoch) },
         ): ErgTransitInfoCapsule {
             val records = mutableListOf<ErgRecord>()
 
@@ -117,16 +117,18 @@ open class ErgTransitInfo(
             val index1 = sector1?.let { ErgIndexRecord.recordFromSector(it) }
             val index2 = sector2?.let { ErgIndexRecord.recordFromSector(it) }
 
-            val activeIndex = when {
-                index1 != null && index2 != null ->
-                    if (index1.version > index2.version) index1 else index2
-                index1 != null -> index1
-                index2 != null -> index2
-                else -> null
-            }
+            val activeIndex =
+                when {
+                    index1 != null && index2 != null ->
+                        if (index1.version > index2.version) index1 else index2
+                    index1 != null -> index1
+                    index2 != null -> index2
+                    else -> null
+                }
 
-            val metadataRecord = getMetadataRecord(card)
-                ?: throw IllegalArgumentException("No metadata record found")
+            val metadataRecord =
+                getMetadataRecord(card)
+                    ?: throw IllegalArgumentException("No metadata record found")
 
             // Iterate through blocks on the card starting from sector 3
             for ((sectorNum, sector) in card.sectors.withIndex()) {
@@ -146,10 +148,12 @@ open class ErgTransitInfo(
             val trips = purseRecords.filter { !it.isCredit }.map { newTrip(it, epochDate) }
             val refills = purseRecords.filter { it.isCredit }.map { newRefill(it, epochDate) }
 
-            val balance = records.filterIsInstance<ErgBalanceRecord>()
-                .sorted()
-                .lastOrNull()
-                ?.balance ?: 0
+            val balance =
+                records
+                    .filterIsInstance<ErgBalanceRecord>()
+                    .sorted()
+                    .lastOrNull()
+                    ?.balance ?: 0
 
             return ErgTransitInfoCapsule(
                 cardSerial = metadataRecord.cardSerial,
@@ -157,7 +161,7 @@ open class ErgTransitInfo(
                 refills = refills.sortedByDescending { it.getTimestamp() },
                 balance = balance,
                 epochDate = epochDate,
-                agencyId = metadataRecord.agencyId
+                agencyId = metadataRecord.agencyId,
             )
         }
     }
@@ -166,7 +170,6 @@ open class ErgTransitInfo(
      * Fallback factory for unrecognized ERG cards.
      */
     open class ErgTransitFactory : TransitFactory<ClassicCard, ErgTransitInfo> {
-
         override val allCards: List<CardInfo> = emptyList()
 
         /**
@@ -195,9 +198,12 @@ open class ErgTransitInfo(
 
         override fun parseIdentity(card: ClassicCard): TransitIdentity {
             val metadata = getMetadataRecord(card)
-            val serial = metadata?.cardSerial?.joinToString("") {
-                (it.toInt() and 0xFF).toString(16).padStart(2, '0')
-            }?.uppercase()
+            val serial =
+                metadata
+                    ?.cardSerial
+                    ?.joinToString("") {
+                        (it.toInt() and 0xFF).toString(16).padStart(2, '0')
+                    }?.uppercase()
             return TransitIdentity.create(NAME, serial)
         }
 

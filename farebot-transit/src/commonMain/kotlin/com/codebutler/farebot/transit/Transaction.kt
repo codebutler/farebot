@@ -74,9 +74,8 @@ abstract class Transaction : Comparable<Transaction> {
 
     open val shortAgencyName: String? get() = agencyName
 
-    open fun shouldBeMerged(other: Transaction): Boolean {
-        return isTapOn && (other.isTapOff || other.isCancel) && isSameTrip(other)
-    }
+    open fun shouldBeMerged(other: Transaction): Boolean =
+        isTapOn && (other.isTapOff || other.isCancel) && isSameTrip(other)
 
     protected abstract fun isSameTrip(other: Transaction): Boolean
 
@@ -90,8 +89,9 @@ abstract class Transaction : Comparable<Transaction> {
     }
 
     class Comparator : kotlin.Comparator<Transaction> {
-        override fun compare(a: Transaction, b: Transaction): Int {
-            return a.compareTo(b)
-        }
+        override fun compare(
+            a: Transaction,
+            b: Transaction,
+        ): Int = a.compareTo(b)
     }
 }

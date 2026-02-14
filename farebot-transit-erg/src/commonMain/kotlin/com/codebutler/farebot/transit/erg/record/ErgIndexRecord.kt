@@ -31,10 +31,13 @@ import com.codebutler.farebot.card.classic.DataClassicSector
 data class ErgIndexRecord(
     val version: Int,
     val version2: Int,
-    private val allocations: Map<Int, Int>
+    private val allocations: Map<Int, Int>,
 ) {
-
-    fun readRecord(sectorNum: Int, blockNum: Int, data: ByteArray): ErgRecord? {
+    fun readRecord(
+        sectorNum: Int,
+        blockNum: Int,
+        data: ByteArray,
+    ): ErgRecord? {
         val block = sectorNum * 3 + blockNum
         val type = allocations[block] ?: 0
         val factory = FACTORIES[type] ?: return null
@@ -42,32 +45,32 @@ data class ErgIndexRecord(
     }
 
     companion object {
-        private val FACTORIES: Map<Int, (ByteArray) -> ErgRecord?> = mapOf(
-            0x03 to ErgBalanceRecord.Companion::recordFromBytes,
-            0x14 to ErgPurseRecord.Companion::recordFromBytes,
-            0x15 to ErgPurseRecord.Companion::recordFromBytes,
-            0x16 to ErgPurseRecord.Companion::recordFromBytes,
-            0x17 to ErgPurseRecord.Companion::recordFromBytes,
-            0x18 to ErgPurseRecord.Companion::recordFromBytes,
-            0x19 to ErgPurseRecord.Companion::recordFromBytes,
-            0x1a to ErgPurseRecord.Companion::recordFromBytes,
-            0x1b to ErgPurseRecord.Companion::recordFromBytes,
-            0x1c to ErgPurseRecord.Companion::recordFromBytes,
-            0x1d to ErgPurseRecord.Companion::recordFromBytes
-        )
+        private val FACTORIES: Map<Int, (ByteArray) -> ErgRecord?> =
+            mapOf(
+                0x03 to ErgBalanceRecord.Companion::recordFromBytes,
+                0x14 to ErgPurseRecord.Companion::recordFromBytes,
+                0x15 to ErgPurseRecord.Companion::recordFromBytes,
+                0x16 to ErgPurseRecord.Companion::recordFromBytes,
+                0x17 to ErgPurseRecord.Companion::recordFromBytes,
+                0x18 to ErgPurseRecord.Companion::recordFromBytes,
+                0x19 to ErgPurseRecord.Companion::recordFromBytes,
+                0x1a to ErgPurseRecord.Companion::recordFromBytes,
+                0x1b to ErgPurseRecord.Companion::recordFromBytes,
+                0x1c to ErgPurseRecord.Companion::recordFromBytes,
+                0x1d to ErgPurseRecord.Companion::recordFromBytes,
+            )
 
-        fun recordFromSector(sector: DataClassicSector): ErgIndexRecord {
-            return recordFromBytes(
+        fun recordFromSector(sector: DataClassicSector): ErgIndexRecord =
+            recordFromBytes(
                 sector.getBlock(0).data,
                 sector.getBlock(1).data,
-                sector.getBlock(2).data
+                sector.getBlock(2).data,
             )
-        }
 
         fun recordFromBytes(
             block0: ByteArray,
             block1: ByteArray,
-            block2: ByteArray
+            block2: ByteArray,
         ): ErgIndexRecord {
             val version = ErgRecord.byteArrayToInt(block0, 1, 2)
             val allocations = mutableMapOf<Int, Int>()

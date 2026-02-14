@@ -32,7 +32,6 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_mrtj.generated.resources.*
 
 class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -41,51 +40,62 @@ class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
         private const val SERVICE_MRTJ_ID = 0x100B
         private const val SERVICE_MRTJ_BALANCE = 0x10D7
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.mrtj_longname,
-            cardType = CardType.FeliCa,
-            region = TransitRegion.INDONESIA,
-            locationRes = Res.string.location_jakarta_indonesia,
-            imageRes = Res.drawable.mrtj_card,
-            latitude = -6.2088f,
-            longitude = 106.8456f,
-            brandColor = 0x86B6B4,
-            credits = listOf("Metrodroid Project", "Bondan Sumbodo"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.mrtj_longname,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.INDONESIA,
+                locationRes = Res.string.location_jakarta_indonesia,
+                imageRes = Res.drawable.mrtj_card,
+                latitude = -6.2088f,
+                longitude = 106.8456f,
+                brandColor = 0x86B6B4,
+                credits = listOf("Metrodroid Project", "Bondan Sumbodo"),
+            )
     }
 
-    override fun check(card: FelicaCard): Boolean {
-        return card.getSystem(SYSTEMCODE_MRTJ) != null
-    }
+    override fun check(card: FelicaCard): Boolean = card.getSystem(SYSTEMCODE_MRTJ) != null
 
-    override fun parseIdentity(card: FelicaCard): TransitIdentity {
-        return TransitIdentity.create(getStringBlocking(Res.string.mrtj_longname), "")
-    }
+    override fun parseIdentity(card: FelicaCard): TransitIdentity =
+        TransitIdentity.create(getStringBlocking(Res.string.mrtj_longname), "")
 
     override fun parseInfo(card: FelicaCard): MRTJTransitInfo {
         val serviceBalance = card.getSystem(SYSTEMCODE_MRTJ)?.getService(SERVICE_MRTJ_BALANCE)
         val dataBalance = serviceBalance?.blocks?.get(0)?.data
 
-        val currentBalance = if (dataBalance != null) {
-            byteArrayToIntReversed(dataBalance, 0, 4)
-        } else 0
+        val currentBalance =
+            if (dataBalance != null) {
+                byteArrayToIntReversed(dataBalance, 0, 4)
+            } else {
+                0
+            }
 
-        val transactionCounter = if (dataBalance != null) {
-            byteArrayToInt(dataBalance, 13, 3)
-        } else 0
+        val transactionCounter =
+            if (dataBalance != null) {
+                byteArrayToInt(dataBalance, 13, 3)
+            } else {
+                0
+            }
 
-        val lastTransAmount = if (dataBalance != null) {
-            byteArrayToIntReversed(dataBalance, 4, 4)
-        } else 0
+        val lastTransAmount =
+            if (dataBalance != null) {
+                byteArrayToIntReversed(dataBalance, 4, 4)
+            } else {
+                0
+            }
 
         return MRTJTransitInfo(
             currentBalance = currentBalance,
             transactionCounter = transactionCounter,
-            lastTransAmount = lastTransAmount
+            lastTransAmount = lastTransAmount,
         )
     }
 
-    private fun byteArrayToIntReversed(data: ByteArray, offset: Int, length: Int): Int {
+    private fun byteArrayToIntReversed(
+        data: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         var result = 0
         for (i in (length - 1) downTo 0) {
             result = result shl 8
@@ -94,7 +104,11 @@ class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
         return result
     }
 
-    private fun byteArrayToInt(data: ByteArray, offset: Int, length: Int): Int {
+    private fun byteArrayToInt(
+        data: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         var result = 0
         for (i in 0 until length) {
             result = result shl 8

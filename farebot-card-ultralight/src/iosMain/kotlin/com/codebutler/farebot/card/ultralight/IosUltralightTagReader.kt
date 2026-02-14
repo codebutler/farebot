@@ -37,15 +37,15 @@ class IosUltralightTagReader(
     private val tagId: ByteArray,
     private val tech: UltralightTechnology,
 ) {
-
     fun readTag(): RawUltralightCard {
         tech.connect()
         try {
-            val size: Int = when (tech.type) {
-                UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
-                UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
-                else -> throw IllegalArgumentException("Unknown Ultralight type ${tech.type}")
-            }
+            val size: Int =
+                when (tech.type) {
+                    UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
+                    UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
+                    else -> throw IllegalArgumentException("Unknown Ultralight type ${tech.type}")
+                }
 
             var pageNumber = 0
             var pageBuffer = ByteArray(0)

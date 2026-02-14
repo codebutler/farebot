@@ -28,18 +28,17 @@ import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.zolotayakorona.RussiaTaxCodes
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class UmarshTrip(
     private val timestamp: Instant,
     private val routeNameValue: String,
     private val vehicleIDValue: String,
-    private val transportType: Int
+    private val transportType: Int,
 ) : Trip() {
-
     override val startTimestamp: Instant get() = timestamp
 
     override val routeName: String get() = routeNameValue
@@ -49,17 +48,21 @@ class UmarshTrip(
     override val fare: TransitCurrency? get() = null
 
     override val mode: Mode
-        get() = when (transportType) {
-            1 -> Mode.BUS
-            2 -> Mode.TROLLEYBUS
-            3 -> Mode.TRAM
-            4 -> Mode.BUS
-            5 -> Mode.BUS
-            else -> Mode.OTHER
-        }
+        get() =
+            when (transportType) {
+                1 -> Mode.BUS
+                2 -> Mode.TROLLEYBUS
+                3 -> Mode.TRAM
+                4 -> Mode.BUS
+                5 -> Mode.BUS
+                else -> Mode.OTHER
+            }
 
     companion object {
-        fun parse(raw: ByteArray, region: Int): UmarshTrip? {
+        fun parse(
+            raw: ByteArray,
+            region: Int,
+        ): UmarshTrip? {
             val trans = raw.getBitsFromBuffer(0, 3)
             val tm = raw.getBitsFromBuffer(3, 13)
             val date = parseDate(raw, 16) ?: return null
@@ -72,13 +75,16 @@ class UmarshTrip(
                 timestamp = instant,
                 routeNameValue = route,
                 vehicleIDValue = veh,
-                transportType = trans
+                transportType = trans,
             )
         }
     }
 }
 
-internal fun parseDate(raw: ByteArray, off: Int): LocalDate? {
+internal fun parseDate(
+    raw: ByteArray,
+    off: Int,
+): LocalDate? {
     val rawBits = raw.getBitsFromBuffer(off, 16)
     if (rawBits == 0 || rawBits == 0xffff) return null
     val year = raw.getBitsFromBuffer(off, 7) + 2000

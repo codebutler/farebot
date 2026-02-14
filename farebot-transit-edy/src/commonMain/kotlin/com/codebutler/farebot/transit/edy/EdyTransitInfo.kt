@@ -36,9 +36,8 @@ import farebot.farebot_transit_edy.generated.resources.card_name_edy
 class EdyTransitInfo(
     override val trips: List<Trip>,
     private val serialNumberData: ByteArray,
-    private val currentBalance: Int
+    private val currentBalance: Int,
 ) : TransitInfo() {
-
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.JPY(currentBalance))
 
@@ -69,7 +68,10 @@ class EdyTransitInfo(
         const val FELICA_MODE_EDY_CHARGE = 0x02
         const val FELICA_MODE_EDY_GIFT = 0x04
 
-        fun create(trips: List<Trip>, serialNumberData: ByteArray, currentBalance: Int): EdyTransitInfo =
-            EdyTransitInfo(trips, serialNumberData, currentBalance)
+        fun create(
+            trips: List<Trip>,
+            serialNumberData: ByteArray,
+            currentBalance: Int,
+        ): EdyTransitInfo = EdyTransitInfo(trips, serialNumberData, currentBalance)
     }
 }

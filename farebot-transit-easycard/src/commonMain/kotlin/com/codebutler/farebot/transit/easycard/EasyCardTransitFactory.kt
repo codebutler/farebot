@@ -28,7 +28,6 @@
 package com.codebutler.farebot.transit.easycard
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.card.CardType
@@ -41,15 +40,15 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_easycard.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.getString
+import kotlin.time.Instant
 
-class EasyCardTransitFactory(private val stringResource: StringResource) : TransitFactory<ClassicCard, EasyCardTransitInfo> {
-
+class EasyCardTransitFactory(
+    private val stringResource: StringResource,
+) : TransitFactory<ClassicCard, EasyCardTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -60,25 +59,41 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
         private val TAIPEI_TZ = TimeZone.of("Asia/Taipei")
 
         // Magic bytes at sector 0, block 1 that identify EasyCard
-        private val MAGIC = byteArrayOf(
-            0x0e, 0x14, 0x00, 0x01, 0x07, 0x02, 0x08, 0x03,
-            0x09, 0x04, 0x08, 0x10, 0x00, 0x00, 0x00, 0x00
-        )
+        private val MAGIC =
+            byteArrayOf(
+                0x0e,
+                0x14,
+                0x00,
+                0x01,
+                0x07,
+                0x02,
+                0x08,
+                0x03,
+                0x09,
+                0x04,
+                0x08,
+                0x10,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+            )
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.easycard_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.TAIWAN,
-            locationRes = Res.string.easycard_card_location,
-            keysRequired = true,
-            extraNoteRes = Res.string.easycard_card_note,
-            imageRes = Res.drawable.easycard,
-            latitude = 25.0330f,
-            longitude = 121.5654f,
-            brandColor = 0xE63279,
-            credits = listOf("b33f"),
-            sampleDumpFile = "EasyCard.mfc",
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.easycard_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.TAIWAN,
+                locationRes = Res.string.easycard_card_location,
+                keysRequired = true,
+                extraNoteRes = Res.string.easycard_card_note,
+                imageRes = Res.drawable.easycard,
+                latitude = 25.0330f,
+                longitude = 121.5654f,
+                brandColor = 0xE63279,
+                credits = listOf("b33f"),
+                sampleDumpFile = "EasyCard.mfc",
+            )
 
         /**
          * Parse an EasyCard timestamp to an Instant.
@@ -100,7 +115,8 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
             // Try MDST database first
             val result = MdstStationLookup.getStation(EASYCARD_STR, stationId)
             if (result != null) {
-                return Station.Builder()
+                return Station
+                    .Builder()
                     .stationName(result.stationName)
                     .shortStationName(result.shortStationName)
                     .companyName(result.companyName)
@@ -126,14 +142,14 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
 
     override fun check(card: ClassicCard): Boolean {
         // Check magic bytes at sector 0, block 1
-        val data = (card.getSector(0) as? DataClassicSector)?.getBlock(1)?.data
-            ?: return false
+        val data =
+            (card.getSector(0) as? DataClassicSector)?.getBlock(1)?.data
+                ?: return false
         return data.contentEquals(MAGIC)
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(stringResource.getString(Res.string.easycard_card_name), null)
-    }
+    override fun parseIdentity(card: ClassicCard): TransitIdentity =
+        TransitIdentity.create(stringResource.getString(Res.string.easycard_card_name), null)
 
     override fun parseInfo(card: ClassicCard): EasyCardTransitInfo {
         val balance = parseBalance(card)
@@ -141,15 +157,16 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
         val topUp = EasyCardTopUp.parse(card)
 
         // Combine trips and top-up into a single list
-        val allTrips: List<Trip> = if (topUp != null) {
-            trips + listOf(topUp)
-        } else {
-            trips
-        }
+        val allTrips: List<Trip> =
+            if (topUp != null) {
+                trips + listOf(topUp)
+            } else {
+                trips
+            }
 
         return EasyCardTransitInfo(
             balanceValue = balance,
-            tripList = allTrips
+            tripList = allTrips,
         )
     }
 
@@ -158,8 +175,9 @@ class EasyCardTransitFactory(private val stringResource: StringResource) : Trans
      * Balance is a 4-byte little-endian integer.
      */
     private fun parseBalance(card: ClassicCard): Int {
-        val data = (card.getSector(2) as? DataClassicSector)?.getBlock(0)?.data
-            ?: return 0
+        val data =
+            (card.getSector(2) as? DataClassicSector)?.getBlock(0)?.data
+                ?: return 0
         return data.byteArrayToIntReversed(0, 4)
     }
 }

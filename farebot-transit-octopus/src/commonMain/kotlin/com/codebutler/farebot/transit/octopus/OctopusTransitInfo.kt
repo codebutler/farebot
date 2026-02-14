@@ -22,13 +22,13 @@
 
 package com.codebutler.farebot.transit.octopus
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_octopus.generated.resources.*
-import com.codebutler.farebot.base.util.getStringBlocking
 
 /**
  * Reader for Octopus (Hong Kong)
@@ -36,9 +36,8 @@ import com.codebutler.farebot.base.util.getStringBlocking
  */
 class OctopusTransitInfo(
     private val octopusBalance: Int?,
-    private val shenzhenBalance: Int?
+    private val shenzhenBalance: Int?,
 ) : TransitInfo() {
-
     private val hasOctopus: Boolean get() = octopusBalance != null
     private val hasShenzhen: Boolean get() = shenzhenBalance != null
 
@@ -52,10 +51,8 @@ class OctopusTransitInfo(
             octopusBalance: Int?,
             shenzhenBalance: Int?,
             @Suppress("UNUSED_PARAMETER") hasOctopus: Boolean,
-            @Suppress("UNUSED_PARAMETER") hasShenzen: Boolean
-        ): OctopusTransitInfo {
-            return OctopusTransitInfo(octopusBalance, shenzhenBalance)
-        }
+            @Suppress("UNUSED_PARAMETER") hasShenzen: Boolean,
+        ): OctopusTransitInfo = OctopusTransitInfo(octopusBalance, shenzhenBalance)
     }
 
     override val balance: TransitBalance?
@@ -79,26 +76,29 @@ class OctopusTransitInfo(
         }
 
     override val cardName: String
-        get() = if (hasShenzhen) {
-            if (hasOctopus) {
-                getStringBlocking(Res.string.octopus_dual_card_name)
+        get() =
+            if (hasShenzhen) {
+                if (hasOctopus) {
+                    getStringBlocking(Res.string.octopus_dual_card_name)
+                } else {
+                    getStringBlocking(Res.string.octopus_szt_card_name)
+                }
             } else {
-                getStringBlocking(Res.string.octopus_szt_card_name)
+                getStringBlocking(Res.string.octopus_card_name)
             }
-        } else {
-            getStringBlocking(Res.string.octopus_card_name)
-        }
 
     override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
         // Dual-mode card, show the CNY balance here.
         val szt = shenzhenBalance
         if (hasOctopus && szt != null) {
             val uiBuilder = FareBotUiTree.builder(stringResource)
-            val apbUiBuilder = uiBuilder.item()
-                .title(Res.string.octopus_alternate_purse_balances)
+            val apbUiBuilder =
+                uiBuilder
+                    .item()
+                    .title(Res.string.octopus_alternate_purse_balances)
             apbUiBuilder.item(
                 Res.string.octopus_szt,
-                TransitCurrency.CNY(szt).formatCurrencyString(isBalance = true)
+                TransitCurrency.CNY(szt).formatCurrencyString(isBalance = true),
             )
             return uiBuilder.build()
         }

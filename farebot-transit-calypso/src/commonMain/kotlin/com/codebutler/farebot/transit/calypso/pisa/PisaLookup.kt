@@ -34,16 +34,21 @@ internal object PisaLookup : En1545LookupSTR("pisa") {
 
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
 
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode = Trip.Mode.OTHER
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        316 to Res.string.pisa_abb_ann_pers,
-        317 to Res.string.pisa_abb_mens_pers,
-        322 to Res.string.pisa_carnet_10_70min,
-        385 to Res.string.pisa_abb_trim_pers
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            316 to Res.string.pisa_abb_ann_pers,
+            317 to Res.string.pisa_abb_mens_pers,
+            322 to Res.string.pisa_carnet_10_70min,
+            385 to Res.string.pisa_abb_trim_pers,
+        )
 
-    fun subscriptionUsesCounter(agency: Int?, contractTariff: Int?): Boolean {
-        return contractTariff !in listOf(316, 317, 385)
-    }
+    fun subscriptionUsesCounter(
+        agency: Int?,
+        contractTariff: Int?,
+    ): Boolean = contractTariff !in listOf(316, 317, 385)
 }

@@ -37,9 +37,8 @@ import kotlin.time.Instant
 internal class TouchnGoInProgressTrip(
     override val startTimestamp: Instant,
     private val startStationCode: TouchnGoStationId,
-    private val agencyRawShort: ByteArray
+    private val agencyRawShort: ByteArray,
 ) : Trip() {
-
     override val fare: TransitCurrency? get() = null
 
     override val mode: Mode get() = Mode.OTHER
@@ -56,7 +55,7 @@ internal class TouchnGoInProgressTrip(
             return TouchnGoInProgressTrip(
                 agencyRawShort = blk.copyOfRange(0, 2),
                 startTimestamp = parseTimestamp(blk, 2),
-                startStationCode = TouchnGoStationId.parse(blk, 6)
+                startStationCode = TouchnGoStationId.parse(blk, 6),
             )
         }
     }

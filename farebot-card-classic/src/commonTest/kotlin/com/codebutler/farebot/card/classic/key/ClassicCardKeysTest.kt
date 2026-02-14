@@ -38,7 +38,6 @@ import kotlin.test.assertTrue
  */
 @OptIn(ExperimentalStdlibApi::class)
 class ClassicCardKeysTest {
-
     @Test
     fun testStaticKeys() {
         // Test well-known static keys
@@ -160,8 +159,8 @@ class ClassicCardKeysTest {
         // Fill with default keys
         val defaultKey = "FFFFFFFFFFFF".hexToByteArray()
         for (i in 0 until numSectors) {
-            defaultKey.copyInto(keyDump, i * 6)         // KeyA
-            defaultKey.copyInto(keyDump, (i + numSectors) * 6)  // KeyB
+            defaultKey.copyInto(keyDump, i * 6) // KeyA
+            defaultKey.copyInto(keyDump, (i + numSectors) * 6) // KeyB
         }
 
         val keys = ClassicCardKeys.fromProxmark3(keyDump)

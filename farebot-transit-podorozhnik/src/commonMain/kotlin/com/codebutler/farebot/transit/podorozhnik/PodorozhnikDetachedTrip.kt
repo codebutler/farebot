@@ -26,8 +26,9 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import kotlin.time.Instant
 
-internal class PodorozhnikDetachedTrip(private val mTimestamp: Int) : Trip() {
-
+internal class PodorozhnikDetachedTrip(
+    private val mTimestamp: Int,
+) : Trip() {
     override val startTimestamp: Instant?
         get() = PodorozhnikTransitInfo.convertDate(mTimestamp)
 

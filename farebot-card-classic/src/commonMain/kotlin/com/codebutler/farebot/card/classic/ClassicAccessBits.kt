@@ -37,16 +37,15 @@ package com.codebutler.farebot.card.classic
 class ClassicAccessBits private constructor(
     private val c1: Int,
     private val c2: Int,
-    private val c3: Int
+    private val c3: Int,
 ) {
-
     /**
      * Parse access bits from the 3-byte access bits field (bytes 6-8 of trailer).
      */
     constructor(raw: ByteArray) : this(
         c1 = (raw[1].toInt() and 0xf0) shr 4,
         c2 = raw[2].toInt() and 0xf,
-        c3 = (raw[2].toInt() and 0xf0) shr 4
+        c3 = (raw[2].toInt() and 0xf0) shr 4,
     )
 
     /**
@@ -62,7 +61,10 @@ class ClassicAccessBits private constructor(
      * @param slot Block index (0-2 for data blocks)
      * @param useKeyB true if authenticating with Key B, false for Key A
      */
-    fun isDataBlockReadable(slot: Int, useKeyB: Boolean): Boolean =
+    fun isDataBlockReadable(
+        slot: Int,
+        useKeyB: Boolean,
+    ): Boolean =
         when (getSlot(slot)) {
             0, 1, 2, 4, 6 -> true
             3, 5 -> useKeyB && !isKeyBReadable
@@ -71,14 +73,17 @@ class ClassicAccessBits private constructor(
         }
 
     enum class AccessLevel {
-        NEVER, KEY_A, KEY_B, KEY_AB
+        NEVER,
+        KEY_A,
+        KEY_B,
+        KEY_AB,
     }
 
     data class BlockAccess(
         val read: AccessLevel,
         val write: AccessLevel,
         val increment: AccessLevel,
-        val decrement: AccessLevel
+        val decrement: AccessLevel,
     )
 
     /**

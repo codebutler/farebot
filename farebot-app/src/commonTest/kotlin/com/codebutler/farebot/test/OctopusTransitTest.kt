@@ -33,11 +33,11 @@ import com.codebutler.farebot.transit.octopus.OctopusTransitInfo
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlin.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Tests for Octopus card.
@@ -53,12 +53,11 @@ import kotlin.test.assertTrue
  * See: https://www.octopus.com.hk/en/consumer/customer-service/faq/get-your-octopus/about-octopus.html#3532
  */
 class OctopusTransitTest {
-
     private val factory = OctopusTransitFactory()
 
     private fun octopusCardFromHex(
         s: String,
-        scannedAt: Instant
+        scannedAt: Instant,
     ): com.codebutler.farebot.card.felica.FelicaCard {
         val data = hexToBytes(s)
 
@@ -69,15 +68,19 @@ class OctopusTransitTest {
         val blockUnknown = felicaBlock(0, ByteArray(16))
         val serviceUnknown = felicaService(0x100b, listOf(blockUnknown))
 
-        val system = felicaSystem(
-            FeliCaConstants.SYSTEMCODE_OCTOPUS,
-            listOf(serviceBalance, serviceUnknown)
-        )
+        val system =
+            felicaSystem(
+                FeliCaConstants.SYSTEMCODE_OCTOPUS,
+                listOf(serviceBalance, serviceUnknown),
+            )
 
         return felicaCard(systems = listOf(system), scannedAt = scannedAt)
     }
 
-    private fun checkCard(card: com.codebutler.farebot.card.felica.FelicaCard, expectedBalance: TransitCurrency) {
+    private fun checkCard(
+        card: com.codebutler.farebot.card.felica.FelicaCard,
+        expectedBalance: TransitCurrency,
+    ) {
         // Test factory detection
         assertTrue(factory.check(card))
 

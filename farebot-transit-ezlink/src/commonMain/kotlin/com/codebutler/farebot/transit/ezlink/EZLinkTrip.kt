@@ -33,8 +33,7 @@ import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_ezlink.generated.resources.*
 import kotlin.time.Instant
 
-private fun String.toStationOrNull(): Station? =
-    trim().ifEmpty { null }?.let { Station.nameOnly(it) }
+private fun String.toStationOrNull(): Station? = trim().ifEmpty { null }?.let { Station.nameOnly(it) }
 
 internal data class EZUserData(
     val startStation: Station?,
@@ -42,15 +41,20 @@ internal data class EZUserData(
     val routeName: String,
 ) {
     companion object {
-        fun parse(userData: String, type: CEPASTransaction.TransactionType, stringResource: StringResource): EZUserData {
+        fun parse(
+            userData: String,
+            type: CEPASTransaction.TransactionType,
+            stringResource: StringResource,
+        ): EZUserData {
             if ((type == CEPASTransaction.TransactionType.BUS || type == CEPASTransaction.TransactionType.BUS_REFUND) &&
                 (userData.startsWith("SVC") || userData.startsWith("BUS"))
             ) {
-                val routeName = if (type == CEPASTransaction.TransactionType.BUS_REFUND) {
-                    stringResource.getString(Res.string.ez_bus_refund)
-                } else {
-                    stringResource.getString(Res.string.ez_bus_number, userData.substring(3, 7).replace(" ", ""))
-                }
+                val routeName =
+                    if (type == CEPASTransaction.TransactionType.BUS_REFUND) {
+                        stringResource.getString(Res.string.ez_bus_refund)
+                    } else {
+                        stringResource.getString(Res.string.ez_bus_number, userData.substring(3, 7).replace(" ", ""))
+                    }
                 return EZUserData(
                     startStation = null,
                     endStation = null,
@@ -61,17 +65,26 @@ internal data class EZUserData(
                 return EZUserData(userData.toStationOrNull(), null, stringResource.getString(Res.string.ez_first_use))
             }
             if (type == CEPASTransaction.TransactionType.RETAIL) {
-                return EZUserData(userData.toStationOrNull(), null, stringResource.getString(Res.string.ez_retail_purchase))
+                return EZUserData(
+                    userData.toStationOrNull(),
+                    null,
+                    stringResource.getString(Res.string.ez_retail_purchase),
+                )
             }
 
-            val routeName = when (type) {
-                CEPASTransaction.TransactionType.BUS -> stringResource.getString(Res.string.ez_unknown_format, userData)
-                CEPASTransaction.TransactionType.BUS_REFUND -> stringResource.getString(Res.string.ez_bus_refund)
-                CEPASTransaction.TransactionType.MRT -> stringResource.getString(Res.string.ez_mrt)
-                CEPASTransaction.TransactionType.TOP_UP -> stringResource.getString(Res.string.ez_topup)
-                CEPASTransaction.TransactionType.SERVICE -> stringResource.getString(Res.string.ez_service_charge)
-                else -> stringResource.getString(Res.string.ez_unknown_format, type.toString())
-            }
+            val routeName =
+                when (type) {
+                    CEPASTransaction.TransactionType.BUS ->
+                        stringResource.getString(
+                            Res.string.ez_unknown_format,
+                            userData,
+                        )
+                    CEPASTransaction.TransactionType.BUS_REFUND -> stringResource.getString(Res.string.ez_bus_refund)
+                    CEPASTransaction.TransactionType.MRT -> stringResource.getString(Res.string.ez_mrt)
+                    CEPASTransaction.TransactionType.TOP_UP -> stringResource.getString(Res.string.ez_topup)
+                    CEPASTransaction.TransactionType.SERVICE -> stringResource.getString(Res.string.ez_service_charge)
+                    else -> stringResource.getString(Res.string.ez_unknown_format, type.toString())
+                }
 
             if (userData.length > 6 && (userData[3] == '-' || userData[3] == ' ')) {
                 val startStationAbbr = userData.substring(0, 3)
@@ -92,7 +105,6 @@ class EZLinkTrip(
     private val cardName: String,
     private val stringResource: StringResource,
 ) : Trip() {
-
     override val startTimestamp: Instant
         get() = Instant.fromEpochSeconds(transaction.timestamp.toLong())
 
@@ -103,11 +115,12 @@ class EZLinkTrip(
         get() = transaction.userData
 
     override val fare: TransitCurrency?
-        get() = if (transaction.type == CEPASTransaction.TransactionType.CREATION) {
-            null
-        } else {
-            TransitCurrency.SGD(-transaction.amount)
-        }
+        get() =
+            if (transaction.type == CEPASTransaction.TransactionType.CREATION) {
+                null
+            } else {
+                TransitCurrency.SGD(-transaction.amount)
+            }
 
     override val startStation: Station?
         get() = EZUserData.parse(transaction.userData, transaction.type, stringResource).startStation
@@ -125,34 +138,40 @@ class EZLinkTrip(
         get() = getAgencyName(transaction.type, cardName, isShort = true, stringResource)
 
     companion object {
-        fun getMode(type: CEPASTransaction.TransactionType): Mode = when (type) {
-            CEPASTransaction.TransactionType.BUS,
-            CEPASTransaction.TransactionType.BUS_REFUND -> Mode.BUS
-            CEPASTransaction.TransactionType.MRT -> Mode.METRO
-            CEPASTransaction.TransactionType.TOP_UP -> Mode.TICKET_MACHINE
-            CEPASTransaction.TransactionType.RETAIL,
-            CEPASTransaction.TransactionType.SERVICE -> Mode.POS
-            else -> Mode.OTHER
-        }
+        fun getMode(type: CEPASTransaction.TransactionType): Mode =
+            when (type) {
+                CEPASTransaction.TransactionType.BUS,
+                CEPASTransaction.TransactionType.BUS_REFUND,
+                -> Mode.BUS
+                CEPASTransaction.TransactionType.MRT -> Mode.METRO
+                CEPASTransaction.TransactionType.TOP_UP -> Mode.TICKET_MACHINE
+                CEPASTransaction.TransactionType.RETAIL,
+                CEPASTransaction.TransactionType.SERVICE,
+                -> Mode.POS
+                else -> Mode.OTHER
+            }
 
         fun getAgencyName(
             type: CEPASTransaction.TransactionType,
             cardName: String,
             isShort: Boolean,
             stringResource: StringResource,
-        ): String = when (type) {
-            CEPASTransaction.TransactionType.BUS,
-            CEPASTransaction.TransactionType.BUS_REFUND -> stringResource.getString(Res.string.ezlink_agency_bus)
-            CEPASTransaction.TransactionType.CREATION,
-            CEPASTransaction.TransactionType.TOP_UP,
-            CEPASTransaction.TransactionType.SERVICE ->
-                if (isShort && cardName == stringResource.getString(Res.string.ezlink_issuer_ezlink)) {
-                    stringResource.getString(Res.string.ezlink_agency_ez)
-                } else {
-                    cardName
-                }
-            CEPASTransaction.TransactionType.RETAIL -> stringResource.getString(Res.string.ezlink_agency_pos)
-            else -> stringResource.getString(Res.string.ezlink_agency_smrt)
-        }
+        ): String =
+            when (type) {
+                CEPASTransaction.TransactionType.BUS,
+                CEPASTransaction.TransactionType.BUS_REFUND,
+                -> stringResource.getString(Res.string.ezlink_agency_bus)
+                CEPASTransaction.TransactionType.CREATION,
+                CEPASTransaction.TransactionType.TOP_UP,
+                CEPASTransaction.TransactionType.SERVICE,
+                ->
+                    if (isShort && cardName == stringResource.getString(Res.string.ezlink_issuer_ezlink)) {
+                        stringResource.getString(Res.string.ezlink_agency_ez)
+                    } else {
+                        cardName
+                    }
+                CEPASTransaction.TransactionType.RETAIL -> stringResource.getString(Res.string.ezlink_agency_pos)
+                else -> stringResource.getString(Res.string.ezlink_agency_smrt)
+            }
     }
 }

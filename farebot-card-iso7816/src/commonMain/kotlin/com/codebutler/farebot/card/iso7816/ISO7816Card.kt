@@ -27,9 +27,9 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Represents an ISO 7816-4 smart card.
@@ -42,13 +42,11 @@ import kotlinx.serialization.Serializable
 data class ISO7816Card(
     @Contextual override val tagId: ByteArray,
     override val scannedAt: Instant,
-    val applications: List<ISO7816Application>
+    val applications: List<ISO7816Application>,
 ) : Card() {
-
     override val cardType: CardType = CardType.ISO7816
 
-    fun getApplication(type: String): ISO7816Application? =
-        applications.firstOrNull { it.type == type }
+    fun getApplication(type: String): ISO7816Application? = applications.firstOrNull { it.type == type }
 
     @OptIn(ExperimentalStdlibApi::class)
     fun getApplicationByName(appName: ByteArray): ISO7816Application? =
@@ -99,11 +97,15 @@ data class ISO7816Card(
         fun create(
             tagId: ByteArray,
             scannedAt: Instant,
-            applications: List<ISO7816Application>
+            applications: List<ISO7816Application>,
         ): ISO7816Card = ISO7816Card(tagId, scannedAt, applications)
 
         @OptIn(ExperimentalStdlibApi::class)
         private fun formatAID(aid: ByteArray): String =
-            aid.toHexString().uppercase().chunked(2).joinToString(":")
+            aid
+                .toHexString()
+                .uppercase()
+                .chunked(2)
+                .joinToString(":")
     }
 }

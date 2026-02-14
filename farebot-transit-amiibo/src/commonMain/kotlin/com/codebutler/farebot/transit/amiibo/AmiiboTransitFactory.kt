@@ -41,7 +41,6 @@ import farebot.farebot_transit_amiibo.generated.resources.*
  * https://3dbrew.org/wiki/Amiibo#Data_structures
  */
 class AmiiboTransitFactory : TransitFactory<UltralightCard, AmiiboTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
@@ -63,19 +62,17 @@ class AmiiboTransitFactory : TransitFactory<UltralightCard, AmiiboTransitInfo> {
         return !(page21.all { it == 0.toByte() } && page22.all { it == 0.toByte() })
     }
 
-    override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        return TransitIdentity.create(getStringBlocking(Res.string.amiibo_card_name), null)
-    }
+    override fun parseIdentity(card: UltralightCard): TransitIdentity =
+        TransitIdentity.create(getStringBlocking(Res.string.amiibo_card_name), null)
 
-    override fun parseInfo(card: UltralightCard): AmiiboTransitInfo {
-        return AmiiboTransitInfo(
+    override fun parseInfo(card: UltralightCard): AmiiboTransitInfo =
+        AmiiboTransitInfo(
             character = card.getPage(0x15).data.byteArrayToInt(0, 2),
             characterVariant = card.getPage(0x15).data.byteArrayToInt(2, 1),
             figureType = card.getPage(0x15).data.byteArrayToInt(3, 1),
             modelNumber = card.getPage(0x16).data.byteArrayToInt(0, 2),
-            series = card.getPage(0x16).data.getBitsFromBuffer(16, 8)
+            series = card.getPage(0x16).data.getBitsFromBuffer(16, 8),
         )
-    }
 }
 
 class AmiiboTransitInfo internal constructor(
@@ -83,24 +80,26 @@ class AmiiboTransitInfo internal constructor(
     private val characterVariant: Int,
     private val figureType: Int,
     private val modelNumber: Int,
-    private val series: Int
+    private val series: Int,
 ) : TransitInfo() {
     override val cardName: String = getStringBlocking(Res.string.amiibo_card_name)
     override val serialNumber: String? = null
 
-    private fun figureTypeName(): String = when (figureType) {
-        0 -> getStringBlocking(Res.string.amiibo_figure_type_figure)
-        1 -> getStringBlocking(Res.string.amiibo_figure_type_card)
-        2 -> getStringBlocking(Res.string.amiibo_figure_type_yarn)
-        else -> getStringBlocking(Res.string.amiibo_unknown_type, figureType)
-    }
+    private fun figureTypeName(): String =
+        when (figureType) {
+            0 -> getStringBlocking(Res.string.amiibo_figure_type_figure)
+            1 -> getStringBlocking(Res.string.amiibo_figure_type_card)
+            2 -> getStringBlocking(Res.string.amiibo_figure_type_yarn)
+            else -> getStringBlocking(Res.string.amiibo_unknown_type, figureType)
+        }
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            ListItem(Res.string.amiibo_type, figureTypeName()),
-            ListItem(Res.string.amiibo_character, "0x${character.toString(16).padStart(4, '0')}"),
-            ListItem(Res.string.amiibo_character_variant, characterVariant.toString()),
-            ListItem(Res.string.amiibo_model_number, modelNumber.toString()),
-            ListItem(Res.string.amiibo_series, series.toString())
-        )
+        get() =
+            listOf(
+                ListItem(Res.string.amiibo_type, figureTypeName()),
+                ListItem(Res.string.amiibo_character, "0x${character.toString(16).padStart(4, '0')}"),
+                ListItem(Res.string.amiibo_character_variant, characterVariant.toString()),
+                ListItem(Res.string.amiibo_model_number, modelNumber.toString()),
+                ListItem(Res.string.amiibo_series, series.toString()),
+            )
 }

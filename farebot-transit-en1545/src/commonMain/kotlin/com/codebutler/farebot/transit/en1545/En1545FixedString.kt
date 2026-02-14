@@ -22,16 +22,30 @@
 
 package com.codebutler.farebot.transit.en1545
 
-class En1545FixedString(private val name: String, private val len: Int) : En1545Field {
-
-    override fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int {
+class En1545FixedString(
+    private val name: String,
+    private val len: Int,
+) : En1545Field {
+    override fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int {
         val string = parseString(b, off, len, bitParser)
-        if (string != null)
+        if (string != null) {
             holder.insertString(name, path, string)
+        }
         return off + len
     }
 
-    private fun parseString(bin: ByteArray, start: Int, length: Int, bitParser: En1545Bits): String? {
+    private fun parseString(
+        bin: ByteArray,
+        start: Int,
+        length: Int,
+        bitParser: En1545Bits,
+    ): String? {
         var i = start
         var j = 0
         var lastNonSpace = 0

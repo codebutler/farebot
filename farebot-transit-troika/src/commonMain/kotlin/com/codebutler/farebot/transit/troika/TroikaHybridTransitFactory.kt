@@ -47,7 +47,6 @@ import farebot.farebot_transit_troika.generated.resources.*
 class TroikaHybridTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, TroikaHybridTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -59,13 +58,14 @@ class TroikaHybridTransitFactory(
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         // Check Podorozhnik first (takes priority), then Strelka, matching Metrodroid order
-        val cardName = when {
-            podorozhnikFactory.check(card) ->
-                getStringBlocking(Res.string.card_name_troika_podorozhnik_hybrid)
-            strelkaFactory.check(card) ->
-                getStringBlocking(Res.string.card_name_troika_strelka_hybrid)
-            else -> TroikaTransitFactory.CARD_NAME
-        }
+        val cardName =
+            when {
+                podorozhnikFactory.check(card) ->
+                    getStringBlocking(Res.string.card_name_troika_podorozhnik_hybrid)
+                strelkaFactory.check(card) ->
+                    getStringBlocking(Res.string.card_name_troika_strelka_hybrid)
+                else -> TroikaTransitFactory.CARD_NAME
+            }
 
         // Serial number comes from Troika (shorter, printed larger on card)
         val troikaIdentity = troikaFactory.parseIdentity(card)
@@ -75,17 +75,19 @@ class TroikaHybridTransitFactory(
     override fun parseInfo(card: ClassicCard): TroikaHybridTransitInfo {
         val troika = troikaFactory.parseInfo(card)
 
-        val podorozhnik = if (podorozhnikFactory.check(card)) {
-            podorozhnikFactory.parseInfo(card)
-        } else {
-            null
-        }
+        val podorozhnik =
+            if (podorozhnikFactory.check(card)) {
+                podorozhnikFactory.parseInfo(card)
+            } else {
+                null
+            }
 
-        val strelka = if (strelkaFactory.check(card)) {
-            strelkaFactory.parseInfo(card)
-        } else {
-            null
-        }
+        val strelka =
+            if (strelkaFactory.check(card)) {
+                strelkaFactory.parseInfo(card)
+            } else {
+                null
+            }
 
         return TroikaHybridTransitInfo(
             troika = troika,
@@ -95,17 +97,18 @@ class TroikaHybridTransitFactory(
     }
 
     companion object {
-        internal val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_troika,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.RUSSIA,
-            locationRes = Res.string.troika_location,
-            imageRes = Res.drawable.troika_card,
-            latitude = 55.7558f,
-            longitude = 37.6173f,
-            brandColor = 0x1885A9,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
-            sampleDumpFile = "Troika.json",
-        )
+        internal val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_troika,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.RUSSIA,
+                locationRes = Res.string.troika_location,
+                imageRes = Res.drawable.troika_card,
+                latitude = 55.7558f,
+                longitude = 37.6173f,
+                brandColor = 0x1885A9,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko", "Michael Farrell"),
+                sampleDumpFile = "Troika.json",
+            )
     }
 }

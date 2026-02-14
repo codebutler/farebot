@@ -35,9 +35,8 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 internal class RavKavSubscription(
     override val parsed: En1545Parsed,
     override val stringResource: StringResource,
-    private val counter: Int?
+    private val counter: Int?,
 ) : En1545Subscription() {
-
     override val lookup: En1545Lookup
         get() = RavKavLookup
 
@@ -63,26 +62,27 @@ internal class RavKavSubscription(
         private const val CONTRACT_SALE_NUMBER = "ContractSaleNumber"
         private const val CONTRACT_RESTRICT_DURATION = "ContractRestrictDuration"
 
-        val FIELDS = En1545Container(
-            En1545FixedInteger("Version", 3),
-            En1545FixedInteger.date(En1545Subscription.CONTRACT_START),
-            En1545FixedInteger(En1545Subscription.CONTRACT_PROVIDER, 8),
-            En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 11),
-            En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
-            En1545FixedInteger(En1545Subscription.CONTRACT_SALE_DEVICE, 12),
-            En1545FixedInteger(CONTRACT_SALE_NUMBER, 10),
-            En1545FixedInteger(En1545Subscription.CONTRACT_INTERCHANGE, 1),
-            En1545Bitmap(
-                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 5),
-                En1545FixedInteger(En1545Subscription.CONTRACT_RESTRICT_CODE, 5),
-                En1545FixedInteger(CONTRACT_RESTRICT_DURATION, 6),
-                En1545FixedInteger.date(En1545Subscription.CONTRACT_END),
-                En1545FixedInteger(En1545Subscription.CONTRACT_DURATION, 8),
-                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_B, 32),
-                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_C, 6),
-                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_D, 32),
-                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_E, 32)
+        val FIELDS =
+            En1545Container(
+                En1545FixedInteger("Version", 3),
+                En1545FixedInteger.date(En1545Subscription.CONTRACT_START),
+                En1545FixedInteger(En1545Subscription.CONTRACT_PROVIDER, 8),
+                En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 11),
+                En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
+                En1545FixedInteger(En1545Subscription.CONTRACT_SALE_DEVICE, 12),
+                En1545FixedInteger(CONTRACT_SALE_NUMBER, 10),
+                En1545FixedInteger(En1545Subscription.CONTRACT_INTERCHANGE, 1),
+                En1545Bitmap(
+                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 5),
+                    En1545FixedInteger(En1545Subscription.CONTRACT_RESTRICT_CODE, 5),
+                    En1545FixedInteger(CONTRACT_RESTRICT_DURATION, 6),
+                    En1545FixedInteger.date(En1545Subscription.CONTRACT_END),
+                    En1545FixedInteger(En1545Subscription.CONTRACT_DURATION, 8),
+                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_B, 32),
+                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_C, 6),
+                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_D, 32),
+                    En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_E, 32),
+                ),
             )
-        )
     }
 }

@@ -37,7 +37,6 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's MykiTest.kt.
  */
 class MykiTransitTest {
-
     private val factory = MykiTransitFactory()
 
     private fun constructMykiCardFromHexString(s: String): com.codebutler.farebot.card.desfire.DesfireCard {
@@ -46,10 +45,11 @@ class MykiTransitTest {
         // Construct a card to hold the data.
         // APP_ID_1 = 4594, APP_ID_2 = 15732978
         return desfireCard(
-            applications = listOf(
-                desfireApp(4594, listOf(standardFile(15, demoData))),
-                desfireApp(15732978, emptyList())
-            )
+            applications =
+                listOf(
+                    desfireApp(4594, listOf(standardFile(15, demoData))),
+                    desfireApp(15732978, emptyList()),
+                ),
         )
     }
 
@@ -60,8 +60,8 @@ class MykiTransitTest {
 
         // Verify the card has the expected DESFire application IDs
         assertEquals(2, card.applications.size)
-        assertEquals(4594, card.applications[0].id)      // APP_ID_1
-        assertEquals(15732978, card.applications[1].id)   // APP_ID_2
+        assertEquals(4594, card.applications[0].id) // APP_ID_1
+        assertEquals(15732978, card.applications[1].id) // APP_ID_2
 
         // Verify the factory detects the card
         assertTrue(factory.check(card))

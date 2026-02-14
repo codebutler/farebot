@@ -28,8 +28,10 @@ import farebot.farebot_transit_smartrider.generated.resources.card_name_smartrid
 import farebot.farebot_transit_smartrider.generated.resources.unknown
 import org.jetbrains.compose.resources.StringResource
 
-enum class SmartRiderType(val friendlyName: StringResource) {
+enum class SmartRiderType(
+    val friendlyName: StringResource,
+) {
     UNKNOWN(Res.string.unknown),
     SMARTRIDER(Res.string.card_name_smartrider),
-    MYWAY(Res.string.card_name_myway)
+    MYWAY(Res.string.card_name_myway),
 }

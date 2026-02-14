@@ -28,12 +28,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RawDesfireManufacturingData(
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
     fun parse(): DesfireManufacturingData = DesfireManufacturingData.create(data)
 
     companion object {
-        fun create(data: ByteArray): RawDesfireManufacturingData =
-            RawDesfireManufacturingData(data)
+        fun create(data: ByteArray): RawDesfireManufacturingData = RawDesfireManufacturingData(data)
     }
 }

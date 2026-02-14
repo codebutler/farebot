@@ -28,10 +28,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClassicSectorKey(
     @Contextual val keyA: ByteArray,
-    @Contextual val keyB: ByteArray
+    @Contextual val keyB: ByteArray,
 ) {
     companion object {
-        fun create(keyA: ByteArray, keyB: ByteArray): ClassicSectorKey =
-            ClassicSectorKey(keyA, keyB)
+        fun create(
+            keyA: ByteArray,
+            keyB: ByteArray,
+        ): ClassicSectorKey = ClassicSectorKey(keyA, keyB)
     }
 }

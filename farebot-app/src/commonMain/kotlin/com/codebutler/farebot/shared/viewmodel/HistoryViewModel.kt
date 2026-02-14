@@ -5,10 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.base.util.formatHumanDate
 import com.codebutler.farebot.base.util.formatTimeShort
 import com.codebutler.farebot.base.util.hex
-import farebot.farebot_app.generated.resources.Res
-import farebot.farebot_app.generated.resources.date_today
-import farebot.farebot_app.generated.resources.date_yesterday
-import org.jetbrains.compose.resources.getString
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardPersister
@@ -21,14 +17,18 @@ import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.screen.HistoryItem
 import com.codebutler.farebot.shared.ui.screen.HistoryUiState
-import kotlinx.coroutines.launch
+import farebot.farebot_app.generated.resources.Res
+import farebot.farebot_app.generated.resources.date_today
+import farebot.farebot_app.generated.resources.date_yesterday
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.jetbrains.compose.resources.getString
 
 class HistoryViewModel(
     private val cardPersister: CardPersister,
@@ -39,7 +39,6 @@ class HistoryViewModel(
     private val versionCode: Int = 1,
     private val versionName: String = "1.0.0",
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(HistoryUiState())
     val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
 
@@ -48,6 +47,7 @@ class HistoryViewModel(
 
     // Map item IDs to raw cards for navigation
     private val rawCardMap = mutableMapOf<String, RawCard<*>>()
+
     // Map item IDs to saved cards for deletion
     private val savedCardMap = mutableMapOf<String, SavedCard>()
 
@@ -68,89 +68,94 @@ class HistoryViewModel(
                 val savedCards = cardPersister.getCards()
 
                 // Build flat list of all items (one per scan)
-                val allItems = savedCards.map { savedCard ->
-                    val rawCard = cardSerializer.deserialize(savedCard.data)
-                    val id = savedCard.id.toString()
-                    rawCardMap[id] = rawCard
-                    savedCardMap[id] = savedCard
+                val allItems =
+                    savedCards.map { savedCard ->
+                        val rawCard = cardSerializer.deserialize(savedCard.data)
+                        val id = savedCard.id.toString()
+                        rawCardMap[id] = rawCard
+                        savedCardMap[id] = savedCard
 
-                    var cardName: String? = null
-                    var serial = savedCard.serial
-                    var parseError: String? = null
-                    var brandColor: Int? = null
-                    var keysRequired = false
-                    var keyBundle: String? = null
-                    var preview = false
-                    var serialOnly = false
-                    try {
-                        val card = rawCard.parse()
-                        val cardInfo = transitFactoryRegistry.findCardInfo(card)
-                        val identity = transitFactoryRegistry.parseTransitIdentity(card)
-                        cardName = identity?.name
-                        brandColor = cardInfo?.brandColor
-                        keysRequired = cardInfo?.keysRequired ?: false
-                        keyBundle = cardInfo?.keyBundle
-                        preview = cardInfo?.preview ?: false
-                        serialOnly = cardInfo?.serialOnly ?: false
-                        if (identity?.serialNumber != null) {
-                            serial = identity.serialNumber!!
+                        var cardName: String? = null
+                        var serial = savedCard.serial
+                        var parseError: String? = null
+                        var brandColor: Int? = null
+                        var keysRequired = false
+                        var keyBundle: String? = null
+                        var preview = false
+                        var serialOnly = false
+                        try {
+                            val card = rawCard.parse()
+                            val cardInfo = transitFactoryRegistry.findCardInfo(card)
+                            val identity = transitFactoryRegistry.parseTransitIdentity(card)
+                            cardName = identity?.name
+                            brandColor = cardInfo?.brandColor
+                            keysRequired = cardInfo?.keysRequired ?: false
+                            keyBundle = cardInfo?.keyBundle
+                            preview = cardInfo?.preview ?: false
+                            serialOnly = cardInfo?.serialOnly ?: false
+                            if (identity?.serialNumber != null) {
+                                serial = identity.serialNumber!!
+                            }
+                        } catch (ex: Exception) {
+                            parseError = ex.message
                         }
-                    } catch (ex: Exception) {
-                        parseError = ex.message
-                    }
 
-                    val scannedDate = try {
-                        formatHumanDate(savedCard.scannedAt, todayLabel, yesterdayLabel)
-                    } catch (_: Exception) {
-                        null
-                    }
-                    val scannedTime = try {
-                        formatTimeShort(savedCard.scannedAt)
-                    } catch (_: Exception) {
-                        null
-                    }
+                        val scannedDate =
+                            try {
+                                formatHumanDate(savedCard.scannedAt, todayLabel, yesterdayLabel)
+                            } catch (_: Exception) {
+                                null
+                            }
+                        val scannedTime =
+                            try {
+                                formatTimeShort(savedCard.scannedAt)
+                            } catch (_: Exception) {
+                                null
+                            }
 
-                    HistoryItem(
-                        id = id,
-                        cardName = cardName,
-                        serial = serial,
-                        scannedDate = scannedDate,
-                        scannedTime = scannedTime,
-                        parseError = parseError,
-                        brandColor = brandColor,
-                        cardType = savedCard.type,
-                        keysRequired = keysRequired,
-                        keyBundle = keyBundle,
-                        preview = preview,
-                        serialOnly = serialOnly,
-                        scanCount = 1,
-                        allScanIds = listOf(id),
-                    )
-                }
-
-                // Build deduplicated list (one per unique card, most recent scan first)
-                // Group by identity: cardType:serial
-                val groupedItems = allItems
-                    .groupBy { item ->
-                        val savedCard = savedCardMap[item.id]
-                        if (savedCard != null) "${savedCard.type.name}:${savedCard.serial}" else item.id
-                    }
-                    .map { (_, scans) ->
-                        // scans are already sorted newest-first (from getCards() order)
-                        val newest = scans.first()
-                        newest.copy(
-                            scanCount = scans.size,
-                            allScanIds = scans.map { it.id },
+                        HistoryItem(
+                            id = id,
+                            cardName = cardName,
+                            serial = serial,
+                            scannedDate = scannedDate,
+                            scannedTime = scannedTime,
+                            parseError = parseError,
+                            brandColor = brandColor,
+                            cardType = savedCard.type,
+                            keysRequired = keysRequired,
+                            keyBundle = keyBundle,
+                            preview = preview,
+                            serialOnly = serialOnly,
+                            scanCount = 1,
+                            allScanIds = listOf(id),
                         )
                     }
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    allItems = allItems,
-                    groupedItems = groupedItems,
-                )
+                // Build deduplicated list (one per unique card, most recent scan first)
+                // Group by identity: cardType:serial
+                val groupedItems =
+                    allItems
+                        .groupBy { item ->
+                            val savedCard = savedCardMap[item.id]
+                            if (savedCard != null) "${savedCard.type.name}:${savedCard.serial}" else item.id
+                        }.map { (_, scans) ->
+                            // scans are already sorted newest-first (from getCards() order)
+                            val newest = scans.first()
+                            newest.copy(
+                                scanCount = scans.size,
+                                allScanIds = scans.map { it.id },
+                            )
+                        }
+
+                _uiState.value =
+                    _uiState.value.copy(
+                        isLoading = false,
+                        allItems = allItems,
+                        groupedItems = groupedItems,
+                    )
             } catch (e: Throwable) {
-                _uiState.value = _uiState.value.copy(isLoading = false, allItems = emptyList(), groupedItems = emptyList())
+                _uiState.value =
+                    _uiState.value.copy(isLoading = false, allItems = emptyList(), groupedItems = emptyList())
             }
         }
     }
@@ -161,22 +166,25 @@ class HistoryViewModel(
 
     fun toggleSelection(itemId: String) {
         val current = _uiState.value
-        val newSelected = if (current.selectedIds.contains(itemId)) {
-            current.selectedIds - itemId
-        } else {
-            current.selectedIds + itemId
-        }
-        _uiState.value = current.copy(
-            selectedIds = newSelected,
-            isSelectionMode = newSelected.isNotEmpty(),
-        )
+        val newSelected =
+            if (current.selectedIds.contains(itemId)) {
+                current.selectedIds - itemId
+            } else {
+                current.selectedIds + itemId
+            }
+        _uiState.value =
+            current.copy(
+                selectedIds = newSelected,
+                isSelectionMode = newSelected.isNotEmpty(),
+            )
     }
 
     fun clearSelection() {
-        _uiState.value = _uiState.value.copy(
-            selectedIds = emptySet(),
-            isSelectionMode = false,
-        )
+        _uiState.value =
+            _uiState.value.copy(
+                selectedIds = emptySet(),
+                isSelectionMode = false,
+            )
     }
 
     fun deleteSelected() {
@@ -218,9 +226,10 @@ class HistoryViewModel(
      * Exports all cards to the specified format.
      */
     fun exportCards(format: ExportFormat): String {
-        val cards = cardPersister.getCards().map { savedCard ->
-            cardSerializer.deserialize(savedCard.data)
-        }
+        val cards =
+            cardPersister.getCards().map { savedCard ->
+                cardSerializer.deserialize(savedCard.data)
+            }
         return cardExporter.exportCards(cards, format)
     }
 
@@ -234,16 +243,20 @@ class HistoryViewModel(
      */
     fun exportSelectedCards(format: ExportFormat): String {
         val selectedIds = _uiState.value.selectedIds
-        val cards = selectedIds.mapNotNull { id ->
-            rawCardMap[id]
-        }
+        val cards =
+            selectedIds.mapNotNull { id ->
+                rawCardMap[id]
+            }
         return cardExporter.exportCards(cards, format)
     }
 
     /**
      * Exports a single card by ID to the specified format.
      */
-    fun exportSingleCard(itemId: String, format: ExportFormat = ExportFormat.JSON): String? {
+    fun exportSingleCard(
+        itemId: String,
+        format: ExportFormat = ExportFormat.JSON,
+    ): String? {
         val card = rawCardMap[itemId] ?: return null
         return cardExporter.exportCard(card, format)
     }
@@ -251,27 +264,26 @@ class HistoryViewModel(
     /**
      * Gets the suggested filename for export.
      */
-    fun getExportFilename(format: ExportFormat = ExportFormat.JSON): String {
-        return cardExporter.generateBulkFilename(format)
-    }
+    fun getExportFilename(format: ExportFormat = ExportFormat.JSON): String = cardExporter.generateBulkFilename(format)
 
     /**
      * Imports cards from JSON or XML data.
      * Returns the number of cards imported, or -1 on error.
      */
-    fun importCards(data: String): Int {
-        return when (val result = cardImporter.importCards(data)) {
+    fun importCards(data: String): Int =
+        when (val result = cardImporter.importCards(data)) {
             is ImportResult.Success -> {
-                val importedCards = result.cards.map { rawCard ->
-                    cardPersister.insertCard(
-                        SavedCard(
-                            type = rawCard.cardType(),
-                            serial = rawCard.tagId().hex(),
-                            data = cardSerializer.serialize(rawCard),
+                val importedCards =
+                    result.cards.map { rawCard ->
+                        cardPersister.insertCard(
+                            SavedCard(
+                                type = rawCard.cardType(),
+                                serial = rawCard.tagId().hex(),
+                                data = cardSerializer.serialize(rawCard),
+                            ),
                         )
-                    )
-                    rawCard
-                }
+                        rawCard
+                    }
 
                 // If exactly one card imported, navigate to it
                 if (importedCards.size == 1) {
@@ -297,12 +309,9 @@ class HistoryViewModel(
                 -1
             }
         }
-    }
 
     /**
      * Gets a detailed import result including error information.
      */
-    fun importCardsDetailed(data: String): ImportResult {
-        return cardImporter.importCards(data)
-    }
+    fun importCardsDetailed(data: String): ImportResult = cardImporter.importCards(data)
 }

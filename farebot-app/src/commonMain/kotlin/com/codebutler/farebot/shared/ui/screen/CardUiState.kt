@@ -40,8 +40,13 @@ data class InfoItem(
 )
 
 sealed class TransactionItem {
-    data class DateHeader(val date: String) : TransactionItem()
-    data class SectionHeader(val title: String) : TransactionItem()
+    data class DateHeader(
+        val date: String,
+    ) : TransactionItem()
+
+    data class SectionHeader(
+        val title: String,
+    ) : TransactionItem()
 
     data class TripItem(
         val route: String?,

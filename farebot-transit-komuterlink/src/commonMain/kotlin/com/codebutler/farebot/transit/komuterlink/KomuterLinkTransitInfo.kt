@@ -44,9 +44,8 @@ class KomuterLinkTransitInfo(
     private val mSerial: Long,
     private val mIssueTimestamp: Instant,
     private val mCardNo: Int,
-    private val mStoredLuhn: Int
+    private val mStoredLuhn: Int,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.komuterlink_card_name)
 
@@ -65,8 +64,7 @@ class KomuterLinkTransitInfo(
             val cardNo = partialCardNo + Luhn.calculateLuhn(partialCardNo)
             return listOf(
                 ListItem(Res.string.komuterlink_card_number, cardNo),
-                ListItem(Res.string.komuterlink_issue_date, mIssueTimestamp.toString())
+                ListItem(Res.string.komuterlink_issue_date, mIssueTimestamp.toString()),
             )
         }
-
 }

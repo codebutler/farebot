@@ -44,9 +44,8 @@ class MetroQTransitInfo(
     private val balanceValue: Int,
     private val product: Int,
     private val expiryDate: LocalDate?,
-    private val date1: LocalDate?
+    private val date1: LocalDate?,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = NumberUtils.zeroPad(serial, 8)
 
@@ -55,15 +54,16 @@ class MetroQTransitInfo(
 
     override val balance: TransitBalance
         get() {
-            val name = when (product) {
-                501 -> getStringBlocking(Res.string.metroq_fare_card)
-                401 -> getStringBlocking(Res.string.metroq_day_pass)
-                else -> product.toString()
-            }
+            val name =
+                when (product) {
+                    501 -> getStringBlocking(Res.string.metroq_fare_card)
+                    401 -> getStringBlocking(Res.string.metroq_day_pass)
+                    else -> product.toString()
+                }
             return TransitBalance(
                 balance = TransitCurrency.USD(balanceValue),
                 name = name,
-                validTo = expiryDate?.atStartOfDayIn(TimeZone.of("America/Chicago"))
+                validTo = expiryDate?.atStartOfDayIn(TimeZone.of("America/Chicago")),
             )
         }
 

@@ -30,7 +30,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class MRTUltralightTransitFactory : TransitFactory<UltralightCard, MRTUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
@@ -43,16 +42,18 @@ class MRTUltralightTransitFactory : TransitFactory<UltralightCard, MRTUltralight
         return TransitIdentity.create(getStringBlocking(Res.string.ultralight_mrt), serial)
     }
 
-    override fun parseInfo(card: UltralightCard): MRTUltralightTransitInfo {
-        return MRTUltralightTransitInfo(getSerial(card))
-    }
+    override fun parseInfo(card: UltralightCard): MRTUltralightTransitInfo = MRTUltralightTransitInfo(getSerial(card))
 
     private fun getSerial(card: UltralightCard): Int {
         val page15 = card.getPage(15).data
         return byteArrayToInt(page15, 0, 4)
     }
 
-    private fun byteArrayToInt(data: ByteArray, offset: Int, length: Int): Int {
+    private fun byteArrayToInt(
+        data: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         var result = 0
         for (i in 0 until length) {
             result = result shl 8
@@ -70,7 +71,7 @@ class MRTUltralightTransitFactory : TransitFactory<UltralightCard, MRTUltralight
 }
 
 class MRTUltralightTransitInfo(
-    private val serial: Int
+    private val serial: Int,
 ) : SerialOnlyTransitInfo() {
     override val reason: Reason = Reason.LOCKED
 

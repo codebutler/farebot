@@ -36,9 +36,8 @@ import farebot.farebot_transit_selecta.generated.resources.selecta_card_name
  */
 class SelectaFranceTransitInfo(
     private val serial: Int,
-    private val balanceValue: Int
+    private val balanceValue: Int,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = serial.toString()
 

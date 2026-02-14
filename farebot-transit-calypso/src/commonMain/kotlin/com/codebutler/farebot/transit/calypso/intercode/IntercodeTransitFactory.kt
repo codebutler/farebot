@@ -39,8 +39,9 @@ import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.farebot_transit_calypso.generated.resources.*
 
-class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+class IntercodeTransitFactory(
+    stringResource: StringResource,
+) : CalypsoTransitFactory(stringResource) {
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
 
@@ -49,37 +50,49 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
 
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
         val app = findCalypsoApp(card)!!
-        val tenvFile = app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT] ?: return TransitIdentity.create(name, getSerial(app))
-        val tenv = tenvFile.records.entries.sortedBy { it.key }.firstOrNull()?.value ?: return TransitIdentity.create(name, getSerial(app))
-        val netId = try {
-            tenv.getBitsFromBuffer(13, 24)
-        } catch (_: Exception) {
-            0
-        }
+        val tenvFile =
+            app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]
+                ?: return TransitIdentity.create(name, getSerial(app))
+        val tenv =
+            tenvFile.records.entries
+                .sortedBy { it.key }
+                .firstOrNull()
+                ?.value
+                ?: return TransitIdentity.create(name, getSerial(app))
+        val netId =
+            try {
+                tenv.getBitsFromBuffer(13, 24)
+            } catch (_: Exception) {
+                0
+            }
         val cardName = IntercodeTransitInfo.getCardName(netId, tenv)
         return TransitIdentity.create(cardName, getSerial(app))
     }
 
-    override fun checkTenv(tenv: ByteArray): Boolean {
-        return try {
+    override fun checkTenv(tenv: ByteArray): Boolean =
+        try {
             val netId = tenv.getBitsFromBuffer(13, 24)
             IntercodeTransitInfo.isIntercode(netId)
         } catch (_: Exception) {
             false
         }
-    }
 
     override fun getSerial(app: ISO7816Application): String? {
         val iccFile = app.sfiFiles[0x02] ?: return null
         val record = iccFile.records[1] ?: return null
 
         val tenvFile = app.sfiFiles[0x07] ?: return null
-        val tenv = tenvFile.records.entries.sortedBy { it.key }.firstOrNull()?.value ?: return null
-        val netId = try {
-            tenv.getBitsFromBuffer(13, 24)
-        } catch (_: Exception) {
-            0
-        }
+        val tenv =
+            tenvFile.records.entries
+                .sortedBy { it.key }
+                .firstOrNull()
+                ?.value ?: return null
+        val netId =
+            try {
+                tenv.getBitsFromBuffer(13, 24)
+            } catch (_: Exception) {
+                0
+            }
 
         if (netId == 0x250502) {
             // OuRA card has a special serial format
@@ -99,23 +112,29 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
         return null
     }
 
-    override fun parseTransitInfo(app: ISO7816Application, serial: String?): TransitInfo {
-        val ticketEnv = Calypso1545TransitData.parseTicketEnv(
-            app, IntercodeFields.TICKET_ENV_HOLDER_FIELDS
-        )
+    override fun parseTransitInfo(
+        app: ISO7816Application,
+        serial: String?,
+    ): TransitInfo {
+        val ticketEnv =
+            Calypso1545TransitData.parseTicketEnv(
+                app,
+                IntercodeFields.TICKET_ENV_HOLDER_FIELDS,
+            )
         val netID = ticketEnv.getIntOrZero(En1545TransitData.ENV_NETWORK_ID)
 
-        val result = Calypso1545TransitData.parse(
-            app = app,
-            ticketEnvFields = IntercodeFields.TICKET_ENV_HOLDER_FIELDS,
-            contractListFields = IntercodeFields.CONTRACT_LIST_FIELDS,
-            serial = serial,
-            createSubscription = { data, counter, list, listnum ->
-                createSubscription(data, list, listnum, netID, counter)
-            },
-            createTrip = { data -> IntercodeTransaction.parse(data, netID) },
-            createSpecialEvent = { data -> IntercodeTransaction.parse(data, netID) }
-        )
+        val result =
+            Calypso1545TransitData.parse(
+                app = app,
+                ticketEnvFields = IntercodeFields.TICKET_ENV_HOLDER_FIELDS,
+                contractListFields = IntercodeFields.CONTRACT_LIST_FIELDS,
+                serial = serial,
+                createSubscription = { data, counter, list, listnum ->
+                    createSubscription(data, list, listnum, netID, counter)
+                },
+                createTrip = { data -> IntercodeTransaction.parse(data, netID) },
+                createSpecialEvent = { data -> IntercodeTransaction.parse(data, netID) },
+            )
 
         return IntercodeTransitInfo(result)
     }
@@ -125,15 +144,19 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
         contractList: En1545Parsed?,
         listNum: Int?,
         netID: Int,
-        counter: Int?
+        counter: Int?,
     ): IntercodeSubscription? {
-        if (contractList == null || listNum == null)
+        if (contractList == null || listNum == null) {
             return null
+        }
         val tariff = contractList.getInt(En1545TransitData.CONTRACTS_TARIFF, listNum) ?: return null
         return IntercodeSubscription.parse(data, tariff shr 4 and 0xff, netID, counter, stringResource)
     }
 
-    private fun ByteArray.byteArrayToLong(offset: Int, length: Int): Long {
+    private fun ByteArray.byteArrayToLong(
+        offset: Int,
+        length: Int,
+    ): Long {
         var result = 0L
         for (i in 0 until length) {
             if (offset + i >= size) return 0L
@@ -142,111 +165,115 @@ class IntercodeTransitFactory(stringResource: StringResource) : CalypsoTransitFa
         return result
     }
 
-    private fun ByteArray.toHexString(offset: Int, length: Int): String {
+    private fun ByteArray.toHexString(
+        offset: Int,
+        length: Int,
+    ): String {
         val sb = StringBuilder()
         for (i in offset until (offset + length).coerceAtMost(size)) {
             val b = this[i].toInt() and 0xFF
-            sb.append(HEX_CHARS[b shr 4])
-            sb.append(HEX_CHARS[b and 0x0F])
+            sb.append(hexChars[b shr 4])
+            sb.append(hexChars[b and 0x0F])
         }
         return sb.toString()
     }
 
-    private val HEX_CHARS = "0123456789abcdef".toCharArray()
+    private val hexChars = "0123456789abcdef".toCharArray()
 
     companion object {
-        private val ALL_CARDS = listOf(
-            CardInfo(
-                nameRes = Res.string.card_name_navigo,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_paris_france,
-                imageRes = Res.drawable.navigo,
-                latitude = 48.8566f,
-                longitude = 2.3522f,
-                brandColor = 0x92D6FE,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_oura,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_grenoble_france,
-                imageRes = Res.drawable.oura,
-                latitude = 45.1885f,
-                longitude = 5.7245f,
-                brandColor = 0x005AA7,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_pastel,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_toulouse_france,
-                preview = true,
-                imageRes = Res.drawable.pastel,
-                latitude = 43.6047f,
-                longitude = 1.4442f,
-                brandColor = 0x285999,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_pass_pass,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_hauts_de_france,
-                preview = true,
-                imageRes = Res.drawable.passpass,
-                latitude = 50.6292f,
-                longitude = 3.0573f,
-                brandColor = 0x4E2D8D,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_transgironde,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_gironde_france,
-                preview = true,
-                imageRes = Res.drawable.transgironde,
-                latitude = 44.8378f,
-                longitude = -0.5792f,
-                brandColor = 0xE39A45,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_tam,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_montpellier_france,
-                imageRes = Res.drawable.tam_montpellier,
-                latitude = 43.6108f,
-                longitude = 3.8767f,
-                brandColor = 0x357828,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_korrigo,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_brittany_france,
-                imageRes = Res.drawable.korrigo,
-                latitude = 48.1173f,
-                longitude = -1.6778f,
-                brandColor = 0xAB7423,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_envibus,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.FRANCE,
-                locationRes = Res.string.card_location_sophia_antipolis_france,
-                imageRes = Res.drawable.envibus,
-                latitude = 43.6163f,
-                longitude = 7.0552f,
-                brandColor = 0xE1047A,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            ),
-        )
+        private val ALL_CARDS =
+            listOf(
+                CardInfo(
+                    nameRes = Res.string.card_name_navigo,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_paris_france,
+                    imageRes = Res.drawable.navigo,
+                    latitude = 48.8566f,
+                    longitude = 2.3522f,
+                    brandColor = 0x92D6FE,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_oura,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_grenoble_france,
+                    imageRes = Res.drawable.oura,
+                    latitude = 45.1885f,
+                    longitude = 5.7245f,
+                    brandColor = 0x005AA7,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_pastel,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_toulouse_france,
+                    preview = true,
+                    imageRes = Res.drawable.pastel,
+                    latitude = 43.6047f,
+                    longitude = 1.4442f,
+                    brandColor = 0x285999,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_pass_pass,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_hauts_de_france,
+                    preview = true,
+                    imageRes = Res.drawable.passpass,
+                    latitude = 50.6292f,
+                    longitude = 3.0573f,
+                    brandColor = 0x4E2D8D,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_transgironde,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_gironde_france,
+                    preview = true,
+                    imageRes = Res.drawable.transgironde,
+                    latitude = 44.8378f,
+                    longitude = -0.5792f,
+                    brandColor = 0xE39A45,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_tam,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_montpellier_france,
+                    imageRes = Res.drawable.tam_montpellier,
+                    latitude = 43.6108f,
+                    longitude = 3.8767f,
+                    brandColor = 0x357828,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_korrigo,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_brittany_france,
+                    imageRes = Res.drawable.korrigo,
+                    latitude = 48.1173f,
+                    longitude = -1.6778f,
+                    brandColor = 0xAB7423,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_envibus,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.FRANCE,
+                    locationRes = Res.string.card_location_sophia_antipolis_france,
+                    imageRes = Res.drawable.envibus,
+                    latitude = 43.6163f,
+                    longitude = 7.0552f,
+                    brandColor = 0xE1047A,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                ),
+            )
     }
 }

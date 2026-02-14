@@ -29,7 +29,6 @@ import com.codebutler.farebot.card.TagReader
 import com.codebutler.farebot.card.china.ChinaRegistry
 import com.codebutler.farebot.card.desfire.DesfireTagReader
 import com.codebutler.farebot.card.iso7816.ISO7816CardReader
-import com.codebutler.farebot.card.iso7816.ISO7816Protocol
 import com.codebutler.farebot.card.iso7816.raw.RawISO7816Card
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
 import com.codebutler.farebot.card.nfc.AndroidCardTransceiver
@@ -41,9 +40,10 @@ import com.codebutler.farebot.key.CardKeys
  * for known China and KSX6924 application identifiers, then falls back
  * to the DESFire protocol if no known ISO 7816 application is found.
  */
-class ISO7816TagReader(tagId: ByteArray, tag: Tag) :
-    TagReader<CardTransceiver, RawCard<*>, CardKeys>(tagId, tag, null) {
-
+class ISO7816TagReader(
+    tagId: ByteArray,
+    tag: Tag,
+) : TagReader<CardTransceiver, RawCard<*>, CardKeys>(tagId, tag, null) {
     override fun getTech(tag: Tag): CardTransceiver = AndroidCardTransceiver(IsoDep.get(tag))
 
     @Throws(Exception::class)
@@ -51,7 +51,7 @@ class ISO7816TagReader(tagId: ByteArray, tag: Tag) :
         tagId: ByteArray,
         tag: Tag,
         tech: CardTransceiver,
-        cardKeys: CardKeys?
+        cardKeys: CardKeys?,
     ): RawCard<*> {
         // Try ISO7816 applications first (China cards, KSX6924/T-Money)
         val iso7816Card = tryISO7816(tagId, tech)
@@ -63,7 +63,10 @@ class ISO7816TagReader(tagId: ByteArray, tag: Tag) :
         return DesfireTagReader(tagId, tag).readTag()
     }
 
-    private fun tryISO7816(tagId: ByteArray, transceiver: CardTransceiver): RawISO7816Card? {
+    private fun tryISO7816(
+        tagId: ByteArray,
+        transceiver: CardTransceiver,
+    ): RawISO7816Card? {
         val appConfigs = buildAppConfigs()
         if (appConfigs.isEmpty()) return null
 
@@ -88,8 +91,8 @@ class ISO7816TagReader(tagId: ByteArray, tag: Tag) :
                         readBalances = { protocol ->
                             ISO7816CardReader.readChinaBalances(protocol)
                         },
-                        fileSelectors = buildChinaFileSelectors()
-                    )
+                        fileSelectors = buildChinaFileSelectors(),
+                    ),
                 )
             }
 
@@ -106,8 +109,8 @@ class ISO7816TagReader(tagId: ByteArray, tag: Tag) :
                         val records = ISO7816CardReader.readKSX6924ExtraRecords(protocol)
                         records.mapIndexed { index, data -> "extra/$index" to data }.toMap()
                     },
-                    fileSelectors = buildKSX6924FileSelectors()
-                )
+                    fileSelectors = buildKSX6924FileSelectors(),
+                ),
             )
 
             return configs
@@ -122,13 +125,12 @@ class ISO7816TagReader(tagId: ByteArray, tag: Tag) :
             return selectors
         }
 
-        private fun buildKSX6924FileSelectors(): List<ISO7816CardReader.FileSelector> {
-            return (1..5).map { fileId ->
+        private fun buildKSX6924FileSelectors(): List<ISO7816CardReader.FileSelector> =
+            (1..5).map { fileId ->
                 ISO7816CardReader.FileSelector(
                     parentDf = null, // Use app's own DF
-                    fileId = fileId
+                    fileId = fileId,
                 )
             }
-        }
     }
 }

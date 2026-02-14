@@ -42,11 +42,11 @@ import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 class SuicaTrip(
     val balance: Int,
@@ -62,7 +62,6 @@ class SuicaTrip(
     val dateRaw: Int,
     private val stringResource: StringResource,
 ) : Trip() {
-
     companion object {
         private const val CONSOLE_BUS = 0x05
         private const val CONSOLE_CHARGE = 0x02
@@ -98,6 +97,7 @@ class SuicaTrip(
 
             val dateRaw = data.byteArrayToInt(4, 2)
             val startTimestamp = SuicaUtil.extractDate(isProductSale, data)
+
             @Suppress("UnnecessaryVariable")
             val endTimestamp = startTimestamp
             // Balance is little-endian
@@ -105,12 +105,13 @@ class SuicaTrip(
 
             val regionCode = data[15].toInt() and 0xFF
 
-            val fareRaw = if (previousBalance >= 0) {
-                previousBalance - balance
-            } else {
-                // Can't get amount for first record.
-                0
-            }
+            val fareRaw =
+                if (previousBalance >= 0) {
+                    previousBalance - balance
+                } else {
+                    // Can't get amount for first record.
+                    0
+                }
 
             val startStation: Station?
             val endStation: Station?
@@ -129,18 +130,30 @@ class SuicaTrip(
             } else if (isTVM(consoleTypeInt)) {
                 val railEntranceLineCode = data[6].toInt() and 0xFF
                 val railEntranceStationCode = data[7].toInt() and 0xFF
-                startStation = SuicaUtil.getRailStation(regionCode, railEntranceLineCode,
-                    railEntranceStationCode)
+                startStation =
+                    SuicaUtil.getRailStation(
+                        regionCode,
+                        railEntranceLineCode,
+                        railEntranceStationCode,
+                    )
                 endStation = null
             } else {
                 val railEntranceLineCode = data[6].toInt() and 0xFF
                 val railEntranceStationCode = data[7].toInt() and 0xFF
                 val railExitLineCode = data[8].toInt() and 0xFF
                 val railExitStationCode = data[9].toInt() and 0xFF
-                startStation = SuicaUtil.getRailStation(regionCode, railEntranceLineCode,
-                    railEntranceStationCode)
-                endStation = SuicaUtil.getRailStation(regionCode, railExitLineCode,
-                    railExitStationCode)
+                startStation =
+                    SuicaUtil.getRailStation(
+                        regionCode,
+                        railEntranceLineCode,
+                        railEntranceStationCode,
+                    )
+                endStation =
+                    SuicaUtil.getRailStation(
+                        regionCode,
+                        railExitLineCode,
+                        railExitStationCode,
+                    )
             }
 
             return SuicaTrip(
@@ -193,11 +206,12 @@ class SuicaTrip(
         }
 
     override val humanReadableRouteID: String?
-        get() = if (startStation != null) {
-            super.humanReadableRouteID
-        } else {
-            "${NumberUtils.intToHex(consoleTypeInt)} ${NumberUtils.intToHex(processType)}"
-        }
+        get() =
+            if (startStation != null) {
+                super.humanReadableRouteID
+            } else {
+                "${NumberUtils.intToHex(consoleTypeInt)} ${NumberUtils.intToHex(processType)}"
+            }
 
     override val agencyName: String?
         get() = startStation?.companyName
@@ -215,19 +229,27 @@ class SuicaTrip(
             }
         }
 
-    fun setEndTime(hour: Int, min: Int) {
+    fun setEndTime(
+        hour: Int,
+        min: Int,
+    ) {
         val ts = endTimestamp ?: return
         val tz = TimeZone.of("Asia/Tokyo")
         val date = ts.toLocalDateTime(tz).date
-        endTimestamp = LocalDateTime(date.year, date.month, date.day, hour, min, 0)
-            .toInstant(tz)
+        endTimestamp =
+            LocalDateTime(date.year, date.month, date.day, hour, min, 0)
+                .toInstant(tz)
     }
 
-    fun setStartTime(hour: Int, min: Int) {
+    fun setStartTime(
+        hour: Int,
+        min: Int,
+    ) {
         val ts = startTimestamp ?: return
         val tz = TimeZone.of("Asia/Tokyo")
         val date = ts.toLocalDateTime(tz).date
-        startTimestamp = LocalDateTime(date.year, date.month, date.day, hour, min, 0)
-            .toInstant(tz)
+        startTimestamp =
+            LocalDateTime(date.year, date.month, date.day, hour, min, 0)
+                .toInstant(tz)
     }
 }

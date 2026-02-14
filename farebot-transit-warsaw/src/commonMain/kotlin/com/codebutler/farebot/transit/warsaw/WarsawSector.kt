@@ -25,11 +25,11 @@ package com.codebutler.farebot.transit.warsaw
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.classic.DataClassicSector
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 private val TZ = TimeZone.of("Europe/Warsaw")
 
@@ -38,17 +38,17 @@ data class WarsawSector(
     val expiryDate: LocalDate?,
     val ticketType: Int,
     val tripType: Int,
-    val counter: Int
+    val counter: Int,
 ) : Comparable<WarsawSector> {
-
-    override operator fun compareTo(other: WarsawSector): Int = when {
-        tripTimestamp == null && other.tripTimestamp == null -> 0
-        tripTimestamp == null -> -1
-        other.tripTimestamp == null -> 1
-        tripTimestamp.compareTo(other.tripTimestamp) != 0 ->
-            tripTimestamp.compareTo(other.tripTimestamp)
-        else -> -((counter - other.counter) and 0xff).compareTo(0x80)
-    }
+    override operator fun compareTo(other: WarsawSector): Int =
+        when {
+            tripTimestamp == null && other.tripTimestamp == null -> 0
+            tripTimestamp == null -> -1
+            other.tripTimestamp == null -> 1
+            tripTimestamp.compareTo(other.tripTimestamp) != 0 ->
+                tripTimestamp.compareTo(other.tripTimestamp)
+            else -> -((counter - other.counter) and 0xff).compareTo(0x80)
+        }
 
     val trip: WarsawTrip?
         get() = if (tripTimestamp == null) null else WarsawTrip(tripTimestamp, tripType)
@@ -68,11 +68,14 @@ data class WarsawSector(
                 expiryDate = parseDate(block0, 16),
                 ticketType = block0.getBitsFromBuffer(32, 12),
                 tripType = block0.byteArrayToInt(9, 3),
-                tripTimestamp = parseDateTime(block0, 44)
+                tripTimestamp = parseDateTime(block0, 44),
             )
         }
 
-        private fun parseDateTime(raw: ByteArray, off: Int): Instant? {
+        private fun parseDateTime(
+            raw: ByteArray,
+            off: Int,
+        ): Instant? {
             if (raw.getBitsFromBuffer(off, 26) == 0) return null
             val year = raw.getBitsFromBuffer(off, 6) + 2000
             val month = raw.getBitsFromBuffer(off + 6, 4)
@@ -83,7 +86,10 @@ data class WarsawSector(
             return ldt.toInstant(TZ)
         }
 
-        private fun parseDate(raw: ByteArray, off: Int): LocalDate? {
+        private fun parseDate(
+            raw: ByteArray,
+            off: Int,
+        ): LocalDate? {
             if (raw.getBitsFromBuffer(off, 16) == 0) return null
             val year = raw.getBitsFromBuffer(off, 7) + 2000
             val month = raw.getBitsFromBuffer(off + 7, 4)

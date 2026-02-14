@@ -34,12 +34,12 @@ import farebot.farebot_transit_tampere.generated.resources.tampere_card_name
 import farebot.farebot_transit_tampere.generated.resources.tampere_cardholder_name
 import farebot.farebot_transit_tampere.generated.resources.tampere_date_of_birth
 import farebot.farebot_transit_tampere.generated.resources.tampere_issue_date
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 class TampereTransitInfo(
     override val serialNumber: String?,
@@ -48,21 +48,24 @@ class TampereTransitInfo(
     override val subscriptions: List<TampereSubscription>?,
     private val mHolderName: String?,
     private val mHolderBirthDate: Int?,
-    private val mIssueDate: Int?
+    private val mIssueDate: Int?,
 ) : TransitInfo() {
-
     override val cardName: String = getStringBlocking(Res.string.tampere_card_name)
 
     override val balance: TransitBalance?
         get() = mBalance?.let { TransitBalance(balance = TransitCurrency.EUR(it)) }
 
     override val info: List<ListItemInterface>
-        get() = listOfNotNull(
-            if (mHolderName.isNullOrEmpty()) null else ListItem(Res.string.tampere_cardholder_name, mHolderName),
-            if (mHolderBirthDate == 0 || mHolderBirthDate == null) null
-            else ListItem(Res.string.tampere_date_of_birth, parseDaystamp(mHolderBirthDate).toString()),
-            ListItem(Res.string.tampere_issue_date, mIssueDate?.let { parseDaystamp(it) }?.toString())
-        )
+        get() =
+            listOfNotNull(
+                if (mHolderName.isNullOrEmpty()) null else ListItem(Res.string.tampere_cardholder_name, mHolderName),
+                if (mHolderBirthDate == 0 || mHolderBirthDate == null) {
+                    null
+                } else {
+                    ListItem(Res.string.tampere_date_of_birth, parseDaystamp(mHolderBirthDate).toString())
+                },
+                ListItem(Res.string.tampere_issue_date, mIssueDate?.let { parseDaystamp(it) }?.toString()),
+            )
 
     companion object {
         const val NAME = "Tampere"
@@ -85,7 +88,10 @@ class TampereTransitInfo(
         /**
          * Parses a day + minute count (since 1900-01-01 local) into an Instant.
          */
-        fun parseTimestamp(day: Int, minute: Int): Instant {
+        fun parseTimestamp(
+            day: Int,
+            minute: Int,
+        ): Instant {
             val epochInstant = EPOCH_DATE.atStartOfDayIn(TZ)
             return epochInstant + (day.toLong()).days + minute.minutes
         }

@@ -45,7 +45,6 @@ class PodorozhnikTransitInfo(
     private val subwayCounter: Int?,
     private val stringResource: StringResource,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = stringResource.getString(Res.string.podorozhnik_card_name)
 
@@ -58,7 +57,7 @@ class PodorozhnikTransitInfo(
             val b = balanceValue ?: return null
             return TransitBalance(
                 balance = TransitCurrency.RUB(b),
-                name = stringResource.getString(Res.string.podorozhnik_card_name)
+                name = stringResource.getString(Res.string.podorozhnik_card_name),
             )
         }
 
@@ -68,12 +67,12 @@ class PodorozhnikTransitInfo(
             return listOf(
                 ListItem(
                     stringResource.getString(Res.string.podorozhnik_ground_trips),
-                    groundCounter.toString()
+                    groundCounter.toString(),
                 ),
                 ListItem(
                     stringResource.getString(Res.string.podorozhnik_subway_trips),
-                    subwayCounter.toString()
-                )
+                    subwayCounter.toString(),
+                ),
             )
         }
 

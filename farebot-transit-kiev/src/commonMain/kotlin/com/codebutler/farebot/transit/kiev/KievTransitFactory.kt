@@ -36,44 +36,44 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_kiev.generated.resources.*
 
 class KievTransitFactory : TransitFactory<ClassicCard, KievTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector1 = card.getSector(1) as? DataClassicSector ?: return false
         return HashUtils.checkKeyHash(
-            sector1.keyA, sector1.keyB, "kiev",
-            "902a69a9d68afa1ddac7b61a512f7d4f"
+            sector1.keyA,
+            sector1.keyB,
+            "kiev",
+            "902a69a9d68afa1ddac7b61a512f7d4f",
         ) >= 0
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(
+    override fun parseIdentity(card: ClassicCard): TransitIdentity =
+        TransitIdentity.create(
             KievTransitInfo.NAME,
-            KievTransitInfo.formatSerial(getSerial(card))
+            KievTransitInfo.formatSerial(getSerial(card)),
         )
-    }
 
-    override fun parseInfo(card: ClassicCard): KievTransitInfo {
-        return KievTransitInfo(
+    override fun parseInfo(card: ClassicCard): KievTransitInfo =
+        KievTransitInfo(
             mSerial = getSerial(card),
-            trips = parseTrips(card)
+            trips = parseTrips(card),
         )
-    }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.kiev_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.UKRAINE,
-            locationRes = Res.string.kiev_location,
-            imageRes = Res.drawable.kiev,
-            latitude = 50.4501f,
-            longitude = 30.5234f,
-            brandColor = 0x4972AC,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.kiev_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.UKRAINE,
+                locationRes = Res.string.kiev_location,
+                imageRes = Res.drawable.kiev,
+                latitude = 50.4501f,
+                longitude = 30.5234f,
+                brandColor = 0x4972AC,
+                credits = listOf("Metrodroid Project"),
+            )
 
         private fun parseTrips(card: ClassicCard): List<KievTrip> =
             (0..5).mapNotNull { i ->
@@ -84,7 +84,9 @@ class KievTransitFactory : TransitFactory<ClassicCard, KievTransitInfo> {
 
         private fun getSerial(card: ClassicCard): String {
             val sector1 = card.getSector(1) as DataClassicSector
-            return sector1.getBlock(0).data
+            return sector1
+                .getBlock(0)
+                .data
                 .sliceOffLen(6, 8)
                 .reverseBuffer()
                 .hex()

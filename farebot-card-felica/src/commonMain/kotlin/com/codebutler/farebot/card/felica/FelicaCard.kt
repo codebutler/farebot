@@ -30,9 +30,9 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class FelicaCard(
@@ -41,9 +41,8 @@ data class FelicaCard(
     @Contextual val idm: FeliCaIdm,
     @Contextual val pmm: FeliCaPmm,
     val systems: List<FelicaSystem>,
-    val isPartialRead: Boolean = false
+    val isPartialRead: Boolean = false,
 ) : Card() {
-
     override val cardType: CardType = CardType.FeliCa
 
     private val systemsByCode: Map<Int, FelicaSystem> by lazy {
@@ -58,15 +57,22 @@ data class FelicaCard(
         cardUiBuilder.item().title("PMm").value(pmm)
         val systemsUiBuilder = cardUiBuilder.item().title("Systems")
         for (system in systems) {
-            val systemUiBuilder = systemsUiBuilder.item()
-                .title("System: ${system.code.toString(16)}")
+            val systemUiBuilder =
+                systemsUiBuilder
+                    .item()
+                    .title("System: ${system.code.toString(16)}")
             for (service in system.services) {
-                val serviceUiBuilder = systemUiBuilder.item()
-                    .title(
-                        "Service: 0x${service.serviceCode.toString(16)} (${FelicaUtils.getFriendlyServiceName(system.code, service.serviceCode)})"
-                    )
+                val serviceUiBuilder =
+                    systemUiBuilder
+                        .item()
+                        .title(
+                            "Service: 0x${service.serviceCode.toString(
+                                16,
+                            )} (${FelicaUtils.getFriendlyServiceName(system.code, service.serviceCode)})",
+                        )
                 for (block in service.blocks) {
-                    serviceUiBuilder.item()
+                    serviceUiBuilder
+                        .item()
                         .title("Block ${block.address.toString().padStart(2, '0')}")
                         .value(block.data)
                 }
@@ -82,9 +88,7 @@ data class FelicaCard(
             idm: FeliCaIdm,
             pmm: FeliCaPmm,
             systems: List<FelicaSystem>,
-            isPartialRead: Boolean = false
-        ): FelicaCard {
-            return FelicaCard(tagId, scannedAt, idm, pmm, systems, isPartialRead)
-        }
+            isPartialRead: Boolean = false,
+        ): FelicaCard = FelicaCard(tagId, scannedAt, idm, pmm, systems, isPartialRead)
     }
 }

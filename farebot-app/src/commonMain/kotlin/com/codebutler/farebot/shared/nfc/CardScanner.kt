@@ -27,12 +27,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
-data class ScannedTag(val id: ByteArray, val techList: List<String>) {
+data class ScannedTag(
+    val id: ByteArray,
+    val techList: List<String>,
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ScannedTag) return false
         return id.contentEquals(other.id) && techList == other.techList
     }
+
     override fun hashCode(): Int = id.contentHashCode() * 31 + techList.hashCode()
 }
 
@@ -46,7 +50,6 @@ data class ScannedTag(val id: ByteArray, val techList: List<String>) {
  *   Call [startActiveScan] which emits results to [scannedCards].
  */
 interface CardScanner {
-
     /** Whether this platform requires user-initiated scanning (e.g., iOS Core NFC). */
     val requiresActiveScan: Boolean get() = true
 

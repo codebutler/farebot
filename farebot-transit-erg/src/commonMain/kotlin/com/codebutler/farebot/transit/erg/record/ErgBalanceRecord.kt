@@ -31,25 +31,24 @@ package com.codebutler.farebot.transit.erg.record
 data class ErgBalanceRecord(
     val balance: Int,
     val version: Int,
-    val agencyId: Int
-) : ErgRecord, Comparable<ErgBalanceRecord> {
-
+    val agencyId: Int,
+) : ErgRecord,
+    Comparable<ErgBalanceRecord> {
     override fun compareTo(other: ErgBalanceRecord): Int =
         // Reverse order so highest version is first
         other.version.compareTo(this.version)
 
     companion object {
-        fun recordFromBytes(block: ByteArray): ErgRecord? {
-            return if (block[7].toInt() != 0x00 || block[8].toInt() != 0x00) {
+        fun recordFromBytes(block: ByteArray): ErgRecord? =
+            if (block[7].toInt() != 0x00 || block[8].toInt() != 0x00) {
                 // Another record type gets mixed in here with non-zero values at these bytes
                 null
             } else {
                 ErgBalanceRecord(
                     balance = ErgRecord.byteArrayToInt(block, 11, 4),
                     version = ErgRecord.byteArrayToInt(block, 1, 2),
-                    agencyId = ErgRecord.byteArrayToInt(block, 5, 2)
+                    agencyId = ErgRecord.byteArrayToInt(block, 5, 2),
                 )
             }
-        }
     }
 }

@@ -37,20 +37,25 @@ import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 object RicaricaMiLookup : En1545LookupSTR("ricaricami") {
-
     override fun parseCurrency(price: Int) = TransitCurrency.EUR(price)
 
     override val timeZone: TimeZone get() = TZ
 
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
-        if (station == 0)
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? {
+        if (station == 0) {
             return null
+        }
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val stationId = station or ((transport ?: 0) shl 24)
         val mdstStation = reader.getStationById(stationId)
         if (mdstStation != null) {
-            val name = mdstStation.name.english.takeIf { it.isNotEmpty() }
-                ?: NumberUtils.intToHex(station)
+            val name =
+                mdstStation.name.english.takeIf { it.isNotEmpty() }
+                    ?: NumberUtils.intToHex(station)
             val lat = mdstStation.latitude.takeIf { it != 0f }?.toString()
             val lng = mdstStation.longitude.takeIf { it != 0f }?.toString()
             return Station.create(name, null, lat, lng)
@@ -58,9 +63,15 @@ object RicaricaMiLookup : En1545LookupSTR("ricaricami") {
         return Station.nameOnly(NumberUtils.intToHex(station))
     }
 
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
-        if (routeNumber == null)
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
+        if (routeNumber == null) {
             return null
+        }
         when (transport) {
             TRANSPORT_METRO -> {
                 when (routeNumber) {
@@ -72,12 +83,14 @@ object RicaricaMiLookup : En1545LookupSTR("ricaricami") {
             }
             TRANSPORT_TRENORD1, TRANSPORT_TRENORD2 -> {
                 // Essentially a placeholder
-                if (routeNumber == 1000)
+                if (routeNumber == 1000) {
                     return null
+                }
             }
             TRANSPORT_TRAM -> {
-                if (routeNumber == 60)
+                if (routeNumber == 60) {
                     return null
+                }
             }
         }
         if (routeVariant != null) {
@@ -98,12 +111,13 @@ object RicaricaMiLookup : En1545LookupSTR("ricaricami") {
     const val TARIFF_YEARLY_URBAN = 45
     const val TARIFF_MONTHLY_URBAN = 46
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        TARIFF_SINGLE_URBAN to Res.string.ricaricami_single_urban,
-        TARIFF_DAILY_URBAN to Res.string.ricaricami_daily_urban,
-        TARIFF_URBAN_2X6 to Res.string.ricaricami_urban_2x6,
-        TARIFF_YEARLY_URBAN to Res.string.ricaricami_yearly_urban,
-        TARIFF_MONTHLY_URBAN to Res.string.ricaricami_monthly_urban,
-        7095 to Res.string.ricaricami_m1_3_ord_single
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            TARIFF_SINGLE_URBAN to Res.string.ricaricami_single_urban,
+            TARIFF_DAILY_URBAN to Res.string.ricaricami_daily_urban,
+            TARIFF_URBAN_2X6 to Res.string.ricaricami_urban_2x6,
+            TARIFF_YEARLY_URBAN to Res.string.ricaricami_yearly_urban,
+            TARIFF_MONTHLY_URBAN to Res.string.ricaricami_monthly_urban,
+            7095 to Res.string.ricaricami_m1_3_ord_single,
+        )
 }

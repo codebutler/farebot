@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToLong
@@ -34,17 +33,18 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class NextfareDesfireTransitFactory : TransitFactory<DesfireCard, NextfareDesfireTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: DesfireCard): Boolean {
         // Early check: exactly 1 app with ID 0x10000, app list not locked
-        if (card.appListLocked || card.applications.size != 1 || card.applications[0].id != 0x10000)
+        if (card.appListLocked || card.applications.size != 1 || card.applications[0].id != 0x10000) {
             return false
+        }
         // Deep check: 1 file, file is unauthorized, file size is 384 bytes
         val app = card.getApplication(0x10000) ?: return false
-        if (app.files.size != 1)
+        if (app.files.size != 1) {
             return false
+        }
         val f = app.files[0] as? UnauthorizedDesfireFile ?: return false
         val fs = f.fileSettings as? StandardDesfireFileSettings ?: return false
         return fs.fileSize == 384
@@ -57,8 +57,7 @@ class NextfareDesfireTransitFactory : TransitFactory<DesfireCard, NextfareDesfir
         NextfareDesfireTransitInfo(mSerial = getSerial(card))
 
     companion object {
-        internal fun getSerial(card: DesfireCard): Long =
-            card.tagId.byteArrayToLong(1, 6)
+        internal fun getSerial(card: DesfireCard): Long = card.tagId.byteArrayToLong(1, 6)
 
         internal fun formatSerial(serial: Long): String {
             var s = "0164" + NumberUtils.zeroPad(serial, 15)

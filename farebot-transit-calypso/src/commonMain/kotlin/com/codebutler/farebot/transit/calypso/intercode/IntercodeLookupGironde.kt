@@ -28,19 +28,20 @@ import farebot.farebot_transit_calypso.generated.resources.card_name_transgirond
 import farebot.farebot_transit_calypso.generated.resources.gironde_line
 
 internal object IntercodeLookupGironde : IntercodeLookupSTR("gironde"), IntercodeLookupSingle {
-
     override val cardName: String = getStringBlocking(Res.string.card_name_transgironde)
 
     override fun getRouteName(
         routeNumber: Int?,
         routeVariant: Int?,
         agency: Int?,
-        transport: Int?
+        transport: Int?,
     ): String? {
-        if (routeNumber == null)
+        if (routeNumber == null) {
             return null
-        if (agency == TRANSGIRONDE)
+        }
+        if (agency == TRANSGIRONDE) {
             return getStringBlocking(Res.string.gironde_line, routeNumber)
+        }
         return super.getRouteName(routeNumber, routeNumber, agency, transport)
     }
 

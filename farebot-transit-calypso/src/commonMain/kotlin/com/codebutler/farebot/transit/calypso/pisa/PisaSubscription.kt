@@ -26,36 +26,41 @@ import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
-import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Parsed
+import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Subscription
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
 internal class PisaSubscription(
     override val parsed: En1545Parsed,
     override val stringResource: StringResource,
-    private val counter: Int?
+    private val counter: Int?,
 ) : En1545Subscription() {
-
     override val lookup get() = PisaLookup
 
     override val remainingTripCount: Int?
-        get() = if (PisaLookup.subscriptionUsesCounter(contractProvider, contractTariff)) {
-            counter
-        } else {
-            null
-        }
+        get() =
+            if (PisaLookup.subscriptionUsesCounter(contractProvider, contractTariff)) {
+                counter
+            } else {
+                null
+            }
 
     companion object {
-        private val SUBSCRIPTION_FIELDS = En1545Container(
-            En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 21),
-            En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
-            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 92),
-            En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
-            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_C, 241)
-        )
+        private val SUBSCRIPTION_FIELDS =
+            En1545Container(
+                En1545FixedInteger(En1545Subscription.CONTRACT_UNKNOWN_A, 21),
+                En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
+                En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 92),
+                En1545FixedInteger.date(En1545Subscription.CONTRACT_SALE),
+                En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_C, 241),
+            )
 
-        fun parse(data: ByteArray, stringResource: StringResource, counter: Int?): PisaSubscription? {
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+            counter: Int?,
+        ): PisaSubscription? {
             if (data.all { it == 0xff.toByte() }) {
                 return null
             }

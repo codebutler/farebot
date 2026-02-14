@@ -29,9 +29,9 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class DesfireCard(
@@ -39,75 +39,93 @@ data class DesfireCard(
     override val scannedAt: Instant,
     val applications: List<DesfireApplication>,
     val manufacturingData: DesfireManufacturingData,
-    val appListLocked: Boolean = false
+    val appListLocked: Boolean = false,
 ) : Card() {
-
     override val cardType: CardType = CardType.MifareDesfire
 
-    fun getApplication(appId: Int): DesfireApplication? =
-        applications.firstOrNull { it.id == appId }
+    fun getApplication(appId: Int): DesfireApplication? = applications.firstOrNull { it.id == appId }
 
     override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
         val cardUiBuilder = FareBotUiTree.builder(stringResource)
         val appsUiBuilder = cardUiBuilder.item().title("Applications")
         for (app in applications) {
-            val appUiBuilder = appsUiBuilder.item()
-                .title("Application: 0x${app.id.toString(16)}")
+            val appUiBuilder =
+                appsUiBuilder
+                    .item()
+                    .title("Application: 0x${app.id.toString(16)}")
             val filesUiBuilder = appUiBuilder.item().title("Files")
             for (file in app.files) {
-                val fileUiBuilder = filesUiBuilder.item()
-                    .title("File: 0x${file.id.toString(16)}")
+                val fileUiBuilder =
+                    filesUiBuilder
+                        .item()
+                        .title("File: 0x${file.id.toString(16)}")
                 val fileSettings = file.fileSettings
                 val settingsUiBuilder = fileUiBuilder.item().title("Settings")
-                settingsUiBuilder.item()
+                settingsUiBuilder
+                    .item()
                     .title("Type")
                     .value(fileSettings.fileTypeName)
                 if (fileSettings is StandardDesfireFileSettings) {
-                    settingsUiBuilder.item()
+                    settingsUiBuilder
+                        .item()
                         .title("Size")
                         .value(fileSettings.fileSize)
                 } else if (fileSettings is RecordDesfireFileSettings) {
-                    settingsUiBuilder.item()
+                    settingsUiBuilder
+                        .item()
                         .title("Cur Records")
                         .value(fileSettings.curRecords)
-                    settingsUiBuilder.item()
+                    settingsUiBuilder
+                        .item()
                         .title("Max Records")
                         .value(fileSettings.maxRecords)
-                    settingsUiBuilder.item()
+                    settingsUiBuilder
+                        .item()
                         .title("Record Size")
                         .value(fileSettings.recordSize)
                 } else if (fileSettings is ValueDesfireFileSettings) {
-                    settingsUiBuilder.item()
+                    settingsUiBuilder
+                        .item()
                         .title("Range")
                         .value("${fileSettings.lowerLimit} - ${fileSettings.upperLimit}")
-                    settingsUiBuilder.item()
+                    settingsUiBuilder
+                        .item()
                         .title("Limited Credit")
-                        .value("${fileSettings.limitedCreditValue} (${if (fileSettings.limitedCreditEnabled) "enabled" else "disabled"})")
+                        .value(
+                            "${fileSettings.limitedCreditValue} (${if (fileSettings.limitedCreditEnabled) "enabled" else "disabled"})",
+                        )
                 }
                 if (file is StandardDesfireFile) {
-                    fileUiBuilder.item()
+                    fileUiBuilder
+                        .item()
                         .title("Data")
                         .value(file.data)
                 } else if (file is RecordDesfireFile) {
-                    val recordsUiBuilder = fileUiBuilder.item()
-                        .title("Records")
+                    val recordsUiBuilder =
+                        fileUiBuilder
+                            .item()
+                            .title("Records")
                     val records = file.records
                     for (i in records.indices) {
                         val record = records[i]
-                        recordsUiBuilder.item()
+                        recordsUiBuilder
+                            .item()
                             .title("Record $i")
                             .value(record.data)
                     }
                 } else if (file is ValueDesfireFile) {
-                    fileUiBuilder.item()
+                    fileUiBuilder
+                        .item()
                         .title("Value")
                         .value(file.value)
                 } else if (file is InvalidDesfireFile) {
-                    fileUiBuilder.item()
+                    fileUiBuilder
+                        .item()
                         .title("Error")
                         .value(file.errorMessage)
                 } else if (file is UnauthorizedDesfireFile) {
-                    fileUiBuilder.item()
+                    fileUiBuilder
+                        .item()
                         .title("Error")
                         .value(file.errorMessage)
                 }
@@ -149,7 +167,7 @@ data class DesfireCard(
             scannedAt: Instant,
             applications: List<DesfireApplication>,
             manufacturingData: DesfireManufacturingData,
-            appListLocked: Boolean = false
+            appListLocked: Boolean = false,
         ): DesfireCard = DesfireCard(tagId, scannedAt, applications, manufacturingData, appListLocked)
     }
 }

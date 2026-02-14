@@ -40,12 +40,13 @@ data class Station(
     val longitude: Float? = null,
     val isUnknown: Boolean = false,
     val humanReadableLineIds: List<String> = emptyList(),
-    val attributes: List<String> = emptyList()
+    val attributes: List<String> = emptyList(),
 ) {
     fun getStationName(showRawIds: Boolean = false): String? {
         if (isUnknown) {
-            val id = humanReadableId
-                ?: return getStringBlocking(Res.string.unknown_station)
+            val id =
+                humanReadableId
+                    ?: return getStringBlocking(Res.string.unknown_station)
             return getStringBlocking(Res.string.unknown_station_format, id)
         }
         val base = shortStationNameRaw ?: stationNameRaw
@@ -62,14 +63,16 @@ data class Station(
     fun addAttribute(attr: String): Station = copy(attributes = attributes + attr)
 
     companion object {
-        fun unknown(id: String): Station = Station(
-            humanReadableId = id,
-            isUnknown = true
-        )
+        fun unknown(id: String): Station =
+            Station(
+                humanReadableId = id,
+                isUnknown = true,
+            )
 
-        fun nameOnly(name: String): Station = Station(
-            stationNameRaw = name
-        )
+        fun nameOnly(name: String): Station =
+            Station(
+                stationNameRaw = name,
+            )
 
         // Backwards-compatible factory methods
 
@@ -77,27 +80,29 @@ data class Station(
             stationName: String?,
             shortStationName: String?,
             latitude: String?,
-            longitude: String?
-        ): Station = Station(
-            stationNameRaw = stationName,
-            shortStationNameRaw = shortStationName,
-            latitude = latitude?.toFloatOrNull(),
-            longitude = longitude?.toFloatOrNull()
-        )
+            longitude: String?,
+        ): Station =
+            Station(
+                stationNameRaw = stationName,
+                shortStationNameRaw = shortStationName,
+                latitude = latitude?.toFloatOrNull(),
+                longitude = longitude?.toFloatOrNull(),
+            )
 
         fun create(
             name: String?,
             code: String?,
             abbreviation: String?,
             latitude: String?,
-            longitude: String?
-        ): Station = Station(
-            stationNameRaw = name,
-            shortStationNameRaw = abbreviation,
-            humanReadableId = code,
-            latitude = latitude?.toFloatOrNull(),
-            longitude = longitude?.toFloatOrNull()
-        )
+            longitude: String?,
+        ): Station =
+            Station(
+                stationNameRaw = name,
+                shortStationNameRaw = abbreviation,
+                humanReadableId = code,
+                latitude = latitude?.toFloatOrNull(),
+                longitude = longitude?.toFloatOrNull(),
+            )
 
         fun builder(): Builder = Builder()
     }
@@ -112,23 +117,55 @@ data class Station(
         private var code: String? = null
         private var abbreviation: String? = null
 
-        fun stationName(stationName: String?): Builder { this.stationName = stationName; return this }
-        fun shortStationName(shortStationName: String?): Builder { this.shortStationName = shortStationName; return this }
-        fun companyName(companyName: String?): Builder { this.companyName = companyName; return this }
-        fun lineNames(lineNames: List<String>): Builder { this.lineNames = lineNames; return this }
-        fun latitude(latitude: String?): Builder { this.latitude = latitude; return this }
-        fun longitude(longitude: String?): Builder { this.longitude = longitude; return this }
-        fun code(code: String?): Builder { this.code = code; return this }
-        fun abbreviation(abbreviation: String?): Builder { this.abbreviation = abbreviation; return this }
+        fun stationName(stationName: String?): Builder {
+            this.stationName = stationName
+            return this
+        }
 
-        fun build(): Station = Station(
-            stationNameRaw = stationName,
-            shortStationNameRaw = shortStationName ?: abbreviation,
-            companyName = companyName,
-            lineNames = lineNames,
-            latitude = latitude?.toFloatOrNull(),
-            longitude = longitude?.toFloatOrNull(),
-            humanReadableId = code
-        )
+        fun shortStationName(shortStationName: String?): Builder {
+            this.shortStationName = shortStationName
+            return this
+        }
+
+        fun companyName(companyName: String?): Builder {
+            this.companyName = companyName
+            return this
+        }
+
+        fun lineNames(lineNames: List<String>): Builder {
+            this.lineNames = lineNames
+            return this
+        }
+
+        fun latitude(latitude: String?): Builder {
+            this.latitude = latitude
+            return this
+        }
+
+        fun longitude(longitude: String?): Builder {
+            this.longitude = longitude
+            return this
+        }
+
+        fun code(code: String?): Builder {
+            this.code = code
+            return this
+        }
+
+        fun abbreviation(abbreviation: String?): Builder {
+            this.abbreviation = abbreviation
+            return this
+        }
+
+        fun build(): Station =
+            Station(
+                stationNameRaw = stationName,
+                shortStationNameRaw = shortStationName ?: abbreviation,
+                companyName = companyName,
+                lineNames = lineNames,
+                latitude = latitude?.toFloatOrNull(),
+                longitude = longitude?.toFloatOrNull(),
+                humanReadableId = code,
+            )
     }
 }

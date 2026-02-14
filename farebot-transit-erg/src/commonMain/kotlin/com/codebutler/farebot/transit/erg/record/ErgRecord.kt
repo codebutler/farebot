@@ -29,7 +29,11 @@ package com.codebutler.farebot.transit.erg.record
  */
 interface ErgRecord {
     companion object {
-        fun byteArrayToInt(data: ByteArray, offset: Int, length: Int): Int {
+        fun byteArrayToInt(
+            data: ByteArray,
+            offset: Int,
+            length: Int,
+        ): Int {
             var result = 0
             for (i in 0 until length) {
                 result = (result shl 8) or (data[offset + i].toInt() and 0xFF)
@@ -37,7 +41,11 @@ interface ErgRecord {
             return result
         }
 
-        fun getBitsFromBuffer(data: ByteArray, startBit: Int, length: Int): Int {
+        fun getBitsFromBuffer(
+            data: ByteArray,
+            startBit: Int,
+            length: Int,
+        ): Int {
             var result = 0
             for (i in startBit until (startBit + length)) {
                 val byteIndex = i / 8

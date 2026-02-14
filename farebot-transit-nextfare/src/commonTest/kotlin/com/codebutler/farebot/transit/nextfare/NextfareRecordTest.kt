@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.nextfare
 import com.codebutler.farebot.transit.nextfare.record.NextfareBalanceRecord
 import com.codebutler.farebot.transit.nextfare.record.NextfareConfigRecord
 import com.codebutler.farebot.transit.nextfare.record.NextfareTransactionRecord
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -39,7 +38,6 @@ import kotlin.test.assertNull
  */
 @OptIn(ExperimentalStdlibApi::class)
 class NextfareRecordTest {
-
     @Test
     fun testExpiryDate() {
         val r20250602 = "01030000c2320000010200000000bf0c".hexToByteArray()
@@ -49,19 +47,19 @@ class NextfareRecordTest {
         val r1 = NextfareConfigRecord.recordFromBytes(r20250602, TimeZone.UTC)!!
         assertEquals(
             LocalDateTime(2025, 6, 2, 0, 0, 0).toInstant(TimeZone.UTC),
-            r1.expiry
+            r1.expiry,
         )
 
         val r2 = NextfareConfigRecord.recordFromBytes(r20240925, TimeZone.UTC)!!
         assertEquals(
             LocalDateTime(2024, 9, 25, 0, 0, 0).toInstant(TimeZone.UTC),
-            r2.expiry
+            r2.expiry,
         )
 
         val r3 = NextfareConfigRecord.recordFromBytes(r20180815, TimeZone.UTC)!!
         assertEquals(
             LocalDateTime(2018, 8, 15, 0, 0, 0).toInstant(TimeZone.UTC),
-            r3.expiry
+            r3.expiry,
         )
     }
 
@@ -80,23 +78,26 @@ class NextfareRecordTest {
         // Checksums are wrong.
 
         // SEQ: $12.34, sequence 0x12
-        val r1 = NextfareBalanceRecord.recordFromBytes(
-            "0128d20400000000000000000012ffff".hexToByteArray()
-        )!!
+        val r1 =
+            NextfareBalanceRecord.recordFromBytes(
+                "0128d20400000000000000000012ffff".hexToByteArray(),
+            )!!
         assertEquals(0x12, r1.version)
         assertEquals(1234, r1.balance)
 
         // SEQ: -$10.00, sequence 0x23
-        val r2 = NextfareBalanceRecord.recordFromBytes(
-            "01a8e80300000000000000000023ffff".hexToByteArray()
-        )!!
+        val r2 =
+            NextfareBalanceRecord.recordFromBytes(
+                "01a8e80300000000000000000023ffff".hexToByteArray(),
+            )!!
         assertEquals(0x23, r2.version)
         assertEquals(-1000, r2.balance)
 
         // SEQ: -$10.00, sequence 0x34
-        val r3 = NextfareBalanceRecord.recordFromBytes(
-            "01a0e80300000000000000000034ffff".hexToByteArray()
-        )!!
+        val r3 =
+            NextfareBalanceRecord.recordFromBytes(
+                "01a0e80300000000000000000034ffff".hexToByteArray(),
+            )!!
         assertEquals(0x34, r3.version)
         assertEquals(-1000, r3.balance)
     }

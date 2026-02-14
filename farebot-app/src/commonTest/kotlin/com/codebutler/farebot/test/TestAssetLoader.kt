@@ -33,10 +33,10 @@ import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitInfo
-import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Platform-specific function to load a test resource as bytes.
@@ -52,11 +52,11 @@ expect fun loadTestResource(path: String): ByteArray?
  * - .json files: FareBot JSON card exports
  */
 object TestAssetLoader {
-
-    private val json = Json {
-        prettyPrint = true
-        ignoreUnknownKeys = true
-    }
+    private val json =
+        Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
 
     private val serializer = KotlinxCardSerializer(json)
 
@@ -107,7 +107,7 @@ object TestAssetLoader {
      */
     fun loadMfcCard(
         resourcePath: String,
-        scannedAt: Instant = TEST_TIMESTAMP
+        scannedAt: Instant = TEST_TIMESTAMP,
     ): RawClassicCard {
         val bytes = loadTestResource(resourcePath)
         assertNotNull(bytes, "Test resource not found: $resourcePath")
@@ -117,7 +117,10 @@ object TestAssetLoader {
     /**
      * Parses raw .mfc bytes into a RawClassicCard.
      */
-    private fun parseMfcBytes(bytes: ByteArray, scannedAt: Instant): RawClassicCard {
+    private fun parseMfcBytes(
+        bytes: ByteArray,
+        scannedAt: Instant,
+    ): RawClassicCard {
         val sectors = mutableListOf<RawClassicSector>()
         var offset = 0
         var sectorNum = 0
@@ -133,11 +136,12 @@ object TestAssetLoader {
             }
 
             val sectorBytes = bytes.copyOfRange(offset, offset + sectorSize)
-            val blocks = (0 until blockCount).map { blockIndex ->
-                val blockStart = blockIndex * 16
-                val blockData = sectorBytes.copyOfRange(blockStart, blockStart + 16)
-                RawClassicBlock.create(blockIndex, blockData)
-            }
+            val blocks =
+                (0 until blockCount).map { blockIndex ->
+                    val blockStart = blockIndex * 16
+                    val blockData = sectorBytes.copyOfRange(blockStart, blockStart + 16)
+                    RawClassicBlock.create(blockIndex, blockData)
+                }
 
             sectors.add(RawClassicSector.createData(sectorNum, blocks))
             offset += sectorSize
@@ -148,11 +152,12 @@ object TestAssetLoader {
         val tagId = extractUidFromBlock0(sectors.firstOrNull())
 
         // Fill remaining sectors as unauthorized based on detected card size
-        val maxSector = when {
-            sectorNum <= 16 -> 15  // 1K card
-            sectorNum <= 32 -> 31  // 2K card
-            else -> 39             // 4K card
-        }
+        val maxSector =
+            when {
+                sectorNum <= 16 -> 15 // 1K card
+                sectorNum <= 32 -> 31 // 2K card
+                else -> 39 // 4K card
+            }
 
         while (sectors.size <= maxSector) {
             sectors.add(RawClassicSector.createUnauthorized(sectors.size))
@@ -183,9 +188,8 @@ object TestAssetLoader {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun ByteArray.getUShort(offset: Int): UShort {
-        return ((this[offset].toInt() and 0xFF) shl 8 or (this[offset + 1].toInt() and 0xFF)).toUShort()
-    }
+    private fun ByteArray.getUShort(offset: Int): UShort =
+        ((this[offset].toInt() and 0xFF) shl 8 or (this[offset + 1].toInt() and 0xFF)).toUShort()
 }
 
 /**
@@ -197,14 +201,13 @@ val TEST_TIMESTAMP: Instant = Instant.fromEpochSeconds(1609459200) // 2021-01-01
  * Base class for tests that load card dumps from test resources.
  */
 abstract class CardDumpTest {
-
     /**
      * Loads an .mfc file and parses it using the given transit factory.
      */
     inline fun <reified T : TransitInfo> loadAndParseMfc(
         path: String,
         factory: TransitFactory<ClassicCard, T>,
-        scannedAt: Instant = TEST_TIMESTAMP
+        scannedAt: Instant = TEST_TIMESTAMP,
     ): T {
         val rawCard = TestAssetLoader.loadMfcCard(path, scannedAt)
         val card = rawCard.parse()
@@ -220,19 +223,18 @@ abstract class CardDumpTest {
      */
     fun loadMfcCard(
         path: String,
-        scannedAt: Instant = TEST_TIMESTAMP
-    ): ClassicCard {
-        return TestAssetLoader.loadMfcCard(path, scannedAt).parse()
-    }
+        scannedAt: Instant = TEST_TIMESTAMP,
+    ): ClassicCard = TestAssetLoader.loadMfcCard(path, scannedAt).parse()
 
     /**
      * Loads a JSON card dump and parses it using the given transit factory.
      */
     inline fun <reified C : Card, reified T : TransitInfo> loadAndParseJson(
         path: String,
-        factory: TransitFactory<C, T>
+        factory: TransitFactory<C, T>,
     ): T {
         val rawCard = TestAssetLoader.loadJsonCard(path)
+
         @Suppress("UNCHECKED_CAST")
         val card = rawCard.parse() as C
         assertTrue(factory.check(card), "Card did not match factory: ${factory::class.simpleName}")
@@ -247,9 +249,10 @@ abstract class CardDumpTest {
      */
     inline fun <reified C : Card, reified T : TransitInfo> loadAndParseMetrodroidJson(
         path: String,
-        factory: TransitFactory<C, T>
+        factory: TransitFactory<C, T>,
     ): Pair<C, T> {
         val rawCard = TestAssetLoader.loadMetrodroidJsonCard(path)
+
         @Suppress("UNCHECKED_CAST")
         val card = rawCard.parse() as C
         assertTrue(factory.check(card), "Card did not match factory: ${factory::class.simpleName}")

@@ -35,9 +35,8 @@ data class ErgPurseRecord(
     val minute: Int,
     val isCredit: Boolean,
     val transactionValue: Int,
-    val isTrip: Boolean
+    val isTrip: Boolean,
 ) : ErgRecord {
-
     companion object {
         fun recordFromBytes(block: ByteArray): ErgRecord? {
             val isCredit: Boolean
@@ -62,14 +61,15 @@ data class ErgPurseRecord(
                 else -> return null
             }
 
-            val record = ErgPurseRecord(
-                agency = ErgRecord.byteArrayToInt(block, 1, 2),
-                day = ErgRecord.getBitsFromBuffer(block, 32, 20),
-                minute = ErgRecord.getBitsFromBuffer(block, 52, 12),
-                transactionValue = ErgRecord.byteArrayToInt(block, 8, 4),
-                isCredit = isCredit,
-                isTrip = isTrip
-            )
+            val record =
+                ErgPurseRecord(
+                    agency = ErgRecord.byteArrayToInt(block, 1, 2),
+                    day = ErgRecord.getBitsFromBuffer(block, 32, 20),
+                    minute = ErgRecord.getBitsFromBuffer(block, 52, 12),
+                    transactionValue = ErgRecord.byteArrayToInt(block, 8, 4),
+                    isCredit = isCredit,
+                    isTrip = isTrip,
+                )
 
             require(record.day >= 0) { "Day < 0" }
             require(record.minute in 0..1440) { "Minute out of range: ${record.minute}" }

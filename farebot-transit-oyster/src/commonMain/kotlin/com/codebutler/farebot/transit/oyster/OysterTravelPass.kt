@@ -37,9 +37,8 @@ import kotlin.time.Instant
 class OysterTravelPass(
     override val validFrom: Instant,
     override val validTo: Instant,
-    override val cost: TransitCurrency
+    override val cost: TransitCurrency,
 ) : Subscription() {
-
     // TODO: Figure this out properly.
     override val subscriptionName: String
         get() = getStringBlocking(Res.string.oyster_travelpass)
@@ -49,8 +48,10 @@ class OysterTravelPass(
             val result = mutableListOf<OysterTravelPass>()
             for (block in 0..2) {
                 try {
-                    val sec7 = (card.getSector(7) as? DataClassicSector)
-                        ?.getBlock(block)?.data ?: continue
+                    val sec7 =
+                        (card.getSector(7) as? DataClassicSector)
+                            ?.getBlock(block)
+                            ?.data ?: continue
 
                     // Don't know what a blank card looks like, so try to skip if it doesn't look
                     // like there is any expiry date on a pass.
@@ -59,15 +60,17 @@ class OysterTravelPass(
                         continue
                     }
 
-                    val sec8 = (card.getSector(8) as? DataClassicSector)
-                        ?.getBlock(block)?.data ?: continue
+                    val sec8 =
+                        (card.getSector(8) as? DataClassicSector)
+                            ?.getBlock(block)
+                            ?.data ?: continue
 
                     result.add(
                         OysterTravelPass(
                             validFrom = OysterUtils.parseTimestamp(sec8, 78),
                             validTo = OysterUtils.parseTimestamp(sec7, 33),
-                            cost = TransitCurrency.GBP(sec8.byteArrayToIntReversed(0, 2))
-                        )
+                            cost = TransitCurrency.GBP(sec8.byteArrayToIntReversed(0, 2)),
+                        ),
                     )
                 } catch (_: Exception) {
                 }

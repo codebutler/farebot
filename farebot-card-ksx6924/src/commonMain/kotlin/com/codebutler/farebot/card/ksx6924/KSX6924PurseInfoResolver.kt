@@ -43,12 +43,9 @@ object KSX6924PurseInfoDefaultResolver : KSX6924PurseInfoResolver()
  * See https://github.com/micolous/metrodroid/wiki/T-Money for more information about these fields.
  */
 abstract class KSX6924PurseInfoResolver {
+    fun resolveCryptoAlgo(algo: Byte): String = getOrNone(cryptoAlgos[algo.toInt() and 0xFF], algo)
 
-    fun resolveCryptoAlgo(algo: Byte): String =
-        getOrNone(cryptoAlgos[algo.toInt() and 0xFF], algo)
-
-    fun resolveCardType(type: Byte): String =
-        getOrNone(cardTypes[type.toInt() and 0xFF], type)
+    fun resolveCardType(type: Byte): String = getOrNone(cardTypes[type.toInt() and 0xFF], type)
 
     /**
      * Maps an `IDCENTER` (issuer ID) into a name of the issuer.
@@ -88,7 +85,10 @@ abstract class KSX6924PurseInfoResolver {
 
     fun resolveCCode(code: Byte): String = getOrNone(cCodes[code.toInt() and 0xFF], code)
 
-    private fun getOrNone(res: String?, value: Byte): String {
+    private fun getOrNone(
+        res: String?,
+        value: Byte,
+    ): String {
         val hexId = NumberUtils.byteToHex(value)
         return when {
             res == null -> "Unknown ($hexId)"
@@ -99,19 +99,21 @@ abstract class KSX6924PurseInfoResolver {
     /**
      * Maps a `ALG` (encryption algorithm type) into a name of the algorithm.
      */
-    private val cryptoAlgos: Map<Int, String> = mapOf(
-        0x00 to "SEED",
-        0x10 to "3DES"
-    )
+    private val cryptoAlgos: Map<Int, String> =
+        mapOf(
+            0x00 to "SEED",
+            0x10 to "3DES",
+        )
 
     /**
      * Maps a `CARDTYPE` (card type) into a name of the type of card.
      *
      * Specifically, this describes the payment terms of the card (pre-paid, post-paid, etc.)
      */
-    private val cardTypes: Map<Int, String> = mapOf(
-        0x00 to "Pre-paid",
-        0x10 to "Post-pay",
-        0x15 to "Mobile Post-pay"
-    )
+    private val cardTypes: Map<Int, String> =
+        mapOf(
+            0x00 to "Pre-paid",
+            0x10 to "Post-pay",
+            0x15 to "Mobile Post-pay",
+        )
 }

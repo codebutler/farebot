@@ -30,14 +30,23 @@ import kotlinx.serialization.Serializable
 data class ListItemRecursive(
     override val text1: String?,
     override val text2: String?,
-    val subTree: List<ListItemInterface>?
+    val subTree: List<ListItemInterface>?,
 ) : ListItemInterface() {
     companion object {
-        fun collapsedValue(name: String, value: String?): ListItemInterface =
-            collapsedValue(name, null, value)
+        fun collapsedValue(
+            name: String,
+            value: String?,
+        ): ListItemInterface = collapsedValue(name, null, value)
 
-        fun collapsedValue(title: String, subtitle: String?, value: String?): ListItemInterface =
-            ListItemRecursive(title, subtitle,
-                if (value != null) listOf(ListItem(null, value)) else null)
+        fun collapsedValue(
+            title: String,
+            subtitle: String?,
+            value: String?,
+        ): ListItemInterface =
+            ListItemRecursive(
+                title,
+                subtitle,
+                if (value != null) listOf(ListItem(null, value)) else null,
+            )
     }
 }

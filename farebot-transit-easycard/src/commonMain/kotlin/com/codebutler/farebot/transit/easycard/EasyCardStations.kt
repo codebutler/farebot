@@ -25,7 +25,8 @@
 
 package com.codebutler.farebot.transit.easycard
 
-val EasyCardStations = mapOf(
+val EasyCardStations =
+    mapOf(
         0x47 to "Metro Tamsui",
         0x46 to "Metro Hongshulin",
         0x45 to "Metro Zhuwei",
@@ -126,4 +127,5 @@ val EasyCardStations = mapOf(
         0xb3 to "Metro Huilong",
         0xb4 to "Metro Danfeng",
         0x05 to "Bus Fare",
-        0x01 to "Store purchase")
+        0x01 to "Store purchase",
+    )

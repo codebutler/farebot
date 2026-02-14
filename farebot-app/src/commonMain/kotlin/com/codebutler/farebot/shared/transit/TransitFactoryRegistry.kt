@@ -30,7 +30,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 
 class TransitFactoryRegistry {
-
     private val registry = mutableMapOf<CardType, MutableList<TransitFactory<Card, TransitInfo>>>()
 
     val allCards: List<CardInfo>
@@ -40,13 +39,15 @@ class TransitFactoryRegistry {
 
     fun parseTransitInfo(card: Card): TransitInfo? = findFactory(card)?.parseInfo(card)
 
-    fun findCardInfo(card: Card): CardInfo? =
-        findFactory(card)?.allCards?.firstOrNull()
+    fun findCardInfo(card: Card): CardInfo? = findFactory(card)?.allCards?.firstOrNull()
 
     fun findBrandColor(card: Card): Int? = findCardInfo(card)?.brandColor
 
     @Suppress("UNCHECKED_CAST")
-    fun registerFactory(cardType: CardType, factory: TransitFactory<*, *>) {
+    fun registerFactory(
+        cardType: CardType,
+        factory: TransitFactory<*, *>,
+    ) {
         val factories = registry.getOrPut(cardType) { mutableListOf() }
         factories.add(factory as TransitFactory<Card, TransitInfo>)
     }

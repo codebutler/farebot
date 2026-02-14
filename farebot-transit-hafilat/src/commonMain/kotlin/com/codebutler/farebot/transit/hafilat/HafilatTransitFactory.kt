@@ -31,8 +31,8 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.transit.CardInfo
-import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.Transaction
+import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
@@ -41,31 +41,30 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import farebot.farebot_transit_hafilat.generated.resources.*
 
 class HafilatTransitFactory(
-    private val stringResource: StringResource = DefaultStringResource()
+    private val stringResource: StringResource = DefaultStringResource(),
 ) : TransitFactory<DesfireCard, HafilatTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(APP_ID) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(APP_ID) != null
 
-    override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        return TransitIdentity.create(
+    override fun parseIdentity(card: DesfireCard): TransitIdentity =
+        TransitIdentity.create(
             getStringBlocking(Res.string.card_name_hafilat),
-            HafilatTransitInfo.formatSerial(getSerial(card.tagId))
+            HafilatTransitInfo.formatSerial(getSerial(card.tagId)),
         )
-    }
 
     override fun parseInfo(card: DesfireCard): HafilatTransitInfo {
         val app = card.getApplication(APP_ID)!!
 
         // 0 = TICKETING_ENVIRONMENT
         val envFile = app.getFile(0) as? StandardDesfireFile
-        val parsed = if (envFile != null) {
-            En1545Parser.parse(envFile.data, IntercodeFields.TICKET_ENV_FIELDS)
-        } else null
+        val parsed =
+            if (envFile != null) {
+                En1545Parser.parse(envFile.data, IntercodeFields.TICKET_ENV_FIELDS)
+            } else {
+                null
+            }
 
         val transactionList = mutableListOf<Transaction>()
 
@@ -97,26 +96,26 @@ class HafilatTransitFactory(
             purse = purse,
             serial = getSerial(card.tagId),
             subscriptions = if (subs.isNotEmpty()) subs else null,
-            trips = TransactionTrip.merge(transactionList)
+            trips = TransactionTrip.merge(transactionList),
         )
     }
 
     companion object {
         private const val APP_ID = 0x107f2
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_hafilat,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.UAE,
-            locationRes = Res.string.location_abu_dhabi,
-            imageRes = Res.drawable.hafilat,
-            latitude = 24.4539f,
-            longitude = 54.3773f,
-            brandColor = 0x95A966,
-            credits = listOf("Metrodroid Project", "Michael Farrell"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_hafilat,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.UAE,
+                locationRes = Res.string.location_abu_dhabi,
+                imageRes = Res.drawable.hafilat,
+                latitude = 24.4539f,
+                longitude = 54.3773f,
+                brandColor = 0x95A966,
+                credits = listOf("Metrodroid Project", "Michael Farrell"),
+            )
 
-        private fun getSerial(tagId: ByteArray): Long =
-            tagId.byteArrayToLongReversed(1, 6)
+        private fun getSerial(tagId: ByteArray): Long = tagId.byteArrayToLongReversed(1, 6)
     }
 }

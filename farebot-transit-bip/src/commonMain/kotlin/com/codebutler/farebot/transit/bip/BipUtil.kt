@@ -23,10 +23,10 @@
 package com.codebutler.farebot.transit.bip
 
 import com.codebutler.farebot.base.util.getBitsFromBufferLeBits
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 private val TZ = TimeZone.of("America/Santiago")
 

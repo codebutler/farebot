@@ -32,9 +32,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClassicCardKeys(
     private val cardType: CardType,
-    val keys: List<ClassicSectorKey>
+    val keys: List<ClassicSectorKey>,
 ) : CardKeys {
-
     override fun cardType(): CardType = cardType
 
     /**
@@ -74,7 +73,9 @@ data class ClassicCardKeys(
         private fun create(keys: List<ClassicSectorKey>): ClassicCardKeys =
             ClassicCardKeys(CardType.MifareClassic, keys)
 
-        private fun readKey(data: ByteArray, offset: Int): ByteArray =
-            data.copyOfRange(offset, offset + KEY_LEN)
+        private fun readKey(
+            data: ByteArray,
+            offset: Int,
+        ): ByteArray = data.copyOfRange(offset, offset + KEY_LEN)
     }
 }

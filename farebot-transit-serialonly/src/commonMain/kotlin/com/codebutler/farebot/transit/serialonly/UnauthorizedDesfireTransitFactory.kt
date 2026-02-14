@@ -40,7 +40,6 @@ import kotlinx.serialization.Serializable
  * This factory should be registered LAST in the DESFire factory list.
  */
 class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, UnauthorizedDesfireTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     /**
@@ -76,16 +75,17 @@ class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, Unauthoriz
          */
         private data class UnauthorizedType(
             val appId: Int,
-            val name: String
+            val name: String,
         )
 
-        private val TYPES = listOf(
-            UnauthorizedType(0x31594f, "Oyster"),
-            UnauthorizedType(0x425311, "Thailand BEM"),
-            UnauthorizedType(0x425303, "Rabbit Card"),
-            UnauthorizedType(0x5011f2, "Litacka"),
-            UnauthorizedType(0x5010f2, "Metrocard (Christchurch)")
-        )
+        private val TYPES =
+            listOf(
+                UnauthorizedType(0x31594f, "Oyster"),
+                UnauthorizedType(0x425311, "Thailand BEM"),
+                UnauthorizedType(0x425303, "Rabbit Card"),
+                UnauthorizedType(0x5011f2, "Litacka"),
+                UnauthorizedType(0x5010f2, "Metrocard (Christchurch)"),
+            )
 
         /**
          * Application ID range for hidden/reserved DESFire apps.
@@ -106,13 +106,14 @@ class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, Unauthoriz
 
 @Serializable
 data class UnauthorizedDesfireTransitInfo(
-    override val cardName: String
+    override val cardName: String,
 ) : TransitInfo() {
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.fully_locked_title),
-            ListItem(Res.string.fully_locked_desc)
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.fully_locked_title),
+                ListItem(Res.string.fully_locked_desc),
+            )
 }

@@ -41,9 +41,8 @@ import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.farebot_transit_calypso.generated.resources.*
 
 internal class PisaTransitInfo(
-    result: CalypsoParseResult
+    result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-
     override val cardName: String = NAME
 
     companion object {
@@ -52,8 +51,9 @@ internal class PisaTransitInfo(
     }
 }
 
-class PisaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+class PisaTransitFactory(
+    stringResource: StringResource,
+) : CalypsoTransitFactory(stringResource) {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -65,46 +65,51 @@ class PisaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
         return networkId == PisaTransitInfo.PISA_NETWORK_ID
     }
 
-    override fun parseTransitInfo(app: ISO7816Application, serial: String?): TransitInfo {
-        val result = Calypso1545TransitData.parse(
-            app = app,
-            ticketEnvFields = TICKET_ENV_FIELDS,
-            contractListFields = null,
-            serial = serial,
-            createSubscription = { data, ctr, _, _ -> PisaSubscription.parse(data, stringResource, ctr) },
-            createTrip = { data -> PisaTransaction.parse(data) },
-            createSpecialEvent = { data -> PisaSpecialEvent.parse(data) }
-        )
+    override fun parseTransitInfo(
+        app: ISO7816Application,
+        serial: String?,
+    ): TransitInfo {
+        val result =
+            Calypso1545TransitData.parse(
+                app = app,
+                ticketEnvFields = ticketEnvFields,
+                contractListFields = null,
+                serial = serial,
+                createSubscription = { data, ctr, _, _ -> PisaSubscription.parse(data, stringResource, ctr) },
+                createTrip = { data -> PisaTransaction.parse(data) },
+                createSpecialEvent = { data -> PisaSpecialEvent.parse(data) },
+            )
 
         return PisaTransitInfo(result)
     }
 
-    override fun getSerial(app: ISO7816Application): String? {
-        return app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]?.records?.get(2)?.let {
+    override fun getSerial(app: ISO7816Application): String? =
+        app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]?.records?.get(2)?.let {
             it.decodeToString().trim { c -> c == '\u0000' || c.isWhitespace() }
         }
-    }
 
-    private val TICKET_ENV_FIELDS = En1545Container(
-        En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 5),
-        En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 24),
-        En1545FixedHex(En1545TransitData.ENV_UNKNOWN_A, 44),
-        En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_ISSUE),
-        En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-        En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE)
-    )
+    private val ticketEnvFields =
+        En1545Container(
+            En1545FixedInteger(En1545TransitData.ENV_VERSION_NUMBER, 5),
+            En1545FixedInteger(En1545TransitData.ENV_NETWORK_ID, 24),
+            En1545FixedHex(En1545TransitData.ENV_UNKNOWN_A, 44),
+            En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_ISSUE),
+            En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+            En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+        )
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_carta_mobile,
-            cardType = CardType.ISO7816,
-            region = TransitRegion.ITALY,
-            locationRes = Res.string.card_location_pisa_italy,
-            imageRes = Res.drawable.cartamobile,
-            latitude = 43.7228f,
-            longitude = 10.4017f,
-            brandColor = 0x0BADDB,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_carta_mobile,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.ITALY,
+                locationRes = Res.string.card_location_pisa_italy,
+                imageRes = Res.drawable.cartamobile,
+                latitude = 43.7228f,
+                longitude = 10.4017f,
+                brandColor = 0x0BADDB,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+            )
     }
 }

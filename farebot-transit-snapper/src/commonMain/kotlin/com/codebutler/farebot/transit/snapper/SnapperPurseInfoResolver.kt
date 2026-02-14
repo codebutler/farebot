@@ -27,7 +27,8 @@ package com.codebutler.farebot.transit.snapper
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfoResolver
 
 object SnapperPurseInfoResolver : KSX6924PurseInfoResolver() {
-    override val issuers = mapOf(
-        0x02 to "Snapper Services Ltd."
-    )
+    override val issuers =
+        mapOf(
+            0x02 to "Snapper Services Ltd.",
+        )
 }

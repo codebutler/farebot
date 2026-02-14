@@ -35,10 +35,10 @@ import com.codebutler.farebot.transit.zolotayakorona.RussiaTaxCodes
 import farebot.farebot_transit_umarsh.generated.resources.Res
 import farebot.farebot_transit_umarsh.generated.resources.umarsh_card_name
 import farebot.farebot_transit_umarsh.generated.resources.umarsh_unknown
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 data class UmarshSector(
     val counter: Int,
@@ -58,7 +58,7 @@ data class UmarshSector(
     val fieldC: Int,
     val fieldD: Int,
     val fieldE: Int,
-    val secno: Int
+    val secno: Int,
 ) {
     val hasExtraSector: Boolean get() = region == 52
 
@@ -82,23 +82,35 @@ data class UmarshSector(
         get() = if (denomination == UmarshDenomination.TRIPS) total else null
 
     val balance: TransitBalance?
-        get() = if (denomination == UmarshDenomination.RUB) TransitBalance(
-            balance = TransitCurrency.RUB(balanceRaw * 100),
-            name = subscriptionName
-        ) else null
+        get() =
+            if (denomination == UmarshDenomination.RUB) {
+                TransitBalance(
+                    balance = TransitCurrency.RUB(balanceRaw * 100),
+                    name = subscriptionName,
+                )
+            } else {
+                null
+            }
 
     val subscriptionValidTo: Instant?
-        get() = validTo?.let {
-            kotlinx.datetime.LocalDateTime(it.year, it.month, it.day, 23, 59, 59)
-                .toInstant(RussiaTaxCodes.codeToTimeZone(region))
-        }
+        get() =
+            validTo?.let {
+                kotlinx.datetime
+                    .LocalDateTime(it.year, it.month, it.day, 23, 59, 59)
+                    .toInstant(RussiaTaxCodes.codeToTimeZone(region))
+            }
 
     companion object {
         fun getRegion(sector: DataClassicSector): Int =
-            (sector.getBlock(1).data.getBitsFromBuffer(100, 4)
-                    or (sector.getBlock(1).data.getBitsFromBuffer(64, 3) shl 4))
+            (
+                sector.getBlock(1).data.getBitsFromBuffer(100, 4)
+                    or (sector.getBlock(1).data.getBitsFromBuffer(64, 3) shl 4)
+            )
 
-        fun parse(sector: DataClassicSector, secno: Int): UmarshSector {
+        fun parse(
+            sector: DataClassicSector,
+            secno: Int,
+        ): UmarshSector {
             val block0 = sector.getBlock(0).data
             val block1 = sector.getBlock(1).data
             val block2 = sector.getBlock(2).data
@@ -120,22 +132,21 @@ data class UmarshSector(
                 balanceRaw = block2.getBitsFromBuffer(65, 15),
                 fieldE = block2.byteArrayToInt(10, 1),
                 hash = block2.sliceOffLen(11, 5),
-                secno = secno
+                secno = secno,
             )
         }
 
         fun check(sector: DataClassicSector): Boolean {
             val block0 = sector.getBlock(0).data
             return block0.byteArrayToIntReversed(0, 4) == block0.byteArrayToIntReversed(4, 4).inv() &&
-                    block0.byteArrayToIntReversed(0, 4) == block0.byteArrayToIntReversed(8, 4) &&
-                    (block0[12].toInt() and 0xff) + (block0[13].toInt() and 0xff) == 0xff &&
-                    block0[12] == block0[14] &&
-                    block0[13] == block0[15] &&
-                    block0.byteArrayToIntReversed(0, 4) >= 0x7fffff00 &&
-                    (block0[13].toInt() and 0xff) >= 0x70
+                block0.byteArrayToIntReversed(0, 4) == block0.byteArrayToIntReversed(8, 4) &&
+                (block0[12].toInt() and 0xff) + (block0[13].toInt() and 0xff) == 0xff &&
+                block0[12] == block0[14] &&
+                block0[13] == block0[15] &&
+                block0.byteArrayToIntReversed(0, 4) >= 0x7fffff00 &&
+                (block0[13].toInt() and 0xff) >= 0x70
         }
 
-        fun system(sector: DataClassicSector): UmarshSystem? =
-            systemsMap[getRegion(sector)]
+        fun system(sector: DataClassicSector): UmarshSystem? = systemsMap[getRegion(sector)]
     }
 }

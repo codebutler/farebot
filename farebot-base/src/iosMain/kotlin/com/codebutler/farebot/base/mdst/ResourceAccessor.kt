@@ -23,16 +23,16 @@ import farebot.farebot_base.generated.resources.Res
 import kotlinx.coroutines.runBlocking
 
 actual object ResourceAccessor {
-    actual fun openMdstFile(dbName: String): ByteArray? {
-        return try {
-            val bytes = runBlocking {
-                Res.readBytes("files/$dbName.mdst")
-            }
+    actual fun openMdstFile(dbName: String): ByteArray? =
+        try {
+            val bytes =
+                runBlocking {
+                    Res.readBytes("files/$dbName.mdst")
+                }
             println("[ResourceAccessor] Loaded $dbName.mdst: ${bytes.size} bytes")
             bytes
         } catch (e: Exception) {
             println("[ResourceAccessor] ERROR loading $dbName.mdst: ${e::class.simpleName}: ${e.message}")
             null
         }
-    }
 }

@@ -42,9 +42,8 @@ class ClipperTrip(
     private val to: Long,
     private val route: Long,
     private val vehicleNum: Long = 0,
-    private val transportCode: Long = 0
+    private val transportCode: Long = 0,
 ) : Trip() {
-
     override val startTimestamp: Instant
         get() = Instant.fromEpochSeconds(timestamp)
 
@@ -78,24 +77,28 @@ class ClipperTrip(
      * as (number * 10 + letter), where the letter is 0-15 (A-P).
      */
     override val vehicleID: String?
-        get() = when (vehicleNum.toInt()) {
-            0, 0xffff -> null
-            in 1..9999 -> vehicleNum.toString()
-            else -> {
-                // LRV4 Muni vehicle: number/10 + letter from remainder
-                val num = vehicleNum.toInt() / 10
-                val letterIndex = (vehicleNum.toInt() % 10) + 9
-                num.toString() + letterIndex.toString(16).uppercase()
+        get() =
+            when (vehicleNum.toInt()) {
+                0, 0xffff -> null
+                in 1..9999 -> vehicleNum.toString()
+                else -> {
+                    // LRV4 Muni vehicle: number/10 + letter from remainder
+                    val num = vehicleNum.toInt() / 10
+                    val letterIndex = (vehicleNum.toInt() % 10) + 9
+                    num.toString() + letterIndex.toString(16).uppercase()
+                }
             }
-        }
 
     /**
      * For GG Ferry, display the route ID in hex as the raw identifier.
      */
     override val humanReadableRouteID: String?
-        get() = if (agency.toInt() == ClipperData.AGENCY_GG_FERRY) {
-            "0x${route.toInt().toString(16)}"
-        } else null
+        get() =
+            if (agency.toInt() == ClipperData.AGENCY_GG_FERRY) {
+                "0x${route.toInt().toString(16)}"
+            } else {
+                null
+            }
 
     fun getBalance(): Long = balance
 
@@ -110,7 +113,18 @@ class ClipperTrip(
     fun getRoute(): Long = route
 
     fun withBalance(newBalance: Long): ClipperTrip =
-        ClipperTrip(timestamp, exitTimestampValue, newBalance, fareValue, agency, from, to, route, vehicleNum, transportCode)
+        ClipperTrip(
+            timestamp,
+            exitTimestampValue,
+            newBalance,
+            fareValue,
+            agency,
+            from,
+            to,
+            route,
+            vehicleNum,
+            transportCode,
+        )
 
     companion object {
         fun builder(): Builder = Builder()
@@ -129,18 +143,37 @@ class ClipperTrip(
         private var transportCode: Long = 0
 
         fun timestamp(timestamp: Long): Builder = apply { this.timestamp = timestamp }
+
         fun exitTimestamp(exitTimestamp: Long): Builder = apply { this.exitTimestamp = exitTimestamp }
+
         fun balance(balance: Long): Builder = apply { this.balance = balance }
+
         fun fare(fare: Long): Builder = apply { this.fare = fare }
+
         fun agency(agency: Long): Builder = apply { this.agency = agency }
+
         fun from(from: Long): Builder = apply { this.from = from }
+
         fun to(to: Long): Builder = apply { this.to = to }
+
         fun route(route: Long): Builder = apply { this.route = route }
+
         fun vehicleNum(vehicleNum: Long): Builder = apply { this.vehicleNum = vehicleNum }
+
         fun transportCode(transportCode: Long): Builder = apply { this.transportCode = transportCode }
 
-        fun build(): ClipperTrip = ClipperTrip(
-            timestamp, exitTimestamp, balance, fare, agency, from, to, route, vehicleNum, transportCode
-        )
+        fun build(): ClipperTrip =
+            ClipperTrip(
+                timestamp,
+                exitTimestamp,
+                balance,
+                fare,
+                agency,
+                from,
+                to,
+                route,
+                vehicleNum,
+                transportCode,
+            )
     }
 }

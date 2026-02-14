@@ -47,9 +47,8 @@ import farebot.farebot_transit_calypso.generated.resources.*
 class LisboaVivaTransitInfo internal constructor(
     result: CalypsoParseResult,
     private val holderName: String?,
-    private val tagId: Long?
+    private val tagId: Long?,
 ) : CalypsoTransitInfo(result) {
-
     override val cardName: String = NAME
 
     override val info: List<ListItemInterface>
@@ -68,8 +67,9 @@ class LisboaVivaTransitInfo internal constructor(
         const val NAME = "Viva"
     }
 
-    class Factory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+    class Factory(
+        stringResource: StringResource,
+    ) : CalypsoTransitFactory(stringResource) {
         override val allCards: List<CardInfo>
             get() = listOf(CARD_INFO)
 
@@ -82,49 +82,69 @@ class LisboaVivaTransitInfo internal constructor(
 
         override fun parseTransitInfo(
             app: ISO7816Application,
-            serial: String?
+            serial: String?,
         ): TransitInfo {
-            val result = Calypso1545TransitData.parse(
-                app = app,
-                ticketEnvFields = TICKET_ENV_FIELDS,
-                contractListFields = null,
-                serial = serial,
-                createSubscription = { data, counter, _, _ -> LisboaVivaSubscription.parse(data, stringResource, counter) },
-                createTrip = { data -> LisboaVivaTransaction.parse(data) }
-            )
+            val result =
+                Calypso1545TransitData.parse(
+                    app = app,
+                    ticketEnvFields = TICKET_ENV_FIELDS,
+                    contractListFields = null,
+                    serial = serial,
+                    createSubscription = {
+                        data,
+                        counter,
+                        _,
+                        _,
+                        ->
+                        LisboaVivaSubscription.parse(data, stringResource, counter)
+                    },
+                    createTrip = { data -> LisboaVivaTransaction.parse(data) },
+                )
 
             // Parse tag ID from ICC file (SFI 0x02)
-            val tagId = Calypso1545TransitData.getSfiFile(app, 0x02)
-                ?.records?.get(1)?.let { record ->
-                    if (record.size >= 20) record.byteArrayToLong(16, 4) else null
-                }
+            val tagId =
+                Calypso1545TransitData
+                    .getSfiFile(app, 0x02)
+                    ?.records
+                    ?.get(1)
+                    ?.let { record ->
+                        if (record.size >= 20) record.byteArrayToLong(16, 4) else null
+                    }
 
             // Parse holder name from ID file (SFI 0x03)
-            val holderName = Calypso1545TransitData.getSfiFile(app, 0x03)
-                ?.records?.get(1)?.readLatin1()?.trim()
+            val holderName =
+                Calypso1545TransitData
+                    .getSfiFile(app, 0x03)
+                    ?.records
+                    ?.get(1)
+                    ?.readLatin1()
+                    ?.trim()
 
             return LisboaVivaTransitInfo(result, holderName, tagId)
         }
 
         override fun getSerial(app: ISO7816Application): String? {
-            val tenvRecord = app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]
-                ?.records?.get(1) ?: return null
+            val tenvRecord =
+                app.sfiFiles[CalypsoConstants.SFI_TICKETING_ENVIRONMENT]
+                    ?.records
+                    ?.get(1) ?: return null
             return NumberUtils.zeroPad(tenvRecord.getBitsFromBuffer(30, 8), 3) + " " +
                 NumberUtils.zeroPad(tenvRecord.getBitsFromBuffer(38, 24), 9)
         }
 
         companion object {
-            private val CARD_INFO = CardInfo(
-                nameRes = Res.string.card_name_lisboa_viva,
-                cardType = CardType.ISO7816,
-                region = TransitRegion.PORTUGAL,
-                locationRes = Res.string.card_location_lisbon_portugal,
-                imageRes = Res.drawable.lisboaviva,
-                latitude = 38.7223f,
-                longitude = -9.1393f,
-                brandColor = 0x46552C,
-                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-            )
+            private val CARD_INFO =
+                CardInfo(
+                    nameRes = Res.string.card_name_lisboa_viva,
+                    cardType = CardType.ISO7816,
+                    region = TransitRegion.PORTUGAL,
+                    locationRes = Res.string.card_location_lisbon_portugal,
+                    imageRes = Res.drawable.lisboaviva,
+                    latitude = 38.7223f,
+                    longitude = -9.1393f,
+                    brandColor = 0x46552C,
+                    credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+                )
 
             private const val COUNTRY_CODE_PORTUGAL = 0x131
             private const val ENV_UNKNOWN_A = "EnvUnknownA"
@@ -134,18 +154,19 @@ class LisboaVivaTransitInfo internal constructor(
             private const val ENV_NETWORK_COUNTRY = "EnvNetworkCountry"
             private const val CARD_SERIAL_PREFIX = "CardSerialPrefix"
 
-            private val TICKET_ENV_FIELDS = En1545Container(
-                En1545FixedInteger(ENV_UNKNOWN_A, 13),
-                En1545FixedInteger(ENV_NETWORK_COUNTRY, 12),
-                En1545FixedInteger(ENV_UNKNOWN_B, 5),
-                En1545FixedInteger(CARD_SERIAL_PREFIX, 8),
-                En1545FixedInteger(En1545TransitData.ENV_CARD_SERIAL, 24),
-                En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_ISSUE),
-                En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-                En1545FixedInteger(ENV_UNKNOWN_C, 15),
-                En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
-                En1545FixedHex(ENV_UNKNOWN_D, 95)
-            )
+            private val TICKET_ENV_FIELDS =
+                En1545Container(
+                    En1545FixedInteger(ENV_UNKNOWN_A, 13),
+                    En1545FixedInteger(ENV_NETWORK_COUNTRY, 12),
+                    En1545FixedInteger(ENV_UNKNOWN_B, 5),
+                    En1545FixedInteger(CARD_SERIAL_PREFIX, 8),
+                    En1545FixedInteger(En1545TransitData.ENV_CARD_SERIAL, 24),
+                    En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_ISSUE),
+                    En1545FixedInteger.date(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+                    En1545FixedInteger(ENV_UNKNOWN_C, 15),
+                    En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+                    En1545FixedHex(ENV_UNKNOWN_D, 95),
+                )
         }
     }
 }

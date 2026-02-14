@@ -24,6 +24,8 @@ package com.codebutler.farebot.card.nfc
 
 interface NfcTechnology {
     fun connect()
+
     fun close()
+
     val isConnected: Boolean
 }

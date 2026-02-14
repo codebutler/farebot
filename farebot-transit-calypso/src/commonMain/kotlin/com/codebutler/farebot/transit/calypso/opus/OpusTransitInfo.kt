@@ -44,44 +44,46 @@ import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.farebot_transit_calypso.generated.resources.*
 
 internal class OpusTransitInfo(
-    result: CalypsoParseResult
+    result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-
     override val cardName: String = NAME
 
     companion object {
         const val NAME = "Opus"
         const val NETWORK_ID = 0x124001
 
-        val TICKET_ENV_FIELDS = En1545Container(
-            IntercodeFields.TICKET_ENV_FIELDS,
-            En1545Bitmap(
-                En1545Container(
-                    En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_A, 3),
-                    En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
-                    En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_B, 13),
-                    En1545FixedInteger.date(En1545TransitData.HOLDER_PROFILE),
-                    En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_C, 8)
+        val TICKET_ENV_FIELDS =
+            En1545Container(
+                IntercodeFields.TICKET_ENV_FIELDS,
+                En1545Bitmap(
+                    En1545Container(
+                        En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_A, 3),
+                        En1545FixedInteger.dateBCD(En1545TransitData.HOLDER_BIRTH_DATE),
+                        En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_B, 13),
+                        En1545FixedInteger.date(En1545TransitData.HOLDER_PROFILE),
+                        En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_C, 8),
+                    ),
+                    // Possibly part of HolderUnknownB or HolderUnknownC
+                    En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_D, 8),
                 ),
-                // Possibly part of HolderUnknownB or HolderUnknownC
-                En1545FixedInteger(En1545TransitData.HOLDER_UNKNOWN_D, 8)
             )
-        )
 
-        val CONTRACT_LIST_FIELDS = En1545Repeat(
-            4,
-            En1545Bitmap(
-                En1545FixedInteger(En1545TransitData.CONTRACTS_PROVIDER, 8),
-                En1545FixedInteger(En1545TransitData.CONTRACTS_TARIFF, 16),
-                En1545FixedInteger(En1545TransitData.CONTRACTS_UNKNOWN_A, 4),
-                En1545FixedInteger(En1545TransitData.CONTRACTS_POINTER, 5)
+        val CONTRACT_LIST_FIELDS =
+            En1545Repeat(
+                4,
+                En1545Bitmap(
+                    En1545FixedInteger(En1545TransitData.CONTRACTS_PROVIDER, 8),
+                    En1545FixedInteger(En1545TransitData.CONTRACTS_TARIFF, 16),
+                    En1545FixedInteger(En1545TransitData.CONTRACTS_UNKNOWN_A, 4),
+                    En1545FixedInteger(En1545TransitData.CONTRACTS_POINTER, 5),
+                ),
             )
-        )
     }
 }
 
-class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+class OpusTransitFactory(
+    stringResource: StringResource,
+) : CalypsoTransitFactory(stringResource) {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -94,8 +96,9 @@ class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
     }
 
     override fun getSerial(app: ISO7816Application): String? {
-        val iccFile = app.sfiFiles[0x02]
-            ?: return null
+        val iccFile =
+            app.sfiFiles[0x02]
+                ?: return null
         val record = iccFile.records[1] ?: return null
 
         // Try bytes 16..20 first
@@ -117,37 +120,49 @@ class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
         return null
     }
 
-    override fun parseTransitInfo(app: ISO7816Application, serial: String?): TransitInfo {
+    override fun parseTransitInfo(
+        app: ISO7816Application,
+        serial: String?,
+    ): TransitInfo {
         // Contracts 2 is a copy of contract list on opus
-        val contracts = Calypso1545TransitData.getSfiRecords(
-            app, CalypsoConstants.SFI_TICKETING_CONTRACTS_1
-        )
+        val contracts =
+            Calypso1545TransitData.getSfiRecords(
+                app,
+                CalypsoConstants.SFI_TICKETING_CONTRACTS_1,
+            )
 
-        val result = Calypso1545TransitData.parse(
-            app = app,
-            ticketEnvFields = OpusTransitInfo.TICKET_ENV_FIELDS,
-            contractListFields = OpusTransitInfo.CONTRACT_LIST_FIELDS,
-            serial = serial,
-            createSubscription = { data, ctr, _, _ ->
-                if (ctr == null) null
-                else OpusSubscription(
-                    parsed = En1545Parser.parse(data, OpusSubscription.FIELDS),
-                    stringResource = stringResource,
-                    ctr = ctr
-                )
-            },
-            createTrip = { data ->
-                OpusTransaction(
-                    parsed = En1545Parser.parse(data, OpusTransaction.FIELDS)
-                )
-            },
-            contracts = contracts
-        )
+        val result =
+            Calypso1545TransitData.parse(
+                app = app,
+                ticketEnvFields = OpusTransitInfo.TICKET_ENV_FIELDS,
+                contractListFields = OpusTransitInfo.CONTRACT_LIST_FIELDS,
+                serial = serial,
+                createSubscription = { data, ctr, _, _ ->
+                    if (ctr == null) {
+                        null
+                    } else {
+                        OpusSubscription(
+                            parsed = En1545Parser.parse(data, OpusSubscription.FIELDS),
+                            stringResource = stringResource,
+                            ctr = ctr,
+                        )
+                    }
+                },
+                createTrip = { data ->
+                    OpusTransaction(
+                        parsed = En1545Parser.parse(data, OpusTransaction.FIELDS),
+                    )
+                },
+                contracts = contracts,
+            )
 
         return OpusTransitInfo(result)
     }
 
-    private fun ByteArray.byteArrayToLong(offset: Int, length: Int): Long {
+    private fun ByteArray.byteArrayToLong(
+        offset: Int,
+        length: Int,
+    ): Long {
         var result = 0L
         for (i in 0 until length) {
             result = (result shl 8) or (this[offset + i].toLong() and 0xFF)
@@ -156,16 +171,17 @@ class OpusTransitFactory(stringResource: StringResource) : CalypsoTransitFactory
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_opus,
-            cardType = CardType.ISO7816,
-            region = TransitRegion.CANADA,
-            locationRes = Res.string.card_location_montreal_canada,
-            imageRes = Res.drawable.opus_card,
-            latitude = 45.5017f,
-            longitude = -73.5673f,
-            brandColor = 0x209BD6,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_opus,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.CANADA,
+                locationRes = Res.string.card_location_montreal_canada,
+                imageRes = Res.drawable.opus_card,
+                latitude = 45.5017f,
+                longitude = -73.5673f,
+                brandColor = 0x209BD6,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+            )
     }
 }

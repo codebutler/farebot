@@ -26,17 +26,16 @@ package com.codebutler.farebot.card.classic.raw
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.classic.ClassicCard
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawClassicCard(
     @Contextual private val tagId: ByteArray,
     private val scannedAt: Instant,
-    private val sectors: List<RawClassicSector>
+    private val sectors: List<RawClassicSector>,
 ) : RawCard<ClassicCard> {
-
     override fun cardType(): CardType = CardType.MifareClassic
 
     override fun tagId(): ByteArray = tagId
@@ -60,7 +59,10 @@ data class RawClassicCard(
     fun sectors(): List<RawClassicSector> = sectors
 
     companion object {
-        fun create(tagId: ByteArray, scannedAt: Instant, sectors: List<RawClassicSector>): RawClassicCard =
-            RawClassicCard(tagId, scannedAt, sectors)
+        fun create(
+            tagId: ByteArray,
+            scannedAt: Instant,
+            sectors: List<RawClassicSector>,
+        ): RawClassicCard = RawClassicCard(tagId, scannedAt, sectors)
     }
 }

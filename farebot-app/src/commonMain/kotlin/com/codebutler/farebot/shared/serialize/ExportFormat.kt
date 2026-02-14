@@ -25,7 +25,10 @@ package com.codebutler.farebot.shared.serialize
 /**
  * Supported export formats for card data.
  */
-enum class ExportFormat(val extension: String, val mimeType: String) {
+enum class ExportFormat(
+    val extension: String,
+    val mimeType: String,
+) {
     /**
      * JSON format - matches Metrodroid's current format for interoperability.
      */
@@ -34,15 +37,18 @@ enum class ExportFormat(val extension: String, val mimeType: String) {
     /**
      * XML format - legacy format for compatibility with older FareBot/Metrodroid exports.
      */
-    XML("xml", "application/xml");
+    XML("xml", "application/xml"),
+    ;
 
     companion object {
-        fun fromExtension(ext: String): ExportFormat? = entries.find {
-            it.extension.equals(ext, ignoreCase = true)
-        }
+        fun fromExtension(ext: String): ExportFormat? =
+            entries.find {
+                it.extension.equals(ext, ignoreCase = true)
+            }
 
-        fun fromMimeType(mime: String): ExportFormat? = entries.find {
-            it.mimeType.equals(mime, ignoreCase = true)
-        }
+        fun fromMimeType(mime: String): ExportFormat? =
+            entries.find {
+                it.mimeType.equals(mime, ignoreCase = true)
+            }
     }
 }

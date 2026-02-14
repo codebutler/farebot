@@ -42,9 +42,8 @@ class HSLTransitInfo(
     val applicationKeyVersion: Int?,
     val platformType: Int?,
     val securityLevel: Int?,
-    val cardNameOverride: String
+    val cardNameOverride: String,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = cardNameOverride
 
@@ -52,10 +51,11 @@ class HSLTransitInfo(
         get() = TransitBalance(balance = TransitCurrency.EUR(mBalance))
 
     override val info: List<ListItemInterface>
-        get() = listOfNotNull(
-            applicationVersion?.let { ListItem(Res.string.hsl_application_version, it.toString()) },
-            applicationKeyVersion?.let { ListItem(Res.string.hsl_application_key_version, it.toString()) },
-            platformType?.let { ListItem(Res.string.hsl_platform_type, it.toString()) },
-            securityLevel?.let { ListItem(Res.string.hsl_security_level, it.toString()) }
-        )
+        get() =
+            listOfNotNull(
+                applicationVersion?.let { ListItem(Res.string.hsl_application_version, it.toString()) },
+                applicationKeyVersion?.let { ListItem(Res.string.hsl_application_key_version, it.toString()) },
+                platformType?.let { ListItem(Res.string.hsl_platform_type, it.toString()) },
+                securityLevel?.let { ListItem(Res.string.hsl_security_level, it.toString()) },
+            )
 }

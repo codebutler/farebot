@@ -24,8 +24,8 @@
 package com.codebutler.farebot.transit.edy
 
 import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.card.felica.FeliCaUtil
+import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_edy.generated.resources.*
@@ -37,34 +37,37 @@ class EdyTrip(
     private val timestampData: Instant,
     private val transactionAmount: Int,
     private val balance: Int,
-    private val stringResource: StringResource
+    private val stringResource: StringResource,
 ) : Trip() {
-
     override val startTimestamp: Instant get() = timestampData
 
     override val mode: Mode
-        get() = when (processType) {
-            EdyTransitInfo.FELICA_MODE_EDY_DEBIT -> Mode.POS
-            EdyTransitInfo.FELICA_MODE_EDY_CHARGE -> Mode.TICKET_MACHINE
-            EdyTransitInfo.FELICA_MODE_EDY_GIFT -> Mode.VENDING_MACHINE
-            else -> Mode.OTHER
-        }
+        get() =
+            when (processType) {
+                EdyTransitInfo.FELICA_MODE_EDY_DEBIT -> Mode.POS
+                EdyTransitInfo.FELICA_MODE_EDY_CHARGE -> Mode.TICKET_MACHINE
+                EdyTransitInfo.FELICA_MODE_EDY_GIFT -> Mode.VENDING_MACHINE
+                else -> Mode.OTHER
+            }
 
     override val fare: TransitCurrency
-        get() = if (processType != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
-            TransitCurrency.JPY(-transactionAmount)
-        } else {
-            TransitCurrency.JPY(transactionAmount)
-        }
+        get() =
+            if (processType != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
+                TransitCurrency.JPY(-transactionAmount)
+            } else {
+                TransitCurrency.JPY(transactionAmount)
+            }
 
     override val agencyName: String
         get() {
-            val str = if (processType != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
-                stringResource.getString(Res.string.felica_process_charge)
-            } else {
-                stringResource.getString(Res.string.felica_process_merchandise_purchase)
-            }
-            return str + " " + stringResource.getString(Res.string.edy_transaction_sequence) + sequenceNumber.toString().padStart(8, '0')
+            val str =
+                if (processType != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
+                    stringResource.getString(Res.string.felica_process_charge)
+                } else {
+                    stringResource.getString(Res.string.felica_process_merchandise_purchase)
+                }
+            return str + " " + stringResource.getString(Res.string.edy_transaction_sequence) +
+                sequenceNumber.toString().padStart(8, '0')
         }
 
     fun getProcessType(): Int = processType
@@ -78,7 +81,10 @@ class EdyTrip(
     fun getBalance(): Int = balance
 
     companion object {
-        fun create(block: FelicaBlock, stringResource: StringResource): EdyTrip {
+        fun create(
+            block: FelicaBlock,
+            stringResource: StringResource,
+        ): EdyTrip {
             val data = block.data
 
             val processType = data[0].toInt()

@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit.nextfare.record
 
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 /**
  * Top-up record type
@@ -34,11 +34,13 @@ data class NextfareTopupRecord(
     val credit: Int,
     val station: Int,
     val checksum: Int,
-    val isAutomatic: Boolean
+    val isAutomatic: Boolean,
 ) : NextfareRecord {
-
     companion object {
-        fun recordFromBytes(input: ByteArray, timeZone: TimeZone): NextfareTopupRecord? {
+        fun recordFromBytes(
+            input: ByteArray,
+            timeZone: TimeZone,
+        ): NextfareTopupRecord? {
             // Check if all the other data is null
             if (NextfareRecord.byteArrayToLong(input, 2, 6) == 0L) {
                 return null
@@ -49,7 +51,7 @@ data class NextfareTopupRecord(
                 credit = NextfareRecord.byteArrayToIntReversed(input, 6, 2) and 0x7FFF,
                 station = NextfareRecord.byteArrayToIntReversed(input, 12, 2),
                 checksum = NextfareRecord.byteArrayToIntReversed(input, 14, 2),
-                isAutomatic = input[0].toInt() == 0x31
+                isAutomatic = input[0].toInt() == 0x31,
             )
         }
     }

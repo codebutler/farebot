@@ -33,9 +33,8 @@ internal class IntercodeSubscription(
     override val parsed: En1545Parsed,
     override val stringResource: StringResource,
     private val ctr: Int?,
-    private val networkId: Int
+    private val networkId: Int,
 ) : En1545Subscription() {
-
     override val lookup: En1545Lookup
         get() = IntercodeTransitInfo.getLookup(networkId)
 
@@ -44,11 +43,17 @@ internal class IntercodeSubscription(
             if (parsed.getIntOrZero(CONTRACT_DEBIT_SOLD) != 0 && parsed.getIntOrZero(CONTRACT_SOLD) != 0) {
                 return ctr!! / parsed.getIntOrZero(CONTRACT_DEBIT_SOLD)
             }
-            if (networkId == IntercodeTransitInfo.NETWORK_NAVIGO && parsed.getIntOrZero(CONTRACT_JOURNEYS) != 0 && ctr != null)
+            if (networkId == IntercodeTransitInfo.NETWORK_NAVIGO &&
+                parsed.getIntOrZero(CONTRACT_JOURNEYS) != 0 &&
+                ctr != null
+            ) {
                 return ctr shr 18
+            }
             return if (parsed.getIntOrZero(CONTRACT_JOURNEYS) != 0) {
                 ctr
-            } else null
+            } else {
+                null
+            }
         }
 
     override val totalTripCount: Int?
@@ -56,18 +61,33 @@ internal class IntercodeSubscription(
             if (parsed.getIntOrZero(CONTRACT_DEBIT_SOLD) != 0 && parsed.getIntOrZero(CONTRACT_SOLD) != 0) {
                 return parsed.getIntOrZero(CONTRACT_SOLD) / parsed.getIntOrZero(CONTRACT_DEBIT_SOLD)
             }
-            if (networkId == IntercodeTransitInfo.NETWORK_NAVIGO && parsed.getIntOrZero(CONTRACT_JOURNEYS) != 0)
+            if (networkId == IntercodeTransitInfo.NETWORK_NAVIGO && parsed.getIntOrZero(CONTRACT_JOURNEYS) != 0) {
                 return parsed.getIntOrZero(CONTRACT_JOURNEYS) and 0xfff
+            }
             return if (parsed.getIntOrZero(CONTRACT_JOURNEYS) != 0) {
                 parsed.getIntOrZero(CONTRACT_JOURNEYS)
-            } else null
+            } else {
+                null
+            }
         }
 
     companion object {
-        fun parse(data: ByteArray, type: Int, networkId: Int, ctr: Int?, stringResource: StringResource): IntercodeSubscription {
+        fun parse(
+            data: ByteArray,
+            type: Int,
+            networkId: Int,
+            ctr: Int?,
+            stringResource: StringResource,
+        ): IntercodeSubscription {
             val parsed = En1545Parser.parse(data, IntercodeFields.getSubscriptionFields(type))
             val nid = parsed.getInt(CONTRACT_NETWORK_ID)
-            return IntercodeSubscription(parsed = parsed, stringResource = stringResource, ctr = ctr, networkId = nid ?: networkId)
+            return IntercodeSubscription(
+                parsed = parsed,
+                stringResource = stringResource,
+                ctr = ctr,
+                networkId =
+                    nid ?: networkId,
+            )
         }
     }
 }

@@ -27,7 +27,6 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
 
 abstract class TransitInfo {
-
     /**
      * The (currency) balance of the card's purse. Most cards have only one purse.
      *

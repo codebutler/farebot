@@ -32,10 +32,10 @@ import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_bonobus.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class BonobusTrip(
     private val mTimestamp: Long,
@@ -45,18 +45,18 @@ class BonobusTrip(
     private val mStation: Int,
     private val mT: Int,
     private val mLine: Int,
-    private val mVehicleNumber: Int
+    private val mVehicleNumber: Int,
 ) : Trip() {
-
     override val fare: TransitCurrency
         get() = TransitCurrency.EUR(if (mMode == MODE_REFILL) -mFare else mFare)
 
     override val mode: Mode
-        get() = when (mMode) {
-            MODE_BUS -> Mode.BUS
-            MODE_REFILL -> Mode.TICKET_MACHINE
-            else -> Mode.BUS
-        }
+        get() =
+            when (mMode) {
+                MODE_BUS -> Mode.BUS
+                MODE_REFILL -> Mode.TICKET_MACHINE
+                else -> Mode.BUS
+            }
 
     override val startTimestamp: Instant
         get() = parseTimestamp(mTimestamp)
@@ -79,7 +79,7 @@ class BonobusTrip(
                     lineNames = result.lineNames,
                     latitude = if (result.hasLocation) result.latitude else null,
                     longitude = if (result.hasLocation) result.longitude else null,
-                    humanReadableId = mStation.toString()
+                    humanReadableId = mStation.toString(),
                 )
             } else {
                 Station.unknown(mStation.toString())
@@ -100,7 +100,7 @@ class BonobusTrip(
                 mStation = raw.byteArrayToInt(8, 2),
                 mT = raw.byteArrayToInt(10, 2),
                 mLine = raw.byteArrayToInt(12, 2),
-                mVehicleNumber = raw.byteArrayToInt(14, 2)
+                mVehicleNumber = raw.byteArrayToInt(14, 2),
             )
         }
 

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import farebot.farebot_transit_clipper.generated.resources.Res
 import farebot.farebot_transit_clipper.generated.resources.clipper_return
@@ -30,41 +31,73 @@ import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_a
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_rtc
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_senior
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_youth
-import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
 
 class ClipperUltralightSubscription(
     private val product: Int,
     private val tripsRemaining: Int,
     private val transferExpiry: Int,
-    private val baseDate: Int
+    private val baseDate: Int,
 ) : Subscription() {
-
     override val id: Int = 0
 
     override val subscriptionName: String
-        get() = when (product and 0xf) {
-            0x3 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_adult))
-            0x4 -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_adult))
-            0x5 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_senior))
-            0x6 -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_senior))
-            0x7 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_rtc))
-            0x8 -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_rtc))
-            0x9 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_youth))
-            0xa -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_youth))
-            else -> product.toString(16)
-        }
+        get() =
+            when (product and 0xf) {
+                0x3 ->
+                    getStringBlocking(
+                        Res.string.clipper_single,
+                        getStringBlocking(Res.string.clipper_ticket_type_adult),
+                    )
+                0x4 ->
+                    getStringBlocking(
+                        Res.string.clipper_return,
+                        getStringBlocking(Res.string.clipper_ticket_type_adult),
+                    )
+                0x5 ->
+                    getStringBlocking(
+                        Res.string.clipper_single,
+                        getStringBlocking(Res.string.clipper_ticket_type_senior),
+                    )
+                0x6 ->
+                    getStringBlocking(
+                        Res.string.clipper_return,
+                        getStringBlocking(Res.string.clipper_ticket_type_senior),
+                    )
+                0x7 ->
+                    getStringBlocking(
+                        Res.string.clipper_single,
+                        getStringBlocking(Res.string.clipper_ticket_type_rtc),
+                    )
+                0x8 ->
+                    getStringBlocking(
+                        Res.string.clipper_return,
+                        getStringBlocking(Res.string.clipper_ticket_type_rtc),
+                    )
+                0x9 ->
+                    getStringBlocking(
+                        Res.string.clipper_single,
+                        getStringBlocking(Res.string.clipper_ticket_type_youth),
+                    )
+                0xa ->
+                    getStringBlocking(
+                        Res.string.clipper_return,
+                        getStringBlocking(Res.string.clipper_ticket_type_youth),
+                    )
+                else -> product.toString(16)
+            }
 
     override val remainingTripCount: Int?
         get() = if (tripsRemaining == -1) null else tripsRemaining
 
     override val subscriptionState: SubscriptionState
-        get() = when {
-            tripsRemaining == -1 -> SubscriptionState.UNUSED
-            tripsRemaining == 0 -> SubscriptionState.USED
-            tripsRemaining > 0 -> SubscriptionState.STARTED
-            else -> SubscriptionState.UNKNOWN
-        }
+        get() =
+            when {
+                tripsRemaining == -1 -> SubscriptionState.UNUSED
+                tripsRemaining == 0 -> SubscriptionState.USED
+                tripsRemaining > 0 -> SubscriptionState.STARTED
+                else -> SubscriptionState.UNKNOWN
+            }
 
     override val transferEndTimestamp: Instant?
         get() {

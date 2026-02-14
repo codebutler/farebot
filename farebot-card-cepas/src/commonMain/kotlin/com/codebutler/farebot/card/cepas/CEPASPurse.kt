@@ -46,7 +46,7 @@ data class CEPASPurse(
     @Contextual val issuerSpecificData: ByteArray?,
     val lastTransactionDebitOptionsByte: Byte,
     val isValid: Boolean,
-    val errorMessage: String?
+    val errorMessage: String?,
 ) {
     companion object {
         fun create(
@@ -66,9 +66,9 @@ data class CEPASPurse(
             lastTransactionTRP: Int,
             lastTransactionRecord: CEPASTransaction,
             issuerSpecificData: ByteArray,
-            lastTransactionDebitOptionsByte: Byte
-        ): CEPASPurse {
-            return CEPASPurse(
+            lastTransactionDebitOptionsByte: Byte,
+        ): CEPASPurse =
+            CEPASPurse(
                 id,
                 cepasVersion,
                 purseStatus,
@@ -87,12 +87,14 @@ data class CEPASPurse(
                 issuerSpecificData,
                 lastTransactionDebitOptionsByte,
                 true,
-                null
+                null,
             )
-        }
 
-        fun create(purseId: Int, errorMessage: String): CEPASPurse {
-            return CEPASPurse(
+        fun create(
+            purseId: Int,
+            errorMessage: String,
+        ): CEPASPurse =
+            CEPASPurse(
                 purseId,
                 0,
                 0,
@@ -111,12 +113,14 @@ data class CEPASPurse(
                 null,
                 0,
                 false,
-                errorMessage
+                errorMessage,
             )
-        }
 
         @Suppress("NAME_SHADOWING")
-        fun create(purseId: Int, purseData: ByteArray): CEPASPurse {
+        fun create(
+            purseId: Int,
+            purseData: ByteArray,
+        ): CEPASPurse {
             var purseData = purseData
             val isValid: Boolean
             val errorMessage: String
@@ -134,7 +138,8 @@ data class CEPASPurse(
             val cepasVersion = purseData[0]
             val purseStatus = purseData[1]
 
-            var tmp = (0x00ff0000 and (purseData[2].toInt() shl 16)) or
+            var tmp =
+                (0x00ff0000 and (purseData[2].toInt() shl 16)) or
                     (0x0000ff00 and (purseData[3].toInt() shl 8)) or
                     (0x000000ff and purseData[4].toInt())
             if (0 != (purseData[2].toInt() and 0x80)) {
@@ -143,8 +148,8 @@ data class CEPASPurse(
             val purseBalance = tmp
 
             tmp = (0x00ff0000 and (purseData[5].toInt() shl 16)) or
-                    (0x0000ff00 and (purseData[6].toInt() shl 8)) or
-                    (0x000000ff and purseData[7].toInt())
+                (0x0000ff00 and (purseData[6].toInt() shl 8)) or
+                (0x000000ff and purseData[7].toInt())
             if (0 != (purseData[5].toInt() and 0x80)) {
                 tmp = tmp or 0xff000000.toInt()
             }
@@ -158,10 +163,15 @@ data class CEPASPurse(
 
             // CEPAS epoch: January 1, 1995 00:00:00 SGT (UTC+8)
             val cepasEpoch = 788947200 - (8 * 3600)
-            val purseExpiryDate = cepasEpoch + (86400 * ((0xff00 and (purseData[24].toInt() shl 8)) or (0x00ff and purseData[25].toInt())))
-            val purseCreationDate = cepasEpoch + (86400 * ((0xff00 and (purseData[26].toInt() shl 8)) or (0x00ff and purseData[27].toInt())))
+            val purseExpiryDate =
+                cepasEpoch +
+                    (86400 * ((0xff00 and (purseData[24].toInt() shl 8)) or (0x00ff and purseData[25].toInt())))
+            val purseCreationDate =
+                cepasEpoch +
+                    (86400 * ((0xff00 and (purseData[26].toInt() shl 8)) or (0x00ff and purseData[27].toInt())))
 
-            val lastCreditTransactionTRP = (0xff000000.toInt() and (purseData[28].toInt() shl 24)) or
+            val lastCreditTransactionTRP =
+                (0xff000000.toInt() and (purseData[28].toInt() shl 24)) or
                     (0x00ff0000 and (purseData[29].toInt() shl 16)) or
                     (0x0000ff00 and (purseData[30].toInt() shl 8)) or
                     (0x000000ff and purseData[31].toInt())
@@ -173,7 +183,8 @@ data class CEPASPurse(
 
             val issuerDataLength = 0x00ff and purseData[41].toInt()
 
-            val lastTransactionTRP = (0xff000000.toInt() and (purseData[42].toInt() shl 24)) or
+            val lastTransactionTRP =
+                (0xff000000.toInt() and (purseData[42].toInt() shl 24)) or
                     (0x00ff0000 and (purseData[43].toInt() shl 16)) or
                     (0x0000ff00 and (purseData[44].toInt() shl 8)) or
                     (0x000000ff and purseData[45].toInt())
@@ -206,7 +217,7 @@ data class CEPASPurse(
                 issuerSpecificData,
                 lastTransactionDebitOptionsByte,
                 isValid,
-                errorMessage
+                errorMessage,
             )
         }
     }

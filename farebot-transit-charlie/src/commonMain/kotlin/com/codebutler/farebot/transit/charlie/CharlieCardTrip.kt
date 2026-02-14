@@ -31,9 +31,8 @@ import kotlin.time.Instant
 class CharlieCardTrip internal constructor(
     private val mFare: Int,
     private val mValidator: Int,
-    private val mTimestamp: Int
+    private val mTimestamp: Int,
 ) : Trip() {
-
     override val startStation: Station?
         get() = Station.unknown((mValidator shr 3).toString())
 
@@ -44,18 +43,22 @@ class CharlieCardTrip internal constructor(
         get() = TransitCurrency.USD(mFare)
 
     override val mode: Mode
-        get() = when (mValidator and 7) {
-            0 -> Mode.TICKET_MACHINE
-            1 -> Mode.BUS
-            else -> Mode.OTHER
-        }
+        get() =
+            when (mValidator and 7) {
+                0 -> Mode.TICKET_MACHINE
+                1 -> Mode.BUS
+                else -> Mode.OTHER
+            }
 
     companion object {
-        fun parse(data: ByteArray, off: Int): CharlieCardTrip =
+        fun parse(
+            data: ByteArray,
+            off: Int,
+        ): CharlieCardTrip =
             CharlieCardTrip(
                 mFare = CharlieCardTransitFactory.getPrice(data, off + 5),
                 mValidator = data.byteArrayToInt(off + 3, 2),
-                mTimestamp = data.byteArrayToInt(off, 3)
+                mTimestamp = data.byteArrayToInt(off, 3),
             )
     }
 }

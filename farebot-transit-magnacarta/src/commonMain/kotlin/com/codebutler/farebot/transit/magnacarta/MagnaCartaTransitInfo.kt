@@ -32,9 +32,8 @@ import farebot.farebot_transit_magnacarta.generated.resources.Res
 import farebot.farebot_transit_magnacarta.generated.resources.magnacarta_card_name
 
 class MagnaCartaTransitInfo(
-    private val mBalance: Int? // cents
+    private val mBalance: Int?, // cents
 ) : TransitInfo() {
-
     override val cardName: String = getStringBlocking(Res.string.magnacarta_card_name)
 
     override val serialNumber: String? = null

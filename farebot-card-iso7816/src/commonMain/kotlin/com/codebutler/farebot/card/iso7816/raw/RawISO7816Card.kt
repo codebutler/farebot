@@ -25,17 +25,16 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816Card
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawISO7816Card(
     @Contextual private val tagId: ByteArray,
     private val scannedAt: Instant,
-    val applications: List<ISO7816Application>
+    val applications: List<ISO7816Application>,
 ) : RawCard<ISO7816Card> {
-
     override fun cardType(): CardType = CardType.ISO7816
 
     override fun tagId(): ByteArray = tagId
@@ -44,15 +43,13 @@ data class RawISO7816Card(
 
     override fun isUnauthorized(): Boolean = false
 
-    override fun parse(): ISO7816Card {
-        return ISO7816Card.create(tagId, scannedAt, applications)
-    }
+    override fun parse(): ISO7816Card = ISO7816Card.create(tagId, scannedAt, applications)
 
     companion object {
         fun create(
             tagId: ByteArray,
             scannedAt: Instant,
-            applications: List<ISO7816Application>
+            applications: List<ISO7816Application>,
         ): RawISO7816Card = RawISO7816Card(tagId, scannedAt, applications)
     }
 }

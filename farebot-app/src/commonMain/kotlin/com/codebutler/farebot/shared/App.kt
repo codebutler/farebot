@@ -9,18 +9,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavType
-import androidx.savedstate.read
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.savedstate.read
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
-import com.codebutler.farebot.card.CardType
-import farebot.farebot_app.generated.resources.Res
-import farebot.farebot_app.generated.resources.*
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.Card
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
@@ -29,19 +27,16 @@ import com.codebutler.farebot.shared.platform.PlatformActions
 import com.codebutler.farebot.shared.platform.getDeviceRegion
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.navigation.Screen
 import com.codebutler.farebot.shared.ui.screen.AddKeyScreen
 import com.codebutler.farebot.shared.ui.screen.AdvancedTab
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
-import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
 import com.codebutler.farebot.shared.ui.screen.CardScreen
+import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
-import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
-import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapUiState
 import com.codebutler.farebot.shared.ui.theme.FareBotTheme
@@ -52,9 +47,12 @@ import com.codebutler.farebot.shared.viewmodel.HomeViewModel
 import com.codebutler.farebot.shared.viewmodel.KeysViewModel
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
-import org.koin.compose.koinInject
-import org.jetbrains.compose.resources.getString
+import farebot.farebot_app.generated.resources.*
+import farebot.farebot_app.generated.resources.Res
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getString
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -90,7 +88,7 @@ fun FareBotApp(
                                     type = rawCard.cardType(),
                                     serial = rawCard.tagId().hex(),
                                     data = cardSerializer.serialize(rawCard),
-                                )
+                                ),
                             )
                         }
                         if (result.cards.size == 1) {
@@ -168,7 +166,7 @@ fun FareBotApp(
                                                     type = rawCard.cardType(),
                                                     serial = rawCard.tagId().hex(),
                                                     data = cardSerializer.serialize(rawCard),
-                                                )
+                                                ),
                                             )
                                         }
                                         if (result.cards.size == 1) {
@@ -177,13 +175,13 @@ fun FareBotApp(
                                             navController.navigate(Screen.Card.createRoute(navKey))
                                         }
                                         platformActions.showToast(
-                                            getStringBlocking(Res.string.imported_cards, result.cards.size)
+                                            getStringBlocking(Res.string.imported_cards, result.cards.size),
                                         )
                                         historyViewModel.loadCards()
                                     }
                                     is ImportResult.Error -> {
                                         platformActions.showToast(
-                                            getStringBlocking(Res.string.import_failed, result.message)
+                                            getStringBlocking(Res.string.import_failed, result.message),
                                         )
                                     }
                                 }
@@ -197,73 +195,82 @@ fun FareBotApp(
                     supportedCardTypes = supportedCardTypes,
                     deviceRegion = getDeviceRegion(),
                     loadedKeyBundles = loadedKeyBundles,
-                    mapMarkers = remember(supportedCards) {
-                        supportedCards
-                            .filter { it.latitude != null && it.longitude != null }
-                            .map { card ->
-                                CardsMapMarker(
-                                    name = getStringBlocking(card.nameRes),
-                                    location = getStringBlocking(card.locationRes),
-                                    latitude = card.latitude!!.toDouble(),
-                                    longitude = card.longitude!!.toDouble(),
-                                )
-                            }
-                    },
+                    mapMarkers =
+                        remember(supportedCards) {
+                            supportedCards
+                                .filter { it.latitude != null && it.longitude != null }
+                                .map { card ->
+                                    CardsMapMarker(
+                                        name = getStringBlocking(card.nameRes),
+                                        location = getStringBlocking(card.locationRes),
+                                        latitude = card.latitude!!.toDouble(),
+                                        longitude = card.longitude!!.toDouble(),
+                                    )
+                                }
+                        },
                     onKeysRequiredTap = {
                         platformActions.showToast(getStringBlocking(Res.string.keys_required))
                     },
                     onStatusChipTap = { message ->
                         platformActions.showToast(message)
                     },
-                    onNavigateToKeys = if (CardType.MifareClassic in supportedCardTypes) {
-                        { navController.navigate(Screen.Keys.route) }
-                    } else null,
+                    onNavigateToKeys =
+                        if (CardType.MifareClassic in supportedCardTypes) {
+                            { navController.navigate(Screen.Keys.route) }
+                        } else {
+                            null
+                        },
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = { platformActions.openNfcSettings() },
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
-                    onAddAllSamples = if (isDebug) {
-                        {
-                            scope.launch {
-                                var count = 0
-                                for (cardInfo in supportedCards) {
-                                    val fileName = cardInfo.sampleDumpFile ?: continue
-                                    try {
-                                        val bytes = Res.readBytes("files/samples/$fileName")
-                                        val result = if (fileName.endsWith(".mfc")) {
-                                            cardImporter.importMfcDump(bytes)
-                                        } else {
-                                            cardImporter.importCards(bytes.decodeToString())
-                                        }
-                                        if (result is ImportResult.Success) {
-                                            for (rawCard in result.cards) {
-                                                cardPersister.insertCard(
-                                                    SavedCard(
-                                                        type = rawCard.cardType(),
-                                                        serial = rawCard.tagId().hex(),
-                                                        data = cardSerializer.serialize(rawCard),
+                    onAddAllSamples =
+                        if (isDebug) {
+                            {
+                                scope.launch {
+                                    var count = 0
+                                    for (cardInfo in supportedCards) {
+                                        val fileName = cardInfo.sampleDumpFile ?: continue
+                                        try {
+                                            val bytes = Res.readBytes("files/samples/$fileName")
+                                            val result =
+                                                if (fileName.endsWith(".mfc")) {
+                                                    cardImporter.importMfcDump(bytes)
+                                                } else {
+                                                    cardImporter.importCards(bytes.decodeToString())
+                                                }
+                                            if (result is ImportResult.Success) {
+                                                for (rawCard in result.cards) {
+                                                    cardPersister.insertCard(
+                                                        SavedCard(
+                                                            type = rawCard.cardType(),
+                                                            serial = rawCard.tagId().hex(),
+                                                            data = cardSerializer.serialize(rawCard),
+                                                        ),
                                                     )
-                                                )
-                                                count++
+                                                    count++
+                                                }
                                             }
+                                        } catch (_: Exception) {
                                         }
-                                    } catch (_: Exception) {
                                     }
+                                    historyViewModel.loadCards()
+                                    platformActions.showToast(getString(Res.string.imported_cards, count))
                                 }
-                                historyViewModel.loadCards()
-                                platformActions.showToast(getString(Res.string.imported_cards, count))
                             }
-                        }
-                    } else null,
+                        } else {
+                            null
+                        },
                     onSampleCardTap = { cardInfo ->
                         val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
                         scope.launch {
                             try {
                                 val bytes = Res.readBytes("files/samples/$fileName")
-                                val result = if (fileName.endsWith(".mfc")) {
-                                    cardImporter.importMfcDump(bytes)
-                                } else {
-                                    cardImporter.importCards(bytes.decodeToString())
-                                }
+                                val result =
+                                    if (fileName.endsWith(".mfc")) {
+                                        cardImporter.importMfcDump(bytes)
+                                    } else {
+                                        cardImporter.importCards(bytes.decodeToString())
+                                    }
                                 if (result is ImportResult.Success && result.cards.isNotEmpty()) {
                                     val rawCard = result.cards.first()
                                     val navKey = navDataHolder.put(rawCard)
@@ -299,10 +306,19 @@ fun FareBotApp(
 
             composable(
                 route = Screen.AddKey.route,
-                arguments = listOf(
-                    navArgument("tagId") { type = NavType.StringType; nullable = true; defaultValue = null },
-                    navArgument("cardType") { type = NavType.StringType; nullable = true; defaultValue = null },
-                ),
+                arguments =
+                    listOf(
+                        navArgument("tagId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                        navArgument("cardType") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                    ),
             ) { backStackEntry ->
                 val viewModel = koinViewModel<AddKeyViewModel>()
                 val uiState by viewModel.uiState.collectAsState()
@@ -348,11 +364,20 @@ fun FareBotApp(
 
             composable(
                 route = Screen.Card.route,
-                arguments = listOf(
-                    navArgument("cardKey") { type = NavType.StringType },
-                    navArgument("scanIdsKey") { type = NavType.StringType; nullable = true; defaultValue = null },
-                    navArgument("currentScanId") { type = NavType.StringType; nullable = true; defaultValue = null },
-                ),
+                arguments =
+                    listOf(
+                        navArgument("cardKey") { type = NavType.StringType },
+                        navArgument("scanIdsKey") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                        navArgument("currentScanId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                    ),
                 enterTransition = {
                     if (initialState.destination.route == Screen.Card.route) fadeIn() else null
                 },
@@ -363,6 +388,7 @@ fun FareBotApp(
                 val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
                 val scanIdsKey = backStackEntry.arguments?.read { getStringOrNull("scanIdsKey") }
                 val currentScanId = backStackEntry.arguments?.read { getStringOrNull("currentScanId") }
+
                 @Suppress("UNCHECKED_CAST")
                 val scanIds = scanIdsKey?.let { navDataHolder.get<List<String>>(it) } ?: emptyList()
                 val viewModel = koinViewModel<CardViewModel>()
@@ -418,10 +444,11 @@ fun FareBotApp(
 
             composable(
                 route = Screen.SampleCard.route,
-                arguments = listOf(
-                    navArgument("cardKey") { type = NavType.StringType },
-                    navArgument("cardName") { type = NavType.StringType },
-                )
+                arguments =
+                    listOf(
+                        navArgument("cardKey") { type = NavType.StringType },
+                        navArgument("cardName") { type = NavType.StringType },
+                    ),
             ) { backStackEntry ->
                 val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
                 val cardName = backStackEntry.arguments?.read { getStringOrNull("cardName") } ?: return@composable
@@ -449,7 +476,7 @@ fun FareBotApp(
 
             composable(
                 route = Screen.CardAdvanced.route,
-                arguments = listOf(navArgument("cardKey") { type = NavType.StringType })
+                arguments = listOf(navArgument("cardKey") { type = NavType.StringType }),
             ) { backStackEntry ->
                 val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
 
@@ -458,19 +485,20 @@ fun FareBotApp(
                 val card = data?.first
                 val transitInfo = data?.second
 
-                val tabs = remember {
-                    val tabList = mutableListOf<AdvancedTab>()
-                    if (transitInfo != null) {
-                        val transitInfoUi = transitInfo.getAdvancedUi(stringResource)
-                        if (transitInfoUi != null) {
-                            tabList.add(AdvancedTab(transitInfo.cardName, transitInfoUi))
+                val tabs =
+                    remember {
+                        val tabList = mutableListOf<AdvancedTab>()
+                        if (transitInfo != null) {
+                            val transitInfoUi = transitInfo.getAdvancedUi(stringResource)
+                            if (transitInfoUi != null) {
+                                tabList.add(AdvancedTab(transitInfo.cardName, transitInfoUi))
+                            }
                         }
+                        if (card != null) {
+                            tabList.add(AdvancedTab(card.cardType.toString(), card.getAdvancedUi(stringResource)))
+                        }
+                        tabList
                     }
-                    if (card != null) {
-                        tabList.add(AdvancedTab(card.cardType.toString(), card.getAdvancedUi(stringResource)))
-                    }
-                    tabList
-                }
 
                 CardAdvancedScreen(
                     uiState = CardAdvancedUiState(tabs = tabs),
@@ -480,19 +508,20 @@ fun FareBotApp(
 
             composable(
                 route = Screen.TripMap.route,
-                arguments = listOf(navArgument("tripKey") { type = NavType.StringType })
+                arguments = listOf(navArgument("tripKey") { type = NavType.StringType }),
             ) { backStackEntry ->
                 val tripKey = backStackEntry.arguments?.read { getStringOrNull("tripKey") } ?: return@composable
 
                 val trip = remember { navDataHolder.get<Trip>(tripKey) }
-                val uiState = remember {
-                    TripMapUiState(
-                        startStation = trip?.startStation,
-                        endStation = trip?.endStation,
-                        routeName = trip?.routeName,
-                        agencyName = trip?.agencyName,
-                    )
-                }
+                val uiState =
+                    remember {
+                        TripMapUiState(
+                            startStation = trip?.startStation,
+                            endStation = trip?.endStation,
+                            routeName = trip?.routeName,
+                            agencyName = trip?.agencyName,
+                        )
+                    }
 
                 TripMapScreen(
                     uiState = uiState,

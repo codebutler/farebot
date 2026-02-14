@@ -33,17 +33,22 @@ import com.codebutler.farebot.card.ultralight.UltralightTagReader
 import com.codebutler.farebot.key.CardKeys
 
 class TagReaderFactory {
-
     fun getTagReader(
         tagId: ByteArray,
         tag: Tag,
-        cardKeys: CardKeys?
-    ): TagReader<*, *, *> = when {
-        "android.nfc.tech.NfcB" in tag.techList -> CEPASTagReader(tagId, tag)
-        "android.nfc.tech.IsoDep" in tag.techList -> ISO7816TagReader(tagId, tag)
-        "android.nfc.tech.NfcF" in tag.techList -> FelicaTagReader(tagId, tag)
-        "android.nfc.tech.MifareClassic" in tag.techList -> ClassicTagReader(tagId, tag, cardKeys as ClassicCardKeys?)
-        "android.nfc.tech.MifareUltralight" in tag.techList -> UltralightTagReader(tagId, tag)
-        else -> throw UnsupportedTagException(tag.techList, ByteUtils.getHexString(tag.id))
-    }
+        cardKeys: CardKeys?,
+    ): TagReader<*, *, *> =
+        when {
+            "android.nfc.tech.NfcB" in tag.techList -> CEPASTagReader(tagId, tag)
+            "android.nfc.tech.IsoDep" in tag.techList -> ISO7816TagReader(tagId, tag)
+            "android.nfc.tech.NfcF" in tag.techList -> FelicaTagReader(tagId, tag)
+            "android.nfc.tech.MifareClassic" in tag.techList ->
+                ClassicTagReader(
+                    tagId,
+                    tag,
+                    cardKeys as ClassicCardKeys?,
+                )
+            "android.nfc.tech.MifareUltralight" in tag.techList -> UltralightTagReader(tagId, tag)
+            else -> throw UnsupportedTagException(tag.techList, ByteUtils.getHexString(tag.id))
+        }
 }

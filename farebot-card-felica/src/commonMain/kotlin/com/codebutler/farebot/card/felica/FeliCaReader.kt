@@ -35,8 +35,10 @@ import kotlin.time.Clock
  * a [RawFelicaCard] with all discovered systems, services, and blocks.
  */
 object FeliCaReader {
-
-    fun readTag(tagId: ByteArray, adapter: FeliCaTagAdapter): RawFelicaCard {
+    fun readTag(
+        tagId: ByteArray,
+        adapter: FeliCaTagAdapter,
+    ): RawFelicaCard {
         val idmBytes = adapter.getIDm()
         val idm = FeliCaIdm(idmBytes)
 
@@ -59,8 +61,9 @@ object FeliCaReader {
 
         // Get PMm from the first system (or use the initial IDm poll's PMm)
         val firstCode = systemCodes.firstOrNull() ?: FeliCaConstants.SYSTEMCODE_ANY
-        val pmmBytes = adapter.selectSystem(firstCode)
-            ?: throw Exception("Failed to poll for PMm")
+        val pmmBytes =
+            adapter.selectSystem(firstCode)
+                ?: throw Exception("Failed to poll for PMm")
         val pmm = FeliCaPmm(pmmBytes)
 
         val systems = mutableListOf<FelicaSystem>()
@@ -69,14 +72,15 @@ object FeliCaReader {
             // Select (poll) this system
             adapter.selectSystem(systemCode)
 
-            val serviceCodes: List<Int> = when {
-                octopusMagic && systemCode == FeliCaConstants.SYSTEMCODE_OCTOPUS ->
-                    listOf(FeliCaConstants.SERVICE_OCTOPUS)
-                sztMagic && systemCode == FeliCaConstants.SYSTEMCODE_SZT ->
-                    listOf(FeliCaConstants.SERVICE_SZT)
-                else ->
-                    adapter.getServiceCodes()
-            }
+            val serviceCodes: List<Int> =
+                when {
+                    octopusMagic && systemCode == FeliCaConstants.SYSTEMCODE_OCTOPUS ->
+                        listOf(FeliCaConstants.SERVICE_OCTOPUS)
+                    sztMagic && systemCode == FeliCaConstants.SYSTEMCODE_SZT ->
+                        listOf(FeliCaConstants.SERVICE_SZT)
+                    else ->
+                        adapter.getServiceCodes()
+                }
 
             val services = mutableListOf<FelicaService>()
             for (serviceCode in serviceCodes) {

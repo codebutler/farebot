@@ -32,7 +32,6 @@ import kotlin.time.Clock
  * then reading their files, records, and balance data.
  */
 object ISO7816CardReader {
-
     /**
      * Configuration for reading a specific ISO 7816 application type.
      *
@@ -48,12 +47,12 @@ object ISO7816CardReader {
         val readBalances: ((ISO7816Protocol) -> Map<Int, ByteArray>)? = null,
         val readExtraData: ((ISO7816Protocol) -> Map<String, ByteArray>)? = null,
         val sfiRange: IntRange = 0..31,
-        val fileSelectors: List<FileSelector> = emptyList()
+        val fileSelectors: List<FileSelector> = emptyList(),
     )
 
     data class FileSelector(
         val parentDf: Int? = null,
-        val fileId: Int
+        val fileId: Int,
     )
 
     /**
@@ -67,7 +66,7 @@ object ISO7816CardReader {
     fun readCard(
         tagId: ByteArray,
         transceiver: CardTransceiver,
-        appConfigs: List<AppConfig>
+        appConfigs: List<AppConfig>,
     ): RawISO7816Card? {
         val protocol = ISO7816Protocol(transceiver)
         val applications = mutableListOf<ISO7816Application>()
@@ -86,7 +85,7 @@ object ISO7816CardReader {
 
     private fun tryReadApplication(
         protocol: ISO7816Protocol,
-        config: AppConfig
+        config: AppConfig,
     ): ISO7816Application? {
         // Try each AID for this application type
         var fci: ByteArray? = null
@@ -119,11 +118,12 @@ object ISO7816CardReader {
             val file = readFileSelector(protocol, selector, matchedAppName)
             if (file != null) {
                 @OptIn(ExperimentalStdlibApi::class)
-                val key = if (selector.parentDf != null) {
-                    "${selector.parentDf.toString(16)}/${selector.fileId.toString(16)}"
-                } else {
-                    selector.fileId.toString(16)
-                }
+                val key =
+                    if (selector.parentDf != null) {
+                        "${selector.parentDf.toString(16)}/${selector.fileId.toString(16)}"
+                    } else {
+                        selector.fileId.toString(16)
+                    }
                 files[key] = file
             }
         }
@@ -152,11 +152,14 @@ object ISO7816CardReader {
             appFci = fci,
             files = allFiles,
             sfiFiles = sfiFiles,
-            type = config.type
+            type = config.type,
         )
     }
 
-    private fun readSfiFile(protocol: ISO7816Protocol, sfi: Int): ISO7816File? {
+    private fun readSfiFile(
+        protocol: ISO7816Protocol,
+        sfi: Int,
+    ): ISO7816File? {
         val records = mutableMapOf<Int, ByteArray>()
         var binaryData: ByteArray? = null
 
@@ -191,7 +194,7 @@ object ISO7816CardReader {
     private fun readFileSelector(
         protocol: ISO7816Protocol,
         selector: FileSelector,
-        appName: ByteArray
+        appName: ByteArray,
     ): ISO7816File? {
         try {
             // If there's a parent DF, select it first
@@ -217,11 +220,12 @@ object ISO7816CardReader {
             }
 
             // Try reading binary
-            val binaryData = try {
-                protocol.readBinary()
-            } catch (e: Exception) {
-                null
-            }
+            val binaryData =
+                try {
+                    protocol.readBinary()
+                } catch (e: Exception) {
+                    null
+                }
 
             if (records.isEmpty() && binaryData == null) return null
 
@@ -239,13 +243,14 @@ object ISO7816CardReader {
         val balances = mutableMapOf<Int, ByteArray>()
         for (i in 0..3) {
             try {
-                val balance = protocol.sendRequest(
-                    ISO7816Protocol.CLASS_80,
-                    0x5c.toByte(), // INS_GET_BALANCE
-                    i.toByte(),
-                    0x02.toByte(),
-                    4 // BALANCE_RESP_LEN
-                )
+                val balance =
+                    protocol.sendRequest(
+                        ISO7816Protocol.CLASS_80,
+                        0x5c.toByte(), // INS_GET_BALANCE
+                        i.toByte(),
+                        0x02.toByte(),
+                        4, // BALANCE_RESP_LEN
+                    )
                 balances[i] = balance
             } catch (e: Exception) {
                 // Some balances may not be available
@@ -258,19 +263,18 @@ object ISO7816CardReader {
      * Read KSX6924 balance using the proprietary GET BALANCE command.
      * CLA=0x90, INS=0x4c, P1=0, P2=0, Le=4
      */
-    fun readKSX6924Balance(protocol: ISO7816Protocol): ByteArray? {
-        return try {
+    fun readKSX6924Balance(protocol: ISO7816Protocol): ByteArray? =
+        try {
             protocol.sendRequest(
                 ISO7816Protocol.CLASS_90,
                 0x4c.toByte(), // INS_GET_BALANCE
                 0.toByte(),
                 0.toByte(),
-                4 // BALANCE_RESP_LEN
+                4, // BALANCE_RESP_LEN
             )
         } catch (e: Exception) {
             null
         }
-    }
 
     /**
      * Read KSX6924 extra records using the proprietary GET RECORD command.
@@ -280,13 +284,14 @@ object ISO7816CardReader {
         val records = mutableListOf<ByteArray>()
         try {
             for (i in 0..0xf) {
-                val record = protocol.sendRequest(
-                    ISO7816Protocol.CLASS_90,
-                    0x78.toByte(), // INS_GET_RECORD
-                    i.toByte(),
-                    0.toByte(),
-                    0x10.toByte()
-                )
+                val record =
+                    protocol.sendRequest(
+                        ISO7816Protocol.CLASS_90,
+                        0x78.toByte(), // INS_GET_RECORD
+                        i.toByte(),
+                        0.toByte(),
+                        0x10.toByte(),
+                    )
                 records.add(record)
             }
         } catch (e: Exception) {

@@ -46,15 +46,14 @@ data class EasyCardTransaction(
     private val rawFare: Int,
     val location: Int,
     private val isEndTap: Boolean,
-    private val machineIdRaw: Long
+    private val machineIdRaw: Long,
 ) : Transaction() {
-
     constructor(data: ByteArray) : this(
         timestampRaw = data.byteArrayToLongReversed(1, 4),
         rawFare = data.byteArrayToIntReversed(6, 2),
         location = data[11].toInt() and 0xFF,
         isEndTap = data[5] == 0x11.toByte(),
-        machineIdRaw = data.byteArrayToLongReversed(12, 4)
+        machineIdRaw = data.byteArrayToLongReversed(12, 4),
     )
 
     override val fare: TransitCurrency get() = TransitCurrency.TWD(rawFare)
@@ -62,18 +61,20 @@ data class EasyCardTransaction(
     override val timestamp: Instant? get() = EasyCardTransitFactory.parseTimestamp(timestampRaw)
 
     override val station: Station?
-        get() = when (location) {
-            BUS -> null
-            POS -> null
-            else -> EasyCardTransitFactory.lookupStation(location)
-        }
+        get() =
+            when (location) {
+                BUS -> null
+                POS -> null
+                else -> EasyCardTransitFactory.lookupStation(location)
+            }
 
     override val mode: Trip.Mode
-        get() = when (location) {
-            BUS -> Trip.Mode.BUS
-            POS -> Trip.Mode.POS
-            else -> Trip.Mode.METRO
-        }
+        get() =
+            when (location) {
+                BUS -> Trip.Mode.BUS
+                POS -> Trip.Mode.POS
+                else -> Trip.Mode.METRO
+            }
 
     override val machineID: String get() = "0x${machineIdRaw.toString(16)}"
 
@@ -83,8 +84,11 @@ data class EasyCardTransaction(
         }
 
         // Bus and POS transactions don't merge
-        if (location == POS || location == BUS ||
-            other.location == POS || other.location == BUS) {
+        if (location == POS ||
+            location == BUS ||
+            other.location == POS ||
+            other.location == BUS
+        ) {
             return false
         }
 
@@ -97,10 +101,11 @@ data class EasyCardTransaction(
     override val isTapOn: Boolean get() = !isEndTap
 
     override val routeNames: List<String>
-        get() = when (mode) {
-            Trip.Mode.METRO -> super.routeNames
-            else -> emptyList()
-        }
+        get() =
+            when (mode) {
+                Trip.Mode.METRO -> super.routeNames
+                else -> emptyList()
+            }
 
     companion object {
         internal const val POS = 1
@@ -129,10 +134,11 @@ data class EasyCardTransaction(
             }
 
             // Filter out empty blocks and parse transactions
-            val transactions = blocks
-                .filter { !it.all { b -> b == 0.toByte() } }
-                .map { EasyCardTransaction(it) }
-                .distinctBy { it.timestamp }
+            val transactions =
+                blocks
+                    .filter { !it.all { b -> b == 0.toByte() } }
+                    .map { EasyCardTransaction(it) }
+                    .distinctBy { it.timestamp }
 
             // Merge tap-on/tap-off into trips
             return TransactionTrip.merge(transactions)

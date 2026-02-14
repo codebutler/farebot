@@ -31,19 +31,15 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class IntercardTransitFactory : TransitFactory<DesfireCard, IntercardTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(APP_ID_BALANCE) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(APP_ID_BALANCE) != null
 
-    override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        return TransitIdentity.create(
+    override fun parseIdentity(card: DesfireCard): TransitIdentity =
+        TransitIdentity.create(
             IntercardTransitInfo.NAME,
-            card.tagId.byteArrayToLongReversed().toString()
+            card.tagId.byteArrayToLongReversed().toString(),
         )
-    }
 
     override fun parseInfo(card: DesfireCard): IntercardTransitInfo {
         val file1 = card.getApplication(APP_ID_BALANCE)?.getFile(1)
@@ -52,7 +48,7 @@ class IntercardTransitFactory : TransitFactory<DesfireCard, IntercardTransitInfo
         return IntercardTransitInfo(
             mBalance = balance,
             mLastTransaction = lastTransaction,
-            mSerialNumber = card.tagId.byteArrayToLongReversed()
+            mSerialNumber = card.tagId.byteArrayToLongReversed(),
         )
     }
 

@@ -31,17 +31,14 @@ import com.codebutler.farebot.transit.TransitIdentity
 class NdefFelicaTransitFactory : TransitFactory<FelicaCard, NdefData> {
     override val allCards: List<CardInfo> = emptyList()
 
-    override fun parseIdentity(card: FelicaCard): TransitIdentity =
-        TransitIdentity.create(NdefData.NAME, null)
+    override fun parseIdentity(card: FelicaCard): TransitIdentity = TransitIdentity.create(NdefData.NAME, null)
 
-    override fun parseInfo(card: FelicaCard): NdefData =
-        NdefData.parseFelica(card) ?: NdefData(emptyList())
+    override fun parseInfo(card: FelicaCard): NdefData = NdefData.parseFelica(card) ?: NdefData(emptyList())
 
     override fun check(card: FelicaCard): Boolean = NdefData.checkFelica(card)
 
     /**
      * Perform early check based on system codes.
      */
-    fun earlyCheck(systemCodes: List<Int>): Boolean =
-        FeliCaConstants.SYSTEMCODE_NDEF in systemCodes
+    fun earlyCheck(systemCodes: List<Int>): Boolean = FeliCaConstants.SYSTEMCODE_NDEF in systemCodes
 }

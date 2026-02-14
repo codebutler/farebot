@@ -22,11 +22,10 @@ package com.codebutler.farebot.transit
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 class TransitCurrencyTest {
-
     @Test
     fun testUSDFormat() {
         val currency = TransitCurrency.USD(350)
@@ -95,8 +94,8 @@ class TransitCurrencyTest {
 
     @Test
     fun testAddDifferentDivisor() {
-        val a = TransitCurrency(100, "USD", 100)  // $1.00
-        val b = TransitCurrency(5, "USD", 10)      // $0.50
+        val a = TransitCurrency(100, "USD", 100) // $1.00
+        val b = TransitCurrency(5, "USD", 10) // $0.50
         val sum = a + b
         // 100/100 + 5/10 = 1.00 + 0.50 = 1.50
         // Should normalize: a has higher divisor, 5 * (100/10) = 50

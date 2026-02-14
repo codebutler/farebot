@@ -38,14 +38,13 @@ import farebot.farebot_transit_opal.generated.resources.*
  *
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Opal
  */
-class OpalTransitFactory(private val stringResource: StringResource) : TransitFactory<DesfireCard, OpalTransitInfo> {
-
+class OpalTransitFactory(
+    private val stringResource: StringResource,
+) : TransitFactory<DesfireCard, OpalTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(0x314553) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(0x314553) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         var data = (card.getApplication(0x314553)!!.getFile(0x07) as StandardDesfireFile).data
@@ -96,24 +95,32 @@ class OpalTransitFactory(private val stringResource: StringResource) : TransitFa
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.transit_opal_card_name,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.AUSTRALIA,
-            locationRes = Res.string.location_sydney,
-            imageRes = Res.drawable.opal_card,
-            latitude = -33.8688f,
-            longitude = 151.2093f,
-            brandColor = 0x3298D6,
-            credits = listOf("Michael Farrell"),
-            sampleDumpFile = "Opal.json",
-            extraNoteRes = Res.string.card_note_opal,
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.transit_opal_card_name,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.AUSTRALIA,
+                locationRes = Res.string.location_sydney,
+                imageRes = Res.drawable.opal_card,
+                latitude = -33.8688f,
+                longitude = 151.2093f,
+                brandColor = 0x3298D6,
+                credits = listOf("Michael Farrell"),
+                sampleDumpFile = "Opal.json",
+                extraNoteRes = Res.string.card_note_opal,
+            )
 
-        private fun formatSerialNumber(serialNumber: Int, lastDigit: Int): String =
+        private fun formatSerialNumber(
+            serialNumber: Int,
+            lastDigit: Int,
+        ): String =
             NumberUtils.formatNumber(
                 3085_2200_0000_0000L + (serialNumber * 10L) + lastDigit,
-                " ", 4, 4, 4, 4
+                " ",
+                4,
+                4,
+                4,
+                4,
             )
     }
 }

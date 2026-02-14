@@ -40,11 +40,13 @@ abstract class En1545Transaction : Transaction() {
 
     override val routeNames: List<String>
         get() {
-            val route = lookup.getRouteName(
-                routeNumber,
-                routeVariant,
-                agency, transport
-            )
+            val route =
+                lookup.getRouteName(
+                    routeNumber,
+                    routeVariant,
+                    agency,
+                    transport,
+                )
             if (route != null) {
                 return listOf(route)
             }
@@ -54,11 +56,13 @@ abstract class En1545Transaction : Transaction() {
 
     override val humanReadableLineIDs: List<String>
         get() {
-            val route = lookup.getHumanReadableRouteId(
-                routeNumber,
-                routeVariant,
-                agency, transport
-            )
+            val route =
+                lookup.getHumanReadableRouteId(
+                    routeNumber,
+                    routeVariant,
+                    agency,
+                    transport,
+                )
             if (route != null) {
                 return listOf(route)
             }
@@ -97,8 +101,9 @@ abstract class En1545Transaction : Transaction() {
         get() = parsed.getTimeStamp(EVENT, lookup.timeZone)
 
     override val mode: Trip.Mode
-        get() = parsed.getInt(EVENT_CODE)?.let { eventCodeToMode(it) }
-            ?: lookup.getMode(agency, parsed.getInt(EVENT_ROUTE_NUMBER))
+        get() =
+            parsed.getInt(EVENT_CODE)?.let { eventCodeToMode(it) }
+                ?: lookup.getMode(agency, parsed.getInt(EVENT_ROUTE_NUMBER))
 
     override val fare: TransitCurrency?
         get() {
@@ -139,17 +144,19 @@ abstract class En1545Transaction : Transaction() {
     override val shortAgencyName: String?
         get() = lookup.getAgencyName(agency, true)
 
-    open fun getStation(station: Int?): Station? {
-        return if (station == null) null else lookup.getStation(station, agency, transport)
-    }
+    open fun getStation(station: Int?): Station? =
+        if (station == null) null else lookup.getStation(station, agency, transport)
 
     override fun isSameTrip(other: Transaction): Boolean {
-        if (other !is En1545Transaction)
+        if (other !is En1545Transaction) {
             return false
-        return (transport == other.transport
-            && parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) == other.parsed.getIntOrZero(EVENT_SERVICE_PROVIDER)
-            && parsed.getIntOrZero(EVENT_ROUTE_NUMBER) == other.parsed.getIntOrZero(EVENT_ROUTE_NUMBER)
-            && parsed.getIntOrZero(EVENT_ROUTE_VARIANT) == other.parsed.getIntOrZero(EVENT_ROUTE_VARIANT))
+        }
+        return (
+            transport == other.transport &&
+                parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) == other.parsed.getIntOrZero(EVENT_SERVICE_PROVIDER) &&
+                parsed.getIntOrZero(EVENT_ROUTE_NUMBER) == other.parsed.getIntOrZero(EVENT_ROUTE_NUMBER) &&
+                parsed.getIntOrZero(EVENT_ROUTE_VARIANT) == other.parsed.getIntOrZero(EVENT_ROUTE_VARIANT)
+        )
     }
 
     override fun toString(): String = "En1545Transaction: $parsed"
@@ -218,13 +225,12 @@ abstract class En1545Transaction : Transaction() {
         private const val TRANSPORT_TAXI = 9
         private const val TRANSPORT_TOPUP = 11
 
-        private fun getTransport(eventCode: Int): Int {
-            return eventCode shr 4
-        }
+        private fun getTransport(eventCode: Int): Int = eventCode shr 4
 
         private fun eventCodeToMode(ec: Int): Trip.Mode? {
-            if (ec and 0xf == EVENT_TYPE_TOPUP)
+            if (ec and 0xf == EVENT_TYPE_TOPUP) {
                 return Trip.Mode.TICKET_MACHINE
+            }
             return when (getTransport(ec)) {
                 TRANSPORT_BUS, TRANSPORT_INTERCITY_BUS -> Trip.Mode.BUS
                 TRANSPORT_METRO -> Trip.Mode.METRO

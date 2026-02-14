@@ -29,9 +29,8 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 class AdelaideSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource
+    override val stringResource: StringResource,
 ) : En1545Subscription() {
-
     override val lookup: AdelaideLookup
         get() = AdelaideLookup
 
@@ -39,7 +38,10 @@ class AdelaideSubscription(
         get() = lookup.isPurseTariff(contractProvider, contractTariff)
 
     companion object {
-        fun parse(data: ByteArray, stringResource: StringResource): AdelaideSubscription =
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+        ): AdelaideSubscription =
             AdelaideSubscription(En1545Parser.parse(data, IntercodeFields.SUB_FIELDS_TYPE_46), stringResource)
     }
 }

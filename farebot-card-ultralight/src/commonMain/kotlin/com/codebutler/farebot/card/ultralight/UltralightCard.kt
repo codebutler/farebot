@@ -30,9 +30,9 @@ import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import farebot.farebot_card_ultralight.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Utility class for reading Mifare Ultralight / Ultralight C
@@ -48,9 +48,8 @@ data class UltralightCard(
      *
      * @return Type of Ultralight card this is.
      */
-    val ultralightType: Int
+    val ultralightType: Int,
 ) : Card() {
-
     override val cardType: CardType = CardType.MifareUltralight
 
     fun getPage(index: Int): UltralightPage = pages[index]
@@ -58,7 +57,10 @@ data class UltralightCard(
     /**
      * Read consecutive pages as a single ByteArray.
      */
-    fun readPages(startPage: Int, count: Int): ByteArray {
+    fun readPages(
+        startPage: Int,
+        count: Int,
+    ): ByteArray {
         val result = ByteArray(count * 4)
         for (i in 0 until count) {
             pages[startPage + i].data.copyInto(result, i * 4)
@@ -68,10 +70,13 @@ data class UltralightCard(
 
     override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
         val builder = FareBotUiTree.builder(stringResource)
-        val pagesBuilder = builder.item()
-            .title(Res.string.ultralight_pages)
+        val pagesBuilder =
+            builder
+                .item()
+                .title(Res.string.ultralight_pages)
         for (page in pages) {
-            pagesBuilder.item()
+            pagesBuilder
+                .item()
                 .title(stringResource.getString(Res.string.ultralight_page_title_format, page.index.toString()))
                 .value(page.data)
         }
@@ -81,15 +86,17 @@ data class UltralightCard(
     /**
      * Known Ultralight card type variants, detected via GET_VERSION command.
      */
-    enum class UltralightType(val pageCount: Int) {
+    enum class UltralightType(
+        val pageCount: Int,
+    ) {
         UNKNOWN(-1),
-        MF0ICU1(16),          // MIFARE Ultralight
-        MF0ICU2(44),          // MIFARE Ultralight C
-        EV1_MF0UL11(20),     // MIFARE Ultralight EV1 (48 bytes)
-        EV1_MF0UL21(41),     // MIFARE Ultralight EV1 (128 bytes)
+        MF0ICU1(16), // MIFARE Ultralight
+        MF0ICU2(44), // MIFARE Ultralight C
+        EV1_MF0UL11(20), // MIFARE Ultralight EV1 (48 bytes)
+        EV1_MF0UL21(41), // MIFARE Ultralight EV1 (128 bytes)
         NTAG213(45),
         NTAG215(135),
-        NTAG216(231);
+        NTAG216(231),
     }
 
     companion object {
@@ -100,7 +107,7 @@ data class UltralightCard(
             tagId: ByteArray,
             scannedAt: Instant,
             pages: List<UltralightPage>,
-            type: Int
+            type: Int,
         ): UltralightCard = UltralightCard(tagId, scannedAt, pages, type)
     }
 }

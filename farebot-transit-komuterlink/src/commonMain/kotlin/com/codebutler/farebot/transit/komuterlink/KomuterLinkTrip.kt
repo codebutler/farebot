@@ -22,24 +22,23 @@
 
 package com.codebutler.farebot.transit.komuterlink
 
-import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class KomuterLinkTrip(
     private val mAmount: Int,
     private val mNewBalance: Int,
     private val mStartTimestamp: Instant,
     override val mode: Mode,
-    private val mTransactionId: Int
+    private val mTransactionId: Int,
 ) : Trip() {
-
     override val startTimestamp: Instant
         get() = mStartTimestamp
 
@@ -49,7 +48,10 @@ class KomuterLinkTrip(
     companion object {
         private val TZ = TimeZone.of("Asia/Kuala_Lumpur")
 
-        private fun parseTimestamp(data: ByteArray, off: Int): Instant {
+        private fun parseTimestamp(
+            data: ByteArray,
+            off: Int,
+        ): Instant {
             val hour = data.getBitsFromBuffer(off * 8, 5)
             val min = data.getBitsFromBuffer(off * 8 + 5, 6)
             val y = data.getBitsFromBuffer(off * 8 + 17, 6) + 2000
@@ -59,7 +61,11 @@ class KomuterLinkTrip(
             return ldt.toInstant(TZ)
         }
 
-        fun parse(sector: DataClassicSector, sign: Int, mode: Mode): KomuterLinkTrip? {
+        fun parse(
+            sector: DataClassicSector,
+            sign: Int,
+            mode: Mode,
+        ): KomuterLinkTrip? {
             val block0 = sector.getBlock(0)
             if (block0.isEmpty) return null
             val data = block0.data
@@ -68,7 +74,7 @@ class KomuterLinkTrip(
                 mNewBalance = data.byteArrayToInt(14, 2),
                 mStartTimestamp = parseTimestamp(data, 0),
                 mode = mode,
-                mTransactionId = data.byteArrayToInt(4, 2)
+                mTransactionId = data.byteArrayToInt(4, 2),
             )
         }
     }

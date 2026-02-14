@@ -49,10 +49,10 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.farebot_transit_calypso.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 import org.jetbrains.compose.resources.getString
+import kotlin.time.Instant
+import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 private val NAME by lazy { getStringBlocking(Res.string.venezia_ultralight_card_name) }
 private const val TRANSPORT_TYPE = "TransportType"
@@ -63,7 +63,6 @@ private const val Y_VALUE = "Y"
  * Ported from Metrodroid's VeneziaUltralightTransitData.kt.
  */
 class VeneziaUltralightTransitFactory : TransitFactory<UltralightCard, VeneziaUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: UltralightCard): Boolean {
@@ -72,49 +71,51 @@ class VeneziaUltralightTransitFactory : TransitFactory<UltralightCard, VeneziaUl
         return otpVal in VENEZIA_OTP_VALUES
     }
 
-    override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        return TransitIdentity.create(NAME, getSerial(card).toString())
-    }
+    override fun parseIdentity(card: UltralightCard): TransitIdentity =
+        TransitIdentity.create(NAME, getSerial(card).toString())
 
     override fun parseInfo(card: UltralightCard): VeneziaUltralightTransitInfo {
         val head = card.readPages(4, 4)
         val tripFormat = head.getBitsFromBuffer(32, 4)
 
-        val transactions = listOf(
-            card.readPages(8, 4),
-            card.readPages(12, 4)
-        ).mapNotNull { VeneziaUltralightTransaction.parse(it, tripFormat) }
+        val transactions =
+            listOf(
+                card.readPages(8, 4),
+                card.readPages(12, 4),
+            ).mapNotNull { VeneziaUltralightTransaction.parse(it, tripFormat) }
 
         val lastTransaction = transactions.maxByOrNull { it.timestamp?.toEpochMilliseconds() ?: 0L }
 
         val otp = card.getPage(3).data
         val otpVal = otp.byteArrayToInt(2, 2)
 
-        val sub = VeneziaUltralightSubscription(
-            parsed = En1545Parser.parse(head, SUBSCRIPTION_FIELDS),
-            validToOverride = lastTransaction?.expiryTimestamp,
-            otp = otpVal
-        )
+        val sub =
+            VeneziaUltralightSubscription(
+                parsed = En1545Parser.parse(head, SUBSCRIPTION_FIELDS),
+                validToOverride = lastTransaction?.expiryTimestamp,
+                otp = otpVal,
+            )
 
         val trips = TransactionTrip.merge(transactions)
 
         return VeneziaUltralightTransitInfo(
             serial = getSerial(card),
             trips = trips,
-            subscriptions = listOfNotNull(sub)
+            subscriptions = listOfNotNull(sub),
         )
     }
 
     companion object {
         private val VENEZIA_OTP_VALUES = listOf(0x30de, 0x3186, 0x4ca8, 0x6221)
 
-        private val SUBSCRIPTION_FIELDS = En1545Container(
-            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_A, 32),
-            En1545FixedInteger(TRIP_FORMAT, 4),
-            En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
-            En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 44),
-            En1545FixedInteger(En1545Subscription.CONTRACT_AUTHENTICATOR, 32)
-        )
+        private val SUBSCRIPTION_FIELDS =
+            En1545Container(
+                En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_A, 32),
+                En1545FixedInteger(TRIP_FORMAT, 4),
+                En1545FixedInteger(En1545Subscription.CONTRACT_TARIFF, 16),
+                En1545FixedHex(En1545Subscription.CONTRACT_UNKNOWN_B, 44),
+                En1545FixedInteger(En1545Subscription.CONTRACT_AUTHENTICATOR, 32),
+            )
 
         private const val TRIP_FORMAT = "TripFormat"
 
@@ -132,7 +133,7 @@ class VeneziaUltralightTransitFactory : TransitFactory<UltralightCard, VeneziaUl
 class VeneziaUltralightTransitInfo internal constructor(
     private val serial: Long,
     override val trips: List<Trip>,
-    override val subscriptions: List<Subscription>?
+    override val subscriptions: List<Subscription>?,
 ) : TransitInfo() {
     override val cardName: String = NAME
     override val serialNumber: String = serial.toString()
@@ -141,7 +142,7 @@ class VeneziaUltralightTransitInfo internal constructor(
 internal class VeneziaUltralightSubscription(
     override val parsed: En1545Parsed,
     private val validToOverride: Instant?,
-    private val otp: Int
+    private val otp: Int,
 ) : En1545Subscription() {
     override val lookup: En1545Lookup = VeneziaUltralightLookup
     override val stringResource: StringResource = DefaultStringResource()
@@ -153,7 +154,7 @@ internal class VeneziaUltralightSubscription(
 }
 
 internal class VeneziaUltralightTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
     override val lookup: En1545Lookup = VeneziaUltralightLookup
 
@@ -163,8 +164,9 @@ internal class VeneziaUltralightTransaction(
                 1 -> return Trip.Mode.BUS
                 5 -> return Trip.Mode.FERRY
             }
-            if (parsed.getInt(Y_VALUE) == 1000)
+            if (parsed.getInt(Y_VALUE) == 1000) {
                 return Trip.Mode.FERRY
+            }
             return Trip.Mode.BUS
         }
 
@@ -172,34 +174,39 @@ internal class VeneziaUltralightTransaction(
         get() = parsed.getTimeStamp(En1545Subscription.CONTRACT_END, VeneziaUltralightLookup.timeZone)
 
     companion object {
-        private val TRIP_FIELDS_FORMAT_1 = En1545Container(
-            En1545FixedInteger("A", 11),
-            En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT),
-            En1545FixedInteger(Y_VALUE, 14),
-            En1545FixedInteger("B", 2),
-            En1545FixedInteger.datePacked(En1545Transaction.EVENT),
-            En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT_FIRST_STAMP),
-            En1545FixedInteger("Z", 16),
-            En1545FixedInteger("C", 17),
-            En1545FixedInteger(En1545Transaction.EVENT_AUTHENTICATOR, 32)
-        )
+        private val TRIP_FIELDS_FORMAT_1 =
+            En1545Container(
+                En1545FixedInteger("A", 11),
+                En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT),
+                En1545FixedInteger(Y_VALUE, 14),
+                En1545FixedInteger("B", 2),
+                En1545FixedInteger.datePacked(En1545Transaction.EVENT),
+                En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT_FIRST_STAMP),
+                En1545FixedInteger("Z", 16),
+                En1545FixedInteger("C", 17),
+                En1545FixedInteger(En1545Transaction.EVENT_AUTHENTICATOR, 32),
+            )
 
-        private val TRIP_FIELDS_DEFAULT = En1545Container(
-            En1545FixedInteger("A", 8),
-            En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT),
-            En1545FixedInteger(Y_VALUE, 14),
-            En1545FixedInteger("B", 2),
-            En1545FixedInteger.datePacked(En1545Transaction.EVENT),
-            En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT_FIRST_STAMP),
-            En1545FixedInteger("D", 2),
-            En1545FixedInteger.datePacked(En1545Subscription.CONTRACT_END),
-            En1545FixedInteger.timePacked11Local(En1545Subscription.CONTRACT_END),
-            En1545FixedInteger(TRANSPORT_TYPE, 4),
-            En1545FixedInteger("F", 5),
-            En1545FixedInteger(En1545Transaction.EVENT_AUTHENTICATOR, 32)
-        )
+        private val TRIP_FIELDS_DEFAULT =
+            En1545Container(
+                En1545FixedInteger("A", 8),
+                En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT),
+                En1545FixedInteger(Y_VALUE, 14),
+                En1545FixedInteger("B", 2),
+                En1545FixedInteger.datePacked(En1545Transaction.EVENT),
+                En1545FixedInteger.timePacked11Local(En1545Transaction.EVENT_FIRST_STAMP),
+                En1545FixedInteger("D", 2),
+                En1545FixedInteger.datePacked(En1545Subscription.CONTRACT_END),
+                En1545FixedInteger.timePacked11Local(En1545Subscription.CONTRACT_END),
+                En1545FixedInteger(TRANSPORT_TYPE, 4),
+                En1545FixedInteger("F", 5),
+                En1545FixedInteger(En1545Transaction.EVENT_AUTHENTICATOR, 32),
+            )
 
-        fun parse(data: ByteArray, tripFormat: Int): VeneziaUltralightTransaction? {
+        fun parse(
+            data: ByteArray,
+            tripFormat: Int,
+        ): VeneziaUltralightTransaction? {
             // Match Metrodroid: check if bytes 1..11 (11 bytes) are all zero
             if (data.sliceOffLen(1, 11).isAllZero()) return null
             val fields = if (tripFormat == 1) TRIP_FIELDS_FORMAT_1 else TRIP_FIELDS_DEFAULT
@@ -210,11 +217,32 @@ internal class VeneziaUltralightTransaction(
 
 private object VeneziaUltralightLookup : En1545Lookup {
     override val timeZone: TimeZone = TimeZone.of("Europe/Rome")
+
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? = null
-    override fun getAgencyName(agency: Int?, isShort: Boolean): String? = null
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? = null
-    override fun getSubscriptionName(stringResource: StringResource, agency: Int?, contractTariff: Int?): String? {
+
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? = null
+
+    override fun getAgencyName(
+        agency: Int?,
+        isShort: Boolean,
+    ): String? = null
+
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? = null
+
+    override fun getSubscriptionName(
+        stringResource: StringResource,
+        agency: Int?,
+        contractTariff: Int?,
+    ): String? {
         if (contractTariff == null) return null
         val res = SUBSCRIPTION_MAP[contractTariff]
         return if (res != null) {
@@ -223,14 +251,19 @@ private object VeneziaUltralightLookup : En1545Lookup {
             stringResource.getString(Res.string.venezia_ul_unknown_subscription, contractTariff.toString())
         }
     }
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode = Trip.Mode.OTHER
 
-    private val SUBSCRIPTION_MAP: Map<Int, ComposeStringResource> = mapOf(
-        11105 to Res.string.venezia_ul_24h_ticket,
-        11209 to Res.string.venezia_ul_rete_unica_75min,
-        11210 to Res.string.venezia_ul_rete_unica_100min,
-        12101 to Res.string.venezia_ul_bus_ticket_75min,
-        12106 to Res.string.venezia_ul_airport_bus_ticket,
-        11400 to Res.string.venezia_ul_carnet_traghetto
-    )
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
+
+    private val SUBSCRIPTION_MAP: Map<Int, ComposeStringResource> =
+        mapOf(
+            11105 to Res.string.venezia_ul_24h_ticket,
+            11209 to Res.string.venezia_ul_rete_unica_75min,
+            11210 to Res.string.venezia_ul_rete_unica_100min,
+            12101 to Res.string.venezia_ul_bus_ticket_75min,
+            12106 to Res.string.venezia_ul_airport_bus_ticket,
+            11400 to Res.string.venezia_ul_carnet_traghetto,
+        )
 }

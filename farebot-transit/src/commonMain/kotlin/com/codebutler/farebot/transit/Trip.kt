@@ -27,7 +27,6 @@ package com.codebutler.farebot.transit
 import kotlin.time.Instant
 
 abstract class Trip {
-
     /**
      * Starting time of the trip.
      */
@@ -118,20 +117,23 @@ abstract class Trip {
      */
     open val isRejected: Boolean get() = false
 
-    fun hasLocation(): Boolean =
-        (startStation?.hasLocation() == true) || (endStation?.hasLocation() == true)
+    fun hasLocation(): Boolean = (startStation?.hasLocation() == true) || (endStation?.hasLocation() == true)
 
     enum class Mode {
         BUS,
+
         /** Used for non-metro (rapid transit) trains */
         TRAIN,
+
         /** Used for trams and light rail */
         TRAM,
+
         /** Used for electric metro and subway systems */
         METRO,
         FERRY,
         TICKET_MACHINE,
         VENDING_MACHINE,
+
         /** Used for transactions at a store, buying something other than travel. */
         POS,
         OTHER,
@@ -139,11 +141,14 @@ abstract class Trip {
         TROLLEYBUS,
         TOLL_ROAD,
         MONORAIL,
-        CABLECAR
+        CABLECAR,
     }
 
     class Comparator : kotlin.Comparator<Trip> {
-        override fun compare(a: Trip, b: Trip): Int {
+        override fun compare(
+            a: Trip,
+            b: Trip,
+        ): Int {
             val aTs = a.startTimestamp ?: a.endTimestamp
             val bTs = b.startTimestamp ?: b.endTimestamp
             return when {
@@ -159,7 +164,10 @@ abstract class Trip {
         /**
          * Finds a common route name between the start and end station line names.
          */
-        fun getRouteName(startLines: List<String>, endLines: List<String>): String? {
+        fun getRouteName(
+            startLines: List<String>,
+            endLines: List<String>,
+        ): String? {
             if (startLines.isEmpty() && endLines.isEmpty()) {
                 return null
             }

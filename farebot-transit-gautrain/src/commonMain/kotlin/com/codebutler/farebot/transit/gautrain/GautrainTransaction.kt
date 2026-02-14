@@ -26,7 +26,6 @@ import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
-import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
@@ -41,46 +40,46 @@ private fun neverSeenField(i: Int) = En1545FixedInteger("NeverSeen$i", 8)
  * EN1545 trip fields for OVChip-format transactions (reversed bitmap).
  * Matches Metrodroid's OVChipTransaction.tripFields(reversed = true).
  */
-internal val GAUTRAIN_TRIP_FIELDS = En1545Bitmap.infixBitmap(
-    En1545Container(
-        En1545FixedInteger.date(En1545Transaction.EVENT),
-        En1545FixedInteger.timeLocal(En1545Transaction.EVENT)
-    ),
-    neverSeenField(1),
-    En1545FixedInteger(En1545Transaction.EVENT_UNKNOWN_A, 24),
-    En1545FixedInteger(TRANSACTION_TYPE, 7),
-    neverSeenField(4),
-    En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 16),
-    neverSeenField(6),
-    En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 24),
-    neverSeenField(8),
-    En1545FixedInteger(En1545Transaction.EVENT_LOCATION_ID, 16),
-    neverSeenField(10),
-    En1545FixedInteger(En1545Transaction.EVENT_DEVICE_ID, 24),
-    neverSeenField(12),
-    neverSeenField(13),
-    neverSeenField(14),
-    En1545FixedInteger(En1545Transaction.EVENT_VEHICLE_ID, 16),
-    neverSeenField(16),
-    En1545FixedInteger(En1545Transaction.EVENT_CONTRACT_POINTER, 5),
-    neverSeenField(18),
-    neverSeenField(19),
-    neverSeenField(20),
-    En1545FixedInteger("TripDurationMinutes", 16),
-    neverSeenField(22),
-    neverSeenField(23),
-    En1545FixedInteger(En1545Transaction.EVENT_PRICE_AMOUNT, 16),
-    En1545FixedInteger("EventSubscriptionID", 13),
-    En1545FixedInteger(En1545Transaction.EVENT_UNKNOWN_C, 10),
-    neverSeenField(27),
-    En1545FixedInteger("EventExtra", 0),
-    reversed = true
-)
+internal val GAUTRAIN_TRIP_FIELDS =
+    En1545Bitmap.infixBitmap(
+        En1545Container(
+            En1545FixedInteger.date(En1545Transaction.EVENT),
+            En1545FixedInteger.timeLocal(En1545Transaction.EVENT),
+        ),
+        neverSeenField(1),
+        En1545FixedInteger(En1545Transaction.EVENT_UNKNOWN_A, 24),
+        En1545FixedInteger(TRANSACTION_TYPE, 7),
+        neverSeenField(4),
+        En1545FixedInteger(En1545Transaction.EVENT_SERVICE_PROVIDER, 16),
+        neverSeenField(6),
+        En1545FixedInteger(En1545Transaction.EVENT_SERIAL_NUMBER, 24),
+        neverSeenField(8),
+        En1545FixedInteger(En1545Transaction.EVENT_LOCATION_ID, 16),
+        neverSeenField(10),
+        En1545FixedInteger(En1545Transaction.EVENT_DEVICE_ID, 24),
+        neverSeenField(12),
+        neverSeenField(13),
+        neverSeenField(14),
+        En1545FixedInteger(En1545Transaction.EVENT_VEHICLE_ID, 16),
+        neverSeenField(16),
+        En1545FixedInteger(En1545Transaction.EVENT_CONTRACT_POINTER, 5),
+        neverSeenField(18),
+        neverSeenField(19),
+        neverSeenField(20),
+        En1545FixedInteger("TripDurationMinutes", 16),
+        neverSeenField(22),
+        neverSeenField(23),
+        En1545FixedInteger(En1545Transaction.EVENT_PRICE_AMOUNT, 16),
+        En1545FixedInteger("EventSubscriptionID", 13),
+        En1545FixedInteger(En1545Transaction.EVENT_UNKNOWN_C, 10),
+        neverSeenField(27),
+        En1545FixedInteger("EventExtra", 0),
+        reversed = true,
+    )
 
 class GautrainTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
-
     private val txnType: Int? get() = parsed.getInt(TRANSACTION_TYPE)
 
     override val isTapOff: Boolean get() = txnType == 0x2a
@@ -89,17 +88,18 @@ class GautrainTransaction(
     override val lookup: En1545Lookup = GautrainLookup
 
     override val mode: Trip.Mode
-        get() = when (txnType) {
-            null -> Trip.Mode.TICKET_MACHINE
-            0x29, 0x2a -> Trip.Mode.TRAIN
-            else -> Trip.Mode.OTHER
-        }
+        get() =
+            when (txnType) {
+                null -> Trip.Mode.TICKET_MACHINE
+                0x29, 0x2a -> Trip.Mode.TRAIN
+                else -> Trip.Mode.OTHER
+            }
 
     companion object {
         fun parse(raw: ByteArray): GautrainTransaction? {
             if (raw.isAllZero()) return null
             return GautrainTransaction(
-                parsed = En1545Parser.parse(raw, GAUTRAIN_TRIP_FIELDS)
+                parsed = En1545Parser.parse(raw, GAUTRAIN_TRIP_FIELDS),
             )
         }
     }

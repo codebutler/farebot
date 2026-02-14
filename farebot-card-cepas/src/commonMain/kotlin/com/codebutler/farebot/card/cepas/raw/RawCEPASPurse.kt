@@ -22,15 +22,15 @@
 
 package com.codebutler.farebot.card.cepas.raw
 
+import com.codebutler.farebot.card.cepas.CEPASPurse
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import com.codebutler.farebot.card.cepas.CEPASPurse
 
 @Serializable
 data class RawCEPASPurse(
     val id: Int,
     @Contextual val data: ByteArray?,
-    val errorMessage: String?
+    val errorMessage: String?,
 ) {
     val isValid: Boolean
         get() = data != null
@@ -45,12 +45,14 @@ data class RawCEPASPurse(
     fun logfileRecordCount(): Byte = data!![40]
 
     companion object {
-        fun create(id: Int, data: ByteArray): RawCEPASPurse {
-            return RawCEPASPurse(id, data, null)
-        }
+        fun create(
+            id: Int,
+            data: ByteArray,
+        ): RawCEPASPurse = RawCEPASPurse(id, data, null)
 
-        fun create(id: Int, errorMessage: String): RawCEPASPurse {
-            return RawCEPASPurse(id, null, errorMessage)
-        }
+        fun create(
+            id: Int,
+            errorMessage: String,
+        ): RawCEPASPurse = RawCEPASPurse(id, null, errorMessage)
     }
 }

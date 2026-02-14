@@ -25,5 +25,6 @@ package com.codebutler.farebot.transit.calypso.intercode
 import com.codebutler.farebot.transit.en1545.En1545LookupUnknown
 
 class IntercodeLookupUnknown(
-    override val cardName: String?
-) : En1545LookupUnknown(), IntercodeLookupSingle
+    override val cardName: String?,
+) : En1545LookupUnknown(),
+    IntercodeLookupSingle

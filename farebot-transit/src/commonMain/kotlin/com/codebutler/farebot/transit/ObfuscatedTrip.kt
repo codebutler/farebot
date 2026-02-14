@@ -22,10 +22,10 @@
 
 package com.codebutler.farebot.transit
 
-import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
+import kotlin.time.Instant
 
 /**
  * Special wrapper for Trip that handles obfuscation of Trip data.
@@ -64,9 +64,8 @@ data class ObfuscatedTrip(
     @SerialName("isTransfer")
     private val _isTransfer: Boolean = false,
     @SerialName("isRejected")
-    private val _isRejected: Boolean = false
+    private val _isRejected: Boolean = false,
 ) : Trip() {
-
     override val startTimestamp: Instant?
         get() = _startTimestamp?.let { Instant.fromEpochMilliseconds(it) }
 
@@ -124,25 +123,28 @@ data class ObfuscatedTrip(
         realTrip: Trip,
         timeDelta: Long,
         obfuscateFares: Boolean,
-        random: Random = Random.Default
+        random: Random = Random.Default,
     ) : this(
-        _startTimestamp = realTrip.startTimestamp?.let {
-            it.toEpochMilliseconds() + timeDelta
-        },
-        _endTimestamp = realTrip.endTimestamp?.let {
-            it.toEpochMilliseconds() + timeDelta
-        },
+        _startTimestamp =
+            realTrip.startTimestamp?.let {
+                it.toEpochMilliseconds() + timeDelta
+            },
+        _endTimestamp =
+            realTrip.endTimestamp?.let {
+                it.toEpochMilliseconds() + timeDelta
+            },
         _routeName = realTrip.routeName,
         _startStation = realTrip.startStation,
         _endStation = realTrip.endStation,
         _mode = realTrip.mode,
-        _fare = realTrip.fare?.let {
-            if (obfuscateFares) {
-                TripObfuscator.obfuscateCurrency(it, random)
-            } else {
-                it
-            }
-        },
+        _fare =
+            realTrip.fare?.let {
+                if (obfuscateFares) {
+                    TripObfuscator.obfuscateCurrency(it, random)
+                } else {
+                    it
+                }
+            },
         _humanReadableRouteID = realTrip.humanReadableRouteID,
         _vehicleID = realTrip.vehicleID,
         _machineID = realTrip.machineID,
@@ -150,6 +152,6 @@ data class ObfuscatedTrip(
         _agencyName = realTrip.agencyName,
         _shortAgencyName = realTrip.shortAgencyName,
         _isTransfer = realTrip.isTransfer,
-        _isRejected = realTrip.isRejected
+        _isRejected = realTrip.isRejected,
     )
 }

@@ -22,4 +22,6 @@
 
 package com.codebutler.farebot.card.cepas
 
-internal class CEPASException(detailMessage: String) : Exception(detailMessage)
+internal class CEPASException(
+    detailMessage: String,
+) : Exception(detailMessage)

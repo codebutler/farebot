@@ -33,8 +33,8 @@ import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 class SnapperTransaction(
     val journeyId: Int,
@@ -43,17 +43,17 @@ class SnapperTransaction(
     val type: Int,
     val cost: Int,
     val time: Long,
-    val operator: String
+    val operator: String,
 ) : Transaction() {
-
     override val isTapOff get() = !isTapOn
 
     override val station get() = Station.nameOnly("$journeyId / $seq")
 
-    override val mode get() = when (type) {
-        2 -> Trip.Mode.BUS
-        else -> Trip.Mode.TROLLEYBUS
-    }
+    override val mode get() =
+        when (type) {
+            2 -> Trip.Mode.BUS
+            else -> Trip.Mode.TROLLEYBUS
+        }
 
     override fun isSameTrip(other: Transaction): Boolean {
         val o = other as SnapperTransaction
@@ -69,7 +69,10 @@ class SnapperTransaction(
     companion object {
         private val TZ = TimeZone.of("Pacific/Auckland")
 
-        fun parseTransaction(trip: ByteArray, balance: ByteArray): SnapperTransaction {
+        fun parseTransaction(
+            trip: ByteArray,
+            balance: ByteArray,
+        ): SnapperTransaction {
             val journeyId = trip[5].toInt()
             val seq = trip[4].toInt()
 
@@ -79,8 +82,9 @@ class SnapperTransaction(
 
             val type = balance[0].toInt()
             var cost = balance.byteArrayToInt(10, 4)
-            if (type == 2)
+            if (type == 2) {
                 cost = -cost
+            }
 
             val operator = balance.getHexString(14, 5).substring(0, 9)
 

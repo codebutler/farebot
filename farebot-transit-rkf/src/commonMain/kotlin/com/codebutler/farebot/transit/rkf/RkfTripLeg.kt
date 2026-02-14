@@ -37,7 +37,7 @@ data class RkfTripLeg(
     override val passengerCount: Int,
     private val mShortAgencyName: String?,
     override val isTransfer: Boolean,
-    private val mAgencyName: String?
+    private val mAgencyName: String?,
 ) : Trip() {
     override val agencyName: String? get() = mAgencyName
     override val shortAgencyName: String? get() = mShortAgencyName

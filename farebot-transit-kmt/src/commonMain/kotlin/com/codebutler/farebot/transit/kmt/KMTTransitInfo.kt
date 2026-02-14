@@ -40,9 +40,8 @@ class KMTTransitInfo(
     private val serialNumberData: ByteArray,
     private val currentBalance: Int,
     private val transactionCounter: Int = 0,
-    private val lastTransAmount: Int = 0
+    private val lastTransAmount: Int = 0,
 ) : TransitInfo() {
-
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.IDR(currentBalance))
 
@@ -54,12 +53,15 @@ class KMTTransitInfo(
         get() = getStringBlocking(Res.string.kmt_longname)
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.kmt_other_data),
-            ListItem(Res.string.kmt_transaction_counter, transactionCounter.toString()),
-            ListItem(Res.string.kmt_last_trx_amount,
-                TransitCurrency.IDR(lastTransAmount).formatCurrencyString(isBalance = false))
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.kmt_other_data),
+                ListItem(Res.string.kmt_transaction_counter, transactionCounter.toString()),
+                ListItem(
+                    Res.string.kmt_last_trx_amount,
+                    TransitCurrency.IDR(lastTransAmount).formatCurrencyString(isBalance = false),
+                ),
+            )
 
     companion object {
         fun create(
@@ -67,8 +69,7 @@ class KMTTransitInfo(
             serialNumberData: ByteArray,
             currentBalance: Int,
             transactionCounter: Int = 0,
-            lastTransAmount: Int = 0
-        ): KMTTransitInfo =
-            KMTTransitInfo(trips, serialNumberData, currentBalance, transactionCounter, lastTransAmount)
+            lastTransAmount: Int = 0,
+        ): KMTTransitInfo = KMTTransitInfo(trips, serialNumberData, currentBalance, transactionCounter, lastTransAmount)
     }
 }

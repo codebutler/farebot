@@ -25,27 +25,27 @@ package com.codebutler.farebot.transit.calypso.pisa
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
-import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Parsed
+import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 
 internal class PisaTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
-
     override val lookup get() = PisaLookup
 
     companion object {
-        private val TRIP_FIELDS = En1545Container(
-            En1545FixedHex("EventUnknownA", 71),
-            En1545FixedInteger.dateTimeLocal(En1545Transaction.EVENT),
-            En1545FixedHex("EventUnknownB", 82),
-            En1545FixedInteger.dateTimeLocal(En1545Transaction.EVENT_FIRST_STAMP),
-            En1545FixedInteger("ValueA", 16),
-            En1545FixedHex("EventUnknownC", 92),
-            En1545FixedInteger("ValueB", 16),
-            En1545FixedHex("EventUnknownD", 47)
-        )
+        private val TRIP_FIELDS =
+            En1545Container(
+                En1545FixedHex("EventUnknownA", 71),
+                En1545FixedInteger.dateTimeLocal(En1545Transaction.EVENT),
+                En1545FixedHex("EventUnknownB", 82),
+                En1545FixedInteger.dateTimeLocal(En1545Transaction.EVENT_FIRST_STAMP),
+                En1545FixedInteger("ValueA", 16),
+                En1545FixedHex("EventUnknownC", 92),
+                En1545FixedInteger("ValueB", 16),
+                En1545FixedHex("EventUnknownD", 47),
+            )
 
         fun parse(data: ByteArray): PisaTransaction? {
             val parsed = En1545Parser.parse(data, TRIP_FIELDS)

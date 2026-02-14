@@ -43,19 +43,20 @@ internal class LisboaVivaSubscription private constructor(
     override val parsed: En1545Parsed,
     override val lookup: En1545Lookup,
     override val stringResource: StringResource,
-    private val counter: Int?
+    private val counter: Int?,
 ) : En1545Subscription() {
-
     private val isZapping: Boolean
-        get() = contractTariff == LisboaVivaLookup.ZAPPING_TARIFF &&
-            contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY
+        get() =
+            contractTariff == LisboaVivaLookup.ZAPPING_TARIFF &&
+                contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY
 
     override val cost: TransitCurrency?
-        get() = if (isZapping && counter != null) {
-            TransitCurrency(counter, "EUR")
-        } else {
-            null
-        }
+        get() =
+            if (isZapping && counter != null) {
+                TransitCurrency(counter, "EUR")
+            } else {
+                null
+            }
 
     override val validTo: Instant?
         get() {
@@ -84,31 +85,44 @@ internal class LisboaVivaSubscription private constructor(
         }
 
     override val agencyName: String?
-        get() = if (contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY) null
-        else super.agencyName
+        get() =
+            if (contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY) {
+                null
+            } else {
+                super.agencyName
+            }
 
     override val shortAgencyName: String?
-        get() = if (contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY) null
-        else super.shortAgencyName
+        get() =
+            if (contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY) {
+                null
+            } else {
+                super.shortAgencyName
+            }
 
     companion object {
         private const val CONTRACT_PERIOD_UNITS = "ContractPeriodUnits"
         private const val CONTRACT_PERIOD = "ContractPeriod"
 
-        private val CONTRACT_FIELDS = En1545Container(
-            En1545FixedInteger(CONTRACT_PROVIDER, 7),
-            En1545FixedInteger(CONTRACT_TARIFF, 16),
-            En1545FixedInteger(CONTRACT_UNKNOWN_A, 2),
-            En1545FixedInteger.date(CONTRACT_START),
-            En1545FixedInteger(CONTRACT_SALE_AGENT, 5),
-            En1545FixedInteger(CONTRACT_UNKNOWN_B, 19),
-            En1545FixedInteger(CONTRACT_PERIOD_UNITS, 16),
-            En1545FixedInteger.date(CONTRACT_END),
-            En1545FixedInteger(CONTRACT_PERIOD, 7),
-            En1545FixedHex(CONTRACT_UNKNOWN_C, 38)
-        )
+        private val CONTRACT_FIELDS =
+            En1545Container(
+                En1545FixedInteger(CONTRACT_PROVIDER, 7),
+                En1545FixedInteger(CONTRACT_TARIFF, 16),
+                En1545FixedInteger(CONTRACT_UNKNOWN_A, 2),
+                En1545FixedInteger.date(CONTRACT_START),
+                En1545FixedInteger(CONTRACT_SALE_AGENT, 5),
+                En1545FixedInteger(CONTRACT_UNKNOWN_B, 19),
+                En1545FixedInteger(CONTRACT_PERIOD_UNITS, 16),
+                En1545FixedInteger.date(CONTRACT_END),
+                En1545FixedInteger(CONTRACT_PERIOD, 7),
+                En1545FixedHex(CONTRACT_UNKNOWN_C, 38),
+            )
 
-        fun parse(data: ByteArray, stringResource: StringResource, counter: Int?): LisboaVivaSubscription? {
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+            counter: Int?,
+        ): LisboaVivaSubscription? {
             if (data.all { it == 0.toByte() }) return null
             val parsed = En1545Parser.parse(data, CONTRACT_FIELDS)
             return LisboaVivaSubscription(parsed, LisboaVivaLookup, stringResource, counter)

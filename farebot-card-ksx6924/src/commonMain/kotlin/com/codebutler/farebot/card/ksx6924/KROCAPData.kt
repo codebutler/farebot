@@ -48,17 +48,18 @@ object KROCAPData {
     /**
      * Tag map for parsing KR-OCAP TLV data.
      */
-    val TAGMAP: Map<String, TagDesc> = mapOf(
-        TAG_CARDTYPE to TagDesc("Card Type", TagContents.DUMP_SHORT),
-        TAG_SUPPORTED_PROTOCOLS to TagDesc("Supported Protocols", TagContents.DUMP_SHORT),
-        TAG_CARD_ISSUER to TagDesc("Card Issuer", TagContents.DUMP_SHORT),
-        TAG_BALANCE_COMMAND to TagDesc("Balance Command", TagContents.DUMP_SHORT),
-        TAG_ADF_AID to TagDesc("ADF AID", TagContents.DUMP_SHORT),
-        TAG_ADDITIONAL_FILE_REFERENCES to TagDesc("Additional File References", TagContents.DUMP_SHORT),
-        TAG_TICKET_TYPE to TagDesc("Ticket Type", TagContents.DUMP_SHORT),
-        TAG_EXPIRY_DATE to TagDesc("Expiry Date", TagContents.DUMP_SHORT),
-        TAG_SERIAL_NUMBER to HIDDEN_TAG, // Card serial number - hidden for privacy
-        TAG_AGENCY_SERIAL_NUMBER to TagDesc("Agency Card Serial Number", TagContents.DUMP_SHORT),
-        TAG_DISCRETIONARY_DATA to TagDesc("Discretionary Data", TagContents.DUMP_SHORT)
-    )
+    val TAGMAP: Map<String, TagDesc> =
+        mapOf(
+            TAG_CARDTYPE to TagDesc("Card Type", TagContents.DUMP_SHORT),
+            TAG_SUPPORTED_PROTOCOLS to TagDesc("Supported Protocols", TagContents.DUMP_SHORT),
+            TAG_CARD_ISSUER to TagDesc("Card Issuer", TagContents.DUMP_SHORT),
+            TAG_BALANCE_COMMAND to TagDesc("Balance Command", TagContents.DUMP_SHORT),
+            TAG_ADF_AID to TagDesc("ADF AID", TagContents.DUMP_SHORT),
+            TAG_ADDITIONAL_FILE_REFERENCES to TagDesc("Additional File References", TagContents.DUMP_SHORT),
+            TAG_TICKET_TYPE to TagDesc("Ticket Type", TagContents.DUMP_SHORT),
+            TAG_EXPIRY_DATE to TagDesc("Expiry Date", TagContents.DUMP_SHORT),
+            TAG_SERIAL_NUMBER to HIDDEN_TAG, // Card serial number - hidden for privacy
+            TAG_AGENCY_SERIAL_NUMBER to TagDesc("Agency Card Serial Number", TagContents.DUMP_SHORT),
+            TAG_DISCRETIONARY_DATA to TagDesc("Discretionary Data", TagContents.DUMP_SHORT),
+        )
 }

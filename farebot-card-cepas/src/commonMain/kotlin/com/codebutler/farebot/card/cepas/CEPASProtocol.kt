@@ -29,12 +29,14 @@ import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory
 import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse
 import com.codebutler.farebot.card.nfc.CardTransceiver
 
-internal class CEPASProtocol(private val mTransceiver: CardTransceiver) {
-
+internal class CEPASProtocol(
+    private val mTransceiver: CardTransceiver,
+) {
     fun getPurse(purseId: Int): RawCEPASPurse {
         try {
             sendSelectFile()
-            val purseBuff = sendRequest(0x32.toByte(), purseId.toByte(), 0.toByte(), 0.toByte(), byteArrayOf(0.toByte()))
+            val purseBuff =
+                sendRequest(0x32.toByte(), purseId.toByte(), 0.toByte(), 0.toByte(), byteArrayOf(0.toByte()))
             return if (purseBuff != null) {
                 RawCEPASPurse.create(purseId, purseBuff)
             } else {
@@ -45,18 +47,33 @@ internal class CEPASProtocol(private val mTransceiver: CardTransceiver) {
         }
     }
 
-    fun getHistory(purseId: Int, recordCount: Int): RawCEPASHistory {
+    fun getHistory(
+        purseId: Int,
+        recordCount: Int,
+    ): RawCEPASHistory {
         try {
             var fullHistoryBuff: ByteArray? = null
-            val historyBuff = sendRequest(0x32.toByte(), purseId.toByte(), 0.toByte(), 1.toByte(),
-                byteArrayOf(0.toByte(), (if (recordCount <= 15) recordCount * 16 else 15 * 16).toByte()))
+            val historyBuff =
+                sendRequest(
+                    0x32.toByte(),
+                    purseId.toByte(),
+                    0.toByte(),
+                    1.toByte(),
+                    byteArrayOf(0.toByte(), (if (recordCount <= 15) recordCount * 16 else 15 * 16).toByte()),
+                )
 
             if (historyBuff != null) {
                 if (recordCount > 15) {
                     var historyBuff2: ByteArray? = null
                     try {
-                        historyBuff2 = sendRequest(0x32.toByte(), purseId.toByte(), 0.toByte(), 1.toByte(),
-                            byteArrayOf(0x0F.toByte(), ((recordCount - 15) * 16).toByte()))
+                        historyBuff2 =
+                            sendRequest(
+                                0x32.toByte(),
+                                purseId.toByte(),
+                                0.toByte(),
+                                1.toByte(),
+                                byteArrayOf(0x0F.toByte(), ((recordCount - 15) * 16).toByte()),
+                            )
                     } catch (ex: CEPASException) {
                         // Error reading 2nd purse history
                     }
@@ -81,12 +98,16 @@ internal class CEPASProtocol(private val mTransceiver: CardTransceiver) {
         }
     }
 
-    private fun sendSelectFile(): ByteArray {
-        return mTransceiver.transceive(CEPAS_SELECT_FILE_COMMAND)
-    }
+    private fun sendSelectFile(): ByteArray = mTransceiver.transceive(CEPAS_SELECT_FILE_COMMAND)
 
     @Throws(CEPASException::class)
-    private fun sendRequest(command: Byte, p1: Byte, p2: Byte, lc: Byte, parameters: ByteArray): ByteArray? {
+    private fun sendRequest(
+        command: Byte,
+        p1: Byte,
+        p2: Byte,
+        lc: Byte,
+        parameters: ByteArray,
+    ): ByteArray? {
         val recvBuffer = mTransceiver.transceive(wrapMessage(command, p1, p2, lc, parameters))
 
         if (recvBuffer[recvBuffer.size - 2] != 0x90.toByte()) {
@@ -96,8 +117,10 @@ internal class CEPASProtocol(private val mTransceiver: CardTransceiver) {
                 throw CEPASException("Got invalid file size response.")
             }
 
-            throw CEPASException("Got generic invalid response: "
-                    + (recvBuffer[recvBuffer.size - 2].toInt() and 0xff).toString(16))
+            throw CEPASException(
+                "Got generic invalid response: " +
+                    (recvBuffer[recvBuffer.size - 2].toInt() and 0xff).toString(16),
+            )
         }
 
         val output = recvBuffer.copyOfRange(0, recvBuffer.size - 2)
@@ -110,16 +133,22 @@ internal class CEPASProtocol(private val mTransceiver: CardTransceiver) {
         }
     }
 
-    private fun wrapMessage(command: Byte, p1: Byte, p2: Byte, lc: Byte, parameters: ByteArray?): ByteArray {
+    private fun wrapMessage(
+        command: Byte,
+        p1: Byte,
+        p2: Byte,
+        lc: Byte,
+        parameters: ByteArray?,
+    ): ByteArray {
         val paramSize = parameters?.size ?: 0
         val result = ByteArray(5 + paramSize)
         var offset = 0
 
         result[offset++] = 0x90.toByte() // CLA
-        result[offset++] = command     // INS
-        result[offset++] = p1          // P1
-        result[offset++] = p2          // P2
-        result[offset++] = lc          // Lc
+        result[offset++] = command // INS
+        result[offset++] = p1 // P1
+        result[offset++] = p2 // P2
+        result[offset++] = lc // Lc
 
         if (parameters != null) {
             parameters.copyInto(result, offset)
@@ -129,12 +158,18 @@ internal class CEPASProtocol(private val mTransceiver: CardTransceiver) {
     }
 
     companion object {
-        private val CEPAS_SELECT_FILE_COMMAND = byteArrayOf(
-            0x00.toByte(), 0xA4.toByte(), 0x00.toByte(), 0x00.toByte(),
-            0x02.toByte(), 0x40.toByte(), 0x00.toByte()
-        )
+        private val CEPAS_SELECT_FILE_COMMAND =
+            byteArrayOf(
+                0x00.toByte(),
+                0xA4.toByte(),
+                0x00.toByte(),
+                0x00.toByte(),
+                0x02.toByte(),
+                0x40.toByte(),
+                0x00.toByte(),
+            )
 
-        /* Status codes */
+        // Status codes
         private const val OPERATION_OK: Byte = 0x00.toByte()
         private val PERMISSION_DENIED: Byte = 0x9D.toByte()
     }

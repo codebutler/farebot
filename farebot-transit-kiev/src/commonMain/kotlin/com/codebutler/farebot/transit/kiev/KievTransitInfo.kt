@@ -29,9 +29,8 @@ import farebot.farebot_transit_kiev.generated.resources.kiev_card_name
 
 class KievTransitInfo(
     private val mSerial: String,
-    override val trips: List<KievTrip>
+    override val trips: List<KievTrip>,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = formatSerial(mSerial)
 
@@ -42,7 +41,6 @@ class KievTransitInfo(
         val NAME: String
             get() = getStringBlocking(Res.string.kiev_card_name)
 
-        fun formatSerial(serial: String): String =
-            NumberUtils.groupString(serial, " ", 4, 4, 4)
+        fun formatSerial(serial: String): String = NumberUtils.groupString(serial, " ", 4, 4, 4)
     }
 }

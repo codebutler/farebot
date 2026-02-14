@@ -25,15 +25,18 @@
 
 package com.codebutler.farebot.card.desfire
 
+import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
-import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.card.nfc.CardTransceiver
 
-class DesfireAccessControlException(message: String) : Exception(message)
+class DesfireAccessControlException(
+    message: String,
+) : Exception(message)
 
-internal class DesfireProtocol(private val mTransceiver: CardTransceiver) {
-
+internal class DesfireProtocol(
+    private val mTransceiver: CardTransceiver,
+) {
     @Throws(Exception::class)
     fun getManufacturingData(): RawDesfireManufacturingData {
         val respBuffer = sendRequest(GET_MANUFACTURING_DATA)
@@ -90,37 +93,52 @@ internal class DesfireProtocol(private val mTransceiver: CardTransceiver) {
     }
 
     @Throws(Exception::class)
-    fun readFile(fileNo: Int): ByteArray {
-        return sendRequest(READ_DATA, byteArrayOf(
-            fileNo.toByte(),
-            0x0.toByte(), 0x0.toByte(), 0x0.toByte(),
-            0x0.toByte(), 0x0.toByte(), 0x0.toByte()
-        ))
-    }
+    fun readFile(fileNo: Int): ByteArray =
+        sendRequest(
+            READ_DATA,
+            byteArrayOf(
+                fileNo.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+            ),
+        )
 
     @Throws(Exception::class)
-    fun readRecord(fileNum: Int): ByteArray {
-        return sendRequest(READ_RECORD, byteArrayOf(
-            fileNum.toByte(),
-            0x0.toByte(), 0x0.toByte(), 0x0.toByte(),
-            0x0.toByte(), 0x0.toByte(), 0x0.toByte()
-        ))
-    }
+    fun readRecord(fileNum: Int): ByteArray =
+        sendRequest(
+            READ_RECORD,
+            byteArrayOf(
+                fileNum.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+            ),
+        )
 
     @Throws(Exception::class)
-    fun getValue(fileNum: Int): ByteArray {
-        return sendRequest(GET_VALUE, byteArrayOf(
-            fileNum.toByte()
-        ))
-    }
+    fun getValue(fileNum: Int): ByteArray =
+        sendRequest(
+            GET_VALUE,
+            byteArrayOf(
+                fileNum.toByte(),
+            ),
+        )
 
     @Throws(Exception::class)
-    private fun sendRequest(command: Byte): ByteArray {
-        return sendRequest(command, null)
-    }
+    private fun sendRequest(command: Byte): ByteArray = sendRequest(command, null)
 
     @Throws(Exception::class)
-    private fun sendRequest(command: Byte, parameters: ByteArray?): ByteArray {
+    private fun sendRequest(
+        command: Byte,
+        parameters: ByteArray?,
+    ): ByteArray {
         val outputChunks = mutableListOf<ByteArray>()
 
         var recvBuffer = mTransceiver.transceive(wrapMessage(command, parameters))
@@ -154,7 +172,10 @@ internal class DesfireProtocol(private val mTransceiver: CardTransceiver) {
     }
 
     @Throws(Exception::class)
-    private fun wrapMessage(command: Byte, parameters: ByteArray?): ByteArray {
+    private fun wrapMessage(
+        command: Byte,
+        parameters: ByteArray?,
+    ): ByteArray {
         // APDU: CLA INS P1 P2 [Lc Data] Le
         val size = if (parameters != null) 6 + parameters.size else 5
         val result = ByteArray(size)

@@ -43,14 +43,13 @@ data class EasyCardTopUp(
     private val timestampRaw: Long,
     private val amount: Int,
     private val location: Int,
-    private val machineIdRaw: Long
+    private val machineIdRaw: Long,
 ) : Trip() {
-
     constructor(data: ByteArray) : this(
         timestampRaw = data.byteArrayToLongReversed(1, 4),
         amount = data.byteArrayToIntReversed(6, 2),
         location = data[11].toInt() and 0xFF,
-        machineIdRaw = data.byteArrayToLongReversed(12, 4)
+        machineIdRaw = data.byteArrayToLongReversed(12, 4),
     )
 
     // Negative fare indicates money added to card
@@ -74,8 +73,9 @@ data class EasyCardTopUp(
          * Parse the top-up record from sector 2, block 2.
          */
         fun parse(card: ClassicCard): EasyCardTopUp? {
-            val data = (card.getSector(2) as? DataClassicSector)?.getBlock(2)?.data
-                ?: return null
+            val data =
+                (card.getSector(2) as? DataClassicSector)?.getBlock(2)?.data
+                    ?: return null
             // Check if block is empty (all zeros)
             if (data.all { it == 0.toByte() }) {
                 return null

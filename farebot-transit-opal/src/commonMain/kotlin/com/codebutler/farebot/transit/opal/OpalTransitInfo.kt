@@ -35,13 +35,13 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_opal.generated.resources.*
 import kotlinx.datetime.DateTimeUnit
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 /**
  * Transit data type for Opal (Sydney, AU).
@@ -63,9 +63,9 @@ class OpalTransitInfo(
     val lastTransactionNumber: Int,
     private val stringResource: StringResource,
 ) : TransitInfo() {
-
     companion object {
         const val NAME = "Opal"
+
         // Opal epoch is 1980-01-01 00:00:00 Sydney local time
         private val OPAL_EPOCH_DATE = LocalDate(1980, 1, 1)
         private val SYDNEY_TZ = TimeZone.of("Australia/Sydney")
@@ -87,25 +87,27 @@ class OpalTransitInfo(
         }
 
     override val trips: List<Trip>
-        get() = listOf(
-            OpalTrip(
-                timestamp = lastTransactionTime,
-                transactionMode = lastTransactionMode,
-                transactionType = lastTransaction,
-                stringResource = stringResource,
+        get() =
+            listOf(
+                OpalTrip(
+                    timestamp = lastTransactionTime,
+                    transactionMode = lastTransactionMode,
+                    transactionType = lastTransaction,
+                    stringResource = stringResource,
+                ),
             )
-        )
 
     override val onlineServicesPage: String
         get() = "https://m.opal.com.au/"
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            ListItem(
-                stringResource.getString(Res.string.opal_weekly_trips),
-                weeklyTrips.toString()
-            ),
-        )
+        get() =
+            listOf(
+                ListItem(
+                    stringResource.getString(Res.string.opal_weekly_trips),
+                    weeklyTrips.toString(),
+                ),
+            )
 
     val lastTransactionTime: Instant
         get() {
@@ -125,10 +127,11 @@ class OpalTransitInfo(
      * This is a simplified version of Metrodroid's getRawFields(RawLevel) that always returns the fields.
      */
     val rawFields: List<ListItemInterface>
-        get() = listOf(
-            ListItem(
-                stringResource.getString(Res.string.opal_checksum),
-                checksum.toString()
+        get() =
+            listOf(
+                ListItem(
+                    stringResource.getString(Res.string.opal_checksum),
+                    checksum.toString(),
+                ),
             )
-        )
 }

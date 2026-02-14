@@ -34,14 +34,18 @@ internal object VeneziaLookup : En1545LookupSTR("venezia") {
 
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
 
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode = Trip.Mode.OTHER
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        11105 to Res.string.venezia_24h_ticket,
-        11209 to Res.string.venezia_rete_unica_75min,
-        11210 to Res.string.venezia_rete_unica_100min,
-        12101 to Res.string.venezia_bus_ticket_75min,
-        12106 to Res.string.venezia_airport_bus_ticket,
-        11400 to Res.string.venezia_carnet_traghetto
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            11105 to Res.string.venezia_24h_ticket,
+            11209 to Res.string.venezia_rete_unica_75min,
+            11210 to Res.string.venezia_rete_unica_100min,
+            12101 to Res.string.venezia_bus_ticket_75min,
+            12106 to Res.string.venezia_airport_bus_ticket,
+            11400 to Res.string.venezia_carnet_traghetto,
+        )
 }

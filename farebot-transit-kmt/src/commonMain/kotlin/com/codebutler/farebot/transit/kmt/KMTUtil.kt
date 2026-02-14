@@ -20,14 +20,13 @@
 
 package com.codebutler.farebot.transit.kmt
 
-import kotlin.time.Instant
+import com.codebutler.farebot.card.felica.FeliCaUtil
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import com.codebutler.farebot.card.felica.FeliCaUtil
+import kotlin.time.Instant
 
 internal object KMTUtil {
-
     val TIME_ZONE: TimeZone = TimeZone.of("Asia/Jakarta")
 
     // Pre-2019 epoch: 2000-01-01 01:00:00 Jakarta time (UTC+7, so 2000-01-01T01:00+07:00)

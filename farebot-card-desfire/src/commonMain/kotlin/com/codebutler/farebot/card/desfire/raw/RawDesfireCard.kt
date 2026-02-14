@@ -25,9 +25,9 @@ package com.codebutler.farebot.card.desfire.raw
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.desfire.DesfireCard
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class RawDesfireCard(
@@ -35,9 +35,8 @@ data class RawDesfireCard(
     private val scannedAt: Instant,
     val applications: List<RawDesfireApplication>,
     val manufacturingData: RawDesfireManufacturingData,
-    val appListLocked: Boolean = false
+    val appListLocked: Boolean = false,
 ) : RawCard<DesfireCard> {
-
     override fun cardType(): CardType = CardType.MifareDesfire
 
     override fun tagId(): ByteArray = tagId
@@ -45,6 +44,7 @@ data class RawDesfireCard(
     override fun scannedAt(): Instant = scannedAt
 
     fun applications(): List<RawDesfireApplication> = applications
+
     fun manufacturingData(): RawDesfireManufacturingData = manufacturingData
 
     override fun isUnauthorized(): Boolean {
@@ -69,7 +69,7 @@ data class RawDesfireCard(
             tagId: ByteArray,
             date: Instant,
             apps: List<RawDesfireApplication>,
-            manufData: RawDesfireManufacturingData
+            manufData: RawDesfireManufacturingData,
         ): RawDesfireCard = RawDesfireCard(tagId, date, apps, manufData)
     }
 }

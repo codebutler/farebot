@@ -28,13 +28,12 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class SampleTransitFactory : TransitFactory<SampleCard, SampleTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     override fun check(card: SampleCard): Boolean = true
 
     override fun parseIdentity(card: SampleCard): TransitIdentity =
-            TransitIdentity.create(card.cardType.toString(), card.tagId.hex())
+        TransitIdentity.create(card.cardType.toString(), card.tagId.hex())
 
     override fun parseInfo(card: SampleCard): SampleTransitInfo = SampleTransitInfo()
 }

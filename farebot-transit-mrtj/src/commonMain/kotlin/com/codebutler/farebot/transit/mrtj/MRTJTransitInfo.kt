@@ -39,9 +39,8 @@ import farebot.farebot_transit_mrtj.generated.resources.mrtj_transaction_counter
 class MRTJTransitInfo(
     private val currentBalance: Int,
     private val transactionCounter: Int,
-    private val lastTransAmount: Int
+    private val lastTransAmount: Int,
 ) : TransitInfo() {
-
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.IDR(currentBalance))
 
@@ -52,10 +51,13 @@ class MRTJTransitInfo(
     override val trips: List<Trip> = emptyList()
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.mrtj_other_data),
-            ListItem(Res.string.mrtj_transaction_counter, transactionCounter.toString()),
-            ListItem(Res.string.mrtj_last_transaction_amount,
-                TransitCurrency.IDR(lastTransAmount).formatCurrencyString(isBalance = false))
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.mrtj_other_data),
+                ListItem(Res.string.mrtj_transaction_counter, transactionCounter.toString()),
+                ListItem(
+                    Res.string.mrtj_last_transaction_amount,
+                    TransitCurrency.IDR(lastTransAmount).formatCurrencyString(isBalance = false),
+                ),
+            )
 }

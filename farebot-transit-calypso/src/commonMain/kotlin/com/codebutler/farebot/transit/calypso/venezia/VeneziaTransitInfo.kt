@@ -42,9 +42,8 @@ import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.farebot_transit_calypso.generated.resources.*
 
 internal class VeneziaTransitInfo(
-    result: CalypsoParseResult
+    result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-
     override val cardName: String = NAME
 
     private val profileNumber: Int
@@ -52,17 +51,19 @@ internal class VeneziaTransitInfo(
 
     @Suppress("unused")
     private val profileDescription: String
-        get() = when (profileNumber) {
-            117 -> "Normal"
-            else -> "Unknown ($profileNumber)"
-        }
+        get() =
+            when (profileNumber) {
+                117 -> "Normal"
+                else -> "Unknown ($profileNumber)"
+            }
 
     override val info: List<ListItemInterface>
         get() {
-            val profileValue = when (profileNumber) {
-                117 -> Res.string.calypso_profile_normal
-                else -> null
-            }
+            val profileValue =
+                when (profileNumber) {
+                    117 -> Res.string.calypso_profile_normal
+                    else -> null
+                }
             return if (profileValue != null) {
                 listOf(ListItem(Res.string.calypso_profile, profileValue))
             } else {
@@ -76,8 +77,9 @@ internal class VeneziaTransitInfo(
     }
 }
 
-class VeneziaTransitFactory(stringResource: StringResource) : CalypsoTransitFactory(stringResource) {
-
+class VeneziaTransitFactory(
+    stringResource: StringResource,
+) : CalypsoTransitFactory(stringResource) {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -85,23 +87,28 @@ class VeneziaTransitFactory(stringResource: StringResource) : CalypsoTransitFact
         get() = VeneziaTransitInfo.NAME
 
     override fun checkTenv(tenv: ByteArray): Boolean {
-        val v = ((tenv[0].toInt() and 0xFF) shl 24) or
+        val v =
+            ((tenv[0].toInt() and 0xFF) shl 24) or
                 ((tenv[1].toInt() and 0xFF) shl 16) or
                 ((tenv[2].toInt() and 0xFF) shl 8) or
                 (tenv[3].toInt() and 0xFF)
         return v == 0x7d0
     }
 
-    override fun parseTransitInfo(app: ISO7816Application, serial: String?): TransitInfo {
-        val result = Calypso1545TransitData.parse(
-            app = app,
-            ticketEnvFields = TICKET_ENV_FIELDS,
-            contractListFields = null,
-            serial = serial,
-            createSubscription = { data, ctr, _, _ -> VeneziaSubscription.parse(data, stringResource, ctr) },
-            createTrip = { data -> VeneziaTransaction.parse(data) },
-            createSpecialEvent = null
-        )
+    override fun parseTransitInfo(
+        app: ISO7816Application,
+        serial: String?,
+    ): TransitInfo {
+        val result =
+            Calypso1545TransitData.parse(
+                app = app,
+                ticketEnvFields = ticketEnvFields,
+                contractListFields = null,
+                serial = serial,
+                createSubscription = { data, ctr, _, _ -> VeneziaSubscription.parse(data, stringResource, ctr) },
+                createTrip = { data -> VeneziaTransaction.parse(data) },
+                createSpecialEvent = null,
+            )
 
         return VeneziaTransitInfo(result)
     }
@@ -117,25 +124,27 @@ class VeneziaTransitFactory(stringResource: StringResource) : CalypsoTransitFact
         return serial.toString()
     }
 
-    private val TICKET_ENV_FIELDS = En1545Container(
-        En1545FixedHex(En1545TransitData.ENV_UNKNOWN_A, 49),
-        En1545FixedInteger.datePacked(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
-        En1545FixedInteger("HolderProfileNumber", 8),
-        En1545FixedHex(En1545TransitData.ENV_UNKNOWN_B, 2),
-        En1545FixedInteger.datePacked(En1545TransitData.HOLDER_PROFILE)
-    )
+    private val ticketEnvFields =
+        En1545Container(
+            En1545FixedHex(En1545TransitData.ENV_UNKNOWN_A, 49),
+            En1545FixedInteger.datePacked(En1545TransitData.ENV_APPLICATION_VALIDITY_END),
+            En1545FixedInteger("HolderProfileNumber", 8),
+            En1545FixedHex(En1545TransitData.ENV_UNKNOWN_B, 2),
+            En1545FixedInteger.datePacked(En1545TransitData.HOLDER_PROFILE),
+        )
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_venezia_unica,
-            cardType = CardType.ISO7816,
-            region = TransitRegion.ITALY,
-            locationRes = Res.string.card_location_venice_italy,
-            imageRes = Res.drawable.veneziaunica,
-            latitude = 45.4408f,
-            longitude = 12.3155f,
-            brandColor = 0xC4F5F7,
-            credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_venezia_unica,
+                cardType = CardType.ISO7816,
+                region = TransitRegion.ITALY,
+                locationRes = Res.string.card_location_venice_italy,
+                imageRes = Res.drawable.veneziaunica,
+                latitude = 45.4408f,
+                longitude = 12.3155f,
+                brandColor = 0xC4F5F7,
+                credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
+            )
     }
 }

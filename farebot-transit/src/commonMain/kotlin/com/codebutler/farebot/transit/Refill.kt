@@ -26,7 +26,6 @@ package com.codebutler.farebot.transit
 import com.codebutler.farebot.base.util.StringResource
 
 abstract class Refill {
-
     abstract fun getTimestamp(): Long
 
     abstract fun getAgencyName(stringResource: StringResource): String
@@ -38,7 +37,10 @@ abstract class Refill {
     abstract fun getAmountString(stringResource: StringResource): String
 
     class Comparator : kotlin.Comparator<Refill> {
-        override fun compare(a: Refill, b: Refill): Int {
+        override fun compare(
+            a: Refill,
+            b: Refill,
+        ): Int {
             // For consistency with Trip, this is reversed.
             return b.getTimestamp().compareTo(a.getTimestamp())
         }

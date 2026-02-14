@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit
 
-import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Represents a balance on a transit card.
@@ -35,5 +35,5 @@ data class TransitBalance(
     val balance: TransitCurrency,
     val name: String? = null,
     val validFrom: Instant? = null,
-    val validTo: Instant? = null
+    val validTo: Instant? = null,
 )

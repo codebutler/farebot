@@ -25,5 +25,11 @@ package com.codebutler.farebot.transit.en1545
 typealias En1545Bits = (buffer: ByteArray, iStartBit: Int, iLength: Int) -> Int
 
 interface En1545Field {
-    fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int
+    fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int
 }

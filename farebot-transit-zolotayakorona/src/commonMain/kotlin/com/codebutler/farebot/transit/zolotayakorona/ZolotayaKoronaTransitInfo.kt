@@ -31,12 +31,11 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_zolotayakorona.generated.resources.*
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.StringResource
+import kotlin.time.Instant
 
 class ZolotayaKoronaTransitInfo internal constructor(
     private val serial: String,
@@ -48,27 +47,28 @@ class ZolotayaKoronaTransitInfo internal constructor(
     private val status: Int,
     private val discountCode: Int,
     private val sequenceCtr: Int,
-    private val tail: ByteArray
+    private val tail: ByteArray,
 ) : TransitInfo() {
-
     companion object {
-        private val discountMap = mapOf<Int, StringResource>(
-            0x46 to Res.string.zolotaya_korona_discount_111,
-            0x47 to Res.string.zolotaya_korona_discount_100,
-            0x48 to Res.string.zolotaya_korona_discount_200
-        )
+        private val discountMap =
+            mapOf<Int, StringResource>(
+                0x46 to Res.string.zolotaya_korona_discount_111,
+                0x47 to Res.string.zolotaya_korona_discount_100,
+                0x48 to Res.string.zolotaya_korona_discount_200,
+            )
 
-        private val CARD_NAMES = mapOf<Int, StringResource>(
-            0x230100 to Res.string.card_name_krasnodar_etk,
-            0x560200 to Res.string.card_name_orenburg_ekg,
-            0x562300 to Res.string.card_name_orenburg_school,
-            0x562400 to Res.string.card_name_orenburg_student,
-            0x631500 to Res.string.card_name_samara_school,
-            0x632600 to Res.string.card_name_samara_etk,
-            0x632700 to Res.string.card_name_samara_student,
-            0x633500 to Res.string.card_name_samara_garden_dacha,
-            0x760500 to Res.string.card_name_yaroslavl_etk
-        )
+        private val CARD_NAMES =
+            mapOf<Int, StringResource>(
+                0x230100 to Res.string.card_name_krasnodar_etk,
+                0x560200 to Res.string.card_name_orenburg_ekg,
+                0x562300 to Res.string.card_name_orenburg_school,
+                0x562400 to Res.string.card_name_orenburg_student,
+                0x631500 to Res.string.card_name_samara_school,
+                0x632600 to Res.string.card_name_samara_etk,
+                0x632700 to Res.string.card_name_samara_student,
+                0x633500 to Res.string.card_name_samara_garden_dacha,
+                0x760500 to Res.string.card_name_yaroslavl_etk,
+            )
 
         internal fun nameCard(type: Int): String {
             val cardNameRes = CARD_NAMES[type]
@@ -80,7 +80,10 @@ class ZolotayaKoronaTransitInfo internal constructor(
             }
         }
 
-        fun parseTime(time: Int, cardType: Int): Instant? {
+        fun parseTime(
+            time: Int,
+            cardType: Int,
+        ): Instant? {
             if (time == 0) return null
             val tz = RussiaTaxCodes.BCDToTimeZone(cardType shr 16)
             // This is pseudo unix time with local day always coerced to 86400 seconds
@@ -96,28 +99,37 @@ class ZolotayaKoronaTransitInfo internal constructor(
             return ldt.toInstant(tz)
         }
 
-        fun formatSerial(serial: String): String =
-            NumberUtils.groupString(serial, " ", 4, 5, 5)
+        fun formatSerial(serial: String): String = NumberUtils.groupString(serial, " ", 4, 5, 5)
     }
 
     private val estimatedBalance: Int
         get() {
             // a trip followed by refill. Assume only one refill.
-            if (refill != null && trip != null && refill.time > trip.time)
+            if (refill != null && trip != null && refill.time > trip.time) {
                 return trip.estimatedBalance + refill.amount
+            }
             // Last transaction was a trip
-            if (trip != null)
+            if (trip != null) {
                 return trip.estimatedBalance
+            }
             // No trips. Look for refill
-            if (refill != null)
+            if (refill != null) {
                 return refill.amount
+            }
             // Card was never used or refilled
             return 0
         }
 
     override val balance: TransitBalance
         get() {
-            val bal = if (balanceValue == null) TransitCurrency.RUB(estimatedBalance) else TransitCurrency.RUB(balanceValue)
+            val bal =
+                if (balanceValue ==
+                    null
+                ) {
+                    TransitCurrency.RUB(estimatedBalance)
+                } else {
+                    TransitCurrency.RUB(balanceValue)
+                }
             return TransitBalance(balance = bal)
         }
 
@@ -129,16 +141,18 @@ class ZolotayaKoronaTransitInfo internal constructor(
         get() {
             val regionNum = cardType shr 16
             val regionName = RussiaTaxCodes.BCDToName(regionNum)
-            val discountName = discountMap[discountCode]?.let { getStringBlocking(it) }
-                ?: getStringBlocking(Res.string.zolotaya_korona_unknown, discountCode.toString(16))
-            val cardTypeName = CARD_NAMES[cardType]?.let { getStringBlocking(it) }
-                ?: cardType.toString(16)
+            val discountName =
+                discountMap[discountCode]?.let { getStringBlocking(it) }
+                    ?: getStringBlocking(Res.string.zolotaya_korona_unknown, discountCode.toString(16))
+            val cardTypeName =
+                CARD_NAMES[cardType]?.let { getStringBlocking(it) }
+                    ?: cardType.toString(16)
             return listOf(
                 ListItem(Res.string.zolotaya_korona_region, regionName),
                 ListItem(Res.string.zolotaya_korona_card_type, cardTypeName),
                 ListItem(Res.string.zolotaya_korona_discount, discountName),
                 ListItem(Res.string.zolotaya_korona_card_serial, cardSerial.uppercase()),
-                ListItem(Res.string.zolotaya_korona_refill_counter, refill?.counter?.toString() ?: "0")
+                ListItem(Res.string.zolotaya_korona_refill_counter, refill?.counter?.toString() ?: "0"),
             )
         }
 

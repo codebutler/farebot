@@ -46,7 +46,6 @@ import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 
 class IosPlatformActions : PlatformActions {
-
     override fun openUrl(url: String) {
         val nsUrl = NSURL(string = url)
         UIApplication.sharedApplication.openURL(nsUrl, emptyMap<Any?, Any>(), null)
@@ -61,29 +60,30 @@ class IosPlatformActions : PlatformActions {
         UIPasteboard.generalPasteboard.string = text
     }
 
-    override fun getClipboardText(): String? {
-        return UIPasteboard.generalPasteboard.string
-    }
+    override fun getClipboardText(): String? = UIPasteboard.generalPasteboard.string
 
     override fun shareText(text: String) {
-        val viewController = getTopViewController() ?: run {
-            copyToClipboard(text)
-            return
-        }
-        val activityVC = UIActivityViewController(
-            activityItems = listOf(text),
-            applicationActivities = null,
-        )
+        val viewController =
+            getTopViewController() ?: run {
+                copyToClipboard(text)
+                return
+            }
+        val activityVC =
+            UIActivityViewController(
+                activityItems = listOf(text),
+                applicationActivities = null,
+            )
         viewController.presentViewController(activityVC, animated = true, completion = null)
     }
 
     override fun showToast(message: String) {
         val viewController = getTopViewController() ?: return
-        val alert = UIAlertController.alertControllerWithTitle(
-            title = null,
-            message = message,
-            preferredStyle = UIAlertControllerStyleAlert,
-        )
+        val alert =
+            UIAlertController.alertControllerWithTitle(
+                title = null,
+                message = message,
+                preferredStyle = UIAlertControllerStyleAlert,
+            )
         viewController.presentViewController(alert, animated = true, completion = null)
         // Auto-dismiss after 1.5 seconds
         NSTimer.scheduledTimerWithTimeInterval(
@@ -98,13 +98,15 @@ class IosPlatformActions : PlatformActions {
         // Delay presentation to let Compose finish its recomposition cycle
         // (presenting a view controller mid-recomposition silently fails on iOS).
         NSTimer.scheduledTimerWithTimeInterval(0.1, repeats = false) {
-            val viewController = getTopViewController() ?: run {
-                onResult(null)
-                return@scheduledTimerWithTimeInterval
-            }
-            val picker = UIDocumentPickerViewController(
-                forOpeningContentTypes = listOf(UTTypeJSON, UTTypePlainText, UTTypeData),
-            )
+            val viewController =
+                getTopViewController() ?: run {
+                    onResult(null)
+                    return@scheduledTimerWithTimeInterval
+                }
+            val picker =
+                UIDocumentPickerViewController(
+                    forOpeningContentTypes = listOf(UTTypeJSON, UTTypePlainText, UTTypeData),
+                )
             picker.allowsMultipleSelection = false
 
             val delegate = DocumentPickerDelegate(onResult)
@@ -116,23 +118,28 @@ class IosPlatformActions : PlatformActions {
         }
     }
 
-    override fun saveFileForExport(content: String, defaultFileName: String) {
+    override fun saveFileForExport(
+        content: String,
+        defaultFileName: String,
+    ) {
         val viewController = getTopViewController() ?: return
-        val activityVC = UIActivityViewController(
-            activityItems = listOf(content),
-            applicationActivities = null,
-        )
+        val activityVC =
+            UIActivityViewController(
+                activityItems = listOf(content),
+                applicationActivities = null,
+            )
         viewController.presentViewController(activityVC, animated = true, completion = null)
     }
 
     private fun getTopViewController(): UIViewController? {
         // Use scene-based API (UIApplication.windows is deprecated on iOS 15+).
         // Don't filter by isKeyWindow — in SwiftUI scene-based apps it may not be set.
-        val window = UIApplication.sharedApplication.connectedScenes
-            .filterIsInstance<UIWindowScene>()
-            .firstNotNullOfOrNull { scene ->
-                scene.windows.filterIsInstance<UIWindow>().firstOrNull()
-            }
+        val window =
+            UIApplication.sharedApplication.connectedScenes
+                .filterIsInstance<UIWindowScene>()
+                .firstNotNullOfOrNull { scene ->
+                    scene.windows.filterIsInstance<UIWindow>().firstOrNull()
+                }
         var topVC = window?.rootViewController
         while (topVC?.presentedViewController != null) {
             topVC = topVC.presentedViewController
@@ -141,13 +148,14 @@ class IosPlatformActions : PlatformActions {
     }
 
     // Strong reference to prevent delegate from being garbage collected
+    @Suppress("ktlint:standard:property-naming")
     private var objc_ref: Any? = null
 
     @OptIn(ExperimentalForeignApi::class)
     private class DocumentPickerDelegate(
         private val onResult: (String?) -> Unit,
-    ) : NSObject(), UIDocumentPickerDelegateProtocol {
-
+    ) : NSObject(),
+        UIDocumentPickerDelegateProtocol {
         override fun documentPicker(
             controller: UIDocumentPickerViewController,
             didPickDocumentsAtURLs: List<*>,
@@ -157,11 +165,12 @@ class IosPlatformActions : PlatformActions {
                 val accessed = url.startAccessingSecurityScopedResource()
                 val content: String?
                 try {
-                    content = NSString.stringWithContentsOfURL(
-                        url,
-                        encoding = NSUTF8StringEncoding,
-                        error = null,
-                    )
+                    content =
+                        NSString.stringWithContentsOfURL(
+                            url,
+                            encoding = NSUTF8StringEncoding,
+                            error = null,
+                        )
                 } finally {
                     if (accessed) {
                         url.stopAccessingSecurityScopedResource()

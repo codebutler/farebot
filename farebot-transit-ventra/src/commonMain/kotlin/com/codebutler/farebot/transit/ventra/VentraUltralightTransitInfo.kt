@@ -37,9 +37,8 @@ import farebot.farebot_transit_ventra.generated.resources.*
 import kotlinx.datetime.TimeZone
 
 class VentraUltralightTransitInfo(
-    override val capsule: NextfareUltralightTransitDataCapsule
+    override val capsule: NextfareUltralightTransitDataCapsule,
 ) : NextfareUltralightTransitData() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.ventra_card_name)
 
@@ -58,37 +57,39 @@ class VentraUltralightTransitInfo(
 
         val FACTORY: TransitFactory<UltralightCard, VentraUltralightTransitInfo> =
             object : TransitFactory<UltralightCard, VentraUltralightTransitInfo> {
-
-                override val allCards: List<CardInfo> = listOf(
-                    CardInfo(
-                        nameRes = Res.string.ventra_card_name,
-                        cardType = CardType.MifareUltralight,
-                        region = TransitRegion.USA,
-                        locationRes = Res.string.card_location_chicago_il,
-                        extraNoteRes = Res.string.card_note_ventra,
-                        imageRes = Res.drawable.ventra,
-                        latitude = 41.8781f,
-                        longitude = -87.6298f,
-                        sampleDumpFile = "Ventra.json",
-                        brandColor = 0x0094C8,
-                        credits = listOf("Metrodroid Project"),
+                override val allCards: List<CardInfo> =
+                    listOf(
+                        CardInfo(
+                            nameRes = Res.string.ventra_card_name,
+                            cardType = CardType.MifareUltralight,
+                            region = TransitRegion.USA,
+                            locationRes = Res.string.card_location_chicago_il,
+                            extraNoteRes = Res.string.card_note_ventra,
+                            imageRes = Res.drawable.ventra,
+                            latitude = 41.8781f,
+                            longitude = -87.6298f,
+                            sampleDumpFile = "Ventra.json",
+                            brandColor = 0x0094C8,
+                            credits = listOf("Metrodroid Project"),
+                        ),
                     )
-                )
 
                 override fun check(card: UltralightCard): Boolean {
                     val head = card.getPage(4).data.byteArrayToInt(0, 3)
-                    if (head != 0x0a0400 && head != 0x0a0800)
+                    if (head != 0x0a0400 && head != 0x0a0800) {
                         return false
+                    }
                     val page1 = card.getPage(5).data
-                    if (page1[1].toInt() != 1 || page1[2].toInt() and 0x80 == 0x80 || page1[3].toInt() != 0)
+                    if (page1[1].toInt() != 1 || page1[2].toInt() and 0x80 == 0x80 || page1[3].toInt() != 0) {
                         return false
+                    }
                     val page2 = card.getPage(6).data
                     return page2.byteArrayToInt(0, 3) == 0
                 }
 
                 override fun parseInfo(card: UltralightCard): VentraUltralightTransitInfo =
                     VentraUltralightTransitInfo(
-                        parse(card, ::VentraUltralightTransaction)
+                        parse(card, ::VentraUltralightTransaction),
                     )
 
                 override fun parseIdentity(card: UltralightCard): TransitIdentity =

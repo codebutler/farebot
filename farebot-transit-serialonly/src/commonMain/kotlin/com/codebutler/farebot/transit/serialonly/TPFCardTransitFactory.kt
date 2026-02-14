@@ -33,30 +33,28 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class TPFCardTransitFactory : TransitFactory<DesfireCard, TPFCardTransitInfo> {
-
-    override val allCards: List<CardInfo> = listOf(
-        CardInfo(
-            nameRes = Res.string.card_name_tpf,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.SWITZERLAND,
-            locationRes = Res.string.card_location_fribourg_switzerland,
-            serialOnly = true,
-            imageRes = Res.drawable.tpf_card,
-            latitude = 46.8065f,
-            longitude = 7.1620f,
-            brandColor = 0xA01D3D,
-            credits = listOf("Metrodroid Project"),
+    override val allCards: List<CardInfo> =
+        listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_tpf,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.SWITZERLAND,
+                locationRes = Res.string.card_location_fribourg_switzerland,
+                serialOnly = true,
+                imageRes = Res.drawable.tpf_card,
+                latitude = 46.8065f,
+                longitude = 7.1620f,
+                brandColor = 0xA01D3D,
+                credits = listOf("Metrodroid Project"),
+            ),
         )
-    )
 
-    override fun check(card: DesfireCard): Boolean =
-        card.getApplication(APP_ID) != null
+    override fun check(card: DesfireCard): Boolean = card.getApplication(APP_ID) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity =
         TransitIdentity.create(TPFCardTransitInfo.NAME, formatSerial(card))
 
-    override fun parseInfo(card: DesfireCard): TPFCardTransitInfo =
-        TPFCardTransitInfo(mSerial = formatSerial(card))
+    override fun parseInfo(card: DesfireCard): TPFCardTransitInfo = TPFCardTransitInfo(mSerial = formatSerial(card))
 
     companion object {
         // "CTK" in ASCII

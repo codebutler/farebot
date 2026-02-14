@@ -37,19 +37,17 @@ import farebot.farebot_transit_ezlink.generated.resources.*
 class EZLinkTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<CEPASCard, EZLinkTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
 
-    override fun check(card: CEPASCard): Boolean {
-        return card.getPurse(3) != null
-    }
+    override fun check(card: CEPASCard): Boolean = card.getPurse(3) != null
 
     override fun parseIdentity(card: CEPASCard): TransitIdentity {
-        val purse = card.getPurse(3) ?: return TransitIdentity.create(
-            EZLinkData.getCardIssuer(null, stringResource),
-            null,
-        )
+        val purse =
+            card.getPurse(3) ?: return TransitIdentity.create(
+                EZLinkData.getCardIssuer(null, stringResource),
+                null,
+            )
         val canNo = purse.can!!.hex()
         return TransitIdentity.create(EZLinkData.getCardIssuer(canNo, stringResource), canNo)
     }
@@ -73,39 +71,43 @@ class EZLinkTransitFactory(
         )
     }
 
-    private fun parseTrips(card: CEPASCard, cardName: String): List<EZLinkTrip> {
+    private fun parseTrips(
+        card: CEPASCard,
+        cardName: String,
+    ): List<EZLinkTrip> {
         val history = card.getHistory(3) ?: return emptyList()
         val transactions = history.transactions ?: return emptyList()
         return transactions.map { EZLinkTrip(it, cardName, stringResource) }
     }
 
     companion object {
-        private val ALL_CARDS = listOf(
-            CardInfo(
-                nameRes = Res.string.card_name_ezlink,
-                cardType = CardType.CEPAS,
-                region = TransitRegion.SINGAPORE,
-                locationRes = Res.string.location_singapore,
-                imageRes = Res.drawable.ezlink_card,
-                latitude = 1.3521f,
-                longitude = 103.8198f,
-                brandColor = 0x0199D9,
-                credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
-                sampleDumpFile = "EZLink.json",
-                extraNoteRes = Res.string.ezlink_card_note,
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_nets,
-                cardType = CardType.CEPAS,
-                region = TransitRegion.SINGAPORE,
-                locationRes = Res.string.location_singapore,
-                imageRes = Res.drawable.nets_card,
-                latitude = 1.3521f,
-                longitude = 103.8198f,
-                brandColor = 0x003DA5,
-                credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
-                extraNoteRes = Res.string.ezlink_card_note,
-            ),
-        )
+        private val ALL_CARDS =
+            listOf(
+                CardInfo(
+                    nameRes = Res.string.card_name_ezlink,
+                    cardType = CardType.CEPAS,
+                    region = TransitRegion.SINGAPORE,
+                    locationRes = Res.string.location_singapore,
+                    imageRes = Res.drawable.ezlink_card,
+                    latitude = 1.3521f,
+                    longitude = 103.8198f,
+                    brandColor = 0x0199D9,
+                    credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
+                    sampleDumpFile = "EZLink.json",
+                    extraNoteRes = Res.string.ezlink_card_note,
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_nets,
+                    cardType = CardType.CEPAS,
+                    region = TransitRegion.SINGAPORE,
+                    locationRes = Res.string.location_singapore,
+                    imageRes = Res.drawable.nets_card,
+                    latitude = 1.3521f,
+                    longitude = 103.8198f,
+                    brandColor = 0x003DA5,
+                    credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
+                    extraNoteRes = Res.string.ezlink_card_note,
+                ),
+            )
     }
 }

@@ -45,9 +45,8 @@ import kotlin.time.Instant
 internal class TouchnGoTrip(
     private val header: ByteArray,
     private val startStationCode: TouchnGoStationId?,
-    private val endStationCode: TouchnGoStationId
+    private val endStationCode: TouchnGoStationId,
 ) : Trip() {
-
     private val agencyRaw: ByteArray
         get() = header.sliceOffLen(2, 4)
 
@@ -90,9 +89,13 @@ internal class TouchnGoTrip(
             }
             return TouchnGoTrip(
                 header = sector.getBlock(0).data,
-                startStationCode = if (isTripInProgress(sector)) null
-                    else TouchnGoStationId.parse(sector.getBlock(1).data, 6),
-                endStationCode = TouchnGoStationId.parse(sector.getBlock(2).data, 6)
+                startStationCode =
+                    if (isTripInProgress(sector)) {
+                        null
+                    } else {
+                        TouchnGoStationId.parse(sector.getBlock(1).data, 6)
+                    },
+                endStationCode = TouchnGoStationId.parse(sector.getBlock(2).data, 6),
             )
         }
     }
@@ -101,18 +104,19 @@ internal class TouchnGoTrip(
 /**
  * Maps an MDST TransportType to a FareBot Trip.Mode.
  */
-internal fun TransportType.toTripMode(): Trip.Mode = when (this) {
-    TransportType.BUS -> Trip.Mode.BUS
-    TransportType.TRAIN -> Trip.Mode.TRAIN
-    TransportType.TRAM -> Trip.Mode.TRAM
-    TransportType.METRO -> Trip.Mode.METRO
-    TransportType.FERRY -> Trip.Mode.FERRY
-    TransportType.TICKET_MACHINE -> Trip.Mode.TICKET_MACHINE
-    TransportType.VENDING_MACHINE -> Trip.Mode.VENDING_MACHINE
-    TransportType.POS -> Trip.Mode.POS
-    TransportType.TROLLEYBUS -> Trip.Mode.TROLLEYBUS
-    TransportType.TOLL_ROAD -> Trip.Mode.TOLL_ROAD
-    TransportType.MONORAIL -> Trip.Mode.MONORAIL
-    TransportType.BANNED -> Trip.Mode.BANNED
-    else -> Trip.Mode.OTHER
-}
+internal fun TransportType.toTripMode(): Trip.Mode =
+    when (this) {
+        TransportType.BUS -> Trip.Mode.BUS
+        TransportType.TRAIN -> Trip.Mode.TRAIN
+        TransportType.TRAM -> Trip.Mode.TRAM
+        TransportType.METRO -> Trip.Mode.METRO
+        TransportType.FERRY -> Trip.Mode.FERRY
+        TransportType.TICKET_MACHINE -> Trip.Mode.TICKET_MACHINE
+        TransportType.VENDING_MACHINE -> Trip.Mode.VENDING_MACHINE
+        TransportType.POS -> Trip.Mode.POS
+        TransportType.TROLLEYBUS -> Trip.Mode.TROLLEYBUS
+        TransportType.TOLL_ROAD -> Trip.Mode.TOLL_ROAD
+        TransportType.MONORAIL -> Trip.Mode.MONORAIL
+        TransportType.BANNED -> Trip.Mode.BANNED
+        else -> Trip.Mode.OTHER
+    }

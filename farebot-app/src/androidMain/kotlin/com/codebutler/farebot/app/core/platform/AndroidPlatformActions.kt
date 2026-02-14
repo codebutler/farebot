@@ -16,50 +16,55 @@ import com.codebutler.farebot.shared.platform.PlatformActions
 class AndroidPlatformActions(
     private val context: Context,
 ) : PlatformActions {
-
     private var filePickerCallback: ((String?) -> Unit)? = null
     private var filePickerLauncher: ActivityResultLauncher<Intent>? = null
     private var bytesPickerCallback: ((ByteArray?) -> Unit)? = null
     private var bytesPickerLauncher: ActivityResultLauncher<Intent>? = null
 
     fun registerFilePickerLauncher(activity: ComponentActivity) {
-        filePickerLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val callback = filePickerCallback
-            filePickerCallback = null
-            if (result.resultCode == Activity.RESULT_OK) {
-                val uri = result.data?.data
-                if (uri != null) {
-                    val text = context.contentResolver.openInputStream(uri)
-                        ?.bufferedReader()
-                        ?.use { it.readText() }
-                    callback?.invoke(text)
+        filePickerLauncher =
+            activity.registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult(),
+            ) { result ->
+                val callback = filePickerCallback
+                filePickerCallback = null
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val uri = result.data?.data
+                    if (uri != null) {
+                        val text =
+                            context.contentResolver
+                                .openInputStream(uri)
+                                ?.bufferedReader()
+                                ?.use { it.readText() }
+                        callback?.invoke(text)
+                    } else {
+                        callback?.invoke(null)
+                    }
                 } else {
                     callback?.invoke(null)
                 }
-            } else {
-                callback?.invoke(null)
             }
-        }
-        bytesPickerLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val callback = bytesPickerCallback
-            bytesPickerCallback = null
-            if (result.resultCode == Activity.RESULT_OK) {
-                val uri = result.data?.data
-                if (uri != null) {
-                    val bytes = context.contentResolver.openInputStream(uri)
-                        ?.use { it.readBytes() }
-                    callback?.invoke(bytes)
+        bytesPickerLauncher =
+            activity.registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult(),
+            ) { result ->
+                val callback = bytesPickerCallback
+                bytesPickerCallback = null
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val uri = result.data?.data
+                    if (uri != null) {
+                        val bytes =
+                            context.contentResolver
+                                .openInputStream(uri)
+                                ?.use { it.readBytes() }
+                        callback?.invoke(bytes)
+                    } else {
+                        callback?.invoke(null)
+                    }
                 } else {
                     callback?.invoke(null)
                 }
-            } else {
-                callback?.invoke(null)
             }
-        }
     }
 
     override fun openUrl(url: String) {
@@ -81,18 +86,24 @@ class AndroidPlatformActions(
 
     override fun getClipboardText(): String? {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        return clipboard.primaryClip?.getItemAt(0)?.text?.toString()
+        return clipboard.primaryClip
+            ?.getItemAt(0)
+            ?.text
+            ?.toString()
     }
 
     override fun shareText(text: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, text)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(Intent.createChooser(intent, "Share").apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, text)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        context.startActivity(
+            Intent.createChooser(intent, "Share").apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
     }
 
     override fun showToast(message: String) {
@@ -106,11 +117,12 @@ class AndroidPlatformActions(
             return
         }
         filePickerCallback = onResult
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain", "text/*"))
-        }
+        val intent =
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain", "text/*"))
+            }
         launcher.launch(intent)
     }
 
@@ -127,23 +139,29 @@ class AndroidPlatformActions(
             return
         }
         bytesPickerCallback = onResult
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-        }
+        val intent =
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }
         launcher.launch(intent)
     }
 
-    override fun saveFileForExport(content: String, defaultFileName: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/json"
-            putExtra(Intent.EXTRA_TEXT, content)
-            putExtra(Intent.EXTRA_SUBJECT, defaultFileName)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(Intent.createChooser(intent, "Save").apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
+    override fun saveFileForExport(
+        content: String,
+        defaultFileName: String,
+    ) {
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "application/json"
+                putExtra(Intent.EXTRA_TEXT, content)
+                putExtra(Intent.EXTRA_SUBJECT, defaultFileName)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        context.startActivity(
+            Intent.createChooser(intent, "Save").apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
     }
-
 }

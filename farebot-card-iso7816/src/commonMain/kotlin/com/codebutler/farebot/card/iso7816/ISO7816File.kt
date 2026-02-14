@@ -37,7 +37,7 @@ import kotlinx.serialization.Serializable
 data class ISO7816File(
     @Contextual val binaryData: ByteArray? = null,
     val records: Map<Int, @Contextual ByteArray> = emptyMap(),
-    @Contextual val fci: ByteArray? = null
+    @Contextual val fci: ByteArray? = null,
 ) {
     val recordList: List<ByteArray>
         get() = records.entries.sortedBy { it.key }.map { it.value }
@@ -48,7 +48,7 @@ data class ISO7816File(
         fun create(
             binaryData: ByteArray? = null,
             records: Map<Int, ByteArray> = emptyMap(),
-            fci: ByteArray? = null
+            fci: ByteArray? = null,
         ): ISO7816File = ISO7816File(binaryData, records, fci)
     }
 }

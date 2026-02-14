@@ -4,16 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import platform.CoreGraphics.CGRectMake
 import platform.CoreLocation.CLLocationCoordinate2DMake
+import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
-import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKPointAnnotation
-import platform.CoreGraphics.CGRectMake
 import platform.UIKit.UIColor
 import platform.UIKit.UIEdgeInsetsMake
 import platform.darwin.NSObject
@@ -32,15 +31,16 @@ actual fun PlatformCardsMap(
     val delegate = remember { CardsMapDelegate() }
     delegate.onMarkerTap = onMarkerTap
 
-    val annotations = remember(markers) {
-        markers.map { marker ->
-            MKPointAnnotation().apply {
-                setCoordinate(CLLocationCoordinate2DMake(marker.latitude, marker.longitude))
-                setTitle(marker.name)
-                setSubtitle(marker.location)
+    val annotations =
+        remember(markers) {
+            markers.map { marker ->
+                MKPointAnnotation().apply {
+                    setCoordinate(CLLocationCoordinate2DMake(marker.latitude, marker.longitude))
+                    setTitle(marker.name)
+                    setSubtitle(marker.location)
+                }
             }
         }
-    }
 
     val topInset = topPadding.value.toDouble()
 
@@ -65,13 +65,15 @@ actual fun PlatformCardsMap(
                         val region = platform.MapKit.MKCoordinateRegionMake(coord, span)
                         mapView.setRegion(region, animated = true)
                     } else {
-                        var rect = platform.MapKit.MKMapPointForCoordinate(focusAnnotations.first().coordinate).useContents {
-                            platform.MapKit.MKMapRectMake(x, y, 0.0, 0.0)
-                        }
-                        focusAnnotations.drop(1).forEach { ann ->
-                            val pointRect = platform.MapKit.MKMapPointForCoordinate(ann.coordinate).useContents {
+                        var rect =
+                            platform.MapKit.MKMapPointForCoordinate(focusAnnotations.first().coordinate).useContents {
                                 platform.MapKit.MKMapRectMake(x, y, 0.0, 0.0)
                             }
+                        focusAnnotations.drop(1).forEach { ann ->
+                            val pointRect =
+                                platform.MapKit.MKMapPointForCoordinate(ann.coordinate).useContents {
+                                    platform.MapKit.MKMapRectMake(x, y, 0.0, 0.0)
+                                }
                             rect = platform.MapKit.MKMapRectUnion(rect, pointRect)
                         }
                         val padding = UIEdgeInsetsMake(20.0, 20.0, 20.0, 20.0)
@@ -85,7 +87,9 @@ actual fun PlatformCardsMap(
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private class CardsMapDelegate : NSObject(), MKMapViewDelegateProtocol {
+private class CardsMapDelegate :
+    NSObject(),
+    MKMapViewDelegateProtocol {
     var onMarkerTap: ((String) -> Unit)? = null
 
     override fun mapView(
@@ -94,20 +98,24 @@ private class CardsMapDelegate : NSObject(), MKMapViewDelegateProtocol {
     ): platform.MapKit.MKAnnotationView? {
         val identifier = "cardDot"
         val dotSize = 14.0
-        val dotView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
-            ?: MKAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier).apply {
-                canShowCallout = true
-                setBounds(CGRectMake(0.0, 0.0, dotSize, dotSize))
-                backgroundColor = UIColor.redColor
-                layer.cornerRadius = dotSize / 2.0
-                layer.borderWidth = 2.0
-                layer.borderColor = UIColor.whiteColor.CGColor
-            }
+        val dotView =
+            mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+                ?: MKAnnotationView(annotation = viewForAnnotation, reuseIdentifier = identifier).apply {
+                    canShowCallout = true
+                    setBounds(CGRectMake(0.0, 0.0, dotSize, dotSize))
+                    backgroundColor = UIColor.redColor
+                    layer.cornerRadius = dotSize / 2.0
+                    layer.borderWidth = 2.0
+                    layer.borderColor = UIColor.whiteColor.CGColor
+                }
         dotView.annotation = viewForAnnotation
         return dotView
     }
 
-    override fun mapView(mapView: MKMapView, didSelectAnnotationView: platform.MapKit.MKAnnotationView) {
+    override fun mapView(
+        mapView: MKMapView,
+        didSelectAnnotationView: platform.MapKit.MKAnnotationView,
+    ) {
         val title = didSelectAnnotationView.annotation?.title ?: return
         onMarkerTap?.invoke(title)
     }

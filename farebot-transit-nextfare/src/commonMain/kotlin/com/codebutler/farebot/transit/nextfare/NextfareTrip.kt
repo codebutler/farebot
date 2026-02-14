@@ -40,7 +40,7 @@ data class NextfareTripCapsule(
     var startStation: Int = -1,
     var endStation: Int = -1,
     var isTransfer: Boolean = false,
-    var cost: Int = 0
+    var cost: Int = 0,
 )
 
 /**
@@ -50,9 +50,8 @@ data class NextfareTripCapsule(
  */
 open class NextfareTrip(
     val capsule: NextfareTripCapsule,
-    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) }
+    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) },
 ) : Trip() {
-
     override val startTimestamp: Instant? get() = capsule.startTimestamp
 
     override val endTimestamp: Instant? get() = capsule.endTimestamp

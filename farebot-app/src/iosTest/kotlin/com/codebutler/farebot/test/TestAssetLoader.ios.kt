@@ -37,17 +37,19 @@ import platform.posix.memcpy
  */
 @OptIn(ExperimentalForeignApi::class)
 actual fun loadTestResource(path: String): ByteArray? {
-    val possibleRoots = listOf(
-        "/Users/eric/Code/farebot",
-        getEnv("PROJECT_DIR"),
-        ".",
-        ".."
-    )
+    val possibleRoots =
+        listOf(
+            "/Users/eric/Code/farebot",
+            getEnv("PROJECT_DIR"),
+            ".",
+            "..",
+        )
 
-    val resourceDirs = listOf(
-        "farebot-shared/src/commonTest/resources",
-        "src/commonTest/resources"
-    )
+    val resourceDirs =
+        listOf(
+            "farebot-shared/src/commonTest/resources",
+            "src/commonTest/resources",
+        )
 
     val fileManager = NSFileManager.defaultManager
     for (root in possibleRoots) {

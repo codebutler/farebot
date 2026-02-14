@@ -31,26 +31,26 @@ data class RecordDesfireFile(
     @Contextual override val fileSettings: DesfireFileSettings,
     val records: List<DesfireRecord>,
     @Deprecated("Use records instead.")
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) : DesfireFile {
-
     companion object {
         fun create(
             fileId: Int,
             fileSettings: DesfireFileSettings,
-            fileData: ByteArray
+            fileData: ByteArray,
         ): RecordDesfireFile {
             val settings = fileSettings as RecordDesfireFileSettings
-            val records = (0 until settings.curRecords).map { i ->
-                val start = settings.recordSize * i
-                val end = start + settings.recordSize
-                DesfireRecord.create(fileData.copyOfRange(start, end))
-            }
+            val records =
+                (0 until settings.curRecords).map { i ->
+                    val start = settings.recordSize * i
+                    val end = start + settings.recordSize
+                    DesfireRecord.create(fileData.copyOfRange(start, end))
+                }
             return RecordDesfireFile(
                 fileId,
                 fileSettings,
                 records,
-                fileData
+                fileData,
             )
         }
     }

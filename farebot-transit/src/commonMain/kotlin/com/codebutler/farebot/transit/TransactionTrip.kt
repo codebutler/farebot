@@ -26,10 +26,12 @@ import kotlin.time.Instant
 
 class TransactionTripCapsule(
     var start: Transaction? = null,
-    var end: Transaction? = null
+    var end: Transaction? = null,
 )
 
-class TransactionTrip(override val capsule: TransactionTripCapsule) : TransactionTripAbstract() {
+class TransactionTrip(
+    override val capsule: TransactionTripCapsule,
+) : TransactionTripAbstract() {
     override val fare: TransitCurrency?
         get() {
             // No fare applies to the trip, as the tap-on was reversed.
@@ -47,20 +49,20 @@ class TransactionTrip(override val capsule: TransactionTripCapsule) : Transactio
         fun merge(transactionsIn: List<Transaction>): List<TransactionTripAbstract> =
             merge(transactionsIn) { TransactionTrip(makeCapsule(it)) }
 
-        fun merge(vararg transactions: Transaction): List<TransactionTripAbstract> =
-            merge(transactions.toList())
+        fun merge(vararg transactions: Transaction): List<TransactionTripAbstract> = merge(transactions.toList())
     }
 }
 
-class TransactionTripLastPrice(override val capsule: TransactionTripCapsule) : TransactionTripAbstract() {
+class TransactionTripLastPrice(
+    override val capsule: TransactionTripCapsule,
+) : TransactionTripAbstract() {
     override val fare: TransitCurrency? get() = end?.fare ?: start?.fare
 
     companion object {
         fun merge(transactionsIn: List<Transaction>): List<TransactionTripAbstract> =
             merge(transactionsIn) { TransactionTripLastPrice(makeCapsule(it)) }
 
-        fun merge(vararg transactions: Transaction): List<TransactionTripAbstract> =
-            merge(transactions.toList())
+        fun merge(vararg transactions: Transaction): List<TransactionTripAbstract> = merge(transactions.toList())
     }
 }
 
@@ -127,23 +129,25 @@ abstract class TransactionTripAbstract : Trip() {
 
     companion object {
         fun makeCapsule(transaction: Transaction): TransactionTripCapsule =
-            if (transaction.isTapOff || transaction.isCancel)
+            if (transaction.isTapOff || transaction.isCancel) {
                 TransactionTripCapsule(null, transaction)
-            else
+            } else {
                 TransactionTripCapsule(transaction, null)
+            }
 
         fun merge(
             transactionsIn: List<Transaction>,
-            factory: (Transaction) -> TransactionTripAbstract
+            factory: (Transaction) -> TransactionTripAbstract,
         ): List<TransactionTripAbstract> {
             val timedTransactions = mutableListOf<Pair<Transaction, Instant>>()
             val unmergeableTransactions = mutableListOf<Transaction>()
             for (transaction in transactionsIn) {
                 val ts = transaction.timestamp
-                if (!transaction.isTransparent && ts != null)
+                if (!transaction.isTransparent && ts != null) {
                     timedTransactions.add(Pair(transaction, ts))
-                else
+                } else {
                     unmergeableTransactions.add(transaction)
+                }
             }
             val transactions = timedTransactions.sortedBy { it.second }
             val trips = mutableListOf<TransactionTripAbstract>()
@@ -153,10 +157,11 @@ abstract class TransactionTripAbstract : Trip() {
                     continue
                 }
                 val previous = trips[trips.size - 1]
-                if (previous.end == null && previous.start?.shouldBeMerged(first) == true)
+                if (previous.end == null && previous.start?.shouldBeMerged(first) == true) {
                     previous.capsule.end = first
-                else
+                } else {
                     trips.add(factory(first))
+                }
             }
             return trips + unmergeableTransactions.map { factory(it) }
         }

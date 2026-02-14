@@ -27,14 +27,14 @@ import com.codebutler.farebot.card.nfc.NfcTechnology
 import com.codebutler.farebot.key.CardKeys
 
 abstract class TagReader<
-        T : NfcTechnology,
-        C : RawCard<*>,
-        K : CardKeys>(
+    T : NfcTechnology,
+    C : RawCard<*>,
+    K : CardKeys,
+>(
     private val mTagId: ByteArray,
     private val mTag: Tag,
-    private val mCardKeys: K?
+    private val mCardKeys: K?,
 ) {
-
     @Throws(Exception::class)
     fun readTag(): C {
         val tech = getTech(mTag)
@@ -57,7 +57,7 @@ abstract class TagReader<
         tagId: ByteArray,
         tag: Tag,
         tech: T,
-        cardKeys: K?
+        cardKeys: K?,
     ): C
 
     protected abstract fun getTech(tag: Tag): T

@@ -32,9 +32,8 @@ data class RecordDesfireFileSettings(
     @Contextual override val accessRights: ByteArray,
     val recordSize: Int,
     val maxRecords: Int,
-    val curRecords: Int
+    val curRecords: Int,
 ) : DesfireFileSettings() {
-
     companion object {
         fun create(
             fileType: Byte,
@@ -42,14 +41,15 @@ data class RecordDesfireFileSettings(
             accessRights: ByteArray,
             recordSize: Int,
             maxRecords: Int,
-            curRecords: Int
-        ): RecordDesfireFileSettings = RecordDesfireFileSettings(
-            fileType,
-            commSetting,
-            accessRights,
-            recordSize,
-            maxRecords,
-            curRecords
-        )
+            curRecords: Int,
+        ): RecordDesfireFileSettings =
+            RecordDesfireFileSettings(
+                fileType,
+                commSetting,
+                accessRights,
+                recordSize,
+                maxRecords,
+                curRecords,
+            )
     }
 }

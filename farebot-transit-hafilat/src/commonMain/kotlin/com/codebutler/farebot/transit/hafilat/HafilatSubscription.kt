@@ -29,9 +29,8 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 class HafilatSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource
+    override val stringResource: StringResource,
 ) : En1545Subscription() {
-
     override val lookup: HafilatLookup
         get() = HafilatLookup
 
@@ -39,7 +38,10 @@ class HafilatSubscription(
         get() = lookup.isPurseTariff(contractProvider, contractTariff)
 
     companion object {
-        fun parse(data: ByteArray, stringResource: StringResource): HafilatSubscription =
+        fun parse(
+            data: ByteArray,
+            stringResource: StringResource,
+        ): HafilatSubscription =
             HafilatSubscription(En1545Parser.parse(data, IntercodeFields.SUB_FIELDS_TYPE_46), stringResource)
     }
 }

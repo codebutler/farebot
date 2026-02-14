@@ -30,20 +30,20 @@ data class StandardDesfireFileSettings(
     override val fileType: Byte,
     override val commSetting: Byte,
     @Contextual override val accessRights: ByteArray,
-    val fileSize: Int
+    val fileSize: Int,
 ) : DesfireFileSettings() {
-
     companion object {
         fun create(
             fileType: Byte,
             commSetting: Byte,
             accessRights: ByteArray,
-            fileSize: Int
-        ): StandardDesfireFileSettings = StandardDesfireFileSettings(
-            fileType,
-            commSetting,
-            accessRights,
-            fileSize
-        )
+            fileSize: Int,
+        ): StandardDesfireFileSettings =
+            StandardDesfireFileSettings(
+                fileType,
+                commSetting,
+                accessRights,
+                fileSize,
+            )
     }
 }

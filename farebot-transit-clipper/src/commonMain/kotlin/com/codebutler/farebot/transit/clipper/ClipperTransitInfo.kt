@@ -40,17 +40,17 @@ class ClipperTransitInfo(
     override val serialNumber: String,
     override val trips: List<Trip>,
     private val balanceValue: Int,
-    private val expiryTimestamp: Instant? = null
+    private val expiryTimestamp: Instant? = null,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.transit_clipper_card_name)
 
     override val balance: TransitBalance
-        get() = TransitBalance(
-            balance = TransitCurrency.USD(balanceValue),
-            validTo = expiryTimestamp
-        )
+        get() =
+            TransitBalance(
+                balance = TransitCurrency.USD(balanceValue),
+                validTo = expiryTimestamp,
+            )
 
     override val subscriptions: List<Subscription>? = null
 
@@ -61,7 +61,7 @@ class ClipperTransitInfo(
             serialNumber: String,
             trips: List<Trip>,
             balance: Int,
-            expiryTimestamp: Instant? = null
+            expiryTimestamp: Instant? = null,
         ): ClipperTransitInfo = ClipperTransitInfo(serialNumber, trips, balance, expiryTimestamp)
     }
 }

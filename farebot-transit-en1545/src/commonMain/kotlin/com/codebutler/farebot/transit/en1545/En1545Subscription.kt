@@ -152,22 +152,35 @@ abstract class En1545Subscription : Subscription() {
                 if (parsed.contains(CONTRACT_VIA_1)) {
                     li.add(
                         ListItem(
-                            getStringBlocking(Res.string.en1545_valid_origin_destination_via, getStationName(CONTRACT_ORIGIN_1) ?: "?", getStationName(CONTRACT_DESTINATION_1) ?: "?", getStationName(CONTRACT_VIA_1) ?: "?")
-                        )
+                            getStringBlocking(
+                                Res.string.en1545_valid_origin_destination_via,
+                                getStationName(CONTRACT_ORIGIN_1) ?: "?",
+                                getStationName(CONTRACT_DESTINATION_1) ?: "?",
+                                getStationName(CONTRACT_VIA_1) ?: "?",
+                            ),
+                        ),
                     )
                 } else {
                     li.add(
                         ListItem(
-                            getStringBlocking(Res.string.en1545_valid_origin_destination, getStationName(CONTRACT_ORIGIN_1) ?: "?", getStationName(CONTRACT_DESTINATION_1) ?: "?")
-                        )
+                            getStringBlocking(
+                                Res.string.en1545_valid_origin_destination,
+                                getStationName(CONTRACT_ORIGIN_1) ?: "?",
+                                getStationName(CONTRACT_DESTINATION_1) ?: "?",
+                            ),
+                        ),
                     )
                 }
             }
             if (parsed.contains(CONTRACT_ORIGIN_2) || parsed.contains(CONTRACT_DESTINATION_2)) {
                 li.add(
                     ListItem(
-                        getStringBlocking(Res.string.en1545_valid_origin_destination, getStationName(CONTRACT_ORIGIN_2) ?: "?", getStationName(CONTRACT_DESTINATION_2) ?: "?")
-                    )
+                        getStringBlocking(
+                            Res.string.en1545_valid_origin_destination,
+                            getStationName(CONTRACT_ORIGIN_2) ?: "?",
+                            getStationName(CONTRACT_DESTINATION_2) ?: "?",
+                        ),
+                    ),
                 )
             }
             return super.info.orEmpty() + li

@@ -24,8 +24,9 @@ package com.codebutler.farebot.card.nfc
 
 import android.nfc.tech.IsoDep
 
-class AndroidCardTransceiver(private val isoDep: IsoDep) : CardTransceiver {
-
+class AndroidCardTransceiver(
+    private val isoDep: IsoDep,
+) : CardTransceiver {
     override fun connect() {
         isoDep.connect()
     }

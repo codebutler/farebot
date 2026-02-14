@@ -33,9 +33,8 @@ import farebot.farebot_transit_kazan.generated.resources.card_name_kazan
 class KazanTransitInfo(
     private val mSerial: Long,
     private val mSub: KazanSubscription,
-    private val mTrip: KazanTrip?
+    private val mTrip: KazanTrip?,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = NumberUtils.zeroPad(mSerial, 10)
 

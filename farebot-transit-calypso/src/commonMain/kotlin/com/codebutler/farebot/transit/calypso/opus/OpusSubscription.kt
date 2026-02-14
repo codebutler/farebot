@@ -35,15 +35,18 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription.Companion.CONTRA
 internal class OpusSubscription(
     override val parsed: En1545Parsed,
     override val stringResource: StringResource,
-    private val ctr: Int?
+    private val ctr: Int?,
 ) : En1545Subscription() {
-
     override val lookup: En1545Lookup
         get() = OpusLookup
 
     override val remainingTripCount: Int?
-        get() = if (parsed.getIntOrZero(En1545FixedInteger.dateName(CONTRACT_END)) == 0)
-            ctr else null
+        get() =
+            if (parsed.getIntOrZero(En1545FixedInteger.dateName(CONTRACT_END)) == 0) {
+                ctr
+            } else {
+                null
+            }
 
     companion object {
         private const val CONTRACT_UNKNOWN_A = "ContractUnknownA"
@@ -57,24 +60,25 @@ internal class OpusSubscription(
         private const val CONTRACT_STATUS = "ContractStatus"
         private const val CONTRACT_UNKNOWN_D = "ContractUnknownD"
 
-        val FIELDS = En1545Container(
-            En1545FixedInteger(CONTRACT_UNKNOWN_A, 3),
-            En1545Bitmap(
-                En1545FixedInteger(CONTRACT_PROVIDER, 8),
-                En1545FixedInteger(CONTRACT_TARIFF, 16),
+        val FIELDS =
+            En1545Container(
+                En1545FixedInteger(CONTRACT_UNKNOWN_A, 3),
                 En1545Bitmap(
-                    En1545FixedInteger.date(CONTRACT_START),
-                    En1545FixedInteger.date(CONTRACT_END)
+                    En1545FixedInteger(CONTRACT_PROVIDER, 8),
+                    En1545FixedInteger(CONTRACT_TARIFF, 16),
+                    En1545Bitmap(
+                        En1545FixedInteger.date(CONTRACT_START),
+                        En1545FixedInteger.date(CONTRACT_END),
+                    ),
+                    En1545Container(
+                        En1545FixedInteger(CONTRACT_UNKNOWN_B, 17),
+                        En1545FixedInteger.date(CONTRACT_SALE),
+                        En1545FixedInteger.timeLocal(CONTRACT_SALE),
+                        En1545FixedHex(CONTRACT_UNKNOWN_C, 36),
+                        En1545FixedInteger(CONTRACT_STATUS, 8),
+                        En1545FixedHex(CONTRACT_UNKNOWN_D, 36),
+                    ),
                 ),
-                En1545Container(
-                    En1545FixedInteger(CONTRACT_UNKNOWN_B, 17),
-                    En1545FixedInteger.date(CONTRACT_SALE),
-                    En1545FixedInteger.timeLocal(CONTRACT_SALE),
-                    En1545FixedHex(CONTRACT_UNKNOWN_C, 36),
-                    En1545FixedInteger(CONTRACT_STATUS, 8),
-                    En1545FixedHex(CONTRACT_UNKNOWN_D, 36)
-                )
             )
-        )
     }
 }

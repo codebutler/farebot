@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.formatDate
 import farebot.farebot_transit_en1545.generated.resources.Res
+import farebot.farebot_transit_en1545.generated.resources.en1545_card_expiry_date_profile
 import farebot.farebot_transit_en1545.generated.resources.en1545_card_issuer
 import farebot.farebot_transit_en1545.generated.resources.en1545_card_type
 import farebot.farebot_transit_en1545.generated.resources.en1545_card_type_anonymous
@@ -37,14 +38,13 @@ import farebot.farebot_transit_en1545.generated.resources.en1545_date_of_birth
 import farebot.farebot_transit_en1545.generated.resources.en1545_expiry_date
 import farebot.farebot_transit_en1545.generated.resources.en1545_issue_date
 import farebot.farebot_transit_en1545.generated.resources.en1545_network_id
-import farebot.farebot_transit_en1545.generated.resources.en1545_card_expiry_date_profile
 import farebot.farebot_transit_en1545.generated.resources.en1545_postal_code
 
 /**
  * Base class providing EN1545 environment field name constants and parsed ticket environment.
  */
 abstract class En1545TransitData(
-    protected val mTicketEnvParsed: En1545Parsed
+    protected val mTicketEnvParsed: En1545Parsed,
 ) {
     protected abstract val lookup: En1545Lookup
 
@@ -61,70 +61,87 @@ abstract class En1545TransitData(
             val tz = lookup.timeZone
 
             if (mTicketEnvParsed.contains(ENV_NETWORK_ID)) {
-                li.add(ListItem(
-                    Res.string.en1545_network_id,
-                    mTicketEnvParsed.getIntOrZero(ENV_NETWORK_ID).toString(16)
-                ))
+                li.add(
+                    ListItem(
+                        Res.string.en1545_network_id,
+                        mTicketEnvParsed.getIntOrZero(ENV_NETWORK_ID).toString(16),
+                    ),
+                )
             }
 
             mTicketEnvParsed.getTimeStamp(ENV_APPLICATION_VALIDITY_END, tz)?.let {
-                li.add(ListItem(
-                    Res.string.en1545_expiry_date,
-                    formatDate(it, DateFormatStyle.LONG)
-                ))
+                li.add(
+                    ListItem(
+                        Res.string.en1545_expiry_date,
+                        formatDate(it, DateFormatStyle.LONG),
+                    ),
+                )
             }
 
             // Birth date - skipped if privacy settings would hide it (not implemented in FareBot)
             mTicketEnvParsed.getTimeStamp(HOLDER_BIRTH_DATE, tz)?.let {
-                li.add(ListItem(
-                    Res.string.en1545_date_of_birth,
-                    formatDate(it, DateFormatStyle.LONG)
-                ))
+                li.add(
+                    ListItem(
+                        Res.string.en1545_date_of_birth,
+                        formatDate(it, DateFormatStyle.LONG),
+                    ),
+                )
             }
 
             if (mTicketEnvParsed.getIntOrZero(ENV_APPLICATION_ISSUER_ID) != 0) {
-                li.add(ListItem(
-                    Res.string.en1545_card_issuer,
-                    lookup.getAgencyName(mTicketEnvParsed.getIntOrZero(ENV_APPLICATION_ISSUER_ID), false)
-                ))
+                li.add(
+                    ListItem(
+                        Res.string.en1545_card_issuer,
+                        lookup.getAgencyName(mTicketEnvParsed.getIntOrZero(ENV_APPLICATION_ISSUER_ID), false),
+                    ),
+                )
             }
 
             mTicketEnvParsed.getTimeStamp(ENV_APPLICATION_ISSUE, tz)?.let {
-                li.add(ListItem(
-                    Res.string.en1545_issue_date,
-                    formatDate(it, DateFormatStyle.LONG)
-                ))
+                li.add(
+                    ListItem(
+                        Res.string.en1545_issue_date,
+                        formatDate(it, DateFormatStyle.LONG),
+                    ),
+                )
             }
 
             mTicketEnvParsed.getTimeStamp(HOLDER_PROFILE, tz)?.let {
-                li.add(ListItem(
-                    Res.string.en1545_card_expiry_date_profile,
-                    formatDate(it, DateFormatStyle.LONG)
-                ))
+                li.add(
+                    ListItem(
+                        Res.string.en1545_card_expiry_date_profile,
+                        formatDate(it, DateFormatStyle.LONG),
+                    ),
+                )
             }
 
             // Postal code - skipped if privacy settings would hide it (not implemented in FareBot)
             // Only Mobib sets this, and Belgium has numeric postal codes.
             mTicketEnvParsed.getInt(HOLDER_INT_POSTAL_CODE)?.let {
                 if (it != 0) {
-                    li.add(ListItem(
-                        Res.string.en1545_postal_code,
-                        it.toString()
-                    ))
+                    li.add(
+                        ListItem(
+                            Res.string.en1545_postal_code,
+                            it.toString(),
+                        ),
+                    )
                 }
             }
 
             mTicketEnvParsed.getInt(HOLDER_CARD_TYPE)?.let { cardType ->
-                val cardTypeRes = when (cardType) {
-                    0 -> Res.string.en1545_card_type_anonymous
-                    1 -> Res.string.en1545_card_type_declarative
-                    2 -> Res.string.en1545_card_type_personal
-                    else -> Res.string.en1545_card_type_provider_specific
-                }
-                li.add(ListItem(
-                    Res.string.en1545_card_type,
-                    cardTypeRes
-                ))
+                val cardTypeRes =
+                    when (cardType) {
+                        0 -> Res.string.en1545_card_type_anonymous
+                        1 -> Res.string.en1545_card_type_declarative
+                        2 -> Res.string.en1545_card_type_personal
+                        else -> Res.string.en1545_card_type_provider_specific
+                    }
+                li.add(
+                    ListItem(
+                        Res.string.en1545_card_type,
+                        cardTypeRes,
+                    ),
+                )
             }
 
             return li

@@ -33,7 +33,7 @@ data class MdstStationResult(
     val companyName: String?,
     val lineNames: List<String>,
     val latitude: Float,
-    val longitude: Float
+    val longitude: Float,
 ) {
     val hasLocation: Boolean
         get() = latitude != 0f || longitude != 0f
@@ -43,20 +43,21 @@ data class MdstStationResult(
  * Convenience methods for looking up station data from MdST database files.
  */
 object MdstStationLookup {
-
     /**
      * Check if the device language matches any of the database's local languages.
      * This is used to determine whether to prefer local or English names.
      *
      * Exposed for testing purposes.
      */
-    internal fun shouldUseLocalName(deviceLanguage: String, localLanguages: List<String>): Boolean {
-        return localLanguages.any { lang ->
+    internal fun shouldUseLocalName(
+        deviceLanguage: String,
+        localLanguages: List<String>,
+    ): Boolean =
+        localLanguages.any { lang ->
             lang.equals(deviceLanguage, ignoreCase = true) ||
                 lang.startsWith(deviceLanguage, ignoreCase = true) ||
                 deviceLanguage.startsWith(lang, ignoreCase = true)
         }
-    }
 
     /**
      * Select the best name from a Names object based on the device locale.
@@ -72,7 +73,7 @@ object MdstStationLookup {
         names: Names?,
         localLanguages: List<String>,
         deviceLanguage: String? = null,
-        isShort: Boolean = false
+        isShort: Boolean = false,
     ): String? {
         if (names == null) return null
 
@@ -101,21 +102,28 @@ object MdstStationLookup {
      * @param stationId The station ID to look up
      * @return Station result, or null if not found
      */
-    fun getStation(dbName: String, stationId: Int): MdstStationResult? {
+    fun getStation(
+        dbName: String,
+        stationId: Int,
+    ): MdstStationResult? {
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val station = reader.getStationById(stationId) ?: return null
 
-        val operatorName = if (station.operatorId != 0) {
-            val op = reader.getOperator(station.operatorId)
-            selectBestName(op?.name, reader.localLanguages)
-        } else null
+        val operatorName =
+            if (station.operatorId != 0) {
+                val op = reader.getOperator(station.operatorId)
+                selectBestName(op?.name, reader.localLanguages)
+            } else {
+                null
+            }
 
-        val lineNames = station.lineId.mapNotNull { lineId ->
-            val line = reader.getLine(lineId)
-            // Use short names for lines (matching Metrodroid's selectBestName(isShort=true))
-            selectShortName(line?.name, reader.localLanguages)
-                ?: selectBestName(line?.name, reader.localLanguages)
-        }
+        val lineNames =
+            station.lineId.mapNotNull { lineId ->
+                val line = reader.getLine(lineId)
+                // Use short names for lines (matching Metrodroid's selectBestName(isShort=true))
+                selectShortName(line?.name, reader.localLanguages)
+                    ?: selectBestName(line?.name, reader.localLanguages)
+            }
 
         return MdstStationResult(
             stationName = selectBestName(station.name, reader.localLanguages),
@@ -123,7 +131,7 @@ object MdstStationLookup {
             companyName = operatorName,
             lineNames = lineNames,
             latitude = station.latitude,
-            longitude = station.longitude
+            longitude = station.longitude,
         )
     }
 
@@ -135,7 +143,11 @@ object MdstStationLookup {
      * @param isShort If true, returns the short form of the operator name if available
      * @return Operator name, or null if not found
      */
-    fun getOperatorName(dbName: String, operatorId: Int, isShort: Boolean = false): String? {
+    fun getOperatorName(
+        dbName: String,
+        operatorId: Int,
+        isShort: Boolean = false,
+    ): String? {
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val op = reader.getOperator(operatorId) ?: return null
         return if (isShort) {
@@ -149,7 +161,10 @@ object MdstStationLookup {
     /**
      * Get the line name from an MdST database.
      */
-    fun getLineName(dbName: String, lineId: Int): String? {
+    fun getLineName(
+        dbName: String,
+        lineId: Int,
+    ): String? {
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val line = reader.getLine(lineId) ?: return null
         return selectBestName(line.name, reader.localLanguages)
@@ -158,7 +173,10 @@ object MdstStationLookup {
     /**
      * Get the transport type for an operator's default mode.
      */
-    fun getOperatorDefaultMode(dbName: String, operatorId: Int): TransportType? {
+    fun getOperatorDefaultMode(
+        dbName: String,
+        operatorId: Int,
+    ): TransportType? {
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         return reader.getOperatorDefaultTransport(operatorId)
     }
@@ -166,7 +184,10 @@ object MdstStationLookup {
     /**
      * Get the transport type for a line.
      */
-    fun getLineMode(dbName: String, lineId: Int): TransportType? {
+    fun getLineMode(
+        dbName: String,
+        lineId: Int,
+    ): TransportType? {
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         return reader.getLineTransport(lineId)
     }
@@ -176,16 +197,18 @@ object MdstStationLookup {
      * If the device language matches one of the local languages for this database,
      * prefer the local name. Otherwise fall back to English.
      */
-    private fun selectBestName(names: Names?, localLanguages: List<String>): String? {
-        return selectName(names, localLanguages, isShort = false)
-    }
+    private fun selectBestName(
+        names: Names?,
+        localLanguages: List<String>,
+    ): String? = selectName(names, localLanguages, isShort = false)
 
     /**
      * Select the best short name based on the device locale.
      * If the device language matches one of the local languages for this database,
      * prefer the local short name. Otherwise fall back to English short name.
      */
-    private fun selectShortName(names: Names?, localLanguages: List<String>): String? {
-        return selectName(names, localLanguages, isShort = true)
-    }
+    private fun selectShortName(
+        names: Names?,
+        localLanguages: List<String>,
+    ): String? = selectName(names, localLanguages, isShort = true)
 }

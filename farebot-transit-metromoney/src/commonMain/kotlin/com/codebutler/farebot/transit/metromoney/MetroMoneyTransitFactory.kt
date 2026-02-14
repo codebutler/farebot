@@ -37,25 +37,25 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_metromoney.generated.resources.*
 
 class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
         return HashUtils.checkKeyHash(
-            sector0.keyA, sector0.keyB, "metromoney",
+            sector0.keyA,
+            sector0.keyB,
+            "metromoney",
             "c48676dac68ec332570a7c20e12e08cb",
-            "5d2457ed5f196e1757b43d074216d0d0"
+            "5d2457ed5f196e1757b43d074216d0d0",
         ) >= 0
     }
 
-    override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(
+    override fun parseIdentity(card: ClassicCard): TransitIdentity =
+        TransitIdentity.create(
             getStringBlocking(Res.string.card_name_metromoney),
-            NumberUtils.zeroPad(getSerial(card), 10)
+            NumberUtils.zeroPad(getSerial(card), 10),
         )
-    }
 
     override fun parseInfo(card: ClassicCard): MetroMoneyTransitInfo {
         val sector0 = card.getSector(0) as DataClassicSector
@@ -68,29 +68,33 @@ class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitIn
             mDate1 = strDate(sector0.getBlock(1).data, 48),
             mDate2 = strDate(sector1.getBlock(2).data, 32),
             mDate3 = strDate(sector1.getBlock(2).data, 96),
-            mDate4 = strDate(sector2.getBlock(2).data, 32)
+            mDate4 = strDate(sector2.getBlock(2).data, 32),
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_metromoney,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.GEORGIA,
-            locationRes = Res.string.location_tbilisi,
-            imageRes = Res.drawable.metromoney,
-            latitude = 41.7151f,
-            longitude = 44.8271f,
-            brandColor = 0xF2C8B6,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_metromoney,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.GEORGIA,
+                locationRes = Res.string.location_tbilisi,
+                imageRes = Res.drawable.metromoney,
+                latitude = 41.7151f,
+                longitude = 44.8271f,
+                brandColor = 0xF2C8B6,
+                credits = listOf("Metrodroid Project"),
+            )
 
         private fun getSerial(card: ClassicCard): Long {
             val sector0 = card.getSector(0) as DataClassicSector
             return sector0.getBlock(0).data.byteArrayToLongReversed(0, 4)
         }
 
-        private fun strDate(raw: ByteArray, off: Int): String {
+        private fun strDate(
+            raw: ByteArray,
+            off: Int,
+        ): String {
             val year = raw.getBitsFromBuffer(off, 6) + 2000
             val month = raw.getBitsFromBuffer(off + 6, 4)
             val day = raw.getBitsFromBuffer(off + 10, 5)

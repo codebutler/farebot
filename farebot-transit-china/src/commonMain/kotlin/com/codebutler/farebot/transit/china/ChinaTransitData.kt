@@ -26,10 +26,10 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.iso7816.ISO7816File
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 /**
  * Shared utilities for parsing China transit card data.
@@ -46,14 +46,15 @@ object ChinaTransitData {
      */
     fun <T : ChinaTripAbstract> parseTrips(
         card: ChinaCard,
-        createTrip: (ByteArray) -> T?
+        createTrip: (ByteArray) -> T?,
     ): List<T> {
         val trips = mutableListOf<T>()
         val historyFile = getFile(card, 0x18)
         for (record in historyFile?.recordList.orEmpty()) {
             val t = createTrip(record)
-            if (t == null || !t.isValid)
+            if (t == null || !t.isValid) {
                 continue
+            }
             trips.add(t)
         }
         return trips
@@ -63,14 +64,17 @@ object ChinaTransitData {
      * Parses the balance from a China card.
      * The upper bit is some garbage, so we only read bits 1-31.
      */
-    fun parseBalance(card: ChinaCard): Int? =
-        card.getBalance(0)?.getBitsFromBufferSigned(1, 31)
+    fun parseBalance(card: ChinaCard): Int? = card.getBalance(0)?.getBitsFromBufferSigned(1, 31)
 
     /**
      * Gets a file from the card by file ID.
      * Tries multiple selectors: 0x1001/id, id, and SFI.
      */
-    fun getFile(card: ChinaCard, id: Int, trySfi: Boolean = true): ISO7816File? {
+    fun getFile(
+        card: ChinaCard,
+        id: Int,
+        trySfi: Boolean = true,
+    ): ISO7816File? {
         // Try selector 0x1001/id
         val selector1 = "1001/${id.toString(16).padStart(2, '0')}"
         var f = card.getFile(selector1)
@@ -90,8 +94,9 @@ object ChinaTransitData {
      * Returns null if the value is 0 or null.
      */
     fun parseHexDate(value: Int?): Instant? {
-        if (value == null || value == 0)
+        if (value == null || value == 0) {
             return null
+        }
         val year = NumberUtils.convertBCDtoInteger(value shr 16)
         val month = NumberUtils.convertBCDtoInteger(value shr 8 and 0xff) - 1
         val day = NumberUtils.convertBCDtoInteger(value and 0xff)
@@ -106,7 +111,7 @@ object ChinaTransitData {
                 day = day,
                 hour = 0,
                 minute = 0,
-                second = 0
+                second = 0,
             ).toInstant(TZ)
         } catch (e: Exception) {
             null
@@ -133,7 +138,7 @@ object ChinaTransitData {
             day = day.coerceIn(1, 31),
             hour = hour.coerceIn(0, 23),
             minute = minute.coerceIn(0, 59),
-            second = second.coerceIn(0, 59)
+            second = second.coerceIn(0, 59),
         ).toInstant(TZ)
     }
 }

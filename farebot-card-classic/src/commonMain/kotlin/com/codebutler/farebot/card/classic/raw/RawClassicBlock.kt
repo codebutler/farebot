@@ -30,9 +30,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RawClassicBlock(
     val index: Int,
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
-
     fun parse(): ClassicBlock = ClassicBlock.create(type(), index, data)
 
     fun type(): String {
@@ -41,7 +40,9 @@ data class RawClassicBlock(
     }
 
     companion object {
-        fun create(blockIndex: Int, data: ByteArray): RawClassicBlock =
-            RawClassicBlock(blockIndex, data)
+        fun create(
+            blockIndex: Int,
+            data: ByteArray,
+        ): RawClassicBlock = RawClassicBlock(blockIndex, data)
     }
 }

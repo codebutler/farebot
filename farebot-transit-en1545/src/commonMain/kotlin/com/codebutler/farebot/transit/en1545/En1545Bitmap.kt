@@ -32,17 +32,22 @@ package com.codebutler.farebot.transit.en1545
 class En1545Bitmap private constructor(
     private val infix: En1545Field?,
     private val fields: List<En1545Field>,
-    private val reversed: Boolean
+    private val reversed: Boolean,
 ) : En1545Field {
-
     constructor(vararg fields: En1545Field, reversed: Boolean = false) : this(
         infix = null,
         fields = fields.toList(),
-        reversed = reversed
+        reversed = reversed,
     )
 
     @Suppress("NAME_SHADOWING")
-    override fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int {
+    override fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int {
         var off = off
         val bitmask: Int
         try {
@@ -52,19 +57,24 @@ class En1545Bitmap private constructor(
         }
 
         off += fields.size
-        if (infix != null)
+        if (infix != null) {
             off = infix.parseField(b, off, path, holder, bitParser)
+        }
         var curbit = if (reversed) (1 shl (fields.size - 1)) else 1
         for (el in fields) {
-            if (bitmask and curbit != 0)
+            if (bitmask and curbit != 0) {
                 off = el.parseField(b, off, path, holder, bitParser)
+            }
             curbit = if (reversed) curbit shr 1 else curbit shl 1
         }
         return off
     }
 
     companion object {
-        fun infixBitmap(infix: En1545Container, vararg fields: En1545Field, reversed: Boolean = false): En1545Field =
-            En1545Bitmap(infix, fields.toList(), reversed = reversed)
+        fun infixBitmap(
+            infix: En1545Container,
+            vararg fields: En1545Field,
+            reversed: Boolean = false,
+        ): En1545Field = En1545Bitmap(infix, fields.toList(), reversed = reversed)
     }
 }

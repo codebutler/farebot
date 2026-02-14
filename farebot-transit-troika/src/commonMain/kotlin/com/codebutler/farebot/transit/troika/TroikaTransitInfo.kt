@@ -42,9 +42,8 @@ import farebot.farebot_transit_troika.generated.resources.troika_unformatted
  * The first valid sector determines the serial number and primary balance.
  */
 class TroikaTransitInfo internal constructor(
-    private val blocks: List<Pair<Int, TroikaBlock>>
+    private val blocks: List<Pair<Int, TroikaBlock>>,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.card_name_troika)
 
@@ -52,8 +51,9 @@ class TroikaTransitInfo internal constructor(
         get() = blocks.firstOrNull()?.second?.serialNumber
 
     override val balance: TransitBalance?
-        get() = blocks.firstOrNull()?.second?.balance
-            ?: TransitBalance(balance = TransitCurrency.RUB(0))
+        get() =
+            blocks.firstOrNull()?.second?.balance
+                ?: TransitBalance(balance = TransitCurrency.RUB(0))
 
     override val trips: List<Trip>
         get() = blocks.flatMap { (_, block) -> block.trips }
@@ -65,7 +65,10 @@ class TroikaTransitInfo internal constructor(
         get() = blocks.flatMap { (_, block) -> block.info.orEmpty() }.ifEmpty { null }
 
     override val warning: String?
-        get() = if (blocks.firstOrNull()?.second?.balance == null && subscriptions.isEmpty())
-            getStringBlocking(Res.string.troika_unformatted)
-        else null
+        get() =
+            if (blocks.firstOrNull()?.second?.balance == null && subscriptions.isEmpty()) {
+                getStringBlocking(Res.string.troika_unformatted)
+            } else {
+                null
+            }
 }

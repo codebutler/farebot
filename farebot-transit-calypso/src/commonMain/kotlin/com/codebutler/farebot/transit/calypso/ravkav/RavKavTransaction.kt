@@ -30,9 +30,8 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 
 internal class RavKavTransaction(
-    override val parsed: En1545Parsed
+    override val parsed: En1545Parsed,
 ) : En1545Transaction() {
-
     override val lookup: En1545Lookup
         get() = RavKavLookup
 
@@ -59,33 +58,34 @@ internal class RavKavTransaction(
         private const val EVENT_UNKNOWN_D = "EventUnknownD"
         private const val EVENT_UNKNOWN_E = "EventUnknownE"
 
-        val FIELDS = En1545Container(
-            En1545FixedInteger("EventVersion", 3),
-            En1545FixedInteger(EVENT_SERVICE_PROVIDER, 8),
-            En1545FixedInteger(EVENT_CONTRACT_POINTER, 4),
-            En1545FixedInteger(EVENT_CODE, 8),
-            En1545FixedInteger.dateTime(EVENT),
-            En1545FixedInteger(EVENT_TRANSFER_FLAG, 1),
-            En1545FixedInteger.dateTime(EVENT_FIRST_STAMP),
-            En1545FixedInteger(EVENT_CONTRACT_PREFS, 32),
-            En1545Bitmap(
-                En1545FixedInteger(EVENT_LOCATION_ID, 16),
-                En1545FixedInteger(EVENT_ROUTE_NUMBER, 16),
-                En1545FixedInteger(STOP_EN_ROUTE, 8),
-                En1545FixedInteger(EVENT_UNKNOWN_A, 12),
-                En1545FixedInteger(EVENT_VEHICLE_ID, 14),
-                En1545FixedInteger(EVENT_UNKNOWN_B, 4),
-                En1545FixedInteger(EVENT_UNKNOWN_C, 8)
-            ),
-            En1545Bitmap(
-                En1545Container(
-                    En1545FixedInteger(ROUTE_SYSTEM, 10),
-                    En1545FixedInteger(FARE_CODE, 8),
-                    En1545FixedInteger(EVENT_PRICE_AMOUNT, 16)
+        val FIELDS =
+            En1545Container(
+                En1545FixedInteger("EventVersion", 3),
+                En1545FixedInteger(EVENT_SERVICE_PROVIDER, 8),
+                En1545FixedInteger(EVENT_CONTRACT_POINTER, 4),
+                En1545FixedInteger(EVENT_CODE, 8),
+                En1545FixedInteger.dateTime(EVENT),
+                En1545FixedInteger(EVENT_TRANSFER_FLAG, 1),
+                En1545FixedInteger.dateTime(EVENT_FIRST_STAMP),
+                En1545FixedInteger(EVENT_CONTRACT_PREFS, 32),
+                En1545Bitmap(
+                    En1545FixedInteger(EVENT_LOCATION_ID, 16),
+                    En1545FixedInteger(EVENT_ROUTE_NUMBER, 16),
+                    En1545FixedInteger(STOP_EN_ROUTE, 8),
+                    En1545FixedInteger(EVENT_UNKNOWN_A, 12),
+                    En1545FixedInteger(EVENT_VEHICLE_ID, 14),
+                    En1545FixedInteger(EVENT_UNKNOWN_B, 4),
+                    En1545FixedInteger(EVENT_UNKNOWN_C, 8),
                 ),
-                En1545FixedInteger(EVENT_UNKNOWN_D, 32),
-                En1545FixedInteger(EVENT_UNKNOWN_E, 32)
+                En1545Bitmap(
+                    En1545Container(
+                        En1545FixedInteger(ROUTE_SYSTEM, 10),
+                        En1545FixedInteger(FARE_CODE, 8),
+                        En1545FixedInteger(EVENT_PRICE_AMOUNT, 16),
+                    ),
+                    En1545FixedInteger(EVENT_UNKNOWN_D, 32),
+                    En1545FixedInteger(EVENT_UNKNOWN_E, 32),
+                ),
             )
-        )
     }
 }

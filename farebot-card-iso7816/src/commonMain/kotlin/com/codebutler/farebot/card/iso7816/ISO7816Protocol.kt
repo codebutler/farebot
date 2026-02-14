@@ -38,8 +38,9 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
  * - EMV 4.3 Book 1 (s9, s11)
  * - https://en.wikipedia.org/wiki/Smart_card_application_protocol_data_unit
  */
-class ISO7816Protocol(private val transceiver: CardTransceiver) {
-
+class ISO7816Protocol(
+    private val transceiver: CardTransceiver,
+) {
     /**
      * Creates a C-APDU. (EMV 4.3 Book 1 s9.4.1)
      *
@@ -54,8 +55,12 @@ class ISO7816Protocol(private val transceiver: CardTransceiver) {
      * @return A wrapped command.
      */
     private fun wrapMessage(
-        cla: Byte, ins: Byte, p1: Byte, p2: Byte,
-        length: Byte, parameters: ByteArray
+        cla: Byte,
+        ins: Byte,
+        p1: Byte,
+        p2: Byte,
+        length: Byte,
+        parameters: ByteArray,
     ): ByteArray {
         val hasParams = parameters.isNotEmpty()
         val size = 4 + (if (hasParams) 1 + parameters.size else 0) + 1
@@ -75,8 +80,12 @@ class ISO7816Protocol(private val transceiver: CardTransceiver) {
     }
 
     private fun sendRequestReal(
-        cla: Byte, ins: Byte, p1: Byte, p2: Byte,
-        length: Byte, parameters: ByteArray
+        cla: Byte,
+        ins: Byte,
+        p1: Byte,
+        p2: Byte,
+        length: Byte,
+        parameters: ByteArray,
     ): ByteArray {
         val sendBuffer = wrapMessage(cla, ins, p1, p2, length, parameters)
         val recvBuffer = transceiver.transceive(sendBuffer)
@@ -100,8 +109,12 @@ class ISO7816Protocol(private val transceiver: CardTransceiver) {
      * @return Response data (without status bytes).
      */
     fun sendRequest(
-        cla: Byte, ins: Byte, p1: Byte, p2: Byte,
-        length: Byte, parameters: ByteArray = ByteArray(0)
+        cla: Byte,
+        ins: Byte,
+        p1: Byte,
+        p2: Byte,
+        length: Byte,
+        parameters: ByteArray = ByteArray(0),
     ): ByteArray {
         var recvBuffer = sendRequestReal(cla, ins, p1, p2, length, parameters)
 
@@ -116,14 +129,16 @@ class ISO7816Protocol(private val transceiver: CardTransceiver) {
 
         if (sw1 != STATUS_OK) {
             when (sw1) {
-                ERROR_COMMAND_NOT_ALLOWED -> when (sw2) {
-                    CNA_NO_CURRENT_EF -> throw ISONoCurrentEF()
-                    CNA_SECURITY_STATUS_NOT_SATISFIED -> throw ISOSecurityStatusNotSatisfied()
-                }
-                ERROR_WRONG_PARAMETERS -> when (sw2) {
-                    WP_FILE_NOT_FOUND -> throw ISOFileNotFoundException()
-                    WP_RECORD_NOT_FOUND -> throw ISOEOFException()
-                }
+                ERROR_COMMAND_NOT_ALLOWED ->
+                    when (sw2) {
+                        CNA_NO_CURRENT_EF -> throw ISONoCurrentEF()
+                        CNA_SECURITY_STATUS_NOT_SATISFIED -> throw ISOSecurityStatusNotSatisfied()
+                    }
+                ERROR_WRONG_PARAMETERS ->
+                    when (sw2) {
+                        WP_FILE_NOT_FOUND -> throw ISOFileNotFoundException()
+                        WP_RECORD_NOT_FOUND -> throw ISOEOFException()
+                    }
                 ERROR_INS_NOT_SUPPORTED_OR_INVALID ->
                     if (sw2 == 0.toByte()) throw ISOInstructionCodeNotSupported()
                 ERROR_CLASS_NOT_SUPPORTED ->
@@ -138,73 +153,106 @@ class ISO7816Protocol(private val transceiver: CardTransceiver) {
         return recvBuffer.copyOfRange(0, recvBuffer.size - 2)
     }
 
-    fun selectByName(name: ByteArray, nextOccurrence: Boolean = false): ByteArray {
-        return sendRequest(
-            CLASS_ISO7816, INSTRUCTION_ISO7816_SELECT,
-            SELECT_BY_NAME, if (nextOccurrence) 0x02.toByte() else 0x00.toByte(),
-            0.toByte(), name
+    fun selectByName(
+        name: ByteArray,
+        nextOccurrence: Boolean = false,
+    ): ByteArray =
+        sendRequest(
+            CLASS_ISO7816,
+            INSTRUCTION_ISO7816_SELECT,
+            SELECT_BY_NAME,
+            if (nextOccurrence) 0x02.toByte() else 0x00.toByte(),
+            0.toByte(),
+            name,
         )
-    }
 
-    fun selectByNameOrNull(name: ByteArray): ByteArray? = try {
-        selectByName(name, false)
-    } catch (e: ISO7816Exception) {
-        null
-    } catch (e: Exception) {
-        null
-    }
+    fun selectByNameOrNull(name: ByteArray): ByteArray? =
+        try {
+            selectByName(name, false)
+        } catch (e: ISO7816Exception) {
+            null
+        } catch (e: Exception) {
+            null
+        }
 
     fun selectById(fileId: Int): ByteArray {
         val file = byteArrayOf((fileId shr 8).toByte(), fileId.toByte())
         return sendRequest(
-            CLASS_ISO7816, INSTRUCTION_ISO7816_SELECT,
-            0.toByte(), 0.toByte(), 0.toByte(), file
+            CLASS_ISO7816,
+            INSTRUCTION_ISO7816_SELECT,
+            0.toByte(),
+            0.toByte(),
+            0.toByte(),
+            file,
         )
     }
 
-    fun readRecord(recordNumber: Byte, length: Byte): ByteArray? = try {
-        sendRequest(
-            CLASS_ISO7816, INSTRUCTION_ISO7816_READ_RECORD,
-            recordNumber, 0x4.toByte(), length
-        )
-    } catch (e: ISOEOFException) {
-        throw e
-    } catch (e: ISO7816Exception) {
-        null
-    }
+    fun readRecord(
+        recordNumber: Byte,
+        length: Byte,
+    ): ByteArray? =
+        try {
+            sendRequest(
+                CLASS_ISO7816,
+                INSTRUCTION_ISO7816_READ_RECORD,
+                recordNumber,
+                0x4.toByte(),
+                length,
+            )
+        } catch (e: ISOEOFException) {
+            throw e
+        } catch (e: ISO7816Exception) {
+            null
+        }
 
-    fun readRecord(sfi: Int, recordNumber: Byte, length: Byte): ByteArray? = try {
-        sendRequest(
-            CLASS_ISO7816, INSTRUCTION_ISO7816_READ_RECORD,
-            recordNumber, ((sfi shl 3) or 4).toByte(), length
-        )
-    } catch (e: ISOEOFException) {
-        throw e
-    } catch (e: ISO7816Exception) {
-        null
-    }
+    fun readRecord(
+        sfi: Int,
+        recordNumber: Byte,
+        length: Byte,
+    ): ByteArray? =
+        try {
+            sendRequest(
+                CLASS_ISO7816,
+                INSTRUCTION_ISO7816_READ_RECORD,
+                recordNumber,
+                ((sfi shl 3) or 4).toByte(),
+                length,
+            )
+        } catch (e: ISOEOFException) {
+            throw e
+        } catch (e: ISO7816Exception) {
+            null
+        }
 
-    fun readBinary(): ByteArray? = try {
-        sendRequest(
-            CLASS_ISO7816, INSTRUCTION_ISO7816_READ_BINARY,
-            0.toByte(), 0.toByte(), 0.toByte()
-        )
-    } catch (e: ISOEOFException) {
-        throw e
-    } catch (e: ISO7816Exception) {
-        null
-    }
+    fun readBinary(): ByteArray? =
+        try {
+            sendRequest(
+                CLASS_ISO7816,
+                INSTRUCTION_ISO7816_READ_BINARY,
+                0.toByte(),
+                0.toByte(),
+                0.toByte(),
+            )
+        } catch (e: ISOEOFException) {
+            throw e
+        } catch (e: ISO7816Exception) {
+            null
+        }
 
-    fun readBinary(sfi: Int): ByteArray? = try {
-        sendRequest(
-            CLASS_ISO7816, INSTRUCTION_ISO7816_READ_BINARY,
-            (0x80 or sfi).toByte(), 0.toByte(), 0.toByte()
-        )
-    } catch (e: ISOEOFException) {
-        throw e
-    } catch (e: ISO7816Exception) {
-        null
-    }
+    fun readBinary(sfi: Int): ByteArray? =
+        try {
+            sendRequest(
+                CLASS_ISO7816,
+                INSTRUCTION_ISO7816_READ_BINARY,
+                (0x80 or sfi).toByte(),
+                0.toByte(),
+                0.toByte(),
+            )
+        } catch (e: ISOEOFException) {
+            throw e
+        } catch (e: ISO7816Exception) {
+            null
+        }
 
     companion object {
         const val CLASS_ISO7816 = 0x00.toByte()

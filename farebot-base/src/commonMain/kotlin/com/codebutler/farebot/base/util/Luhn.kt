@@ -1,7 +1,6 @@
 package com.codebutler.farebot.base.util
 
 object Luhn {
-
     /**
      * Given a partial card number, calculate the Luhn check digit.
      *
@@ -19,9 +18,7 @@ object Luhn {
      * @param cardNumber Complete card number.
      * @return true if valid, false if invalid.
      */
-    fun validateLuhn(cardNumber: String): Boolean {
-        return luhnChecksum(cardNumber) == 0
-    }
+    fun validateLuhn(cardNumber: String): Boolean = luhnChecksum(cardNumber) == 0
 
     private fun luhnChecksum(cardNumber: String): Int {
         val digits = digitsOf(cardNumber)
@@ -48,13 +45,9 @@ object Luhn {
         return checksum % 10
     }
 
-    private fun digitsOf(integer: Int): IntArray {
-        return digitsOf(integer.toLong())
-    }
+    private fun digitsOf(integer: Int): IntArray = digitsOf(integer.toLong())
 
-    private fun digitsOf(integer: Long): IntArray {
-        return digitsOf(integer.toString())
-    }
+    private fun digitsOf(integer: Long): IntArray = digitsOf(integer.toString())
 
     private fun digitsOf(integer: String): IntArray {
         val out = IntArray(integer.length)

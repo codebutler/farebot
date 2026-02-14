@@ -44,9 +44,8 @@ class GautrainTransitInfo internal constructor(
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>,
     private val expdate: Int,
-    private val mBalanceBlocks: List<GautrainBalanceBlock>
+    private val mBalanceBlocks: List<GautrainBalanceBlock>,
 ) : TransitInfo() {
-
     override val cardName: String
         get() = getStringBlocking(Res.string.gautrain_card_name)
 
@@ -60,8 +59,8 @@ class GautrainTransitInfo internal constructor(
             return listOf(
                 TransitBalance(
                     balance = currency,
-                    validTo = expiry
-                )
+                    validTo = expiry,
+                ),
             )
         }
 
@@ -76,13 +75,13 @@ class GautrainTransitInfo internal constructor(
  */
 internal data class GautrainBalanceBlock(
     val balance: Int,
-    val txn: Int
+    val txn: Int,
 ) {
     companion object {
         fun parse(input: ByteArray): GautrainBalanceBlock =
             GautrainBalanceBlock(
                 balance = input.getBitsFromBufferSigned(75, 16) xor 0x7fff.inv(),
-                txn = input.getBitsFromBuffer(30, 16)
+                txn = input.getBitsFromBuffer(30, 16),
             )
     }
 }
@@ -93,7 +92,7 @@ internal data class GautrainBalanceBlock(
  */
 internal data class GautrainIndex(
     val recentSubscriptionSlot: Boolean,
-    val subscriptionIndex: List<Int>
+    val subscriptionIndex: List<Int>,
 ) {
     companion object {
         fun parse(buffer: ByteArray): GautrainIndex {
@@ -105,13 +104,14 @@ internal data class GautrainIndex(
 
             val recent = if (iIDb3 > iIDa3) secondSlot else firstSlot
             val indexes = recent.getBitsFromBuffer(31 * 8, 3)
-            val subscriptionIndex = (0..11).map { i ->
-                recent.getBitsFromBuffer(108 + i * 4, 4)
-            }
+            val subscriptionIndex =
+                (0..11).map { i ->
+                    recent.getBitsFromBuffer(108 + i * 4, 4)
+                }
 
             return GautrainIndex(
                 recentSubscriptionSlot = indexes and 0x04 != 0x00,
-                subscriptionIndex = subscriptionIndex
+                subscriptionIndex = subscriptionIndex,
             )
         }
     }

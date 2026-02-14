@@ -34,15 +34,17 @@ import java.io.IOException
  * Builds raw NFC-F command packets inline and parses responses directly,
  * replacing the old FeliCaTag/FeliCaLibAndroid wrapper classes.
  */
-class AndroidFeliCaTagAdapter(private val tag: Tag) : FeliCaTagAdapter {
-
+class AndroidFeliCaTagAdapter(
+    private val tag: Tag,
+) : FeliCaTagAdapter {
     private var currentIdm: ByteArray? = null
     private var nfcF: NfcF? = null
 
     override fun getIDm(): ByteArray {
         // Poll with SYSTEMCODE_ANY to get IDm
-        val response = polling(FeliCaConstants.SYSTEMCODE_ANY)
-            ?: throw Exception("Failed to poll for IDm")
+        val response =
+            polling(FeliCaConstants.SYSTEMCODE_ANY)
+                ?: throw Exception("Failed to poll for IDm")
         // IDm is bytes 2..9 of the response
         val idm = response.copyOfRange(2, 10)
         currentIdm = idm
@@ -84,10 +86,13 @@ class AndroidFeliCaTagAdapter(private val tag: Tag) : FeliCaTagAdapter {
 
         while (true) {
             // Build SEARCH_SERVICECODE command: IDm + index (little-endian 2 bytes)
-            val cmd = buildCommand(
-                FeliCaConstants.COMMAND_SEARCH_SERVICECODE, idm,
-                (index and 0xff).toByte(), (index shr 8).toByte()
-            )
+            val cmd =
+                buildCommand(
+                    FeliCaConstants.COMMAND_SEARCH_SERVICECODE,
+                    idm,
+                    (index and 0xff).toByte(),
+                    (index shr 8).toByte(),
+                )
             val response = transceive(cmd)
             if (response == null || response.isEmpty() || response[1] != FeliCaConstants.RESPONSE_SEARCH_SERVICECODE) {
                 break
@@ -106,19 +111,26 @@ class AndroidFeliCaTagAdapter(private val tag: Tag) : FeliCaTagAdapter {
         return serviceCodes
     }
 
-    override fun readBlock(serviceCode: Int, blockAddr: Byte): ByteArray? {
+    override fun readBlock(
+        serviceCode: Int,
+        blockAddr: Byte,
+    ): ByteArray? {
         val idm = currentIdm ?: throw Exception("Must call getIDm() first")
         // Service code bytes (little-endian)
         val scLo = (serviceCode and 0xff).toByte()
         val scHi = (serviceCode shr 8).toByte()
         // Build READ_WITHOUT_ENCRYPTION command
-        val cmd = buildCommand(
-            FeliCaConstants.COMMAND_READ_WO_ENCRYPTION, idm,
-            0x01,       // number of services
-            scLo, scHi, // service code (little-endian)
-            0x01,       // number of blocks
-            0x80.toByte(), blockAddr // block list element (2-byte format)
-        )
+        val cmd =
+            buildCommand(
+                FeliCaConstants.COMMAND_READ_WO_ENCRYPTION,
+                idm,
+                0x01, // number of services
+                scLo,
+                scHi, // service code (little-endian)
+                0x01, // number of blocks
+                0x80.toByte(),
+                blockAddr, // block list element (2-byte format)
+            )
         val response = transceive(cmd) ?: return null
         // Check response: minimum length and status flags
         if (response.size < 12) return null
@@ -133,18 +145,23 @@ class AndroidFeliCaTagAdapter(private val tag: Tag) : FeliCaTagAdapter {
 
     private fun polling(systemCode: Int): ByteArray? {
         // Build POLLING command: system code (big-endian), request code, time slot
-        val cmd = buildCommand(
-            FeliCaConstants.COMMAND_POLLING,
-            byteArrayOf(), // no IDm for polling
-            (systemCode shr 8).toByte(),
-            (systemCode and 0xff).toByte(),
-            0x01, // request system code
-            0x00  // time slot
-        )
+        val cmd =
+            buildCommand(
+                FeliCaConstants.COMMAND_POLLING,
+                byteArrayOf(), // no IDm for polling
+                (systemCode shr 8).toByte(),
+                (systemCode and 0xff).toByte(),
+                0x01, // request system code
+                0x00, // time slot
+            )
         return transceive(cmd)
     }
 
-    private fun buildCommand(commandCode: Byte, idm: ByteArray, vararg data: Byte): ByteArray {
+    private fun buildCommand(
+        commandCode: Byte,
+        idm: ByteArray,
+        vararg data: Byte,
+    ): ByteArray {
         val length = 2 + idm.size + data.size // length byte + command byte + idm + data
         return byteArrayOf(length.toByte(), commandCode) + idm + data
     }

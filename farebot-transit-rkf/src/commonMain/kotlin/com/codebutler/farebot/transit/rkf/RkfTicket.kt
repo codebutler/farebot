@@ -33,15 +33,31 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 class RkfTicket(
     override val parsed: En1545Parsed,
-    override val lookup: RkfLookup
+    override val lookup: RkfLookup,
 ) : En1545Subscription() {
     override val stringResource: StringResource = DefaultStringResource()
 
     companion object {
-        fun parse(record: RkfTctoRecord, lookup: RkfLookup): RkfTicket {
+        fun parse(
+            record: RkfTctoRecord,
+            lookup: RkfLookup,
+        ): RkfTicket {
             val version = record.chunks[0][0].getBitsFromBufferLeBits(8, 6)
-            val maxTxn = record.chunks.filter { it[0][0] == 0x88.toByte() }.map { it[0].getBitsFromBufferLeBits(8, 12) }.maxOrNull()
-            val flat = record.chunks.filter { it[0][0] != 0x88.toByte() || it[0].getBitsFromBufferLeBits(8, 12) == maxTxn }.flatten()
+            val maxTxn =
+                record.chunks
+                    .filter { it[0][0] == 0x88.toByte() }
+                    .map {
+                        it[0].getBitsFromBufferLeBits(
+                            8,
+                            12,
+                        )
+                    }.maxOrNull()
+            val flat =
+                record.chunks
+                    .filter {
+                        it[0][0] != 0x88.toByte() ||
+                            it[0].getBitsFromBufferLeBits(8, 12) == maxTxn
+                    }.flatten()
             val parsed = En1545Parsed()
             for (tag in flat) {
                 val fields = getFields(tag[0], version) ?: continue
@@ -51,35 +67,44 @@ class RkfTicket(
         }
 
         @Suppress("UNUSED_PARAMETER")
-        private fun getFields(id: Byte, version: Int): En1545Field? = when (id.toInt() and 0xff) {
-            0x87 -> En1545Container(
-                RkfTransitInfo.ID_FIELD, // verified
-                RkfTransitInfo.VERSION_FIELD // verified
-            )
-            0x88 -> En1545Container(
-                RkfTransitInfo.ID_FIELD, // verified
-                En1545FixedInteger("TransactionNumber", 12) // verified
-            )
-            0x89 -> En1545Container(
-                RkfTransitInfo.ID_FIELD, // verified
-                En1545FixedInteger(CONTRACT_PROVIDER, 12), // verified
-                En1545FixedInteger(CONTRACT_TARIFF, 12),
-                En1545FixedInteger(CONTRACT_SALE_DEVICE, 16),
-                En1545FixedInteger(CONTRACT_SERIAL_NUMBER, 32),
-                RkfTransitInfo.STATUS_FIELD)
-            0x96 -> En1545Container(
-                RkfTransitInfo.ID_FIELD, // verified
-                En1545FixedInteger.date(CONTRACT_START), // verified
-                En1545FixedInteger.timePacked16(CONTRACT_START), // verified
-                En1545FixedInteger.date(CONTRACT_END), // verified
-                En1545FixedInteger.timePacked16(CONTRACT_END), // verified
-                En1545FixedInteger(CONTRACT_DURATION, 8),  // verified, days
-                En1545FixedInteger.date("Limit"),
-                En1545FixedInteger("PeriodJourneys", 8),
-                En1545FixedInteger("RestrictDay", 8),
-                En1545FixedInteger("RestrictTimecode", 8)
-            )
-            else -> null
-        }
+        private fun getFields(
+            id: Byte,
+            version: Int,
+        ): En1545Field? =
+            when (id.toInt() and 0xff) {
+                0x87 ->
+                    En1545Container(
+                        RkfTransitInfo.ID_FIELD, // verified
+                        RkfTransitInfo.VERSION_FIELD, // verified
+                    )
+                0x88 ->
+                    En1545Container(
+                        RkfTransitInfo.ID_FIELD, // verified
+                        En1545FixedInteger("TransactionNumber", 12), // verified
+                    )
+                0x89 ->
+                    En1545Container(
+                        RkfTransitInfo.ID_FIELD, // verified
+                        En1545FixedInteger(CONTRACT_PROVIDER, 12), // verified
+                        En1545FixedInteger(CONTRACT_TARIFF, 12),
+                        En1545FixedInteger(CONTRACT_SALE_DEVICE, 16),
+                        En1545FixedInteger(CONTRACT_SERIAL_NUMBER, 32),
+                        RkfTransitInfo.STATUS_FIELD,
+                    )
+                0x96 ->
+                    En1545Container(
+                        RkfTransitInfo.ID_FIELD, // verified
+                        En1545FixedInteger.date(CONTRACT_START), // verified
+                        En1545FixedInteger.timePacked16(CONTRACT_START), // verified
+                        En1545FixedInteger.date(CONTRACT_END), // verified
+                        En1545FixedInteger.timePacked16(CONTRACT_END), // verified
+                        En1545FixedInteger(CONTRACT_DURATION, 8), // verified, days
+                        En1545FixedInteger.date("Limit"),
+                        En1545FixedInteger("PeriodJourneys", 8),
+                        En1545FixedInteger("RestrictDay", 8),
+                        En1545FixedInteger("RestrictTimecode", 8),
+                    )
+                else -> null
+            }
     }
 }

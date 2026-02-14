@@ -23,25 +23,24 @@
 
 package com.codebutler.farebot.card.cepas
 
-import com.codebutler.farebot.card.Card
-import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.CurrencyFormatter
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
-import kotlin.time.Instant
+import com.codebutler.farebot.card.Card
+import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import com.codebutler.farebot.base.util.CurrencyFormatter
+import kotlin.time.Instant
 
 @Serializable
 data class CEPASCard(
     @Contextual override val tagId: ByteArray,
     override val scannedAt: Instant,
     val purses: List<CEPASPurse>,
-    val histories: List<CEPASHistory>
+    val histories: List<CEPASHistory>,
 ) : Card() {
-
     override val cardType: CardType = CardType.CEPAS
 
     fun getPurse(purse: Int): CEPASPurse? = purses[purse]
@@ -53,15 +52,23 @@ data class CEPASCard(
 
         val pursesUiBuilder = cardUiBuilder.item().title("Purses")
         for (purse in purses) {
-            val purseUiBuilder = pursesUiBuilder.item()
-                .title("Purse ID ${purse.id}")
+            val purseUiBuilder =
+                pursesUiBuilder
+                    .item()
+                    .title("Purse ID ${purse.id}")
             purseUiBuilder.item().title("CEPAS Version").value(purse.cepasVersion)
             purseUiBuilder.item().title("Purse Status").value(purse.purseStatus)
-            purseUiBuilder.item().title("Purse Balance")
+            purseUiBuilder
+                .item()
+                .title("Purse Balance")
                 .value(CurrencyFormatter.formatValue(purse.purseBalance / 100.0, "SGD"))
-            purseUiBuilder.item().title("Purse Creation Date")
+            purseUiBuilder
+                .item()
+                .title("Purse Creation Date")
                 .value(formatDate(Instant.fromEpochMilliseconds(purse.purseCreationDate * 1000L), DateFormatStyle.LONG))
-            purseUiBuilder.item().title("Purse Expiry Date")
+            purseUiBuilder
+                .item()
+                .title("Purse Expiry Date")
                 .value(formatDate(Instant.fromEpochMilliseconds(purse.purseExpiryDate * 1000L), DateFormatStyle.LONG))
             purseUiBuilder.item().title("Autoload Amount").value(purse.autoLoadAmount)
             purseUiBuilder.item().title("CAN").value(purse.can)
@@ -87,9 +94,7 @@ data class CEPASCard(
             tagId: ByteArray,
             scannedAt: Instant,
             purses: List<CEPASPurse>,
-            histories: List<CEPASHistory>
-        ): CEPASCard {
-            return CEPASCard(tagId, scannedAt, purses, histories)
-        }
+            histories: List<CEPASHistory>,
+        ): CEPASCard = CEPASCard(tagId, scannedAt, purses, histories)
     }
 }

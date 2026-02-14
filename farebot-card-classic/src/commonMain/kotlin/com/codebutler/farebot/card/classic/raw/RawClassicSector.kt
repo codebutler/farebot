@@ -24,21 +24,20 @@
 package com.codebutler.farebot.card.classic.raw
 
 import com.codebutler.farebot.card.classic.ClassicSector
-import kotlinx.serialization.Serializable
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.card.classic.InvalidClassicSector
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class RawClassicSector(
     val type: String,
     val index: Int,
     val blocks: List<RawClassicBlock>? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 ) {
-
-    fun parse(): ClassicSector {
-        return when (type) {
+    fun parse(): ClassicSector =
+        when (type) {
             TYPE_DATA -> {
                 val parsedBlocks = blocks!!.map { it.parse() }
                 DataClassicSector.create(index, parsedBlocks)
@@ -47,20 +46,22 @@ data class RawClassicSector(
             TYPE_UNAUTHORIZED -> UnauthorizedClassicSector.create(index)
             else -> throw RuntimeException("Unknown type")
         }
-    }
 
     companion object {
         const val TYPE_DATA = "data"
         const val TYPE_INVALID = "invalid"
         const val TYPE_UNAUTHORIZED = "unauthorized"
 
-        fun createData(index: Int, blocks: List<RawClassicBlock>): RawClassicSector =
-            RawClassicSector(TYPE_DATA, index, blocks, null)
+        fun createData(
+            index: Int,
+            blocks: List<RawClassicBlock>,
+        ): RawClassicSector = RawClassicSector(TYPE_DATA, index, blocks, null)
 
-        fun createInvalid(index: Int, errorMessage: String): RawClassicSector =
-            RawClassicSector(TYPE_INVALID, index, null, errorMessage)
+        fun createInvalid(
+            index: Int,
+            errorMessage: String,
+        ): RawClassicSector = RawClassicSector(TYPE_INVALID, index, null, errorMessage)
 
-        fun createUnauthorized(index: Int): RawClassicSector =
-            RawClassicSector(TYPE_UNAUTHORIZED, index, null, null)
+        fun createUnauthorized(index: Int): RawClassicSector = RawClassicSector(TYPE_UNAUTHORIZED, index, null, null)
     }
 }

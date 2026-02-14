@@ -44,14 +44,13 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_orca.generated.resources.*
 
-class OrcaTransitFactory(private val stringResource: StringResource) : TransitFactory<DesfireCard, OrcaTransitInfo> {
-
+class OrcaTransitFactory(
+    private val stringResource: StringResource,
+) : TransitFactory<DesfireCard, OrcaTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override fun check(card: DesfireCard): Boolean {
-        return card.getApplication(APP_ID) != null
-    }
+    override fun check(card: DesfireCard): Boolean = card.getApplication(APP_ID) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         try {
@@ -86,30 +85,36 @@ class OrcaTransitFactory(private val stringResource: StringResource) : TransitFa
         return OrcaTransitInfo(trips, serialNumber, balance)
     }
 
-    private fun parseTrips(card: DesfireCard, fileId: Int, isTopup: Boolean): List<Trip> {
+    private fun parseTrips(
+        card: DesfireCard,
+        fileId: Int,
+        isTopup: Boolean,
+    ): List<Trip> {
         val file = card.getApplication(APP_ID)?.getFile(fileId)
         if (file !is RecordDesfireFile) return emptyList()
 
-        val transactions = file.records.map { record ->
-            OrcaTransaction.parse(record.data, isTopup, stringResource)
-        }
+        val transactions =
+            file.records.map { record ->
+                OrcaTransaction.parse(record.data, isTopup, stringResource)
+            }
         return TransactionTrip.merge(transactions)
     }
 
     companion object {
         const val APP_ID = 0x3010f2
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.transit_orca_card_name,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.USA,
-            locationRes = Res.string.location_seattle,
-            imageRes = Res.drawable.orca_card,
-            latitude = 47.6062f,
-            longitude = -122.3321f,
-            brandColor = 0x3558A0,
-            credits = listOf("Karl Koscher", "Sean CyberKitsune McClenaghan", "Kramer Campbell"),
-            sampleDumpFile = "ORCA.nfc",
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.transit_orca_card_name,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.USA,
+                locationRes = Res.string.location_seattle,
+                imageRes = Res.drawable.orca_card,
+                latitude = 47.6062f,
+                longitude = -122.3321f,
+                brandColor = 0x3558A0,
+                credits = listOf("Karl Koscher", "Sean CyberKitsune McClenaghan", "Kramer Campbell"),
+                sampleDumpFile = "ORCA.nfc",
+            )
     }
 }

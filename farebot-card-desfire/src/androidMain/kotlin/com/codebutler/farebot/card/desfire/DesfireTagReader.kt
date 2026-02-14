@@ -36,9 +36,10 @@ import java.io.IOException
 import java.util.ArrayList
 import kotlin.time.Clock
 
-class DesfireTagReader(tagId: ByteArray, tag: Tag) :
-    TagReader<CardTransceiver, RawDesfireCard, CardKeys>(tagId, tag, null) {
-
+class DesfireTagReader(
+    tagId: ByteArray,
+    tag: Tag,
+) : TagReader<CardTransceiver, RawDesfireCard, CardKeys>(tagId, tag, null) {
     override fun getTech(tag: Tag): CardTransceiver = AndroidCardTransceiver(IsoDep.get(tag))
 
     @Throws(Exception::class)
@@ -46,7 +47,7 @@ class DesfireTagReader(tagId: ByteArray, tag: Tag) :
         tagId: ByteArray,
         tag: Tag,
         tech: CardTransceiver,
-        cardKeys: CardKeys?
+        cardKeys: CardKeys?,
     ): RawDesfireCard {
         val desfireProtocol = DesfireProtocol(tech)
         val apps = readApplications(desfireProtocol)
@@ -78,9 +79,9 @@ class DesfireTagReader(tagId: ByteArray, tag: Tag) :
     private fun readFile(
         desfireProtocol: DesfireProtocol,
         fileId: Int,
-        fileSettings: RawDesfireFileSettings
-    ): RawDesfireFile {
-        return try {
+        fileSettings: RawDesfireFileSettings,
+    ): RawDesfireFile =
+        try {
             val fileData = readFileData(desfireProtocol, fileId, fileSettings)
             RawDesfireFile.create(fileId, fileSettings, fileData)
         } catch (ex: DesfireAccessControlException) {
@@ -90,21 +91,21 @@ class DesfireTagReader(tagId: ByteArray, tag: Tag) :
         } catch (ex: Exception) {
             RawDesfireFile.createInvalid(fileId, fileSettings, ex.toString())
         }
-    }
 
     @Throws(Exception::class)
     private fun readFileData(
         desfireProtocol: DesfireProtocol,
         fileId: Int,
-        settings: RawDesfireFileSettings
-    ): ByteArray {
-        return when (settings.fileType()) {
+        settings: RawDesfireFileSettings,
+    ): ByteArray =
+        when (settings.fileType()) {
             DesfireFileSettings.STANDARD_DATA_FILE,
-            DesfireFileSettings.BACKUP_DATA_FILE -> desfireProtocol.readFile(fileId)
+            DesfireFileSettings.BACKUP_DATA_FILE,
+            -> desfireProtocol.readFile(fileId)
             DesfireFileSettings.VALUE_FILE -> desfireProtocol.getValue(fileId)
             DesfireFileSettings.CYCLIC_RECORD_FILE,
-            DesfireFileSettings.LINEAR_RECORD_FILE -> desfireProtocol.readRecord(fileId)
+            DesfireFileSettings.LINEAR_RECORD_FILE,
+            -> desfireProtocol.readRecord(fileId)
             else -> throw Exception("Unknown file type")
         }
-    }
 }

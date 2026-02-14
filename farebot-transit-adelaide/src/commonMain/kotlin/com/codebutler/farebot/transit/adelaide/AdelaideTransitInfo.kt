@@ -40,9 +40,8 @@ class AdelaideTransitInfo(
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>?,
     private val purse: AdelaideSubscription?,
-    private val serial: Long
+    private val serial: Long,
 ) : TransitInfo() {
-
     override val serialNumber: String
         get() = formatSerial(serial)
 
@@ -70,7 +69,6 @@ class AdelaideTransitInfo(
         }
 
     companion object {
-        fun formatSerial(serial: Long): String =
-            "01-" + NumberUtils.formatNumber(serial, " ", 3, 4, 4, 4)
+        fun formatSerial(serial: Long): String = "01-" + NumberUtils.formatNumber(serial, " ", 3, 4, 4, 4)
     }
 }

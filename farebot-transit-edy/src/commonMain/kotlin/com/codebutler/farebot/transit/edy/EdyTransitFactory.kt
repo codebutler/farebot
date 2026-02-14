@@ -27,9 +27,9 @@ package com.codebutler.farebot.transit.edy
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.felica.FeliCaConstants
 import com.codebutler.farebot.card.felica.FeliCaUtil
+import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
@@ -37,8 +37,9 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_edy.generated.resources.*
 
-class EdyTransitFactory(private val stringResource: StringResource) : TransitFactory<FelicaCard, EdyTransitInfo> {
-
+class EdyTransitFactory(
+    private val stringResource: StringResource,
+) : TransitFactory<FelicaCard, EdyTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -47,26 +48,24 @@ class EdyTransitFactory(private val stringResource: StringResource) : TransitFac
         private const val FELICA_SERVICE_EDY_BALANCE = 0x1317
         private const val FELICA_SERVICE_EDY_HISTORY = 0x170F
 
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.card_name_edy,
-            cardType = CardType.FeliCa,
-            region = TransitRegion.JAPAN,
-            locationRes = Res.string.location_tokyo_japan,
-            imageRes = Res.drawable.edy_card,
-            latitude = 35.6762f,
-            longitude = 139.6503f,
-            brandColor = 0x000059,
-            credits = listOf("Chris Norden", "Kazzz"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.card_name_edy,
+                cardType = CardType.FeliCa,
+                region = TransitRegion.JAPAN,
+                locationRes = Res.string.location_tokyo_japan,
+                imageRes = Res.drawable.edy_card,
+                latitude = 35.6762f,
+                longitude = 139.6503f,
+                brandColor = 0x000059,
+                credits = listOf("Chris Norden", "Kazzz"),
+            )
     }
 
-    override fun check(card: FelicaCard): Boolean {
-        return card.getSystem(FeliCaConstants.SYSTEMCODE_EDY) != null
-    }
+    override fun check(card: FelicaCard): Boolean = card.getSystem(FeliCaConstants.SYSTEMCODE_EDY) != null
 
-    override fun parseIdentity(card: FelicaCard): TransitIdentity {
-        return TransitIdentity.create(getStringBlocking(Res.string.card_name_edy), null)
-    }
+    override fun parseIdentity(card: FelicaCard): TransitIdentity =
+        TransitIdentity.create(getStringBlocking(Res.string.card_name_edy), null)
 
     override fun parseInfo(card: FelicaCard): EdyTransitInfo {
         // card ID is in block 0, bytes 2-9, big-endian ordering

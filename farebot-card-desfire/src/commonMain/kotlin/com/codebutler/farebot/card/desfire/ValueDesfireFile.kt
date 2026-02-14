@@ -36,14 +36,13 @@ import kotlinx.serialization.Serializable
 data class ValueDesfireFile(
     override val id: Int,
     @Contextual override val fileSettings: DesfireFileSettings,
-    val value: Int
+    val value: Int,
 ) : DesfireFile {
-
     companion object {
         fun create(
             fileId: Int,
             fileSettings: DesfireFileSettings,
-            fileData: ByteArray
+            fileData: ByteArray,
         ): ValueDesfireFile {
             val myData = fileData.copyOf()
             myData.reverse()

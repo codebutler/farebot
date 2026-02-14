@@ -37,21 +37,16 @@ import farebot.farebot_transit_vicinity.generated.resources.*
  * Should be registered last in the Vicinity factory list.
  */
 class UnknownVicinityTransitFactory : TransitFactory<VicinityCard, UnknownVicinityTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
-    override fun check(card: VicinityCard): Boolean {
-        return card.pages.isNotEmpty()
-    }
+    override fun check(card: VicinityCard): Boolean = card.pages.isNotEmpty()
 
     override fun parseIdentity(card: VicinityCard): TransitIdentity {
         val name = getStringBlocking(Res.string.unknown_nfcv_card)
         return TransitIdentity.create(name, null)
     }
 
-    override fun parseInfo(card: VicinityCard): UnknownVicinityTransitInfo {
-        return UnknownVicinityTransitInfo()
-    }
+    override fun parseInfo(card: VicinityCard): UnknownVicinityTransitInfo = UnknownVicinityTransitInfo()
 }
 
 class UnknownVicinityTransitInfo : TransitInfo() {
@@ -60,8 +55,9 @@ class UnknownVicinityTransitInfo : TransitInfo() {
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.unknown_card_title),
-            ListItem(Res.string.unknown_card_desc)
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.unknown_card_title),
+                ListItem(Res.string.unknown_card_desc),
+            )
 }

@@ -25,15 +25,15 @@ package com.codebutler.farebot.app.core.nfc
 import android.nfc.Tag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+
 /**
  * A singleton holder for NFC tag events. The Activity manages the NFC adapter lifecycle
  * and emits tags here. ViewModels and other components observe this flow.
  */
 class NfcStream {
+    private val tagFlow = MutableSharedFlow<Tag>(replay = 1)
 
-    private val _tags = MutableSharedFlow<Tag>(replay = 1)
-
-    fun observe(): Flow<Tag> = _tags
+    fun observe(): Flow<Tag> = tagFlow
 
     fun emitTag(tag: Tag) {
         _tags.tryEmit(tag)

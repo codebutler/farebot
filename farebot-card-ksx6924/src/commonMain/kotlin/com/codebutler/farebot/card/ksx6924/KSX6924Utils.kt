@@ -23,11 +23,11 @@
 package com.codebutler.farebot.card.ksx6924
 
 import com.codebutler.farebot.base.util.NumberUtils
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 object KSX6924Utils {
     const val INVALID_DATETIME = 0xffffffffffffffL
@@ -42,9 +42,13 @@ object KSX6924Utils {
      * @param tz The timezone to use
      * @return An [Instant], or null if the value is invalid
      */
-    fun parseHexDateTime(value: Long, tz: TimeZone): Instant? {
-        if (value == INVALID_DATETIME)
+    fun parseHexDateTime(
+        value: Long,
+        tz: TimeZone,
+    ): Instant? {
+        if (value == INVALID_DATETIME) {
             return null
+        }
 
         val year = NumberUtils.convertBCDtoInteger((value shr 40).toInt() and 0xFF)
         val month = NumberUtils.convertBCDtoInteger((value shr 32 and 0xffL).toInt())
@@ -63,7 +67,7 @@ object KSX6924Utils {
                 day = day,
                 hour = hour,
                 minute = minute,
-                second = second
+                second = second,
             ).toInstant(tz)
         } catch (e: Exception) {
             null
@@ -79,8 +83,9 @@ object KSX6924Utils {
      * @return A [LocalDate], or null if the value is invalid
      */
     fun parseHexDate(value: Long): LocalDate? {
-        if (value >= INVALID_DATE)
+        if (value >= INVALID_DATE) {
             return null
+        }
 
         val year = NumberUtils.convertBCDtoInteger((value shr 16).toInt() and 0xFFFF)
         val month = NumberUtils.convertBCDtoInteger((value shr 8 and 0xffL).toInt())
@@ -96,6 +101,8 @@ object KSX6924Utils {
     /**
      * Converts a [LocalDate] to an [Instant] at the start of the day in the given timezone.
      */
-    fun localDateToInstant(date: LocalDate, tz: TimeZone): Instant =
-        LocalDateTime(date, kotlinx.datetime.LocalTime(0, 0)).toInstant(tz)
+    fun localDateToInstant(
+        date: LocalDate,
+        tz: TimeZone,
+    ): Instant = LocalDateTime(date, kotlinx.datetime.LocalTime(0, 0)).toInstant(tz)
 }

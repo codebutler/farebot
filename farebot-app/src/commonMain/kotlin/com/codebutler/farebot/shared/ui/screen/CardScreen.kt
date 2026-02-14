@@ -1,17 +1,17 @@
 package com.codebutler.farebot.shared.ui.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,19 +21,19 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -45,21 +45,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.ElevatedCard
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_app.generated.resources.Res
-import farebot.farebot_app.generated.resources.back
-import farebot.farebot_app.generated.resources.menu
 import farebot.farebot_app.generated.resources.advanced
+import farebot.farebot_app.generated.resources.back
 import farebot.farebot_app.generated.resources.balance
-import farebot.farebot_app.generated.resources.current_scan
 import farebot.farebot_app.generated.resources.delete
-import farebot.farebot_app.generated.resources.n_scans
-import farebot.farebot_app.generated.resources.save
-import farebot.farebot_app.generated.resources.scan_history
-import farebot.farebot_app.generated.resources.share
 import farebot.farebot_app.generated.resources.ic_transaction_banned_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_bus_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_ferry_32dp
@@ -70,7 +62,11 @@ import farebot.farebot_app.generated.resources.ic_transaction_tram_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_tvm_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_unknown_32dp
 import farebot.farebot_app.generated.resources.ic_transaction_vend_32dp
+import farebot.farebot_app.generated.resources.menu
 import farebot.farebot_app.generated.resources.refill
+import farebot.farebot_app.generated.resources.save
+import farebot.farebot_app.generated.resources.scan_history
+import farebot.farebot_app.generated.resources.share
 import farebot.farebot_app.generated.resources.trip_mode_bus
 import farebot.farebot_app.generated.resources.trip_mode_cablecar
 import farebot.farebot_app.generated.resources.trip_mode_ferry
@@ -128,14 +124,14 @@ fun CardScreen(
                 actions = {
                     if (uiState.currentScanLabel != null) {
                         Box(
-                            modifier = Modifier
-                                .padding(end = 4.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.secondaryContainer,
-                                    shape = RoundedCornerShape(12.dp),
-                                )
-                                .clickable(onClick = onShowScanHistory)
-                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                            modifier =
+                                Modifier
+                                    .padding(end = 4.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.secondaryContainer,
+                                        shape = RoundedCornerShape(12.dp),
+                                    ).clickable(onClick = onShowScanHistory)
+                                    .padding(horizontal = 10.dp, vertical = 4.dp),
                         ) {
                             Text(
                                 text = uiState.currentScanLabel,
@@ -152,11 +148,17 @@ fun CardScreen(
                             if (!uiState.isSample) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.share)) },
-                                    onClick = { menuExpanded = false; onExportShare() }
+                                    onClick = {
+                                        menuExpanded = false
+                                        onExportShare()
+                                    },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.save)) },
-                                    onClick = { menuExpanded = false; onExportSave() }
+                                    onClick = {
+                                        menuExpanded = false
+                                        onExportSave()
+                                    },
                                 )
                             }
                             if (uiState.hasAdvancedData) {
@@ -165,7 +167,7 @@ fun CardScreen(
                                     onClick = {
                                         menuExpanded = false
                                         onNavigateToAdvanced()
-                                    }
+                                    },
                                 )
                             }
                             if (onDelete != null) {
@@ -174,19 +176,20 @@ fun CardScreen(
                                     onClick = {
                                         menuExpanded = false
                                         onDelete()
-                                    }
+                                    },
                                 )
                             }
                         }
                     }
                 },
             )
-        }
+        },
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
         ) {
             when {
                 uiState.isLoading -> {
@@ -196,9 +199,10 @@ fun CardScreen(
                     Text(
                         text = uiState.error,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(16.dp)
+                        modifier =
+                            Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
                     )
                 }
                 else -> {
@@ -211,15 +215,16 @@ fun CardScreen(
                         }
 
                         // Empty state message (e.g., serial-only cards)
-                        if (uiState.emptyStateMessage != null
-                            && uiState.balances.isEmpty()
-                            && uiState.transactions.isEmpty()
+                        if (uiState.emptyStateMessage != null &&
+                            uiState.balances.isEmpty() &&
+                            uiState.transactions.isEmpty()
                         ) {
                             item {
                                 Box(
-                                    modifier = Modifier
-                                        .fillParentMaxHeight(0.6f)
-                                        .fillMaxWidth(),
+                                    modifier =
+                                        Modifier
+                                            .fillParentMaxHeight(0.6f)
+                                            .fillMaxWidth(),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
@@ -236,29 +241,30 @@ fun CardScreen(
                         if (uiState.balances.isNotEmpty()) {
                             item {
                                 ElevatedCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
                                 ) {
                                     Column(
-                                        modifier = Modifier.padding(16.dp)
+                                        modifier = Modifier.padding(16.dp),
                                     ) {
                                         Text(
                                             text = stringResource(Res.string.balance),
                                             style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                         for (balanceItem in uiState.balances) {
                                             if (balanceItem.name != null) {
                                                 Text(
                                                     text = balanceItem.name,
                                                     style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 )
                                             }
                                             Text(
                                                 text = balanceItem.balance,
-                                                style = MaterialTheme.typography.headlineMedium
+                                                style = MaterialTheme.typography.headlineMedium,
                                             )
                                         }
                                     }
@@ -331,14 +337,14 @@ fun CardScreen(
                 )
                 for (entry in uiState.scanHistory) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (!entry.isCurrent) {
-                                    onNavigateToScan(entry.savedCardId)
-                                }
-                            }
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (!entry.isCurrent) {
+                                        onNavigateToScan(entry.savedCardId)
+                                    }
+                                }.padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
@@ -375,9 +381,10 @@ private fun WarningBanner(warning: String) {
     Surface(
         color = MaterialTheme.colorScheme.errorContainer,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -404,10 +411,11 @@ private fun DateHeaderRow(header: TransactionItem.DateHeader) {
         text = header.date,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }
 
@@ -417,10 +425,11 @@ private fun SectionHeaderRow(header: TransactionItem.SectionHeader) {
         text = header.title,
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }
 
@@ -439,15 +448,18 @@ private fun InfoItemRow(item: InfoItem) {
     } else {
         ListItem(
             headlineContent = { Text(text = item.title ?: "") },
-            supportingContent = if (item.value != null) {
-                {
-                    Text(
-                        text = item.value,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            } else null,
+            supportingContent =
+                if (item.value != null) {
+                    {
+                        Text(
+                            text = item.value,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    null
+                },
         )
     }
 }
@@ -472,18 +484,22 @@ private fun TripRow(
         headline = tripModeName(trip.mode)
         stationsInSupporting = false
     }
-    val supportingParts = buildList {
-        if (stationsInSupporting && trip.stations != null) add(trip.stations)
-        if (trip.isTransfer) add("Transfer")
-        if (trip.isRejected) add("Rejected")
-    }
+    val supportingParts =
+        buildList {
+            if (stationsInSupporting && trip.stations != null) add(trip.stations)
+            if (trip.isTransfer) add("Transfer")
+            if (trip.isRejected) add("Rejected")
+        }
     ListItem(
         headlineContent = {
             Text(text = headline)
         },
-        supportingContent = if (supportingParts.isNotEmpty()) {
-            { Text(text = supportingParts.joinToString(" \u00b7 ")) }
-        } else null,
+        supportingContent =
+            if (supportingParts.isNotEmpty()) {
+                { Text(text = supportingParts.joinToString(" \u00b7 ")) }
+            } else {
+                null
+            },
         leadingContent = {
             Image(
                 painter = painterResource(tripModeIcon(trip.mode)),
@@ -492,27 +508,33 @@ private fun TripRow(
                 colorFilter = if (trip.isRejected) ColorFilter.tint(MaterialTheme.colorScheme.error) else null,
             )
         },
-        trailingContent = if (trip.fare != null || trip.time != null) {
-            {
-                Column(horizontalAlignment = Alignment.End) {
-                    if (trip.fare != null) {
-                        Text(text = trip.fare, style = MaterialTheme.typography.bodyLarge)
-                    }
-                    if (trip.time != null) {
-                        Text(
-                            text = trip.time,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+        trailingContent =
+            if (trip.fare != null || trip.time != null) {
+                {
+                    Column(horizontalAlignment = Alignment.End) {
+                        if (trip.fare != null) {
+                            Text(text = trip.fare, style = MaterialTheme.typography.bodyLarge)
+                        }
+                        if (trip.time != null) {
+                            Text(
+                                text = trip.time,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
-            }
-        } else null,
-        modifier = Modifier.let { mod ->
-            if (trip.hasLocation && trip.tripKey != null) {
-                mod.clickable { onNavigateToTripMap(trip.tripKey) }
-            } else mod
-        },
+            } else {
+                null
+            },
+        modifier =
+            Modifier.let { mod ->
+                if (trip.hasLocation && trip.tripKey != null) {
+                    mod.clickable { onNavigateToTripMap(trip.tripKey) }
+                } else {
+                    mod
+                }
+            },
     )
 }
 
@@ -520,9 +542,12 @@ private fun TripRow(
 private fun RefillRow(refill: TransactionItem.RefillItem) {
     ListItem(
         headlineContent = { Text(text = stringResource(Res.string.refill)) },
-        supportingContent = if (refill.agency != null) {
-            { Text(text = refill.agency) }
-        } else null,
+        supportingContent =
+            if (refill.agency != null) {
+                { Text(text = refill.agency) }
+            } else {
+                null
+            },
         leadingContent = {
             Image(
                 painter = painterResource(Res.drawable.ic_transaction_tvm_32dp),
@@ -537,7 +562,7 @@ private fun RefillRow(refill: TransactionItem.RefillItem) {
                     Text(
                         text = refill.time,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -547,46 +572,55 @@ private fun RefillRow(refill: TransactionItem.RefillItem) {
 
 @Composable
 private fun SubscriptionRow(sub: TransactionItem.SubscriptionItem) {
-    val supportingParts = buildList {
-        if (sub.agency != null) add(sub.agency)
-        add(sub.validRange)
-        if (sub.remainingTrips != null) add(sub.remainingTrips)
-    }
+    val supportingParts =
+        buildList {
+            if (sub.agency != null) add(sub.agency)
+            add(sub.validRange)
+            if (sub.remainingTrips != null) add(sub.remainingTrips)
+        }
     ListItem(
         headlineContent = { Text(text = sub.name ?: sub.agency ?: "") },
-        supportingContent = if (supportingParts.isNotEmpty()) {
-            { Text(text = supportingParts.joinToString("\n")) }
-        } else null,
-        trailingContent = if (sub.state != null) {
-            { Text(text = sub.state, style = MaterialTheme.typography.labelMedium) }
-        } else null,
+        supportingContent =
+            if (supportingParts.isNotEmpty()) {
+                { Text(text = supportingParts.joinToString("\n")) }
+            } else {
+                null
+            },
+        trailingContent =
+            if (sub.state != null) {
+                { Text(text = sub.state, style = MaterialTheme.typography.labelMedium) }
+            } else {
+                null
+            },
     )
 }
 
-private fun tripModeIcon(mode: Trip.Mode?): DrawableResource = when (mode) {
-    Trip.Mode.BUS -> Res.drawable.ic_transaction_bus_32dp
-    Trip.Mode.TRAIN -> Res.drawable.ic_transaction_train_32dp
-    Trip.Mode.TRAM -> Res.drawable.ic_transaction_tram_32dp
-    Trip.Mode.METRO -> Res.drawable.ic_transaction_metro_32dp
-    Trip.Mode.FERRY -> Res.drawable.ic_transaction_ferry_32dp
-    Trip.Mode.TICKET_MACHINE -> Res.drawable.ic_transaction_tvm_32dp
-    Trip.Mode.VENDING_MACHINE -> Res.drawable.ic_transaction_vend_32dp
-    Trip.Mode.POS -> Res.drawable.ic_transaction_pos_32dp
-    Trip.Mode.BANNED -> Res.drawable.ic_transaction_banned_32dp
-    else -> Res.drawable.ic_transaction_unknown_32dp
-}
+private fun tripModeIcon(mode: Trip.Mode?): DrawableResource =
+    when (mode) {
+        Trip.Mode.BUS -> Res.drawable.ic_transaction_bus_32dp
+        Trip.Mode.TRAIN -> Res.drawable.ic_transaction_train_32dp
+        Trip.Mode.TRAM -> Res.drawable.ic_transaction_tram_32dp
+        Trip.Mode.METRO -> Res.drawable.ic_transaction_metro_32dp
+        Trip.Mode.FERRY -> Res.drawable.ic_transaction_ferry_32dp
+        Trip.Mode.TICKET_MACHINE -> Res.drawable.ic_transaction_tvm_32dp
+        Trip.Mode.VENDING_MACHINE -> Res.drawable.ic_transaction_vend_32dp
+        Trip.Mode.POS -> Res.drawable.ic_transaction_pos_32dp
+        Trip.Mode.BANNED -> Res.drawable.ic_transaction_banned_32dp
+        else -> Res.drawable.ic_transaction_unknown_32dp
+    }
 
 @Composable
-private fun tripModeName(mode: Trip.Mode?): String = when (mode) {
-    Trip.Mode.BUS -> stringResource(Res.string.trip_mode_bus)
-    Trip.Mode.TRAIN -> stringResource(Res.string.trip_mode_train)
-    Trip.Mode.TRAM -> stringResource(Res.string.trip_mode_tram)
-    Trip.Mode.METRO -> stringResource(Res.string.trip_mode_metro)
-    Trip.Mode.FERRY -> stringResource(Res.string.trip_mode_ferry)
-    Trip.Mode.POS -> stringResource(Res.string.trip_mode_pos)
-    Trip.Mode.TROLLEYBUS -> stringResource(Res.string.trip_mode_trolleybus)
-    Trip.Mode.TOLL_ROAD -> stringResource(Res.string.trip_mode_toll_road)
-    Trip.Mode.MONORAIL -> stringResource(Res.string.trip_mode_monorail)
-    Trip.Mode.CABLECAR -> stringResource(Res.string.trip_mode_cablecar)
-    else -> stringResource(Res.string.trip_mode_other)
-}
+private fun tripModeName(mode: Trip.Mode?): String =
+    when (mode) {
+        Trip.Mode.BUS -> stringResource(Res.string.trip_mode_bus)
+        Trip.Mode.TRAIN -> stringResource(Res.string.trip_mode_train)
+        Trip.Mode.TRAM -> stringResource(Res.string.trip_mode_tram)
+        Trip.Mode.METRO -> stringResource(Res.string.trip_mode_metro)
+        Trip.Mode.FERRY -> stringResource(Res.string.trip_mode_ferry)
+        Trip.Mode.POS -> stringResource(Res.string.trip_mode_pos)
+        Trip.Mode.TROLLEYBUS -> stringResource(Res.string.trip_mode_trolleybus)
+        Trip.Mode.TOLL_ROAD -> stringResource(Res.string.trip_mode_toll_road)
+        Trip.Mode.MONORAIL -> stringResource(Res.string.trip_mode_monorail)
+        Trip.Mode.CABLECAR -> stringResource(Res.string.trip_mode_cablecar)
+        else -> stringResource(Res.string.trip_mode_other)
+    }

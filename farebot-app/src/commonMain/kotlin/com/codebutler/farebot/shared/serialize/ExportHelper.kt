@@ -24,9 +24,9 @@ package com.codebutler.farebot.shared.serialize
 
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.RawCard
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 /**
  * Helper functions for export operations.
@@ -77,7 +77,9 @@ object ExportHelper {
      */
     fun makeBulkExportFilename(
         format: ExportFormat = ExportFormat.JSON,
-        timestamp: Instant = kotlin.time.Clock.System.now(),
+        timestamp: Instant =
+            kotlin.time.Clock.System
+                .now(),
     ): String {
         val dt = formatDateTimeForFilename(timestamp)
         return "farebot-export-$dt.${format.extension}"
@@ -90,7 +92,9 @@ object ExportHelper {
      * @return A filename in the format "FareBot-export-{datetime}.zip"
      */
     fun makeZipFilename(
-        timestamp: Instant = kotlin.time.Clock.System.now(),
+        timestamp: Instant =
+            kotlin.time.Clock.System
+                .now(),
     ): String {
         val dt = formatDateTimeForFilename(timestamp)
         return "farebot-export-$dt.zip"

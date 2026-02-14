@@ -24,17 +24,16 @@ package com.codebutler.farebot.shared.sample
 
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
-import kotlin.time.Clock
-import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Serializable
 data class RawSampleCard(
     @Contextual private val tagId: ByteArray = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0),
     private val scannedAt: Instant = Clock.System.now(),
 ) : RawCard<SampleCard> {
-
     override fun cardType(): CardType = CardType.Sample
 
     override fun tagId(): ByteArray = tagId

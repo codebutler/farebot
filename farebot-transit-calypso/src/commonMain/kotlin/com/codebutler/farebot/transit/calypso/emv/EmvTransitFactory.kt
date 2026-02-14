@@ -23,18 +23,11 @@
 
 package com.codebutler.farebot.transit.calypso.emv
 
-import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.card.iso7816.ISO7816Application
-import farebot.farebot_transit_calypso.generated.resources.Res
-import farebot.farebot_transit_calypso.generated.resources.emv_expiry_date
-import farebot.farebot_transit_calypso.generated.resources.emv_pin_attempts_remaining
-import farebot.farebot_transit_calypso.generated.resources.emv_service_code
-import farebot.farebot_transit_calypso.generated.resources.emv_transaction_counter
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
 import com.codebutler.farebot.transit.CardInfo
@@ -42,36 +35,40 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
+import farebot.farebot_transit_calypso.generated.resources.Res
+import farebot.farebot_transit_calypso.generated.resources.emv_expiry_date
+import farebot.farebot_transit_calypso.generated.resources.emv_pin_attempts_remaining
+import farebot.farebot_transit_calypso.generated.resources.emv_service_code
+import farebot.farebot_transit_calypso.generated.resources.emv_transaction_counter
 
 /**
  * Identifies and parses EMV contactless payment cards (Visa, Mastercard, etc.).
  */
 object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     // Common EMV application AIDs
-    private val EMV_AIDS = mapOf(
-        "a0000000031010" to "Visa",
-        "a0000000032010" to "Visa Electron",
-        "a0000000041010" to "Mastercard",
-        "a0000000042010" to "Mastercard Maestro",
-        "a00000002501" to "American Express",
-        "a0000000651010" to "JCB",
-        "a0000003241010" to "Discover",
-        "a0000003710001" to "Interac",
-        "a0000000043060" to "Mastercard Maestro",
-        "a000000004101001" to "Mastercard",
-        "d5780000021010" to "Bankaxept",
-    )
+    private val EMV_AIDS =
+        mapOf(
+            "a0000000031010" to "Visa",
+            "a0000000032010" to "Visa Electron",
+            "a0000000041010" to "Mastercard",
+            "a0000000042010" to "Mastercard Maestro",
+            "a00000002501" to "American Express",
+            "a0000000651010" to "JCB",
+            "a0000003241010" to "Discover",
+            "a0000003710001" to "Interac",
+            "a0000000043060" to "Mastercard Maestro",
+            "a000000004101001" to "Mastercard",
+            "d5780000021010" to "Bankaxept",
+        )
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun check(card: ISO7816Card): Boolean {
-        return card.applications.any { app ->
+    override fun check(card: ISO7816Card): Boolean =
+        card.applications.any { app ->
             val aidHex = app.appName?.toHexString()?.lowercase()
             aidHex != null && EMV_AIDS.keys.any { aidHex.startsWith(it) }
         }
-    }
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
@@ -84,11 +81,16 @@ object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
     }
 
     override fun parseInfo(card: ISO7816Card): EmvTransitInfo {
-        val app = findEmvApp(card) ?: return EmvTransitInfo(
-            name = "EMV", mSerialNumber = null, tlvs = emptyList(),
-            pinTriesRemaining = null, transactionCounter = null,
-            logEntries = null, t2 = null
-        )
+        val app =
+            findEmvApp(card) ?: return EmvTransitInfo(
+                name = "EMV",
+                mSerialNumber = null,
+                tlvs = emptyList(),
+                pinTriesRemaining = null,
+                transactionCounter = null,
+                logEntries = null,
+                t2 = null,
+            )
 
         val allTlv = getAllTlv(app)
         val name = findName(allTlv)
@@ -97,21 +99,26 @@ object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
         // Parse log entries if available
         val logEntryTag = getTag(allTlv, EmvData.LOG_ENTRY)
         val logFormat = findLogFormat(app)
-        val logEntries = if (logEntryTag != null && logFormat != null && logEntryTag.isNotEmpty()) {
-            val logSfi = logEntryTag[0].toInt() and 0xff
-            val logFile = app.getSfiFile(logSfi)
-            logFile?.recordList?.mapNotNull { EmvLogEntry.parseEmvTrip(it, logFormat) }
-        } else null
+        val logEntries =
+            if (logEntryTag != null && logFormat != null && logEntryTag.isNotEmpty()) {
+                val logSfi = logEntryTag[0].toInt() and 0xff
+                val logFile = app.getSfiFile(logSfi)
+                logFile?.recordList?.mapNotNull { EmvLogEntry.parseEmvTrip(it, logFormat) }
+            } else {
+                null
+            }
 
         // Parse PIN tries remaining (tag 9f17)
-        val pinTriesRemaining = getTag(allTlv, "9f17")?.let {
-            ISO7816TLV.removeTlvHeader(it).byteArrayToInt()
-        }
+        val pinTriesRemaining =
+            getTag(allTlv, "9f17")?.let {
+                ISO7816TLV.removeTlvHeader(it).byteArrayToInt()
+            }
 
         // Parse transaction counter (tag 9f36)
-        val transactionCounter = getTag(allTlv, "9f36")?.let {
-            ISO7816TLV.removeTlvHeader(it).byteArrayToInt()
-        }
+        val transactionCounter =
+            getTag(allTlv, "9f36")?.let {
+                ISO7816TLV.removeTlvHeader(it).byteArrayToInt()
+            }
 
         return EmvTransitInfo(
             name = name,
@@ -120,7 +127,7 @@ object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
             pinTriesRemaining = pinTriesRemaining,
             transactionCounter = transactionCounter,
             logEntries = logEntries,
-            t2 = t2
+            t2 = t2,
         )
     }
 
@@ -158,7 +165,10 @@ object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
         return getTag(allTlv, EmvData.TAG_LOG_FORMAT)
     }
 
-    private fun getTag(tlvs: List<ByteArray>, id: String): ByteArray? {
+    private fun getTag(
+        tlvs: List<ByteArray>,
+        id: String,
+    ): ByteArray? {
         for (tlv in tlvs) {
             return ISO7816TLV.findBERTLV(tlv, id, false) ?: continue
         }
@@ -207,9 +217,8 @@ class EmvTransitInfo(
     private val pinTriesRemaining: Int?,
     private val transactionCounter: Int?,
     private val logEntries: List<EmvLogEntry>?,
-    private val t2: ByteArray?
+    private val t2: ByteArray?,
 ) : TransitInfo() {
-
     override val cardName: String = name
 
     override val serialNumber: String? = mSerialNumber

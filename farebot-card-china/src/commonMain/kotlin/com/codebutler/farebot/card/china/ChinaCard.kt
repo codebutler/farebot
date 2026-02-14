@@ -25,8 +25,6 @@ package com.codebutler.farebot.card.china
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.iso7816.ISO7816File
-import com.codebutler.farebot.transit.TransitIdentity
-import com.codebutler.farebot.transit.TransitInfo
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
@@ -49,7 +47,7 @@ data class ChinaCard(
     @Contextual val appFci: ByteArray? = null,
     val files: Map<String, ISO7816File> = emptyMap(),
     val sfiFiles: Map<Int, ISO7816File> = emptyMap(),
-    val balances: Map<Int, @Contextual ByteArray> = emptyMap()
+    val balances: Map<Int, @Contextual ByteArray> = emptyMap(),
 ) {
     /**
      * Extracts the proprietary BER-TLV data (tag A5) from the FCI template.
@@ -59,7 +57,8 @@ data class ChinaCard(
     val appProprietaryBerTlv: ByteArray?
         get() {
             val fci = appFci ?: return null
-            return com.codebutler.farebot.card.iso7816.ISO7816TLV.findBERTLV(fci, "a5")
+            return com.codebutler.farebot.card.iso7816.ISO7816TLV
+                .findBERTLV(fci, "a5")
         }
 
     /**
@@ -85,14 +84,15 @@ data class ChinaCard(
          */
         fun fromISO7816Application(
             app: ISO7816Application,
-            balances: Map<Int, ByteArray>
-        ): ChinaCard = ChinaCard(
-            appName = app.appName,
-            appFci = app.appFci,
-            files = app.files,
-            sfiFiles = app.sfiFiles,
-            balances = balances
-        )
+            balances: Map<Int, ByteArray>,
+        ): ChinaCard =
+            ChinaCard(
+                appName = app.appName,
+                appFci = app.appFci,
+                files = app.files,
+                sfiFiles = app.sfiFiles,
+                balances = balances,
+            )
 
         /**
          * Extracts a ChinaCard from an ISO7816Card if present.
@@ -138,7 +138,7 @@ data class ChinaCard(
                 appFci = app.appFci,
                 files = regularFiles,
                 sfiFiles = app.sfiFiles,
-                balances = balances
+                balances = balances,
             )
         }
     }

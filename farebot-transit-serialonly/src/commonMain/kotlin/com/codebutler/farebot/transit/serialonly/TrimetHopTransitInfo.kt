@@ -14,21 +14,29 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.issue_date
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 class TrimetHopTransitInfo(
     private val mSerial: Int?,
-    private val mIssueDate: Int?
+    private val mIssueDate: Int?,
 ) : SerialOnlyTransitInfo() {
-
     override val extraInfo: List<ListItemInterface>?
-        get() = mIssueDate?.let {
-            val instant = Instant.fromEpochSeconds(it.toLong())
-            val local = instant.toLocalDateTime(TimeZone.of("America/Los_Angeles"))
-            listOf(ListItem(Res.string.issue_date, "${local.date} ${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"))
-        }
+        get() =
+            mIssueDate?.let {
+                val instant = Instant.fromEpochSeconds(it.toLong())
+                val local = instant.toLocalDateTime(TimeZone.of("America/Los_Angeles"))
+                listOf(
+                    ListItem(
+                        Res.string.issue_date,
+                        "${local.date} ${local.hour.toString().padStart(
+                            2,
+                            '0',
+                        )}:${local.minute.toString().padStart(2, '0')}",
+                    ),
+                )
+            }
 
     override val reason get() = Reason.NOT_STORED
     override val cardName get() = TrimetHopTransitFactory.NAME

@@ -22,20 +22,27 @@
 
 package com.codebutler.farebot.transit.en1545
 
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toInstant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
-class En1545FixedInteger(private val name: String, private val len: Int) : En1545Field {
-
-    override fun parseField(b: ByteArray, off: Int, path: String, holder: En1545Parsed, bitParser: En1545Bits): Int {
+class En1545FixedInteger(
+    private val name: String,
+    private val len: Int,
+) : En1545Field {
+    override fun parseField(
+        b: ByteArray,
+        off: Int,
+        path: String,
+        holder: En1545Parsed,
+        bitParser: En1545Bits,
+    ): Int {
         try {
             holder.insertInt(name, path, bitParser(b, off, len))
         } catch (_: Exception) {
@@ -47,30 +54,50 @@ class En1545FixedInteger(private val name: String, private val len: Int) : En154
         private val EPOCH = LocalDate(1997, 1, 1)
 
         fun dateName(base: String) = "${base}Date"
+
         fun datePackedName(base: String) = "${base}DatePacked"
+
         fun dateBCDName(base: String) = "${base}DateBCD"
+
         fun timeName(base: String) = "${base}Time"
+
         fun timePacked16Name(base: String) = "${base}TimePacked16"
+
         fun timePacked11LocalName(base: String) = "${base}TimePacked11Local"
+
         fun timeLocalName(base: String) = "${base}TimeLocal"
+
         fun dateTimeName(base: String) = "${base}DateTime"
+
         fun dateTimeLocalName(base: String) = "${base}DateTimeLocal"
 
         private fun utcEpoch(): Instant = EPOCH.atStartOfDayIn(TimeZone.UTC)
 
         private fun localEpoch(tz: TimeZone): Instant = EPOCH.atStartOfDayIn(tz)
 
-        fun parseTime(d: Int, t: Int, tz: TimeZone): Instant? {
+        fun parseTime(
+            d: Int,
+            t: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (d == 0 && t == 0) return null
             return utcEpoch() + d.days + t.minutes
         }
 
-        fun parseTimeLocal(d: Int, t: Int, tz: TimeZone): Instant? {
+        fun parseTimeLocal(
+            d: Int,
+            t: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (d == 0 && t == 0) return null
             return localEpoch(tz) + d.days + t.minutes
         }
 
-        fun parseTimePacked16(d: Int, t: Int, tz: TimeZone): Instant? {
+        fun parseTimePacked16(
+            d: Int,
+            t: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (d == 0 && t == 0) return null
             val hours = t shr 11
             val minutes = (t shr 5) and 0x3f
@@ -79,7 +106,11 @@ class En1545FixedInteger(private val name: String, private val len: Int) : En154
                 minutes.toLong().let { it * 60 }.seconds + secs.seconds
         }
 
-        fun parseTimePacked11Local(day: Int, time: Int, tz: TimeZone): Instant? {
+        fun parseTimePacked11Local(
+            day: Int,
+            time: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (day == 0) return null
             val year = (day shr 9) + 2000
             val month = (day shr 5) and 0xf
@@ -90,7 +121,10 @@ class En1545FixedInteger(private val name: String, private val len: Int) : En154
                 .toInstant(tz)
         }
 
-        fun parseDate(d: Int, tz: TimeZone): Instant? {
+        fun parseDate(
+            d: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (d == 0) return null
             return localEpoch(tz) + d.days
         }
@@ -103,12 +137,18 @@ class En1545FixedInteger(private val name: String, private val len: Int) : En154
             return LocalDate(year, month, dayOfMonth).atStartOfDayIn(TimeZone.UTC)
         }
 
-        fun parseTimeSec(value: Int, tz: TimeZone): Instant? {
+        fun parseTimeSec(
+            value: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (value == 0) return null
             return utcEpoch() + value.toLong().seconds
         }
 
-        fun parseTimeSecLocal(sec: Int, tz: TimeZone): Instant? {
+        fun parseTimeSecLocal(
+            sec: Int,
+            tz: TimeZone,
+        ): Instant? {
             if (sec == 0) return null
             return localEpoch(tz) + sec.toLong().seconds
         }
@@ -140,13 +180,21 @@ class En1545FixedInteger(private val name: String, private val len: Int) : En154
         }
 
         fun date(name: String) = En1545FixedInteger(dateName(name), 14)
+
         fun datePacked(name: String) = En1545FixedInteger(datePackedName(name), 14)
+
         fun dateBCD(name: String) = En1545FixedInteger(dateBCDName(name), 32)
+
         fun time(name: String) = En1545FixedInteger(timeName(name), 11)
+
         fun timePacked16(name: String) = En1545FixedInteger(timePacked16Name(name), 16)
+
         fun timePacked11Local(name: String) = En1545FixedInteger(timePacked11LocalName(name), 11)
+
         fun dateTime(name: String) = En1545FixedInteger(dateTimeName(name), 30)
+
         fun dateTimeLocal(name: String) = En1545FixedInteger(dateTimeLocalName(name), 30)
+
         fun timeLocal(name: String) = En1545FixedInteger(timeLocalName(name), 11)
     }
 }

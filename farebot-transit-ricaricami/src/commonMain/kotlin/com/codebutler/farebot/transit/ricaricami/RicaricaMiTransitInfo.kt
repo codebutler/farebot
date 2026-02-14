@@ -34,9 +34,8 @@ class RicaricaMiTransitInfo(
     override val subscriptions: List<Subscription>,
     private val ticketEnvParsed: En1545Parsed,
     private val contractList1: En1545Parsed,
-    private val contractList2: En1545Parsed
+    private val contractList2: En1545Parsed,
 ) : TransitInfo() {
-
     override val serialNumber: String? get() = null
 
     override val cardName: String get() = getStringBlocking(Res.string.ricaricami_card_name)

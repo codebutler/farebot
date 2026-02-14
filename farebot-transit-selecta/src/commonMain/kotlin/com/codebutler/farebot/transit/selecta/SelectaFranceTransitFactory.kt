@@ -39,7 +39,6 @@ import farebot.farebot_transit_selecta.generated.resources.*
  * Reference: https://dyrk.org/2015/09/03/faille-nfc-distributeur-selecta/
  */
 class SelectaFranceTransitFactory : TransitFactory<ClassicCard, SelectaFranceTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -58,23 +57,23 @@ class SelectaFranceTransitFactory : TransitFactory<ClassicCard, SelectaFranceTra
         val sector1 = card.getSector(1) as DataClassicSector
         return SelectaFranceTransitInfo(
             serial = getSerial(card),
-            balanceValue = sector1.getBlock(2).data.byteArrayToInt(0, 3)
+            balanceValue = sector1.getBlock(2).data.byteArrayToInt(0, 3),
         )
     }
 
     companion object {
-        private val CARD_INFO = CardInfo(
-            nameRes = Res.string.selecta_card_name,
-            cardType = CardType.MifareClassic,
-            region = TransitRegion.FRANCE,
-            locationRes = Res.string.selecta_location,
-            imageRes = Res.drawable.selecta,
-            brandColor = 0xD9423A,
-            credits = listOf("Metrodroid Project"),
-        )
+        private val CARD_INFO =
+            CardInfo(
+                nameRes = Res.string.selecta_card_name,
+                cardType = CardType.MifareClassic,
+                region = TransitRegion.FRANCE,
+                locationRes = Res.string.selecta_location,
+                imageRes = Res.drawable.selecta,
+                brandColor = 0xD9423A,
+                credits = listOf("Metrodroid Project"),
+            )
     }
 
-    private fun getSerial(card: ClassicCard): Int {
-        return (card.getSector(1) as DataClassicSector).getBlock(0).data.byteArrayToInt(13, 3)
-    }
+    private fun getSerial(card: ClassicCard): Int =
+        (card.getSector(1) as DataClassicSector).getBlock(0).data.byteArrayToInt(13, 3)
 }

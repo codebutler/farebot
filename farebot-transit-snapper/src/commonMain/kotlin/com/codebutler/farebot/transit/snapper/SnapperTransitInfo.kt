@@ -42,21 +42,21 @@ class SnapperTransitInfo internal constructor(
     private val mBalance: Int,
     private val mPurseInfo: KSX6924PurseInfo?,
     private val mTrips: List<Trip>,
-    private val mSerialNumber: String?
+    private val mSerialNumber: String?,
 ) : TransitInfo() {
-
     override val serialNumber: String?
         get() = mPurseInfo?.serial ?: mSerialNumber
 
     override val balance: TransitBalance?
-        get() = mPurseInfo?.buildTransitBalance(
-            balance = TransitCurrency.NZD(mBalance),
-            tz = TZ
-        ) ?: if (mBalance != 0) {
-            TransitBalance(TransitCurrency.NZD(mBalance))
-        } else {
-            null
-        }
+        get() =
+            mPurseInfo?.buildTransitBalance(
+                balance = TransitCurrency.NZD(mBalance),
+                tz = TZ,
+            ) ?: if (mBalance != 0) {
+                TransitBalance(TransitCurrency.NZD(mBalance))
+            } else {
+                null
+            }
 
     override val cardName: String
         get() = getCardName()
@@ -76,31 +76,30 @@ class SnapperTransitInfo internal constructor(
             val purseInfo = card.purseInfo
             val balance = card.balance.byteArrayToInt()
 
-            val trips = TransactionTrip.merge(
-                getSnapperTransactionRecords(card).map {
-                    SnapperTransaction.parseTransaction(it.first, it.second)
-                }
-            )
+            val trips =
+                TransactionTrip.merge(
+                    getSnapperTransactionRecords(card).map {
+                        SnapperTransaction.parseTransaction(it.first, it.second)
+                    },
+                )
 
             return SnapperTransitInfo(
                 mBalance = balance,
                 mPurseInfo = purseInfo,
                 mTrips = trips,
-                mSerialNumber = card.serial
+                mSerialNumber = card.serial,
             )
         }
 
-        fun createEmpty(serialNumber: String? = null): SnapperTransitInfo {
-            return SnapperTransitInfo(
+        fun createEmpty(serialNumber: String? = null): SnapperTransitInfo =
+            SnapperTransitInfo(
                 mBalance = 0,
                 mPurseInfo = null,
                 mTrips = emptyList(),
-                mSerialNumber = serialNumber
+                mSerialNumber = serialNumber,
             )
-        }
 
-        private fun getSnapperTransactionRecords(card: KSX6924Application)
-                : List<Pair<ByteArray, ByteArray>> {
+        private fun getSnapperTransactionRecords(card: KSX6924Application): List<Pair<ByteArray, ByteArray>> {
             val trips = card.application.getSfiFile(3) ?: return emptyList()
             val balances = card.application.getSfiFile(4) ?: return emptyList()
 

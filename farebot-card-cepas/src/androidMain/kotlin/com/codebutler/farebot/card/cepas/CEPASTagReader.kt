@@ -33,9 +33,10 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
 import com.codebutler.farebot.key.CardKeys
 import kotlin.time.Clock
 
-class CEPASTagReader(tagId: ByteArray, tag: Tag) :
-    TagReader<CardTransceiver, RawCEPASCard, CardKeys>(tagId, tag, null) {
-
+class CEPASTagReader(
+    tagId: ByteArray,
+    tag: Tag,
+) : TagReader<CardTransceiver, RawCEPASCard, CardKeys>(tagId, tag, null) {
     override fun getTech(tag: Tag): CardTransceiver = AndroidCardTransceiver(IsoDep.get(tag))
 
     @Throws(Exception::class)
@@ -43,7 +44,7 @@ class CEPASTagReader(tagId: ByteArray, tag: Tag) :
         tagId: ByteArray,
         tag: Tag,
         tech: CardTransceiver,
-        cardKeys: CardKeys?
+        cardKeys: CardKeys?,
     ): RawCEPASCard {
         val purses = arrayOfNulls<RawCEPASPurse>(16)
         val histories = arrayOfNulls<RawCEPASHistory>(16)
@@ -65,9 +66,10 @@ class CEPASTagReader(tagId: ByteArray, tag: Tag) :
         }
 
         return RawCEPASCard.create(
-            tag.id, Clock.System.now(),
+            tag.id,
+            Clock.System.now(),
             purses.toList().filterNotNull(),
-            histories.toList().filterNotNull()
+            histories.toList().filterNotNull(),
         )
     }
 }

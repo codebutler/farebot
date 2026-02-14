@@ -27,8 +27,8 @@
 
 package com.codebutler.farebot.transit.easycard
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -40,9 +40,8 @@ import farebot.farebot_transit_easycard.generated.resources.easycard_card_name
 
 data class EasyCardTransitInfo(
     private val balanceValue: Int,
-    private val tripList: List<Trip>
+    private val tripList: List<Trip>,
 ) : TransitInfo() {
-
     override val cardName: String = getStringBlocking(Res.string.easycard_card_name)
 
     // EasyCard doesn't expose a serial number

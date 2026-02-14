@@ -49,8 +49,8 @@ import platform.CoreNFC.NFCPollingISO18092
 import platform.CoreNFC.NFCTagReaderSession
 import platform.CoreNFC.NFCTagReaderSessionDelegateProtocol
 import platform.Foundation.NSError
-import platform.darwin.NSObject
 import platform.darwin.DISPATCH_TIME_FOREVER
+import platform.darwin.NSObject
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_create
@@ -67,7 +67,6 @@ import platform.darwin.dispatch_semaphore_wait
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosNfcScanner : CardScanner {
-
     override val requiresActiveScan: Boolean get() = true
 
     private var session: NFCTagReaderSession? = null
@@ -95,29 +94,31 @@ class IosNfcScanner : CardScanner {
         session = null
         delegate = null
 
-        val scanDelegate = ScanDelegate(
-            workerQueue = workerQueue,
-            onCardScanned = { rawCard ->
-                delegate = null
-                _scannedCards.tryEmit(rawCard)
-            },
-            onError = { error ->
-                delegate = null
-                _scanErrors.tryEmit(Exception(error))
-            },
-            onSessionEnded = {
-                session = null
-                delegate = null
-            },
-        )
+        val scanDelegate =
+            ScanDelegate(
+                workerQueue = workerQueue,
+                onCardScanned = { rawCard ->
+                    delegate = null
+                    _scannedCards.tryEmit(rawCard)
+                },
+                onError = { error ->
+                    delegate = null
+                    _scanErrors.tryEmit(Exception(error))
+                },
+                onSessionEnded = {
+                    session = null
+                    delegate = null
+                },
+            )
         delegate = scanDelegate
 
         dispatch_async(dispatch_get_main_queue()) {
-            val newSession = NFCTagReaderSession(
-                pollingOption = NFCPollingISO14443 or NFCPollingISO18092,
-                delegate = scanDelegate,
-                queue = nfcQueue,
-            )
+            val newSession =
+                NFCTagReaderSession(
+                    pollingOption = NFCPollingISO14443 or NFCPollingISO18092,
+                    delegate = scanDelegate,
+                    queue = nfcQueue,
+                )
             newSession.alertMessage = "Hold your transit card near the top of your iPhone."
             session = newSession
             newSession.beginSession()
@@ -135,13 +136,17 @@ class IosNfcScanner : CardScanner {
         private val onCardScanned: (RawCard<*>) -> Unit,
         private val onError: (String) -> Unit,
         private val onSessionEnded: () -> Unit,
-    ) : NSObject(), NFCTagReaderSessionDelegateProtocol {
-
-        override fun tagReaderSession(session: NFCTagReaderSession, didDetectTags: List<*>) {
-            val tag = didDetectTags.firstOrNull() ?: run {
-                onError("No tags detected")
-                return
-            }
+    ) : NSObject(),
+        NFCTagReaderSessionDelegateProtocol {
+        override fun tagReaderSession(
+            session: NFCTagReaderSession,
+            didDetectTags: List<*>,
+        ) {
+            val tag =
+                didDetectTags.firstOrNull() ?: run {
+                    onError("No tags detected")
+                    return
+                }
 
             // Dispatch blocking work to a separate queue so the delegate queue
             // remains free to receive connectToTag/sendMiFareCommand completions.
@@ -176,7 +181,10 @@ class IosNfcScanner : CardScanner {
             }
         }
 
-        override fun tagReaderSession(session: NFCTagReaderSession, didInvalidateWithError: NSError) {
+        override fun tagReaderSession(
+            session: NFCTagReaderSession,
+            didInvalidateWithError: NSError,
+        ) {
             onSessionEnded()
             // Session invalidated - this is called when session ends (normally or with error)
             // Error code 200 = user cancelled, which is not an error
@@ -188,13 +196,12 @@ class IosNfcScanner : CardScanner {
         override fun tagReaderSessionDidBecomeActive(session: NFCTagReaderSession) {
         }
 
-        private fun readTag(tag: Any): RawCard<*> {
-            return when (tag) {
+        private fun readTag(tag: Any): RawCard<*> =
+            when (tag) {
                 is NFCFeliCaTagProtocol -> readFelicaTag(tag)
                 is NFCMiFareTagProtocol -> readMiFareTag(tag)
                 else -> throw Exception("Unsupported NFC tag type")
             }
-        }
 
         private fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()
@@ -221,7 +228,10 @@ class IosNfcScanner : CardScanner {
             }
         }
 
-        private fun tryISO7816(tagId: ByteArray, transceiver: IosCardTransceiver): RawCard<*>? {
+        private fun tryISO7816(
+            tagId: ByteArray,
+            transceiver: IosCardTransceiver,
+        ): RawCard<*>? {
             val appConfigs = mutableListOf<ISO7816CardReader.AppConfig>()
 
             // China transit cards
@@ -233,8 +243,8 @@ class IosNfcScanner : CardScanner {
                         type = "china",
                         readBalances = { protocol ->
                             ISO7816CardReader.readChinaBalances(protocol)
-                        }
-                    )
+                        },
+                    ),
                 )
             }
 
@@ -250,8 +260,8 @@ class IosNfcScanner : CardScanner {
                     readExtraData = { protocol ->
                         val records = ISO7816CardReader.readKSX6924ExtraRecords(protocol)
                         records.mapIndexed { index, data -> "extra/$index" to data }.toMap()
-                    }
-                )
+                    },
+                ),
             )
 
             return try {

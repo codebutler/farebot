@@ -34,9 +34,8 @@ class ZolotayaKoronaRefill internal constructor(
     internal val amount: Int,
     internal val counter: Int,
     private val cardType: Int,
-    private val machineIdValue: Int
+    private val machineIdValue: Int,
 ) : Trip() {
-
     override val startTimestamp: Instant?
         get() = ZolotayaKoronaTransitInfo.parseTime(time, cardType)
 
@@ -47,7 +46,10 @@ class ZolotayaKoronaRefill internal constructor(
     override val mode: Mode get() = Mode.TICKET_MACHINE
 
     companion object {
-        fun parse(block: ByteArray, cardType: Int): ZolotayaKoronaRefill? {
+        fun parse(
+            block: ByteArray,
+            cardType: Int,
+        ): ZolotayaKoronaRefill? {
             if (block.isAllZero()) return null
             val region = NumberUtils.convertBCDtoInteger(cardType shr 16)
             // known values: 23 -> 1, 76 -> 2
@@ -57,7 +59,7 @@ class ZolotayaKoronaRefill internal constructor(
                 time = block.byteArrayToIntReversed(3, 4),
                 amount = block.byteArrayToIntReversed(7, 4),
                 counter = block.byteArrayToIntReversed(11, 2),
-                cardType = cardType
+                cardType = cardType,
             )
         }
     }

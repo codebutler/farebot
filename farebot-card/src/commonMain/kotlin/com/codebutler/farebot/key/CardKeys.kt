@@ -25,6 +25,5 @@ package com.codebutler.farebot.key
 import com.codebutler.farebot.card.CardType
 
 interface CardKeys {
-
     fun cardType(): CardType
 }

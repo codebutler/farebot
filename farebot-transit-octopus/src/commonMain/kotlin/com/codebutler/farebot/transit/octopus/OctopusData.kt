@@ -18,10 +18,10 @@
  */
 package com.codebutler.farebot.transit.octopus
 
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 /**
  * Octopus balance offset data.
@@ -34,20 +34,23 @@ import kotlinx.datetime.toInstant
 object OctopusData {
     private val OCTOPUS_TZ = TimeZone.of("Asia/Hong_Kong")
 
-    private val OCTOPUS_OFFSETS: List<Pair<Instant, Int>> = listOf(
-        // Original offset from 1997
-        LocalDateTime(1997, 1, 1, 0, 0).toInstant(OCTOPUS_TZ) to 350,
-
-        // Negative balance amount change effective 2017-10-01, which changes the offset
-        LocalDateTime(2017, 10, 1, 0, 0).toInstant(OCTOPUS_TZ) to 500
-    )
+    private val OCTOPUS_OFFSETS: List<Pair<Instant, Int>> =
+        listOf(
+            // Original offset from 1997
+            LocalDateTime(1997, 1, 1, 0, 0).toInstant(OCTOPUS_TZ) to 350,
+            // Negative balance amount change effective 2017-10-01, which changes the offset
+            LocalDateTime(2017, 10, 1, 0, 0).toInstant(OCTOPUS_TZ) to 500,
+        )
 
     private const val SHENZHEN_OFFSET = 350
 
     // Shenzhen Tong issues different cards now, so do not know if the new balance applies to
     // that card as well.
 
-    private fun getOffset(scanTime: Instant, offsets: List<Pair<Instant, Int>>): Int {
+    private fun getOffset(
+        scanTime: Instant,
+        offsets: List<Pair<Instant, Int>>,
+    ): Int {
         var offset = offsets.first().second
 
         for ((offsetStart, offsetValue) in offsets) {
@@ -63,5 +66,7 @@ object OctopusData {
 
     fun getOctopusOffset(scanTime: Instant): Int = getOffset(scanTime, OCTOPUS_OFFSETS)
 
-    fun getShenzhenOffset(@Suppress("UNUSED_PARAMETER") scanTime: Instant): Int = SHENZHEN_OFFSET
+    fun getShenzhenOffset(
+        @Suppress("UNUSED_PARAMETER") scanTime: Instant,
+    ): Int = SHENZHEN_OFFSET
 }

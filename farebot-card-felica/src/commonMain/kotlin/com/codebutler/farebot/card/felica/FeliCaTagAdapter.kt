@@ -43,5 +43,8 @@ interface FeliCaTagAdapter {
     fun getServiceCodes(): List<Int>
 
     /** Reads a single 16-byte block from [serviceCode] at [blockAddr], or null on failure. */
-    fun readBlock(serviceCode: Int, blockAddr: Byte): ByteArray?
+    fun readBlock(
+        serviceCode: Int,
+        blockAddr: Byte,
+    ): ByteArray?
 }

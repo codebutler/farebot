@@ -4,7 +4,10 @@ import com.codebutler.farebot.persist.db.model.SavedKey
 
 interface CardKeysPersister {
     fun getSavedKeys(): List<SavedKey>
+
     fun getForTagId(tagId: String): SavedKey?
+
     fun insert(savedKey: SavedKey): Long
+
     fun delete(savedKey: SavedKey)
 }

@@ -21,11 +21,10 @@
 
 package com.codebutler.farebot.transit.yargor
 
-import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.mdst.MdstStationTableReader
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_yargor.generated.resources.Res
@@ -33,17 +32,15 @@ import farebot.farebot_transit_yargor.generated.resources.yargor_mode_bus
 import farebot.farebot_transit_yargor.generated.resources.yargor_mode_tram
 import farebot.farebot_transit_yargor.generated.resources.yargor_mode_trolleybus
 import farebot.farebot_transit_yargor.generated.resources.yargor_unknown_format
-import com.codebutler.farebot.base.util.getStringBlocking
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class YarGorTrip(
     override val startTimestamp: Instant,
     private val mRoute: Int,
     private val mVehicle: Int,
 ) : Trip() {
-
     override val fare: TransitCurrency?
         get() = null
 
@@ -71,12 +68,13 @@ class YarGorTrip(
         }
 
     override val agencyName: String?
-        get() = when (mode) {
-            Mode.TRAM -> getStringBlocking(Res.string.yargor_mode_tram)
-            Mode.TROLLEYBUS -> getStringBlocking(Res.string.yargor_mode_trolleybus)
-            Mode.BUS -> getStringBlocking(Res.string.yargor_mode_bus)
-            else -> getStringBlocking(Res.string.yargor_unknown_format, (mRoute / 100).toString())
-        }
+        get() =
+            when (mode) {
+                Mode.TRAM -> getStringBlocking(Res.string.yargor_mode_tram)
+                Mode.TROLLEYBUS -> getStringBlocking(Res.string.yargor_mode_trolleybus)
+                Mode.BUS -> getStringBlocking(Res.string.yargor_mode_bus)
+                else -> getStringBlocking(Res.string.yargor_unknown_format, (mRoute / 100).toString())
+            }
 
     override val routeName: String?
         get() {
@@ -93,7 +91,10 @@ class YarGorTrip(
     companion object {
         private const val YARGOR_STR = "yargor"
 
-        private fun parseTimestampBCD(data: ByteArray, off: Int): Instant {
+        private fun parseTimestampBCD(
+            data: ByteArray,
+            off: Int,
+        ): Instant {
             val year = 2000 + NumberUtils.convertBCDtoInteger(data[off])
             val month = NumberUtils.convertBCDtoInteger(data[off + 1])
             val day = NumberUtils.convertBCDtoInteger(data[off + 2])
@@ -105,8 +106,9 @@ class YarGorTrip(
         }
 
         fun parse(input: ByteArray): YarGorTrip? {
-            if (input[9] == 0.toByte())
+            if (input[9] == 0.toByte()) {
                 return null
+            }
             return YarGorTrip(
                 startTimestamp = parseTimestampBCD(input, 9),
                 mVehicle = input.byteArrayToIntReversed(0, 2),

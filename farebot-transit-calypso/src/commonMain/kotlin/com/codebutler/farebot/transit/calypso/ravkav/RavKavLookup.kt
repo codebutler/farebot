@@ -34,11 +34,18 @@ import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 object RavKavLookup : En1545LookupSTR("ravkav") {
     override val timeZone: TimeZone = TimeZone.of("Asia/Jerusalem")
 
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
-        return if (station == 0) null else Station.unknown(station.toString())
-    }
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? = if (station == 0) null else Station.unknown(station.toString())
 
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
         if (routeNumber == null || routeNumber == 0) return null
         return if (agency == 3) {
             // Egged
@@ -48,13 +55,15 @@ object RavKavLookup : En1545LookupSTR("ravkav") {
         }
     }
 
-    override fun getMode(agency: Int?, route: Int?): Trip.Mode {
-        return Trip.Mode.OTHER
-    }
+    override fun getMode(
+        agency: Int?,
+        route: Int?,
+    ): Trip.Mode = Trip.Mode.OTHER
 
     override fun parseCurrency(price: Int) = TransitCurrency(price, "ILS")
 
-    override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
-        641 to Res.string.ravkav_generic_trips
-    )
+    override val subscriptionMap: Map<Int, ComposeStringResource> =
+        mapOf(
+            641 to Res.string.ravkav_generic_trips,
+        )
 }

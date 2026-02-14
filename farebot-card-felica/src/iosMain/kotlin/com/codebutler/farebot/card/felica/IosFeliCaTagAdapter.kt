@@ -25,9 +25,9 @@ package com.codebutler.farebot.card.felica
 import com.codebutler.farebot.card.nfc.toByteArray
 import com.codebutler.farebot.card.nfc.toNSData
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.CoreNFC.NFCFeliCaTagProtocol
 import platform.CoreNFC.NFCFeliCaPollingRequestCodeNoRequest
 import platform.CoreNFC.NFCFeliCaPollingTimeSlotMax1
+import platform.CoreNFC.NFCFeliCaTagProtocol
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.darwin.DISPATCH_TIME_FOREVER
@@ -41,8 +41,9 @@ import platform.darwin.dispatch_semaphore_wait
  * Uses semaphore-based bridging for the async Core NFC API.
  */
 @OptIn(ExperimentalForeignApi::class)
-class IosFeliCaTagAdapter(private val tag: NFCFeliCaTagProtocol) : FeliCaTagAdapter {
-
+class IosFeliCaTagAdapter(
+    private val tag: NFCFeliCaTagProtocol,
+) : FeliCaTagAdapter {
     override fun getIDm(): ByteArray = tag.currentIDm.toByteArray()
 
     override fun getSystemCodes(): List<Int> {
@@ -76,10 +77,11 @@ class IosFeliCaTagAdapter(private val tag: NFCFeliCaTagProtocol) : FeliCaTagAdap
         var pmmData: NSData? = null
         var nfcError: NSError? = null
 
-        val systemCodeBytes = byteArrayOf(
-            (systemCode shr 8).toByte(),
-            (systemCode and 0xff).toByte(),
-        )
+        val systemCodeBytes =
+            byteArrayOf(
+                (systemCode shr 8).toByte(),
+                (systemCode and 0xff).toByte(),
+            )
 
         tag.pollingWithSystemCode(
             systemCodeBytes.toNSData(),
@@ -120,16 +122,20 @@ class IosFeliCaTagAdapter(private val tag: NFCFeliCaTagProtocol) : FeliCaTagAdap
         return discovered
     }
 
-    override fun readBlock(serviceCode: Int, blockAddr: Byte): ByteArray? {
+    override fun readBlock(
+        serviceCode: Int,
+        blockAddr: Byte,
+    ): ByteArray? {
         val semaphore = dispatch_semaphore_create(0)
         var blockDataList: List<*>? = null
         var nfcError: NSError? = null
 
         // Service code list: 2 bytes, little-endian
-        val serviceCodeData = byteArrayOf(
-            (serviceCode and 0xff).toByte(),
-            (serviceCode shr 8).toByte(),
-        ).toNSData()
+        val serviceCodeData =
+            byteArrayOf(
+                (serviceCode and 0xff).toByte(),
+                (serviceCode shr 8).toByte(),
+            ).toNSData()
 
         // Block list element: 2-byte format (0x80 | service_list_order, block_number)
         val blockListData = byteArrayOf(0x80.toByte(), blockAddr).toNSData()
@@ -157,12 +163,13 @@ class IosFeliCaTagAdapter(private val tag: NFCFeliCaTagProtocol) : FeliCaTagAdap
         var versionList: List<*>? = null
         var nfcError: NSError? = null
 
-        val nodeCodeList = serviceCodes.map { code ->
-            byteArrayOf(
-                (code and 0xff).toByte(),
-                (code shr 8).toByte(),
-            ).toNSData()
-        }
+        val nodeCodeList =
+            serviceCodes.map { code ->
+                byteArrayOf(
+                    (code and 0xff).toByte(),
+                    (code shr 8).toByte(),
+                ).toNSData()
+            }
 
         tag.requestServiceWithNodeCodeList(nodeCodeList) { versions: List<*>?, error: NSError? ->
             versionList = versions
@@ -191,10 +198,17 @@ class IosFeliCaTagAdapter(private val tag: NFCFeliCaTagProtocol) : FeliCaTagAdap
         // Service code attributes to probe for. Includes both read-only and read-write
         // attributes so that card type detection (which relies on identifying unique
         // service codes) works correctly even for services we can't read data from.
-        private val PROBE_ATTRIBUTES = listOf(
-            0x08, 0x09, 0x0A, 0x0B, // Random: R/W key, R/O key, R/W no-key, R/O no-key
-            0x0C, 0x0D, 0x0E, 0x0F, // Cyclic: R/W key, R/O key, R/W no-key, R/O no-key
-            0x17,                    // Purse: Cashback R/O no-key
-        )
+        private val PROBE_ATTRIBUTES =
+            listOf(
+                0x08,
+                0x09,
+                0x0A,
+                0x0B, // Random: R/W key, R/O key, R/W no-key, R/O no-key
+                0x0C,
+                0x0D,
+                0x0E,
+                0x0F, // Cyclic: R/W key, R/O key, R/W no-key, R/O no-key
+                0x17, // Purse: Cashback R/O no-key
+            )
     }
 }

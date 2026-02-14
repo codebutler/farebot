@@ -49,6 +49,7 @@ interface IntercodeLookupSingle : IntercodeLookup {
     val cardName: String?
 
     override fun cardName(env: () -> En1545Parsed): String? = cardName
+
     override val allCardNames: List<String>
         get() = listOfNotNull(cardName)
 }

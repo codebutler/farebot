@@ -34,37 +34,39 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_serialonly.generated.resources.*
 
 class AtHopTransitFactory : TransitFactory<DesfireCard, AtHopTransitInfo> {
-
-    override val allCards: List<CardInfo> = listOf(
-        CardInfo(
-            nameRes = Res.string.card_name_at_hop,
-            cardType = CardType.MifareDesfire,
-            region = TransitRegion.NEW_ZEALAND,
-            locationRes = Res.string.card_location_auckland_new_zealand,
-            serialOnly = true,
-            imageRes = Res.drawable.athopcard,
-            latitude = -36.8485f,
-            longitude = 174.7633f,
-            brandColor = 0x333C45,
-            credits = listOf("Metrodroid Project", "Michael Farrell"),
+    override val allCards: List<CardInfo> =
+        listOf(
+            CardInfo(
+                nameRes = Res.string.card_name_at_hop,
+                cardType = CardType.MifareDesfire,
+                region = TransitRegion.NEW_ZEALAND,
+                locationRes = Res.string.card_location_auckland_new_zealand,
+                serialOnly = true,
+                imageRes = Res.drawable.athopcard,
+                latitude = -36.8485f,
+                longitude = 174.7633f,
+                brandColor = 0x333C45,
+                credits = listOf("Metrodroid Project", "Michael Farrell"),
+            ),
         )
-    )
 
     companion object {
         private const val APP_ID_SERIAL = 0xffffff
         internal const val NAME = "AT HOP"
 
         internal fun getSerial(card: DesfireCard): Int? {
-            val file = card.getApplication(APP_ID_SERIAL)?.getFile(8) as? StandardDesfireFile
-                ?: return null
+            val file =
+                card.getApplication(APP_ID_SERIAL)?.getFile(8) as? StandardDesfireFile
+                    ?: return null
             return file.data.getBitsFromBuffer(61, 32)
         }
 
         internal fun formatSerial(serial: Int?): String? =
-            if (serial != null)
+            if (serial != null) {
                 "7824 6702 " + NumberUtils.formatNumber(serial.toLong(), " ", 4, 4, 3)
-            else
+            } else {
                 null
+            }
     }
 
     override fun check(card: DesfireCard): Boolean =
@@ -73,6 +75,5 @@ class AtHopTransitFactory : TransitFactory<DesfireCard, AtHopTransitInfo> {
     override fun parseIdentity(card: DesfireCard): TransitIdentity =
         TransitIdentity.create(NAME, formatSerial(getSerial(card)))
 
-    override fun parseInfo(card: DesfireCard): AtHopTransitInfo =
-        AtHopTransitInfo(mSerial = getSerial(card))
+    override fun parseInfo(card: DesfireCard): AtHopTransitInfo = AtHopTransitInfo(mSerial = getSerial(card))
 }

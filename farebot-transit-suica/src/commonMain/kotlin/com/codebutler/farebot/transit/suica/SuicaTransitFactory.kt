@@ -39,8 +39,8 @@ import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.felica.FeliCaConstants
+import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
@@ -51,13 +51,10 @@ import farebot.farebot_transit_suica.generated.resources.*
 class SuicaTransitFactory(
     private val stringResource: StringResource,
 ) : TransitFactory<FelicaCard, SuicaTransitInfo> {
-
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
 
-    override fun check(card: FelicaCard): Boolean {
-        return card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA) != null
-    }
+    override fun check(card: FelicaCard): Boolean = card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA) != null
 
     override fun parseIdentity(card: FelicaCard): TransitIdentity {
         val cardName = detectCardName(card)
@@ -79,11 +76,12 @@ class SuicaTransitFactory(
         for (i in blocks.indices.reversed()) {
             val block = blocks[i]
 
-            val previousBalance = if (i + 1 < blocks.size) {
-                blocks[i + 1].data.byteArrayToIntReversed(10, 2)
-            } else {
-                -1
-            }
+            val previousBalance =
+                if (i + 1 < blocks.size) {
+                    blocks[i + 1].data.byteArrayToIntReversed(10, 2)
+                } else {
+                    -1
+                }
 
             val trip = SuicaTrip.parse(block, previousBalance, stringResource)
 
@@ -99,24 +97,28 @@ class SuicaTransitFactory(
                     val tapData = tapBlock.data
 
                     // Skip tap-ons
-                    if (tapData[0].toInt() and 0x80 != 0)
+                    if (tapData[0].toInt() and 0x80 != 0) {
                         continue
+                    }
 
                     val station = tapData.byteArrayToInt(2, 2)
-                    if (station != trip.endStationId)
+                    if (station != trip.endStationId) {
                         continue
+                    }
 
                     val dateNum = tapData.byteArrayToInt(6, 2)
-                    if (dateNum != trip.dateRaw)
+                    if (dateNum != trip.dateRaw) {
                         continue
+                    }
 
                     val fare = tapData.byteArrayToIntReversed(10, 2)
-                    if (fare != trip.fareRaw)
+                    if (fare != trip.fareRaw) {
                         continue
+                    }
 
                     trip.setEndTime(
                         NumberUtils.convertBCDtoInteger(tapData[8]),
-                        NumberUtils.convertBCDtoInteger(tapData[9])
+                        NumberUtils.convertBCDtoInteger(tapData[9]),
                     )
                     matchedTaps.add(tapIdx)
                     break
@@ -128,20 +130,23 @@ class SuicaTransitFactory(
                     val tapData = tapBlock.data
 
                     // Skip tap-offs
-                    if (tapData[0].toInt() and 0x80 == 0)
+                    if (tapData[0].toInt() and 0x80 == 0) {
                         continue
+                    }
 
                     val station = tapData.byteArrayToInt(2, 2)
-                    if (station != trip.startStationId)
+                    if (station != trip.startStationId) {
                         continue
+                    }
 
                     val dateNum = tapData.byteArrayToInt(6, 2)
-                    if (dateNum != trip.dateRaw)
+                    if (dateNum != trip.dateRaw) {
                         continue
+                    }
 
                     trip.setStartTime(
                         NumberUtils.convertBCDtoInteger(tapData[8]),
-                        NumberUtils.convertBCDtoInteger(tapData[9])
+                        NumberUtils.convertBCDtoInteger(tapData[9]),
                     )
                     matchedTaps.add(tapIdx)
                     break
@@ -170,131 +175,134 @@ class SuicaTransitFactory(
     }
 
     private fun detectCardName(card: FelicaCard): String {
-        val system = card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA)
-            ?: return stringResource.getString(Res.string.card_name_suica)
+        val system =
+            card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA)
+                ?: return stringResource.getString(Res.string.card_name_suica)
         // Use allServiceCodes (includes services without readable data) for card type detection.
         // Fall back to services list for backward compatibility with old serialized cards.
-        val serviceCodes = system.allServiceCodes.ifEmpty {
-            system.services.map { it.serviceCode }.toSet()
-        }
+        val serviceCodes =
+            system.allServiceCodes.ifEmpty {
+                system.services.map { it.serviceCode }.toSet()
+            }
         return SuicaUtil.getCardName(stringResource, serviceCodes)
     }
 
     companion object {
-        private val ALL_CARDS = listOf(
-            CardInfo(
-                nameRes = Res.string.card_name_suica,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_tokyo_japan,
-                imageRes = Res.drawable.suica_card,
-                latitude = 35.6762f,
-                longitude = 139.6503f,
-                brandColor = 0x6CBB5A,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-                sampleDumpFile = "Suica.nfc",
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_pasmo,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_tokyo_japan,
-                imageRes = Res.drawable.pasmo_card,
-                latitude = 35.6762f,
-                longitude = 139.6503f,
-                brandColor = 0xFC848C,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-                sampleDumpFile = "PASMO.nfc",
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_icoca,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_osaka_japan,
-                imageRes = Res.drawable.icoca_card,
-                latitude = 34.6937f,
-                longitude = 135.5023f,
-                brandColor = 0x74C6D3,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-                sampleDumpFile = "ICOCA.nfc",
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_toica,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_nagoya_japan,
-                imageRes = Res.drawable.toica,
-                latitude = 35.1815f,
-                longitude = 136.9066f,
-                brandColor = 0x01C4FE,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_manaca,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_nagoya_japan,
-                imageRes = Res.drawable.manaca,
-                latitude = 35.1815f,
-                longitude = 136.9066f,
-                brandColor = 0x95B5C6,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_pitapa,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_osaka_japan,
-                imageRes = Res.drawable.pitapa,
-                latitude = 34.6937f,
-                longitude = 135.5023f,
-                brandColor = 0x898CB0,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_kitaca,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_sapporo_japan,
-                imageRes = Res.drawable.kitaca,
-                latitude = 43.0618f,
-                longitude = 141.3545f,
-                brandColor = 0xE5F5BA,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_sugoca,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_fukuoka_japan,
-                imageRes = Res.drawable.sugoca,
-                latitude = 33.5904f,
-                longitude = 130.4017f,
-                brandColor = 0xE86696,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_nimoca,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_fukuoka_japan,
-                imageRes = Res.drawable.nimoca,
-                latitude = 33.5904f,
-                longitude = 130.4017f,
-                brandColor = 0xE9D0A1,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-            CardInfo(
-                nameRes = Res.string.card_name_hayakaken,
-                cardType = CardType.FeliCa,
-                region = TransitRegion.JAPAN,
-                locationRes = Res.string.location_fukuoka_japan,
-                imageRes = Res.drawable.hayakaken,
-                latitude = 33.5904f,
-                longitude = 130.4017f,
-                brandColor = 0xA0D8EE,
-                credits = listOf("nfc-felica project", "IC SFCard Fan project"),
-            ),
-        )
+        private val ALL_CARDS =
+            listOf(
+                CardInfo(
+                    nameRes = Res.string.card_name_suica,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_tokyo_japan,
+                    imageRes = Res.drawable.suica_card,
+                    latitude = 35.6762f,
+                    longitude = 139.6503f,
+                    brandColor = 0x6CBB5A,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                    sampleDumpFile = "Suica.nfc",
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_pasmo,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_tokyo_japan,
+                    imageRes = Res.drawable.pasmo_card,
+                    latitude = 35.6762f,
+                    longitude = 139.6503f,
+                    brandColor = 0xFC848C,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                    sampleDumpFile = "PASMO.nfc",
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_icoca,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_osaka_japan,
+                    imageRes = Res.drawable.icoca_card,
+                    latitude = 34.6937f,
+                    longitude = 135.5023f,
+                    brandColor = 0x74C6D3,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                    sampleDumpFile = "ICOCA.nfc",
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_toica,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_nagoya_japan,
+                    imageRes = Res.drawable.toica,
+                    latitude = 35.1815f,
+                    longitude = 136.9066f,
+                    brandColor = 0x01C4FE,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_manaca,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_nagoya_japan,
+                    imageRes = Res.drawable.manaca,
+                    latitude = 35.1815f,
+                    longitude = 136.9066f,
+                    brandColor = 0x95B5C6,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_pitapa,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_osaka_japan,
+                    imageRes = Res.drawable.pitapa,
+                    latitude = 34.6937f,
+                    longitude = 135.5023f,
+                    brandColor = 0x898CB0,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_kitaca,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_sapporo_japan,
+                    imageRes = Res.drawable.kitaca,
+                    latitude = 43.0618f,
+                    longitude = 141.3545f,
+                    brandColor = 0xE5F5BA,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_sugoca,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_fukuoka_japan,
+                    imageRes = Res.drawable.sugoca,
+                    latitude = 33.5904f,
+                    longitude = 130.4017f,
+                    brandColor = 0xE86696,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_nimoca,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_fukuoka_japan,
+                    imageRes = Res.drawable.nimoca,
+                    latitude = 33.5904f,
+                    longitude = 130.4017f,
+                    brandColor = 0xE9D0A1,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+                CardInfo(
+                    nameRes = Res.string.card_name_hayakaken,
+                    cardType = CardType.FeliCa,
+                    region = TransitRegion.JAPAN,
+                    locationRes = Res.string.location_fukuoka_japan,
+                    imageRes = Res.drawable.hayakaken,
+                    latitude = 33.5904f,
+                    longitude = 130.4017f,
+                    brandColor = 0xA0D8EE,
+                    credits = listOf("nfc-felica project", "IC SFCard Fan project"),
+                ),
+            )
     }
 }

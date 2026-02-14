@@ -31,7 +31,6 @@ import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 internal object LisboaVivaLookup : En1545LookupSTR("lisboa_viva") {
-
     const val ZAPPING_TARIFF = 33592
     const val INTERAGENCY31_AGENCY = 31
     const val AGENCY_CARRIS = 1
@@ -43,7 +42,12 @@ internal object LisboaVivaLookup : En1545LookupSTR("lisboa_viva") {
 
     override fun parseCurrency(price: Int) = TransitCurrency(price, "EUR")
 
-    override fun getRouteName(routeNumber: Int?, routeVariant: Int?, agency: Int?, transport: Int?): String? {
+    override fun getRouteName(
+        routeNumber: Int?,
+        routeVariant: Int?,
+        agency: Int?,
+        transport: Int?,
+    ): String? {
         if (routeNumber == null || routeNumber == 0) return null
         if (agency == null || agency == AGENCY_CARRIS) {
             return (routeNumber and 0xfff).toString()
@@ -58,13 +62,17 @@ internal object LisboaVivaLookup : En1545LookupSTR("lisboa_viva") {
         routeNumber: Int?,
         routeVariant: Int?,
         agency: Int?,
-        transport: Int?
+        transport: Int?,
     ): String? {
         if (routeNumber == null || agency == null) return null
         return mungeRouteNumber(agency, routeNumber).toString()
     }
 
-    override fun getStation(station: Int, agency: Int?, transport: Int?): Station? {
+    override fun getStation(
+        station: Int,
+        agency: Int?,
+        transport: Int?,
+    ): Station? {
         // transport parameter is used as routeNumber by LisboaVivaTransaction
         val routeNumber = transport
         if (station == 0 || agency == null) return null
@@ -74,8 +82,9 @@ internal object LisboaVivaLookup : En1545LookupSTR("lisboa_viva") {
         val stationId = mungedStation or (mungedRouteNumber shl 8) or (agency shl 24)
         val mdstStation = reader.getStationById(stationId)
         if (mdstStation != null) {
-            val name = mdstStation.name.english.takeIf { it.isNotEmpty() }
-                ?: "$agency/$routeNumber/$station"
+            val name =
+                mdstStation.name.english.takeIf { it.isNotEmpty() }
+                    ?: "$agency/$routeNumber/$station"
             val lat = mdstStation.latitude.takeIf { it != 0f }?.toString()
             val lng = mdstStation.longitude.takeIf { it != 0f }?.toString()
             return Station.create(name, null, lat, lng)
@@ -83,24 +92,28 @@ internal object LisboaVivaLookup : En1545LookupSTR("lisboa_viva") {
         return Station.nameOnly("$agency/$routeNumber/$station")
     }
 
-    private fun mungeRouteNumber(agency: Int, routeNumber: Int): Int {
+    private fun mungeRouteNumber(
+        agency: Int,
+        routeNumber: Int,
+    ): Int {
         if (agency == 16) return routeNumber and 0xf
         return if (agency == AGENCY_CP && routeNumber != ROUTE_CASCAIS_SADO) 4096 else routeNumber
     }
 
-    override val subscriptionMapByAgency: Map<Pair<Int?, Int>, ComposeStringResource> = mapOf(
-        Pair(15, 73) to Res.string.lisboa_viva_ass_pal_lis,
-        Pair(15, 193) to Res.string.lisboa_viva_ass_fog_lis,
-        Pair(15, 217) to Res.string.lisboa_viva_ass_pra_lis,
-        Pair(16, 5) to Res.string.lisboa_viva_passe_mts,
-        Pair(30, 113) to Res.string.lisboa_viva_metro_rl_12,
-        Pair(30, 316) to Res.string.lisboa_viva_vermelho_a1,
-        Pair(30, 454) to Res.string.lisboa_viva_metro_cp_r_mouro_melecas,
-        Pair(30, 720) to Res.string.lisboa_viva_navegante_urbano,
-        Pair(30, 725) to Res.string.lisboa_viva_navegante_rede,
-        Pair(30, 733) to Res.string.lisboa_viva_navegante_sl_tcb_barreiro,
-        Pair(30, 1088) to Res.string.lisboa_viva_fertagus_pal_lis_ml,
-        Pair(INTERAGENCY31_AGENCY, 906) to Res.string.lisboa_viva_navegante_lisboa,
-        Pair(INTERAGENCY31_AGENCY, ZAPPING_TARIFF) to Res.string.lisboa_viva_zapping
-    )
+    override val subscriptionMapByAgency: Map<Pair<Int?, Int>, ComposeStringResource> =
+        mapOf(
+            Pair(15, 73) to Res.string.lisboa_viva_ass_pal_lis,
+            Pair(15, 193) to Res.string.lisboa_viva_ass_fog_lis,
+            Pair(15, 217) to Res.string.lisboa_viva_ass_pra_lis,
+            Pair(16, 5) to Res.string.lisboa_viva_passe_mts,
+            Pair(30, 113) to Res.string.lisboa_viva_metro_rl_12,
+            Pair(30, 316) to Res.string.lisboa_viva_vermelho_a1,
+            Pair(30, 454) to Res.string.lisboa_viva_metro_cp_r_mouro_melecas,
+            Pair(30, 720) to Res.string.lisboa_viva_navegante_urbano,
+            Pair(30, 725) to Res.string.lisboa_viva_navegante_rede,
+            Pair(30, 733) to Res.string.lisboa_viva_navegante_sl_tcb_barreiro,
+            Pair(30, 1088) to Res.string.lisboa_viva_fertagus_pal_lis_ml,
+            Pair(INTERAGENCY31_AGENCY, 906) to Res.string.lisboa_viva_navegante_lisboa,
+            Pair(INTERAGENCY31_AGENCY, ZAPPING_TARIFF) to Res.string.lisboa_viva_zapping,
+        )
 }

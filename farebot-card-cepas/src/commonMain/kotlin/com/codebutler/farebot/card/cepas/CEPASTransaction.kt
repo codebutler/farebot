@@ -31,7 +31,7 @@ data class CEPASTransaction(
     val rawType: Int,
     val amount: Int,
     val timestamp: Int,
-    val userData: String
+    val userData: String,
 ) {
     enum class TransactionType {
         MRT,
@@ -41,20 +41,21 @@ data class CEPASTransaction(
         CREATION,
         RETAIL,
         SERVICE,
-        UNKNOWN
+        UNKNOWN,
     }
 
     val type: TransactionType
-        get() = when (rawType) {
-            48 -> TransactionType.MRT
-            117, 3 -> TransactionType.TOP_UP
-            49 -> TransactionType.BUS
-            118 -> TransactionType.BUS_REFUND
-            -16, 5 -> TransactionType.CREATION
-            4 -> TransactionType.SERVICE
-            1 -> TransactionType.RETAIL
-            else -> TransactionType.UNKNOWN
-        }
+        get() =
+            when (rawType) {
+                48 -> TransactionType.MRT
+                117, 3 -> TransactionType.TOP_UP
+                49 -> TransactionType.BUS
+                118 -> TransactionType.BUS_REFUND
+                -16, 5 -> TransactionType.CREATION
+                4 -> TransactionType.SERVICE
+                1 -> TransactionType.RETAIL
+                else -> TransactionType.UNKNOWN
+            }
 
     companion object {
         // CEPAS epoch: January 1, 1995 00:00:00 SGT (UTC+8)
@@ -64,7 +65,8 @@ data class CEPASTransaction(
         fun create(rawData: ByteArray): CEPASTransaction {
             val type = rawData[0].toInt()
 
-            var tmp = (0x00ff0000 and (rawData[1].toInt() shl 16)) or
+            var tmp =
+                (0x00ff0000 and (rawData[1].toInt() shl 16)) or
                     (0x0000ff00 and (rawData[2].toInt() shl 8)) or
                     (0x000000ff and rawData[3].toInt())
             if (0 != (rawData[1].toInt() and 0x80)) {
@@ -72,11 +74,14 @@ data class CEPASTransaction(
             }
             val amount = tmp
 
-            /* Date is expressed "in seconds", but the epoch is January 1 1995, SGT */
-            val date = ((0xff000000.toInt() and (rawData[4].toInt() shl 24)) or
-                    (0x00ff0000 and (rawData[5].toInt() shl 16)) or
-                    (0x0000ff00 and (rawData[6].toInt() shl 8)) or
-                    (0x000000ff and rawData[7].toInt())) +
+            // Date is expressed "in seconds", but the epoch is January 1 1995, SGT
+            val date =
+                (
+                    (0xff000000.toInt() and (rawData[4].toInt() shl 24)) or
+                        (0x00ff0000 and (rawData[5].toInt() shl 16)) or
+                        (0x0000ff00 and (rawData[6].toInt() shl 8)) or
+                        (0x000000ff and rawData[7].toInt())
+                ) +
                     CEPAS_EPOCH
 
             val userDataBytes = ByteArray(9)

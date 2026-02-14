@@ -41,15 +41,15 @@ class ZolotayaKoronaTrip internal constructor(
     private val nextBalance: Int?,
     private val fieldA: Int,
     private val fieldB: Int,
-    private val fieldC: Int
+    private val fieldC: Int,
 ) : Trip() {
-
     private val estimatedFare: Int?
-        get() = when (cardType) {
-            0x760500 -> 1150
-            0x230100 -> 1275
-            else -> null
-        }
+        get() =
+            when (cardType) {
+                0x760500 -> 1150
+                0x230100 -> 1275
+                else -> null
+            }
 
     internal val estimatedBalance: Int
         get() = previousBalance - (estimatedFare ?: DEFAULT_FARE)
@@ -72,7 +72,12 @@ class ZolotayaKoronaTrip internal constructor(
     override val mode: Mode get() = Mode.BUS
 
     companion object {
-        fun parse(block: ByteArray, cardType: Int, refill: ZolotayaKoronaRefill?, balance: Int?): ZolotayaKoronaTrip? {
+        fun parse(
+            block: ByteArray,
+            cardType: Int,
+            refill: ZolotayaKoronaRefill?,
+            balance: Int?,
+        ): ZolotayaKoronaTrip? {
             if (block.isAllZero()) return null
             val time = block.byteArrayToIntReversed(6, 4)
             var balanceAfter: Int? = null
@@ -91,7 +96,7 @@ class ZolotayaKoronaTrip internal constructor(
                 previousBalance = block.byteArrayToIntReversed(11, 4),
                 fieldC = block[15].toInt() and 0xff,
                 nextBalance = balanceAfter,
-                cardType = cardType
+                cardType = cardType,
             )
         }
     }

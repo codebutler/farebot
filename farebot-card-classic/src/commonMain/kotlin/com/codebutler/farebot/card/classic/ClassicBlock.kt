@@ -32,9 +32,8 @@ import kotlinx.serialization.Serializable
 data class ClassicBlock(
     val type: String,
     val index: Int,
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
-
     /**
      * Whether this block contains only zeros, 0xFF bytes, or is otherwise empty/unused.
      */
@@ -47,7 +46,10 @@ data class ClassicBlock(
         const val TYPE_TRAILER = "trailer"
         const val TYPE_VALUE = "value"
 
-        fun create(type: String, index: Int, data: ByteArray): ClassicBlock =
-            ClassicBlock(type, index, data)
+        fun create(
+            type: String,
+            index: Int,
+            data: ByteArray,
+        ): ClassicBlock = ClassicBlock(type, index, data)
     }
 }

@@ -25,9 +25,9 @@ package com.codebutler.farebot.transit.nextfare.record
 data class NextfareBalanceRecord(
     val version: Int,
     val balance: Int,
-    val hasTravelPassAvailable: Boolean
-) : NextfareRecord, Comparable<NextfareBalanceRecord> {
-
+    val hasTravelPassAvailable: Boolean,
+) : NextfareRecord,
+    Comparable<NextfareBalanceRecord> {
     override fun compareTo(other: NextfareBalanceRecord): Int =
         // So sorting works, we reverse the order so highest number is first.
         other.version.compareTo(this.version)

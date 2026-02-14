@@ -37,7 +37,6 @@ import kotlin.test.assertEquals
  */
 @OptIn(ExperimentalStdlibApi::class)
 class KeyHashTest {
-
     @Test
     fun testIncorrectKeyHash() {
         // Empty list
@@ -47,25 +46,79 @@ class KeyHashTest {
         assertEquals(-1, HashUtils.checkKeyHash(MAD_KEY, SALT0, MAD_HASH1))
 
         // Then test with multiple
-        assertEquals(-1, HashUtils.checkKeyHash(MAD_KEY, SALT0,
-            MAD_HASH1, MAD_HASH2,
-            DEFAULT_HASH0, DEFAULT_HASH1, DEFAULT_HASH2))
-        assertEquals(-1, HashUtils.checkKeyHash(MAD_KEY, SALT1,
-            MAD_HASH0, MAD_HASH2,
-            DEFAULT_HASH0, DEFAULT_HASH1, DEFAULT_HASH2))
-        assertEquals(-1, HashUtils.checkKeyHash(MAD_KEY, SALT2,
-            MAD_HASH0, MAD_HASH1,
-            DEFAULT_HASH0, DEFAULT_HASH1, DEFAULT_HASH2))
+        assertEquals(
+            -1,
+            HashUtils.checkKeyHash(
+                MAD_KEY,
+                SALT0,
+                MAD_HASH1,
+                MAD_HASH2,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+                DEFAULT_HASH2,
+            ),
+        )
+        assertEquals(
+            -1,
+            HashUtils.checkKeyHash(
+                MAD_KEY,
+                SALT1,
+                MAD_HASH0,
+                MAD_HASH2,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+                DEFAULT_HASH2,
+            ),
+        )
+        assertEquals(
+            -1,
+            HashUtils.checkKeyHash(
+                MAD_KEY,
+                SALT2,
+                MAD_HASH0,
+                MAD_HASH1,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+                DEFAULT_HASH2,
+            ),
+        )
 
-        assertEquals(-1, HashUtils.checkKeyHash(DEFAULT_KEY, SALT0,
-            MAD_HASH0, MAD_HASH1, MAD_HASH2,
-            DEFAULT_HASH1, DEFAULT_HASH2))
-        assertEquals(-1, HashUtils.checkKeyHash(DEFAULT_KEY, SALT1,
-            MAD_HASH0, MAD_HASH1, MAD_HASH2,
-            DEFAULT_HASH0, DEFAULT_HASH2))
-        assertEquals(-1, HashUtils.checkKeyHash(DEFAULT_KEY, SALT2,
-            MAD_HASH0, MAD_HASH1, MAD_HASH2,
-            DEFAULT_HASH0, DEFAULT_HASH1))
+        assertEquals(
+            -1,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT0,
+                MAD_HASH0,
+                MAD_HASH1,
+                MAD_HASH2,
+                DEFAULT_HASH1,
+                DEFAULT_HASH2,
+            ),
+        )
+        assertEquals(
+            -1,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT1,
+                MAD_HASH0,
+                MAD_HASH1,
+                MAD_HASH2,
+                DEFAULT_HASH0,
+                DEFAULT_HASH2,
+            ),
+        )
+        assertEquals(
+            -1,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT2,
+                MAD_HASH0,
+                MAD_HASH1,
+                MAD_HASH2,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+            ),
+        )
     }
 
     @Test
@@ -82,29 +135,88 @@ class KeyHashTest {
 
     @Test
     fun testOffsetCorrectKeyHash() {
-        assertEquals(1, HashUtils.checkKeyHash(MAD_KEY, SALT1,
-            MAD_HASH0, MAD_HASH1))
-        assertEquals(1, HashUtils.checkKeyHash(MAD_KEY, SALT1,
-            MAD_HASH0, MAD_HASH1, MAD_HASH2))
+        assertEquals(
+            1,
+            HashUtils.checkKeyHash(
+                MAD_KEY,
+                SALT1,
+                MAD_HASH0,
+                MAD_HASH1,
+            ),
+        )
+        assertEquals(
+            1,
+            HashUtils.checkKeyHash(
+                MAD_KEY,
+                SALT1,
+                MAD_HASH0,
+                MAD_HASH1,
+                MAD_HASH2,
+            ),
+        )
 
-        assertEquals(2, HashUtils.checkKeyHash(MAD_KEY, SALT2,
-            MAD_HASH0, MAD_HASH1, MAD_HASH2))
+        assertEquals(
+            2,
+            HashUtils.checkKeyHash(
+                MAD_KEY,
+                SALT2,
+                MAD_HASH0,
+                MAD_HASH1,
+                MAD_HASH2,
+            ),
+        )
     }
 
     @Test
     fun testRepeatedCorrectKeyHash() {
-        assertEquals(0, HashUtils.checkKeyHash(DEFAULT_KEY, SALT0,
-            DEFAULT_HASH0, DEFAULT_HASH0, DEFAULT_HASH1))
-        assertEquals(0, HashUtils.checkKeyHash(DEFAULT_KEY, SALT0,
-            DEFAULT_HASH0, DEFAULT_HASH1, DEFAULT_HASH0))
+        assertEquals(
+            0,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT0,
+                DEFAULT_HASH0,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+            ),
+        )
+        assertEquals(
+            0,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT0,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+                DEFAULT_HASH0,
+            ),
+        )
 
-        assertEquals(2, HashUtils.checkKeyHash(DEFAULT_KEY, SALT1,
-            DEFAULT_HASH0, DEFAULT_HASH0, DEFAULT_HASH1))
-        assertEquals(2, HashUtils.checkKeyHash(DEFAULT_KEY, SALT1,
-            DEFAULT_HASH0, DEFAULT_HASH0, DEFAULT_HASH1, DEFAULT_HASH1))
+        assertEquals(
+            2,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT1,
+                DEFAULT_HASH0,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+            ),
+        )
+        assertEquals(
+            2,
+            HashUtils.checkKeyHash(
+                DEFAULT_KEY,
+                SALT1,
+                DEFAULT_HASH0,
+                DEFAULT_HASH0,
+                DEFAULT_HASH1,
+                DEFAULT_HASH1,
+            ),
+        )
     }
 
-    private fun checkVector(input: String, output: String) {
+    private fun checkVector(
+        input: String,
+        output: String,
+    ) {
         val digest = md5(input.hexToByteArray()).toHexString()
         assertEquals(output, digest, "Hash of <$input> failed")
     }

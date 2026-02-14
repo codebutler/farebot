@@ -33,12 +33,14 @@ data class DataClassicSector(
     override val index: Int,
     val blocks: List<ClassicBlock>,
     @Contextual val keyA: ByteArray? = null,
-    @Contextual val keyB: ByteArray? = null
+    @Contextual val keyB: ByteArray? = null,
 ) : ClassicSector {
-
     fun getBlock(index: Int): ClassicBlock = blocks[index]
 
-    fun readBlocks(startBlock: Int, blockCount: Int): kotlin.ByteArray {
+    fun readBlocks(
+        startBlock: Int,
+        blockCount: Int,
+    ): kotlin.ByteArray {
         var readBlocks = 0
         val data = kotlin.ByteArray(blockCount * 16)
         for (i in startBlock until (startBlock + blockCount)) {
@@ -66,8 +68,7 @@ data class DataClassicSector(
             sectorIndex: Int,
             classicBlocks: List<ClassicBlock>,
             keyA: ByteArray? = null,
-            keyB: ByteArray? = null
-        ): ClassicSector =
-            DataClassicSector(sectorIndex, classicBlocks, keyA, keyB)
+            keyB: ByteArray? = null,
+        ): ClassicSector = DataClassicSector(sectorIndex, classicBlocks, keyA, keyB)
     }
 }

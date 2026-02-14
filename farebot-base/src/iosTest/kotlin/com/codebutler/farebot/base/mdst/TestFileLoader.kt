@@ -12,11 +12,12 @@ import platform.posix.memcpy
 @OptIn(ExperimentalForeignApi::class)
 actual fun loadTestFile(relativePath: String): ByteArray? {
     // Try common locations for the project root
-    val possibleRoots = listOf(
-        "/Users/eric/Code/farebot",
-        getEnv("PROJECT_DIR") ?: "",
-        "."
-    )
+    val possibleRoots =
+        listOf(
+            "/Users/eric/Code/farebot",
+            getEnv("PROJECT_DIR") ?: "",
+            ".",
+        )
 
     for (root in possibleRoots) {
         if (root.isEmpty()) continue

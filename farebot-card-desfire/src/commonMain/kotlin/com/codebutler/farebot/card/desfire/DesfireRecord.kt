@@ -27,10 +27,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DesfireRecord(
-    @Contextual val data: ByteArray
+    @Contextual val data: ByteArray,
 ) {
     companion object {
-        fun create(data: ByteArray): DesfireRecord =
-            DesfireRecord(data)
+        fun create(data: ByteArray): DesfireRecord = DesfireRecord(data)
     }
 }

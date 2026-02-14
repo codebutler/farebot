@@ -23,13 +23,12 @@
 package com.codebutler.farebot.shared.sample
 
 import com.codebutler.farebot.transit.Subscription
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Instant
 
 class SampleSubscription : Subscription() {
-
     override val id: Int = 1
 
     override val validFrom: Instant get() = LocalDate(2017, 6, 1).atStartOfDayIn(TimeZone.UTC)

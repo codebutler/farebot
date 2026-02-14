@@ -22,8 +22,6 @@
 
 package com.codebutler.farebot.transit.smartrider
 
-import kotlin.time.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -37,7 +35,6 @@ import kotlin.test.assertNotNull
  * Ported from Metrodroid's SmartRiderTest.kt.
  */
 class SmartRiderTest {
-
     /**
      * Tests timestamp conversion for SmartRider and MyWay cards.
      *

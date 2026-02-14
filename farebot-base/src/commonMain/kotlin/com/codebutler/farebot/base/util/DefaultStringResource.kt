@@ -8,9 +8,10 @@ import org.jetbrains.compose.resources.StringResource as ComposeStringResource
  * via [getStringBlocking].
  */
 class DefaultStringResource : StringResource {
-    override fun getString(resource: ComposeStringResource): String =
-        getStringBlocking(resource)
+    override fun getString(resource: ComposeStringResource): String = getStringBlocking(resource)
 
-    override fun getString(resource: ComposeStringResource, vararg formatArgs: Any): String =
-        getStringBlocking(resource, *formatArgs)
+    override fun getString(
+        resource: ComposeStringResource,
+        vararg formatArgs: Any,
+    ): String = getStringBlocking(resource, *formatArgs)
 }

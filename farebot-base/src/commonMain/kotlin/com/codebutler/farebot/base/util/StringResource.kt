@@ -8,5 +8,9 @@ import org.jetbrains.compose.resources.StringResource as ComposeStringResource
  */
 interface StringResource {
     fun getString(resource: ComposeStringResource): String
-    fun getString(resource: ComposeStringResource, vararg formatArgs: Any): String
+
+    fun getString(
+        resource: ComposeStringResource,
+        vararg formatArgs: Any,
+    ): String
 }

@@ -24,12 +24,12 @@ package com.codebutler.farebot.shared.serialize
 
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.serialize.CardSerializer
-import kotlin.time.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlin.time.Clock
 
 /**
  * High-level export functionality for card data.
@@ -49,10 +49,11 @@ class CardExporter(
     fun exportCard(
         card: RawCard<*>,
         format: ExportFormat = ExportFormat.JSON,
-    ): String = when (format) {
-        ExportFormat.JSON -> exportCardToJson(card)
-        ExportFormat.XML -> XmlCardExporter.exportCard(card)
-    }
+    ): String =
+        when (format) {
+            ExportFormat.JSON -> exportCardToJson(card)
+            ExportFormat.XML -> XmlCardExporter.exportCard(card)
+        }
 
     /**
      * Exports multiple cards to the specified format.
@@ -60,17 +61,16 @@ class CardExporter(
     fun exportCards(
         cards: List<RawCard<*>>,
         format: ExportFormat = ExportFormat.JSON,
-    ): String = when (format) {
-        ExportFormat.JSON -> exportCardsToJson(cards)
-        ExportFormat.XML -> XmlCardExporter.exportCards(cards)
-    }
+    ): String =
+        when (format) {
+            ExportFormat.JSON -> exportCardsToJson(cards)
+            ExportFormat.XML -> XmlCardExporter.exportCards(cards)
+        }
 
     /**
      * Exports a single card to JSON format with full card data.
      */
-    private fun exportCardToJson(card: RawCard<*>): String {
-        return cardSerializer.serialize(card)
-    }
+    private fun exportCardToJson(card: RawCard<*>): String = cardSerializer.serialize(card)
 
     /**
      * Exports multiple cards to JSON format with metadata.
@@ -89,20 +89,22 @@ class CardExporter(
      * ```
      */
     private fun exportCardsToJson(cards: List<RawCard<*>>): String {
-        val cardElements = cards.map { card ->
-            json.parseToJsonElement(cardSerializer.serialize(card))
-        }
+        val cardElements =
+            cards.map { card ->
+                json.parseToJsonElement(cardSerializer.serialize(card))
+            }
 
         val metadata = ExportMetadata.create(versionCode, versionName)
 
-        val export = buildJsonObject {
-            put("cards", JsonArray(cardElements))
-            put("appName", metadata.appName)
-            put("versionCode", metadata.versionCode)
-            put("versionName", metadata.versionName)
-            put("exportedAt", metadata.exportedAt.toString())
-            put("formatVersion", metadata.formatVersion)
-        }
+        val export =
+            buildJsonObject {
+                put("cards", JsonArray(cardElements))
+                put("appName", metadata.appName)
+                put("versionCode", metadata.versionCode)
+                put("versionName", metadata.versionName)
+                put("exportedAt", metadata.exportedAt.toString())
+                put("formatVersion", metadata.formatVersion)
+            }
 
         return json.encodeToString(JsonObject.serializer(), export)
     }
@@ -118,9 +120,8 @@ class CardExporter(
     /**
      * Generates a filename for bulk export.
      */
-    fun generateBulkFilename(
-        format: ExportFormat = ExportFormat.JSON,
-    ): String = ExportHelper.makeBulkExportFilename(format, Clock.System.now())
+    fun generateBulkFilename(format: ExportFormat = ExportFormat.JSON): String =
+        ExportHelper.makeBulkExportFilename(format, Clock.System.now())
 
     companion object {
         /**
@@ -128,10 +129,11 @@ class CardExporter(
          */
         fun create(
             cardSerializer: CardSerializer,
-            json: Json = Json {
-                prettyPrint = true
-                encodeDefaults = false
-            },
+            json: Json =
+                Json {
+                    prettyPrint = true
+                    encodeDefaults = false
+                },
         ): CardExporter = CardExporter(cardSerializer, json)
     }
 }

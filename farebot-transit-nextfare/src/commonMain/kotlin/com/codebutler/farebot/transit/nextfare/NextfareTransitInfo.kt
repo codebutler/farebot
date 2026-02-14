@@ -56,7 +56,7 @@ data class NextfareTransitInfoCapsule(
     val balance: Int,
     val trips: List<Trip>,
     val refills: List<Refill>,
-    val subscriptions: List<NextfareSubscription>
+    val subscriptions: List<NextfareSubscription>,
 )
 
 /**
@@ -67,9 +67,8 @@ data class NextfareTransitInfoCapsule(
  */
 open class NextfareTransitInfo(
     val capsule: NextfareTransitInfoCapsule,
-    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) }
+    private val currencyFactory: (Int) -> TransitCurrency = { TransitCurrency.XXX(it) },
 ) : TransitInfo() {
-
     override val balance: TransitBalance
         get() = TransitBalance(balance = currencyFactory(capsule.balance))
 
@@ -91,10 +90,17 @@ open class NextfareTransitInfo(
     companion object {
         const val NAME = "Nextfare"
 
-        val MANUFACTURER = byteArrayOf(
-            0x16, 0x18, 0x1A, 0x1B,
-            0x1C, 0x1D, 0x1E, 0x1F
-        )
+        val MANUFACTURER =
+            byteArrayOf(
+                0x16,
+                0x18,
+                0x1A,
+                0x1B,
+                0x1C,
+                0x1D,
+                0x1E,
+                0x1F,
+            )
 
         /**
          * Format a Nextfare serial number with the standard 0160 prefix and Luhn check digit.
@@ -102,13 +108,14 @@ open class NextfareTransitInfo(
         fun formatSerialNumber(serialNumber: Long): String {
             val digits = serialNumber.toString().padStart(11, '0')
             val raw = "0160$digits"
-            val spaced = buildString {
-                append("0160 ")
-                for (i in digits.indices) {
-                    append(digits[i])
-                    if (i == 3 || i == 7) append(' ')
+            val spaced =
+                buildString {
+                    append("0160 ")
+                    for (i in digits.indices) {
+                        append(digits[i])
+                        if (i == 3 || i == 7) append(' ')
+                    }
                 }
-            }
             val luhn = calculateLuhn(raw)
             return "$spaced$luhn"
         }
@@ -134,13 +141,12 @@ open class NextfareTransitInfo(
          */
         private fun tapsMergeable(
             tap1: NextfareTransactionRecord,
-            tap2: NextfareTransactionRecord
-        ): Boolean {
-            return when {
+            tap2: NextfareTransactionRecord,
+        ): Boolean =
+            when {
                 tap1.type.isSale || tap2.type.isSale -> false
                 else -> tap1.journey == tap2.journey && tap1.mode == tap2.mode
             }
-        }
 
         /**
          * Core Nextfare card parsing logic. Parses a ClassicCard into a NextfareTransitInfoCapsule.
@@ -156,7 +162,7 @@ open class NextfareTransitInfo(
             timeZone: TimeZone,
             newTrip: (NextfareTripCapsule) -> Trip = { NextfareTrip(it) },
             newRefill: (NextfareTopupRecord) -> Refill = { NextfareRefill(it) },
-            shouldMergeJourneys: Boolean = true
+            shouldMergeJourneys: Boolean = true,
         ): NextfareTransitInfoCapsule {
             val sector0 = card.getSector(0) as DataClassicSector
             val serialData = sector0.getBlock(0).data
@@ -173,9 +179,13 @@ open class NextfareTransitInfo(
                 if (sector !is DataClassicSector) continue
                 for ((blockIdx, block) in sector.blocks.withIndex()) {
                     if (blockIdx >= 3) continue // Skip trailer blocks
-                    val record = NextfareRecord.recordFromBytes(
-                        block.data, secIdx, blockIdx, timeZone
-                    )
+                    val record =
+                        NextfareRecord.recordFromBytes(
+                            block.data,
+                            secIdx,
+                            blockIdx,
+                            timeZone,
+                        )
                     if (record != null) {
                         records.add(record)
                     }
@@ -196,21 +206,22 @@ open class NextfareTransitInfo(
             refills += records.filterIsInstance<NextfareTopupRecord>().map { newRefill(it) }
 
             // Determine balance
-            val balance: Int = if (balances.isNotEmpty()) {
-                var best = balances[0]
-                if (balances.size == 2) {
-                    // If the version number overflowed, swap them
-                    if (balances[0].version >= 240 && balances[1].version <= 10) {
-                        best = balances[1]
+            val balance: Int =
+                if (balances.isNotEmpty()) {
+                    var best = balances[0]
+                    if (balances.size == 2) {
+                        // If the version number overflowed, swap them
+                        if (balances[0].version >= 240 && balances[1].version <= 10) {
+                            best = balances[1]
+                        }
                     }
+                    if (best.hasTravelPassAvailable) {
+                        subscriptions.add(NextfareSubscription(best))
+                    }
+                    best.balance
+                } else {
+                    0
                 }
-                if (best.hasTravelPassAvailable) {
-                    subscriptions.add(NextfareSubscription(best))
-                }
-                best.balance
-            } else {
-                0
-            }
 
             // Build trips from transaction records
             if (taps.isNotEmpty()) {
@@ -218,14 +229,15 @@ open class NextfareTransitInfo(
                 while (i < taps.size) {
                     val tapOn = taps[i]
 
-                    val trip = NextfareTripCapsule(
-                        journeyId = tapOn.journey,
-                        startTimestamp = tapOn.timestamp,
-                        startStation = tapOn.station,
-                        modeInt = tapOn.mode,
-                        isTransfer = tapOn.isContinuation,
-                        cost = -tapOn.value
-                    )
+                    val trip =
+                        NextfareTripCapsule(
+                            journeyId = tapOn.journey,
+                            startTimestamp = tapOn.timestamp,
+                            startStation = tapOn.station,
+                            modeInt = tapOn.mode,
+                            isTransfer = tapOn.isContinuation,
+                            cost = -tapOn.value,
+                        )
 
                     // Check if next record is a tap-off for this journey
                     if (shouldMergeJourneys && i + 1 < taps.size && tapsMergeable(tapOn, taps[i + 1])) {
@@ -244,9 +256,10 @@ open class NextfareTransitInfo(
                 trips.reverse()
             }
 
-            val hasUnknownStations = trips.any {
-                it.startStation == null || it.endStation == null
-            }
+            val hasUnknownStations =
+                trips.any {
+                    it.startStation == null || it.endStation == null
+                }
 
             if (passes.isNotEmpty()) {
                 subscriptions.add(NextfareSubscription(passes[0]))
@@ -261,7 +274,7 @@ open class NextfareTransitInfo(
                 balance = balance,
                 trips = trips,
                 refills = refills,
-                subscriptions = subscriptions
+                subscriptions = subscriptions,
             )
         }
     }
@@ -270,7 +283,6 @@ open class NextfareTransitInfo(
      * Fallback factory for unrecognized Nextfare cards.
      */
     open class NextfareTransitFactory : TransitFactory<ClassicCard, NextfareTransitInfo> {
-
         override val allCards: List<CardInfo> = emptyList()
 
         override fun check(card: ClassicCard): Boolean {
@@ -278,7 +290,8 @@ open class NextfareTransitInfo(
             if (sector0 !is DataClassicSector) return false
             val blockData = sector0.getBlock(1).data
             if (blockData.size < MANUFACTURER.size + 1) return false
-            return blockData.copyOfRange(1, MANUFACTURER.size + 1)
+            return blockData
+                .copyOfRange(1, MANUFACTURER.size + 1)
                 .contentEquals(MANUFACTURER)
         }
 

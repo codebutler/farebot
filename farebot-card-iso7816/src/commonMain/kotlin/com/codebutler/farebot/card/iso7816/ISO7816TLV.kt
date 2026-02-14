@@ -27,15 +27,15 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.ui.ListItemRecursive
-import farebot.farebot_card_iso7816.generated.resources.*
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.hex
-import com.codebutler.farebot.base.util.indexOfFirstStarting
 import com.codebutler.farebot.base.util.indexOf
+import com.codebutler.farebot.base.util.indexOfFirstStarting
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.base.util.sliceOffLenSafe
 import com.codebutler.farebot.base.util.toHexDump
+import farebot.farebot_card_iso7816.generated.resources.*
 
 /**
  * Utilities for decoding BER-TLV values.
@@ -53,17 +53,23 @@ object ISO7816TLV {
      * @param p Offset within [buf] to read from
      * @return The number of bytes for this tag's identifier octets.
      */
-    private fun getTLVIDLen(buf: ByteArray, p: Int): Int {
+    private fun getTLVIDLen(
+        buf: ByteArray,
+        p: Int,
+    ): Int {
         // One byte version: if the lower 5 bits (tag number) != 0x1f.
-        if (buf[p].toInt() and 0x1f != 0x1f)
+        if (buf[p].toInt() and 0x1f != 0x1f) {
             return 1
+        }
 
         // Multi-byte version: if the first byte has the lower 5 bits == 0x1f then subsequent
         // bytes contain the tag number. Bit 8 is set when there (is/are) more byte(s) for the
         // tag number.
         var len = 1
         @Suppress("ControlFlowWithEmptyBody")
-        while (buf[p + len++].toInt() and 0x80 != 0);
+        while (buf[p + len++].toInt() and 0x80 != 0) {
+            // empty body - continue reading multi-byte tag
+        }
         return len
     }
 
@@ -77,7 +83,10 @@ object ISO7816TLV {
      *
      * Returns `null` if invalid.
      */
-    private fun decodeTLVLen(buf: ByteArray, p: Int): Triple<Int, Int, Int>? {
+    private fun decodeTLVLen(
+        buf: ByteArray,
+        p: Int,
+    ): Triple<Int, Int, Int>? {
         val headByte = buf[p].toInt() and 0xff
         if (headByte shr 7 == 0) {
             // Definite, short form (1 byte)
@@ -128,8 +137,10 @@ object ISO7816TLV {
      * @param multihead If true, process multiple top-level TLV containers
      * @return [Sequence] of [Triple] of `id, header, data`
      */
-    fun berTlvIterate(buf: ByteArray, multihead: Boolean = false):
-        Sequence<Triple<ByteArray, ByteArray, ByteArray>> {
+    fun berTlvIterate(
+        buf: ByteArray,
+        multihead: Boolean = false,
+    ): Sequence<Triple<ByteArray, ByteArray, ByteArray>> {
         return sequence {
             var p = 0
             while (p < buf.size) {
@@ -178,8 +189,9 @@ object ISO7816TLV {
                         return@sequence
                     }
 
-                    if ((id.isAllZero() || id.isEmpty()) && (header.isEmpty() || header.isAllZero())
-                        && data.isEmpty()
+                    if ((id.isAllZero() || id.isEmpty()) &&
+                        (header.isEmpty() || header.isAllZero()) &&
+                        data.isEmpty()
                     ) {
                         // Skip empty tag
                         continue
@@ -189,8 +201,9 @@ object ISO7816TLV {
                     p += idlen + hlen + datalen + eoclen
                 }
 
-                if (!multihead)
+                if (!multihead) {
                     return@sequence
+                }
             }
         }
     }
@@ -217,18 +230,22 @@ object ISO7816TLV {
 
     @OptIn(ExperimentalStdlibApi::class)
     fun findBERTLV(
-        buf: ByteArray, target: String,
-        keepHeader: Boolean = false, multihead: Boolean = false
-    ): ByteArray? =
-        findBERTLV(buf, target.hexToByteArray(), keepHeader, multihead)
+        buf: ByteArray,
+        target: String,
+        keepHeader: Boolean = false,
+        multihead: Boolean = false,
+    ): ByteArray? = findBERTLV(buf, target.hexToByteArray(), keepHeader, multihead)
 
     fun findBERTLV(
-        buf: ByteArray, target: ByteArray,
-        keepHeader: Boolean = false, multihead: Boolean = false
+        buf: ByteArray,
+        target: ByteArray,
+        keepHeader: Boolean = false,
+        multihead: Boolean = false,
     ): ByteArray? {
-        val result = berTlvIterate(buf, multihead).firstOrNull {
-            it.first.contentEquals(target)
-        } ?: return null
+        val result =
+            berTlvIterate(buf, multihead).firstOrNull {
+                it.first.contentEquals(target)
+            } ?: return null
 
         return if (keepHeader) {
             result.second + result.third
@@ -239,59 +256,71 @@ object ISO7816TLV {
 
     @OptIn(ExperimentalStdlibApi::class)
     fun findRepeatedBERTLV(
-        buf: ByteArray, target: String, keepHeader: Boolean
-    ): Sequence<ByteArray> =
-        findRepeatedBERTLV(buf, target.hexToByteArray(), keepHeader)
+        buf: ByteArray,
+        target: String,
+        keepHeader: Boolean,
+    ): Sequence<ByteArray> = findRepeatedBERTLV(buf, target.hexToByteArray(), keepHeader)
 
     fun findRepeatedBERTLV(
-        buf: ByteArray, target: ByteArray, keepHeader: Boolean
-    ): Sequence<ByteArray> {
-        return berTlvIterate(buf).filter { it.first.contentEquals(target) }.map {
+        buf: ByteArray,
+        target: ByteArray,
+        keepHeader: Boolean,
+    ): Sequence<ByteArray> =
+        berTlvIterate(buf).filter { it.first.contentEquals(target) }.map {
             if (keepHeader) {
                 it.second + it.third
             } else {
                 it.third
             }
         }
-    }
 
     // Backwards-compatible convenience methods (no keepHeader/multihead)
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun findAllBERTLV(buf: ByteArray, targetHex: String): List<ByteArray> {
+    fun findAllBERTLV(
+        buf: ByteArray,
+        targetHex: String,
+    ): List<ByteArray> {
         val target = targetHex.hexToByteArray()
-        return berTlvIterate(buf).filter { it.first.contentEquals(target) }
-            .map { it.third }.toList()
+        return berTlvIterate(buf)
+            .filter { it.first.contentEquals(target) }
+            .map { it.third }
+            .toList()
     }
 
     /**
      * Parses BER-TLV data, and builds [ListItem] and [ListItemRecursive] for each of the tags.
      */
-    fun infoBerTLV(buf: ByteArray, multihead: Boolean = false): List<ListItemInterface> {
-        return berTlvIterate(buf, multihead).map { (id, header, data) ->
-            if (id[0].toInt() and 0xe0 == 0xa0) {
-                try {
-                    ListItemRecursive(
-                        id.hex(),
-                        null, infoBerTLV(header + data, multihead)
-                    )
-                } catch (e: Exception) {
+    fun infoBerTLV(
+        buf: ByteArray,
+        multihead: Boolean = false,
+    ): List<ListItemInterface> =
+        berTlvIterate(buf, multihead)
+            .map { (id, header, data) ->
+                if (id[0].toInt() and 0xe0 == 0xa0) {
+                    try {
+                        ListItemRecursive(
+                            id.hex(),
+                            null,
+                            infoBerTLV(header + data, multihead),
+                        )
+                    } catch (e: Exception) {
+                        ListItem(id.toHexDump(), data.toHexDump())
+                    }
+                } else {
                     ListItem(id.toHexDump(), data.toHexDump())
                 }
-            } else {
-                ListItem(id.toHexDump(), data.toHexDump())
-            }
-        }.toList()
-    }
+            }.toList()
 
-    fun infoWithRaw(buf: ByteArray) = listOfNotNull(
-        ListItemRecursive.collapsedValue("Raw", buf.toHexDump()),
-        try {
-            ListItemRecursive("TLV", null, infoBerTLV(buf))
-        } catch (e: Exception) {
-            null
-        }
-    )
+    fun infoWithRaw(buf: ByteArray) =
+        listOfNotNull(
+            ListItemRecursive.collapsedValue("Raw", buf.toHexDump()),
+            try {
+                ListItemRecursive("TLV", null, infoBerTLV(buf))
+            } catch (e: Exception) {
+                null
+            },
+        )
 
     fun removeTlvHeader(buf: ByteArray): ByteArray {
         val p = getTLVIDLen(buf, 0)
@@ -309,20 +338,21 @@ object ISO7816TLV {
         tlv: ByteArray,
         tagMap: Map<String, TagDesc>,
         includeUnknown: Boolean = false,
-        multihead: Boolean = false
-    ) = berTlvIterate(tlv, multihead).mapNotNull { (id, _, data) ->
-        val idStr = id.hex()
-        val d = tagMap[idStr]
-        if (d == null) {
-            if (includeUnknown) {
-                ListItem(idStr, data.toHexDump())
+        multihead: Boolean = false,
+    ) = berTlvIterate(tlv, multihead)
+        .mapNotNull { (id, _, data) ->
+            val idStr = id.hex()
+            val d = tagMap[idStr]
+            if (d == null) {
+                if (includeUnknown) {
+                    ListItem(idStr, data.toHexDump())
+                } else {
+                    null
+                }
             } else {
-                null
+                d.interpretTag(data)
             }
-        } else {
-            d.interpretTag(data)
-        }
-    }.toList()
+        }.toList()
 
     /**
      * Like [infoBerTLV], but also returns a list of IDs that were unknown in the process.
@@ -330,20 +360,24 @@ object ISO7816TLV {
     fun infoBerTLVWithUnknowns(
         tlv: ByteArray,
         tagMap: Map<String, TagDesc>,
-        multihead: Boolean
+        multihead: Boolean,
     ): Pair<List<ListItemInterface>, Set<String>> {
         val unknownIds = mutableSetOf<String>()
 
-        return Pair(berTlvIterate(tlv, multihead).mapNotNull { (id, _, data) ->
-            val idStr = id.hex()
-            val d = tagMap[idStr]
-            if (d == null) {
-                unknownIds.add(idStr)
-                ListItem(idStr, data.toHexDump())
-            } else {
-                d.interpretTag(data)
-            }
-        }.toList(), unknownIds.toSet())
+        return Pair(
+            berTlvIterate(tlv, multihead)
+                .mapNotNull { (id, _, data) ->
+                    val idStr = id.hex()
+                    val d = tagMap[idStr]
+                    if (d == null) {
+                        unknownIds.add(idStr)
+                        ListItem(idStr, data.toHexDump())
+                    } else {
+                        d.interpretTag(data)
+                    }
+                }.toList(),
+            unknownIds.toSet(),
+        )
     }
 
     /**
@@ -377,8 +411,9 @@ object ISO7816TLV {
                 // Skip empty tag
                 if (len < 1) continue
 
-                val d = buf.sliceOffLenSafe(p, len)
-                    ?: return@sequence // Invalid length
+                val d =
+                    buf.sliceOffLenSafe(p, len)
+                        ?: return@sequence // Invalid length
 
                 yield(Pair(tag, d))
                 p += len
@@ -407,8 +442,9 @@ object ISO7816TLV {
 
                 // Skip empty tag
                 if (len < 1) continue
-                val d = buf.sliceOffLenSafe(p, len)
-                    ?: return@sequence // Invalid length
+                val d =
+                    buf.sliceOffLenSafe(p, len)
+                        ?: return@sequence // Invalid length
 
                 yield(Pair(tag, d))
                 p += len
@@ -420,20 +456,22 @@ object ISO7816TLV {
         tlvs: List<ByteArray>,
         tagmap: Map<String, TagDesc>,
         hideThings: Boolean,
-        multihead: Boolean = false
+        multihead: Boolean = false,
     ): List<ListItemInterface> {
-        val res = mutableListOf<ListItemInterface>(
-            HeaderListItem(Res.string.iso7816_tlv_tags)
-        )
+        val res =
+            mutableListOf<ListItemInterface>(
+                HeaderListItem(Res.string.iso7816_tlv_tags),
+            )
         val unknownIds = mutableSetOf<String>()
         for (tlv in tlvs) {
-            val li = if (hideThings) {
-                infoBerTLV(tlv, tagmap, multihead = multihead)
-            } else {
-                val (parsed, unknowns) = infoBerTLVWithUnknowns(tlv, tagmap, multihead)
-                unknownIds += unknowns
-                parsed
-            }
+            val li =
+                if (hideThings) {
+                    infoBerTLV(tlv, tagmap, multihead = multihead)
+                } else {
+                    val (parsed, unknowns) = infoBerTLVWithUnknowns(tlv, tagmap, multihead)
+                    unknownIds += unknowns
+                    parsed
+                }
             res += li
         }
 

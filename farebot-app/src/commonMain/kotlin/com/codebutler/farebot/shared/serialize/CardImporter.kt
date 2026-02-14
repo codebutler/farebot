@@ -27,7 +27,6 @@ import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.serialize.CardSerializer
-import kotlin.time.Clock
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -35,8 +34,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlin.time.Clock
 
 /**
  * Result of an import operation.
@@ -140,9 +139,10 @@ class CardImporter(
         return when {
             element is JsonArray -> {
                 // Array of cards (legacy format)
-                val cards = element.map { cardElement ->
-                    deserializeCard(cardElement)
-                }
+                val cards =
+                    element.map { cardElement ->
+                        deserializeCard(cardElement)
+                    }
                 ImportResult.Success(cards, ImportFormat.FAREBOT_JSON)
             }
 
@@ -188,24 +188,30 @@ class CardImporter(
     /**
      * Imports cards from a bulk export JSON object.
      */
-    private fun importBulkExport(obj: JsonObject, cardsArray: JsonArray): ImportResult {
-        val metadata = ImportMetadata(
-            appName = obj["appName"]?.toString()?.removeSurrounding("\""),
-            versionCode = obj["versionCode"]?.toString()?.toIntOrNull(),
-            versionName = obj["versionName"]?.toString()?.removeSurrounding("\""),
-            exportedAt = obj["exportedAt"]?.toString()?.removeSurrounding("\""),
-            formatVersion = obj["formatVersion"]?.toString()?.toIntOrNull(),
-        )
+    private fun importBulkExport(
+        obj: JsonObject,
+        cardsArray: JsonArray,
+    ): ImportResult {
+        val metadata =
+            ImportMetadata(
+                appName = obj["appName"]?.toString()?.removeSurrounding("\""),
+                versionCode = obj["versionCode"]?.toString()?.toIntOrNull(),
+                versionName = obj["versionName"]?.toString()?.removeSurrounding("\""),
+                exportedAt = obj["exportedAt"]?.toString()?.removeSurrounding("\""),
+                formatVersion = obj["formatVersion"]?.toString()?.toIntOrNull(),
+            )
 
-        val format = when {
-            metadata.appName == "FareBot" -> ImportFormat.FAREBOT_BULK_JSON
-            metadata.appName == "Metrodroid" -> ImportFormat.METRODROID_JSON
-            else -> ImportFormat.FAREBOT_BULK_JSON
-        }
+        val format =
+            when {
+                metadata.appName == "FareBot" -> ImportFormat.FAREBOT_BULK_JSON
+                metadata.appName == "Metrodroid" -> ImportFormat.METRODROID_JSON
+                else -> ImportFormat.FAREBOT_BULK_JSON
+            }
 
-        val cards = cardsArray.map { cardElement ->
-            deserializeCard(cardElement)
-        }
+        val cards =
+            cardsArray.map { cardElement ->
+                deserializeCard(cardElement)
+            }
 
         return ImportResult.Success(cards, format, metadata)
     }
@@ -234,24 +240,22 @@ class CardImporter(
      * Note: This is a simplified implementation that handles the most common case.
      * Complex Metrodroid cards may require additional conversion logic.
      */
-    private fun importMetrodroidCard(obj: JsonObject): RawCard<*> {
-        return MetrodroidJsonParser.parse(obj)
+    private fun importMetrodroidCard(obj: JsonObject): RawCard<*> =
+        MetrodroidJsonParser.parse(obj)
             ?: throw IllegalArgumentException(
-                "Unsupported Metrodroid card format. Known keys: ${obj.keys.joinToString()}"
+                "Unsupported Metrodroid card format. Known keys: ${obj.keys.joinToString()}",
             )
-    }
 
     /**
      * Imports a binary .mfc (MIFARE Classic dump) file.
      */
-    fun importMfcDump(bytes: ByteArray): ImportResult {
-        return try {
+    fun importMfcDump(bytes: ByteArray): ImportResult =
+        try {
             val rawCard = parseMfcBytes(bytes)
             ImportResult.Success(listOf(rawCard), ImportFormat.UNKNOWN)
         } catch (e: Exception) {
             ImportResult.Error("Failed to parse MFC dump: ${e.message}", e)
         }
-    }
 
     private fun parseMfcBytes(bytes: ByteArray): RawClassicCard {
         val sectors = mutableListOf<RawClassicSector>()
@@ -264,28 +268,31 @@ class CardImporter(
             if (offset + sectorSize > bytes.size) break
 
             val sectorBytes = bytes.copyOfRange(offset, offset + sectorSize)
-            val blocks = (0 until blockCount).map { blockIndex ->
-                val blockStart = blockIndex * 16
-                val blockData = sectorBytes.copyOfRange(blockStart, blockStart + 16)
-                RawClassicBlock.create(blockIndex, blockData)
-            }
+            val blocks =
+                (0 until blockCount).map { blockIndex ->
+                    val blockStart = blockIndex * 16
+                    val blockData = sectorBytes.copyOfRange(blockStart, blockStart + 16)
+                    RawClassicBlock.create(blockIndex, blockData)
+                }
 
             sectors.add(RawClassicSector.createData(sectorNum, blocks))
             offset += sectorSize
             sectorNum++
         }
 
-        val tagId = if (sectors.isNotEmpty() && !sectors[0].blocks.isNullOrEmpty()) {
-            sectors[0].blocks!![0].data.copyOfRange(0, 4)
-        } else {
-            byteArrayOf(0xDE.toByte(), 0xAD.toByte(), 0xBE.toByte(), 0xEF.toByte())
-        }
+        val tagId =
+            if (sectors.isNotEmpty() && !sectors[0].blocks.isNullOrEmpty()) {
+                sectors[0].blocks!![0].data.copyOfRange(0, 4)
+            } else {
+                byteArrayOf(0xDE.toByte(), 0xAD.toByte(), 0xBE.toByte(), 0xEF.toByte())
+            }
 
-        val maxSector = when {
-            sectorNum <= 16 -> 15
-            sectorNum <= 32 -> 31
-            else -> 39
-        }
+        val maxSector =
+            when {
+                sectorNum <= 16 -> 15
+                sectorNum <= 32 -> 31
+                else -> 39
+            }
         while (sectors.size <= maxSector) {
             sectors.add(RawClassicSector.createUnauthorized(sectors.size))
         }
@@ -294,8 +301,11 @@ class CardImporter(
     }
 
     private fun importFromFlipper(data: String): ImportResult {
-        val rawCard = FlipperNfcParser.parse(data)
-            ?: return ImportResult.Error("Failed to parse Flipper NFC dump. Unsupported card type or malformed file.")
+        val rawCard =
+            FlipperNfcParser.parse(data)
+                ?: return ImportResult.Error(
+                    "Failed to parse Flipper NFC dump. Unsupported card type or malformed file.",
+                )
         return ImportResult.Success(listOf(rawCard), ImportFormat.FLIPPER_NFC)
     }
 
@@ -305,10 +315,11 @@ class CardImporter(
          */
         fun create(
             cardSerializer: CardSerializer,
-            json: Json = Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-            },
+            json: Json =
+                Json {
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                },
         ): CardImporter = CardImporter(cardSerializer, json)
     }
 }

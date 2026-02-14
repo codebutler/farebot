@@ -34,9 +34,8 @@ class ClipperUltralightTrip(
     private val balanceSeqCounter: Int,
     private val station: Int,
     private val type: Int,
-    private val agency: Int
+    private val agency: Int,
 ) : Trip() {
-
     constructor(transaction: ByteArray, baseDate: Int) : this(
         seqCounter = getBitsFromBuffer(transaction, 0, 7),
         type = getBitsFromBuffer(transaction, 7, 17),
@@ -45,7 +44,7 @@ class ClipperUltralightTrip(
         agency = getBitsFromBuffer(transaction, 68, 5),
         balanceSeqCounter = getBitsFromBuffer(transaction, 80, 4),
         tripsRemaining = getBitsFromBuffer(transaction, 84, 6),
-        transferExpiry = getBitsFromBuffer(transaction, 100, 10)
+        transferExpiry = getBitsFromBuffer(transaction, 100, 10),
     )
 
     val isHidden: Boolean get() = type == 1
@@ -66,16 +65,19 @@ class ClipperUltralightTrip(
 
     override val mode: Mode get() = ClipperData.getMode(agency)
 
-    fun isSeqGreater(other: ClipperUltralightTrip): Boolean {
-        return if (other.balanceSeqCounter != balanceSeqCounter) {
+    fun isSeqGreater(other: ClipperUltralightTrip): Boolean =
+        if (other.balanceSeqCounter != balanceSeqCounter) {
             (balanceSeqCounter - other.balanceSeqCounter) and 0x8 == 0
         } else {
             (seqCounter - other.seqCounter) and 0x40 == 0
         }
-    }
 
     companion object {
-        private fun getBitsFromBuffer(buffer: ByteArray, offset: Int, length: Int): Int {
+        private fun getBitsFromBuffer(
+            buffer: ByteArray,
+            offset: Int,
+            length: Int,
+        ): Int {
             var result = 0
             for (i in offset until offset + length) {
                 result = result shl 1

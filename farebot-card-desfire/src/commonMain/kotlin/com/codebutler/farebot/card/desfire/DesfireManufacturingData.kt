@@ -47,7 +47,7 @@ data class DesfireManufacturingData(
     @Contextual val uid: ByteArray,
     @Contextual val batchNo: ByteArray,
     val weekProd: Int,
-    val yearProd: Int
+    val yearProd: Int,
 ) {
     val uidHex: String
         get() = uid.toHexString()
@@ -101,7 +101,7 @@ data class DesfireManufacturingData(
                 uid = uid,
                 batchNo = batchNo,
                 weekProd = weekProd,
-                yearProd = yearProd
+                yearProd = yearProd,
             )
         }
     }

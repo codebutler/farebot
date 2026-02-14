@@ -30,7 +30,6 @@ import com.codebutler.farebot.card.cepas.raw.RawCEPASCard
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.desfire.raw.RawDesfireCard
-import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
 import com.codebutler.farebot.card.felica.raw.RawFelicaCard
 import com.codebutler.farebot.card.iso7816.raw.RawISO7816Card
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
@@ -48,19 +47,18 @@ object XmlCardExporter {
     /**
      * Exports a single card to XML format.
      */
-    fun exportCard(card: RawCard<*>): String {
-        return buildString {
+    fun exportCard(card: RawCard<*>): String =
+        buildString {
             append(XML_HEADER)
             append("\n")
             appendCardXml(card)
         }
-    }
 
     /**
      * Exports multiple cards to XML format wrapped in a <cards> element.
      */
-    fun exportCards(cards: List<RawCard<*>>): String {
-        return buildString {
+    fun exportCards(cards: List<RawCard<*>>): String =
+        buildString {
             append(XML_HEADER)
             append("\n<cards>\n")
             for (card in cards) {
@@ -69,9 +67,11 @@ object XmlCardExporter {
             }
             append("</cards>")
         }
-    }
 
-    private fun StringBuilder.appendCardXml(card: RawCard<*>, indent: String = "") {
+    private fun StringBuilder.appendCardXml(
+        card: RawCard<*>,
+        indent: String = "",
+    ) {
         val tagId = card.tagId().hex()
         val scannedAt = card.scannedAt().toEpochMilliseconds()
         val cardType = card.cardType().toInteger()
@@ -98,7 +98,10 @@ object XmlCardExporter {
         append("</card>")
     }
 
-    private fun StringBuilder.appendDesfireCard(card: RawDesfireCard, indent: String) {
+    private fun StringBuilder.appendDesfireCard(
+        card: RawDesfireCard,
+        indent: String,
+    ) {
         // Manufacturing data - export raw bytes as base64
         append(indent)
         append("<manufacturing-data>")
@@ -150,7 +153,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendClassicCard(card: RawClassicCard, indent: String) {
+    private fun StringBuilder.appendClassicCard(
+        card: RawClassicCard,
+        indent: String,
+    ) {
         for (sector in card.sectors()) {
             append(indent)
             append("<sector")
@@ -209,7 +215,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendUltralightCard(card: RawUltralightCard, indent: String) {
+    private fun StringBuilder.appendUltralightCard(
+        card: RawUltralightCard,
+        indent: String,
+    ) {
         append(indent)
         append("<ultralightType>")
         append(card.ultralightType.toString())
@@ -225,7 +234,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendFelicaCard(card: RawFelicaCard, indent: String) {
+    private fun StringBuilder.appendFelicaCard(
+        card: RawFelicaCard,
+        indent: String,
+    ) {
         // IDm
         append(indent)
         append("<idm>")
@@ -275,7 +287,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendCepasCard(card: RawCEPASCard, indent: String) {
+    private fun StringBuilder.appendCepasCard(
+        card: RawCEPASCard,
+        indent: String,
+    ) {
         // Purses
         for (purse in card.purses) {
             append(indent)
@@ -325,7 +340,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendIso7816Card(card: RawISO7816Card, indent: String) {
+    private fun StringBuilder.appendIso7816Card(
+        card: RawISO7816Card,
+        indent: String,
+    ) {
         for (app in card.applications) {
             append(indent)
             append("<application")
@@ -409,7 +427,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendVicinityCard(card: RawVicinityCard, indent: String) {
+    private fun StringBuilder.appendVicinityCard(
+        card: RawVicinityCard,
+        indent: String,
+    ) {
         val sysInfo = card.sysInfo
         if (sysInfo != null) {
             append(indent)
@@ -438,7 +459,10 @@ object XmlCardExporter {
         }
     }
 
-    private fun StringBuilder.appendAttr(name: String, value: String) {
+    private fun StringBuilder.appendAttr(
+        name: String,
+        value: String,
+    ) {
         append(" ")
         append(name)
         append("=\"")
@@ -470,14 +494,15 @@ object XmlCardExporter {
         }
     }
 
-    private fun CardType.toInteger(): Int = when (this) {
-        CardType.MifareClassic -> 0
-        CardType.MifareUltralight -> 1
-        CardType.MifareDesfire -> 2
-        CardType.CEPAS -> 3
-        CardType.FeliCa -> 4
-        CardType.ISO7816 -> 5
-        CardType.Vicinity -> 6
-        CardType.Sample -> 7
-    }
+    private fun CardType.toInteger(): Int =
+        when (this) {
+            CardType.MifareClassic -> 0
+            CardType.MifareUltralight -> 1
+            CardType.MifareDesfire -> 2
+            CardType.CEPAS -> 3
+            CardType.FeliCa -> 4
+            CardType.ISO7816 -> 5
+            CardType.Vicinity -> 6
+            CardType.Sample -> 7
+        }
 }

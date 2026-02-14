@@ -19,15 +19,15 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 
 class NorticTransitFactory : TransitFactory<DesfireCard, NorticTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     companion object {
         internal const val APP_ID = 0x8057
 
         internal fun parse(card: DesfireCard): NorticTransitInfo? {
-            val ciHeader = (card.getApplication(APP_ID)?.getFile(0xc) as? StandardDesfireFile)
-                ?.data ?: return null
+            val ciHeader =
+                (card.getApplication(APP_ID)?.getFile(0xc) as? StandardDesfireFile)
+                    ?.data ?: return null
 
             return NorticTransitInfo(
                 mCountry = ciHeader.getBitsFromBuffer(0, 10),
@@ -37,22 +37,22 @@ class NorticTransitFactory : TransitFactory<DesfireCard, NorticTransitInfo> {
                 mValidityEndDate = ciHeader.getBitsFromBuffer(64, 14),
                 mOwnerCompany = ciHeader.getBitsFromBuffer(78, 20),
                 mRetailerCompany = ciHeader.getBitsFromBuffer(98, 20),
-                mCardKeyVersion = ciHeader.getBitsFromBuffer(118, 4)
+                mCardKeyVersion = ciHeader.getBitsFromBuffer(118, 4),
             )
         }
     }
 
-    override fun check(card: DesfireCard): Boolean =
-        card.getApplication(APP_ID) != null
+    override fun check(card: DesfireCard): Boolean = card.getApplication(APP_ID) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        val ciHeader = (card.getApplication(APP_ID)?.getFile(0xc) as? StandardDesfireFile)?.data
-            ?: return TransitIdentity.create("Nortic", null)
+        val ciHeader =
+            (card.getApplication(APP_ID)?.getFile(0xc) as? StandardDesfireFile)?.data
+                ?: return TransitIdentity.create("Nortic", null)
         val serial = ciHeader.byteArrayToLong(4, 4)
         val ownerCompany = ciHeader.getBitsFromBuffer(78, 20)
         return TransitIdentity.create(
             NorticTransitInfo.getName(ownerCompany),
-            NorticTransitInfo.formatSerial(ownerCompany, serial)
+            NorticTransitInfo.formatSerial(ownerCompany, serial),
         )
     }
 

@@ -22,12 +22,12 @@
 
 package com.codebutler.farebot.card.classic
 
-import kotlin.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Tests for Classic card structure and parsing.
@@ -35,7 +35,6 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's ClassicCardTest.kt and ClassicReaderTest.kt
  */
 class ClassicCardTest {
-
     private val testTime = Instant.fromEpochMilliseconds(1264982400000)
     private val testTagId = byteArrayOf(0x01, 0x02, 0x03, 0x04)
 
@@ -50,24 +49,26 @@ class ClassicCardTest {
     fun testManufacturingInfoParsedFromSector0() {
         // Create sector 0 with valid manufacturer data in block 0
         // Block 0 layout: UID (4 bytes) + BCC + SAK + ATQA (2 bytes) + manufacturer data (8 bytes)
-        val manufacturerBlock = ByteArray(16).also {
-            it[0] = 0x01  // UID byte 1
-            it[1] = 0x02  // UID byte 2
-            it[2] = 0x03  // UID byte 3
-            it[3] = 0x04  // UID byte 4
-            it[4] = 0x04  // BCC (XOR of UID bytes)
-            it[5] = 0x08  // SAK
-            it[6] = 0x04  // ATQA byte 1
-            it[7] = 0x00  // ATQA byte 2
-            // Manufacturer data bytes 8-15
-        }
+        val manufacturerBlock =
+            ByteArray(16).also {
+                it[0] = 0x01 // UID byte 1
+                it[1] = 0x02 // UID byte 2
+                it[2] = 0x03 // UID byte 3
+                it[3] = 0x04 // UID byte 4
+                it[4] = 0x04 // BCC (XOR of UID bytes)
+                it[5] = 0x08 // SAK
+                it[6] = 0x04 // ATQA byte 1
+                it[7] = 0x00 // ATQA byte 2
+                // Manufacturer data bytes 8-15
+            }
 
-        val blocks = listOf(
-            ClassicBlock.create(ClassicBlock.TYPE_MANUFACTURER, 0, manufacturerBlock),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, ByteArray(16))
-        )
+        val blocks =
+            listOf(
+                ClassicBlock.create(ClassicBlock.TYPE_MANUFACTURER, 0, manufacturerBlock),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, ByteArray(16)),
+            )
 
         val sector0 = DataClassicSector(0, blocks)
         val card = ClassicCard.create(testTagId, testTime, listOf(sector0))
@@ -96,21 +97,24 @@ class ClassicCardTest {
 
     @Test
     fun testGetSector() {
-        val sectors = (0 until 16).map { index ->
-            if (index == 0) {
-                val blocks = (0 until 4).map { blockIndex ->
-                    val type = when (blockIndex) {
-                        0 -> ClassicBlock.TYPE_MANUFACTURER
-                        3 -> ClassicBlock.TYPE_TRAILER
-                        else -> ClassicBlock.TYPE_DATA
-                    }
-                    ClassicBlock.create(type, blockIndex, ByteArray(16))
+        val sectors =
+            (0 until 16).map { index ->
+                if (index == 0) {
+                    val blocks =
+                        (0 until 4).map { blockIndex ->
+                            val type =
+                                when (blockIndex) {
+                                    0 -> ClassicBlock.TYPE_MANUFACTURER
+                                    3 -> ClassicBlock.TYPE_TRAILER
+                                    else -> ClassicBlock.TYPE_DATA
+                                }
+                            ClassicBlock.create(type, blockIndex, ByteArray(16))
+                        }
+                    DataClassicSector(index, blocks)
+                } else {
+                    UnauthorizedClassicSector.create(index)
                 }
-                DataClassicSector(index, blocks)
-            } else {
-                UnauthorizedClassicSector.create(index)
             }
-        }
 
         val card = ClassicCard.create(testTagId, testTime, sectors)
 
@@ -126,12 +130,13 @@ class ClassicCardTest {
         val block2Data = ByteArray(16) { 0x22 }
         val trailerData = ByteArray(16) { 0xFF.toByte() }
 
-        val blocks = listOf(
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, block0Data),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, block1Data),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, block2Data),
-            ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailerData)
-        )
+        val blocks =
+            listOf(
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, block0Data),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, block1Data),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, block2Data),
+                ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailerData),
+            )
 
         val sector = DataClassicSector(0, blocks)
 
@@ -150,12 +155,13 @@ class ClassicCardTest {
     @Test
     fun testDataClassicSectorGetBlock() {
         val block0Data = ByteArray(16) { (it + 1).toByte() }
-        val blocks = listOf(
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, block0Data),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, ByteArray(16))
-        )
+        val blocks =
+            listOf(
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, block0Data),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, ByteArray(16)),
+            )
 
         val sector = DataClassicSector(0, blocks)
         val block = sector.getBlock(0)
@@ -181,25 +187,27 @@ class ClassicCardTest {
     fun testAccessBitsParsing() {
         // Create a sector with a valid trailer block containing access bits
         // Trailer layout: KeyA (6 bytes) + Access bits (4 bytes) + KeyB (6 bytes)
-        val trailerData = ByteArray(16).also {
-            // KeyA (bytes 0-5)
-            for (i in 0..5) it[i] = 0xFF.toByte()
-            // Access bits (bytes 6-9)
-            // Standard access bits: FF 07 80 69
-            it[6] = 0xFF.toByte()
-            it[7] = 0x07
-            it[8] = 0x80.toByte()
-            it[9] = 0x69
-            // KeyB (bytes 10-15)
-            for (i in 10..15) it[i] = 0xFF.toByte()
-        }
+        val trailerData =
+            ByteArray(16).also {
+                // KeyA (bytes 0-5)
+                for (i in 0..5) it[i] = 0xFF.toByte()
+                // Access bits (bytes 6-9)
+                // Standard access bits: FF 07 80 69
+                it[6] = 0xFF.toByte()
+                it[7] = 0x07
+                it[8] = 0x80.toByte()
+                it[9] = 0x69
+                // KeyB (bytes 10-15)
+                for (i in 10..15) it[i] = 0xFF.toByte()
+            }
 
-        val blocks = listOf(
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailerData)
-        )
+        val blocks =
+            listOf(
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailerData),
+            )
 
         val sector = DataClassicSector(0, blocks)
         val accessBits = sector.accessBits
@@ -223,11 +231,12 @@ class ClassicCardTest {
     @Test
     fun testSectorWithNoTrailerHasNoAccessBits() {
         // Sector with no trailer block
-        val blocks = listOf(
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
-            ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16))
-        )
+        val blocks =
+            listOf(
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
+                ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
+            )
 
         val sector = DataClassicSector(0, blocks)
         assertNull(sector.accessBits)
@@ -237,13 +246,15 @@ class ClassicCardTest {
     fun testLargeSectorStructure() {
         // MIFARE Classic 4K has sectors 32-39 with 16 blocks each
         val blockCount = 16
-        val blocks = (0 until blockCount).map { blockIndex ->
-            val type = when (blockIndex) {
-                blockCount - 1 -> ClassicBlock.TYPE_TRAILER
-                else -> ClassicBlock.TYPE_DATA
+        val blocks =
+            (0 until blockCount).map { blockIndex ->
+                val type =
+                    when (blockIndex) {
+                        blockCount - 1 -> ClassicBlock.TYPE_TRAILER
+                        else -> ClassicBlock.TYPE_DATA
+                    }
+                ClassicBlock.create(type, blockIndex, ByteArray(16) { blockIndex.toByte() })
             }
-            ClassicBlock.create(type, blockIndex, ByteArray(16) { blockIndex.toByte() })
-        }
 
         val largeSector = DataClassicSector(32, blocks)
 
@@ -257,17 +268,18 @@ class ClassicCardTest {
 
     @Test
     fun testClassicCardPartialRead() {
-        val sectors = (0 until 16).map { index ->
-            DataClassicSector(
-                index,
-                listOf(
-                    ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
-                    ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
-                    ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
-                    ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, ByteArray(16))
+        val sectors =
+            (0 until 16).map { index ->
+                DataClassicSector(
+                    index,
+                    listOf(
+                        ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
+                        ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
+                        ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
+                        ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, ByteArray(16)),
+                    ),
                 )
-            )
-        }
+            }
 
         // Test with isPartialRead = true
         val partialCard = ClassicCard(testTagId, testTime, sectors, isPartialRead = true)

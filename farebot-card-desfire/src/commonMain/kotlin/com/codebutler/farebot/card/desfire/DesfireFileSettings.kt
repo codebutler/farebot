@@ -23,24 +23,24 @@
 package com.codebutler.farebot.card.desfire
 
 abstract class DesfireFileSettings {
-
     abstract val fileType: Byte
     abstract val commSetting: Byte
     abstract val accessRights: ByteArray
 
     // FIXME: Localize
     val fileTypeName: String
-        get() = when (fileType) {
-            STANDARD_DATA_FILE -> "Standard"
-            BACKUP_DATA_FILE -> "Backup"
-            VALUE_FILE -> "Value"
-            LINEAR_RECORD_FILE -> "Linear Record"
-            CYCLIC_RECORD_FILE -> "Cyclic Record"
-            else -> "Unknown"
-        }
+        get() =
+            when (fileType) {
+                STANDARD_DATA_FILE -> "Standard"
+                BACKUP_DATA_FILE -> "Backup"
+                VALUE_FILE -> "Value"
+                LINEAR_RECORD_FILE -> "Linear Record"
+                CYCLIC_RECORD_FILE -> "Cyclic Record"
+                else -> "Unknown"
+            }
 
     companion object {
-        /* DesfireFile Types */
+        // DesfireFile Types
         const val STANDARD_DATA_FILE: Byte = 0x00
         const val BACKUP_DATA_FILE: Byte = 0x01
         const val VALUE_FILE: Byte = 0x02

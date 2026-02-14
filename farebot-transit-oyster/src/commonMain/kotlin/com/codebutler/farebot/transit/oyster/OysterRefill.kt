@@ -31,9 +31,8 @@ import kotlin.time.Instant
 
 class OysterRefill(
     override val startTimestamp: Instant,
-    private val amount: Int
+    private val amount: Int,
 ) : Trip() {
-
     override val fare: TransitCurrency
         get() = TransitCurrency.GBP(-amount)
 
@@ -51,8 +50,8 @@ class OysterRefill(
                         OysterRefill(
                             startTimestamp = OysterUtils.parseTimestamp(data),
                             // estimate: max top-up requires 14 bits
-                            amount = data.getBitsFromBufferLeBits(74, 14)
-                        )
+                            amount = data.getBitsFromBufferLeBits(74, 14),
+                        ),
                     )
                 } catch (_: Exception) {
                 }

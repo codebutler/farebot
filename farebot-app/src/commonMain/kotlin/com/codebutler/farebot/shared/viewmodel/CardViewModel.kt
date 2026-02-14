@@ -39,7 +39,6 @@ class CardViewModel(
     private val cardSerializer: CardSerializer,
     private val cardPersister: CardPersister,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(CardUiState())
     val uiState: StateFlow<CardUiState> = _uiState.asStateFlow()
 
@@ -49,17 +48,28 @@ class CardViewModel(
     private var currentScanIds: List<String> = emptyList()
     private var currentCardId: String? = null
 
-    fun loadCard(cardKey: String, scanIds: List<String> = emptyList(), currentScanId: String? = null) {
+    fun loadCard(
+        cardKey: String,
+        scanIds: List<String> = emptyList(),
+        currentScanId: String? = null,
+    ) {
         currentScanIds = scanIds
         currentCardId = currentScanId ?: scanIds.firstOrNull()
         loadCardInternal(cardKey, isSample = false, sampleTitle = null)
     }
 
-    fun loadSampleCard(cardKey: String, sampleTitle: String) {
+    fun loadSampleCard(
+        cardKey: String,
+        sampleTitle: String,
+    ) {
         loadCardInternal(cardKey, isSample = true, sampleTitle = sampleTitle)
     }
 
-    private fun loadCardInternal(cardKey: String, isSample: Boolean, sampleTitle: String?) {
+    private fun loadCardInternal(
+        cardKey: String,
+        isSample: Boolean,
+        sampleTitle: String?,
+    ) {
         val rawCard = navDataHolder.get<RawCard<*>>(cardKey) ?: return
         currentRawCard = rawCard
 
@@ -71,16 +81,22 @@ class CardViewModel(
                 // Build scan history entries
                 val scanHistory = buildScanHistory()
                 val currentScan = scanHistory.firstOrNull { it.isCurrent }
-                val currentScanLabel = if (currentScan != null) {
-                    listOfNotNull(currentScan.scannedDate, currentScan.scannedTime.ifEmpty { null })
-                        .joinToString(" ")
-                } else null
+                val currentScanLabel =
+                    if (currentScan != null) {
+                        listOfNotNull(currentScan.scannedDate, currentScan.scannedTime.ifEmpty { null })
+                            .joinToString(" ")
+                    } else {
+                        null
+                    }
 
                 if (transitInfo != null) {
                     if (!isSample) {
-                        analytics.logEvent("view_card", mapOf(
-                            "card_name" to transitInfo.cardName,
-                        ))
+                        analytics.logEvent(
+                            "view_card",
+                            mapOf(
+                                "card_name" to transitInfo.cardName,
+                            ),
+                        )
                     }
                     val transactions = createTransactionItems(transitInfo)
                     val balances = createBalanceItems(transitInfo)
@@ -89,73 +105,82 @@ class CardViewModel(
                     // Store card + transitInfo for advanced screen
                     parsedCardKey = navDataHolder.put(Pair(card, transitInfo))
 
-                    _uiState.value = CardUiState(
-                        isLoading = false,
-                        cardName = sampleTitle ?: transitInfo.cardName,
-                        serialNumber = transitInfo.serialNumber,
-                        balances = balances,
-                        transactions = transactions,
-                        infoItems = infoItems,
-                        warning = transitInfo.warning,
-                        emptyStateMessage = transitInfo.emptyStateMessage,
-                        hasAdvancedData = true,
-                        isSample = isSample,
-                        scanCount = currentScanIds.size.coerceAtLeast(1),
-                        currentScanLabel = currentScanLabel,
-                        scanHistory = scanHistory,
-                    )
+                    _uiState.value =
+                        CardUiState(
+                            isLoading = false,
+                            cardName = sampleTitle ?: transitInfo.cardName,
+                            serialNumber = transitInfo.serialNumber,
+                            balances = balances,
+                            transactions = transactions,
+                            infoItems = infoItems,
+                            warning = transitInfo.warning,
+                            emptyStateMessage = transitInfo.emptyStateMessage,
+                            hasAdvancedData = true,
+                            isSample = isSample,
+                            scanCount = currentScanIds.size.coerceAtLeast(1),
+                            currentScanLabel = currentScanLabel,
+                            scanHistory = scanHistory,
+                        )
                 } else {
-                    val tagIdHex = card.tagId.joinToString("") {
-                        (it.toInt() and 0xFF).toString(16).padStart(2, '0')
-                    }.uppercase()
-                    val unknownInfo = UnknownTransitInfo(
-                        cardTypeName = card.cardType.toString(),
-                        tagIdHex = tagIdHex
-                    )
+                    val tagIdHex =
+                        card.tagId
+                            .joinToString("") {
+                                (it.toInt() and 0xFF).toString(16).padStart(2, '0')
+                            }.uppercase()
+                    val unknownInfo =
+                        UnknownTransitInfo(
+                            cardTypeName = card.cardType.toString(),
+                            tagIdHex = tagIdHex,
+                        )
                     parsedCardKey = navDataHolder.put(Pair(card, unknownInfo))
-                    _uiState.value = CardUiState(
-                        isLoading = false,
-                        cardName = sampleTitle ?: unknownInfo.cardName,
-                        serialNumber = unknownInfo.serialNumber,
-                        balances = createBalanceItems(unknownInfo),
-                        hasAdvancedData = true,
-                        isSample = isSample,
-                        scanCount = currentScanIds.size.coerceAtLeast(1),
-                        currentScanLabel = currentScanLabel,
-                        scanHistory = scanHistory,
-                    )
+                    _uiState.value =
+                        CardUiState(
+                            isLoading = false,
+                            cardName = sampleTitle ?: unknownInfo.cardName,
+                            serialNumber = unknownInfo.serialNumber,
+                            balances = createBalanceItems(unknownInfo),
+                            hasAdvancedData = true,
+                            isSample = isSample,
+                            scanCount = currentScanIds.size.coerceAtLeast(1),
+                            currentScanLabel = currentScanLabel,
+                            scanHistory = scanHistory,
+                        )
                 }
             } catch (ex: Exception) {
-                _uiState.value = CardUiState(
-                    isLoading = false,
-                    error = ex.message ?: "Unknown error",
-                )
+                _uiState.value =
+                    CardUiState(
+                        isLoading = false,
+                        error = ex.message ?: "Unknown error",
+                    )
             }
         }
     }
 
     private fun buildScanHistory(): List<ScanHistoryEntry> {
         if (currentScanIds.size <= 1) return emptyList()
-        return currentScanIds.mapIndexed { index, scanId ->
-            val savedCard = cardPersister.getCard(scanId.toLongOrNull() ?: return@mapIndexed null)
-            if (savedCard == null) return@mapIndexed null
-            val scannedDate = try {
-                formatHumanDate(savedCard.scannedAt)
-            } catch (_: Exception) {
-                "?"
-            }
-            val scannedTime = try {
-                formatTimeShort(savedCard.scannedAt)
-            } catch (_: Exception) {
-                ""
-            }
-            ScanHistoryEntry(
-                savedCardId = scanId,
-                scannedDate = scannedDate,
-                scannedTime = scannedTime,
-                isCurrent = scanId == currentCardId,
-            )
-        }.filterNotNull()
+        return currentScanIds
+            .mapIndexed { index, scanId ->
+                val savedCard = cardPersister.getCard(scanId.toLongOrNull() ?: return@mapIndexed null)
+                if (savedCard == null) return@mapIndexed null
+                val scannedDate =
+                    try {
+                        formatHumanDate(savedCard.scannedAt)
+                    } catch (_: Exception) {
+                        "?"
+                    }
+                val scannedTime =
+                    try {
+                        formatTimeShort(savedCard.scannedAt)
+                    } catch (_: Exception) {
+                        ""
+                    }
+                ScanHistoryEntry(
+                    savedCardId = scanId,
+                    scannedDate = scannedDate,
+                    scannedTime = scannedTime,
+                    isCurrent = scanId == currentCardId,
+                )
+            }.filterNotNull()
     }
 
     fun toggleScanHistory() {
@@ -188,9 +213,7 @@ class CardViewModel(
         }
     }
 
-    fun getTripKey(tripItem: TransactionItem.TripItem): String? {
-        return tripItem.tripKey
-    }
+    fun getTripKey(tripItem: TransactionItem.TripItem): String? = tripItem.tripKey
 
     private fun createBalanceItems(transitInfo: TransitInfo): List<BalanceItem> {
         val balances = transitInfo.balances ?: return emptyList()
@@ -214,76 +237,83 @@ class CardViewModel(
     }
 
     private fun createTransactionItems(transitInfo: TransitInfo): List<TransactionItem> {
-        val subscriptions = transitInfo.subscriptions?.map { sub ->
-            TransactionItem.SubscriptionItem(
-                name = sub.subscriptionName,
-                agency = sub.shortAgencyName,
-                validRange = formatSubscriptionRange(sub),
-                remainingTrips = sub.remainingTripCount?.let { "$it trips remaining" },
-                state = formatSubscriptionState(sub),
-            )
-        } ?: emptyList()
-
-        val trips = transitInfo.trips?.map { trip ->
-            val ts = trip.startTimestamp?.epochSeconds ?: 0L
-            val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString
-
-            // Ticket machine / vending machine with negative fare = refill/top-up
-            val isRefill = trip.mode in listOf(Trip.Mode.TICKET_MACHINE, Trip.Mode.VENDING_MACHINE)
-                && trip.fare?.let { it.currency < 0 } == true
-
-            if (isRefill) {
-                TransactionItem.RefillItem(
-                    agency = trip.shortAgencyName,
-                    amount = fareStr ?: "",
-                    time = formatTimestamp(ts),
-                    epochSeconds = ts,
-                ) as TransactionItem
-            } else {
-                val hasLocation = trip.startStation?.hasLocation() == true ||
-                    trip.endStation?.hasLocation() == true
-                val tripKey = if (hasLocation) navDataHolder.put(trip) else null
-                val stationsStr = buildStationsString(trip)
-                TransactionItem.TripItem(
-                    route = trip.routeName,
-                    agency = trip.shortAgencyName,
-                    fare = fareStr,
-                    stations = stationsStr,
-                    time = formatTimestamp(ts),
-                    mode = trip.mode,
-                    hasLocation = hasLocation,
-                    tripKey = tripKey,
-                    epochSeconds = ts,
-                    isTransfer = trip.isTransfer,
-                    isRejected = trip.isRejected,
+        val subscriptions =
+            transitInfo.subscriptions?.map { sub ->
+                TransactionItem.SubscriptionItem(
+                    name = sub.subscriptionName,
+                    agency = sub.shortAgencyName,
+                    validRange = formatSubscriptionRange(sub),
+                    remainingTrips = sub.remainingTripCount?.let { "$it trips remaining" },
+                    state = formatSubscriptionState(sub),
                 )
-            }
-        } ?: emptyList()
+            } ?: emptyList()
+
+        val trips =
+            transitInfo.trips?.map { trip ->
+                val ts = trip.startTimestamp?.epochSeconds ?: 0L
+                val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString
+
+                // Ticket machine / vending machine with negative fare = refill/top-up
+                val isRefill =
+                    trip.mode in listOf(Trip.Mode.TICKET_MACHINE, Trip.Mode.VENDING_MACHINE) &&
+                        trip.fare?.let { it.currency < 0 } == true
+
+                if (isRefill) {
+                    TransactionItem.RefillItem(
+                        agency = trip.shortAgencyName,
+                        amount = fareStr ?: "",
+                        time = formatTimestamp(ts),
+                        epochSeconds = ts,
+                    ) as TransactionItem
+                } else {
+                    val hasLocation =
+                        trip.startStation?.hasLocation() == true ||
+                            trip.endStation?.hasLocation() == true
+                    val tripKey = if (hasLocation) navDataHolder.put(trip) else null
+                    val stationsStr = buildStationsString(trip)
+                    TransactionItem.TripItem(
+                        route = trip.routeName,
+                        agency = trip.shortAgencyName,
+                        fare = fareStr,
+                        stations = stationsStr,
+                        time = formatTimestamp(ts),
+                        mode = trip.mode,
+                        hasLocation = hasLocation,
+                        tripKey = tripKey,
+                        epochSeconds = ts,
+                        isTransfer = trip.isTransfer,
+                        isRejected = trip.isRejected,
+                    )
+                }
+            } ?: emptyList()
 
         // Sort trips by time descending
-        val sortedTimedItems = trips.sortedByDescending { item ->
-            when (item) {
-                is TransactionItem.TripItem -> item.epochSeconds
-                is TransactionItem.RefillItem -> item.epochSeconds
-                else -> 0L
+        val sortedTimedItems =
+            trips.sortedByDescending { item ->
+                when (item) {
+                    is TransactionItem.TripItem -> item.epochSeconds
+                    is TransactionItem.RefillItem -> item.epochSeconds
+                    else -> 0L
+                }
             }
-        }
 
         // Group by calendar day and insert date headers
         val withDateHeaders = mutableListOf<TransactionItem>()
         var lastDateStr: String? = null
         for (item in sortedTimedItems) {
-            val epochSec = when (item) {
-                is TransactionItem.TripItem -> item.epochSeconds
-                is TransactionItem.RefillItem -> item.epochSeconds
-                else -> 0L
-            }
-            if (epochSec > 0L) {
-                val dateStr = try {
-                    formatDate(Instant.fromEpochSeconds(epochSec), DateFormatStyle.LONG)
-                } catch (_: Exception) {
-                    null
+            val epochSec =
+                when (item) {
+                    is TransactionItem.TripItem -> item.epochSeconds
+                    is TransactionItem.RefillItem -> item.epochSeconds
+                    else -> 0L
                 }
+            if (epochSec > 0L) {
+                val dateStr =
+                    try {
+                        formatDate(Instant.fromEpochSeconds(epochSec), DateFormatStyle.LONG)
+                    } catch (_: Exception) {
+                        null
+                    }
                 if (dateStr != null && dateStr != lastDateStr) {
                     withDateHeaders.add(TransactionItem.DateHeader(dateStr))
                     lastDateStr = dateStr
@@ -322,18 +352,17 @@ class CardViewModel(
         }
     }
 
-    private fun formatSubscriptionRange(sub: Subscription): String {
-        return try {
+    private fun formatSubscriptionRange(sub: Subscription): String =
+        try {
             val from = sub.validFrom?.let { formatDate(it, DateFormatStyle.SHORT) }
             val to = sub.validTo?.let { formatDate(it, DateFormatStyle.SHORT) }
             "${from ?: "?"} - ${to ?: "?"}"
         } catch (_: Exception) {
             "${sub.validFrom ?: "?"} - ${sub.validTo ?: "?"}"
         }
-    }
 
-    private fun formatSubscriptionState(sub: Subscription): String? {
-        return when (sub.subscriptionState) {
+    private fun formatSubscriptionState(sub: Subscription): String? =
+        when (sub.subscriptionState) {
             Subscription.SubscriptionState.INACTIVE -> "Inactive"
             Subscription.SubscriptionState.UNUSED -> "Unused"
             Subscription.SubscriptionState.STARTED -> "Active"
@@ -341,5 +370,4 @@ class CardViewModel(
             Subscription.SubscriptionState.EXPIRED -> "Expired"
             else -> null
         }
-    }
 }

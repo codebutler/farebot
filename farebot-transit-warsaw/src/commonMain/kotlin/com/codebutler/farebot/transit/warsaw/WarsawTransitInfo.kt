@@ -33,15 +33,15 @@ import farebot.farebot_transit_warsaw.generated.resources.warsaw_card_name
 class WarsawTransitInfo(
     private val serial: Pair<Int, Int>,
     private val sectorA: WarsawSector,
-    private val sectorB: WarsawSector
+    private val sectorB: WarsawSector,
 ) : TransitInfo() {
-
     companion object {
         val NAME: String get() = getStringBlocking(Res.string.warsaw_card_name)
     }
 
     override val serialNumber: String
-        get() = NumberUtils.zeroPad(serial.first, 3) + " " +
+        get() =
+            NumberUtils.zeroPad(serial.first, 3) + " " +
                 NumberUtils.zeroPad(serial.second, 8)
 
     override val cardName: String get() = getStringBlocking(Res.string.warsaw_card_name)

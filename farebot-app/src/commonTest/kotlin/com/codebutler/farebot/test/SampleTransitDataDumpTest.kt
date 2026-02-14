@@ -33,15 +33,14 @@ import com.codebutler.farebot.shared.transit.createTransitFactoryRegistry
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.Trip
 import kotlinx.serialization.json.Json
-import java.io.File
 import kotlin.test.Test
 
 class SampleTransitDataDumpTest {
-
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-    }
+    private val json =
+        Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
 
     private val serializer = KotlinxCardSerializer(json)
     private val importer = CardImporter.create(serializer, json)
@@ -55,84 +54,96 @@ class SampleTransitDataDumpTest {
         enum class Format { METRODROID_JSON, MFC_BINARY, FLIPPER_NFC }
     }
 
-    private val samples = listOf(
-        SampleCard("Opal", "opal/Opal.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("HSLv2", "hsl/HSLv2.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("HSL_UL", "hsl/HSL_UL.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("TroikaUL", "troika/TroikaUL.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("TMoney", "tmoney/TMoney.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("EZLink", "cepas/EZLink.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("Holo", "holo/Holo.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("Mobib", "mobib/Mobib.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("Compass", "compass/Compass.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("SeqGo", "seqgo/SeqGo.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("LaxTap", "laxtap/LaxTap.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("MspGoTo", "mspgoto/MspGoTo.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("Myki", "myki/Myki.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("Octopus", "octopus/Octopus.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("TrimetHop", "trimethop/TrimetHop.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("BilheteUnico", "bilhete/BilheteUnico.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("Ventra", "ventra/Ventra.json", SampleCard.Format.METRODROID_JSON),
-        SampleCard("EasyCard", "easycard/deadbeef.mfc", SampleCard.Format.MFC_BINARY),
-        SampleCard("Clipper", "flipper/Clipper.nfc", SampleCard.Format.FLIPPER_NFC),
-        SampleCard("ICOCA", "flipper/ICOCA.nfc", SampleCard.Format.FLIPPER_NFC),
-        SampleCard("ORCA", "flipper/ORCA.nfc", SampleCard.Format.FLIPPER_NFC),
-        SampleCard("PASMO", "flipper/PASMO.nfc", SampleCard.Format.FLIPPER_NFC),
-        SampleCard("Suica", "flipper/Suica.nfc", SampleCard.Format.FLIPPER_NFC),
-    )
+    private val samples =
+        listOf(
+            SampleCard("Opal", "opal/Opal.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("HSLv2", "hsl/HSLv2.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("HSL_UL", "hsl/HSL_UL.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("TroikaUL", "troika/TroikaUL.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("TMoney", "tmoney/TMoney.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("EZLink", "cepas/EZLink.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("Holo", "holo/Holo.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("Mobib", "mobib/Mobib.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("Compass", "compass/Compass.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("SeqGo", "seqgo/SeqGo.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("LaxTap", "laxtap/LaxTap.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("MspGoTo", "mspgoto/MspGoTo.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("Myki", "myki/Myki.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("Octopus", "octopus/Octopus.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("TrimetHop", "trimethop/TrimetHop.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("BilheteUnico", "bilhete/BilheteUnico.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("Ventra", "ventra/Ventra.json", SampleCard.Format.METRODROID_JSON),
+            SampleCard("EasyCard", "easycard/deadbeef.mfc", SampleCard.Format.MFC_BINARY),
+            SampleCard("Clipper", "flipper/Clipper.nfc", SampleCard.Format.FLIPPER_NFC),
+            SampleCard("ICOCA", "flipper/ICOCA.nfc", SampleCard.Format.FLIPPER_NFC),
+            SampleCard("ORCA", "flipper/ORCA.nfc", SampleCard.Format.FLIPPER_NFC),
+            SampleCard("PASMO", "flipper/PASMO.nfc", SampleCard.Format.FLIPPER_NFC),
+            SampleCard("Suica", "flipper/Suica.nfc", SampleCard.Format.FLIPPER_NFC),
+        )
 
     @Test
     fun dumpAllSampleTransitData() {
-        val output = buildString {
-            appendLine("# FareBot Sample Transit Data Dump")
-            appendLine("# Generated by SampleTransitDataDumpTest")
-            appendLine()
-            appendLine("cards:")
+        val output =
+            buildString {
+                appendLine("# FareBot Sample Transit Data Dump")
+                appendLine("# Generated by SampleTransitDataDumpTest")
+                appendLine()
+                appendLine("cards:")
 
-            for (sample in samples) {
-                try {
-                    appendLine(processSample(sample))
-                } catch (e: Exception) {
-                    appendLine("  - name: \"${sample.name}\"")
-                    appendLine("    error: \"${e::class.simpleName}: ${yamlEscape(e.message ?: "unknown")}\"")
+                for (sample in samples) {
+                    try {
+                        appendLine(processSample(sample))
+                    } catch (e: Exception) {
+                        appendLine("  - name: \"${sample.name}\"")
+                        appendLine("    error: \"${e::class.simpleName}: ${yamlEscape(e.message ?: "unknown")}\"")
+                    }
                 }
             }
-        }
 
-        val outputFile = File("build/reports/transit-dump.yaml")
-        outputFile.parentFile.mkdirs()
-        outputFile.writeText(output)
-        println("Transit dump written to: ${outputFile.absolutePath}")
         print(output)
     }
 
     private fun processSample(sample: SampleCard): String {
-        val bytes = loadTestResource(sample.resourcePath)
-            ?: return "  - name: \"${sample.name}\"\n    error: \"Missing resource: ${sample.resourcePath}\""
+        val bytes =
+            loadTestResource(sample.resourcePath)
+                ?: return "  - name: \"${sample.name}\"\n    error: \"Missing resource: ${sample.resourcePath}\""
 
-        val rawCard = when (sample.format) {
-            SampleCard.Format.METRODROID_JSON -> {
-                val result = importer.importCards(bytes.decodeToString())
-                when (result) {
-                    is ImportResult.Success -> result.cards.first()
-                    is ImportResult.Error -> return "  - name: \"${sample.name}\"\n    error: \"Import error: ${yamlEscape(result.message)}\""
+        val rawCard =
+            when (sample.format) {
+                SampleCard.Format.METRODROID_JSON -> {
+                    val result = importer.importCards(bytes.decodeToString())
+                    when (result) {
+                        is ImportResult.Success -> result.cards.first()
+                        is ImportResult.Error -> {
+                            val err = yamlEscape(result.message)
+                            return "  - name: \"${sample.name}\"\n" +
+                                "    error: \"Import error: $err\""
+                        }
+                    }
+                }
+                SampleCard.Format.MFC_BINARY -> {
+                    val result = importer.importMfcDump(bytes)
+                    when (result) {
+                        is ImportResult.Success -> result.cards.first()
+                        is ImportResult.Error -> {
+                            val err = yamlEscape(result.message)
+                            return "  - name: \"${sample.name}\"\n" +
+                                "    error: \"Import error: $err\""
+                        }
+                    }
+                }
+                SampleCard.Format.FLIPPER_NFC -> {
+                    val result = importer.importCards(bytes.decodeToString())
+                    when (result) {
+                        is ImportResult.Success -> result.cards.first()
+                        is ImportResult.Error -> {
+                            val err = yamlEscape(result.message)
+                            return "  - name: \"${sample.name}\"\n" +
+                                "    error: \"Import error: $err\""
+                        }
+                    }
                 }
             }
-            SampleCard.Format.MFC_BINARY -> {
-                val result = importer.importMfcDump(bytes)
-                when (result) {
-                    is ImportResult.Success -> result.cards.first()
-                    is ImportResult.Error -> return "  - name: \"${sample.name}\"\n    error: \"Import error: ${yamlEscape(result.message)}\""
-                }
-            }
-            SampleCard.Format.FLIPPER_NFC -> {
-                val result = importer.importCards(bytes.decodeToString())
-                when (result) {
-                    is ImportResult.Success -> result.cards.first()
-                    is ImportResult.Error -> return "  - name: \"${sample.name}\"\n    error: \"Import error: ${yamlEscape(result.message)}\""
-                }
-            }
-        }
 
         val card = rawCard.parse()
         val identity = registry.parseTransitIdentity(card)
@@ -207,7 +218,10 @@ class SampleTransitDataDumpTest {
         }.trimEnd()
     }
 
-    private fun formatTrip(trip: Trip, sb: StringBuilder) {
+    private fun formatTrip(
+        trip: Trip,
+        sb: StringBuilder,
+    ) {
         val ts = trip.startTimestamp ?: trip.endTimestamp
         sb.appendLine("      - timestamp: ${if (ts != null) "\"$ts\"" else "null"}")
         sb.appendLine("        mode: ${trip.mode}")
@@ -221,7 +235,10 @@ class SampleTransitDataDumpTest {
         if (trip.isRejected) sb.appendLine("        rejected: true")
     }
 
-    private fun formatSubscription(sub: Subscription, sb: StringBuilder) {
+    private fun formatSubscription(
+        sub: Subscription,
+        sb: StringBuilder,
+    ) {
         sb.appendLine("      - name: ${yamlValue(sub.subscriptionName)}")
         sb.appendLine("        agency: ${yamlValue(sub.agencyName)}")
         sb.appendLine("        validity: ${yamlValue(sub.formatValidity())}")
@@ -234,7 +251,10 @@ class SampleTransitDataDumpTest {
         }
     }
 
-    private fun formatInfoItem(item: ListItemInterface, sb: StringBuilder) {
+    private fun formatInfoItem(
+        item: ListItemInterface,
+        sb: StringBuilder,
+    ) {
         if (item is HeaderListItem) {
             sb.appendLine("      - header: ${yamlValue(item.text1)}")
         } else {
@@ -243,11 +263,12 @@ class SampleTransitDataDumpTest {
         }
     }
 
-    private fun yamlValue(value: String?): String = when {
-        value == null -> "null"
-        value.isEmpty() -> "\"\""
-        else -> "\"${yamlEscape(value)}\""
-    }
+    private fun yamlValue(value: String?): String =
+        when {
+            value == null -> "null"
+            value.isEmpty() -> "\"\""
+            else -> "\"${yamlEscape(value)}\""
+        }
 
     private fun yamlEscape(value: String): String =
         value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")

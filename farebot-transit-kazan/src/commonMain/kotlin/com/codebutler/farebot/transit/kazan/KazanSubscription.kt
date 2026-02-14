@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.transit.kazan
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -28,37 +29,40 @@ import farebot.farebot_transit_kazan.generated.resources.Res
 import farebot.farebot_transit_kazan.generated.resources.kazan_blank
 import farebot.farebot_transit_kazan.generated.resources.kazan_unknown_type
 import farebot.farebot_transit_kazan.generated.resources.kazan_unknown_unlimited
-import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
 
 class KazanSubscription(
     override val validFrom: Instant?,
     override val validTo: Instant?,
     private val mType: Int,
-    private val mCounter: Int
+    private val mCounter: Int,
 ) : Subscription() {
-
     val isPurse: Boolean get() = mType == 0x53
 
     val isUnlimited: Boolean get() = mType in listOf(0, 0x60)
 
     val balance: TransitBalance?
-        get() = if (!isPurse) null else
-            TransitBalance(
-                balance = TransitCurrency.RUB(mCounter * 100),
-                validFrom = validFrom,
-                validTo = validTo
-            )
+        get() =
+            if (!isPurse) {
+                null
+            } else {
+                TransitBalance(
+                    balance = TransitCurrency.RUB(mCounter * 100),
+                    validFrom = validFrom,
+                    validTo = validTo,
+                )
+            }
 
     override val remainingTripCount: Int?
         get() = if (isUnlimited) null else mCounter
 
     override val subscriptionName: String
-        get() = when (mType) {
-            0 -> getStringBlocking(Res.string.kazan_blank)
-            // Could be unlimited buses, unlimited tram, unlimited trolleybus
-            // or unlimited tram+trolleybus
-            0x60 -> getStringBlocking(Res.string.kazan_unknown_unlimited)
-            else -> getStringBlocking(Res.string.kazan_unknown_type, mType.toString(16))
-        }
+        get() =
+            when (mType) {
+                0 -> getStringBlocking(Res.string.kazan_blank)
+                // Could be unlimited buses, unlimited tram, unlimited trolleybus
+                // or unlimited tram+trolleybus
+                0x60 -> getStringBlocking(Res.string.kazan_unknown_unlimited)
+                else -> getStringBlocking(Res.string.kazan_unknown_type, mType.toString(16))
+            }
 }

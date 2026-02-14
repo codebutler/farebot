@@ -39,8 +39,8 @@ import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_orca.generated.resources.*
-import kotlin.time.Instant
 import org.jetbrains.compose.resources.getString
+import kotlin.time.Instant
 
 class OrcaTransaction(
     private val mTimestamp: Long,
@@ -53,7 +53,6 @@ class OrcaTransaction(
     private val mIsTopup: Boolean,
     private val stringResource: StringResource,
 ) : Transaction() {
-
     override val timestamp: Instant?
         get() = if (mTimestamp == 0L) null else Instant.fromEpochSeconds(mTimestamp)
 
@@ -67,22 +66,47 @@ class OrcaTransaction(
         get() = !mIsTopup && mTransType == TRANS_TYPE_TAP_IN
 
     override val routeNames: List<String>
-        get() = when {
-            mIsTopup -> listOf(stringResource.getString(Res.string.transit_orca_route_topup))
-            isLink -> super.routeNames.ifEmpty { listOf(stringResource.getString(Res.string.transit_orca_route_link)) }
-            isSounder -> super.routeNames.ifEmpty { listOf(stringResource.getString(Res.string.transit_orca_route_sounder)) }
-            isSeattleStreetcar -> super.routeNames.ifEmpty { listOf(stringResource.getString(Res.string.transit_orca_route_streetcar)) }
-            mAgency == AGENCY_ST -> listOf(stringResource.getString(Res.string.transit_orca_route_express_bus))
-            isMonorail -> listOf(stringResource.getString(Res.string.transit_orca_route_monorail))
-            isWaterTaxi -> listOf(stringResource.getString(Res.string.transit_orca_route_water_taxi))
-            isSwift -> super.routeNames.ifEmpty { listOf(stringResource.getString(Res.string.transit_orca_route_brt)) }
-            mAgency == AGENCY_KCM -> when (mFtpType) {
-                FTP_TYPE_BUS -> listOf(stringResource.getString(Res.string.transit_orca_route_bus))
-                FTP_TYPE_BRT -> super.routeNames.ifEmpty { listOf(stringResource.getString(Res.string.transit_orca_route_brt)) }
+        get() =
+            when {
+                mIsTopup -> listOf(stringResource.getString(Res.string.transit_orca_route_topup))
+                isLink ->
+                    super.routeNames.ifEmpty {
+                        listOf(
+                            stringResource.getString(Res.string.transit_orca_route_link),
+                        )
+                    }
+                isSounder ->
+                    super.routeNames.ifEmpty {
+                        listOf(
+                            stringResource.getString(Res.string.transit_orca_route_sounder),
+                        )
+                    }
+                isSeattleStreetcar ->
+                    super.routeNames.ifEmpty {
+                        listOf(stringResource.getString(Res.string.transit_orca_route_streetcar))
+                    }
+                mAgency == AGENCY_ST -> listOf(stringResource.getString(Res.string.transit_orca_route_express_bus))
+                isMonorail -> listOf(stringResource.getString(Res.string.transit_orca_route_monorail))
+                isWaterTaxi -> listOf(stringResource.getString(Res.string.transit_orca_route_water_taxi))
+                isSwift ->
+                    super.routeNames.ifEmpty {
+                        listOf(
+                            stringResource.getString(Res.string.transit_orca_route_brt),
+                        )
+                    }
+                mAgency == AGENCY_KCM ->
+                    when (mFtpType) {
+                        FTP_TYPE_BUS -> listOf(stringResource.getString(Res.string.transit_orca_route_bus))
+                        FTP_TYPE_BRT ->
+                            super.routeNames.ifEmpty {
+                                listOf(
+                                    stringResource.getString(Res.string.transit_orca_route_brt),
+                                )
+                            }
+                        else -> emptyList()
+                    }
                 else -> emptyList()
             }
-            else -> emptyList()
-        }
 
     override val fare: TransitCurrency?
         get() = TransitCurrency.USD(if (mIsTopup || mTransType == TRANS_TYPE_TAP_OUT) -mFare else mFare)
@@ -104,66 +128,97 @@ class OrcaTransaction(
         }
 
     override val vehicleID: String?
-        get() = when {
-            mIsTopup -> mCoachNum.toString()
-            isLink || isSounder || mAgency == AGENCY_WSF ||
-                isSeattleStreetcar || isSwift || isRapidRide ||
-                isMonorail -> null
-            else -> mCoachNum.toString()
-        }
+        get() =
+            when {
+                mIsTopup -> mCoachNum.toString()
+                isLink ||
+                    isSounder ||
+                    mAgency == AGENCY_WSF ||
+                    isSeattleStreetcar ||
+                    isSwift ||
+                    isRapidRide ||
+                    isMonorail -> null
+                else -> mCoachNum.toString()
+            }
 
     override val mode: Trip.Mode
-        get() = when {
-            mIsTopup -> Trip.Mode.TICKET_MACHINE
-            isMonorail -> Trip.Mode.MONORAIL
-            isWaterTaxi -> Trip.Mode.FERRY
-            else -> when (mFtpType) {
-                FTP_TYPE_LINK -> Trip.Mode.METRO
-                FTP_TYPE_SOUNDER -> Trip.Mode.TRAIN
-                FTP_TYPE_FERRY -> Trip.Mode.FERRY
-                FTP_TYPE_STREETCAR -> Trip.Mode.TRAM
-                else -> Trip.Mode.BUS
+        get() =
+            when {
+                mIsTopup -> Trip.Mode.TICKET_MACHINE
+                isMonorail -> Trip.Mode.MONORAIL
+                isWaterTaxi -> Trip.Mode.FERRY
+                else ->
+                    when (mFtpType) {
+                        FTP_TYPE_LINK -> Trip.Mode.METRO
+                        FTP_TYPE_SOUNDER -> Trip.Mode.TRAIN
+                        FTP_TYPE_FERRY -> Trip.Mode.FERRY
+                        FTP_TYPE_STREETCAR -> Trip.Mode.TRAM
+                        else -> Trip.Mode.BUS
+                    }
             }
-        }
 
     override val agencyName: String?
-        get() = when {
-            mIsTopup -> null
-            // Seattle Monorail Services uses KCM's agency ID.
-            isMonorail -> stringResource.getString(Res.string.transit_orca_agency_sms)
-            // The King County Water Taxi is now a separate agency but uses KCM's agency ID
-            isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt)
-            else -> MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = false)
-                ?: getAgencyNameFallback(false)
-                ?: getStringBlocking(Res.string.transit_orca_agency_unknown, mAgency.toString())
-        }
+        get() =
+            when {
+                mIsTopup -> null
+                // Seattle Monorail Services uses KCM's agency ID.
+                isMonorail -> stringResource.getString(Res.string.transit_orca_agency_sms)
+                // The King County Water Taxi is now a separate agency but uses KCM's agency ID
+                isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt)
+                else ->
+                    MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = false)
+                        ?: getAgencyNameFallback(false)
+                        ?: getStringBlocking(Res.string.transit_orca_agency_unknown, mAgency.toString())
+            }
 
     override val shortAgencyName: String?
-        get() = when {
-            mIsTopup -> null
-            // Seattle Monorail Services uses KCM's agency ID.
-            isMonorail -> stringResource.getString(Res.string.transit_orca_agency_sms_short)
-            // The King County Water Taxi is now a separate agency but uses KCM's agency ID
-            isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt_short)
-            else -> MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = true)
-                ?: getAgencyNameFallback(true)
-                ?: getStringBlocking(Res.string.transit_orca_agency_unknown_short)
+        get() =
+            when {
+                mIsTopup -> null
+                // Seattle Monorail Services uses KCM's agency ID.
+                isMonorail -> stringResource.getString(Res.string.transit_orca_agency_sms_short)
+                // The King County Water Taxi is now a separate agency but uses KCM's agency ID
+                isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt_short)
+                else ->
+                    MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = true)
+                        ?: getAgencyNameFallback(true)
+                        ?: getStringBlocking(Res.string.transit_orca_agency_unknown_short)
+            }
+
+    private fun getAgencyNameFallback(isShort: Boolean): String? =
+        when (mAgency) {
+            AGENCY_CT ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_ct_short else Res.string.transit_orca_agency_ct,
+                )
+            AGENCY_ET ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_et_short else Res.string.transit_orca_agency_et,
+                )
+            AGENCY_KCM ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_kcm_short else Res.string.transit_orca_agency_kcm,
+                )
+            AGENCY_KT ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_kt_short else Res.string.transit_orca_agency_kt,
+                )
+            AGENCY_PT ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_pt_short else Res.string.transit_orca_agency_pt,
+                )
+            AGENCY_ST ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_st_short else Res.string.transit_orca_agency_st,
+                )
+            AGENCY_WSF ->
+                stringResource.getString(
+                    if (isShort) Res.string.transit_orca_agency_wsf_short else Res.string.transit_orca_agency_wsf,
+                )
+            else -> null
         }
 
-    private fun getAgencyNameFallback(isShort: Boolean): String? = when (mAgency) {
-        AGENCY_CT -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_ct_short else Res.string.transit_orca_agency_ct)
-        AGENCY_ET -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_et_short else Res.string.transit_orca_agency_et)
-        AGENCY_KCM -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_kcm_short else Res.string.transit_orca_agency_kcm)
-        AGENCY_KT -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_kt_short else Res.string.transit_orca_agency_kt)
-        AGENCY_PT -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_pt_short else Res.string.transit_orca_agency_pt)
-        AGENCY_ST -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_st_short else Res.string.transit_orca_agency_st)
-        AGENCY_WSF -> stringResource.getString(if (isShort) Res.string.transit_orca_agency_wsf_short else Res.string.transit_orca_agency_wsf)
-        else -> null
-    }
-
-    override fun isSameTrip(other: Transaction): Boolean {
-        return other is OrcaTransaction && mAgency == other.mAgency
-    }
+    override fun isSameTrip(other: Transaction): Boolean = other is OrcaTransaction && mAgency == other.mAgency
 
     /**
      * Returns raw debugging fields for this transaction.
@@ -172,14 +227,18 @@ class OrcaTransaction(
     fun getRawFields(): List<ListItemInterface> {
         val prefix = if (mIsTopup) "topup, " else ""
         return listOf(
-            ListItem(Res.string.transit_orca_raw_fields, prefix + listOf(
-                "agency" to mAgency,
-                "type" to mTransType,
-                "ftp" to mFtpType,
-                "coach" to mCoachNum,
-                "fare" to mFare,
-                "newBal" to mNewBalance
-            ).joinToString { "${it.first} = 0x${it.second.toString(16)}" })
+            ListItem(
+                Res.string.transit_orca_raw_fields,
+                prefix +
+                    listOf(
+                        "agency" to mAgency,
+                        "type" to mTransType,
+                        "ftp" to mFtpType,
+                        "coach" to mCoachNum,
+                        "fare" to mFare,
+                        "newBal" to mNewBalance,
+                    ).joinToString { "${it.first} = 0x${it.second.toString(16)}" },
+            ),
         )
     }
 
@@ -204,9 +263,13 @@ class OrcaTransaction(
     private val isSwift: Boolean
         get() = mAgency == AGENCY_CT && mFtpType == FTP_TYPE_BRT
 
-    private fun lookupMdstStation(dbName: String, stationId: Int): Station? {
+    private fun lookupMdstStation(
+        dbName: String,
+        stationId: Int,
+    ): Station? {
         val result = MdstStationLookup.getStation(dbName, stationId) ?: return null
-        return Station.Builder()
+        return Station
+            .Builder()
             .stationName(result.stationName)
             .shortStationName(result.shortStationName)
             .companyName(result.companyName)
@@ -246,7 +309,11 @@ class OrcaTransaction(
 
         const val COACH_NUM_MONORAIL = 0x3
 
-        fun parse(data: ByteArray, isTopup: Boolean, stringResource: StringResource): OrcaTransaction {
+        fun parse(
+            data: ByteArray,
+            isTopup: Boolean,
+            stringResource: StringResource,
+        ): OrcaTransaction {
             val agency = ByteUtils.getBitsFromBuffer(data, 24, 4)
             val timestamp = ByteUtils.getBitsFromBuffer(data, 28, 32).toLong() and 0xFFFFFFFFL
             val ftpType = ByteUtils.getBitsFromBuffer(data, 60, 8)

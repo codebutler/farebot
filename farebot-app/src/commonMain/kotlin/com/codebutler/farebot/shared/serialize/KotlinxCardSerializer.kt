@@ -18,31 +18,39 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-class KotlinxCardSerializer(private val json: Json) : CardSerializer {
-
+class KotlinxCardSerializer(
+    private val json: Json,
+) : CardSerializer {
     override fun serialize(card: RawCard<*>): String {
         val cardType = card.cardType()
-        val jsonElement = when (cardType) {
-            CardType.MifareDesfire -> json.encodeToJsonElement(RawDesfireCard.serializer(), card as RawDesfireCard)
-            CardType.MifareClassic -> json.encodeToJsonElement(RawClassicCard.serializer(), card as RawClassicCard)
-            CardType.MifareUltralight -> json.encodeToJsonElement(RawUltralightCard.serializer(), card as RawUltralightCard)
-            CardType.CEPAS -> json.encodeToJsonElement(RawCEPASCard.serializer(), card as RawCEPASCard)
-            CardType.FeliCa -> json.encodeToJsonElement(RawFelicaCard.serializer(), card as RawFelicaCard)
-            CardType.ISO7816 -> json.encodeToJsonElement(RawISO7816Card.serializer(), card as RawISO7816Card)
-            CardType.Vicinity -> json.encodeToJsonElement(RawVicinityCard.serializer(), card as RawVicinityCard)
-            CardType.Sample -> json.encodeToJsonElement(RawSampleCard.serializer(), card as RawSampleCard)
-        }
-        val jsonObject = buildJsonObject {
-            put("cardType", cardType.name)
-            jsonElement.jsonObject.forEach { (key, value) -> put(key, value) }
-        }
+        val jsonElement =
+            when (cardType) {
+                CardType.MifareDesfire -> json.encodeToJsonElement(RawDesfireCard.serializer(), card as RawDesfireCard)
+                CardType.MifareClassic -> json.encodeToJsonElement(RawClassicCard.serializer(), card as RawClassicCard)
+                CardType.MifareUltralight ->
+                    json.encodeToJsonElement(
+                        RawUltralightCard.serializer(),
+                        card as RawUltralightCard,
+                    )
+                CardType.CEPAS -> json.encodeToJsonElement(RawCEPASCard.serializer(), card as RawCEPASCard)
+                CardType.FeliCa -> json.encodeToJsonElement(RawFelicaCard.serializer(), card as RawFelicaCard)
+                CardType.ISO7816 -> json.encodeToJsonElement(RawISO7816Card.serializer(), card as RawISO7816Card)
+                CardType.Vicinity -> json.encodeToJsonElement(RawVicinityCard.serializer(), card as RawVicinityCard)
+                CardType.Sample -> json.encodeToJsonElement(RawSampleCard.serializer(), card as RawSampleCard)
+            }
+        val jsonObject =
+            buildJsonObject {
+                put("cardType", cardType.name)
+                jsonElement.jsonObject.forEach { (key, value) -> put(key, value) }
+            }
         return json.encodeToString(JsonObject.serializer(), jsonObject)
     }
 
     override fun deserialize(data: String): RawCard<*> {
         val jsonObject = json.decodeFromString(JsonObject.serializer(), data)
-        val cardTypeName = jsonObject["cardType"]?.jsonPrimitive?.content
-            ?: throw IllegalArgumentException("Missing cardType field")
+        val cardTypeName =
+            jsonObject["cardType"]?.jsonPrimitive?.content
+                ?: throw IllegalArgumentException("Missing cardType field")
         val cardType = CardType.valueOf(cardTypeName)
         val contentJson = JsonObject(jsonObject.filterKeys { it != "cardType" })
         val contentString = json.encodeToString(JsonObject.serializer(), contentJson)

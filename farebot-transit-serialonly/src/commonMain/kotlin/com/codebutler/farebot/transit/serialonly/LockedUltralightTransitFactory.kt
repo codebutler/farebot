@@ -39,7 +39,6 @@ import farebot.farebot_transit_serialonly.generated.resources.*
  * This is because it will catch others' cards.
  */
 class LockedUltralightTransitFactory : TransitFactory<UltralightCard, LockedUltralightTransitInfo> {
-
     override val allCards: List<CardInfo> = emptyList()
 
     /**
@@ -57,9 +56,7 @@ class LockedUltralightTransitFactory : TransitFactory<UltralightCard, LockedUltr
         return TransitIdentity.create(name, null)
     }
 
-    override fun parseInfo(card: UltralightCard): LockedUltralightTransitInfo {
-        return LockedUltralightTransitInfo()
-    }
+    override fun parseInfo(card: UltralightCard): LockedUltralightTransitInfo = LockedUltralightTransitInfo()
 }
 
 class LockedUltralightTransitInfo : TransitInfo() {
@@ -68,8 +65,9 @@ class LockedUltralightTransitInfo : TransitInfo() {
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
-        get() = listOf(
-            HeaderListItem(Res.string.fully_locked_title),
-            ListItem(Res.string.fully_locked_desc)
-        )
+        get() =
+            listOf(
+                HeaderListItem(Res.string.fully_locked_title),
+                ListItem(Res.string.fully_locked_desc),
+            )
 }
