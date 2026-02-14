@@ -34,3 +34,6 @@ gradle/gradle-daemon-jvm.properties
 
 # Stray compiled classes
 *.class
+
+# Git worktrees
+.worktrees/
