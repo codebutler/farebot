@@ -64,6 +64,22 @@ class MdstStationTableReader private constructor(
     val ttsHintLanguage: String
         get() = stationDb.ttsHintLanguage
 
+    val version: Long
+        get() = stationDb.version
+
+    val operators: Map<Int, Operator>
+        get() = stationDb.operators
+
+    val lines: Map<Int, Line>
+        get() = stationDb.lines
+
+    fun getAllStationIds(): Set<Int> = stationIndex.keys
+
+    fun getAllStations(): List<Pair<Int, MdstStation>> =
+        stationIndex.keys.sorted().mapNotNull { id ->
+            getStationById(id)?.let { id to it }
+        }
+
     fun getStationById(id: Int): MdstStation? {
         val offset = stationIndex[id] ?: return null
         val absoluteOffset = stationsStart + offset
@@ -148,7 +164,7 @@ class MdstStationTableReader private constructor(
             return MdstStationTableReader(data, stationDb, stationsStart, stationsLength)
         }
 
-        private fun readUint32BE(
+        internal fun readUint32BE(
             data: ByteArray,
             offset: Int,
         ): Int =
@@ -161,7 +177,7 @@ class MdstStationTableReader private constructor(
          * Read a varint-delimited protobuf message from byte array.
          * Returns the message bytes and the offset after the message.
          */
-        private fun readDelimitedBytes(
+        internal fun readDelimitedBytes(
             data: ByteArray,
             offset: Int,
         ): Pair<ByteArray, Int> {
@@ -248,7 +264,7 @@ class MdstStationTableReader private constructor(
             return map
         }
 
-        private fun readVarint(
+        internal fun readVarint(
             data: ByteArray,
             offset: Int,
         ): Pair<Int, Int> {
