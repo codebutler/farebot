@@ -62,7 +62,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -88,6 +87,7 @@ import com.codebutler.farebot.shared.viewmodel.ScanError
 import com.codebutler.farebot.transit.CardInfo
 import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.ic_cards_stack
+import farebot.farebot_app.generated.resources.ic_logo_dev
 import farebot.farebot_app.generated.resources.ic_launcher
 import farebot.farebot_app.generated.resources.about
 import farebot.farebot_app.generated.resources.add_all_samples
@@ -316,7 +316,7 @@ fun HomeScreen(
                             if (onAddAllSamples != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.add_all_samples)) },
-                                    trailingIcon = { Icon(Icons.Default.Code, contentDescription = null) },
+                                    trailingIcon = { Icon(painterResource(Res.drawable.ic_logo_dev), contentDescription = null) },
                                     onClick = { menuExpanded = false; onAddAllSamples() }
                                 )
                             }
@@ -607,6 +607,8 @@ fun HomeScreen(
                 ) {
                     HistoryContent(
                         uiState = historyUiState,
+                        supportedCardTypes = supportedCardTypes,
+                        loadedKeyBundles = loadedKeyBundles,
                         onNavigateToCard = onNavigateToCard,
                         onToggleSelection = onToggleSelection,
                     )
