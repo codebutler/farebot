@@ -42,6 +42,7 @@ import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.platform.AndroidPlatformActions
 import com.codebutler.farebot.app.feature.home.AndroidCardScanner
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.BuildConfig
 import com.codebutler.farebot.shared.FareBotApp
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.serialize.CardImporter
@@ -112,6 +113,7 @@ class MainActivity : ComponentActivity() {
             FareBotApp(
                 platformActions = platformActions,
                 supportedCardTypes = supportedCardTypes,
+                isDebug = BuildConfig.DEBUG,
             )
         }
     }

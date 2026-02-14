@@ -67,6 +67,7 @@ fun FareBotApp(
     platformActions: PlatformActions,
     supportedCardTypes: Set<CardType> = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.Vicinity),
     loadedKeyBundles: Set<String> = emptySet(),
+    isDebug: Boolean = false,
 ) {
     FareBotTheme {
         val navController = rememberNavController()
@@ -211,12 +212,48 @@ fun FareBotApp(
                     onKeysRequiredTap = {
                         platformActions.showToast(runBlocking { getString(Res.string.keys_required) })
                     },
+                    onStatusChipTap = { message ->
+                        platformActions.showToast(message)
+                    },
                     onNavigateToKeys = if (CardType.MifareClassic in supportedCardTypes) {
                         { navController.navigate(Screen.Keys.route) }
                     } else null,
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = { platformActions.openNfcSettings() },
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
+                    onAddAllSamples = if (isDebug) {
+                        {
+                            scope.launch {
+                                var count = 0
+                                for (cardInfo in supportedCards) {
+                                    val fileName = cardInfo.sampleDumpFile ?: continue
+                                    try {
+                                        val bytes = Res.readBytes("files/samples/$fileName")
+                                        val result = if (fileName.endsWith(".mfc")) {
+                                            cardImporter.importMfcDump(bytes)
+                                        } else {
+                                            cardImporter.importCards(bytes.decodeToString())
+                                        }
+                                        if (result is ImportResult.Success) {
+                                            for (rawCard in result.cards) {
+                                                cardPersister.insertCard(
+                                                    SavedCard(
+                                                        type = rawCard.cardType(),
+                                                        serial = rawCard.tagId().hex(),
+                                                        data = cardSerializer.serialize(rawCard),
+                                                    )
+                                                )
+                                                count++
+                                            }
+                                        }
+                                    } catch (_: Exception) {
+                                    }
+                                }
+                                historyViewModel.loadCards()
+                                platformActions.showToast(getString(Res.string.imported_cards, count))
+                            }
+                        }
+                    } else null,
                     onSampleCardTap = { cardInfo ->
                         val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
                         scope.launch {

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
@@ -61,6 +62,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.Composable
@@ -87,6 +90,7 @@ import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.ic_cards_stack
 import farebot.farebot_app.generated.resources.ic_launcher
 import farebot.farebot_app.generated.resources.about
+import farebot.farebot_app.generated.resources.add_all_samples
 import farebot.farebot_app.generated.resources.add_key
 import farebot.farebot_app.generated.resources.app_name
 import farebot.farebot_app.generated.resources.cancel
@@ -135,9 +139,11 @@ fun HomeScreen(
     loadedKeyBundles: Set<String>,
     mapMarkers: List<CardsMapMarker>,
     onKeysRequiredTap: () -> Unit,
+    onStatusChipTap: (String) -> Unit = {},
     onNavigateToKeys: (() -> Unit)?,
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: () -> Unit,
+    onAddAllSamples: (() -> Unit)? = null,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
     onToggleShowAllScans: () -> Unit = {},
 ) {
@@ -307,6 +313,13 @@ fun HomeScreen(
                                 text = { Text(stringResource(Res.string.import_file)) },
                                 onClick = { menuExpanded = false; onImportFile() }
                             )
+                            if (onAddAllSamples != null) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.add_all_samples)) },
+                                    trailingIcon = { Icon(Icons.Default.Code, contentDescription = null) },
+                                    onClick = { menuExpanded = false; onAddAllSamples() }
+                                )
+                            }
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.keys)) },
@@ -614,6 +627,7 @@ fun HomeScreen(
                         showKeysRequired = showKeysRequired,
                         showExperimental = showExperimental,
                         onKeysRequiredTap = onKeysRequiredTap,
+                        onStatusChipTap = onStatusChipTap,
                         mapMarkers = mapMarkers,
                         onSampleCardTap = onSampleCardTap,
                         searchQuery = exploreSearchQuery,

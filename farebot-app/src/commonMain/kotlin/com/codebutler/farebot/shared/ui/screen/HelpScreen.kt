@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.SubtitlesOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +42,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -66,6 +68,10 @@ import farebot.farebot_app.generated.resources.card_experimental
 import farebot.farebot_app.generated.resources.legend_keys_required
 import farebot.farebot_app.generated.resources.legend_serial_only
 import farebot.farebot_app.generated.resources.legend_experimental
+import farebot.farebot_app.generated.resources.chip_keys_required_info
+import farebot.farebot_app.generated.resources.chip_preview_info
+import farebot.farebot_app.generated.resources.chip_serial_only_info
+import farebot.farebot_app.generated.resources.chip_unsupported_info
 import farebot.farebot_app.generated.resources.credits
 import farebot.farebot_app.generated.resources.legend_unsupported
 import farebot.farebot_app.generated.resources.view_sample
@@ -87,6 +93,7 @@ fun ExploreContent(
     showKeysRequired: Boolean = false,
     showExperimental: Boolean = false,
     onKeysRequiredTap: () -> Unit,
+    onStatusChipTap: (String) -> Unit = {},
     mapMarkers: List<CardsMapMarker> = emptyList(),
     onMapMarkerTap: ((String) -> Unit)? = null,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
@@ -316,6 +323,7 @@ fun ExploreContent(
                 cardLocation = cardLocations[selectedCard.nameRes.key] ?: "",
                 isSupported = selectedCard.cardType in supportedCardTypes,
                 isKeysRequired = selectedCard.keysRequired && selectedCard.keyBundle !in loadedKeyBundles,
+                onStatusChipTap = onStatusChipTap,
                 onSampleCardTap = if (selectedCard.sampleDumpFile != null && onSampleCardTap != null) {
                     {
                         scope.launch {
@@ -433,6 +441,7 @@ private fun CardDetailSheet(
     cardLocation: String,
     isSupported: Boolean,
     isKeysRequired: Boolean,
+    onStatusChipTap: (String) -> Unit = {},
     onSampleCardTap: (() -> Unit)? = null,
 ) {
     Column(
@@ -488,50 +497,48 @@ private fun CardDetailSheet(
 
         // Status chips (card type + status indicators)
         Spacer(Modifier.height(8.dp))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            // Card type chip (always shown)
-            NonInteractiveChip {
-                SuggestionChip(
-                    onClick = {},
-                    label = { Text(card.cardType.toString()) },
-                    icon = { Icon(Icons.Default.Nfc, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                )
-            }
-
-            if (!isSupported) {
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                // Card type chip (always shown)
                 NonInteractiveChip {
                     SuggestionChip(
                         onClick = {},
+                        label = { Text(card.cardType.toString()) },
+                        icon = { Icon(Icons.Default.Nfc, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    )
+                }
+
+                if (!isSupported) {
+                    val msg = stringResource(Res.string.chip_unsupported_info)
+                    SuggestionChip(
+                        onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.legend_unsupported)) },
                         icon = { Icon(Icons.Default.MobileOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     )
                 }
-            }
-            if (isKeysRequired) {
-                NonInteractiveChip {
+                if (isKeysRequired) {
+                    val msg = stringResource(Res.string.chip_keys_required_info)
                     SuggestionChip(
-                        onClick = {},
+                        onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.legend_keys_required)) },
                         icon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     )
                 }
-            }
-            if (card.serialOnly) {
-                NonInteractiveChip {
+                if (card.serialOnly) {
+                    val msg = stringResource(Res.string.chip_serial_only_info)
                     SuggestionChip(
-                        onClick = {},
+                        onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.legend_serial_only)) },
                         icon = { Icon(Icons.Default.SubtitlesOff, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     )
                 }
-            }
-            if (card.preview) {
-                NonInteractiveChip {
+                if (card.preview) {
+                    val msg = stringResource(Res.string.chip_preview_info)
                     SuggestionChip(
-                        onClick = {},
+                        onClick = { onStatusChipTap(msg) },
                         label = { Text(stringResource(Res.string.card_experimental)) },
                         icon = { Icon(Icons.Default.Science, contentDescription = null, modifier = Modifier.size(16.dp)) },
                     )

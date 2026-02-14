@@ -23,6 +23,7 @@
     <string name="import_clipboard">Import from Clipboard</string>
     <string name="import_failed">Import failed: %1$s</string>
     <string name="import_file">Import from File</string>
+    <string name="add_all_samples">Add all samples</string>
     <string name="import_file_button">Import File</string>
     <string name="imported_cards">Imported %1$d cards</string>
     <string name="key_data">Key Data</string>
@@ -79,6 +80,10 @@
     <string name="legend_keys_required">Locked</string>
     <string name="legend_serial_only">Limited</string>
     <string name="legend_experimental">Experimental</string>
+    <string name="chip_unsupported_info">This card type isn\'t compatible with this device</string>
+    <string name="chip_keys_required_info">Encryption keys are needed to read this card</string>
+    <string name="chip_serial_only_info">Only the serial number can be read from this card</string>
+    <string name="chip_preview_info">Support for this card is experimental and may be incomplete</string>
     <string name="credits">Thanks to</string>
 
     <!-- Date labels -->
