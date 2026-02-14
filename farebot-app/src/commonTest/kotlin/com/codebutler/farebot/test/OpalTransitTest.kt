@@ -27,6 +27,7 @@ import com.codebutler.farebot.test.CardTestHelper.desfireCard
 import com.codebutler.farebot.test.CardTestHelper.hexToBytes
 import com.codebutler.farebot.test.CardTestHelper.standardFile
 import com.codebutler.farebot.transit.TransitCurrency
+import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.opal.OpalData
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
@@ -156,6 +157,14 @@ class OpalTransitTest {
         assertEquals(OpalData.ACTION_JOURNEY_COMPLETED_DISTANCE, info.lastTransaction)
         assertEquals(39, info.lastTransactionNumber)
         assertEquals(1, info.weeklyTrips)
+
+        // Last transaction exposed as trip via OpalTrip
+        val trips = info.trips
+        assertNotNull(trips)
+        assertEquals(1, trips.size)
+        assertEquals(Trip.Mode.BUS, trips[0].mode)
+        assertEquals(expectedTime, trips[0].startTimestamp)
+        assertNotNull(trips[0].routeName, "OpalTrip should have a route name (action description)")
     }
 
     /**

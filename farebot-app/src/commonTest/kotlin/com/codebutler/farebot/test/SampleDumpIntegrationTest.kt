@@ -59,6 +59,7 @@ import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
 import com.codebutler.farebot.transit.serialonly.HoloTransitFactory
 import com.codebutler.farebot.transit.serialonly.HoloTransitInfo
+import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
 import com.codebutler.farebot.transit.serialonly.TrimetHopTransitFactory
 import com.codebutler.farebot.transit.serialonly.TrimetHopTransitInfo
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
@@ -69,6 +70,7 @@ import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -110,6 +112,13 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         assertEquals(TransitCurrency.AUD(-182), balances[0].balance)
 
         assertEquals(2, info.weeklyTrips)
+
+        // Last transaction is now exposed as a Trip (OpalTrip)
+        val trips = info.trips
+        assertNotNull(trips)
+        assertEquals(1, trips.size)
+        assertEquals(Trip.Mode.TRAIN, trips[0].mode)
+        assertNotNull(trips[0].startTimestamp)
     }
 
     // --- HSL v2 (DESFire) ---
@@ -249,10 +258,30 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         assertEquals(1, balances.size)
         assertEquals(TransitCurrency.SGD(897), balances[0].balance)
 
-        // Should have trips
+        // 4 trips: BUS, BUS_REFUND, MRT, CREATION
         val trips = info.trips
         assertNotNull(trips)
-        assertTrue(trips.isNotEmpty(), "Should have trips")
+        assertEquals(4, trips.size)
+
+        // Verify expected modes are present
+        val modes = trips.map { it.mode }
+        assertEquals(2, modes.count { it == Trip.Mode.BUS }, "Should have 2 BUS trips (bus + refund)")
+        assertEquals(1, modes.count { it == Trip.Mode.METRO }, "Should have 1 MRT trip")
+        assertEquals(1, modes.count { it == Trip.Mode.OTHER }, "Should have 1 OTHER trip (creation)")
+
+        // MRT trip should have stations
+        val mrtTrip = trips.first { it.mode == Trip.Mode.METRO }
+        assertNotNull(mrtTrip.startStation, "MRT trip should have a start station")
+        assertNotNull(mrtTrip.endStation, "MRT trip should have an end station")
+
+        // Bus trips should not have stations (BUS_REFUND userData handled via toStationOrNull)
+        trips.filter { it.mode == Trip.Mode.BUS }.forEach { busTrip ->
+            assertNull(busTrip.startStation, "Bus trip should not have a station")
+        }
+
+        // CREATION trip should not have a station (blank userData nullified by toStationOrNull)
+        val creationTrip = trips.first { it.mode == Trip.Mode.OTHER }
+        assertNull(creationTrip.startStation, "CREATION trip should not have a station for blank userData")
     }
 
     // --- Holo (DESFire, serial-only) ---
@@ -270,6 +299,16 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val identity = factory.parseIdentity(card)
         assertEquals("HOLO", identity.name)
         assertNotNull(identity.serialNumber)
+
+        // Serial-only card: no balance, no trips, but has emptyStateMessage
+        assertTrue(info is SerialOnlyTransitInfo)
+        assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
+        assertNull(info.trips, "Serial-only card should have null trips")
+        assertTrue(info.balances.isNullOrEmpty(), "Serial-only card should have no balances")
+
+        // Holo has extraInfo (last transaction, manufacturing ID)
+        assertNotNull(info.info, "Holo should have info items")
+        assertTrue(info.info!!.isNotEmpty(), "Holo should have at least one info item")
     }
 
     // --- Mobib (Calypso, blank card) ---
@@ -437,6 +476,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val identity = factory.parseIdentity(card)
         assertNotNull(identity.name)
         assertEquals("308425123456780", identity.serialNumber)
+
+        // Serial-only card: has emptyStateMessage, no trips
+        assertTrue(info is SerialOnlyTransitInfo)
+        assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
+        assertNull(info.trips, "Serial-only card should have null trips")
     }
 
     // --- Octopus (FeliCa) ---
@@ -479,6 +523,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
 
         assertTrue(info is TrimetHopTransitInfo)
         assertEquals("01-001-12345678-RA", info.serialNumber)
+
+        // Serial-only card: has emptyStateMessage, no trips
+        assertTrue(info is SerialOnlyTransitInfo)
+        assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
+        assertNull(info.trips, "Serial-only card should have null trips")
     }
 
     // --- Bilhete Unico (Classic) ---

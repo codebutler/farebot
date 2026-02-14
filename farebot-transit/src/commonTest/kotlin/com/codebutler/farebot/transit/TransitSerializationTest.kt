@@ -245,4 +245,35 @@ class TransitSerializationTest {
 
         assertEquals("XXX", deserialized.currencyCode)
     }
+
+    @Test
+    fun testStationUnknownSerializationRoundTrip() {
+        val original = Station.unknown("30890")
+
+        val jsonString = json.encodeToString(Station.serializer(), original)
+        assertTrue(jsonString.contains("30890"))
+        assertTrue(jsonString.contains("isUnknown"))
+
+        val deserialized = json.decodeFromString(Station.serializer(), jsonString)
+        assertEquals(original.humanReadableId, deserialized.humanReadableId)
+        assertEquals(original.isUnknown, deserialized.isUnknown)
+        assertEquals(null, deserialized.stationNameRaw)
+    }
+
+    @Test
+    fun testStationUnknownStationNameFormat() {
+        val station = Station.unknown("0x1a2b")
+        val name = station.stationName
+        assertNotNull(name)
+        // Station.unknown() uses Res.string.unknown_station_format which renders as "Unknown (id)"
+        assertTrue(name.contains("0x1a2b"), "Unknown station name should contain the ID, got: $name")
+    }
+
+    @Test
+    fun testStationNameOnlyPreservesRawName() {
+        val station = Station.nameOnly("Bayfront")
+        assertEquals("Bayfront", station.stationName)
+        assertEquals(false, station.isUnknown)
+        assertEquals(null, station.humanReadableId)
+    }
 }
