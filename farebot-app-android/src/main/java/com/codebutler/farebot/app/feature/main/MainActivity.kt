@@ -93,7 +93,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        registerReceiver(nfcReceiver, IntentFilter(ACTION_TAG))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(nfcReceiver, IntentFilter(ACTION_TAG), RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(nfcReceiver, IntentFilter(ACTION_TAG))
+        }
 
         initDeviceRegion(this)
 
