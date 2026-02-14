@@ -227,6 +227,9 @@ $ make              # show all targets
 
 ## Thanks To
 
+> [!NOTE]
+> Huge thanks to [the Metrodroid project](https://github.com/metrodroid/metrodroid), a fork of FareBot that added support for many additional transit systems. All features as of [v3.1.0 (`04a603ba`)](https://github.com/metrodroid/metrodroid/commit/04a603ba639f) have been backported.
+
 * [Karl Koscher](https://x.com/supersat) (ORCA)
 * [Sean Cross](https://x.com/xobs) (CEPAS/EZ-Link)
 * Anonymous Contributor (Clipper)
@@ -237,7 +240,6 @@ $ make              # show all targets
 * [Lauri Andler](https://github.com/landler/) (HSL)
 * [Michael Farrell](https://github.com/micolous/) (Opal, Manly Fast Ferry, Go card, Myki, Octopus)
 * [Rob O'Regan](http://www.robx1.net/nswtkt/private/manlyff/manlyff.htm) (Manly Fast Ferry card image)
-* [The Metrodroid project](https://github.com/metrodroid/metrodroid) (many transit system implementations)
 * [b33f](http://www.fuzzysecurity.com/tutorials/rfid/4.html) (EasyCard)
 * [Bondan Sumbodo](http://sybond.web.id) (Kartu Multi Trip, COMMET)
 
