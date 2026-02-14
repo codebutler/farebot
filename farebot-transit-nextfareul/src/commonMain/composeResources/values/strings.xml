@@ -6,4 +6,5 @@
     <string name="nextfareul_product_type">Product type</string>
     <string name="nextfareul_machine_code">Machine code</string>
     <string name="nextfareul_note">Single ride tickets only</string>
+    <string name="nextfareul_unknown_route">Route %1$s</string>
 </resources>

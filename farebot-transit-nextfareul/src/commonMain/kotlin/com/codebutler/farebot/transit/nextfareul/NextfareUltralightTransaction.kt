@@ -28,8 +28,12 @@ import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
+import farebot.farebot_transit_nextfareul.generated.resources.Res
+import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_unknown_route
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
+import org.jetbrains.compose.resources.getString
 
 abstract class NextfareUltralightTransaction(
     raw: ByteArray,
@@ -61,7 +65,7 @@ abstract class NextfareUltralightTransaction(
     }
 
     override val routeNames: List<String>
-        get() = listOf(mRoute.toString(16))
+        get() = listOf(runBlocking { getString(Res.string.nextfareul_unknown_route, mRoute.toString(16)) })
 
     override val station: Station?
         get() = if (mLocation == 0) {
