@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.TransitBalance
@@ -34,12 +35,10 @@ import com.codebutler.farebot.transit.zolotayakorona.RussiaTaxCodes
 import farebot.farebot_transit_umarsh.generated.resources.Res
 import farebot.farebot_transit_umarsh.generated.resources.umarsh_card_name
 import farebot.farebot_transit_umarsh.generated.resources.umarsh_unknown
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 data class UmarshSector(
     val counter: Int,
@@ -68,13 +67,13 @@ data class UmarshSector(
     private val tariff get() = system?.tariffs?.get(tariffRaw)
 
     val cardName: String
-        get() = tariff?.cardName ?: system?.cardName ?: runBlocking { getString(Res.string.umarsh_card_name) }
+        get() = tariff?.cardName ?: system?.cardName ?: getStringBlocking(Res.string.umarsh_card_name)
 
     internal val denomination: UmarshDenomination
         get() = tariff?.denomination ?: if (total == 0) UmarshDenomination.RUB else UmarshDenomination.TRIPS
 
     val subscriptionName: String?
-        get() = tariff?.name ?: runBlocking { getString(Res.string.umarsh_unknown, NumberUtils.intToHex(tariffRaw)) }
+        get() = tariff?.name ?: getStringBlocking(Res.string.umarsh_unknown, NumberUtils.intToHex(tariffRaw))
 
     val remainingTripCount: Int?
         get() = if (denomination == UmarshDenomination.TRIPS) balanceRaw else null

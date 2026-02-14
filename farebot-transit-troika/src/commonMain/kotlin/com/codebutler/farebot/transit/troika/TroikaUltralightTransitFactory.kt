@@ -44,11 +44,10 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_troika.generated.resources.Res
 import farebot.farebot_transit_troika.generated.resources.*
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -289,24 +288,21 @@ abstract class TroikaBlock(
 
         private fun getLayout(rawData: ByteArray) = rawData.getBitsFromBuffer(52, 4)
 
-        fun getHeader(ticketType: Int) = runBlocking {
-            when (ticketType) {
-                0x5d3d, 0x5d3e, 0x5d48, 0x2135 -> getString(Res.string.troika_empty_ticket_holder)
-                0x183d, 0x2129 -> getString(Res.string.troika_druzhinnik_card)
-                0x5d9a -> troikaRides(1)
-                0x5d9b -> troikaRides(1)
-                0x5d9c -> troikaRides(2)
-                0x5da0 -> troikaRides(20)
-                0x5db1 -> getString(Res.string.troika_purse)
-                0x5dd3 -> troikaRides(60)
-                else -> getString(Res.string.troika_unknown_ticket, ticketType.toString(16))
-            }
+        fun getHeader(ticketType: Int) = when (ticketType) {
+            0x5d3d, 0x5d3e, 0x5d48, 0x2135 -> getStringBlocking(Res.string.troika_empty_ticket_holder)
+            0x183d, 0x2129 -> getStringBlocking(Res.string.troika_druzhinnik_card)
+            0x5d9a -> troikaRides(1)
+            0x5d9b -> troikaRides(1)
+            0x5d9c -> troikaRides(2)
+            0x5da0 -> troikaRides(20)
+            0x5db1 -> getStringBlocking(Res.string.troika_purse)
+            0x5dd3 -> troikaRides(60)
+            else -> getStringBlocking(Res.string.troika_unknown_ticket, ticketType.toString(16))
         }
 
-        private fun troikaRides(rides: Int) = runBlocking {
-            if (rides == 1) getString(Res.string.troika_rides_one, rides)
-            else getString(Res.string.troika_rides_other, rides)
-        }
+        private fun troikaRides(rides: Int) =
+            if (rides == 1) getStringBlocking(Res.string.troika_rides_one, rides)
+            else getStringBlocking(Res.string.troika_rides_other, rides)
 
         fun check(rawData: ByteArray): Boolean =
             rawData.getBitsFromBuffer(0, 10) in listOf(0x117, 0x108, 0x106)
@@ -440,12 +436,10 @@ private class TroikaPurseE3(private val rawData: ByteArray) : TroikaBlock(
     transfers = listOf(rawData.getBitsFromBuffer(171, 7)),
     lastTransportLeadingCode = rawData.getBitsFromBuffer(178, 2),
     lastTransportLongCode = rawData.getBitsFromBuffer(180, 8),
-    fareDesc = runBlocking {
-        when (rawData.getBitsFromBuffer(210, 2)) {
-            1 -> getString(Res.string.troika_fare_single)
-            2 -> getString(Res.string.troika_fare_90mins)
-            else -> null
-        }
+    fareDesc = when (rawData.getBitsFromBuffer(210, 2)) {
+        1 -> getStringBlocking(Res.string.troika_fare_single)
+        2 -> getStringBlocking(Res.string.troika_fare_90mins)
+        else -> null
     },
     // 12 bits zero
     checkSum = rawData.getHexString(28, 4)
@@ -596,15 +590,13 @@ private class TroikaTrip(
         }
 
     override val agencyName: String?
-        get() = runBlocking {
-            when (transportType) {
-                TroikaTransportType.UNKNOWN -> getString(Res.string.unknown)
-                null, TroikaTransportType.NONE -> rawTransport
-                TroikaTransportType.SUBWAY -> getString(Res.string.moscow_metro)
-                TroikaTransportType.MONORAIL -> getString(Res.string.moscow_monorail)
-                TroikaTransportType.GROUND -> getString(Res.string.moscow_ground_transport)
-                TroikaTransportType.MCC -> getString(Res.string.moscow_mcc)
-            }
+        get() = when (transportType) {
+            TroikaTransportType.UNKNOWN -> getStringBlocking(Res.string.unknown)
+            null, TroikaTransportType.NONE -> rawTransport
+            TroikaTransportType.SUBWAY -> getStringBlocking(Res.string.moscow_metro)
+            TroikaTransportType.MONORAIL -> getStringBlocking(Res.string.moscow_monorail)
+            TroikaTransportType.GROUND -> getStringBlocking(Res.string.moscow_ground_transport)
+            TroikaTransportType.MCC -> getStringBlocking(Res.string.moscow_mcc)
         }
 }
 

@@ -22,14 +22,13 @@
 package com.codebutler.farebot.transit.kazan
 
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_kazan.generated.resources.Res
 import farebot.farebot_transit_kazan.generated.resources.card_name_kazan
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class KazanTransitInfo(
     private val mSerial: Long,
@@ -51,5 +50,5 @@ class KazanTransitInfo(
         get() = mTrip?.let { listOf(it) }
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.card_name_kazan) }
+        get() = getStringBlocking(Res.string.card_name_kazan)
 }

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.msp_goto
 
 import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -34,9 +35,7 @@ import com.codebutler.farebot.transit.nextfare.NextfareRefill
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
 import com.codebutler.farebot.transit.nextfare.record.NextfareRecord
 import farebot.farebot_transit_msp_goto.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit factory for MSP Go-To card (Minneapolis, MN).
@@ -62,7 +61,7 @@ class MspGotoTransitFactory : TransitFactory<ClassicCard, MspGotoTransitInfo> {
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serialData = (card.getSector(0) as DataClassicSector).getBlock(0).data
         val serialNumber = NextfareRecord.byteArrayToLongReversed(serialData, 0, 4)
-        val cardName = runBlocking { getString(Res.string.msp_goto_card_name) }
+        val cardName = getStringBlocking(Res.string.msp_goto_card_name)
         return TransitIdentity.create(cardName, NextfareTransitInfo.formatSerialNumber(serialNumber))
     }
 

@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -34,8 +35,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_metromoney.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitInfo> {
 
@@ -53,7 +52,7 @@ class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitIn
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         return TransitIdentity.create(
-            runBlocking { getString(Res.string.card_name_metromoney) },
+            getStringBlocking(Res.string.card_name_metromoney),
             NumberUtils.zeroPad(getSerial(card), 10)
         )
     }

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.nextfareul
 
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitCurrency
@@ -30,9 +31,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_nextfareul.generated.resources.Res
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_card_name
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.getString
 
 class NextfareUnknownUltralightTransitInfo(
     override val capsule: NextfareUltralightTransitDataCapsule
@@ -42,7 +41,7 @@ class NextfareUnknownUltralightTransitInfo(
         get() = TZ
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.nextfareul_card_name) }
+        get() = getStringBlocking(Res.string.nextfareul_card_name)
 
     override fun makeCurrency(value: Int) = TransitCurrency.XXX(value)
 
@@ -69,7 +68,7 @@ class NextfareUnknownUltralightTransitInfo(
 
                 override fun parseIdentity(card: UltralightCard): TransitIdentity {
                     return TransitIdentity(
-                        runBlocking { getString(Res.string.nextfareul_card_name) },
+                        getStringBlocking(Res.string.nextfareul_card_name),
                         NextfareUltralightTransitData.formatSerial(
                             NextfareUltralightTransitData.getSerial(card)
                         )

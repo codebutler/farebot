@@ -23,12 +23,11 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit.generated.resources.Res
 import farebot.farebot_transit.generated.resources.unknown_station
 import farebot.farebot_transit.generated.resources.unknown_station_format
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 @Serializable
 data class Station(
@@ -46,8 +45,8 @@ data class Station(
     fun getStationName(showRawIds: Boolean = false): String? {
         if (isUnknown) {
             val id = humanReadableId
-                ?: return runBlocking { getString(Res.string.unknown_station) }
-            return runBlocking { getString(Res.string.unknown_station_format, id) }
+                ?: return getStringBlocking(Res.string.unknown_station)
+            return getStringBlocking(Res.string.unknown_station_format, id)
         }
         val base = shortStationNameRaw ?: stationNameRaw
         if (showRawIds && humanReadableId != null && base != null) {

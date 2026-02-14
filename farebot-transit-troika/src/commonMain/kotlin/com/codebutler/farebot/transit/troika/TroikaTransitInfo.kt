@@ -24,6 +24,7 @@
 package com.codebutler.farebot.transit.troika
 
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -32,8 +33,6 @@ import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_troika.generated.resources.Res
 import farebot.farebot_transit_troika.generated.resources.card_name_troika
 import farebot.farebot_transit_troika.generated.resources.troika_unformatted
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Troika, Moscow, Russia.
@@ -47,7 +46,7 @@ class TroikaTransitInfo internal constructor(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.card_name_troika) }
+        get() = getStringBlocking(Res.string.card_name_troika)
 
     override val serialNumber: String?
         get() = blocks.firstOrNull()?.second?.serialNumber
@@ -67,6 +66,6 @@ class TroikaTransitInfo internal constructor(
 
     override val warning: String?
         get() = if (blocks.firstOrNull()?.second?.balance == null && subscriptions.isEmpty())
-            runBlocking { getString(Res.string.troika_unformatted) }
+            getStringBlocking(Res.string.troika_unformatted)
         else null
 }

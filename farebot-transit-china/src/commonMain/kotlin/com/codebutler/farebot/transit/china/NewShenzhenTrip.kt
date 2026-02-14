@@ -24,16 +24,15 @@ package com.codebutler.farebot.transit.china
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import farebot.farebot_transit_china.generated.resources.Res
 import farebot.farebot_transit_china.generated.resources.szt_bus
 import farebot.farebot_transit_china.generated.resources.szt_metro
 import farebot.farebot_transit_china.generated.resources.szt_station_gate
 import farebot.farebot_transit_china.generated.resources.unknown_format
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 /**
  * Trip implementation for Shenzhen Tong (深圳通) cards.
@@ -50,7 +49,7 @@ class NewShenzhenTrip(override val capsule: ChinaTripCapsule) : ChinaTripAbstrac
                 val result = MdstStationLookup.getStation(SHENZHEN_STR, stationId)
                 if (result != null) {
                     val gate = (mStation and 0xff).toString(16)
-                    val gateAttr = runBlocking { getString(Res.string.szt_station_gate, gate) }
+                    val gateAttr = getStringBlocking(Res.string.szt_station_gate, gate)
                     Station(
                         stationNameRaw = result.stationName,
                         shortStationNameRaw = result.shortStationName,
@@ -104,9 +103,9 @@ class NewShenzhenTrip(override val capsule: ChinaTripCapsule) : ChinaTripAbstrac
 
     override val agencyName: String?
         get() = when (transport) {
-            SZT_METRO -> runBlocking { getString(Res.string.szt_metro) }
-            SZT_BUS -> runBlocking { getString(Res.string.szt_bus) }
-            else -> runBlocking { getString(Res.string.unknown_format, transport.toString()) }
+            SZT_METRO -> getStringBlocking(Res.string.szt_metro)
+            SZT_BUS -> getStringBlocking(Res.string.szt_bus)
+            else -> getStringBlocking(Res.string.unknown_format, transport.toString())
         }
 
     companion object {

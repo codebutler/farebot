@@ -23,11 +23,10 @@
 
 package com.codebutler.farebot.base.ui
 
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
 
 @Serializable
 @SerialName("normal")
@@ -38,12 +37,12 @@ data class ListItem(
     constructor(name: String) : this(name, null)
 
     constructor(nameRes: StringResource, value: String?) : this(
-        text1 = runBlocking { getString(nameRes) },
+        text1 = getStringBlocking(nameRes),
         text2 = value
     )
 
     constructor(nameRes: StringResource) : this(
-        text1 = runBlocking { getString(nameRes) },
+        text1 = getStringBlocking(nameRes),
         text2 = null
     )
 
@@ -52,7 +51,7 @@ data class ListItem(
      * The nameRes should be a format string like "%s spend".
      */
     constructor(nameRes: StringResource, value: String?, vararg formatArgs: Any) : this(
-        text1 = runBlocking { getString(nameRes, *formatArgs) },
+        text1 = getStringBlocking(nameRes, *formatArgs),
         text2 = value
     )
 
@@ -60,7 +59,7 @@ data class ListItem(
      * Constructor for two StringResources.
      */
     constructor(nameRes: StringResource, valueRes: StringResource) : this(
-        text1 = runBlocking { getString(nameRes) },
-        text2 = runBlocking { getString(valueRes) }
+        text1 = getStringBlocking(nameRes),
+        text2 = getStringBlocking(valueRes)
     )
 }

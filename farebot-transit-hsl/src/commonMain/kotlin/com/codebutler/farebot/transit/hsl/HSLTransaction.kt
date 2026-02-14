@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.hsl
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
@@ -32,8 +33,6 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import farebot.farebot_transit_hsl.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 
 class HSLTransaction internal constructor(
@@ -61,10 +60,8 @@ class HSLTransaction internal constructor(
             }
             val end = this.expireTimestamp?.toEpochMilliseconds()
             val start = this.timestamp?.toEpochMilliseconds()
-            val mins = if (start != null && end != null) runBlocking {
-                getString(Res.string.hsl_mins_format, ((end - start) / 60000L).toString())
-            } else null
-            val type = runBlocking { getString(Res.string.hsl_balance_ticket_label) }
+            val mins = if (start != null && end != null) getStringBlocking(Res.string.hsl_mins_format, ((end - start) / 60000L).toString()) else null
+            val type = getStringBlocking(Res.string.hsl_balance_ticket_label)
             return if (mins != null) "$type, $mins" else type
         }
 

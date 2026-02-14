@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.clipper
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Subscription
@@ -38,8 +39,6 @@ import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_r
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_senior
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_youth
 import farebot.farebot_transit_clipper.generated.resources.clipper_ul_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUltralightTransitInfo> {
 
@@ -50,7 +49,7 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
     }
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        val cardName = runBlocking { getString(Res.string.clipper_ul_card_name) }
+        val cardName = getStringBlocking(Res.string.clipper_ul_card_name)
         return TransitIdentity.create(cardName, getSerial(card).toString())
     }
 
@@ -122,7 +121,7 @@ class ClipperUltralightTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.clipper_ul_card_name) }
+        get() = getStringBlocking(Res.string.clipper_ul_card_name)
 
     override val serialNumber: String = serial.toString()
 

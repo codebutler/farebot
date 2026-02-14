@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.calypso.venezia
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.transit.CardInfo
@@ -39,8 +40,6 @@ import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.farebot_transit_calypso.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 internal class VeneziaTransitInfo(
     result: CalypsoParseResult
@@ -67,7 +66,7 @@ internal class VeneziaTransitInfo(
             return if (profileValue != null) {
                 listOf(ListItem(Res.string.calypso_profile, profileValue))
             } else {
-                val unknownProfile = runBlocking { getString(Res.string.calypso_profile_unknown, profileNumber) }
+                val unknownProfile = getStringBlocking(Res.string.calypso_profile_unknown, profileNumber)
                 listOf(ListItem(Res.string.calypso_profile, unknownProfile))
             }
         }

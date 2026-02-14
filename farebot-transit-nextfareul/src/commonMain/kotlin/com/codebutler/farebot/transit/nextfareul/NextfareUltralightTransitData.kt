@@ -29,6 +29,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.TransactionTrip
@@ -43,14 +44,12 @@ import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_product
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_ticket_type
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_ticket_type_concession
 import farebot.farebot_transit_nextfareul.generated.resources.nextfareul_ticket_type_regular
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Duration.Companion.minutes
 
 data class NextfareUltralightTransitDataCapsule(
@@ -87,9 +86,9 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
         get() {
             val items = mutableListOf<ListItem>()
             val ticketTypeValue = if (capsule.mType.toInt() == 8) {
-                runBlocking { getString(Res.string.nextfareul_ticket_type_concession) }
+                getStringBlocking(Res.string.nextfareul_ticket_type_concession)
             } else {
-                runBlocking { getString(Res.string.nextfareul_ticket_type_regular) }
+                getStringBlocking(Res.string.nextfareul_ticket_type_regular)
             }
             items.add(ListItem(Res.string.nextfareul_ticket_type, ticketTypeValue))
 

@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -49,9 +50,7 @@ import farebot.farebot_transit_china.generated.resources.city_union_city
 import farebot.farebot_transit_china.generated.resources.location_shanghai
 import farebot.farebot_transit_china.generated.resources.shanghai
 import farebot.farebot_transit_china.generated.resources.unknown_format
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit info implementation for China City Union cards.
@@ -94,15 +93,15 @@ class CityUnionTransitInfo(
             return if (cityInfo != null) {
                 listOf(
                     ListItem(
-                        runBlocking { getString(Res.string.city_union_city) },
-                        runBlocking { getString(cityInfo.locationId) }
+                        getStringBlocking(Res.string.city_union_city),
+                        getStringBlocking(cityInfo.locationId)
                     )
                 )
             } else {
                 listOf(
                     ListItem(
-                        runBlocking { getString(Res.string.city_union_city) },
-                        runBlocking { getString(Res.string.unknown_format, mCity.toString(16)) }
+                        getStringBlocking(Res.string.city_union_city),
+                        getStringBlocking(Res.string.unknown_format, mCity.toString(16))
                     )
                 )
             }
@@ -155,9 +154,9 @@ class CityUnionTransitInfo(
         private fun nameCity(city: Int?): String {
             val cityInfo = cities[city]
             return if (cityInfo != null) {
-                runBlocking { getString(cityInfo.nameId) }
+                getStringBlocking(cityInfo.nameId)
             } else {
-                runBlocking { getString(Res.string.card_name_cityunion) }
+                getStringBlocking(Res.string.card_name_cityunion)
             }
         }
 

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.selecta
 
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -31,8 +32,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_selecta.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Selecta payment cards (France).
@@ -52,7 +51,7 @@ class SelectaFranceTransitFactory : TransitFactory<ClassicCard, SelectaFranceTra
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        return TransitIdentity.create(runBlocking { getString(Res.string.selecta_card_name) }, serial.toString())
+        return TransitIdentity.create(getStringBlocking(Res.string.selecta_card_name), serial.toString())
     }
 
     override fun parseInfo(card: ClassicCard): SelectaFranceTransitInfo {

@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -38,9 +39,7 @@ import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.farebot_transit_ovc.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.getString
 
 class OVChipTransitInfo(
     private val parsed: En1545Parsed,
@@ -62,9 +61,9 @@ class OVChipTransitInfo(
         get() = TransitBalance(
             balance = TransitCurrency.EUR(credit),
             name = if (type == 2)
-                runBlocking { getString(Res.string.card_type_personal) }
+                getStringBlocking(Res.string.card_type_personal)
             else
-                runBlocking { getString(Res.string.card_type_anonymous) },
+                getStringBlocking(Res.string.card_type_anonymous),
             validTo = convertDate(expdate)
         )
 
@@ -99,16 +98,16 @@ class OVChipTransitInfo(
             // OVC-specific info
             li.add(ListItem(Res.string.ovc_banned,
                 if (banbits and 0xC0 == 0xC0)
-                    runBlocking { getString(Res.string.ovc_yes) }
+                    getStringBlocking(Res.string.ovc_yes)
                 else
-                    runBlocking { getString(Res.string.ovc_no) }))
+                    getStringBlocking(Res.string.ovc_no)))
 
             li.add(HeaderListItem(Res.string.ovc_autocharge_information))
             li.add(ListItem(Res.string.ovc_autocharge,
                     if (parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_ACTIVE) == 0x05)
-                        runBlocking { getString(Res.string.ovc_yes) }
+                        getStringBlocking(Res.string.ovc_yes)
                     else
-                        runBlocking { getString(Res.string.ovc_no) }))
+                        getStringBlocking(Res.string.ovc_no)))
             li.add(ListItem(Res.string.ovc_autocharge_limit,
                     TransitCurrency.EUR(parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_LIMIT))
                             .formatCurrencyString(true)))

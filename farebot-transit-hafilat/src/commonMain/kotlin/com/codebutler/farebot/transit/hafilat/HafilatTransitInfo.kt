@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.hafilat
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
@@ -33,8 +34,6 @@ import farebot.farebot_transit_hafilat.generated.resources.issue_date
 import farebot.farebot_transit_hafilat.generated.resources.machine_id
 import farebot.farebot_transit_hafilat.generated.resources.purse_serial_number
 import farebot.farebot_transit_hafilat.generated.resources.ticket_type
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class HafilatTransitInfo(
     override val trips: List<Trip>,
@@ -47,7 +46,7 @@ class HafilatTransitInfo(
         get() = formatSerial(serial)
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.card_name_hafilat) }
+        get() = getStringBlocking(Res.string.card_name_hafilat)
 
     override val info: List<ListItemInterface>?
         get() {

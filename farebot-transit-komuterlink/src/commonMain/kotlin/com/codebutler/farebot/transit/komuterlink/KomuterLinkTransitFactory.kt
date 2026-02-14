@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -37,12 +38,10 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_komuterlink.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransitInfo> {
 
@@ -61,7 +60,7 @@ class KomuterLinkTransitFactory : TransitFactory<ClassicCard, KomuterLinkTransit
         val sector0 = card.getSector(0) as DataClassicSector
         val serial = sector0.getBlock(0).data.byteArrayToLongReversed(0, 4)
         return TransitIdentity.create(
-            runBlocking { getString(Res.string.komuterlink_card_name) },
+            getStringBlocking(Res.string.komuterlink_card_name),
             NumberUtils.zeroPad(serial, 10)
         )
     }

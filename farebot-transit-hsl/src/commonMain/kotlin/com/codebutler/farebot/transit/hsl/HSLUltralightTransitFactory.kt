@@ -38,13 +38,11 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_hsl.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getStringBlocking
 
-private fun getNameUL(city: Int) = runBlocking {
-    if (city == HSLLookup.CITY_UL_TAMPERE) getString(Res.string.tampere_ultralight_card_name)
-    else getString(Res.string.hsl_ultralight_card_name)
-}
+private fun getNameUL(city: Int) =
+    if (city == HSLLookup.CITY_UL_TAMPERE) getStringBlocking(Res.string.tampere_ultralight_card_name)
+    else getStringBlocking(Res.string.hsl_ultralight_card_name)
 
 /**
  * HSL (Helsinki) and Tampere Ultralight transit cards.

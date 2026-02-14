@@ -25,10 +25,9 @@ package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getPluralString
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getPluralStringBlocking
 import kotlin.time.Instant
 
 /**
@@ -241,27 +240,23 @@ abstract class Subscription {
         val remainingTrips = remainingTripCount
         val totalTrips = totalTripCount
 
-        return runBlocking {
-            when {
-                remainingTrips != null && totalTrips != null ->
-                    getPluralString(Res.plurals.subscription_trips_remaining_total, remainingTrips, remainingTrips, totalTrips)
-                remainingTrips != null ->
-                    getPluralString(Res.plurals.subscription_trips_remaining, remainingTrips, remainingTrips)
-                else -> null
-            }
+        return when {
+            remainingTrips != null && totalTrips != null ->
+                getPluralStringBlocking(Res.plurals.subscription_trips_remaining_total, remainingTrips, remainingTrips, totalTrips)
+            remainingTrips != null ->
+                getPluralStringBlocking(Res.plurals.subscription_trips_remaining, remainingTrips, remainingTrips)
+            else -> null
         }
     }
 
     fun formatValidity(): String? {
         val from = validFrom
         val to = validTo
-        return runBlocking {
-            when {
-                from != null && to != null -> getString(Res.string.subscription_valid_format, from.toString(), to.toString())
-                to != null -> getString(Res.string.subscription_valid_to_format, to.toString())
-                from != null -> getString(Res.string.subscription_valid_from_format, from.toString())
-                else -> null
-            }
+        return when {
+            from != null && to != null -> getStringBlocking(Res.string.subscription_valid_format, from.toString(), to.toString())
+            to != null -> getStringBlocking(Res.string.subscription_valid_to_format, to.toString())
+            from != null -> getStringBlocking(Res.string.subscription_valid_from_format, from.toString())
+            else -> null
         }
     }
 
@@ -294,6 +289,6 @@ abstract class Subscription {
         /** The subscription costs nothing (gratis). */
         FREE(Res.string.payment_method_free);
 
-        val description: String get() = runBlocking { getString(descriptionRes) }
+        val description: String get() = getStringBlocking(descriptionRes)
     }
 }

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.magnacarta
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -29,14 +30,12 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_magnacarta.generated.resources.Res
 import farebot.farebot_transit_magnacarta.generated.resources.magnacarta_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class MagnaCartaTransitInfo(
     private val mBalance: Int? // cents
 ) : TransitInfo() {
 
-    override val cardName: String = runBlocking { getString(Res.string.magnacarta_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.magnacarta_card_name)
 
     override val serialNumber: String? = null
 

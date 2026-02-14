@@ -25,6 +25,7 @@
 package com.codebutler.farebot.transit.edy
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.felica.FeliCaConstants
@@ -35,8 +36,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_edy.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class EdyTransitFactory(private val stringResource: StringResource) : TransitFactory<FelicaCard, EdyTransitInfo> {
 
@@ -66,7 +65,7 @@ class EdyTransitFactory(private val stringResource: StringResource) : TransitFac
     }
 
     override fun parseIdentity(card: FelicaCard): TransitIdentity {
-        return TransitIdentity.create(runBlocking { getString(Res.string.card_name_edy) }, null)
+        return TransitIdentity.create(getStringBlocking(Res.string.card_name_edy), null)
     }
 
     override fun parseInfo(card: FelicaCard): EdyTransitInfo {

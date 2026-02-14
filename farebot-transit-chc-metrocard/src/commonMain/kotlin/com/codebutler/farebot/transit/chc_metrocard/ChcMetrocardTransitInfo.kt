@@ -21,13 +21,12 @@
 
 package com.codebutler.farebot.transit.chc_metrocard
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
 import com.codebutler.farebot.transit.erg.ErgTransitInfoCapsule
 import farebot.farebot_transit_chc_metrocard.generated.resources.Res
 import farebot.farebot_transit_chc_metrocard.generated.resources.chc_metrocard_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data type for pre-2016 Metrocard (Christchurch, NZ).
@@ -43,7 +42,7 @@ class ChcMetrocardTransitInfo(
 ) : ErgTransitInfo(capsule, { TransitCurrency.NZD(it) }) {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.chc_metrocard_card_name) }
+        get() = getStringBlocking(Res.string.chc_metrocard_card_name)
 
     override val serialNumber: String?
         get() = capsule.cardSerial?.let { internalFormatSerialNumber(it) }

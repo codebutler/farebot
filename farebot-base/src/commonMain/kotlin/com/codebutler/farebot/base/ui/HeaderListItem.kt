@@ -23,11 +23,10 @@
 
 package com.codebutler.farebot.base.ui
 
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
 
 @Serializable
 @SerialName("header")
@@ -38,7 +37,7 @@ data class HeaderListItem(
     constructor(title: String) : this(title, 2)
 
     constructor(titleRes: StringResource) : this(
-        text1 = runBlocking { getString(titleRes) },
+        text1 = getStringBlocking(titleRes),
         headingLevel = 2
     )
 

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.oyster
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitBalance
@@ -29,8 +30,6 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_oyster.generated.resources.Res
 import farebot.farebot_transit_oyster.generated.resources.oyster_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Oyster (Transport for London) on MIFARE Classic
@@ -48,7 +47,7 @@ class OysterTransitInfo internal constructor(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.oyster_card_name) }
+        get() = getStringBlocking(Res.string.oyster_card_name)
 
     override val serialNumber: String = OysterTransitFactory.formatSerial(serial)
 

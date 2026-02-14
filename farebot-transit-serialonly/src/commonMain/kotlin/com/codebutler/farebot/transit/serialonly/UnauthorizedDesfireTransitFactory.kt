@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.UnauthorizedDesfireFile
 import com.codebutler.farebot.transit.CardInfo
@@ -32,9 +33,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_serialonly.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 /**
  * Catch-all for MIFARE DESFire cards where all files are locked/unauthorized.
@@ -100,7 +99,7 @@ class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, Unauthoriz
                     return name
                 }
             }
-            return runBlocking { getString(Res.string.locked_mfd_card) }
+            return getStringBlocking(Res.string.locked_mfd_card)
         }
     }
 }

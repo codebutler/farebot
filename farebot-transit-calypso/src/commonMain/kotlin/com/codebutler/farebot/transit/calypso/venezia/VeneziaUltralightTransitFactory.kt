@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ultralight.UltralightCard
@@ -49,12 +50,11 @@ import com.codebutler.farebot.transit.en1545.En1545Transaction
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.farebot_transit_calypso.generated.resources.*
 import kotlin.time.Instant
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 import org.jetbrains.compose.resources.getString
 
-private val NAME by lazy { runBlocking { getString(Res.string.venezia_ultralight_card_name) } }
+private val NAME by lazy { getStringBlocking(Res.string.venezia_ultralight_card_name) }
 private const val TRANSPORT_TYPE = "TransportType"
 private const val Y_VALUE = "Y"
 

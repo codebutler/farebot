@@ -24,6 +24,7 @@
 package com.codebutler.farebot.transit.troika
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.transit.CardInfo
@@ -33,8 +34,6 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.podorozhnik.PodorozhnikTransitFactory
 import com.codebutler.farebot.transit.serialonly.StrelkaTransitFactory
 import farebot.farebot_transit_troika.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Hybrid factory for Troika cards that may also contain Podorozhnik or Strelka.
@@ -62,9 +61,9 @@ class TroikaHybridTransitFactory(
         // Check Podorozhnik first (takes priority), then Strelka, matching Metrodroid order
         val cardName = when {
             podorozhnikFactory.check(card) ->
-                runBlocking { getString(Res.string.card_name_troika_podorozhnik_hybrid) }
+                getStringBlocking(Res.string.card_name_troika_podorozhnik_hybrid)
             strelkaFactory.check(card) ->
-                runBlocking { getString(Res.string.card_name_troika_strelka_hybrid) }
+                getStringBlocking(Res.string.card_name_troika_strelka_hybrid)
             else -> TroikaTransitFactory.CARD_NAME
         }
 

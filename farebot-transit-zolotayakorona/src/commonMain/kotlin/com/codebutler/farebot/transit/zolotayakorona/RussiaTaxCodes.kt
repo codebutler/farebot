@@ -23,11 +23,10 @@
 package com.codebutler.farebot.transit.zolotayakorona
 
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_zolotayakorona.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
 
 /**
  * Tax codes assigned by Russian Tax agency for places both inside Russia and outside (e.g. Baikonur).
@@ -42,9 +41,9 @@ object RussiaTaxCodes {
         val bcd = NumberUtils.intToBCD(regionNum)
         val nameRes = TAX_CODE_NAMES[bcd]
         return if (nameRes != null) {
-            runBlocking { getString(nameRes) }
+            getStringBlocking(nameRes)
         } else {
-            runBlocking { getString(Res.string.russia_region_unknown, regionNum.toString()) }
+            getStringBlocking(Res.string.russia_region_unknown, regionNum.toString())
         }
     }
 
@@ -55,9 +54,9 @@ object RussiaTaxCodes {
     fun BCDToName(regionNum: Int): String {
         val nameRes = TAX_CODE_NAMES[regionNum]
         return if (nameRes != null) {
-            runBlocking { getString(nameRes) }
+            getStringBlocking(nameRes)
         } else {
-            runBlocking { getString(Res.string.russia_region_unknown, regionNum.toString(16)) }
+            getStringBlocking(Res.string.russia_region_unknown, regionNum.toString(16))
         }
     }
 

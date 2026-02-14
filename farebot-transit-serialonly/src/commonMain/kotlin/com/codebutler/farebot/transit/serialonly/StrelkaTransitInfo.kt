@@ -12,11 +12,10 @@ package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.card_name_strelka
 import farebot.farebot_transit_serialonly.generated.resources.strelka_long_serial
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class StrelkaTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() {
 
@@ -25,5 +24,5 @@ class StrelkaTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() 
 
     override val reason get() = Reason.MORE_RESEARCH_NEEDED
     override val serialNumber get() = StrelkaTransitFactory.formatShortSerial(mSerial)
-    override val cardName get() = runBlocking { getString(Res.string.card_name_strelka) }
+    override val cardName get() = getStringBlocking(Res.string.card_name_strelka)
 }

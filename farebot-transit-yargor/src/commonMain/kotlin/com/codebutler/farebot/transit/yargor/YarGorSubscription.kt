@@ -33,12 +33,11 @@ import farebot.farebot_transit_yargor.generated.resources.yargor_sub_allday_all
 import farebot.farebot_transit_yargor.generated.resources.yargor_sub_weekday_tram
 import farebot.farebot_transit_yargor.generated.resources.yargor_sub_weekday_trolley
 import farebot.farebot_transit_yargor.generated.resources.yargor_unknown_format
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 class YarGorSubscription(
     override val validFrom: Instant,
@@ -49,28 +48,26 @@ class YarGorSubscription(
 ) : Subscription() {
 
     override val subscriptionName: String?
-        get() = runBlocking {
-            when (mType) {
-                0x9613 -> getString(Res.string.yargor_sub_weekday_tram)
-                0x9615 -> getString(Res.string.yargor_sub_weekday_trolley)
-                0x9621 -> getString(Res.string.yargor_sub_allday_all)
-                else -> getString(Res.string.yargor_unknown_format, mType.toString(16))
-            }
+        get() = when (mType) {
+            0x9613 -> getStringBlocking(Res.string.yargor_sub_weekday_tram)
+            0x9615 -> getStringBlocking(Res.string.yargor_sub_weekday_trolley)
+            0x9621 -> getStringBlocking(Res.string.yargor_sub_allday_all)
+            else -> getStringBlocking(Res.string.yargor_unknown_format, mType.toString(16))
         }
 
     private val transportsDesc: String
-        get() = runBlocking {
+        get() {
             val t = mutableListOf<String>()
             for (i in 0..7) {
                 if ((mTransports.toInt() and (0x1 shl i)) != 0)
                     t += when (i) {
-                        0 -> getString(Res.string.yargor_mode_bus)
-                        1 -> getString(Res.string.yargor_mode_tram)
-                        2 -> getString(Res.string.yargor_mode_trolleybus)
-                        else -> getString(Res.string.yargor_unknown_format, i.toString())
+                        0 -> getStringBlocking(Res.string.yargor_mode_bus)
+                        1 -> getStringBlocking(Res.string.yargor_mode_tram)
+                        2 -> getStringBlocking(Res.string.yargor_mode_trolleybus)
+                        else -> getStringBlocking(Res.string.yargor_unknown_format, i.toString())
                     }
             }
-            t.joinToString()
+            return t.joinToString()
         }
 
     companion object {

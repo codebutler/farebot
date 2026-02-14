@@ -31,6 +31,7 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.formatDateTime
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -47,13 +48,11 @@ import farebot.farebot_transit_tfi_leap.generated.resources.transit_leap_initial
 import farebot.farebot_transit_tfi_leap.generated.resources.transit_leap_issue_date
 import farebot.farebot_transit_tfi_leap.generated.resources.transit_leap_period_start
 import farebot.farebot_transit_tfi_leap.generated.resources.transit_leap_weekly_accumulators
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data for a TFI Leap card (Dublin, Ireland).
@@ -83,7 +82,7 @@ class LeapTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.transit_leap_card_name) }
+        get() = getStringBlocking(Res.string.transit_leap_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(

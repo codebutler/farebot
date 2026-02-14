@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
@@ -44,11 +45,9 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import farebot.farebot_transit_calypso.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.getString
 
-private val NAME by lazy { runBlocking { getString(Res.string.pisa_ultralight_card_name) } }
+private val NAME by lazy { getStringBlocking(Res.string.pisa_ultralight_card_name) }
 
 /**
  * Pisa Ultralight transit cards (Pisa, Italy).

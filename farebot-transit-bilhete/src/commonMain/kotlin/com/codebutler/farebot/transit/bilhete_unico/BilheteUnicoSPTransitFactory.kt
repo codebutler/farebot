@@ -30,6 +30,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicBlock
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -40,8 +41,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_bilhete.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class BilheteUnicoSPTransitFactory : TransitFactory<ClassicCard, BilheteUnicoSPTransitInfo> {
 
@@ -122,7 +121,7 @@ class BilheteUnicoSPTransitFactory : TransitFactory<ClassicCard, BilheteUnicoSPT
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        return TransitIdentity.create(runBlocking { getString(Res.string.bilhete_card_name) }, formatSerial(getSerial(card)))
+        return TransitIdentity.create(getStringBlocking(Res.string.bilhete_card_name), formatSerial(getSerial(card)))
     }
 
     override fun parseInfo(card: ClassicCard): BilheteUnicoSPTransitInfo {

@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
@@ -37,9 +38,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Subscription
 import farebot.farebot_transit_hsl.generated.resources.*
 import kotlin.time.Instant
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getPluralString
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getPluralStringBlocking
 
 class HSLArvo(
     override val parsed: En1545Parsed,
@@ -53,13 +52,11 @@ class HSLArvo(
 
     internal fun formatPeriod(): String {
         val period = parsed.getIntOrZero(CONTRACT_PERIOD)
-        return runBlocking {
-            when (parsed.getIntOrZero(CONTRACT_PERIOD_UNITS)) {
-                0 -> getPluralString(Res.plurals.hsl_valid_mins, period, period)
-                1 -> getPluralString(Res.plurals.hsl_valid_hours, period, period)
-                2 -> getPluralString(Res.plurals.hsl_valid_days_24h, period, period)
-                else -> getPluralString(Res.plurals.hsl_valid_days_calendar, period, period)
-            }
+        return when (parsed.getIntOrZero(CONTRACT_PERIOD_UNITS)) {
+            0 -> getPluralStringBlocking(Res.plurals.hsl_valid_mins, period, period)
+            1 -> getPluralStringBlocking(Res.plurals.hsl_valid_hours, period, period)
+            2 -> getPluralStringBlocking(Res.plurals.hsl_valid_days_24h, period, period)
+            else -> getPluralStringBlocking(Res.plurals.hsl_valid_days_calendar, period, period)
         }
     }
 
@@ -68,12 +65,12 @@ class HSLArvo(
             val prof = parsed.getInt(CUSTOMER_PROFILE)
             when (prof) {
                 null -> {}
-                1 -> return runBlocking { getString(Res.string.hsl_adult) }
-                else -> return runBlocking { getString(Res.string.hsl_unknown_format, prof.toString()) }
+                1 -> return getStringBlocking(Res.string.hsl_adult)
+                else -> return getStringBlocking(Res.string.hsl_unknown_format, prof.toString())
             }
             return when (parsed.getInt(CHILD)) {
-                0 -> runBlocking { getString(Res.string.hsl_adult) }
-                1 -> runBlocking { getString(Res.string.hsl_child) }
+                0 -> getStringBlocking(Res.string.hsl_adult)
+                1 -> getStringBlocking(Res.string.hsl_child)
                 else -> null
             }
         }
@@ -105,7 +102,7 @@ class HSLArvo(
                 parsed, prefix = CONTRACT_PREFIX,
                 isValidity = true, ultralightCity = ultralightCity
             )
-            return runBlocking { getString(Res.string.hsl_arvo_format, area ?: "") }
+            return getStringBlocking(Res.string.hsl_arvo_format, area ?: "")
         }
 
     companion object {

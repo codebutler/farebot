@@ -26,6 +26,7 @@ package com.codebutler.farebot.transit.china
 
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -40,9 +41,7 @@ import farebot.farebot_transit_china.generated.resources.card_location_wuhan_chi
 import farebot.farebot_transit_china.generated.resources.card_name_wuhan_tong
 import farebot.farebot_transit_china.generated.resources.card_name_wuhantong
 import farebot.farebot_transit_china.generated.resources.wuhantong
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit info implementation for Wuhan Tong (武汉通) cards.
@@ -63,7 +62,7 @@ class WuhanTongTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.card_name_wuhantong) }
+        get() = getStringBlocking(Res.string.card_name_wuhantong)
 
     override val balance: TransitBalance?
         get() = if (mBalance != null)
@@ -97,7 +96,7 @@ class WuhanTongTransitInfo(
 
             override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
                 TransitIdentity(
-                    runBlocking { getString(Res.string.card_name_wuhantong) },
+                    getStringBlocking(Res.string.card_name_wuhantong),
                     parseSerial(card)
                 )
 

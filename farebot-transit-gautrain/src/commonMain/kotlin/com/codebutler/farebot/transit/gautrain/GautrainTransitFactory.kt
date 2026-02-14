@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -36,8 +37,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_gautrain.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit factory for Gautrain (Gauteng, South Africa).
@@ -62,7 +61,7 @@ class GautrainTransitFactory(
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(
-            runBlocking { getString(Res.string.gautrain_card_name) },
+            getStringBlocking(Res.string.gautrain_card_name),
             GautrainTransitInfo.formatSerial(getSerial(card))
         )
 

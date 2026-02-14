@@ -14,6 +14,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.country
 import farebot.farebot_transit_serialonly.generated.resources.country_code_format
@@ -21,9 +22,7 @@ import farebot.farebot_transit_serialonly.generated.resources.expiry_date
 import farebot.farebot_transit_serialonly.generated.resources.owner_company
 import farebot.farebot_transit_serialonly.generated.resources.retailer_company
 import farebot.farebot_transit_serialonly.generated.resources.unknown_company
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
-import org.jetbrains.compose.resources.getString
 
 class NorticTransitInfo(
     private val mCountry: Int,
@@ -48,7 +47,7 @@ class NorticTransitInfo(
             }
 
             return listOf(
-                ListItem(Res.string.country, runBlocking { getString(Res.string.country_code_format, mCountry) }),
+                ListItem(Res.string.country, getStringBlocking(Res.string.country_code_format, mCountry)),
                 ListItem(Res.string.expiry_date, expiryStr),
                 ListItem(Res.string.owner_company, getCompanyName(mOwnerCompany)),
                 ListItem(Res.string.retailer_company, getCompanyName(mRetailerCompany))
@@ -69,7 +68,7 @@ class NorticTransitInfo(
         )
 
         private fun getCompanyName(company: Int): String =
-            operators[company] ?: runBlocking { getString(Res.string.unknown_company, company) }
+            operators[company] ?: getStringBlocking(Res.string.unknown_company, company)
 
         internal fun getName(ownerCompany: Int): String = when (ownerCompany) {
             1 -> "Ruter Travelcard"

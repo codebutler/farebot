@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.nextfare
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
@@ -41,9 +42,7 @@ import com.codebutler.farebot.transit.nextfare.record.NextfareTransactionRecord
 import com.codebutler.farebot.transit.nextfare.record.NextfareTravelPassRecord
 import farebot.farebot_transit_nextfare.generated.resources.Res
 import farebot.farebot_transit_nextfare.generated.resources.nextfare_card_name
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.getString
 
 /**
  * Parsed data from a Nextfare card.
@@ -84,7 +83,7 @@ open class NextfareTransitInfo(
         get() = capsule.subscriptions
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.nextfare_card_name) }
+        get() = getStringBlocking(Res.string.nextfare_card_name)
 
     override val hasUnknownStations: Boolean
         get() = capsule.hasUnknownStations
@@ -286,7 +285,7 @@ open class NextfareTransitInfo(
         override fun parseIdentity(card: ClassicCard): TransitIdentity {
             val serialData = (card.getSector(0) as DataClassicSector).getBlock(0).data
             val serialNumber = NextfareRecord.byteArrayToLongReversed(serialData, 0, 4)
-            val cardName = runBlocking { getString(Res.string.nextfare_card_name) }
+            val cardName = getStringBlocking(Res.string.nextfare_card_name)
             return TransitIdentity.create(cardName, formatSerialNumber(serialNumber))
         }
 

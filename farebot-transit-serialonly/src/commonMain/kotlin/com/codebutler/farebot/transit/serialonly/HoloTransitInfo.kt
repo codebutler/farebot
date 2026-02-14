@@ -12,15 +12,14 @@ package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.last_transaction
 import farebot.farebot_transit_serialonly.generated.resources.manufacture_id
 import farebot.farebot_transit_serialonly.generated.resources.never
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.getString
 
 class HoloTransitInfo(
     private val mSerial: Int?,
@@ -33,7 +32,7 @@ class HoloTransitInfo(
             ListItem(
                 Res.string.last_transaction,
                 when (mLastTransactionTimestamp) {
-                    0 -> runBlocking { getString(Res.string.never) }
+                    0 -> getStringBlocking(Res.string.never)
                     else -> {
                         val instant = Instant.fromEpochSeconds(mLastTransactionTimestamp.toLong())
                         val local = instant.toLocalDateTime(TimeZone.of("Pacific/Honolulu"))

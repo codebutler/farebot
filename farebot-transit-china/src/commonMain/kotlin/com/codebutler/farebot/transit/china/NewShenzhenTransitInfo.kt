@@ -27,6 +27,7 @@ package com.codebutler.farebot.transit.china
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -42,9 +43,7 @@ import farebot.farebot_transit_china.generated.resources.card_location_shenzhen_
 import farebot.farebot_transit_china.generated.resources.card_name_shenzhen_tong
 import farebot.farebot_transit_china.generated.resources.card_name_szt
 import farebot.farebot_transit_china.generated.resources.szt_card
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit info implementation for Shenzhen Tong (深圳通) cards.
@@ -68,7 +67,7 @@ class NewShenzhenTransitInfo(
         get() = formatSerial(mSerial)
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.card_name_szt) }
+        get() = getStringBlocking(Res.string.card_name_szt)
 
     override val balance: TransitBalance?
         get() = if (mBalance != null)
@@ -103,7 +102,7 @@ class NewShenzhenTransitInfo(
 
             override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
                 TransitIdentity(
-                    runBlocking { getString(Res.string.card_name_szt) },
+                    getStringBlocking(Res.string.card_name_szt),
                     formatSerial(parseSerial(card))
                 )
 

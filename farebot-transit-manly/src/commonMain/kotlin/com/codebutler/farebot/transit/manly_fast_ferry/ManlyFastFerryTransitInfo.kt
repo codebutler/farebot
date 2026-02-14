@@ -23,13 +23,12 @@
 
 package com.codebutler.farebot.transit.manly_fast_ferry
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
 import com.codebutler.farebot.transit.erg.ErgTransitInfoCapsule
 import farebot.farebot_transit_manly.generated.resources.Res
 import farebot.farebot_transit_manly.generated.resources.manly_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data type for Manly Fast Ferry Smartcard (Sydney, AU).
@@ -46,7 +45,7 @@ class ManlyFastFerryTransitInfo(
 ) : ErgTransitInfo(capsule, { TransitCurrency.AUD(it) }) {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.manly_card_name) }
+        get() = getStringBlocking(Res.string.manly_card_name)
 
     companion object {
         internal const val AGENCY_ID = 0x0227

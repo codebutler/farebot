@@ -23,11 +23,10 @@
 
 package com.codebutler.farebot.transit.myki
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
 import farebot.farebot_transit_myki.generated.resources.Res
 import farebot.farebot_transit_myki.generated.resources.myki_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data type for Myki (Melbourne, AU).
@@ -53,7 +52,7 @@ class MykiTransitInfo(
 
     override val serialNumber: String? = serialNumberValue
 
-    override val cardName: String = runBlocking { getString(Res.string.myki_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.myki_card_name)
 
     override val moreInfoPage: String
         get() = "https://micolous.github.io/metrodroid/myki"

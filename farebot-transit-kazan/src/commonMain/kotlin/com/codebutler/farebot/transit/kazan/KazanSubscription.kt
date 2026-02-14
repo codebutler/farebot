@@ -28,9 +28,8 @@ import farebot.farebot_transit_kazan.generated.resources.Res
 import farebot.farebot_transit_kazan.generated.resources.kazan_blank
 import farebot.farebot_transit_kazan.generated.resources.kazan_unknown_type
 import farebot.farebot_transit_kazan.generated.resources.kazan_unknown_unlimited
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class KazanSubscription(
     override val validFrom: Instant?,
@@ -55,13 +54,11 @@ class KazanSubscription(
         get() = if (isUnlimited) null else mCounter
 
     override val subscriptionName: String
-        get() = runBlocking {
-            when (mType) {
-                0 -> getString(Res.string.kazan_blank)
-                // Could be unlimited buses, unlimited tram, unlimited trolleybus
-                // or unlimited tram+trolleybus
-                0x60 -> getString(Res.string.kazan_unknown_unlimited)
-                else -> getString(Res.string.kazan_unknown_type, mType.toString(16))
-            }
+        get() = when (mType) {
+            0 -> getStringBlocking(Res.string.kazan_blank)
+            // Could be unlimited buses, unlimited tram, unlimited trolleybus
+            // or unlimited tram+trolleybus
+            0x60 -> getStringBlocking(Res.string.kazan_unknown_unlimited)
+            else -> getStringBlocking(Res.string.kazan_unknown_type, mType.toString(16))
         }
 }

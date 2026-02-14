@@ -30,6 +30,7 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -39,8 +40,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_touchngo.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class TouchnGoTransitFactory : TransitFactory<ClassicCard, TouchnGoTransitInfo> {
 
@@ -121,7 +120,7 @@ class TouchnGoTransitFactory : TransitFactory<ClassicCard, TouchnGoTransitInfo> 
         )
 
         internal val NAME: String
-            get() = runBlocking { getString(Res.string.touchngo_card_name) }
+            get() = getStringBlocking(Res.string.touchngo_card_name)
 
         private val EXPECTED_BLOCK1 = ByteUtils.hexStringToByteArray("000102030405060708090a0b0c0d0e0f")
 

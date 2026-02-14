@@ -31,8 +31,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_octopus.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getStringBlocking
 
 class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
 
@@ -44,20 +43,19 @@ class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
                 || (card.getSystem(FeliCaConstants.SYSTEMCODE_SZT) != null)
     }
 
-    override fun parseIdentity(card: FelicaCard): TransitIdentity = runBlocking {
+    override fun parseIdentity(card: FelicaCard): TransitIdentity =
         if (card.getSystem(FeliCaConstants.SYSTEMCODE_SZT) != null) {
             if (card.getSystem(FeliCaConstants.SYSTEMCODE_OCTOPUS) != null) {
                 // Dual-mode card.
-                TransitIdentity.create(getString(Res.string.octopus_dual_card_name), null)
+                TransitIdentity.create(getStringBlocking(Res.string.octopus_dual_card_name), null)
             } else {
                 // SZT-only card.
-                TransitIdentity.create(getString(Res.string.octopus_szt_card_name), null)
+                TransitIdentity.create(getStringBlocking(Res.string.octopus_szt_card_name), null)
             }
         } else {
             // Octopus-only card.
-            TransitIdentity.create(getString(Res.string.octopus_card_name), null)
+            TransitIdentity.create(getStringBlocking(Res.string.octopus_card_name), null)
         }
-    }
 
     override fun parseInfo(card: FelicaCard): OctopusTransitInfo {
         var octopusBalance: Int? = null

@@ -30,8 +30,7 @@ import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_locked
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_more_research
 import farebot.farebot_transit_serialonly.generated.resources.serial_only_card_description_not_stored
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getStringBlocking
 
 abstract class SerialOnlyTransitInfo : TransitInfo() {
 
@@ -44,13 +43,11 @@ abstract class SerialOnlyTransitInfo : TransitInfo() {
         get() = extraInfo
 
     override val emptyStateMessage: String
-        get() = runBlocking {
-            when (reason) {
-                Reason.NOT_STORED -> getString(Res.string.serial_only_card_description_not_stored)
-                Reason.LOCKED -> getString(Res.string.serial_only_card_description_locked)
-                Reason.MORE_RESEARCH_NEEDED -> getString(Res.string.serial_only_card_description_more_research)
-                else -> getString(Res.string.serial_only_card_description_more_research)
-            }
+        get() = when (reason) {
+            Reason.NOT_STORED -> getStringBlocking(Res.string.serial_only_card_description_not_stored)
+            Reason.LOCKED -> getStringBlocking(Res.string.serial_only_card_description_locked)
+            Reason.MORE_RESEARCH_NEEDED -> getStringBlocking(Res.string.serial_only_card_description_more_research)
+            else -> getStringBlocking(Res.string.serial_only_card_description_more_research)
         }
 
     override val trips: List<Trip>? get() = null

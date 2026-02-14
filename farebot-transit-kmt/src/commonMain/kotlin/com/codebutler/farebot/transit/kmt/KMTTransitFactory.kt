@@ -20,6 +20,7 @@
 
 package com.codebutler.farebot.transit.kmt
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.felica.FeliCaUtil
@@ -29,8 +30,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_kmt.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
 
@@ -72,7 +71,7 @@ class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
             serialNumber = serviceID.blocks[0].data.decodeToString()
         }
 
-        return TransitIdentity.create(runBlocking { getString(Res.string.kmt_longname) }, serialNumber)
+        return TransitIdentity.create(getStringBlocking(Res.string.kmt_longname), serialNumber)
     }
 
     override fun parseInfo(card: FelicaCard): KMTTransitInfo {

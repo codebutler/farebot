@@ -22,15 +22,14 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_calypso.generated.resources.Res
 import farebot.farebot_transit_calypso.generated.resources.card_name_transgironde
 import farebot.farebot_transit_calypso.generated.resources.gironde_line
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 internal object IntercodeLookupGironde : IntercodeLookupSTR("gironde"), IntercodeLookupSingle {
 
-    override val cardName: String = runBlocking { getString(Res.string.card_name_transgironde) }
+    override val cardName: String = getStringBlocking(Res.string.card_name_transgironde)
 
     override fun getRouteName(
         routeNumber: Int?,
@@ -41,7 +40,7 @@ internal object IntercodeLookupGironde : IntercodeLookupSTR("gironde"), Intercod
         if (routeNumber == null)
             return null
         if (agency == TRANSGIRONDE)
-            return runBlocking { getString(Res.string.gironde_line, routeNumber) }
+            return getStringBlocking(Res.string.gironde_line, routeNumber)
         return super.getRouteName(routeNumber, routeNumber, agency, transport)
     }
 

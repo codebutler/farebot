@@ -26,6 +26,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -33,9 +34,7 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_clipper.generated.resources.Res
 import farebot.farebot_transit_clipper.generated.resources.transit_clipper_card_name
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class ClipperTransitInfo(
     override val serialNumber: String,
@@ -45,7 +44,7 @@ class ClipperTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.transit_clipper_card_name) }
+        get() = getStringBlocking(Res.string.transit_clipper_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(

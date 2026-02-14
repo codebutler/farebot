@@ -25,12 +25,11 @@
 
 package com.codebutler.farebot.transit.touchngo
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import farebot.farebot_transit_touchngo.generated.resources.Res
 import farebot.farebot_transit_touchngo.generated.resources.touchngo_travel_pass
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Duration.Companion.days
 
 /**
@@ -44,5 +43,5 @@ internal class TouchnGoTravelPass(
         get() = validFrom + 1.days
 
     override val subscriptionName: String
-        get() = runBlocking { getString(Res.string.touchngo_travel_pass) }
+        get() = getStringBlocking(Res.string.touchngo_travel_pass)
 }

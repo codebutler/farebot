@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.mrtj
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.transit.CardInfo
@@ -29,8 +30,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_mrtj.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
 
@@ -60,7 +59,7 @@ class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
     }
 
     override fun parseIdentity(card: FelicaCard): TransitIdentity {
-        return TransitIdentity.create(runBlocking { getString(Res.string.mrtj_longname) }, "")
+        return TransitIdentity.create(getStringBlocking(Res.string.mrtj_longname), "")
     }
 
     override fun parseInfo(card: FelicaCard): MRTJTransitInfo {

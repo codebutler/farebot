@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.gautrain
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -32,8 +33,6 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import farebot.farebot_transit_gautrain.generated.resources.Res
 import farebot.farebot_transit_gautrain.generated.resources.gautrain_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Gautrain (Gauteng, South Africa) transit card.
@@ -49,7 +48,7 @@ class GautrainTransitInfo internal constructor(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.gautrain_card_name) }
+        get() = getStringBlocking(Res.string.gautrain_card_name)
 
     override val serialNumber: String = formatSerial(serial)
 

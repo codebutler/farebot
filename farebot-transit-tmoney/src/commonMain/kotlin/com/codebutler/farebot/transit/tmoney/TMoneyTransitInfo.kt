@@ -24,6 +24,7 @@
 package com.codebutler.farebot.transit.tmoney
 
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfo
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfoResolver
@@ -34,10 +35,8 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_tmoney.generated.resources.Res
 import farebot.farebot_transit_tmoney.generated.resources.card_name_tmoney
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data for T-Money cards (South Korea).
@@ -87,7 +86,7 @@ open class TMoneyTransitInfo protected constructor(
     companion object {
         private val TZ = TimeZone.of("Asia/Seoul")
 
-        fun getCardName(): String = runBlocking { getString(Res.string.card_name_tmoney) }
+        fun getCardName(): String = getStringBlocking(Res.string.card_name_tmoney)
 
         /**
          * Creates a [TMoneyTransitInfo] from a [KSX6924Application].

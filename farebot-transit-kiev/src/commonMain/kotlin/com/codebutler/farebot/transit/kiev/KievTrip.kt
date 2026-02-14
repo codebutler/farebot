@@ -23,18 +23,17 @@ package com.codebutler.farebot.transit.kiev
 
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_kiev.generated.resources.Res
 import farebot.farebot_transit_kiev.generated.resources.kiev_agency_metro
 import farebot.farebot_transit_kiev.generated.resources.kiev_agency_unknown
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 class KievTrip(
     override val startTimestamp: Instant?,
@@ -55,8 +54,8 @@ class KievTrip(
 
     override val agencyName: String?
         get() = when {
-            mTransactionType == "84/04/40/53" -> runBlocking { getString(Res.string.kiev_agency_metro) }
-            mTransactionType != null -> runBlocking { getString(Res.string.kiev_agency_unknown, mTransactionType) }
+            mTransactionType == "84/04/40/53" -> getStringBlocking(Res.string.kiev_agency_metro)
+            mTransactionType != null -> getStringBlocking(Res.string.kiev_agency_unknown, mTransactionType)
             else -> null
         }
 

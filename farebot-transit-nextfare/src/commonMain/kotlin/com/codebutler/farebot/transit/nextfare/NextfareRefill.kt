@@ -23,13 +23,12 @@
 package com.codebutler.farebot.transit.nextfare
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.nextfare.record.NextfareTopupRecord
 import farebot.farebot_transit_nextfare.generated.resources.Res
 import farebot.farebot_transit_nextfare.generated.resources.nextfare_agency_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Represents a refill/top-up on a Nextfare card.
@@ -42,7 +41,7 @@ open class NextfareRefill(
     override fun getTimestamp(): Long = record.timestamp.epochSeconds
 
     override fun getAgencyName(stringResource: StringResource): String =
-        runBlocking { getString(Res.string.nextfare_agency_name) }
+        getStringBlocking(Res.string.nextfare_agency_name)
 
     override fun getShortAgencyName(stringResource: StringResource): String? = getAgencyName(stringResource)
 

@@ -23,15 +23,14 @@ package com.codebutler.farebot.transit.cifial
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_cifial.generated.resources.Res
 import farebot.farebot_transit_cifial.generated.resources.cifial_card_name
 import farebot.farebot_transit_cifial.generated.resources.cifial_hotel_checkin
 import farebot.farebot_transit_cifial.generated.resources.cifial_hotel_checkout
 import farebot.farebot_transit_cifial.generated.resources.cifial_hotel_room_number
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class CifialTransitInfo(
     private val mRoomNumber: String,
@@ -48,5 +47,5 @@ class CifialTransitInfo(
             ListItem(Res.string.cifial_hotel_checkout, mCheckOut.toString())
         )
 
-    override val cardName: String get() = runBlocking { getString(Res.string.cifial_card_name) }
+    override val cardName: String get() = getStringBlocking(Res.string.cifial_card_name)
 }

@@ -26,17 +26,16 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_bonobus.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 class BonobusTrip(
     private val mTimestamp: Long,
@@ -88,7 +87,7 @@ class BonobusTrip(
         }
 
     override val agencyName: String?
-        get() = if (mMode == MODE_BUS) runBlocking { getString(Res.string.bonobus_agency_tranvia) } else null
+        get() = if (mMode == MODE_BUS) getStringBlocking(Res.string.bonobus_agency_tranvia) else null
 
     companion object {
         fun parse(raw: ByteArray): BonobusTrip? {

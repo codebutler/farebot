@@ -24,13 +24,12 @@
 package com.codebutler.farebot.transit.calypso.intercode
 
 import com.codebutler.farebot.base.mdst.MdstStationTableReader
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.farebot_transit_calypso.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 private const val NAVIGO_STR = "navigo"
@@ -61,7 +60,7 @@ internal object IntercodeLookupNavigo : IntercodeLookupSTR(NAVIGO_STR) {
             fallBackName = if (SECTOR_NAMES[sectorId] != null)
                 "${SECTOR_NAMES[sectorId]} #$stationId"
             else
-                runBlocking { getString(Res.string.navigo_sector_station, sectorId, stationId) }
+                getStringBlocking(Res.string.navigo_sector_station, sectorId, stationId)
             humanReadableId = "$sectorId/$stationId"
         }
 

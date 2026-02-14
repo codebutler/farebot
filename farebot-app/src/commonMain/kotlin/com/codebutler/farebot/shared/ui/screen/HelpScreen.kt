@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitRegion
@@ -76,8 +77,6 @@ import farebot.farebot_app.generated.resources.credits
 import farebot.farebot_app.generated.resources.legend_unsupported
 import farebot.farebot_app.generated.resources.view_sample
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -118,12 +117,12 @@ fun ExploreContent(
     // Pre-resolve card names and locations for search
     val cardNames = remember(displayedCards) {
         displayedCards.associate { card ->
-            card.nameRes.key to runBlocking { getString(card.nameRes) }
+            card.nameRes.key to getStringBlocking(card.nameRes)
         }
     }
     val cardLocations = remember(displayedCards) {
         displayedCards.associate { card ->
-            card.nameRes.key to runBlocking { getString(card.locationRes) }
+            card.nameRes.key to getStringBlocking(card.locationRes)
         }
     }
 

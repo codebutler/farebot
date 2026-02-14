@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.en1545
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -34,9 +35,7 @@ import farebot.farebot_transit_en1545.generated.resources.en1545_valid_origin_de
 import farebot.farebot_transit_en1545.generated.resources.en1545_valid_origin_destination_via
 import farebot.farebot_transit_en1545.generated.resources.en1545_with_receipt
 import farebot.farebot_transit_en1545.generated.resources.en1545_without_receipt
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 abstract class En1545Subscription : Subscription() {
     protected abstract val parsed: En1545Parsed
@@ -144,35 +143,22 @@ abstract class En1545Subscription : Subscription() {
             }
             val receipt = parsed.getInt(CONTRACT_RECEIPT_DELIVERED)
             if (receipt != null && receipt != 0) {
-                li.add(ListItem(runBlocking { getString(Res.string.en1545_with_receipt) }))
+                li.add(ListItem(getStringBlocking(Res.string.en1545_with_receipt)))
             }
             if (receipt != null && receipt == 0) {
-                li.add(ListItem(runBlocking { getString(Res.string.en1545_without_receipt) }))
+                li.add(ListItem(getStringBlocking(Res.string.en1545_without_receipt)))
             }
             if (parsed.contains(CONTRACT_ORIGIN_1) || parsed.contains(CONTRACT_DESTINATION_1)) {
                 if (parsed.contains(CONTRACT_VIA_1)) {
                     li.add(
                         ListItem(
-                            runBlocking {
-                                getString(
-                                    Res.string.en1545_valid_origin_destination_via,
-                                    getStationName(CONTRACT_ORIGIN_1) ?: "?",
-                                    getStationName(CONTRACT_DESTINATION_1) ?: "?",
-                                    getStationName(CONTRACT_VIA_1) ?: "?"
-                                )
-                            }
+                            getStringBlocking(Res.string.en1545_valid_origin_destination_via, getStationName(CONTRACT_ORIGIN_1) ?: "?", getStationName(CONTRACT_DESTINATION_1) ?: "?", getStationName(CONTRACT_VIA_1) ?: "?")
                         )
                     )
                 } else {
                     li.add(
                         ListItem(
-                            runBlocking {
-                                getString(
-                                    Res.string.en1545_valid_origin_destination,
-                                    getStationName(CONTRACT_ORIGIN_1) ?: "?",
-                                    getStationName(CONTRACT_DESTINATION_1) ?: "?"
-                                )
-                            }
+                            getStringBlocking(Res.string.en1545_valid_origin_destination, getStationName(CONTRACT_ORIGIN_1) ?: "?", getStationName(CONTRACT_DESTINATION_1) ?: "?")
                         )
                     )
                 }
@@ -180,13 +166,7 @@ abstract class En1545Subscription : Subscription() {
             if (parsed.contains(CONTRACT_ORIGIN_2) || parsed.contains(CONTRACT_DESTINATION_2)) {
                 li.add(
                     ListItem(
-                        runBlocking {
-                            getString(
-                                Res.string.en1545_valid_origin_destination,
-                                getStationName(CONTRACT_ORIGIN_2) ?: "?",
-                                getStationName(CONTRACT_DESTINATION_2) ?: "?"
-                            )
-                        }
+                        getStringBlocking(Res.string.en1545_valid_origin_destination, getStationName(CONTRACT_ORIGIN_2) ?: "?", getStationName(CONTRACT_DESTINATION_2) ?: "?")
                     )
                 )
             }

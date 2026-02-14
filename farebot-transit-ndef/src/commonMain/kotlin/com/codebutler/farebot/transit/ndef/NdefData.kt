@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.ndef
 
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.classic.ClassicBlock
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -36,9 +37,7 @@ import com.codebutler.farebot.card.vicinity.VicinityCard
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_ndef.generated.resources.Res
 import farebot.farebot_transit_ndef.generated.resources.ndef_card_name
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.getString
 
 @Serializable
 data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
@@ -59,7 +58,7 @@ data class NdefData(val entries: List<NdefEntry>) : TransitInfo() {
 
     companion object {
         val NAME: String
-            get() = runBlocking { getString(Res.string.ndef_card_name) }
+            get() = getStringBlocking(Res.string.ndef_card_name)
 
         fun checkClassic(card: ClassicCard): Boolean =
             MifareClassicAccessDirectory.parse(card)

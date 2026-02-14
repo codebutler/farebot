@@ -23,12 +23,11 @@
 
 package com.codebutler.farebot.transit.seq_go
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_seqgo.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 /**
  * Represents trip events on Go Card.
@@ -52,15 +51,15 @@ class SeqGoTrip(
 
     override val agencyName: String
         get() = when (mode) {
-            Mode.FERRY -> runBlocking { getString(Res.string.seqgo_agency_transdev) }
+            Mode.FERRY -> getStringBlocking(Res.string.seqgo_agency_transdev)
             Mode.TRAIN -> {
                 if (startStationId == 9 || endStationId == 9) {
-                    runBlocking { getString(Res.string.seqgo_agency_airtrain) }
+                    getStringBlocking(Res.string.seqgo_agency_airtrain)
                 } else {
-                    runBlocking { getString(Res.string.seqgo_agency_qr) }
+                    getStringBlocking(Res.string.seqgo_agency_qr)
                 }
             }
-            else -> runBlocking { getString(Res.string.seqgo_agency_translink) }
+            else -> getStringBlocking(Res.string.seqgo_agency_translink)
         }
 
     override val startStation: Station?

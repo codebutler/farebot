@@ -33,11 +33,10 @@ import farebot.farebot_transit_yargor.generated.resources.yargor_mode_bus
 import farebot.farebot_transit_yargor.generated.resources.yargor_mode_tram
 import farebot.farebot_transit_yargor.generated.resources.yargor_mode_trolleybus
 import farebot.farebot_transit_yargor.generated.resources.yargor_unknown_format
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 class YarGorTrip(
     override val startTimestamp: Instant,
@@ -72,13 +71,11 @@ class YarGorTrip(
         }
 
     override val agencyName: String?
-        get() = runBlocking {
-            when (mode) {
-                Mode.TRAM -> getString(Res.string.yargor_mode_tram)
-                Mode.TROLLEYBUS -> getString(Res.string.yargor_mode_trolleybus)
-                Mode.BUS -> getString(Res.string.yargor_mode_bus)
-                else -> getString(Res.string.yargor_unknown_format, (mRoute / 100).toString())
-            }
+        get() = when (mode) {
+            Mode.TRAM -> getStringBlocking(Res.string.yargor_mode_tram)
+            Mode.TROLLEYBUS -> getStringBlocking(Res.string.yargor_mode_trolleybus)
+            Mode.BUS -> getStringBlocking(Res.string.yargor_mode_bus)
+            else -> getStringBlocking(Res.string.yargor_unknown_format, (mRoute / 100).toString())
         }
 
     override val routeName: String?

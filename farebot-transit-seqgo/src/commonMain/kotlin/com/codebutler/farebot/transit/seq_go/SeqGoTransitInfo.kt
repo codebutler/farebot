@@ -23,14 +23,13 @@
 
 package com.codebutler.farebot.transit.seq_go
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_seqgo.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit data type for Go card (Brisbane / South-East Queensland, AU), used by Translink.
@@ -48,7 +47,7 @@ class SeqGoTransitInfo(
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.AUD(balanceValue))
 
-    override val cardName: String = runBlocking { getString(Res.string.seqgo_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.seqgo_card_name)
 
     override val serialNumber: String = serialNumberValue
 
@@ -65,7 +64,7 @@ class SeqGoTransitInfo(
         get() = "https://gocard.translink.com.au/"
 
     companion object {
-        val NAME: String get() = runBlocking { getString(Res.string.seqgo_card_name) }
+        val NAME: String get() = getStringBlocking(Res.string.seqgo_card_name)
 
         fun create(
             serialNumber: String,

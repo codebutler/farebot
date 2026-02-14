@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.warsaw
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -33,8 +34,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_warsaw.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class WarsawTransitFactory : TransitFactory<ClassicCard, WarsawTransitInfo> {
 
@@ -55,7 +54,7 @@ class WarsawTransitFactory : TransitFactory<ClassicCard, WarsawTransitInfo> {
         val serial = getSerial(card)
         val formatted = NumberUtils.zeroPad(serial.first, 3) + " " +
                 NumberUtils.zeroPad(serial.second, 8)
-        return TransitIdentity.create(runBlocking { getString(Res.string.warsaw_card_name) }, formatted)
+        return TransitIdentity.create(getStringBlocking(Res.string.warsaw_card_name), formatted)
     }
 
     override fun parseInfo(card: ClassicCard): WarsawTransitInfo {

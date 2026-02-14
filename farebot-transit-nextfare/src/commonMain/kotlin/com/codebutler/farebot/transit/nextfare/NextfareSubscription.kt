@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.nextfare
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.nextfare.record.NextfareBalanceRecord
 import com.codebutler.farebot.transit.nextfare.record.NextfareTravelPassRecord
@@ -29,9 +30,7 @@ import farebot.farebot_transit_nextfare.generated.resources.Res
 import farebot.farebot_transit_nextfare.generated.resources.nextfare_agency_name
 import farebot.farebot_transit_nextfare.generated.resources.nextfare_travel_pass
 import farebot.farebot_transit_nextfare.generated.resources.nextfare_travel_pass_unused
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 /**
  * Represents a Nextfare travel pass subscription.
@@ -65,15 +64,13 @@ class NextfareSubscription private constructor(
     override val validTo: Instant? get() = validToValue ?: Instant.DISTANT_FUTURE
 
     override val agencyName: String
-        get() = runBlocking { getString(Res.string.nextfare_agency_name) }
+        get() = getStringBlocking(Res.string.nextfare_agency_name)
 
     override val shortAgencyName: String get() = agencyName
 
     override val machineId: Int = 0
 
     override val subscriptionName: String
-        get() = runBlocking {
-            if (isActive) getString(Res.string.nextfare_travel_pass)
-            else getString(Res.string.nextfare_travel_pass_unused)
-        }
+        get() = if (isActive) getStringBlocking(Res.string.nextfare_travel_pass)
+            else getStringBlocking(Res.string.nextfare_travel_pass_unused)
 }

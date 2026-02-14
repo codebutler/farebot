@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.ui.ListItemRecursive
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isASCII
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.readLatin1
@@ -36,10 +37,8 @@ import com.codebutler.farebot.base.util.readUTF8
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.base.util.toHexDump
 import farebot.farebot_transit_ndef.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
 
 @Serializable
 sealed class NdefEntry {
@@ -50,7 +49,7 @@ sealed class NdefEntry {
 
     private val headInfo: List<ListItemInterface>
         get() = listOfNotNull(
-            HeaderListItem(runBlocking { getString(name) }),
+            HeaderListItem(getStringBlocking(name)),
             id?.let {
                 ListItem(
                     Res.string.ndef_id,
@@ -310,7 +309,7 @@ data class NdefWifi(
                 0x1049 -> if (it.value.size >= 5
                     && it.value.byteArrayToInt(0, 3) == 0x372A) {
                     ListItemRecursive(
-                        runBlocking { getString(Res.string.ndef_wifi_wfa_extension) },
+                        getStringBlocking(Res.string.ndef_wifi_wfa_extension),
                         null,
                         infoWfaExtension(it.value)
                     )
@@ -332,7 +331,7 @@ data class NdefWifi(
                         Res.string.ndef_wifi_key_provided_automatically_no
                 )
                 else -> ListItem(
-                    runBlocking { getString(Res.string.ndef_wifi_unknown, it.type.toString(16)) },
+                    getStringBlocking(Res.string.ndef_wifi_unknown, it.type.toString(16)),
                     it.value.toHexDump()
                 )
             }
@@ -366,7 +365,7 @@ data class NdefWifi(
                             Res.string.ndef_wifi_key_is_shareable_no
                     )
                     else -> ListItem(
-                        runBlocking { getString(Res.string.ndef_wifi_unknown, it.type.toString(16)) },
+                        getStringBlocking(Res.string.ndef_wifi_unknown, it.type.toString(16)),
                         it.value.toHexDump()
                     )
                 }
@@ -410,7 +409,7 @@ data class NdefWifi(
                 if (builder.isNotEmpty()) {
                     builder.append(", ")
                 }
-                builder.append(runBlocking { getString(bitmapDefinition[i]) })
+                builder.append(getStringBlocking(bitmapDefinition[i]))
             }
 
             for (i in bitmapDefinition.size until (8 * len)) {
@@ -420,7 +419,7 @@ data class NdefWifi(
                 if (builder.isNotEmpty()) {
                     builder.append(", ")
                 }
-                builder.append(runBlocking { getString(Res.string.ndef_wifi_bitmap_unknown, i) })
+                builder.append(getStringBlocking(Res.string.ndef_wifi_bitmap_unknown, i))
             }
 
             return builder.toString()

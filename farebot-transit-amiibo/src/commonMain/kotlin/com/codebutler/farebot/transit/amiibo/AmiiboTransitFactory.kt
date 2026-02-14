@@ -26,14 +26,13 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_amiibo.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Nintendo Amiibo NFC tag reader (NTAG215).
@@ -65,7 +64,7 @@ class AmiiboTransitFactory : TransitFactory<UltralightCard, AmiiboTransitInfo> {
     }
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        return TransitIdentity.create(runBlocking { getString(Res.string.amiibo_card_name) }, null)
+        return TransitIdentity.create(getStringBlocking(Res.string.amiibo_card_name), null)
     }
 
     override fun parseInfo(card: UltralightCard): AmiiboTransitInfo {
@@ -86,16 +85,14 @@ class AmiiboTransitInfo internal constructor(
     private val modelNumber: Int,
     private val series: Int
 ) : TransitInfo() {
-    override val cardName: String = runBlocking { getString(Res.string.amiibo_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.amiibo_card_name)
     override val serialNumber: String? = null
 
-    private fun figureTypeName(): String = runBlocking {
-        when (figureType) {
-            0 -> getString(Res.string.amiibo_figure_type_figure)
-            1 -> getString(Res.string.amiibo_figure_type_card)
-            2 -> getString(Res.string.amiibo_figure_type_yarn)
-            else -> getString(Res.string.amiibo_unknown_type, figureType)
-        }
+    private fun figureTypeName(): String = when (figureType) {
+        0 -> getStringBlocking(Res.string.amiibo_figure_type_figure)
+        1 -> getStringBlocking(Res.string.amiibo_figure_type_card)
+        2 -> getStringBlocking(Res.string.amiibo_figure_type_yarn)
+        else -> getStringBlocking(Res.string.amiibo_unknown_type, figureType)
     }
 
     override val info: List<ListItemInterface>

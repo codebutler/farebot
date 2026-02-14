@@ -21,14 +21,13 @@
 
 package com.codebutler.farebot.transit.ricaricami
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import farebot.farebot_transit_ricaricami.generated.resources.Res
 import farebot.farebot_transit_ricaricami.generated.resources.ricaricami_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class RicaricaMiTransitInfo(
     override val trips: List<Trip>,
@@ -40,5 +39,5 @@ class RicaricaMiTransitInfo(
 
     override val serialNumber: String? get() = null
 
-    override val cardName: String get() = runBlocking { getString(Res.string.ricaricami_card_name) }
+    override val cardName: String get() = getStringBlocking(Res.string.ricaricami_card_name)
 }

@@ -23,13 +23,12 @@
 package com.codebutler.farebot.transit.warsaw
 
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_warsaw.generated.resources.Res
 import farebot.farebot_transit_warsaw.generated.resources.warsaw_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class WarsawTransitInfo(
     private val serial: Pair<Int, Int>,
@@ -38,14 +37,14 @@ class WarsawTransitInfo(
 ) : TransitInfo() {
 
     companion object {
-        val NAME: String get() = runBlocking { getString(Res.string.warsaw_card_name) }
+        val NAME: String get() = getStringBlocking(Res.string.warsaw_card_name)
     }
 
     override val serialNumber: String
         get() = NumberUtils.zeroPad(serial.first, 3) + " " +
                 NumberUtils.zeroPad(serial.second, 8)
 
-    override val cardName: String get() = runBlocking { getString(Res.string.warsaw_card_name) }
+    override val cardName: String get() = getStringBlocking(Res.string.warsaw_card_name)
 
     override val trips: List<Trip>?
         get() = listOfNotNull(sectorA.trip, sectorB.trip).ifEmpty { null }

@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -35,9 +36,7 @@ import farebot.farebot_transit_komuterlink.generated.resources.Res
 import farebot.farebot_transit_komuterlink.generated.resources.komuterlink_card_name
 import farebot.farebot_transit_komuterlink.generated.resources.komuterlink_card_number
 import farebot.farebot_transit_komuterlink.generated.resources.komuterlink_issue_date
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class KomuterLinkTransitInfo(
     override val trips: List<Trip>,
@@ -49,7 +48,7 @@ class KomuterLinkTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.komuterlink_card_name) }
+        get() = getStringBlocking(Res.string.komuterlink_card_name)
 
     override val serialNumber: String
         get() = NumberUtils.zeroPad(mSerial, 10)

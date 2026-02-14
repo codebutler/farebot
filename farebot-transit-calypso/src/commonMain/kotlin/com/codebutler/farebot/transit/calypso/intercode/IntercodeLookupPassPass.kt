@@ -23,14 +23,13 @@
 package com.codebutler.farebot.transit.calypso.intercode
 
 import com.codebutler.farebot.base.mdst.MdstStationTableReader
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_calypso.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 internal object IntercodeLookupPassPass : IntercodeLookupSTR("passpass"), IntercodeLookupSingle {
 
-    override val cardName: String = runBlocking { getString(Res.string.card_name_passpass) }
+    override val cardName: String = getStringBlocking(Res.string.card_name_passpass)
 
     override val subscriptionMap: Map<Int, ComposeStringResource> = mapOf(
         24577 to Res.string.ilevia_trajet_unitaire,

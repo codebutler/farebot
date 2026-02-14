@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.bip
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -34,8 +35,6 @@ import farebot.farebot_transit_bip.generated.resources.bip_card_holders_name
 import farebot.farebot_transit_bip.generated.resources.bip_card_type
 import farebot.farebot_transit_bip.generated.resources.bip_card_type_anonymous
 import farebot.farebot_transit_bip.generated.resources.bip_card_type_personal
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 private const val NAME = "bip!"
 
@@ -61,9 +60,9 @@ class BipTransitInfo(
             ListItem(
                 Res.string.bip_card_type,
                 if (mHolderId == 0) {
-                    runBlocking { getString(Res.string.bip_card_type_anonymous) }
+                    getStringBlocking(Res.string.bip_card_type_anonymous)
                 } else {
-                    runBlocking { getString(Res.string.bip_card_type_personal) }
+                    getStringBlocking(Res.string.bip_card_type_personal)
                 }
             ),
             if (mHolderName != null) {

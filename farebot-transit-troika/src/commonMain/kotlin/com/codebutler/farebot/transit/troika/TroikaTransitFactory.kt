@@ -24,14 +24,13 @@
 package com.codebutler.farebot.transit.troika
 
 import com.codebutler.farebot.base.util.HashUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_troika.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Troika, Moscow, Russia.
@@ -85,7 +84,7 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
         } ?: throw RuntimeException("No valid Troika sector found")
 
         return TransitIdentity.create(
-            runBlocking { getString(Res.string.card_name_troika) },
+            getStringBlocking(Res.string.card_name_troika),
             TroikaBlock.formatSerial(TroikaBlock.getSerial(block))
         )
     }
@@ -99,7 +98,7 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
 
     companion object {
         internal val CARD_NAME: String
-            get() = runBlocking { getString(Res.string.card_name_troika) }
+            get() = getStringBlocking(Res.string.card_name_troika)
 
         /**
          * Main sectors to check for Troika header magic.

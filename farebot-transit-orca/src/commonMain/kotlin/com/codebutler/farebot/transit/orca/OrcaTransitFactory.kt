@@ -31,6 +31,7 @@ package com.codebutler.farebot.transit.orca
 
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.RecordDesfireFile
@@ -42,8 +43,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_orca.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class OrcaTransitFactory(private val stringResource: StringResource) : TransitFactory<DesfireCard, OrcaTransitInfo> {
 
@@ -57,7 +56,7 @@ class OrcaTransitFactory(private val stringResource: StringResource) : TransitFa
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         try {
             val data = (card.getApplication(0xffffff)!!.getFile(0x0f) as StandardDesfireFile).data
-            val cardName = runBlocking { getString(Res.string.transit_orca_card_name) }
+            val cardName = getStringBlocking(Res.string.transit_orca_card_name)
             return TransitIdentity.create(cardName, ByteUtils.byteArrayToInt(data, 4, 4).toString())
         } catch (ex: Exception) {
             throw RuntimeException("Error parsing ORCA serial", ex)

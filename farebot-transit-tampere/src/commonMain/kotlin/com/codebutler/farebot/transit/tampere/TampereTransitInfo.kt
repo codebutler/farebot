@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.tampere
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -33,8 +34,6 @@ import farebot.farebot_transit_tampere.generated.resources.tampere_card_name
 import farebot.farebot_transit_tampere.generated.resources.tampere_cardholder_name
 import farebot.farebot_transit_tampere.generated.resources.tampere_date_of_birth
 import farebot.farebot_transit_tampere.generated.resources.tampere_issue_date
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -52,7 +51,7 @@ class TampereTransitInfo(
     private val mIssueDate: Int?
 ) : TransitInfo() {
 
-    override val cardName: String = runBlocking { getString(Res.string.tampere_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.tampere_card_name)
 
     override val balance: TransitBalance?
         get() = mBalance?.let { TransitBalance(balance = TransitCurrency.EUR(it)) }

@@ -25,14 +25,13 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_serialonly.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Handle MIFARE Ultralight with no open pages (catch-all for unrecognized cards).
@@ -54,7 +53,7 @@ class LockedUltralightTransitFactory : TransitFactory<UltralightCard, LockedUltr
     }
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        val name = runBlocking { getString(Res.string.locked_mfu_card) }
+        val name = getStringBlocking(Res.string.locked_mfu_card)
         return TransitIdentity.create(name, null)
     }
 
@@ -64,7 +63,7 @@ class LockedUltralightTransitFactory : TransitFactory<UltralightCard, LockedUltr
 }
 
 class LockedUltralightTransitInfo : TransitInfo() {
-    override val cardName: String = runBlocking { getString(Res.string.locked_mfu_card) }
+    override val cardName: String = getStringBlocking(Res.string.locked_mfu_card)
 
     override val serialNumber: String? = null
 

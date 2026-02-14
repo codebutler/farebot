@@ -22,6 +22,7 @@
 package com.codebutler.farebot.transit.yargor
 
 import com.codebutler.farebot.base.util.HashUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -30,8 +31,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.farebot_transit_yargor.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
 
@@ -50,7 +49,7 @@ class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity(
-            runBlocking { getString(Res.string.yargor_card_name) },
+            getStringBlocking(Res.string.yargor_card_name),
             YarGorTransitInfo.formatSerial(YarGorTransitInfo.getSerial(card))
         )
 

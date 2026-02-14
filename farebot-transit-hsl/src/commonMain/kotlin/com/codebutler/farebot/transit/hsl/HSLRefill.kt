@@ -24,6 +24,7 @@
 
 package com.codebutler.farebot.transit.hsl
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -33,8 +34,6 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import farebot.farebot_transit_hsl.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class HSLRefill private constructor(
     override val parsed: En1545Parsed
@@ -49,7 +48,7 @@ class HSLRefill private constructor(
         get() = Trip.Mode.TICKET_MACHINE
 
     override val agencyName: String
-        get() = runBlocking { getString(Res.string.hsl_balance_refill) }
+        get() = getStringBlocking(Res.string.hsl_balance_refill)
 
     companion object {
         private val FIELDS_V1_V2 = En1545Container(

@@ -27,14 +27,13 @@
 
 package com.codebutler.farebot.transit.orca
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_orca.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class OrcaTransitInfo(
     override val trips: List<Trip>,
@@ -42,7 +41,7 @@ class OrcaTransitInfo(
     private val balanceValue: Int,
 ) : TransitInfo() {
 
-    override val cardName: String = runBlocking { getString(Res.string.transit_orca_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.transit_orca_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.USD(balanceValue))

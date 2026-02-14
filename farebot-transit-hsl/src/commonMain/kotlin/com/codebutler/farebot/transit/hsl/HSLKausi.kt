@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -35,9 +36,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Subscription
 import farebot.farebot_transit_hsl.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getPluralString
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getPluralStringBlocking
 
 class HSLKausi(
     override val parsed: En1545Parsed
@@ -49,9 +48,7 @@ class HSLKausi(
 
     internal fun formatPeriod(): String {
         val period = parsed.getIntOrZero(CONTRACT_PERIOD_DAYS)
-        return runBlocking {
-            getPluralString(Res.plurals.hsl_valid_days_calendar, period, period)
-        }
+        return getPluralStringBlocking(Res.plurals.hsl_valid_days_calendar, period, period)
     }
 
     override val subscriptionName: String?
@@ -60,7 +57,7 @@ class HSLKausi(
                 parsed, prefix = CONTRACT_PREFIX,
                 isValidity = true
             )
-            return runBlocking { getString(Res.string.hsl_kausi_format, area ?: "") }
+            return getStringBlocking(Res.string.hsl_kausi_format, area ?: "")
         }
 
     override val info: List<ListItemInterface>?

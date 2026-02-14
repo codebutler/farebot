@@ -23,13 +23,12 @@
 package com.codebutler.farebot.transit.erg
 
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.erg.record.ErgPurseRecord
 import farebot.farebot_transit_erg.generated.resources.Res
 import farebot.farebot_transit_erg.generated.resources.erg_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Represents a refill/top-up on an ERG card.
@@ -42,7 +41,7 @@ open class ErgRefill(
 
     override fun getTimestamp(): Long = ErgTrip.convertTimestamp(epochDate, purse.day, purse.minute)
 
-    override fun getAgencyName(stringResource: StringResource): String = runBlocking { getString(Res.string.erg_card_name) }
+    override fun getAgencyName(stringResource: StringResource): String = getStringBlocking(Res.string.erg_card_name)
 
     override fun getShortAgencyName(stringResource: StringResource): String? = getAgencyName(stringResource)
 

@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
@@ -38,8 +39,6 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import farebot.farebot_transit_hafilat.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class HafilatTransitFactory(
     private val stringResource: StringResource = DefaultStringResource()
@@ -54,7 +53,7 @@ class HafilatTransitFactory(
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         return TransitIdentity.create(
-            runBlocking { getString(Res.string.card_name_hafilat) },
+            getStringBlocking(Res.string.card_name_hafilat),
             HafilatTransitInfo.formatSerial(getSerial(card.tagId))
         )
     }

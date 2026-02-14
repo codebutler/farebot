@@ -23,6 +23,7 @@ package com.codebutler.farebot.transit.kmt
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -33,8 +34,6 @@ import farebot.farebot_transit_kmt.generated.resources.kmt_last_trx_amount
 import farebot.farebot_transit_kmt.generated.resources.kmt_longname
 import farebot.farebot_transit_kmt.generated.resources.kmt_other_data
 import farebot.farebot_transit_kmt.generated.resources.kmt_transaction_counter
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class KMTTransitInfo(
     override val trips: List<Trip>,
@@ -52,7 +51,7 @@ class KMTTransitInfo(
     override val subscriptions: List<Subscription>? = null
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.kmt_longname) }
+        get() = getStringBlocking(Res.string.kmt_longname)
 
     override val info: List<ListItemInterface>
         get() = listOf(

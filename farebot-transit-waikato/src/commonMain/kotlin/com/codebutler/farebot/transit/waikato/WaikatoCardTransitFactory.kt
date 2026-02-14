@@ -38,13 +38,12 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_waikato.generated.resources.*
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.jetbrains.compose.resources.getString
 
 /**
  * Transit factory for Waikato-region cards (BUSIT / SmartRide Rotorua, New Zealand).
@@ -142,12 +141,10 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
         private fun getName(card: ClassicCard): String {
             val sector0 = card.getSector(0) as DataClassicSector
             val header = sector0.getBlock(1).data.copyOfRange(0, 5).readASCII()
-            return runBlocking {
-                if (header == "Panda") {
-                    getString(Res.string.waikato_card_name_busit)
-                } else {
-                    getString(Res.string.waikato_card_name_rotorua)
-                }
+            return if (header == "Panda") {
+                getStringBlocking(Res.string.waikato_card_name_busit)
+            } else {
+                getStringBlocking(Res.string.waikato_card_name_rotorua)
             }
         }
 

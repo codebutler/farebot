@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.magnacarta
 
 import com.codebutler.farebot.base.util.byteArrayToInt
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.transit.CardInfo
@@ -30,8 +31,6 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.farebot_transit_magnacarta.generated.resources.Res
 import farebot.farebot_transit_magnacarta.generated.resources.magnacarta_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class MagnaCartaTransitFactory : TransitFactory<DesfireCard, MagnaCartaTransitInfo> {
 
@@ -42,7 +41,7 @@ class MagnaCartaTransitFactory : TransitFactory<DesfireCard, MagnaCartaTransitIn
     }
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        return TransitIdentity.create(runBlocking { getString(Res.string.magnacarta_card_name) }, null)
+        return TransitIdentity.create(getStringBlocking(Res.string.magnacarta_card_name), null)
     }
 
     override fun parseInfo(card: DesfireCard): MagnaCartaTransitInfo {

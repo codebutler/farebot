@@ -33,12 +33,12 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_orca.generated.resources.*
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import org.jetbrains.compose.resources.getString
 
@@ -135,7 +135,7 @@ class OrcaTransaction(
             isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt)
             else -> MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = false)
                 ?: getAgencyNameFallback(false)
-                ?: runBlocking { getString(Res.string.transit_orca_agency_unknown, mAgency.toString()) }
+                ?: getStringBlocking(Res.string.transit_orca_agency_unknown, mAgency.toString())
         }
 
     override val shortAgencyName: String?
@@ -147,7 +147,7 @@ class OrcaTransaction(
             isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt_short)
             else -> MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = true)
                 ?: getAgencyNameFallback(true)
-                ?: runBlocking { getString(Res.string.transit_orca_agency_unknown_short) }
+                ?: getStringBlocking(Res.string.transit_orca_agency_unknown_short)
         }
 
     private fun getAgencyNameFallback(isShort: Boolean): String? = when (mAgency) {

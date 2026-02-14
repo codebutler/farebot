@@ -26,6 +26,7 @@ package com.codebutler.farebot.transit.troika
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -36,8 +37,6 @@ import farebot.farebot_transit_troika.generated.resources.Res
 import farebot.farebot_transit_troika.generated.resources.card_name_troika_podorozhnik_hybrid
 import farebot.farebot_transit_troika.generated.resources.card_name_troika_strelka_hybrid
 import farebot.farebot_transit_troika.generated.resources.card_number
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Hybrid cards containing both Troika and Podorozhnik or Strelka.
@@ -88,10 +87,10 @@ class TroikaHybridTransitInfo(
     override val cardName: String
         get() {
             if (podorozhnik != null) {
-                return runBlocking { getString(Res.string.card_name_troika_podorozhnik_hybrid) }
+                return getStringBlocking(Res.string.card_name_troika_podorozhnik_hybrid)
             }
             if (strelka != null) {
-                return runBlocking { getString(Res.string.card_name_troika_strelka_hybrid) }
+                return getStringBlocking(Res.string.card_name_troika_strelka_hybrid)
             }
             return troika.cardName
         }

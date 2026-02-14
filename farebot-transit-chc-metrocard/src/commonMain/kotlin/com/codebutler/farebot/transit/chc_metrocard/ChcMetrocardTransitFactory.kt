@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.transit.chc_metrocard
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -30,8 +31,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
 import farebot.farebot_transit_chc_metrocard.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Factory for detecting and parsing CHC Metrocard (Christchurch, NZ) transit cards.
@@ -67,7 +66,7 @@ class ChcMetrocardTransitFactory : TransitFactory<ClassicCard, ChcMetrocardTrans
             }
             result.toString()
         }
-        return TransitIdentity.create(runBlocking { getString(Res.string.chc_metrocard_card_name) }, serial)
+        return TransitIdentity.create(getStringBlocking(Res.string.chc_metrocard_card_name), serial)
     }
 
     override fun parseInfo(card: ClassicCard): ChcMetrocardTransitInfo {

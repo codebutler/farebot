@@ -9,10 +9,9 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.farebot_transit_serialonly.generated.resources.Res
 import farebot.farebot_transit_serialonly.generated.resources.card_name_tpf
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class TPFCardTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() {
     override val reason get() = Reason.LOCKED
@@ -20,6 +19,6 @@ class TPFCardTransitInfo(private val mSerial: String) : SerialOnlyTransitInfo() 
     override val cardName get() = NAME
 
     companion object {
-        internal val NAME by lazy { runBlocking { getString(Res.string.card_name_tpf) } }
+        internal val NAME by lazy { getStringBlocking(Res.string.card_name_tpf) }
     }
 }

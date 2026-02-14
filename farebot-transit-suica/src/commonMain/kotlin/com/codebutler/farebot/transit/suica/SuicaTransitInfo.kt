@@ -34,6 +34,7 @@
 
 package com.codebutler.farebot.transit.suica
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -41,17 +42,15 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.farebot_transit_suica.generated.resources.Res
 import farebot.farebot_transit_suica.generated.resources.card_name_suica
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
-import org.jetbrains.compose.resources.getString
 
 class SuicaTransitInfo(
     override val serialNumber: String?,
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>?,
-    override val cardName: String = runBlocking { getString(Res.string.card_name_suica) },
+    override val cardName: String = getStringBlocking(Res.string.card_name_suica),
 ) : TransitInfo() {
 
     override val balance: TransitBalance?

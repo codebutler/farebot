@@ -64,8 +64,7 @@ import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_regula
 import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_senior
 import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_test
 import farebot.farebot_transit_tmoney.generated.resources.tmoney_usercode_youth
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getStringBlocking
 
 /**
  * [KSX6924PurseInfoResolver] singleton for T-Money.
@@ -77,87 +76,77 @@ import org.jetbrains.compose.resources.getString
 object TMoneyPurseInfoResolver : KSX6924PurseInfoResolver() {
 
     override val issuers: Map<Int, String> by lazy {
-        runBlocking {
-            mapOf(
-                // 0x00: reserved
-                0x01 to getString(Res.string.tmoney_issuer_kftci),
-                // 0x02: A-CASH (에이캐시) (Also used by Snapper)
-                0x03 to getString(Res.string.tmoney_issuer_mybi),
-                // 0x04: reserved
-                // 0x05: V-Cash (브이캐시)
-                0x06 to getString(Res.string.tmoney_issuer_mondex),
-                0x07 to getString(Res.string.tmoney_issuer_kec),
-                0x08 to getString(Res.string.tmoney_issuer_kscc),
-                0x09 to getString(Res.string.tmoney_issuer_korail),
-                // 0x0a: reserved
-                0x0b to getString(Res.string.tmoney_issuer_eb),
-                0x0c to getString(Res.string.tmoney_issuer_seoul_bus),
-                0x0d to getString(Res.string.tmoney_issuer_cardnet)
-            )
-        }
+        mapOf(
+            //0x00: reserved
+            0x01 to getStringBlocking(Res.string.tmoney_issuer_kftci),
+            //0x02: A-CASH (에이캐시) (Also used by Snapper)
+            0x03 to getStringBlocking(Res.string.tmoney_issuer_mybi),
+            //0x04: reserved
+            //0x05: V-Cash (브이캐시)
+            0x06 to getStringBlocking(Res.string.tmoney_issuer_mondex),
+            0x07 to getStringBlocking(Res.string.tmoney_issuer_kec),
+            0x08 to getStringBlocking(Res.string.tmoney_issuer_kscc),
+            0x09 to getStringBlocking(Res.string.tmoney_issuer_korail),
+            //0x0a: reserved
+            0x0b to getStringBlocking(Res.string.tmoney_issuer_eb),
+            0x0c to getStringBlocking(Res.string.tmoney_issuer_seoul_bus),
+            0x0d to getStringBlocking(Res.string.tmoney_issuer_cardnet)
+        )
     }
 
     override val userCodes: Map<Int, String> by lazy {
-        runBlocking {
-            mapOf(
-                0x01 to getString(Res.string.tmoney_usercode_regular),
-                0x02 to getString(Res.string.tmoney_usercode_child),
-                // TTAK.KO 12.0240 disagrees
-                0x03 to getString(Res.string.tmoney_usercode_youth),
-                // TTAK.KO 12.0240 disagrees
-                0x04 to getString(Res.string.tmoney_usercode_senior),
-                // TTAK.KO 12.0240 disagrees
-                0x05 to getString(Res.string.tmoney_usercode_disabled),
-                // Only in TTAK.KO 12.0240
-                0x0f to getString(Res.string.tmoney_usercode_test),
-                0x11 to getString(Res.string.tmoney_usercode_bus),
-                0x12 to getString(Res.string.tmoney_usercode_lorry),
-                0xff to getString(Res.string.tmoney_usercode_inactive)
-            )
-        }
+        mapOf(
+            0x01 to getStringBlocking(Res.string.tmoney_usercode_regular),
+            0x02 to getStringBlocking(Res.string.tmoney_usercode_child),
+            //TTAK.KO 12.0240 disagrees
+            0x03 to getStringBlocking(Res.string.tmoney_usercode_youth),
+            //TTAK.KO 12.0240 disagrees
+            0x04 to getStringBlocking(Res.string.tmoney_usercode_senior),
+            //TTAK.KO 12.0240 disagrees
+            0x05 to getStringBlocking(Res.string.tmoney_usercode_disabled),
+            //Only in TTAK.KO 12.0240
+            0x0f to getStringBlocking(Res.string.tmoney_usercode_test),
+            0x11 to getStringBlocking(Res.string.tmoney_usercode_bus),
+            0x12 to getStringBlocking(Res.string.tmoney_usercode_lorry),
+            0xff to getStringBlocking(Res.string.tmoney_usercode_inactive)
+        )
     }
 
     override val disRates: Map<Int, String> by lazy {
-        runBlocking {
-            mapOf(
-                0x00 to getString(Res.string.tmoney_disrate_none),
-                0x10 to getString(Res.string.tmoney_disrate_disabled_basic),
-                0x11 to getString(Res.string.tmoney_disrate_disabled_companion),
-                // 0x12 - 0x1f: reserved
-                0x20 to getString(Res.string.tmoney_disrate_veteran_basic),
-                0x21 to getString(Res.string.tmoney_disrate_veteran_companion)
-                // 0x22 - 0x2f: reserved
-            )
-        }
+        mapOf(
+            0x00 to getStringBlocking(Res.string.tmoney_disrate_none),
+            0x10 to getStringBlocking(Res.string.tmoney_disrate_disabled_basic),
+            0x11 to getStringBlocking(Res.string.tmoney_disrate_disabled_companion),
+            //0x12 - 0x1f: reserved
+            0x20 to getStringBlocking(Res.string.tmoney_disrate_veteran_basic),
+            0x21 to getStringBlocking(Res.string.tmoney_disrate_veteran_companion)
+            //0x22 - 0x2f: reserved
+        )
     }
 
     override val tCodes: Map<Int, String> by lazy {
-        runBlocking {
-            mapOf(
-                0x00 to getString(Res.string.none),
-                0x01 to getString(Res.string.tmoney_tcode_sk),
-                0x02 to getString(Res.string.tmoney_tcode_kt),
-                0x03 to getString(Res.string.tmoney_tcode_lg)
-            )
-        }
+        mapOf(
+            0x00 to getStringBlocking(Res.string.none),
+            0x01 to getStringBlocking(Res.string.tmoney_tcode_sk),
+            0x02 to getStringBlocking(Res.string.tmoney_tcode_kt),
+            0x03 to getStringBlocking(Res.string.tmoney_tcode_lg)
+        )
     }
 
     override val cCodes: Map<Int, String> by lazy {
-        runBlocking {
-            mapOf(
-                0x00 to getString(Res.string.none),
-                0x01 to getString(Res.string.tmoney_ccode_kb),
-                0x02 to getString(Res.string.tmoney_ccode_nonghyup),
-                0x03 to getString(Res.string.tmoney_ccode_lotte),
-                0x04 to getString(Res.string.tmoney_ccode_bc),
-                0x05 to getString(Res.string.tmoney_ccode_samsung),
-                0x06 to getString(Res.string.tmoney_ccode_shinhan),
-                0x07 to getString(Res.string.tmoney_ccode_citi),
-                0x08 to getString(Res.string.tmoney_ccode_exchange),
-                0x09 to getString(Res.string.tmoney_ccode_woori),
-                0x0a to getString(Res.string.tmoney_ccode_hana_sk),
-                0x0b to getString(Res.string.tmoney_ccode_hyundai)
-            )
-        }
+        mapOf(
+            0x00 to getStringBlocking(Res.string.none),
+            0x01 to getStringBlocking(Res.string.tmoney_ccode_kb),
+            0x02 to getStringBlocking(Res.string.tmoney_ccode_nonghyup),
+            0x03 to getStringBlocking(Res.string.tmoney_ccode_lotte),
+            0x04 to getStringBlocking(Res.string.tmoney_ccode_bc),
+            0x05 to getStringBlocking(Res.string.tmoney_ccode_samsung),
+            0x06 to getStringBlocking(Res.string.tmoney_ccode_shinhan),
+            0x07 to getStringBlocking(Res.string.tmoney_ccode_citi),
+            0x08 to getStringBlocking(Res.string.tmoney_ccode_exchange),
+            0x09 to getStringBlocking(Res.string.tmoney_ccode_woori),
+            0x0a to getStringBlocking(Res.string.tmoney_ccode_hana_sk),
+            0x0b to getStringBlocking(Res.string.tmoney_ccode_hyundai)
+        )
     }
 }

@@ -28,6 +28,7 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.formatDate
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -37,8 +38,6 @@ import farebot.farebot_transit_bilhete.generated.resources.bilhete_card_name
 import farebot.farebot_transit_bilhete.generated.resources.bilhete_date_1
 import farebot.farebot_transit_bilhete.generated.resources.bilhete_refill_counter
 import farebot.farebot_transit_bilhete.generated.resources.bilhete_trips_counter
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class BilheteUnicoSPTransitInfo(
     private val credit: Int,
@@ -50,7 +49,7 @@ class BilheteUnicoSPTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.bilhete_card_name) }
+        get() = getStringBlocking(Res.string.bilhete_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.BRL(credit))

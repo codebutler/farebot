@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.erg
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
@@ -40,8 +41,6 @@ import com.codebutler.farebot.transit.erg.record.ErgPurseRecord
 import com.codebutler.farebot.transit.erg.record.ErgRecord
 import farebot.farebot_transit_erg.generated.resources.Res
 import farebot.farebot_transit_erg.generated.resources.erg_card_name
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Parsed data from an ERG card.
@@ -77,10 +76,10 @@ open class ErgTransitInfo(
 
     override val trips: List<Trip> get() = capsule.trips
 
-    override val cardName: String = runBlocking { getString(Res.string.erg_card_name) }
+    override val cardName: String = getStringBlocking(Res.string.erg_card_name)
 
     companion object {
-        val NAME: String get() = runBlocking { getString(Res.string.erg_card_name) }
+        val NAME: String get() = getStringBlocking(Res.string.erg_card_name)
 
         val SIGNATURE = byteArrayOf(0x32, 0x32, 0x00, 0x00, 0x00, 0x01, 0x01)
 

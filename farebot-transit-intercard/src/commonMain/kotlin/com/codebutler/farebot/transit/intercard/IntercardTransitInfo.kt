@@ -23,14 +23,13 @@ package com.codebutler.farebot.transit.intercard
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_intercard.generated.resources.Res
 import farebot.farebot_transit_intercard.generated.resources.card_name_intercard
 import farebot.farebot_transit_intercard.generated.resources.last_transaction
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class IntercardTransitInfo(
     private val mSerialNumber: Long,
@@ -39,7 +38,7 @@ class IntercardTransitInfo(
 ) : TransitInfo() {
 
     override val cardName: String
-        get() = runBlocking { getString(Res.string.card_name_intercard) }
+        get() = getStringBlocking(Res.string.card_name_intercard)
 
     override val balance: TransitBalance?
         get() = mBalance?.let {
@@ -65,7 +64,7 @@ class IntercardTransitInfo(
 
     companion object {
         val NAME: String
-            get() = runBlocking { getString(Res.string.card_name_intercard) }
+            get() = getStringBlocking(Res.string.card_name_intercard)
 
         // FIXME: Apparently this system may be either in euro or in Swiss Francs.
         // Unfortunately Swiss Franc one still has string "EUR" in file 0, so this

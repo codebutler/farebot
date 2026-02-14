@@ -30,9 +30,8 @@ import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_a
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_rtc
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_senior
 import farebot.farebot_transit_clipper.generated.resources.clipper_ticket_type_youth
-import kotlinx.coroutines.runBlocking
+import com.codebutler.farebot.base.util.getStringBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class ClipperUltralightSubscription(
     private val product: Int,
@@ -44,18 +43,16 @@ class ClipperUltralightSubscription(
     override val id: Int = 0
 
     override val subscriptionName: String
-        get() = runBlocking {
-            when (product and 0xf) {
-                0x3 -> getString(Res.string.clipper_single, getString(Res.string.clipper_ticket_type_adult))
-                0x4 -> getString(Res.string.clipper_return, getString(Res.string.clipper_ticket_type_adult))
-                0x5 -> getString(Res.string.clipper_single, getString(Res.string.clipper_ticket_type_senior))
-                0x6 -> getString(Res.string.clipper_return, getString(Res.string.clipper_ticket_type_senior))
-                0x7 -> getString(Res.string.clipper_single, getString(Res.string.clipper_ticket_type_rtc))
-                0x8 -> getString(Res.string.clipper_return, getString(Res.string.clipper_ticket_type_rtc))
-                0x9 -> getString(Res.string.clipper_single, getString(Res.string.clipper_ticket_type_youth))
-                0xa -> getString(Res.string.clipper_return, getString(Res.string.clipper_ticket_type_youth))
-                else -> product.toString(16)
-            }
+        get() = when (product and 0xf) {
+            0x3 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_adult))
+            0x4 -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_adult))
+            0x5 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_senior))
+            0x6 -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_senior))
+            0x7 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_rtc))
+            0x8 -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_rtc))
+            0x9 -> getStringBlocking(Res.string.clipper_single, getStringBlocking(Res.string.clipper_ticket_type_youth))
+            0xa -> getStringBlocking(Res.string.clipper_return, getStringBlocking(Res.string.clipper_ticket_type_youth))
+            else -> product.toString(16)
         }
 
     override val remainingTripCount: Int?

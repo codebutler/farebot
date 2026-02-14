@@ -22,14 +22,13 @@
 
 package com.codebutler.farebot.transit.warsaw
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.hexString
 import com.codebutler.farebot.transit.Subscription
 import farebot.farebot_transit_warsaw.generated.resources.Res
 import farebot.farebot_transit_warsaw.generated.resources.warsaw_90_days
 import farebot.farebot_transit_warsaw.generated.resources.warsaw_unknown
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class WarsawSubscription(
     private val validToInstant: Instant,
@@ -40,7 +39,7 @@ class WarsawSubscription(
 
     override val subscriptionName: String
         get() = when (ticketType) {
-            0xbf6 -> runBlocking { getString(Res.string.warsaw_90_days) }
-            else -> runBlocking { getString(Res.string.warsaw_unknown, ticketType.hexString) }
+            0xbf6 -> getStringBlocking(Res.string.warsaw_90_days)
+            else -> getStringBlocking(Res.string.warsaw_unknown, ticketType.hexString)
         }
 }

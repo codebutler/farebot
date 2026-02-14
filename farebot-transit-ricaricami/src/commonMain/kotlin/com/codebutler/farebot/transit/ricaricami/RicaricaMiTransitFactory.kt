@@ -25,6 +25,7 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -36,8 +37,6 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.en1545.*
 import farebot.farebot_transit_ricaricami.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 class RicaricaMiTransitFactory(
     private val stringResource: StringResource = DefaultStringResource()
@@ -58,7 +57,7 @@ class RicaricaMiTransitFactory(
     }
 
     override fun parseIdentity(card: ClassicCard) = TransitIdentity(
-        runBlocking { getString(Res.string.ricaricami_card_name) },
+        getStringBlocking(Res.string.ricaricami_card_name),
         null
     )
 

@@ -25,17 +25,16 @@
 
 package com.codebutler.farebot.transit.opal
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import farebot.farebot_transit_opal.generated.resources.Res
 import farebot.farebot_transit_opal.generated.resources.opal_agency_tfnsw
 import farebot.farebot_transit_opal.generated.resources.opal_agency_tfnsw_short
 import farebot.farebot_transit_opal.generated.resources.opal_automatic_top_up
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import org.jetbrains.compose.resources.getString
 
 /**
  * Class describing auto-topup on Opal.
@@ -58,13 +57,13 @@ internal class OpalSubscription private constructor() : Subscription() {
     override val validTo: Instant get() = LocalDate(2159, 6, 6).atStartOfDayIn(TimeZone.UTC)
 
     override val subscriptionName: String
-        get() = runBlocking { getString(Res.string.opal_automatic_top_up) }
+        get() = getStringBlocking(Res.string.opal_automatic_top_up)
 
     override val paymentMethod: PaymentMethod get() = PaymentMethod.CREDIT_CARD
 
     override val agencyName: String
-        get() = runBlocking { getString(Res.string.opal_agency_tfnsw) }
+        get() = getStringBlocking(Res.string.opal_agency_tfnsw)
 
     override val shortAgencyName: String
-        get() = runBlocking { getString(Res.string.opal_agency_tfnsw_short) }
+        get() = getStringBlocking(Res.string.opal_agency_tfnsw_short)
 }

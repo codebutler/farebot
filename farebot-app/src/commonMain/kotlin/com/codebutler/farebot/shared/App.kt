@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import farebot.farebot_app.generated.resources.Res
 import farebot.farebot_app.generated.resources.*
@@ -52,7 +53,6 @@ import com.codebutler.farebot.shared.viewmodel.KeysViewModel
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import org.koin.compose.koinInject
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.koin.compose.viewmodel.koinViewModel
@@ -177,13 +177,13 @@ fun FareBotApp(
                                             navController.navigate(Screen.Card.createRoute(navKey))
                                         }
                                         platformActions.showToast(
-                                            runBlocking { getString(Res.string.imported_cards, result.cards.size) }
+                                            getStringBlocking(Res.string.imported_cards, result.cards.size)
                                         )
                                         historyViewModel.loadCards()
                                     }
                                     is ImportResult.Error -> {
                                         platformActions.showToast(
-                                            runBlocking { getString(Res.string.import_failed, result.message) }
+                                            getStringBlocking(Res.string.import_failed, result.message)
                                         )
                                     }
                                 }
@@ -202,15 +202,15 @@ fun FareBotApp(
                             .filter { it.latitude != null && it.longitude != null }
                             .map { card ->
                                 CardsMapMarker(
-                                    name = runBlocking { getString(card.nameRes) },
-                                    location = runBlocking { getString(card.locationRes) },
+                                    name = getStringBlocking(card.nameRes),
+                                    location = getStringBlocking(card.locationRes),
                                     latitude = card.latitude!!.toDouble(),
                                     longitude = card.longitude!!.toDouble(),
                                 )
                             }
                     },
                     onKeysRequiredTap = {
-                        platformActions.showToast(runBlocking { getString(Res.string.keys_required) })
+                        platformActions.showToast(getStringBlocking(Res.string.keys_required))
                     },
                     onStatusChipTap = { message ->
                         platformActions.showToast(message)

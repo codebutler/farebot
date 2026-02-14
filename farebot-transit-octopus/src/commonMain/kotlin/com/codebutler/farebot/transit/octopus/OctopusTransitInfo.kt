@@ -28,8 +28,7 @@ import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.farebot_transit_octopus.generated.resources.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
+import com.codebutler.farebot.base.util.getStringBlocking
 
 /**
  * Reader for Octopus (Hong Kong)
@@ -80,16 +79,14 @@ class OctopusTransitInfo(
         }
 
     override val cardName: String
-        get() = runBlocking {
-            if (hasShenzhen) {
-                if (hasOctopus) {
-                    getString(Res.string.octopus_dual_card_name)
-                } else {
-                    getString(Res.string.octopus_szt_card_name)
-                }
+        get() = if (hasShenzhen) {
+            if (hasOctopus) {
+                getStringBlocking(Res.string.octopus_dual_card_name)
             } else {
-                getString(Res.string.octopus_card_name)
+                getStringBlocking(Res.string.octopus_szt_card_name)
             }
+        } else {
+            getStringBlocking(Res.string.octopus_card_name)
         }
 
     override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {

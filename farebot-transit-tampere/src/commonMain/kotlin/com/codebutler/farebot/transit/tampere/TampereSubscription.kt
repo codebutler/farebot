@@ -22,12 +22,11 @@
 
 package com.codebutler.farebot.transit.tampere
 
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import farebot.farebot_transit_tampere.generated.resources.Res
 import farebot.farebot_transit_tampere.generated.resources.tampere_subscription
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Instant
-import org.jetbrains.compose.resources.getString
 
 class TampereSubscription(
     private val mStart: Int? = null,
@@ -42,5 +41,5 @@ class TampereSubscription(
         get() = mEnd?.let { TampereTransitInfo.parseDaystamp(it) }
 
     override val subscriptionName: String
-        get() = runBlocking { getString(Res.string.tampere_subscription, mType.toString()) }
+        get() = getStringBlocking(Res.string.tampere_subscription, mType.toString())
 }

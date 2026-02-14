@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.lax_tap
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.util.NumberUtils
+import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.lax_tap.LaxTapData.AGENCY_METRO
@@ -36,8 +37,6 @@ import com.codebutler.farebot.transit.nextfare.NextfareTrip
 import com.codebutler.farebot.transit.nextfare.NextfareTripCapsule
 import farebot.farebot_transit_lax_tap.generated.resources.Res
 import farebot.farebot_transit_lax_tap.generated.resources.lax_tap_unknown_route
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 
 /**
  * Represents trip events on LAX TAP card.
@@ -53,7 +52,7 @@ class LaxTapTrip(
             ) {
                 // Metro Bus uses the station_id for route numbers.
                 return METRO_BUS_ROUTES[capsule.startStation]
-                    ?: runBlocking { getString(Res.string.lax_tap_unknown_route, capsule.startStation.toString()) }
+                    ?: getStringBlocking(Res.string.lax_tap_unknown_route, capsule.startStation.toString())
             }
             // Normally not possible to guess what the route is.
             return null
