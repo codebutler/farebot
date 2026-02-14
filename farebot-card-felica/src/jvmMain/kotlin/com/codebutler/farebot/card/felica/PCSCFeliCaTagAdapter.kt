@@ -87,7 +87,8 @@ class PCSCFeliCaTagAdapter(
                     (index shr 8).toByte(),
                 )
             val response = transceiveFelica(cmd)
-            if (response == null || response.isEmpty() ||
+            if (response == null ||
+                response.isEmpty() ||
                 response[1] != FeliCaConstants.RESPONSE_SEARCH_SERVICECODE
             ) {
                 break

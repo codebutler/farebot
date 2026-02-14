@@ -21,14 +21,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeveloperBoard
-import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
@@ -301,7 +298,11 @@ fun HomeScreen(
                                 text = { Text(stringResource(Res.string.show_latest_scans)) },
                                 trailingIcon = {
                                     Icon(
-                                        if (!historyUiState.showAllScans) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                                        if (!historyUiState.showAllScans) {
+                                            Icons.Default.RadioButtonChecked
+                                        } else {
+                                            Icons.Default.RadioButtonUnchecked
+                                        },
                                         contentDescription = null,
                                     )
                                 },
@@ -317,7 +318,11 @@ fun HomeScreen(
                                 text = { Text(stringResource(Res.string.show_all_scans)) },
                                 trailingIcon = {
                                     Icon(
-                                        if (historyUiState.showAllScans) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                                        if (historyUiState.showAllScans) {
+                                            Icons.Default.RadioButtonChecked
+                                        } else {
+                                            Icons.Default.RadioButtonUnchecked
+                                        },
                                         contentDescription = null,
                                     )
                                 },
@@ -419,7 +424,11 @@ fun HomeScreen(
                                     },
                                     trailingIcon = {
                                         Icon(
-                                            if (showUnsupported) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                            if (showUnsupported) {
+                                                Icons.Default.CheckBox
+                                            } else {
+                                                Icons.Default.CheckBoxOutlineBlank
+                                            },
                                             contentDescription = null,
                                         )
                                     },
@@ -447,7 +456,11 @@ fun HomeScreen(
                                 },
                                 trailingIcon = {
                                     Icon(
-                                        if (showSerialOnly) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                        if (showSerialOnly) {
+                                            Icons.Default.CheckBox
+                                        } else {
+                                            Icons.Default.CheckBoxOutlineBlank
+                                        },
                                         contentDescription = null,
                                     )
                                 },
@@ -474,7 +487,11 @@ fun HomeScreen(
                                 },
                                 trailingIcon = {
                                     Icon(
-                                        if (showKeysRequired) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                        if (showKeysRequired) {
+                                            Icons.Default.CheckBox
+                                        } else {
+                                            Icons.Default.CheckBoxOutlineBlank
+                                        },
                                         contentDescription = null,
                                     )
                                 },
@@ -501,7 +518,11 @@ fun HomeScreen(
                                 },
                                 trailingIcon = {
                                     Icon(
-                                        if (showExperimental) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                        if (showExperimental) {
+                                            Icons.Default.CheckBox
+                                        } else {
+                                            Icons.Default.CheckBoxOutlineBlank
+                                        },
                                         contentDescription = null,
                                     )
                                 },
