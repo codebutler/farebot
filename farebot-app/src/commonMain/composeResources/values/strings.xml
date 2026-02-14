@@ -47,10 +47,10 @@
     <string name="station_from">From</string>
     <string name="station_to">To</string>
     <string name="subscription_valid_format">Valid %1$s to %2$s</string>
-    <string name="show_unsupported_cards">Show incompatible cards</string>
-    <string name="show_serial_only_cards">Show serial-only cards</string>
-    <string name="show_keys_required_cards">Show keys-required cards</string>
-    <string name="show_experimental_cards">Show experimental cards</string>
+    <string name="show_unsupported_cards">Incompatible</string>
+    <string name="show_serial_only_cards">Limited</string>
+    <string name="show_keys_required_cards">Locked</string>
+    <string name="show_experimental_cards">Experimental</string>
     <string name="tag_lost">Card Connection Lost</string>
     <string name="tag_lost_message">Avoid moving card until reading is complete.</string>
     <string name="tap_your_card">Tap your card</string>
@@ -64,19 +64,20 @@
     <string name="tab_scan">Cards</string>
     <string name="tab_explore">Explore</string>
     <string name="scan">Scan</string>
-    <string name="search_supported_cards">Search supported cards</string>
+    <string name="search_supported_cards">Search</string>
     <string name="nfc_disabled_tap_to_enable">Enable NFC to scan cards</string>
 
     <!-- Scan history -->
     <string name="n_scans">%1$d scans</string>
     <string name="scan_history">Scan History</string>
     <string name="current_scan">Current</string>
+    <string name="show">Show</string>
     <string name="show_all_scans">Show all scans</string>
     <string name="legend_unsupported">Incompatible</string>
-    <string name="legend_keys_required">Keys required</string>
-    <string name="legend_serial_only">Serial only</string>
+    <string name="legend_keys_required">Locked</string>
+    <string name="legend_serial_only">Limited</string>
     <string name="legend_experimental">Experimental</string>
-    <string name="credits">Credits</string>
+    <string name="credits">Thanks to</string>
 
     <!-- Date labels -->
     <string name="date_today">Today</string>

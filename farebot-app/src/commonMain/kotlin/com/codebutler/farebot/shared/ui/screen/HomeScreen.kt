@@ -28,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -81,6 +82,7 @@ import farebot.farebot_app.generated.resources.nfc_listening
 import farebot.farebot_app.generated.resources.nfc_settings
 import farebot.farebot_app.generated.resources.ok
 import farebot.farebot_app.generated.resources.scan
+import farebot.farebot_app.generated.resources.show
 import farebot.farebot_app.generated.resources.show_all_scans
 import farebot.farebot_app.generated.resources.show_experimental_cards
 import farebot.farebot_app.generated.resources.show_keys_required_cards
@@ -304,6 +306,12 @@ fun HomeScreen(
                             Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
                         }
                         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                            Text(
+                                stringResource(Res.string.show),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            )
                             if (hasUnsupportedCards) {
                                 DropdownMenuItem(
                                     text = {
@@ -370,6 +378,7 @@ fun HomeScreen(
                                     menuExpanded = false
                                 },
                             )
+                            HorizontalDivider()
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.keys)) },
