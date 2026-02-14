@@ -8,9 +8,15 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.codebutler.farebot.transit.manly_fast_ferry"
-        compileSdk = libs.versions.compileSdk.get().toInt()
-        minSdk = libs.versions.minSdk.get().toInt()
+        namespace = "com.codebutler.farebot.transit.manlyfastferry"
+        compileSdk =
+            libs.versions.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.minSdk
+                .get()
+                .toInt()
     }
 
     iosX64()

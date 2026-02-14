@@ -8,9 +8,15 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.codebutler.farebot.transit.seq_go"
-        compileSdk = libs.versions.compileSdk.get().toInt()
-        minSdk = libs.versions.minSdk.get().toInt()
+        namespace = "com.codebutler.farebot.transit.seqgo"
+        compileSdk =
+            libs.versions.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.minSdk
+                .get()
+                .toInt()
     }
 
     iosX64()

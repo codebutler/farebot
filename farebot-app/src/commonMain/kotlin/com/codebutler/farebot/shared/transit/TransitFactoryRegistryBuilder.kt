@@ -4,8 +4,9 @@ import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.sample.SampleTransitFactory
+import com.codebutler.farebot.transit.adelaide.AdelaideTransitFactory
 import com.codebutler.farebot.transit.amiibo.AmiiboTransitFactory
-import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitFactory
+import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitFactory
 import com.codebutler.farebot.transit.bip.BipTransitFactory
 import com.codebutler.farebot.transit.bonobus.BonobusTransitFactory
 import com.codebutler.farebot.transit.calypso.emv.EmvTransitFactory
@@ -19,7 +20,7 @@ import com.codebutler.farebot.transit.calypso.ravkav.RavKavTransitFactory
 import com.codebutler.farebot.transit.calypso.venezia.VeneziaTransitFactory
 import com.codebutler.farebot.transit.calypso.venezia.VeneziaUltralightTransitFactory
 import com.codebutler.farebot.transit.charlie.CharlieCardTransitFactory
-import com.codebutler.farebot.transit.chc_metrocard.ChcMetrocardTransitFactory
+import com.codebutler.farebot.transit.chcmetrocard.ChcMetrocardTransitFactory
 import com.codebutler.farebot.transit.china.ChinaTransitRegistry
 import com.codebutler.farebot.transit.cifial.CifialTransitFactory
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
@@ -29,7 +30,6 @@ import com.codebutler.farebot.transit.edy.EdyTransitFactory
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
 import com.codebutler.farebot.transit.gautrain.GautrainTransitFactory
-import com.codebutler.farebot.transit.adelaide.AdelaideTransitFactory
 import com.codebutler.farebot.transit.hafilat.HafilatTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
@@ -39,13 +39,13 @@ import com.codebutler.farebot.transit.kiev.KievTransitFactory
 import com.codebutler.farebot.transit.kmt.KMTTransitFactory
 import com.codebutler.farebot.transit.komuterlink.KomuterLinkTransitFactory
 import com.codebutler.farebot.transit.krocap.KROCAPTransitFactory
-import com.codebutler.farebot.transit.lax_tap.LaxTapTransitFactory
+import com.codebutler.farebot.transit.laxtap.LaxTapTransitFactory
 import com.codebutler.farebot.transit.magnacarta.MagnaCartaTransitFactory
-import com.codebutler.farebot.transit.manly_fast_ferry.ManlyFastFerryTransitFactory
+import com.codebutler.farebot.transit.manlyfastferry.ManlyFastFerryTransitFactory
 import com.codebutler.farebot.transit.metromoney.MetroMoneyTransitFactory
 import com.codebutler.farebot.transit.metroq.MetroQTransitFactory
 import com.codebutler.farebot.transit.mrtj.MRTJTransitFactory
-import com.codebutler.farebot.transit.msp_goto.MspGotoTransitFactory
+import com.codebutler.farebot.transit.mspgoto.MspGotoTransitFactory
 import com.codebutler.farebot.transit.myki.MykiTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefClassicTransitFactory
 import com.codebutler.farebot.transit.ndef.NdefFelicaTransitFactory
@@ -66,7 +66,7 @@ import com.codebutler.farebot.transit.podorozhnik.PodorozhnikTransitFactory
 import com.codebutler.farebot.transit.ricaricami.RicaricaMiTransitFactory
 import com.codebutler.farebot.transit.rkf.RkfTransitFactory
 import com.codebutler.farebot.transit.selecta.SelectaFranceTransitFactory
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
+import com.codebutler.farebot.transit.seqgo.SeqGoTransitFactory
 import com.codebutler.farebot.transit.serialonly.AtHopTransitFactory
 import com.codebutler.farebot.transit.serialonly.BlankClassicTransitFactory
 import com.codebutler.farebot.transit.serialonly.BlankDesfireTransitFactory
@@ -89,7 +89,7 @@ import com.codebutler.farebot.transit.smartrider.SmartRiderTransitFactory
 import com.codebutler.farebot.transit.snapper.SnapperTransitFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
 import com.codebutler.farebot.transit.tampere.TampereTransitFactory
-import com.codebutler.farebot.transit.tfi_leap.LeapTransitFactory
+import com.codebutler.farebot.transit.tfileap.LeapTransitFactory
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
 import com.codebutler.farebot.transit.touchngo.TouchnGoTransitFactory
 import com.codebutler.farebot.transit.troika.TroikaHybridTransitFactory
@@ -101,12 +101,10 @@ import com.codebutler.farebot.transit.vicinity.UnknownVicinityTransitFactory
 import com.codebutler.farebot.transit.waikato.WaikatoCardTransitFactory
 import com.codebutler.farebot.transit.warsaw.WarsawTransitFactory
 import com.codebutler.farebot.transit.yargor.YarGorTransitFactory
-import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
+import com.codebutler.farebot.transit.yvrcompass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.zolotayakorona.ZolotayaKoronaTransitFactory
 
-fun createTransitFactoryRegistry(
-    stringResource: StringResource = DefaultStringResource()
-): TransitFactoryRegistry {
+fun createTransitFactoryRegistry(stringResource: StringResource = DefaultStringResource()): TransitFactoryRegistry {
     ChinaTransitRegistry.registerAll()
 
     val registry = TransitFactoryRegistry()

@@ -25,6 +25,7 @@ package com.codebutler.farebot.test
 import com.codebutler.farebot.card.cepas.CEPASCard
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.desfire.DesfireCard
+import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.shared.serialize.CardImporter
@@ -32,31 +33,29 @@ import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitFactory
+import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitInfo
+import com.codebutler.farebot.transit.calypso.mobib.MobibTransitInfo
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
 import com.codebutler.farebot.transit.easycard.EasyCardTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitInfo
-import com.codebutler.farebot.transit.lax_tap.LaxTapTransitFactory
-import com.codebutler.farebot.transit.lax_tap.LaxTapTransitInfo
-import com.codebutler.farebot.transit.msp_goto.MspGotoTransitFactory
-import com.codebutler.farebot.transit.msp_goto.MspGotoTransitInfo
-import com.codebutler.farebot.transit.myki.MykiTransitFactory
-import com.codebutler.farebot.transit.myki.MykiTransitInfo
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitInfo
-import com.codebutler.farebot.transit.yvr_compass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitInfo
-import com.codebutler.farebot.transit.calypso.mobib.MobibTransitInfo
-import com.codebutler.farebot.card.felica.FelicaCard
-import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitFactory
-import com.codebutler.farebot.transit.bilhete_unico.BilheteUnicoSPTransitInfo
+import com.codebutler.farebot.transit.laxtap.LaxTapTransitFactory
+import com.codebutler.farebot.transit.laxtap.LaxTapTransitInfo
+import com.codebutler.farebot.transit.mspgoto.MspGotoTransitFactory
+import com.codebutler.farebot.transit.mspgoto.MspGotoTransitInfo
+import com.codebutler.farebot.transit.myki.MykiTransitFactory
+import com.codebutler.farebot.transit.myki.MykiTransitInfo
 import com.codebutler.farebot.transit.octopus.OctopusTransitFactory
 import com.codebutler.farebot.transit.octopus.OctopusTransitInfo
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
+import com.codebutler.farebot.transit.seqgo.SeqGoTransitFactory
+import com.codebutler.farebot.transit.seqgo.SeqGoTransitInfo
 import com.codebutler.farebot.transit.serialonly.HoloTransitFactory
 import com.codebutler.farebot.transit.serialonly.HoloTransitInfo
 import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
@@ -66,6 +65,7 @@ import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitInfo
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitFactory
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitInfo
+import com.codebutler.farebot.transit.yvrcompass.CompassUltralightTransitInfo
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -86,7 +86,6 @@ import kotlin.test.assertTrue
  * These sample files are the same ones used on the Explore screen.
  */
 class SampleDumpIntegrationTest : CardDumpTest() {
-
     private val stringResource = TestStringResource()
 
     // --- Opal (DESFire) ---
@@ -97,9 +96,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testOpalDump() {
         val factory = OpalTransitFactory(stringResource)
-        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, OpalTransitInfo>(
-            "opal/Opal.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<DesfireCard, OpalTransitInfo>(
+                "opal/Opal.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("Opal", identity.name)
@@ -129,9 +130,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testHSLv2Dump() {
         val factory = HSLTransitFactory(stringResource)
-        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, HSLTransitInfo>(
-            "hsl/HSLv2.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<DesfireCard, HSLTransitInfo>(
+                "hsl/HSLv2.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("HSL", identity.name)
@@ -162,9 +165,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testHSLUltralightDump() {
         val factory = HSLUltralightTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<UltralightCard, HSLUltralightTransitInfo>(
-            "hsl/HSL_UL.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<UltralightCard, HSLUltralightTransitInfo>(
+                "hsl/HSL_UL.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("HSL Ultralight", identity.name)
@@ -188,9 +193,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testTroikaUltralightDump() {
         val factory = TroikaUltralightTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<UltralightCard, TroikaUltralightTransitInfo>(
-            "troika/TroikaUL.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<UltralightCard, TroikaUltralightTransitInfo>(
+                "troika/TroikaUL.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("Troika", identity.name)
@@ -215,9 +222,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testTMoneyDump() {
         val factory = TMoneyTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<ISO7816Card, TMoneyTransitInfo>(
-            "tmoney/TMoney.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<ISO7816Card, TMoneyTransitInfo>(
+                "tmoney/TMoney.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("T-Money", identity.name)
@@ -243,9 +252,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testEZLinkDump() {
         val factory = EZLinkTransitFactory(stringResource)
-        val (card, info) = loadAndParseMetrodroidJson<CEPASCard, EZLinkTransitInfo>(
-            "cepas/EZLink.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<CEPASCard, EZLinkTransitInfo>(
+                "cepas/EZLink.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         // CAN "112..." maps to generic CEPAS issuer (not specifically EZ-Link "100...")
@@ -292,9 +303,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testHoloDump() {
         val factory = HoloTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, HoloTransitInfo>(
-            "holo/Holo.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<DesfireCard, HoloTransitInfo>(
+                "holo/Holo.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("HOLO", identity.name)
@@ -347,7 +360,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val bytes = loadTestResource("easycard/deadbeef.mfc")
         assertNotNull(bytes, "Test resource not found: easycard/deadbeef.mfc")
 
-        val json = Json { isLenient = true; ignoreUnknownKeys = true }
+        val json =
+            Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+            }
         val importer = CardImporter.create(KotlinxCardSerializer(json))
         val result = importer.importMfcDump(bytes)
         assertTrue(result is ImportResult.Success, "Failed to import MFC dump: $result")
@@ -388,9 +405,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testCompassDump() {
         val factory = CompassUltralightTransitInfo.FACTORY
-        val (card, info) = loadAndParseMetrodroidJson<UltralightCard, CompassUltralightTransitInfo>(
-            "compass/Compass.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<UltralightCard, CompassUltralightTransitInfo>(
+                "compass/Compass.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertNotNull(identity.name)
@@ -412,9 +431,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testSeqGoDump() {
         val factory = SeqGoTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, SeqGoTransitInfo>(
-            "seqgo/SeqGo.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<ClassicCard, SeqGoTransitInfo>(
+                "seqgo/SeqGo.json",
+                factory,
+            )
 
         assertEquals("0160 0012 3456 7893", info.serialNumber)
 
@@ -431,9 +452,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testLaxTapDump() {
         val factory = LaxTapTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, LaxTapTransitInfo>(
-            "laxtap/LaxTap.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<ClassicCard, LaxTapTransitInfo>(
+                "laxtap/LaxTap.json",
+                factory,
+            )
 
         assertEquals("0160 0323 4663 8769", info.serialNumber)
 
@@ -450,9 +473,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testMspGoToDump() {
         val factory = MspGotoTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, MspGotoTransitInfo>(
-            "mspgoto/MspGoTo.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<ClassicCard, MspGotoTransitInfo>(
+                "mspgoto/MspGoTo.json",
+                factory,
+            )
 
         assertEquals("0160 0112 3581 3212", info.serialNumber)
 
@@ -469,9 +494,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testMykiDump() {
         val factory = MykiTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, MykiTransitInfo>(
-            "myki/Myki.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<DesfireCard, MykiTransitInfo>(
+                "myki/Myki.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertNotNull(identity.name)
@@ -492,9 +519,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testOctopusDump() {
         val factory = OctopusTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<FelicaCard, OctopusTransitInfo>(
-            "octopus/Octopus.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<FelicaCard, OctopusTransitInfo>(
+                "octopus/Octopus.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertNotNull(identity.name)
@@ -513,9 +542,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testTrimetHopDump() {
         val factory = TrimetHopTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<DesfireCard, TrimetHopTransitInfo>(
-            "trimethop/TrimetHop.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<DesfireCard, TrimetHopTransitInfo>(
+                "trimethop/TrimetHop.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertEquals("Hop Fastpass", identity.name)
@@ -538,9 +569,11 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     @Test
     fun testBilheteUnicoDump() {
         val factory = BilheteUnicoSPTransitFactory()
-        val (card, info) = loadAndParseMetrodroidJson<ClassicCard, BilheteUnicoSPTransitInfo>(
-            "bilhete/BilheteUnico.json", factory
-        )
+        val (card, info) =
+            loadAndParseMetrodroidJson<ClassicCard, BilheteUnicoSPTransitInfo>(
+                "bilhete/BilheteUnico.json",
+                factory,
+            )
 
         val identity = factory.parseIdentity(card)
         assertNotNull(identity.name)

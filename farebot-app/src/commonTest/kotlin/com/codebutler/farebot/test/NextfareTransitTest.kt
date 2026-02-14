@@ -25,13 +25,13 @@ import com.codebutler.farebot.card.classic.ClassicBlock
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.test.CardTestHelper.hexToBytes
-import com.codebutler.farebot.transit.lax_tap.LaxTapTransitFactory
-import com.codebutler.farebot.transit.lax_tap.LaxTapTransitInfo
-import com.codebutler.farebot.transit.msp_goto.MspGotoTransitFactory
-import com.codebutler.farebot.transit.msp_goto.MspGotoTransitInfo
+import com.codebutler.farebot.transit.laxtap.LaxTapTransitFactory
+import com.codebutler.farebot.transit.laxtap.LaxTapTransitInfo
+import com.codebutler.farebot.transit.mspgoto.MspGotoTransitFactory
+import com.codebutler.farebot.transit.mspgoto.MspGotoTransitInfo
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitFactory
-import com.codebutler.farebot.transit.seq_go.SeqGoTransitInfo
+import com.codebutler.farebot.transit.seqgo.SeqGoTransitFactory
+import com.codebutler.farebot.transit.seqgo.SeqGoTransitInfo
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,11 +45,10 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's NextfareTest.kt (card-level tests).
  */
 class NextfareTransitTest {
-
     private fun buildNextfareCard(
         uid: ByteArray,
         systemCode: ByteArray,
-        block2: ByteArray? = null
+        block2: ByteArray? = null,
     ): ClassicCard {
         require(systemCode.size == 6)
         require(uid.size == 4)
@@ -64,28 +63,32 @@ class NextfareTransitTest {
         val block1Data = byteArrayOf(0) + NextfareTransitInfo.MANUFACTURER + systemCode + byteArrayOf(0)
         val block2Data = b2data + ByteArray(16 - b2data.size)
 
-        sectors += DataClassicSector(
-            index = 0,
-            blocks = listOf(
-                ClassicBlock.create(ClassicBlock.TYPE_MANUFACTURER, 0, block0Data),
-                ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, block1Data),
-                ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, block2Data),
-                ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailer)
-            ),
-            keyA = keyA
-        )
+        sectors +=
+            DataClassicSector(
+                index = 0,
+                blocks =
+                    listOf(
+                        ClassicBlock.create(ClassicBlock.TYPE_MANUFACTURER, 0, block0Data),
+                        ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, block1Data),
+                        ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, block2Data),
+                        ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailer),
+                    ),
+                keyA = keyA,
+            )
 
         for (sectorNum in 1..15) {
-            sectors += DataClassicSector(
-                index = sectorNum,
-                blocks = listOf(
-                    ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
-                    ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
-                    ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
-                    ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailer)
-                ),
-                keyA = keyA
-            )
+            sectors +=
+                DataClassicSector(
+                    index = sectorNum,
+                    blocks =
+                        listOf(
+                            ClassicBlock.create(ClassicBlock.TYPE_DATA, 0, ByteArray(16)),
+                            ClassicBlock.create(ClassicBlock.TYPE_DATA, 1, ByteArray(16)),
+                            ClassicBlock.create(ClassicBlock.TYPE_DATA, 2, ByteArray(16)),
+                            ClassicBlock.create(ClassicBlock.TYPE_TRAILER, 3, trailer),
+                        ),
+                    keyA = keyA,
+                )
         }
 
         return CardTestHelper.classicCard(sectors)
@@ -94,10 +97,11 @@ class NextfareTransitTest {
     @Test
     fun testNextfareDetection() {
         // Build a card with Nextfare manufacturer bytes
-        val card = buildNextfareCard(
-            uid = hexToBytes("15cd5b07"),
-            systemCode = hexToBytes("010101010101")
-        )
+        val card =
+            buildNextfareCard(
+                uid = hexToBytes("15cd5b07"),
+                systemCode = hexToBytes("010101010101"),
+            )
 
         // Verify the factory detects Nextfare manufacturer bytes
         val factory = NextfareTransitInfo.NextfareTransitFactory()
@@ -108,15 +112,17 @@ class NextfareTransitTest {
     fun testNextfareSerialNumber() {
         // 0160 0012 3456 7893
         // This is a fake card number.
-        val card = buildNextfareCard(
-            uid = hexToBytes("15cd5b07"),
-            systemCode = hexToBytes("010101010101")
-        )
+        val card =
+            buildNextfareCard(
+                uid = hexToBytes("15cd5b07"),
+                systemCode = hexToBytes("010101010101"),
+            )
 
-        val capsule = NextfareTransitInfo.parse(
-            card = card,
-            timeZone = TimeZone.UTC
-        )
+        val capsule =
+            NextfareTransitInfo.parse(
+                card = card,
+                timeZone = TimeZone.UTC,
+            )
         val info = NextfareTransitInfo(capsule)
         assertEquals("0160 0012 3456 7893", info.serialNumber)
     }
@@ -125,15 +131,17 @@ class NextfareTransitTest {
     fun testNextfareSerialNumber2() {
         // 0160 0098 7654 3213
         // This is a fake card number.
-        val card = buildNextfareCard(
-            uid = hexToBytes("b168de3a"),
-            systemCode = hexToBytes("010101010101")
-        )
+        val card =
+            buildNextfareCard(
+                uid = hexToBytes("b168de3a"),
+                systemCode = hexToBytes("010101010101"),
+            )
 
-        val capsule = NextfareTransitInfo.parse(
-            card = card,
-            timeZone = TimeZone.UTC
-        )
+        val capsule =
+            NextfareTransitInfo.parse(
+                card = card,
+                timeZone = TimeZone.UTC,
+            )
         val info = NextfareTransitInfo(capsule)
         assertEquals("0160 0098 7654 3213", info.serialNumber)
     }
@@ -141,15 +149,17 @@ class NextfareTransitTest {
     @Test
     fun testNextfareEmptyBalance() {
         // Card with no balance records should have 0 balance
-        val card = buildNextfareCard(
-            uid = hexToBytes("897df842"),
-            systemCode = hexToBytes("010101010101")
-        )
+        val card =
+            buildNextfareCard(
+                uid = hexToBytes("897df842"),
+                systemCode = hexToBytes("010101010101"),
+            )
 
-        val capsule = NextfareTransitInfo.parse(
-            card = card,
-            timeZone = TimeZone.UTC
-        )
+        val capsule =
+            NextfareTransitInfo.parse(
+                card = card,
+                timeZone = TimeZone.UTC,
+            )
         assertEquals(0, capsule.balance)
     }
 
@@ -157,10 +167,11 @@ class NextfareTransitTest {
     fun testSeqGo() {
         // 0160 0012 3456 7893
         // This is a fake card number.
-        val c1 = buildNextfareCard(
-            uid = hexToBytes("15cd5b07"),
-            systemCode = SEQGO_SYSTEM_CODE1
-        )
+        val c1 =
+            buildNextfareCard(
+                uid = hexToBytes("15cd5b07"),
+                systemCode = SEQGO_SYSTEM_CODE1,
+            )
         val seqGoFactory = SeqGoTransitFactory()
         assertTrue(seqGoFactory.check(c1), "Card is seqgo")
         val d1 = seqGoFactory.parseInfo(c1)
@@ -172,10 +183,11 @@ class NextfareTransitTest {
 
         // 0160 0098 7654 3213
         // This is a fake card number.
-        val c2 = buildNextfareCard(
-            uid = hexToBytes("b168de3a"),
-            systemCode = SEQGO_SYSTEM_CODE2
-        )
+        val c2 =
+            buildNextfareCard(
+                uid = hexToBytes("b168de3a"),
+                systemCode = SEQGO_SYSTEM_CODE2,
+            )
         assertTrue(seqGoFactory.check(c2), "Card is seqgo")
         val d2 = seqGoFactory.parseInfo(c2)
         assertTrue(d2 is SeqGoTransitInfo, "Card is SeqGoTransitInfo")
@@ -190,11 +202,12 @@ class NextfareTransitTest {
         // 0160 0323 4663 8769
         // This is a fake card number (323.GO.METRO)
         // LAX TAP BLOCK2 is 4 bytes of zeros
-        val c = buildNextfareCard(
-            uid = hexToBytes("c40dcdc0"),
-            systemCode = hexToBytes("010101010101"),
-            block2 = LAX_TAP_BLOCK2
-        )
+        val c =
+            buildNextfareCard(
+                uid = hexToBytes("c40dcdc0"),
+                systemCode = hexToBytes("010101010101"),
+                block2 = LAX_TAP_BLOCK2,
+            )
         val laxTapFactory = LaxTapTransitFactory()
         assertTrue(laxTapFactory.check(c), "Card is laxtap")
         val d = laxTapFactory.parseInfo(c)
@@ -209,11 +222,12 @@ class NextfareTransitTest {
     fun testMspGoTo() {
         // 0160 0112 3581 3212
         // This is a fake card number
-        val c = buildNextfareCard(
-            uid = hexToBytes("897df842"),
-            systemCode = hexToBytes("010101010101"),
-            block2 = MSP_GOTO_BLOCK2
-        )
+        val c =
+            buildNextfareCard(
+                uid = hexToBytes("897df842"),
+                systemCode = hexToBytes("010101010101"),
+                block2 = MSP_GOTO_BLOCK2,
+            )
         val mspGotoFactory = MspGotoTransitFactory()
         assertTrue(mspGotoFactory.check(c), "Card is mspgoto")
         val d = mspGotoFactory.parseInfo(c)
@@ -229,11 +243,12 @@ class NextfareTransitTest {
         // 0160 0112 3581 3212
         // This is a fake card number
         // Card with unrecognized block2 should be detected as generic Nextfare
-        val c1 = buildNextfareCard(
-            uid = hexToBytes("897df842"),
-            systemCode = hexToBytes("010101010101"),
-            block2 = hexToBytes("ff00ff00ff00ff00ff00ff00ff00ff00")
-        )
+        val c1 =
+            buildNextfareCard(
+                uid = hexToBytes("897df842"),
+                systemCode = hexToBytes("010101010101"),
+                block2 = hexToBytes("ff00ff00ff00ff00ff00ff00ff00ff00"),
+            )
         val factory = NextfareTransitInfo.NextfareTransitFactory()
         assertTrue(factory.check(c1), "Card is nextfare")
         // Specific factories should NOT match
@@ -249,10 +264,11 @@ class NextfareTransitTest {
         assertEquals("XXX", balances1.first().balance.currencyCode)
 
         // Card with unrecognized system code should also be unknown Nextfare
-        val c2 = buildNextfareCard(
-            uid = hexToBytes("897df842"),
-            systemCode = hexToBytes("ff00ff00ff00")
-        )
+        val c2 =
+            buildNextfareCard(
+                uid = hexToBytes("897df842"),
+                systemCode = hexToBytes("ff00ff00ff00"),
+            )
         assertTrue(factory.check(c2), "Card is nextfare")
         val d2 = factory.parseInfo(c2)
         assertEquals("0160 0112 3581 3212", d2.serialNumber)
@@ -265,8 +281,10 @@ class NextfareTransitTest {
         // SEQ Go system codes from Metrodroid
         private val SEQGO_SYSTEM_CODE1 = hexToBytes("5A5B20212223")
         private val SEQGO_SYSTEM_CODE2 = hexToBytes("202122230101")
+
         // LAX TAP BLOCK2 is 4 bytes of zeros
         private val LAX_TAP_BLOCK2 = ByteArray(4)
+
         // MSP Go-To BLOCK2 from Metrodroid
         private val MSP_GOTO_BLOCK2 = hexToBytes("3f332211c0ccddee3f33221101fe01fe")
     }

@@ -7,9 +7,15 @@ plugins {
 }
 kotlin {
     androidLibrary {
-        namespace = "com.codebutler.farebot.transit.yvr_compass"
-        compileSdk = libs.versions.compileSdk.get().toInt()
-        minSdk = libs.versions.minSdk.get().toInt()
+        namespace = "com.codebutler.farebot.transit.yvrcompass"
+        compileSdk =
+            libs.versions.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.minSdk
+                .get()
+                .toInt()
     }
     iosX64()
     iosArm64()
