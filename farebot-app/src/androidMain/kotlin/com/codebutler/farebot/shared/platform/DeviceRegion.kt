@@ -14,10 +14,7 @@ actual fun getDeviceRegion(): String? {
     if (!::appContext.isInitialized) return Locale.getDefault().country.uppercase(Locale.US)
 
     val tm = appContext.getSystemService(Context.TELEPHONY_SERVICE)
-    if (tm is TelephonyManager && (
-        tm.phoneType == TelephonyManager.PHONE_TYPE_GSM ||
-        tm.phoneType == TelephonyManager.PHONE_TYPE_CDMA
-    )) {
+    if (tm is TelephonyManager && tm.phoneType != TelephonyManager.PHONE_TYPE_NONE) {
         val netCountry = tm.networkCountryIso
         if (netCountry != null && netCountry.length == 2) {
             return netCountry.uppercase(Locale.US)
