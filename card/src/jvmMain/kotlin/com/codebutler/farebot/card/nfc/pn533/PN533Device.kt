@@ -43,20 +43,23 @@ object PN533Device {
 
     private var context: Context? = null
 
-    fun open(): PN533Transport? {
+    fun open(): PN533Transport? = openAll().firstOrNull()
+
+    fun openAll(): List<PN533Transport> {
         val ctx = Context()
         val result = LibUsb.init(ctx)
         if (result != LibUsb.SUCCESS) {
-            return null
+            return emptyList()
         }
 
         val deviceList = DeviceList()
         val count = LibUsb.getDeviceList(ctx, deviceList)
         if (count < 0) {
             LibUsb.exit(ctx)
-            return null
+            return emptyList()
         }
 
+        val transports = mutableListOf<PN533Transport>()
         try {
             for (device in deviceList) {
                 val descriptor = org.usb4java.DeviceDescriptor()
@@ -81,15 +84,18 @@ object PN533Device {
                     continue
                 }
 
-                context = ctx
-                return PN533Transport(handle)
+                transports.add(PN533Transport(handle))
             }
         } finally {
             LibUsb.freeDeviceList(deviceList, true)
         }
 
-        LibUsb.exit(ctx)
-        return null
+        if (transports.isEmpty()) {
+            LibUsb.exit(ctx)
+        } else {
+            context = ctx
+        }
+        return transports
     }
 
     fun shutdown() {

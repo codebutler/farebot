@@ -23,6 +23,8 @@
 package com.codebutler.farebot.desktop
 
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.nfc.pn533.PN533
+import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.CoroutineScope
@@ -63,18 +65,13 @@ class DesktopCardScanner : CardScanner {
     private var scanJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val backends: List<NfcReaderBackend> =
-        listOf(
-            PcscReaderBackend(),
-            PN533ReaderBackend(),
-        )
-
     override fun startActiveScan() {
         if (scanJob?.isActive == true) return
         _isScanning.value = true
 
         scanJob =
             scope.launch {
+                val backends = discoverBackends()
                 val backendJobs =
                     backends.map { backend ->
                         launch {
@@ -116,5 +113,29 @@ class DesktopCardScanner : CardScanner {
         scanJob?.cancel()
         scanJob = null
         _isScanning.value = false
+        PN533Device.shutdown()
+    }
+
+    private fun discoverBackends(): List<NfcReaderBackend> {
+        val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend())
+        val transports = PN533Device.openAll()
+        if (transports.isEmpty()) {
+            backends.add(PN533ReaderBackend())
+        } else {
+            transports.forEachIndexed { index, transport ->
+                transport.flush()
+                transport.sendAck() // RC-S956 needs ACK before first command
+                val probe = PN533(transport)
+                val fw = probe.getFirmwareVersion()
+                val label = "PN53x #${index + 1}"
+                println("[DesktopCardScanner] $label firmware: $fw")
+                if (fw.version >= 2) {
+                    backends.add(PN533ReaderBackend(transport))
+                } else {
+                    backends.add(RCS956ReaderBackend(transport, label))
+                }
+            }
+        }
+        return backends
     }
 }

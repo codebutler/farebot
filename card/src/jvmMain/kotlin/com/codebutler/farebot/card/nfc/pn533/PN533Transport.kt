@@ -62,11 +62,19 @@ class PN533Transport(
         val payload = byteArrayOf(TFI_HOST_TO_PN533, code) + data
         val frame = buildFrame(payload)
 
+        if (DEBUG) println("[PN53x TX] cmd=0x%02X frame=${frame.hex()}".format(code))
         bulkWrite(frame)
         val staleResponse = readAck()
         // If readAck got a response frame instead of an ACK, use it directly
-        if (staleResponse != null) return parseFrame(staleResponse)
+        if (staleResponse != null) {
+            if (DEBUG) println("[PN53x RX] (stale) ${staleResponse.hex()}")
+            return parseFrame(staleResponse)
+        }
         return readResponse(timeoutMs)
+    }
+
+    fun sendAck() {
+        bulkWrite(ACK_FRAME)
     }
 
     fun close() {
@@ -145,6 +153,7 @@ class PN533Transport(
         val bytes = ByteArray(count)
         buf.rewind()
         buf.get(bytes)
+        if (DEBUG) println("[PN53x RX] ${bytes.hex()}")
         return parseFrame(bytes)
     }
 
@@ -173,6 +182,11 @@ class PN533Transport(
             val len = frame[3].toInt() and 0xFF
             // LCS at frame[4]
             payload = frame.copyOfRange(5, 5 + len)
+        }
+
+        // Error frame: 1-byte payload with error code (e.g., 0x7F = command not supported)
+        if (payload.size == 1) {
+            throw PN533CommandException(payload[0].toInt() and 0xFF)
         }
 
         // payload[0] = TFI (0xD5 for PN533-to-host), payload[1] = response code
@@ -216,10 +230,16 @@ class PN533Transport(
                 0x00,
             )
 
+        const val DEBUG = false
+
         private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }
 }
 
-class PN533Exception(
+open class PN533Exception(
     message: String,
 ) : Exception(message)
+
+class PN533CommandException(
+    val errorCode: Int,
+) : PN533Exception("PN53x command error: 0x%02X".format(errorCode))
