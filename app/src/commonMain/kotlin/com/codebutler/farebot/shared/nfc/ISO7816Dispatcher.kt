@@ -117,7 +117,7 @@ object ISO7816Dispatcher {
                 ISO7816CardReader.FileSelector(
                     parentDf = null,
                     fileId = fileId,
-                )
+                ),
             )
         }
 
@@ -127,7 +127,7 @@ object ISO7816Dispatcher {
             ISO7816CardReader.FileSelector(
                 parentDf = null,
                 fileId = 0xdf00,
-            )
+            ),
         )
 
         return selectors
