@@ -35,12 +35,15 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
 import com.codebutler.farebot.card.ultralight.UltralightPage
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
+import com.codebutler.farebot.card.vicinity.VicinityPage
+import com.codebutler.farebot.card.vicinity.raw.RawVicinityCard
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Instant
 
@@ -323,6 +326,66 @@ class CardSerializationTest {
             }
         val otherCard = RawClassicCard.create(tagId, scannedAt, otherSectors)
         assertFalse(otherCard.isUnauthorized())
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    @Test
+    fun testVicinityCardJsonRoundTrip() {
+        val tagId = "0102030405060708".hexToByteArray()
+        val scannedAt = Instant.fromEpochMilliseconds(1264982400000)
+
+        val pages =
+            listOf(
+                VicinityPage.create(0, "11223344".hexToByteArray()),
+                VicinityPage.create(1, "55667788".hexToByteArray()),
+                VicinityPage.create(2, "aabbccdd".hexToByteArray()),
+            )
+        val sysInfo = "0f01020304050607".hexToByteArray()
+
+        val card = RawVicinityCard.create(tagId, scannedAt, pages, sysInfo, isPartialRead = false)
+
+        // Serialize
+        val jsonString = serializer.serialize(card)
+        assertNotNull(jsonString)
+        assertTrue(jsonString.contains("Vicinity"))
+
+        // Deserialize
+        val deserializedCard = serializer.deserialize(jsonString)
+        assertEquals(CardType.Vicinity, deserializedCard.cardType())
+        assertTrue(deserializedCard.tagId().contentEquals(tagId))
+        assertEquals(scannedAt, deserializedCard.scannedAt())
+
+        // Verify page data survived round-trip
+        val rawVicinity = deserializedCard as RawVicinityCard
+        assertEquals(3, rawVicinity.pages.size)
+        assertEquals(0, rawVicinity.pages[0].index)
+        assertEquals(1, rawVicinity.pages[1].index)
+        assertEquals(2, rawVicinity.pages[2].index)
+        assertTrue(rawVicinity.pages[0].data.contentEquals("11223344".hexToByteArray()))
+        assertNotNull(rawVicinity.sysInfo)
+        assertTrue(rawVicinity.sysInfo!!.contentEquals(sysInfo))
+        assertFalse(rawVicinity.isPartialRead)
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    @Test
+    fun testVicinityPartialReadRoundTrip() {
+        val tagId = "0102030405060708".hexToByteArray()
+        val scannedAt = Instant.fromEpochMilliseconds(1264982400000)
+
+        val pages =
+            listOf(
+                VicinityPage.create(0, "11223344".hexToByteArray()),
+            )
+
+        val card = RawVicinityCard.create(tagId, scannedAt, pages, sysInfo = null, isPartialRead = true)
+
+        val jsonString = serializer.serialize(card)
+        val deserializedCard = serializer.deserialize(jsonString) as RawVicinityCard
+
+        assertTrue(deserializedCard.isPartialRead)
+        assertEquals(1, deserializedCard.pages.size)
+        assertNull(deserializedCard.sysInfo)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
