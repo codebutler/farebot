@@ -65,7 +65,10 @@ class PN533(
         Thread.sleep(10)
     }
 
-    fun writeRegister(address: Int, value: Int) {
+    fun writeRegister(
+        address: Int,
+        value: Int,
+    ) {
         transport.sendCommand(
             CMD_WRITE_REGISTER,
             byteArrayOf(

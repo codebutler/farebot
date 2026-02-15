@@ -28,6 +28,7 @@ import com.codebutler.farebot.card.cepas.CEPASCardReader
 import com.codebutler.farebot.card.classic.ClassicCardReader
 import com.codebutler.farebot.card.felica.FeliCaReader
 import com.codebutler.farebot.card.felica.PN533FeliCaTagAdapter
+import com.codebutler.farebot.card.nfc.CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
 import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
@@ -49,17 +50,22 @@ import com.codebutler.farebot.shared.nfc.ScannedTag
 abstract class PN53xReaderBackend(
     private val preOpenedTransport: PN533Transport? = null,
 ) : NfcReaderBackend {
-
     protected abstract fun initDevice(pn533: PN533)
+
+    protected open fun createTransceiver(
+        pn533: PN533,
+        tg: Int,
+    ): CardTransceiver = PN533CardTransceiver(pn533, tg)
 
     override fun scanLoop(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
     ) {
-        val transport = preOpenedTransport
-            ?: PN533Device.open()
-            ?: throw Exception("PN53x device not found")
+        val transport =
+            preOpenedTransport
+                ?: PN533Device.open()
+                ?: throw Exception("PN53x device not found")
 
         transport.flush()
         val pn533 = PN533(transport)
@@ -86,10 +92,11 @@ abstract class PN53xReaderBackend(
             // Try FeliCa (212 kbps) if no Type A card found.
             // SENSF_REQ initiator data is required for RC-S956; PN533 generates defaults internally.
             if (target == null) {
-                target = pn533.inListPassiveTarget(
-                    baudRate = PN533.BAUD_RATE_212_FELICA,
-                    initiatorData = SENSF_REQ,
-                )
+                target =
+                    pn533.inListPassiveTarget(
+                        baudRate = PN533.BAUD_RATE_212_FELICA,
+                        initiatorData = SENSF_REQ,
+                    )
             }
 
             if (target == null) {
@@ -149,7 +156,7 @@ abstract class PN53xReaderBackend(
 
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
-                val transceiver = PN533CardTransceiver(pn533, target.tg)
+                val transceiver = createTransceiver(pn533, target.tg)
                 ISO7816Dispatcher.readCard(tagId, transceiver)
             }
 
@@ -164,12 +171,12 @@ abstract class PN53xReaderBackend(
             }
 
             CardType.CEPAS -> {
-                val transceiver = PN533CardTransceiver(pn533, target.tg)
+                val transceiver = createTransceiver(pn533, target.tg)
                 CEPASCardReader.readCard(tagId, transceiver)
             }
 
             else -> {
-                val transceiver = PN533CardTransceiver(pn533, target.tg)
+                val transceiver = createTransceiver(pn533, target.tg)
                 ISO7816Dispatcher.readCard(tagId, transceiver)
             }
         }

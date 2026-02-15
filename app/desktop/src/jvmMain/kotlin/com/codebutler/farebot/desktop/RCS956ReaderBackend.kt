@@ -22,7 +22,9 @@
 
 package com.codebutler.farebot.desktop
 
+import com.codebutler.farebot.card.nfc.CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533
+import com.codebutler.farebot.card.nfc.pn533.PN533CommunicateThruTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533Transport
 
 /**
@@ -39,6 +41,11 @@ class RCS956ReaderBackend(
     private val deviceLabel: String = "RC-S956",
 ) : PN53xReaderBackend(transport) {
     override val name: String = deviceLabel
+
+    override fun createTransceiver(
+        pn533: PN533,
+        tg: Int,
+    ): CardTransceiver = PN533CommunicateThruTransceiver(pn533)
 
     override fun initDevice(pn533: PN533) {
         // nfcpy rcs956.py init(transport) + Device.__init__() sequence.
@@ -67,8 +74,17 @@ class RCS956ReaderBackend(
         pn533.rfConfiguration(
             0x0A,
             byteArrayOf(
-                0x5A, 0xF4.toByte(), 0x3F, 0x11, 0x4D,
-                0x85.toByte(), 0x61, 0x6F, 0x26, 0x62, 0x87.toByte(),
+                0x5A,
+                0xF4.toByte(),
+                0x3F,
+                0x11,
+                0x4D,
+                0x85.toByte(),
+                0x61,
+                0x6F,
+                0x26,
+                0x62,
+                0x87.toByte(),
             ),
         ) // 106kbps Type A
         pn533.setParameters(0x08)
