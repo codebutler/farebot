@@ -43,7 +43,7 @@ jobs:
 
   ios:
     name: Build & Test (iOS)
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,7 +57,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build iOS framework
-        run: ./gradlew linkDebugFrameworkIosArm64 -Dorg.gradle.jvmargs=-Xmx2g -Pkotlin.native.jvmArgs=-Xmx5g
+        run: ./gradlew linkDebugFrameworkIosArm64
 
       - name: Run iOS simulator tests
-        run: ./gradlew iosSimulatorArm64Test -Dorg.gradle.jvmargs=-Xmx2g -Pkotlin.native.jvmArgs=-Xmx5g
+        run: ./gradlew iosSimulatorArm64Test
