@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.toHexDump
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.advanced
@@ -73,7 +74,7 @@ fun CardAdvancedScreen(
                         Tab(
                             selected = selectedTab == index,
                             onClick = { selectedTab = index },
-                            text = { Text(tab.title) },
+                            text = { Text(tab.title.resolve()) },
                         )
                     }
                 }

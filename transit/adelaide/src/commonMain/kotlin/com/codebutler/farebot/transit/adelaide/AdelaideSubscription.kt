@@ -21,7 +21,6 @@
 
 package com.codebutler.farebot.transit.adelaide
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
@@ -29,7 +28,6 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 class AdelaideSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
 ) : En1545Subscription() {
     override val lookup: AdelaideLookup
         get() = AdelaideLookup
@@ -40,8 +38,7 @@ class AdelaideSubscription(
     companion object {
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
         ): AdelaideSubscription =
-            AdelaideSubscription(En1545Parser.parse(data, IntercodeFields.SUB_FIELDS_TYPE_46), stringResource)
+            AdelaideSubscription(En1545Parser.parse(data, IntercodeFields.SUB_FIELDS_TYPE_46))
     }
 }

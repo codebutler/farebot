@@ -25,13 +25,13 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.serialonly.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Handle MIFARE Ultralight with no non-default data.
@@ -184,7 +184,7 @@ class BlankUltralightTransitFactory : TransitFactory<UltralightCard, BlankUltral
     }
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        val name = getStringBlocking(Res.string.blank_mfu_card)
+        val name = FormattedString(Res.string.blank_mfu_card)
         return TransitIdentity.create(name, null)
     }
 
@@ -204,7 +204,7 @@ class BlankUltralightTransitFactory : TransitFactory<UltralightCard, BlankUltral
 }
 
 class BlankUltralightTransitInfo : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.blank_mfu_card)
+    override val cardName: FormattedString = FormattedString(Res.string.blank_mfu_card)
 
     override val serialNumber: String? = null
 

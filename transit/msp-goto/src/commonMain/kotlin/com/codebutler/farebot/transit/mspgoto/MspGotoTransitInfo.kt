@@ -22,12 +22,12 @@
 
 package com.codebutler.farebot.transit.mspgoto
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfoCapsule
 import farebot.transit.msp_goto.generated.resources.Res
 import farebot.transit.msp_goto.generated.resources.msp_goto_card_name
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit data type for Go-To card (Minneapolis / St. Paul, MN).
@@ -41,6 +41,6 @@ class MspGotoTransitInfo(
         capsule = capsule,
         currencyFactory = { TransitCurrency.USD(it) },
     ) {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.msp_goto_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.msp_goto_card_name)
 }

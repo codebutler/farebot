@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit.zolotayakorona
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -36,6 +35,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
 import org.jetbrains.compose.resources.StringResource
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class ZolotayaKoronaTransitInfo internal constructor(
     private val serial: String,
@@ -70,13 +70,12 @@ class ZolotayaKoronaTransitInfo internal constructor(
                 0x760500 to Res.string.card_name_yaroslavl_etk,
             )
 
-        internal fun nameCard(type: Int): String {
+        internal fun nameCard(type: Int): FormattedString {
             val cardNameRes = CARD_NAMES[type]
             return if (cardNameRes != null) {
-                getStringBlocking(cardNameRes)
+                FormattedString(cardNameRes)
             } else {
-                val baseName = getStringBlocking(Res.string.zolotaya_korona_card_name)
-                "$baseName ${type.toString(16)}"
+                FormattedString(Res.string.zolotaya_korona_card_name) + FormattedString(" ${type.toString(16)}")
             }
         }
 
@@ -135,18 +134,18 @@ class ZolotayaKoronaTransitInfo internal constructor(
 
     override val serialNumber: String get() = formatSerial(serial)
 
-    override val cardName: String get() = nameCard(cardType)
+    override val cardName: FormattedString get() = nameCard(cardType)
 
     override val info: List<ListItemInterface>
         get() {
             val regionNum = cardType shr 16
             val regionName = RussiaTaxCodes.BCDToName(regionNum)
             val discountName =
-                discountMap[discountCode]?.let { getStringBlocking(it) }
-                    ?: getStringBlocking(Res.string.zolotaya_korona_unknown, discountCode.toString(16))
+                discountMap[discountCode]?.let { FormattedString(it) }
+                    ?: FormattedString(Res.string.zolotaya_korona_unknown, discountCode.toString(16))
             val cardTypeName =
-                CARD_NAMES[cardType]?.let { getStringBlocking(it) }
-                    ?: cardType.toString(16)
+                CARD_NAMES[cardType]?.let { FormattedString(it) }
+                    ?: FormattedString(cardType.toString(16))
             return listOf(
                 ListItem(Res.string.zolotaya_korona_region, regionName),
                 ListItem(Res.string.zolotaya_korona_card_type, cardTypeName),

@@ -41,7 +41,7 @@ data class RkfPurse(
 
             return TransitBalance(
                 balance = balance,
-                name = name,
+                formattedName = name,
                 validFrom = mStatic.getTimeStamp(START, mLookup.timeZone),
                 validTo = mDynamic.getTimeStamp(END, mLookup.timeZone),
             )

@@ -4,4 +4,6 @@
     <string name="edy_transaction_sequence">#</string>
     <string name="felica_process_charge">Charge</string>
     <string name="felica_process_merchandise_purchase">Merchandise</string>
+    <string name="edy_agency_charge_seq">Charge #%1$s</string>
+    <string name="edy_agency_purchase_seq">Merchandise #%1$s</string>
 </resources>

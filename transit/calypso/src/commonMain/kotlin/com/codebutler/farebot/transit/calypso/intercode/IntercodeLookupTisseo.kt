@@ -22,13 +22,13 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.transit.calypso.generated.resources.*
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
+import com.codebutler.farebot.base.util.FormattedString
 
 internal object IntercodeLookupTisseo : IntercodeLookupSTR("tisseo"), IntercodeLookupSingle {
     // https://www.tisseo.fr/les-tarifs/obtenir-une-carte-pastel
-    override val cardName: String = getStringBlocking(Res.string.card_name_pastel)
+    override val cardName: FormattedString = FormattedString(Res.string.card_name_pastel)
 
     @Suppress("unused")
     private const val AGENCY_TISSEO = 1

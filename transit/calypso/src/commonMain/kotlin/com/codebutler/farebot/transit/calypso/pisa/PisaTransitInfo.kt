@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.pisa
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.transit.CardInfo
@@ -43,7 +43,7 @@ import farebot.transit.calypso.generated.resources.*
 internal class PisaTransitInfo(
     result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = FormattedString(NAME)
 
     companion object {
         const val NAME = "Carta Mobile"
@@ -51,14 +51,12 @@ internal class PisaTransitInfo(
     }
 }
 
-class PisaTransitFactory(
-    stringResource: StringResource,
-) : CalypsoTransitFactory(stringResource) {
+class PisaTransitFactory : CalypsoTransitFactory() {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override val name: String
-        get() = PisaTransitInfo.NAME
+    override val name: FormattedString
+        get() = FormattedString(PisaTransitInfo.NAME)
 
     override fun checkTenv(tenv: ByteArray): Boolean {
         val networkId = tenv.getBitsFromBuffer(5, 24)
@@ -75,7 +73,7 @@ class PisaTransitFactory(
                 ticketEnvFields = ticketEnvFields,
                 contractListFields = null,
                 serial = serial,
-                createSubscription = { data, ctr, _, _ -> PisaSubscription.parse(data, stringResource, ctr) },
+                createSubscription = { data, ctr, _, _ -> PisaSubscription.parse(data, ctr) },
                 createTrip = { data -> PisaTransaction.parse(data) },
                 createSpecialEvent = { data -> PisaSpecialEvent.parse(data) },
             )

@@ -26,7 +26,6 @@ package com.codebutler.farebot.transit.china
 
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -42,6 +41,7 @@ import farebot.transit.china.generated.resources.card_location_beijing_china
 import farebot.transit.china.generated.resources.card_name_beijing
 import farebot.transit.china.generated.resources.card_name_beijing_municipal_card
 import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit info implementation for Beijing Municipal Card (BMAC / 北京市政交通一卡通).
@@ -60,8 +60,8 @@ class BeijingTransitInfo(
     override val trips: List<ChinaTrip>?,
     val mBalance: Int?,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_beijing)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_beijing)
 
     override val balance: TransitBalance?
         get() =
@@ -116,7 +116,7 @@ class BeijingTransitInfo(
 
                 override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
                     TransitIdentity(
-                        getStringBlocking(Res.string.card_name_beijing),
+                        FormattedString(Res.string.card_name_beijing),
                         parseSerial(card),
                     )
 

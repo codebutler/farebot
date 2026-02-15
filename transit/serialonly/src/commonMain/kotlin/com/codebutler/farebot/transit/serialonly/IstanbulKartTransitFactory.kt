@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.base.util.hex
@@ -41,7 +42,7 @@ class IstanbulKartTransitFactory : TransitFactory<DesfireCard, IstanbulKartTrans
 
     companion object {
         internal const val APP_ID = 0x422201
-        internal const val NAME = "IstanbulKart"
+        internal val NAME = FormattedString("IstanbulKart")
 
         internal fun parseSerial(card: DesfireCard): String? =
             (card.getApplication(APP_ID)?.getFile(2) as? StandardDesfireFile)

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.test
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -225,6 +226,17 @@ object TestAssetLoader {
     @OptIn(ExperimentalStdlibApi::class)
     private fun ByteArray.getUShort(offset: Int): UShort =
         ((this[offset].toInt() and 0xFF) shl 8 or (this[offset + 1].toInt() and 0xFF)).toUShort()
+}
+
+/**
+ * Assert that a FormattedString's plain text representation equals the expected string.
+ */
+fun assertFormattedEquals(
+    expected: String?,
+    actual: FormattedString?,
+    message: String? = null,
+) {
+    kotlin.test.assertEquals(expected, actual?.toPlainString(), message)
 }
 
 /**

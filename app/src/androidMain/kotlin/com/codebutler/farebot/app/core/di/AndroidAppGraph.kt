@@ -6,8 +6,6 @@ import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.app.core.platform.AndroidAppPreferences
 import com.codebutler.farebot.app.feature.home.AndroidCardScanner
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
@@ -85,10 +83,6 @@ abstract class AndroidAppGraph : AppGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideTransitFactoryRegistry(): TransitFactoryRegistry = createTransitFactoryRegistry()
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideStringResource(): StringResource = DefaultStringResource()
 
     @Provides
     @SingleIn(AppScope::class)

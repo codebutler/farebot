@@ -23,10 +23,10 @@
 package com.codebutler.farebot.transit.zolotayakorona
 
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.transit.zolotayakorona.generated.resources.*
 import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Tax codes assigned by Russian Tax agency for places both inside Russia and outside (e.g. Baikonur).
@@ -36,13 +36,13 @@ object RussiaTaxCodes {
     @Suppress("FunctionName")
     fun BCDToTimeZone(bcd: Int): TimeZone = TAX_CODE_TIMEZONES[bcd] ?: TimeZone.of("Europe/Moscow")
 
-    fun codeToName(regionNum: Int): String {
+    fun codeToName(regionNum: Int): FormattedString {
         val bcd = NumberUtils.intToBCD(regionNum)
         val nameRes = TAX_CODE_NAMES[bcd]
         return if (nameRes != null) {
-            getStringBlocking(nameRes)
+            FormattedString(nameRes)
         } else {
-            getStringBlocking(Res.string.russia_region_unknown, regionNum.toString())
+            FormattedString(Res.string.russia_region_unknown, regionNum.toString())
         }
     }
 
@@ -50,12 +50,12 @@ object RussiaTaxCodes {
         TAX_CODE_TIMEZONES[NumberUtils.intToBCD(regionNum)] ?: TimeZone.of("Europe/Moscow")
 
     @Suppress("FunctionName")
-    fun BCDToName(regionNum: Int): String {
+    fun BCDToName(regionNum: Int): FormattedString {
         val nameRes = TAX_CODE_NAMES[regionNum]
         return if (nameRes != null) {
-            getStringBlocking(nameRes)
+            FormattedString(nameRes)
         } else {
-            getStringBlocking(Res.string.russia_region_unknown, regionNum.toString(16))
+            FormattedString(Res.string.russia_region_unknown, regionNum.toString(16))
         }
     }
 

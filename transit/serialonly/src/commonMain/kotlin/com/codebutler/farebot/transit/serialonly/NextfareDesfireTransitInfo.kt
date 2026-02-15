@@ -9,9 +9,9 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.transit.serialonly.generated.resources.Res
 import farebot.transit.serialonly.generated.resources.card_name_nextfare_desfire
+import com.codebutler.farebot.base.util.FormattedString
 
 class NextfareDesfireTransitInfo(
     private val mSerial: Long,
@@ -21,6 +21,6 @@ class NextfareDesfireTransitInfo(
     override val cardName get() = NAME
 
     companion object {
-        internal val NAME by lazy { getStringBlocking(Res.string.card_name_nextfare_desfire) }
+        internal val NAME by lazy { FormattedString(Res.string.card_name_nextfare_desfire) }
     }
 }

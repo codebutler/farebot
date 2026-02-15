@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.laxtap
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.laxtap.LaxTapData.AGENCY_METRO
@@ -37,6 +36,7 @@ import com.codebutler.farebot.transit.nextfare.NextfareTrip
 import com.codebutler.farebot.transit.nextfare.NextfareTripCapsule
 import farebot.transit.lax_tap.generated.resources.Res
 import farebot.transit.lax_tap.generated.resources.lax_tap_unknown_route
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Represents trip events on LAX TAP card.
@@ -44,14 +44,14 @@ import farebot.transit.lax_tap.generated.resources.lax_tap_unknown_route
 class LaxTapTrip(
     capsule: NextfareTripCapsule,
 ) : NextfareTrip(capsule, currencyFactory = { TransitCurrency.USD(it) }) {
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() {
             if (capsule.modeInt == AGENCY_METRO &&
                 capsule.startStation >= METRO_BUS_START
             ) {
                 // Metro Bus uses the station_id for route numbers.
-                return METRO_BUS_ROUTES[capsule.startStation]
-                    ?: getStringBlocking(Res.string.lax_tap_unknown_route, capsule.startStation.toString())
+                return METRO_BUS_ROUTES[capsule.startStation]?.let { FormattedString(it) }
+                    ?: FormattedString(Res.string.lax_tap_unknown_route, capsule.startStation.toString())
             }
             // Normally not possible to guess what the route is.
             return null

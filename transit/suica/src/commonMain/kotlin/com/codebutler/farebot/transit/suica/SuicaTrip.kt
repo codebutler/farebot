@@ -35,13 +35,13 @@
 package com.codebutler.farebot.transit.suica
 
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.base.util.FormattedString
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -60,7 +60,6 @@ class SuicaTrip(
     val startStationId: Int,
     val endStationId: Int,
     val dateRaw: Int,
-    private val stringResource: StringResource,
 ) : Trip() {
     companion object {
         private const val CONSOLE_BUS = 0x05
@@ -86,7 +85,6 @@ class SuicaTrip(
         fun parse(
             block: FelicaBlock,
             previousBalance: Int,
-            stringResource: StringResource,
         ): SuicaTrip {
             val data = block.data
 
@@ -168,7 +166,6 @@ class SuicaTrip(
                 startStationId = data.byteArrayToInt(6, 2),
                 endStationId = data.byteArrayToInt(8, 2),
                 dateRaw = dateRaw,
-                stringResource = stringResource,
             )
         }
     }
@@ -176,33 +173,14 @@ class SuicaTrip(
     override val fare: TransitCurrency
         get() = TransitCurrency.JPY(fareRaw)
 
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() {
             if (startStation == null) {
-                val consoleTypeName = SuicaUtil.getConsoleTypeName(stringResource, consoleTypeInt)
-                val processTypeName = SuicaUtil.getProcessTypeName(stringResource, processType)
-                return "$consoleTypeName $processTypeName"
+                val consoleTypeName = SuicaUtil.getConsoleTypeName(consoleTypeInt)
+                val processTypeName = SuicaUtil.getProcessTypeName(processType)
+                return consoleTypeName + FormattedString(" ") + processTypeName
             }
-            val routeName = super.routeName ?: return null
-            // SUICA HACK:
-            // If there's something that looks like "#2" at the start, then mark
-            // that as the default language.
-            // Note: In Metrodroid, this is used with FormattedString to mark the line number
-            // portion as the default language for localization. With plain strings, we just
-            // return the route name as-is, but preserve this logic structure for when
-            // FormattedString support is added.
-            val match = LINE_NUMBER.matchEntire(routeName)?.groups ?: return routeName
-            // There is a line number - the regex matched
-            // Group 1 is the line number part (e.g., "#7" or "300")
-            // Group 2 is the rest of the name (e.g., " Eastern Line")
-            val lineNumberPart = match[1]?.value
-            if (lineNumberPart != null) {
-                // Line number exists at the start
-                // In Metrodroid, this would mark lineNumberPart as default language
-                // and the rest as foreign language
-                return routeName
-            }
-            return routeName
+            return super.routeName
         }
 
     override val humanReadableRouteID: String?
@@ -213,8 +191,8 @@ class SuicaTrip(
                 "${NumberUtils.intToHex(consoleTypeInt)} ${NumberUtils.intToHex(processType)}"
             }
 
-    override val agencyName: String?
-        get() = startStation?.companyName
+    override val agencyName: FormattedString?
+        get() = startStation?.companyName?.let { FormattedString(it) }
 
     override val mode: Mode
         get() {

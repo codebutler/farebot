@@ -49,8 +49,7 @@ import kotlin.time.Instant
  * or filesystem (iOS native).
  */
 class EasyCardTransitTest : CardDumpTest() {
-    private val stringResource = TestStringResource()
-    private val factory = EasyCardTransitFactory(stringResource)
+    private val factory = EasyCardTransitFactory()
 
     /**
      * Format an Instant as ISO date-time in Taipei timezone (like Metrodroid's test).
@@ -102,15 +101,15 @@ class EasyCardTransitTest : CardDumpTest() {
         assertEquals(TransitCurrency.TWD(15), trainTrip.fare)
         assertEquals(Trip.Mode.METRO, trainTrip.mode)
         assertNotNull(trainTrip.startStation, "Train trip should have a start station")
-        assertEquals("Taipei Main Station", trainTrip.startStation?.stationName)
+        assertFormattedEquals("Taipei Main Station", trainTrip.startStation?.stationName)
         assertNotNull(trainTrip.endStation, "Train trip should have an end station")
-        assertEquals("NTU Hospital", trainTrip.endStation?.stationName)
+        assertFormattedEquals("NTU Hospital", trainTrip.endStation?.stationName)
         assertEquals("0xccbbaa", trainTrip.machineID)
 
         // Route name comes from MDST line data — the common line between start and end stations
         val routeName = trainTrip.routeName
         if (routeName != null) {
-            assertEquals("Red", routeName)
+            assertFormattedEquals("Red", routeName)
         }
 
         // Trip 2: Top-up/refill at Yongan Market
@@ -119,7 +118,7 @@ class EasyCardTransitTest : CardDumpTest() {
         assertEquals(TransitCurrency.TWD(-100), refill.fare, "Refill fare should be negative (money added)")
         assertEquals(Trip.Mode.TICKET_MACHINE, refill.mode)
         assertNotNull(refill.startStation, "Refill should have a station")
-        assertEquals("Yongan Market", refill.startStation?.stationName)
+        assertFormattedEquals("Yongan Market", refill.startStation?.stationName)
         assertNull(refill.routeName, "Refill should not have a route name")
         assertEquals("0x31c046", refill.machineID)
     }
@@ -152,7 +151,7 @@ class EasyCardTransitTest : CardDumpTest() {
         assertNotNull(refill.startStation, "Refill should have a station")
         // In the test environment, MDST returns English names.
         // Verify the station is correctly resolved (Yongan Market).
-        assertEquals("Yongan Market", refill.startStation?.stationName)
+        assertFormattedEquals("Yongan Market", refill.startStation?.stationName)
         assertNull(refill.routeName, "Refill should not have a route name")
     }
 

@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.ravkav
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
@@ -34,7 +33,6 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 internal class RavKavSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val counter: Int?,
 ) : En1545Subscription() {
     override val lookup: En1545Lookup

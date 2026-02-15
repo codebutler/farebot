@@ -24,7 +24,7 @@ package com.codebutler.farebot.shared.sample
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.uiTree
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -51,10 +51,10 @@ class SampleTransitInfo : TransitInfo() {
             SampleSubscription(),
         )
 
-    override val cardName: String = "Sample Transit"
+    override val cardName: FormattedString = FormattedString("Sample Transit")
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree =
-        uiTree(stringResource) {
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
             item {
                 title = "Sample Card Section 1"
                 item {

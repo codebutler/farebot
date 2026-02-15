@@ -22,13 +22,13 @@
 package com.codebutler.farebot.transit.kazan
 
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.kazan.generated.resources.Res
 import farebot.transit.kazan.generated.resources.card_name_kazan
+import com.codebutler.farebot.base.util.FormattedString
 
 class KazanTransitInfo(
     private val mSerial: Long,
@@ -48,6 +48,6 @@ class KazanTransitInfo(
     override val trips: List<Trip>?
         get() = mTrip?.let { listOf(it) }
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_kazan)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_kazan)
 }

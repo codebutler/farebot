@@ -1,7 +1,5 @@
 package com.codebutler.farebot.web
 
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
@@ -52,10 +50,6 @@ abstract class WebAppGraph : AppGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideTransitFactoryRegistry(): TransitFactoryRegistry = createTransitFactoryRegistry()
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideStringResource(): StringResource = DefaultStringResource()
 
     @Provides
     @SingleIn(AppScope::class)

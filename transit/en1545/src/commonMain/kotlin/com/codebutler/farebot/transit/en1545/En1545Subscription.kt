@@ -24,8 +24,6 @@ package com.codebutler.farebot.transit.en1545
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -36,12 +34,11 @@ import farebot.transit.en1545.generated.resources.en1545_valid_origin_destinatio
 import farebot.transit.en1545.generated.resources.en1545_with_receipt
 import farebot.transit.en1545.generated.resources.en1545_without_receipt
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 abstract class En1545Subscription : Subscription() {
     protected abstract val parsed: En1545Parsed
     protected abstract val lookup: En1545Lookup
-    protected abstract val stringResource: StringResource
-
     protected val contractTariff: Int?
         get() = parsed.getInt(CONTRACT_TARIFF)
 
@@ -90,7 +87,7 @@ abstract class En1545Subscription : Subscription() {
             }
         }
 
-    override val saleAgencyName: String?
+    override val saleAgencyName: FormattedString?
         get() {
             val agency = parsed.getInt(CONTRACT_SALE_AGENT) ?: return null
             return lookup.getAgencyName(agency, false)
@@ -122,17 +119,17 @@ abstract class En1545Subscription : Subscription() {
     override val validTo: Instant?
         get() = parsed.getTimeStamp(CONTRACT_END, lookup.timeZone)
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() = lookup.getAgencyName(contractProvider, false)
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() = lookup.getAgencyName(contractProvider, true)
 
     override val machineId: Int?
         get() = parsed.getInt(CONTRACT_SALE_DEVICE)?.let { if (it == 0) null else it }
 
-    override val subscriptionName: String?
-        get() = lookup.getSubscriptionName(stringResource, contractProvider, contractTariff)
+    override val subscriptionName: FormattedString?
+        get() = lookup.getSubscriptionName(contractProvider, contractTariff)
 
     override val info: List<ListItemInterface>?
         get() {
@@ -143,16 +140,16 @@ abstract class En1545Subscription : Subscription() {
             }
             val receipt = parsed.getInt(CONTRACT_RECEIPT_DELIVERED)
             if (receipt != null && receipt != 0) {
-                li.add(ListItem(getStringBlocking(Res.string.en1545_with_receipt)))
+                li.add(ListItem(FormattedString(Res.string.en1545_with_receipt)))
             }
             if (receipt != null && receipt == 0) {
-                li.add(ListItem(getStringBlocking(Res.string.en1545_without_receipt)))
+                li.add(ListItem(FormattedString(Res.string.en1545_without_receipt)))
             }
             if (parsed.contains(CONTRACT_ORIGIN_1) || parsed.contains(CONTRACT_DESTINATION_1)) {
                 if (parsed.contains(CONTRACT_VIA_1)) {
                     li.add(
                         ListItem(
-                            getStringBlocking(
+                            FormattedString(
                                 Res.string.en1545_valid_origin_destination_via,
                                 getStationName(CONTRACT_ORIGIN_1) ?: "?",
                                 getStationName(CONTRACT_DESTINATION_1) ?: "?",
@@ -163,7 +160,7 @@ abstract class En1545Subscription : Subscription() {
                 } else {
                     li.add(
                         ListItem(
-                            getStringBlocking(
+                            FormattedString(
                                 Res.string.en1545_valid_origin_destination,
                                 getStationName(CONTRACT_ORIGIN_1) ?: "?",
                                 getStationName(CONTRACT_DESTINATION_1) ?: "?",
@@ -175,7 +172,7 @@ abstract class En1545Subscription : Subscription() {
             if (parsed.contains(CONTRACT_ORIGIN_2) || parsed.contains(CONTRACT_DESTINATION_2)) {
                 li.add(
                     ListItem(
-                        getStringBlocking(
+                        FormattedString(
                             Res.string.en1545_valid_origin_destination,
                             getStationName(CONTRACT_ORIGIN_2) ?: "?",
                             getStationName(CONTRACT_DESTINATION_2) ?: "?",
@@ -187,7 +184,7 @@ abstract class En1545Subscription : Subscription() {
         }
 
     private fun getStationName(prop: String): String? {
-        return lookup.getStation(parsed.getInt(prop) ?: return null, contractProvider, null)?.stationName
+        return lookup.getStation(parsed.getInt(prop) ?: return null, contractProvider, null)?.stationNameRaw
     }
 
     companion object {

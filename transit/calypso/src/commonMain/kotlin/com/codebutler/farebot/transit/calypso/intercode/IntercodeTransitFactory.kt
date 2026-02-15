@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816Card
@@ -39,14 +39,12 @@ import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.transit.calypso.generated.resources.*
 
-class IntercodeTransitFactory(
-    stringResource: StringResource,
-) : CalypsoTransitFactory(stringResource) {
+class IntercodeTransitFactory : CalypsoTransitFactory() {
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
 
-    override val name: String
-        get() = "Intercode"
+    override val name: FormattedString
+        get() = FormattedString("Intercode")
 
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
         val app = findCalypsoApp(card)!!
@@ -150,7 +148,7 @@ class IntercodeTransitFactory(
             return null
         }
         val tariff = contractList.getInt(En1545TransitData.CONTRACTS_TARIFF, listNum) ?: return null
-        return IntercodeSubscription.parse(data, tariff shr 4 and 0xff, netID, counter, stringResource)
+        return IntercodeSubscription.parse(data, tariff shr 4 and 0xff, netID, counter)
     }
 
     private fun ByteArray.byteArrayToLong(

@@ -26,7 +26,6 @@ package com.codebutler.farebot.card.cepas
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.CurrencyFormatter
 import com.codebutler.farebot.base.util.DateFormatStyle
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
@@ -47,8 +46,8 @@ data class CEPASCard(
 
     fun getHistory(purse: Int): CEPASHistory? = histories[purse]
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val cardUiBuilder = FareBotUiTree.builder()
 
         val pursesUiBuilder = cardUiBuilder.item().title("Purses")
         for (purse in purses) {

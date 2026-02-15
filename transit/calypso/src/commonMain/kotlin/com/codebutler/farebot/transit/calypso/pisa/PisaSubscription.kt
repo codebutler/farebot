@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.pisa
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
@@ -33,7 +32,6 @@ import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
 internal class PisaSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val counter: Int?,
 ) : En1545Subscription() {
     override val lookup get() = PisaLookup
@@ -58,7 +56,6 @@ internal class PisaSubscription(
 
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
             counter: Int?,
         ): PisaSubscription? {
             if (data.all { it == 0xff.toByte() }) {
@@ -70,7 +67,7 @@ internal class PisaSubscription(
             }
 
             val parsed = En1545Parser.parse(data, SUBSCRIPTION_FIELDS)
-            return PisaSubscription(parsed, stringResource, counter)
+            return PisaSubscription(parsed, counter)
         }
     }
 }

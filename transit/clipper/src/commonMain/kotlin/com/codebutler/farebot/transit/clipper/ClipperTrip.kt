@@ -27,6 +27,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -53,14 +54,14 @@ class ClipperTrip(
     override val fare: TransitCurrency
         get() = TransitCurrency.USD(fareValue.toInt())
 
-    override val agencyName: String
+    override val agencyName: FormattedString
         get() = ClipperData.getAgencyName(agency.toInt())
 
-    override val shortAgencyName: String
+    override val shortAgencyName: FormattedString
         get() = ClipperData.getShortAgencyName(agency.toInt())
 
-    override val routeName: String?
-        get() = ClipperData.getRouteName(agency.toInt(), route.toInt())
+    override val routeName: FormattedString?
+        get() = ClipperData.getRouteName(agency.toInt(), route.toInt())?.let { FormattedString(it) }
 
     override val startStation: Station?
         get() = ClipperData.getStation(agency.toInt(), from.toInt(), false)

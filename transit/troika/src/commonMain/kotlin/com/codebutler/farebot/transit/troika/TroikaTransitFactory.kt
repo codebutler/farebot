@@ -24,13 +24,13 @@
 package com.codebutler.farebot.transit.troika
 
 import com.codebutler.farebot.base.util.HashUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.transit.troika.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Troika, Moscow, Russia.
@@ -86,7 +86,7 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
             } ?: throw RuntimeException("No valid Troika sector found")
 
         return TransitIdentity.create(
-            getStringBlocking(Res.string.card_name_troika),
+            FormattedString(Res.string.card_name_troika),
             TroikaBlock.formatSerial(TroikaBlock.getSerial(block)),
         )
     }
@@ -100,8 +100,8 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
     }
 
     companion object {
-        internal val CARD_NAME: String
-            get() = getStringBlocking(Res.string.card_name_troika)
+        internal val CARD_NAME: FormattedString
+            get() = FormattedString(Res.string.card_name_troika)
 
         /**
          * Main sectors to check for Troika header magic.

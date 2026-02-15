@@ -26,7 +26,6 @@ package com.codebutler.farebot.transit.snapper
 
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfo
 import com.codebutler.farebot.transit.TransactionTrip
@@ -37,6 +36,7 @@ import com.codebutler.farebot.transit.Trip
 import farebot.transit.snapper.generated.resources.Res
 import farebot.transit.snapper.generated.resources.snapper_card_name
 import kotlinx.datetime.TimeZone
+import com.codebutler.farebot.base.util.FormattedString
 
 class SnapperTransitInfo internal constructor(
     private val mBalance: Int,
@@ -58,7 +58,7 @@ class SnapperTransitInfo internal constructor(
                 null
             }
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = getCardName()
 
     override val info: List<ListItemInterface>?
@@ -70,7 +70,7 @@ class SnapperTransitInfo internal constructor(
     companion object {
         private val TZ = TimeZone.of("Pacific/Auckland")
 
-        fun getCardName(): String = getStringBlocking(Res.string.snapper_card_name)
+        fun getCardName(): FormattedString = FormattedString(Res.string.snapper_card_name)
 
         fun create(card: KSX6924Application): SnapperTransitInfo {
             val purseInfo = card.purseInfo

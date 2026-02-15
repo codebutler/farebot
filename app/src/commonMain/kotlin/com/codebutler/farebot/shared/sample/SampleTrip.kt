@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.shared.sample
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -34,11 +35,11 @@ class SampleTrip(
 
     override val endTimestamp: Instant get() = Instant.fromEpochSeconds(epochSeconds)
 
-    override val routeName: String get() = "Route Name"
+    override val routeName: FormattedString? get() = FormattedString("Route Name")
 
-    override val agencyName: String get() = "Agency"
+    override val agencyName: FormattedString? get() = FormattedString("Agency")
 
-    override val shortAgencyName: String get() = "Agency"
+    override val shortAgencyName: FormattedString? get() = FormattedString("Agency")
 
     override val fare: TransitCurrency get() = TransitCurrency.USD(420)
 

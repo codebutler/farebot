@@ -34,6 +34,7 @@ import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.base.util.FormattedString
 import kotlin.time.Instant
 
 /**
@@ -62,7 +63,7 @@ data class EasyCardTopUp(
 
     override val mode: Mode get() = Mode.TICKET_MACHINE
 
-    override val routeName: String? get() = null
+    override val routeName: FormattedString? get() = null
 
     override val humanReadableRouteID: String? get() = null
 

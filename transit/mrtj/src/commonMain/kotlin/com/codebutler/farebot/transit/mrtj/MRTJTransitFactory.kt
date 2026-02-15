@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.mrtj
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FelicaCard
 import com.codebutler.farebot.transit.CardInfo
@@ -30,6 +29,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.mrtj.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
     override val allCards: List<CardInfo>
@@ -57,7 +57,7 @@ class MRTJTransitFactory : TransitFactory<FelicaCard, MRTJTransitInfo> {
     override fun check(card: FelicaCard): Boolean = card.getSystem(SYSTEMCODE_MRTJ) != null
 
     override fun parseIdentity(card: FelicaCard): TransitIdentity =
-        TransitIdentity.create(getStringBlocking(Res.string.mrtj_longname), "")
+        TransitIdentity.create(FormattedString(Res.string.mrtj_longname), "")
 
     override fun parseInfo(card: FelicaCard): MRTJTransitInfo {
         val serviceBalance = card.getSystem(SYSTEMCODE_MRTJ)?.getService(SERVICE_MRTJ_BALANCE)

@@ -23,7 +23,6 @@
 package com.codebutler.farebot.transit.yvrcompass
 
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
@@ -35,6 +34,7 @@ import com.codebutler.farebot.transit.nextfareul.NextfareUltralightTransitData
 import com.codebutler.farebot.transit.nextfareul.NextfareUltralightTransitDataCapsule
 import farebot.transit.yvr_compass.generated.resources.*
 import kotlinx.datetime.TimeZone
+import com.codebutler.farebot.base.util.FormattedString
 
 // Based on reference at http://www.lenrek.net/experiments/compass-tickets/.
 class CompassUltralightTransitInfo(
@@ -43,14 +43,14 @@ class CompassUltralightTransitInfo(
     override val timeZone: TimeZone
         get() = TZ
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.compass_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.compass_card_name)
 
     override fun makeCurrency(value: Int) = TransitCurrency.CAD(value)
 
-    override fun getProductName(productCode: Int): String? =
+    override fun getProductName(productCode: Int): FormattedString? =
         PRODUCT_CODES[productCode]?.let {
-            getStringBlocking(it)
+            FormattedString(it)
         }
 
     companion object {
@@ -95,7 +95,7 @@ class CompassUltralightTransitInfo(
 
                 override fun parseIdentity(card: UltralightCard): TransitIdentity =
                     TransitIdentity(
-                        getStringBlocking(Res.string.compass_card_name),
+                        FormattedString(Res.string.compass_card_name),
                         formatSerial(getSerial(card)),
                     )
             }

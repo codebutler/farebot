@@ -36,13 +36,14 @@ import farebot.app.generated.resources.station_from
 import farebot.app.generated.resources.station_to
 import farebot.app.generated.resources.trip_map
 import farebot.app.generated.resources.unknown_station
+import com.codebutler.farebot.base.util.FormattedString
 import org.jetbrains.compose.resources.stringResource
 
 data class TripMapUiState(
     val startStation: Station? = null,
     val endStation: Station? = null,
-    val routeName: String? = null,
-    val agencyName: String? = null,
+    val routeName: FormattedString? = null,
+    val agencyName: FormattedString? = null,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,16 +52,18 @@ fun TripMapScreen(
     uiState: TripMapUiState,
     onBack: () -> Unit,
 ) {
-    val startName = uiState.startStation?.shortStationNameRaw ?: uiState.startStation?.stationName
-    val endName = uiState.endStation?.shortStationNameRaw ?: uiState.endStation?.stationName
+    val startName = uiState.startStation?.shortStationNameRaw ?: uiState.startStation?.stationName?.resolve()
+    val endName = uiState.endStation?.shortStationNameRaw ?: uiState.endStation?.stationName?.resolve()
+    val resolvedRouteName = uiState.routeName?.resolve()
+    val resolvedAgencyName = uiState.agencyName?.resolve()
     val title =
         if (startName != null && endName != null) {
             "$startName \u2192 $endName"
         } else {
-            uiState.routeName ?: stringResource(Res.string.trip_map)
+            resolvedRouteName ?: stringResource(Res.string.trip_map)
         }
     val subtitle =
-        listOfNotNull(uiState.agencyName, uiState.routeName)
+        listOfNotNull(resolvedAgencyName, resolvedRouteName)
             .joinToString(" ")
             .takeIf { it.isNotBlank() }
 
@@ -181,7 +184,7 @@ private fun StationCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = station.stationName ?: stringResource(Res.string.unknown_station),
+                text = station.stationName?.resolve() ?: stringResource(Res.string.unknown_station),
                 style = MaterialTheme.typography.titleMedium,
             )
             val lineName = station.lineNames.firstOrNull()

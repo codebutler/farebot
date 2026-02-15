@@ -30,7 +30,6 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicBlock
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -41,6 +40,7 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.bilhete.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class BilheteUnicoSPTransitFactory : TransitFactory<ClassicCard, BilheteUnicoSPTransitInfo> {
     override val allCards: List<CardInfo>
@@ -128,7 +128,7 @@ class BilheteUnicoSPTransitFactory : TransitFactory<ClassicCard, BilheteUnicoSPT
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
-        TransitIdentity.create(getStringBlocking(Res.string.bilhete_card_name), formatSerial(getSerial(card)))
+        TransitIdentity.create(FormattedString(Res.string.bilhete_card_name), formatSerial(getSerial(card)))
 
     override fun parseInfo(card: ClassicCard): BilheteUnicoSPTransitInfo {
         val creditSector = card.getSector(8) as DataClassicSector

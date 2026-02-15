@@ -23,7 +23,6 @@
 package com.codebutler.farebot.transit.pilet
 
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.CardType
@@ -34,6 +33,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.pilet.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit data type for Tartu bus card.
@@ -94,14 +94,14 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        return TransitIdentity.create(getStringBlocking(Res.string.pilet_tartu_card_name), serial)
+        return TransitIdentity.create(FormattedString(Res.string.pilet_tartu_card_name), serial)
     }
 
     override fun parseInfo(card: ClassicCard): PiletTransitInfo {
         val ndefData = collectNdefData(card, startSector = 1)
         return PiletTransitInfo(
             serial = getSerialFromTlv(ndefData),
-            cardName = getStringBlocking(Res.string.pilet_tartu_card_name),
+            cardName = FormattedString(Res.string.pilet_tartu_card_name),
             berTlvData = ndefData,
         )
     }

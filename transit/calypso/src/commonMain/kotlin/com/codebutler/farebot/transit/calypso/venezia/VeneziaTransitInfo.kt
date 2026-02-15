@@ -24,8 +24,6 @@ package com.codebutler.farebot.transit.calypso.venezia
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.transit.CardInfo
@@ -40,11 +38,12 @@ import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.transit.calypso.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 internal class VeneziaTransitInfo(
     result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = FormattedString(NAME)
 
     private val profileNumber: Int
         get() = result.ticketEnv.getIntOrZero("HolderProfileNumber")
@@ -67,7 +66,7 @@ internal class VeneziaTransitInfo(
             return if (profileValue != null) {
                 listOf(ListItem(Res.string.calypso_profile, profileValue))
             } else {
-                val unknownProfile = getStringBlocking(Res.string.calypso_profile_unknown, profileNumber)
+                val unknownProfile = FormattedString(Res.string.calypso_profile_unknown, profileNumber)
                 listOf(ListItem(Res.string.calypso_profile, unknownProfile))
             }
         }
@@ -77,14 +76,12 @@ internal class VeneziaTransitInfo(
     }
 }
 
-class VeneziaTransitFactory(
-    stringResource: StringResource,
-) : CalypsoTransitFactory(stringResource) {
+class VeneziaTransitFactory : CalypsoTransitFactory() {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override val name: String
-        get() = VeneziaTransitInfo.NAME
+    override val name: FormattedString
+        get() = FormattedString(VeneziaTransitInfo.NAME)
 
     override fun checkTenv(tenv: ByteArray): Boolean {
         val v =
@@ -105,7 +102,7 @@ class VeneziaTransitFactory(
                 ticketEnvFields = ticketEnvFields,
                 contractListFields = null,
                 serial = serial,
-                createSubscription = { data, ctr, _, _ -> VeneziaSubscription.parse(data, stringResource, ctr) },
+                createSubscription = { data, ctr, _, _ -> VeneziaSubscription.parse(data, ctr) },
                 createTrip = { data -> VeneziaTransaction.parse(data) },
                 createSpecialEvent = null,
             )

@@ -26,13 +26,13 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.amiibo.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Nintendo Amiibo NFC tag reader (NTAG215).
@@ -63,7 +63,7 @@ class AmiiboTransitFactory : TransitFactory<UltralightCard, AmiiboTransitInfo> {
     }
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity =
-        TransitIdentity.create(getStringBlocking(Res.string.amiibo_card_name), null)
+        TransitIdentity.create(FormattedString(Res.string.amiibo_card_name), null)
 
     override fun parseInfo(card: UltralightCard): AmiiboTransitInfo =
         AmiiboTransitInfo(
@@ -82,15 +82,15 @@ class AmiiboTransitInfo internal constructor(
     private val modelNumber: Int,
     private val series: Int,
 ) : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.amiibo_card_name)
+    override val cardName: FormattedString = FormattedString(Res.string.amiibo_card_name)
     override val serialNumber: String? = null
 
-    private fun figureTypeName(): String =
+    private fun figureTypeName(): FormattedString =
         when (figureType) {
-            0 -> getStringBlocking(Res.string.amiibo_figure_type_figure)
-            1 -> getStringBlocking(Res.string.amiibo_figure_type_card)
-            2 -> getStringBlocking(Res.string.amiibo_figure_type_yarn)
-            else -> getStringBlocking(Res.string.amiibo_unknown_type, figureType)
+            0 -> FormattedString(Res.string.amiibo_figure_type_figure)
+            1 -> FormattedString(Res.string.amiibo_figure_type_card)
+            2 -> FormattedString(Res.string.amiibo_figure_type_yarn)
+            else -> FormattedString(Res.string.amiibo_unknown_type, figureType)
         }
 
     override val info: List<ListItemInterface>

@@ -23,13 +23,13 @@
 package com.codebutler.farebot.transit.smartrider
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.smartrider.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Reader for SmartRider (Western Australia) and MyWay (Australian Capital Territory / Canberra).
@@ -46,10 +46,9 @@ class SmartRiderTransitInfo(
     private val mTokenExpiryDate: Int,
     private val mAutoloadThreshold: Int,
     private val mAutoloadValue: Int,
-    private val stringResource: StringResource,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = stringResource.getString(mSmartRiderType.friendlyName)
+    override val cardName: FormattedString
+        get() = FormattedString(mSmartRiderType.friendlyName)
 
     override val serialNumber: String?
         get() = serialNumberValue
@@ -62,39 +61,39 @@ class SmartRiderTransitInfo(
                 mIssueDate > 0 && mTokenExpiryDate > 0 ->
                     TransitBalance(
                         balance = aud,
-                        name = tokenType,
+                        formattedName = tokenType,
                         validFrom = convertDate(mIssueDate),
                         validTo = convertDate(mTokenExpiryDate),
                     )
                 mIssueDate > 0 ->
                     TransitBalance(
                         balance = aud,
-                        name = tokenType,
+                        formattedName = tokenType,
                         validFrom = convertDate(mIssueDate),
                     )
                 mTokenExpiryDate > 0 ->
                     TransitBalance(
                         balance = aud,
-                        name = tokenType,
+                        formattedName = tokenType,
                         validTo = convertDate(mTokenExpiryDate),
                     )
-                else -> TransitBalance(balance = aud, name = tokenType)
+                else -> TransitBalance(balance = aud, formattedName = tokenType)
             }
         }
 
-    private val localisedTokenType: String?
+    private val localisedTokenType: FormattedString?
         get() =
             when (mSmartRiderType) {
                 SmartRiderType.SMARTRIDER ->
                     when (mTokenType) {
-                        0x1 -> stringResource.getString(Res.string.smartrider_fare_standard)
-                        0x2 -> stringResource.getString(Res.string.smartrider_fare_student)
-                        0x4 -> stringResource.getString(Res.string.smartrider_fare_tertiary)
-                        0x6 -> stringResource.getString(Res.string.smartrider_fare_senior)
-                        0x7 -> stringResource.getString(Res.string.smartrider_fare_concession)
-                        0xe -> stringResource.getString(Res.string.smartrider_fare_staff)
-                        0xf -> stringResource.getString(Res.string.smartrider_fare_pensioner)
-                        0x10 -> stringResource.getString(Res.string.smartrider_fare_convention)
+                        0x1 -> FormattedString(Res.string.smartrider_fare_standard)
+                        0x2 -> FormattedString(Res.string.smartrider_fare_student)
+                        0x4 -> FormattedString(Res.string.smartrider_fare_tertiary)
+                        0x6 -> FormattedString(Res.string.smartrider_fare_senior)
+                        0x7 -> FormattedString(Res.string.smartrider_fare_concession)
+                        0xe -> FormattedString(Res.string.smartrider_fare_staff)
+                        0xf -> FormattedString(Res.string.smartrider_fare_pensioner)
+                        0x10 -> FormattedString(Res.string.smartrider_fare_convention)
                         else -> null
                     }
                 else -> null
@@ -102,8 +101,8 @@ class SmartRiderTransitInfo(
 
     override val subscriptions: List<Subscription>? = null
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
-        val uiBuilder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
+        val uiBuilder = FareBotUiTree.builder()
         uiBuilder
             .item()
             .title(Res.string.smartrider_ticket_type)

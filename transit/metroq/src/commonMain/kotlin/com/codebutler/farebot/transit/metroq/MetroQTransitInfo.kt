@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit.metroq
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -38,6 +37,7 @@ import farebot.transit.metroq.generated.resources.metroq_fare_card
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import com.codebutler.farebot.base.util.FormattedString
 
 class MetroQTransitInfo(
     private val serial: Long,
@@ -49,15 +49,15 @@ class MetroQTransitInfo(
     override val serialNumber: String
         get() = NumberUtils.zeroPad(serial, 8)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.metroq_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.metroq_card_name)
 
     override val balance: TransitBalance
         get() {
-            val name =
+            val name: String? =
                 when (product) {
-                    501 -> getStringBlocking(Res.string.metroq_fare_card)
-                    401 -> getStringBlocking(Res.string.metroq_day_pass)
+                    501 -> "Fare Card"
+                    401 -> "Day Pass"
                     else -> product.toString()
                 }
             return TransitBalance(

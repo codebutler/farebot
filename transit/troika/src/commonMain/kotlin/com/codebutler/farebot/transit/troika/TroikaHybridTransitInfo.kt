@@ -27,8 +27,6 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -39,6 +37,7 @@ import farebot.transit.troika.generated.resources.Res
 import farebot.transit.troika.generated.resources.card_name_troika_podorozhnik_hybrid
 import farebot.transit.troika.generated.resources.card_name_troika_strelka_hybrid
 import farebot.transit.troika.generated.resources.card_number
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Hybrid cards containing both Troika and Podorozhnik or Strelka.
@@ -83,13 +82,13 @@ class TroikaHybridTransitInfo(
             return items.ifEmpty { null }
         }
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() {
             if (podorozhnik != null) {
-                return getStringBlocking(Res.string.card_name_troika_podorozhnik_hybrid)
+                return FormattedString(Res.string.card_name_troika_podorozhnik_hybrid)
             }
             if (strelka != null) {
-                return getStringBlocking(Res.string.card_name_troika_strelka_hybrid)
+                return FormattedString(Res.string.card_name_troika_strelka_hybrid)
             }
             return troika.cardName
         }
@@ -103,18 +102,18 @@ class TroikaHybridTransitInfo(
     override val subscriptions: List<Subscription>?
         get() = troika.subscriptions
 
-    override val warning: String?
+    override val warning: FormattedString?
         get() = troika.warning
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
         val trees =
             listOfNotNull(
-                troika.getAdvancedUi(stringResource),
-                podorozhnik?.getAdvancedUi(stringResource),
-                strelka?.getAdvancedUi(stringResource),
+                troika.getAdvancedUi(),
+                podorozhnik?.getAdvancedUi(),
+                strelka?.getAdvancedUi(),
             )
         if (trees.isEmpty()) return null
-        val b = FareBotUiTree.builder(stringResource)
+        val b = FareBotUiTree.builder()
         for (tree in trees) {
             for (item in tree.items) {
                 b.item().title(item.title).value(item.value)

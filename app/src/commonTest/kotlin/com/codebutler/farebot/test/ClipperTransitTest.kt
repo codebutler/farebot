@@ -25,6 +25,7 @@
 
 package com.codebutler.farebot.test
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.test.CardTestHelper.desfireApp
 import com.codebutler.farebot.test.CardTestHelper.desfireCard
@@ -233,14 +234,14 @@ class ClipperTransitTest {
 
         // Test TransitIdentity
         val identity = factory.parseIdentity(card)
-        assertEquals("Clipper", identity.name)
+        assertFormattedEquals("Clipper", identity.name)
         assertEquals("572691763", identity.serialNumber)
 
         val info = factory.parseInfo(card)
         assertTrue(info is ClipperTransitInfo, "TransitData must be instance of ClipperTransitInfo")
 
         assertEquals("572691763", info.serialNumber)
-        assertEquals("Clipper", info.cardName)
+        assertFormattedEquals("Clipper", info.cardName)
         assertEquals(TransitCurrency.USD(30583), info.balances?.firstOrNull()?.balance)
         assertNull(info.subscriptions)
 
@@ -252,7 +253,7 @@ class ClipperTransitTest {
 
         // Find the BART trip
         val bartTrip =
-            trips.find { it.agencyName?.contains("BART") == true || it.shortAgencyName == "BART" }
+            trips.find { it.agencyName?.toPlainString()?.contains("BART") == true || it.shortAgencyName?.toPlainString() == "BART" }
                 ?: trips.first()
 
         // BART trip verification
@@ -265,8 +266,8 @@ class ClipperTransitTest {
 
         // Verify station names if MDST is available
         if (bartTrip.startStation != null) {
-            val startStationName = bartTrip.startStation?.stationName ?: ""
-            val endStationName = bartTrip.endStation?.stationName ?: ""
+            val startStationName = bartTrip.startStation?.stationName?.toPlainString() ?: ""
+            val endStationName = bartTrip.endStation?.stationName?.toPlainString() ?: ""
             // These may be resolved names from MDST, or hex placeholders if not available
             assertTrue(startStationName.isNotEmpty(), "Start station should have a name")
             if (startStationName == "Powell Street") {

@@ -22,13 +22,13 @@
 
 package com.codebutler.farebot.transit.otago
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.otago.generated.resources.Res
 import farebot.transit.otago.generated.resources.otago_card_name
+import com.codebutler.farebot.base.util.FormattedString
 
 class OtagoGoCardTransitInfo(
     private val serial: Long,
@@ -39,8 +39,8 @@ class OtagoGoCardTransitInfo(
     override val serialNumber: String
         get() = serial.toString(16)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.otago_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.otago_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.NZD(balanceValue))

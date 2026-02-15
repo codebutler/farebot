@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector
 import com.codebutler.farebot.transit.CardInfo
@@ -34,6 +33,7 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.serialonly.generated.resources.*
 import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Catch-all for MIFARE Classic cards where all sectors are locked/unauthorized.
@@ -55,7 +55,7 @@ class UnauthorizedClassicTransitFactory : TransitFactory<ClassicCard, Unauthoriz
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        val name = getStringBlocking(Res.string.locked_mfc_card)
+        val name = FormattedString(Res.string.locked_mfc_card)
         return TransitIdentity.create(name, null)
     }
 
@@ -71,7 +71,7 @@ class UnauthorizedClassicTransitFactory : TransitFactory<ClassicCard, Unauthoriz
 data class UnauthorizedClassicTransitInfo(
     val isUnlockable: Boolean = false,
 ) : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.locked_mfc_card)
+    override val cardName: FormattedString get() = FormattedString(Res.string.locked_mfc_card)
 
     override val serialNumber: String? = null
 

@@ -24,7 +24,6 @@
 
 package com.codebutler.farebot.transit.edy
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -32,6 +31,7 @@ import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.edy.generated.resources.Res
 import farebot.transit.edy.generated.resources.card_name_edy
+import com.codebutler.farebot.base.util.FormattedString
 
 class EdyTransitInfo(
     override val trips: List<Trip>,
@@ -57,7 +57,7 @@ class EdyTransitInfo(
 
     override val subscriptions: List<Subscription>? = null
 
-    override val cardName: String get() = getStringBlocking(Res.string.card_name_edy)
+    override val cardName: FormattedString get() = FormattedString(Res.string.card_name_edy)
 
     fun getSerialNumberData(): ByteArray = serialNumberData
 

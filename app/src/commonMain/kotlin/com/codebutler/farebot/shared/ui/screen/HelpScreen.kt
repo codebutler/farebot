@@ -60,7 +60,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitRegion
@@ -79,6 +78,7 @@ import farebot.app.generated.resources.view_sample
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.codebutler.farebot.base.util.FormattedString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,17 +124,13 @@ fun ExploreContent(
         }
 
     // Pre-resolve card names and locations for search
-    val cardNames =
-        remember(displayedCards) {
-            displayedCards.associate { card ->
-                card.nameRes.key to getStringBlocking(card.nameRes)
-            }
+    val cardNames: Map<String, String> =
+        displayedCards.associate { card ->
+            card.nameRes.key to FormattedString(card.nameRes).resolve()
         }
-    val cardLocations =
-        remember(displayedCards) {
-            displayedCards.associate { card ->
-                card.nameRes.key to getStringBlocking(card.locationRes)
-            }
+    val cardLocations: Map<String, String> =
+        displayedCards.associate { card ->
+            card.nameRes.key to FormattedString(card.locationRes).resolve()
         }
 
     val regionComparator =
@@ -212,7 +208,7 @@ fun ExploreContent(
         }
     val visibleMarkers =
         remember(mapMarkers, displayedCardNames) {
-            mapMarkers.filter { it.name in displayedCardNames }
+            mapMarkers.filter { it.name.toPlainString() in displayedCardNames }
         }
 
     // Compute focus markers for the current visible region
@@ -221,7 +217,7 @@ fun ExploreContent(
             val region = currentRegion ?: return@remember visibleMarkers
             val regionCards = groupedCards[region] ?: return@remember visibleMarkers
             val regionCardNames = regionCards.mapNotNull { cardNames[it.nameRes.key] }.toSet()
-            val filtered = visibleMarkers.filter { it.name in regionCardNames }
+            val filtered = visibleMarkers.filter { it.name.toPlainString() in regionCardNames }
             filtered.ifEmpty { visibleMarkers }
         }
 

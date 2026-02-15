@@ -26,6 +26,7 @@ package com.codebutler.farebot.card.iso7816
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.ui.ListItemRecursive
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.base.util.getHexString
@@ -115,7 +116,7 @@ enum class TagContents : TagContentsInterface {
             if (data.size < 8) {
                 data.hex()
             } else {
-                subList(data).map { "${it.text1.orEmpty()}: ${it.text2.orEmpty()}" }.joinToString(", ")
+                subList(data).map { "${it.text1?.toPlainString().orEmpty()}: ${it.text2?.toPlainString().orEmpty()}" }.joinToString(", ")
             }
 
         override fun interpretTag(
@@ -125,7 +126,7 @@ enum class TagContents : TagContentsInterface {
             if (data.size < 8) {
                 return ListItem(name, data.getHexString(0, data.size))
             }
-            return ListItemRecursive(name, null, subList(data))
+            return ListItemRecursive(FormattedString(name), null, subList(data))
         }
     },
     CONTENTS_DATE {

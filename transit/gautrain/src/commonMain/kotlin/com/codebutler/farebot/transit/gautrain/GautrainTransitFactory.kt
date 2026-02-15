@@ -22,12 +22,9 @@
 
 package com.codebutler.farebot.transit.gautrain
 
-import com.codebutler.farebot.base.util.DefaultStringResource
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -37,6 +34,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.gautrain.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit factory for Gautrain (Gauteng, South Africa).
@@ -45,7 +43,6 @@ import farebot.transit.gautrain.generated.resources.*
  * with EN1545 field encoding for transactions and subscriptions.
  */
 class GautrainTransitFactory(
-    private val stringResource: StringResource = DefaultStringResource(),
 ) : TransitFactory<ClassicCard, GautrainTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -60,7 +57,7 @@ class GautrainTransitFactory(
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(
-            getStringBlocking(Res.string.gautrain_card_name),
+            FormattedString(Res.string.gautrain_card_name),
             GautrainTransitInfo.formatSerial(getSerial(card)),
         )
 
@@ -94,7 +91,7 @@ class GautrainTransitFactory(
                 val subscriptionAddress = index.subscriptionIndex[subscriptionIndexId - 1]
                 val subSector = card.getSector(32 + subscriptionAddress / 5) as DataClassicSector
                 val subData = subSector.readBlocks(subscriptionAddress % 5 * 3, 3)
-                GautrainSubscription.parse(subData, stringResource, type1, used)
+                GautrainSubscription.parse(subData, type1, used)
             }
 
         // Parse balance blocks from sector 39 blocks 9-10

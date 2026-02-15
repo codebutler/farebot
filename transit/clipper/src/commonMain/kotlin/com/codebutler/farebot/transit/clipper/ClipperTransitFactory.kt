@@ -27,7 +27,6 @@
 package com.codebutler.farebot.transit.clipper
 
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
@@ -38,6 +37,7 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.clipper.generated.resources.*
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
     companion object {
@@ -71,7 +71,7 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
             val file =
                 card.getApplication(0x9011f2)!!.getFile(0x08) as? StandardDesfireFile
                     ?: throw RuntimeException("Clipper file 0x08 is not readable")
-            val cardName = getStringBlocking(Res.string.transit_clipper_card_name)
+            val cardName = FormattedString(Res.string.transit_clipper_card_name)
             return TransitIdentity.create(cardName, ByteUtils.byteArrayToLong(file.data, 1, 4).toString())
         } catch (ex: Exception) {
             throw RuntimeException("Error parsing Clipper serial", ex)

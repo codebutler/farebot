@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.tampere
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -40,6 +39,7 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class TampereTransitInfo(
     override val serialNumber: String?,
@@ -50,7 +50,7 @@ class TampereTransitInfo(
     private val mHolderBirthDate: Int?,
     private val mIssueDate: Int?,
 ) : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.tampere_card_name)
+    override val cardName: FormattedString = FormattedString(Res.string.tampere_card_name)
 
     override val balance: TransitBalance?
         get() = mBalance?.let { TransitBalance(balance = TransitCurrency.EUR(it)) }

@@ -26,7 +26,6 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -39,6 +38,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
     override val allCards: List<CardInfo>
@@ -57,7 +57,7 @@ class KazanTransitFactory : TransitFactory<ClassicCard, KazanTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(
-            getStringBlocking(Res.string.card_name_kazan),
+            FormattedString(Res.string.card_name_kazan),
             NumberUtils.zeroPad(getSerial(card), 10),
         )
 

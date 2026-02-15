@@ -26,7 +26,6 @@ package com.codebutler.farebot.card.ksx6924
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.base.util.convertBCDtoLong
@@ -133,11 +132,10 @@ data class KSX6924PurseInfo(
             ListItem(Res.string.ksx6924_discount_type, resolver.resolveDisRate(disRate)),
         )
 
-    fun getAdvancedInfo(
-        stringResource: StringResource,
+    suspend fun getAdvancedInfo(
         resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver,
     ): FareBotUiTree {
-        val b = FareBotUiTree.builder(stringResource)
+        val b = FareBotUiTree.builder()
         b.item().title(Res.string.ksx6924_crypto_algorithm).value(resolver.resolveCryptoAlgo(alg))
         b.item().title(Res.string.ksx6924_encryption_key_version).value(vk.hexString)
         b.item().title(Res.string.ksx6924_auth_id).value(idtr.hexString)

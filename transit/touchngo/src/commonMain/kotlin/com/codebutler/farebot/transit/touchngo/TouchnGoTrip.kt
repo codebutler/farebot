@@ -27,6 +27,7 @@ package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.mdst.TransportType
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.isASCII
@@ -75,11 +76,12 @@ internal class TouchnGoTrip(
     override val endStation: Station
         get() = endStationCode.resolve()
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() {
             val operatorId = agencyRaw.byteArrayToInt()
             val mdstName = MdstStationLookup.getOperatorName(TNG_STR, operatorId)
-            return mdstName ?: if (agencyRaw.isASCII()) agencyRaw.readASCII() else agencyRaw.hex()
+            val name = mdstName ?: if (agencyRaw.isASCII()) agencyRaw.readASCII() else agencyRaw.hex()
+            return FormattedString(name)
         }
 
     companion object {

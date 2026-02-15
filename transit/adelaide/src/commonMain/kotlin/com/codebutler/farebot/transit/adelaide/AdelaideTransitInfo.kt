@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit.adelaide
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
@@ -35,6 +34,7 @@ import farebot.transit.adelaide.generated.resources.issue_date
 import farebot.transit.adelaide.generated.resources.machine_id
 import farebot.transit.adelaide.generated.resources.purse_serial_number
 import farebot.transit.adelaide.generated.resources.ticket_type
+import com.codebutler.farebot.base.util.FormattedString
 
 class AdelaideTransitInfo(
     override val trips: List<Trip>,
@@ -45,8 +45,8 @@ class AdelaideTransitInfo(
     override val serialNumber: String
         get() = formatSerial(serial)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_adelaide)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_adelaide)
 
     override val info: List<ListItemInterface>?
         get() {

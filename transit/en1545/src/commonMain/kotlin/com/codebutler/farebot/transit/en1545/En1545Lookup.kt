@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.en1545
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -55,7 +55,7 @@ interface En1545Lookup {
     fun getAgencyName(
         agency: Int?,
         isShort: Boolean,
-    ): String?
+    ): FormattedString?
 
     fun getStation(
         station: Int,
@@ -64,10 +64,9 @@ interface En1545Lookup {
     ): Station?
 
     fun getSubscriptionName(
-        stringResource: StringResource,
         agency: Int?,
         contractTariff: Int?,
-    ): String?
+    ): FormattedString?
 
     fun parseCurrency(price: Int): TransitCurrency
 

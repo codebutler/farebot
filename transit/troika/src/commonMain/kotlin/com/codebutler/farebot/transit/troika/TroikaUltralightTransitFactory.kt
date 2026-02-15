@@ -29,7 +29,6 @@ import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
@@ -50,8 +49,9 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
-private const val NAME = "Troika"
+private val NAME = FormattedString(Res.string.card_name_troika)
 private val MOSCOW = TimeZone.of("Europe/Moscow")
 
 private val TROIKA_EPOCH_1992 = LocalDate(1992, 1, 1).atStartOfDayIn(MOSCOW)
@@ -97,7 +97,7 @@ class TroikaUltralightTransitFactory : TransitFactory<UltralightCard, TroikaUltr
 class TroikaUltralightTransitInfo internal constructor(
     private val block: TroikaBlock,
 ) : TransitInfo() {
-    override val cardName: String get() = NAME
+    override val cardName: FormattedString get() = NAME
     override val serialNumber: String get() = block.serialNumber
     override val trips: List<Trip> get() = block.trips
     override val subscriptions: List<Subscription>? get() = listOfNotNull(block.subscription)
@@ -179,7 +179,7 @@ abstract class TroikaBlock(
     protected val validityEnd: Instant?,
     private val remainingTrips: Int?,
     protected val transfers: List<Int>,
-    private val fareDesc: String?,
+    private val fareDesc: FormattedString?,
     private val checkSum: String?,
 ) {
     val serialNumber: String get() = formatSerial(serial)
@@ -283,7 +283,7 @@ abstract class TroikaBlock(
         validityEnd: Instant? = null,
         remainingTrips: Int? = null,
         transfers: List<Int> = listOf(),
-        fareDesc: String? = null,
+        fareDesc: FormattedString? = null,
         checkSum: String? = null,
     ) : this(
         serial = getSerial(rawData),
@@ -315,22 +315,22 @@ abstract class TroikaBlock(
 
         fun getHeader(ticketType: Int) =
             when (ticketType) {
-                0x5d3d, 0x5d3e, 0x5d48, 0x2135 -> getStringBlocking(Res.string.troika_empty_ticket_holder)
-                0x183d, 0x2129 -> getStringBlocking(Res.string.troika_druzhinnik_card)
+                0x5d3d, 0x5d3e, 0x5d48, 0x2135 -> FormattedString(Res.string.troika_empty_ticket_holder)
+                0x183d, 0x2129 -> FormattedString(Res.string.troika_druzhinnik_card)
                 0x5d9a -> troikaRides(1)
                 0x5d9b -> troikaRides(1)
                 0x5d9c -> troikaRides(2)
                 0x5da0 -> troikaRides(20)
-                0x5db1 -> getStringBlocking(Res.string.troika_purse)
+                0x5db1 -> FormattedString(Res.string.troika_purse)
                 0x5dd3 -> troikaRides(60)
-                else -> getStringBlocking(Res.string.troika_unknown_ticket, ticketType.toString(16))
+                else -> FormattedString(Res.string.troika_unknown_ticket, ticketType.toString(16))
             }
 
         private fun troikaRides(rides: Int) =
             if (rides == 1) {
-                getStringBlocking(Res.string.troika_rides_one, rides)
+                FormattedString(Res.string.troika_rides_one, rides)
             } else {
-                getStringBlocking(Res.string.troika_rides_other, rides)
+                FormattedString(Res.string.troika_rides_other, rides)
             }
 
         fun check(rawData: ByteArray): Boolean = rawData.getBitsFromBuffer(0, 10) in listOf(0x117, 0x108, 0x106)
@@ -485,8 +485,8 @@ private class TroikaPurseE3(
         lastTransportLongCode = rawData.getBitsFromBuffer(180, 8),
         fareDesc =
             when (rawData.getBitsFromBuffer(210, 2)) {
-                1 -> getStringBlocking(Res.string.troika_fare_single)
-                2 -> getStringBlocking(Res.string.troika_fare_90mins)
+                1 -> FormattedString(Res.string.troika_fare_single)
+                2 -> FormattedString(Res.string.troika_fare_90mins)
                 else -> null
             },
         // 12 bits zero
@@ -501,7 +501,7 @@ private class TroikaPurseE3(
         get() =
             TransitBalance(
                 balance = TransitCurrency.RUB(purseBalance),
-                name = NAME,
+                formattedName = NAME,
                 validTo = expiryDate,
             )
 
@@ -545,7 +545,7 @@ private class TroikaPurseE5(
         get() =
             TransitBalance(
                 balance = TransitCurrency.RUB(purseBalance),
-                name = NAME,
+                formattedName = NAME,
                 validTo = expiryDate,
             )
 
@@ -591,10 +591,10 @@ private class TroikaSubscription(
     override val validTo: Instant?
         get() = validityEnd ?: expiryDate
 
-    override val subscriptionName: String
+    override val subscriptionName: FormattedString
         get() = TroikaBlock.getHeader(ticketType)
 
-    override val agencyName: String get() = NAME
+    override val agencyName: FormattedString get() = NAME
 }
 
 // --- TroikaTrip ---
@@ -604,7 +604,7 @@ private class TroikaTrip(
     private val transportType: TroikaTransportType?,
     private val validator: Int?,
     private val rawTransport: String?,
-    private val fareDescription: String? = null,
+    private val fareDescription: FormattedString? = null,
 ) : Trip() {
     companion object {
         private const val TROIKA_STR = "troika"
@@ -633,7 +633,7 @@ private class TroikaTrip(
     override val fare: TransitCurrency?
         get() = null
 
-    override val fareString: String? get() = fareDescription
+    override val fareString: FormattedString? get() = fareDescription
 
     override val mode: Mode
         get() =
@@ -646,15 +646,15 @@ private class TroikaTrip(
                 TroikaTransportType.MCC -> Mode.TRAIN
             }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when (transportType) {
-                TroikaTransportType.UNKNOWN -> getStringBlocking(Res.string.unknown)
-                null, TroikaTransportType.NONE -> rawTransport
-                TroikaTransportType.SUBWAY -> getStringBlocking(Res.string.moscow_metro)
-                TroikaTransportType.MONORAIL -> getStringBlocking(Res.string.moscow_monorail)
-                TroikaTransportType.GROUND -> getStringBlocking(Res.string.moscow_ground_transport)
-                TroikaTransportType.MCC -> getStringBlocking(Res.string.moscow_mcc)
+                TroikaTransportType.UNKNOWN -> FormattedString(Res.string.unknown)
+                null, TroikaTransportType.NONE -> rawTransport?.let { FormattedString(it) }
+                TroikaTransportType.SUBWAY -> FormattedString(Res.string.moscow_metro)
+                TroikaTransportType.MONORAIL -> FormattedString(Res.string.moscow_monorail)
+                TroikaTransportType.GROUND -> FormattedString(Res.string.moscow_ground_transport)
+                TroikaTransportType.MCC -> FormattedString(Res.string.moscow_mcc)
             }
 }
 

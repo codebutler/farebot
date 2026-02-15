@@ -24,26 +24,26 @@
 package com.codebutler.farebot.transit.calypso.intercode
 
 import com.codebutler.farebot.base.mdst.MdstStationTableReader
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.transit.calypso.generated.resources.*
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
+import com.codebutler.farebot.base.util.FormattedString
 
 private const val NAVIGO_STR = "navigo"
 
 internal object IntercodeLookupNavigo : IntercodeLookupSTR(NAVIGO_STR) {
-    override fun cardName(env: () -> En1545Parsed): String =
+    override fun cardName(env: () -> En1545Parsed): FormattedString =
         if (env().getIntOrZero(En1545TransitData.HOLDER_CARD_TYPE) == 1) {
-            NAVIGO_DECOUVERTE_NAME
+            FormattedString(NAVIGO_DECOUVERTE_NAME)
         } else {
-            NAVIGO_NAME
+            FormattedString(NAVIGO_NAME)
         }
 
-    override val allCardNames: List<String>
-        get() = listOf(NAVIGO_NAME)
+    override val allCardNames: List<FormattedString>
+        get() = listOf(FormattedString(NAVIGO_NAME))
 
     override fun getStation(
         station: Int,
@@ -69,7 +69,7 @@ internal object IntercodeLookupNavigo : IntercodeLookupSTR(NAVIGO_STR) {
                 if (SECTOR_NAMES[sectorId] != null) {
                     "${SECTOR_NAMES[sectorId]} #$stationId"
                 } else {
-                    getStringBlocking(Res.string.navigo_sector_station, sectorId, stationId)
+                    "Sector $sectorId #$stationId"
                 }
             humanReadableId = "$sectorId/$stationId"
         }

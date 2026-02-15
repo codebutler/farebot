@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit.calypso.ravkav
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
@@ -47,7 +47,7 @@ import farebot.transit.calypso.generated.resources.*
 internal class RavKavTransitInfo(
     result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = FormattedString(NAME)
 
     override val info: List<ListItemInterface>
         get() {
@@ -82,14 +82,12 @@ internal class RavKavTransitInfo(
     }
 }
 
-class RavKavTransitFactory(
-    stringResource: StringResource,
-) : CalypsoTransitFactory(stringResource) {
+class RavKavTransitFactory : CalypsoTransitFactory() {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override val name: String
-        get() = RavKavTransitInfo.NAME
+    override val name: FormattedString
+        get() = FormattedString(RavKavTransitInfo.NAME)
 
     override fun checkTenv(tenv: ByteArray): Boolean {
         val networkId = tenv.getBitsFromBuffer(3, 20)
@@ -117,7 +115,6 @@ class RavKavTransitFactory(
                 createSubscription = { data, ctr, _, _ ->
                     RavKavSubscription(
                         parsed = En1545Parser.parse(data, RavKavSubscription.FIELDS),
-                        stringResource = stringResource,
                         counter = ctr,
                     )
                 },

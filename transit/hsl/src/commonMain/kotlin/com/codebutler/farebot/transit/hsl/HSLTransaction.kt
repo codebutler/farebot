@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.hsl
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
@@ -34,6 +33,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import farebot.transit.hsl.generated.resources.*
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class HSLTransaction internal constructor(
     override val parsed: En1545Parsed,
@@ -53,7 +53,7 @@ class HSLTransaction internal constructor(
     private val expireTimestamp: Instant?
         get() = parsed.getTimeStamp(TRANSFER_END, lookup.timeZone)
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() {
             if (isArvo != true) {
                 return null
@@ -64,12 +64,12 @@ class HSLTransaction internal constructor(
                 if (start != null &&
                     end != null
                 ) {
-                    getStringBlocking(Res.string.hsl_mins_format, ((end - start) / 60000L).toString())
+                    FormattedString(Res.string.hsl_mins_format, ((end - start) / 60000L).toString())
                 } else {
                     null
                 }
-            val type = getStringBlocking(Res.string.hsl_balance_ticket_label)
-            return if (mins != null) "$type, $mins" else type
+            val type = FormattedString(Res.string.hsl_balance_ticket_label)
+            return if (mins != null) type + FormattedString(", ") + mins else type
         }
 
     override val lookup: En1545Lookup

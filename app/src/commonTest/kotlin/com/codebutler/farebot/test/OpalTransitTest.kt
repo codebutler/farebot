@@ -40,8 +40,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Instant
 
 class OpalTransitTest {
-    private val stringResource = TestStringResource()
-    private val factory = OpalTransitFactory(stringResource)
+    private val factory = OpalTransitFactory()
 
     private fun createOpalCard(fileData: ByteArray) =
         desfireCard(
@@ -94,7 +93,7 @@ class OpalTransitTest {
 
         val card = createOpalCard(data)
         val identity = factory.parseIdentity(card)
-        assertEquals("Opal", identity.name)
+        assertFormattedEquals("Opal", identity.name)
     }
 
     @Test
@@ -122,7 +121,6 @@ class OpalTransitTest {
                 minute = 0,
                 day = 0,
                 lastTransactionNumber = 0,
-                stringResource = stringResource,
             )
         val balanceStr = info.formatBalanceString()
         // Should contain AUD formatting, not USD
@@ -145,7 +143,7 @@ class OpalTransitTest {
         // Test TransitIdentity
         val identity = factory.parseIdentity(card)
         assertNotNull(identity)
-        assertEquals(OpalTransitInfo.NAME, identity.name)
+        assertFormattedEquals(OpalTransitInfo.NAME, identity.name)
         assertEquals("3085 2200 1234 5670", identity.serialNumber)
 
         // Test TransitInfo

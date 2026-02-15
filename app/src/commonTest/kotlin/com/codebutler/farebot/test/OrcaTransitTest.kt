@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.test
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.test.CardTestHelper.desfireApp
 import com.codebutler.farebot.test.CardTestHelper.desfireCard
 import com.codebutler.farebot.test.CardTestHelper.hexToBytes
@@ -44,8 +45,7 @@ import kotlin.test.assertTrue
  * Ported from Metrodroid's OrcaTest.kt.
  */
 class OrcaTransitTest {
-    private val stringResource = TestStringResource()
-    private val factory = OrcaTransitFactory(stringResource)
+    private val factory = OrcaTransitFactory()
 
     private fun assertNear(
         expected: Double,
@@ -88,14 +88,14 @@ class OrcaTransitTest {
 
         // Test TransitIdentity
         val identity = factory.parseIdentity(card)
-        assertEquals("ORCA", identity.name)
+        assertFormattedEquals("ORCA", identity.name)
         assertEquals("12030625", identity.serialNumber)
 
         // Test TransitInfo
         val info = factory.parseInfo(card)
         assertTrue(info is OrcaTransitInfo, "TransitData must be instance of OrcaTransitInfo")
         assertEquals("12030625", info.serialNumber)
-        assertEquals("ORCA", info.cardName)
+        assertFormattedEquals("ORCA", info.cardName)
         assertEquals(TransitCurrency.USD(23432), info.balances?.firstOrNull()?.balance)
         assertNull(info.subscriptions)
 
@@ -104,8 +104,8 @@ class OrcaTransitTest {
         assertTrue(trips.size >= 5, "Should have at least 5 trips, got ${trips.size}")
 
         // Trip 0: Community Transit bus
-        assertEquals("Community Transit", trips[0].agencyName)
-        assertEquals("CT", trips[0].shortAgencyName)
+        assertFormattedEquals("Community Transit", trips[0].agencyName)
+        assertFormattedEquals("CT", trips[0].shortAgencyName)
         assertEquals((1514843334L + 256), trips[0].startTimestamp?.epochSeconds)
         assertEquals(TransitCurrency.USD(534), trips[0].fare)
         assertNull(trips[0].routeName)
@@ -115,7 +115,7 @@ class OrcaTransitTest {
         assertEquals("30246", trips[0].vehicleID)
 
         // Trip 1: Unknown agency bus (agency 0xf)
-        assertContains(trips[1].agencyName ?: "", "Unknown")
+        assertContains(trips[1].agencyName?.toPlainString() ?: "", "Unknown")
         assertEquals((1514843334L), trips[1].startTimestamp?.epochSeconds)
         assertEquals(TransitCurrency.USD(289), trips[1].fare)
         assertNull(trips[1].routeName)
@@ -125,19 +125,19 @@ class OrcaTransitTest {
         assertEquals("30262", trips[1].vehicleID)
 
         // Trip 2: Sound Transit Link Light Rail
-        assertEquals("Sound Transit", trips[2].agencyName)
-        assertEquals("ST", trips[2].shortAgencyName)
+        assertFormattedEquals("Sound Transit", trips[2].agencyName)
+        assertFormattedEquals("ST", trips[2].shortAgencyName)
         assertEquals((1514843334L - 256), trips[2].startTimestamp?.epochSeconds)
         assertEquals(TransitCurrency.USD(179), trips[2].fare)
         assertEquals(Trip.Mode.METRO, trips[2].mode)
         assertNotNull(trips[2].startStation)
         // Station name and route name depend on MDST being available
-        val trip2StationName = trips[2].startStation?.stationName
+        val trip2StationName = trips[2].startStation?.stationName?.toPlainString()
         if (trip2StationName == "Stadium") {
             // MDST is available with full station data
             assertEquals("Stadium", trip2StationName)
             // Route name comes from MDST line name or falls back to string resource
-            val trip2RouteName = trips[2].routeName
+            val trip2RouteName = trips[2].routeName?.toPlainString()
             assertTrue(
                 trip2RouteName == "Link 1 Line" || trip2RouteName == "Link Light Rail",
                 "Route name should be 'Link 1 Line' (from MDST) or 'Link Light Rail' (fallback), got: $trip2RouteName",
@@ -148,20 +148,20 @@ class OrcaTransitTest {
             assertNear(-122.327354, trips[2].startStation!!.longitude!!.toDouble(), 0.00001)
         } else {
             // MDST not available or station not found, should have fallback route name
-            val trip2RouteName = trips[2].routeName
+            val trip2RouteName = trips[2].routeName?.toPlainString()
             assertEquals("Link Light Rail", trip2RouteName)
         }
         assertNull(trips[2].endStation)
 
         // Trip 3: Sound Transit Sounder
-        assertEquals("Sound Transit", trips[3].agencyName)
-        assertEquals("ST", trips[3].shortAgencyName)
+        assertFormattedEquals("Sound Transit", trips[3].agencyName)
+        assertFormattedEquals("ST", trips[3].shortAgencyName)
         assertEquals((1514843334L - 512), trips[3].startTimestamp?.epochSeconds)
         assertEquals(TransitCurrency.USD(178), trips[3].fare)
         assertEquals(Trip.Mode.TRAIN, trips[3].mode)
         assertNotNull(trips[3].startStation)
         // Station name and route name depend on MDST being available
-        val trip3StationName = trips[3].startStation?.stationName
+        val trip3StationName = trips[3].startStation?.stationName?.toPlainString()
         if (trip3StationName == "King Street" || trip3StationName == "King St") {
             // MDST is available with full station data
             assertTrue(
@@ -169,7 +169,7 @@ class OrcaTransitTest {
                 "Station name should be 'King Street' or 'King St', got: $trip3StationName",
             )
             // Route name comes from MDST line name or falls back to string resource
-            val trip3RouteName = trips[3].routeName
+            val trip3RouteName = trips[3].routeName?.toPlainString()
             assertTrue(
                 trip3RouteName == "Sounder N Line" || trip3RouteName == "Sounder Train",
                 "Route name should be 'Sounder N Line' (from MDST) or 'Sounder Train' (fallback), got: $trip3RouteName",
@@ -180,21 +180,21 @@ class OrcaTransitTest {
             assertNear(-122.330161, trips[3].startStation!!.longitude!!.toDouble(), 0.00001)
         } else {
             // MDST not available or station not found, should have fallback route name
-            val trip3RouteName = trips[3].routeName
+            val trip3RouteName = trips[3].routeName?.toPlainString()
             assertEquals("Sounder Train", trip3RouteName)
         }
         assertNull(trips[3].endStation)
 
         // Trip 4: Washington State Ferries
-        assertEquals("Washington State Ferries", trips[4].agencyName)
-        assertEquals("WSF", trips[4].shortAgencyName)
+        assertFormattedEquals("Washington State Ferries", trips[4].agencyName)
+        assertFormattedEquals("WSF", trips[4].shortAgencyName)
         assertEquals((1514843334L - 768), trips[4].startTimestamp?.epochSeconds)
         assertEquals(TransitCurrency.USD(177), trips[4].fare)
         assertNull(trips[4].routeName) // WSF doesn't have route names
         assertEquals(Trip.Mode.FERRY, trips[4].mode)
         assertNotNull(trips[4].startStation)
         // Station name depends on MDST being available
-        val trip4StationName = trips[4].startStation?.stationName
+        val trip4StationName = trips[4].startStation?.stationName?.toPlainString()
         if (trip4StationName == "Seattle Terminal" || trip4StationName == "Seattle") {
             // MDST is available with full station data
             assertTrue(

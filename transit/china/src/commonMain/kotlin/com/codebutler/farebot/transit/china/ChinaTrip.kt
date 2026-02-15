@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.china
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.transit.TransitCurrency
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Trip
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -81,8 +82,8 @@ abstract class ChinaTripAbstract : Trip() {
         get() = if (isTopup) Mode.TICKET_MACHINE else Mode.OTHER
 
     // Should be overridden if anything is known about transports
-    override val routeName: String?
-        get() = humanReadableRouteID
+    override val routeName: FormattedString?
+        get() = humanReadableRouteID?.let { FormattedString(it) }
 
     override val humanReadableRouteID: String?
         get() = mStation.toString(16) + "/" + mType

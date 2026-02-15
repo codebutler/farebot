@@ -26,7 +26,6 @@ package com.codebutler.farebot.transit.podorozhnik
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.card.CardType
@@ -38,9 +37,9 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.podorozhnik.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class PodorozhnikTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, PodorozhnikTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -55,7 +54,7 @@ class PodorozhnikTransitFactory(
         val block0Data = sector0?.getBlock(0)?.data
         val serial = if (block0Data != null) getSerial(block0Data) else null
         return TransitIdentity(
-            stringResource.getString(Res.string.podorozhnik_card_name),
+            FormattedString(Res.string.podorozhnik_card_name),
             serial,
         )
     }
@@ -79,7 +78,6 @@ class PodorozhnikTransitFactory(
                     mFare = sector4Data.lastTopup,
                     mAgency = sector4Data.lastTopupAgency,
                     mTopupMachine = sector4Data.lastTopupMachine,
-                    stringResource = stringResource,
                 ),
             )
         }
@@ -90,7 +88,6 @@ class PodorozhnikTransitFactory(
                     mFare = sector5Data.lastFare,
                     mLastTransport = sector5Data.lastTransport,
                     mLastValidator = sector5Data.lastValidator,
-                    stringResource = stringResource,
                 ),
             )
         }
@@ -104,7 +101,6 @@ class PodorozhnikTransitFactory(
             tripList = trips,
             groundCounter = sector5Data?.groundCounter,
             subwayCounter = sector5Data?.subwayCounter,
-            stringResource = stringResource,
         )
     }
 

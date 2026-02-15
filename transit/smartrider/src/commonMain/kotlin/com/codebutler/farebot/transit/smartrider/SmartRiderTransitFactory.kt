@@ -23,7 +23,6 @@
 package com.codebutler.farebot.transit.smartrider
 
 import com.codebutler.farebot.base.util.HashUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getHexString
 import com.codebutler.farebot.card.CardType
@@ -35,6 +34,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.smartrider.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit factory for SmartRider (Perth, Western Australia) and MyWay (Canberra, ACT).
@@ -46,7 +46,6 @@ import farebot.transit.smartrider.generated.resources.*
  * https://github.com/micolous/metrodroid/wiki/MyWay
  */
 class SmartRiderTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, SmartRiderTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -134,7 +133,7 @@ class SmartRiderTransitFactory(
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val type = detectKeyType(card)
-        return TransitIdentity.create(stringResource.getString(type.friendlyName), getSerialData(card))
+        return TransitIdentity.create(FormattedString(type.friendlyName), getSerialData(card))
     }
 
     override fun parseInfo(card: ClassicCard): SmartRiderTransitInfo {
@@ -153,8 +152,8 @@ class SmartRiderTransitFactory(
         val tokenType = config[24].toInt()
 
         // Balance records from sectors 2 and 3
-        val balanceA = SmartRiderBalanceRecord(cardType, card.getSector(2) as DataClassicSector, stringResource)
-        val balanceB = SmartRiderBalanceRecord(cardType, card.getSector(3) as DataClassicSector, stringResource)
+        val balanceA = SmartRiderBalanceRecord(cardType, card.getSector(2) as DataClassicSector)
+        val balanceB = SmartRiderBalanceRecord(cardType, card.getSector(3) as DataClassicSector)
         val sortedBalances = listOf(balanceA, balanceB).sortedByDescending { it.transactionNumber }
         val balance = sortedBalances[0].balance
 
@@ -166,7 +165,7 @@ class SmartRiderTransitFactory(
                     if (sector !is DataClassicSector) return@flatMap emptyList()
                     (0..2).map { b -> sector.getBlock(b).data }
                 }.map { blockData ->
-                    SmartRiderTagRecord.parse(cardType, blockData, stringResource)
+                    SmartRiderTagRecord.parse(cardType, blockData)
                 }.filter { it.isValid }
                 .map { record ->
                     // Check the Balances for a recent transaction with more data.
@@ -195,7 +194,6 @@ class SmartRiderTransitFactory(
             mTokenExpiryDate = tokenExpiryDate,
             mAutoloadThreshold = autoloadThreshold,
             mAutoloadValue = autoloadValue,
-            stringResource = stringResource,
         )
     }
 }

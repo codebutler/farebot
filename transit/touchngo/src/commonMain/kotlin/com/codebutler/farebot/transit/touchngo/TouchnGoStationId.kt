@@ -27,10 +27,10 @@ package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import farebot.transit.touchngo.generated.resources.Res
 import farebot.transit.touchngo.generated.resources.touchngo_machine
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Represents a station identifier on a Touch 'n Go card, consisting of
@@ -59,7 +59,7 @@ internal data class TouchnGoStationId(
             } else {
                 Station.unknown(station.toString())
             }
-        val machineAttr = getStringBlocking(Res.string.touchngo_machine, machine)
+        val machineAttr = FormattedString(Res.string.touchngo_machine, machine)
         return baseStation.addAttribute(machineAttr)
     }
 

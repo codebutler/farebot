@@ -23,7 +23,6 @@
 package com.codebutler.farebot.transit.oyster
 
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -33,6 +32,7 @@ import com.codebutler.farebot.transit.TransitCurrency
 import farebot.transit.oyster.generated.resources.Res
 import farebot.transit.oyster.generated.resources.oyster_travelpass
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class OysterTravelPass(
     override val validFrom: Instant,
@@ -40,8 +40,8 @@ class OysterTravelPass(
     override val cost: TransitCurrency,
 ) : Subscription() {
     // TODO: Figure this out properly.
-    override val subscriptionName: String
-        get() = getStringBlocking(Res.string.oyster_travelpass)
+    override val subscriptionName: FormattedString
+        get() = FormattedString(Res.string.oyster_travelpass)
 
     companion object {
         internal fun parseAll(card: ClassicCard): List<OysterTravelPass> {

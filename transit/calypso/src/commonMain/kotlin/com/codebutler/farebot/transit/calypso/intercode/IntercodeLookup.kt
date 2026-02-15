@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
@@ -34,10 +35,10 @@ interface IntercodeLookup : En1545Lookup {
      * additional info and so in most cases we can avoid completely parsing the ticketing
      * environment just to get the card name.
      */
-    fun cardName(env: () -> En1545Parsed): String?
+    fun cardName(env: () -> En1545Parsed): FormattedString?
 
     /** All known card names for this lookup. */
-    val allCardNames: List<String>
+    val allCardNames: List<FormattedString>
 
     override val timeZone: TimeZone
         get() = TimeZone.of("Europe/Paris")
@@ -46,10 +47,10 @@ interface IntercodeLookup : En1545Lookup {
 }
 
 interface IntercodeLookupSingle : IntercodeLookup {
-    val cardName: String?
+    val cardName: FormattedString?
 
-    override fun cardName(env: () -> En1545Parsed): String? = cardName
+    override fun cardName(env: () -> En1545Parsed): FormattedString? = cardName
 
-    override val allCardNames: List<String>
+    override val allCardNames: List<FormattedString>
         get() = listOfNotNull(cardName)
 }

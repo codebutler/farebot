@@ -35,6 +35,7 @@ import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.bip.generated.resources.*
 import kotlin.experimental.and
 
@@ -59,7 +60,7 @@ class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        return TransitIdentity.create(NAME, formatSerial(serial))
+        return TransitIdentity.create(FormattedString(NAME), formatSerial(serial))
     }
 
     override fun parseInfo(card: ClassicCard): BipTransitInfo {

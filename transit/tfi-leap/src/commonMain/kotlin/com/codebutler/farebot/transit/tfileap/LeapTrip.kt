@@ -25,6 +25,7 @@ import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.mdst.TransportType
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.isAllZero
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
@@ -69,10 +70,10 @@ class LeapTrip internal constructor(
     override val mode: Mode
         get() = mMode ?: guessMode(mAgency)
 
-    override val agencyName: String?
-        get() = MdstStationLookup.getOperatorName(LEAP_STR, mAgency)
+    override val agencyName: FormattedString?
+        get() = MdstStationLookup.getOperatorName(LEAP_STR, mAgency)?.let { FormattedString(it) }
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() = agencyName
 
     override fun compareTo(other: LeapTrip): Int {

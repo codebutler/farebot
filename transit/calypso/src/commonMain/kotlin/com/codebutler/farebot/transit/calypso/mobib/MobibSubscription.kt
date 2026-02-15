@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.mobib
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
@@ -36,7 +35,6 @@ import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 internal class MobibSubscription private constructor(
     override val parsed: En1545Parsed,
     override val lookup: En1545Lookup,
-    override val stringResource: StringResource,
     private val counter: Int?,
 ) : En1545Subscription() {
     private val counterUse: Int? = contractTariff?.shr(10)?.and(7)
@@ -52,7 +50,6 @@ internal class MobibSubscription private constructor(
 
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
             counter: Int?,
         ): MobibSubscription? {
             if (data.all { it == 0.toByte() }) return null
@@ -92,7 +89,7 @@ internal class MobibSubscription private constructor(
                 }
 
             val parsed = En1545Parser.parse(data, fields)
-            return MobibSubscription(parsed, MobibLookup, stringResource, counter)
+            return MobibSubscription(parsed, MobibLookup, counter)
         }
     }
 }

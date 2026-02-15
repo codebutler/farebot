@@ -26,7 +26,6 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
@@ -36,6 +35,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class BonobusTrip(
     private val mTimestamp: Long,
@@ -64,8 +64,8 @@ class BonobusTrip(
     override val vehicleID: String?
         get() = if (mVehicleNumber == 0) null else NumberUtils.zeroPad(mVehicleNumber, 4)
 
-    override val routeName: String?
-        get() = if (mMode == MODE_BUS) (mLine - 10).toString() else null
+    override val routeName: FormattedString?
+        get() = if (mMode == MODE_BUS) FormattedString((mLine - 10).toString()) else null
 
     override val startStation: Station?
         get() {
@@ -86,8 +86,8 @@ class BonobusTrip(
             }
         }
 
-    override val agencyName: String?
-        get() = if (mMode == MODE_BUS) getStringBlocking(Res.string.bonobus_agency_tranvia) else null
+    override val agencyName: FormattedString?
+        get() = if (mMode == MODE_BUS) FormattedString(Res.string.bonobus_agency_tranvia) else null
 
     companion object {
         fun parse(raw: ByteArray): BonobusTrip? {

@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.generated.resources.Res
 import farebot.transit.generated.resources.unknown_station
 import farebot.transit.generated.resources.unknown_station_format
@@ -41,26 +41,33 @@ data class Station(
     val isUnknown: Boolean = false,
     val humanReadableLineIds: List<String> = emptyList(),
     val attributes: List<String> = emptyList(),
+    @kotlinx.serialization.Transient
+    val formattedStationName: FormattedString? = null,
+    @kotlinx.serialization.Transient
+    val formattedAttributes: List<FormattedString> = emptyList(),
 ) {
-    fun getStationName(showRawIds: Boolean = false): String? {
+    fun getStationName(showRawIds: Boolean = false): FormattedString? {
+        if (formattedStationName != null) return formattedStationName
         if (isUnknown) {
-            val id =
-                humanReadableId
-                    ?: return getStringBlocking(Res.string.unknown_station)
-            return getStringBlocking(Res.string.unknown_station_format, id)
+            val id = humanReadableId
+                ?: return FormattedString(Res.string.unknown_station)
+            return FormattedString(Res.string.unknown_station_format, id)
         }
         val base = shortStationNameRaw ?: stationNameRaw
         if (showRawIds && humanReadableId != null && base != null) {
-            return "$base [$humanReadableId]"
+            return FormattedString("$base [$humanReadableId]")
         }
-        return base
+        return base?.let { FormattedString(it) }
     }
 
-    val stationName: String? get() = getStationName()
+    val stationName: FormattedString? get() = getStationName()
 
     fun hasLocation(): Boolean = latitude != null && longitude != null
 
     fun addAttribute(attr: String): Station = copy(attributes = attributes + attr)
+
+    fun addAttribute(attr: FormattedString): Station =
+        copy(formattedAttributes = formattedAttributes + attr)
 
     companion object {
         fun unknown(id: String): Station =
@@ -72,6 +79,11 @@ data class Station(
         fun nameOnly(name: String): Station =
             Station(
                 stationNameRaw = name,
+            )
+
+        fun nameOnly(name: FormattedString): Station =
+            Station(
+                formattedStationName = name,
             )
 
         // Backwards-compatible factory methods

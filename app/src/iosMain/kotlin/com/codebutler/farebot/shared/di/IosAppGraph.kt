@@ -1,8 +1,6 @@
 package com.codebutler.farebot.shared.di
 
 import com.codebutler.farebot.base.util.BundledDatabaseDriverFactory
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
@@ -44,10 +42,6 @@ abstract class IosAppGraph : AppGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideAppPreferences(): AppPreferences = IosAppPreferences()
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideStringResource(): StringResource = DefaultStringResource()
 
     @Provides
     @SingleIn(AppScope::class)

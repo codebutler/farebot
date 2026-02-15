@@ -26,7 +26,6 @@ import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.CardType
@@ -43,6 +42,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit factory for Waikato-region cards (BUSIT / SmartRide Rotorua, New Zealand).
@@ -139,7 +139,7 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
             return sector1.getBlock(0).data.byteArrayToLong(4, 4)
         }
 
-        private fun getName(card: ClassicCard): String {
+        private fun getName(card: ClassicCard): FormattedString {
             val sector0 = card.getSector(0) as DataClassicSector
             val header =
                 sector0
@@ -148,9 +148,9 @@ class WaikatoCardTransitFactory : TransitFactory<ClassicCard, WaikatoCardTransit
                     .copyOfRange(0, 5)
                     .readASCII()
             return if (header == "Panda") {
-                getStringBlocking(Res.string.waikato_card_name_busit)
+                FormattedString(Res.string.waikato_card_name_busit)
             } else {
-                getStringBlocking(Res.string.waikato_card_name_rotorua)
+                FormattedString(Res.string.waikato_card_name_rotorua)
             }
         }
 

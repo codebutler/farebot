@@ -26,7 +26,6 @@ import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -35,6 +34,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.charlie.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * CharlieCard, Boston, USA (MBTA).
@@ -107,8 +107,8 @@ class CharlieCardTransitFactory : TransitFactory<ClassicCard, CharlieCardTransit
                 credits = listOf("Metrodroid Project", "Vladimir Serbinenko"),
             )
 
-        internal val NAME: String
-            get() = getStringBlocking(Res.string.charlie_card_name)
+        internal val NAME: FormattedString
+            get() = FormattedString(Res.string.charlie_card_name)
 
         internal fun getPrice(
             data: ByteArray,

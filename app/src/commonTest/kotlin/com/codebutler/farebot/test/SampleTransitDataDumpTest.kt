@@ -24,7 +24,7 @@ package com.codebutler.farebot.test
 
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.DefaultStringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -44,7 +44,7 @@ class SampleTransitDataDumpTest {
 
     private val serializer = KotlinxCardSerializer(json)
     private val importer = CardImporter.create(serializer, json)
-    private val registry: TransitFactoryRegistry = createTransitFactoryRegistry(DefaultStringResource())
+    private val registry: TransitFactoryRegistry = createTransitFactoryRegistry()
 
     data class SampleCard(
         val name: String,
@@ -148,7 +148,7 @@ class SampleTransitDataDumpTest {
         val card = rawCard.parse()
         val identity = registry.parseTransitIdentity(card)
         val info = registry.parseTransitInfo(card)
-        val cardName = identity?.name ?: sample.name
+        val cardName = identity?.name?.toPlainString() ?: sample.name
 
         return buildString {
             appendLine("  - name: \"$cardName\"")
@@ -208,12 +208,12 @@ class SampleTransitDataDumpTest {
 
             // Empty state
             if (info.emptyStateMessage != null) {
-                appendLine("    emptyState: \"${yamlEscape(info.emptyStateMessage!!)}\"")
+                appendLine("    emptyState: \"${yamlEscape(info.emptyStateMessage!!.toPlainString())}\"")
             }
 
             // Warning
             if (info.warning != null) {
-                appendLine("    warning: \"${yamlEscape(info.warning!!)}\"")
+                appendLine("    warning: \"${yamlEscape(info.warning!!.toPlainString())}\"")
             }
         }.trimEnd()
     }
@@ -225,11 +225,11 @@ class SampleTransitDataDumpTest {
         val ts = trip.startTimestamp ?: trip.endTimestamp
         sb.appendLine("      - timestamp: ${if (ts != null) "\"$ts\"" else "null"}")
         sb.appendLine("        mode: ${trip.mode}")
-        sb.appendLine("        agency: ${yamlValue(trip.shortAgencyName)}")
-        sb.appendLine("        route: ${yamlValue(trip.routeName)}")
-        sb.appendLine("        startStation: ${yamlValue(trip.startStation?.stationName)}")
-        sb.appendLine("        endStation: ${yamlValue(trip.endStation?.stationName)}")
-        val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString
+        sb.appendLine("        agency: ${yamlValue(trip.shortAgencyName?.toPlainString())}")
+        sb.appendLine("        route: ${yamlValue(trip.routeName?.toPlainString())}")
+        sb.appendLine("        startStation: ${yamlValue(trip.startStation?.stationName?.toPlainString())}")
+        sb.appendLine("        endStation: ${yamlValue(trip.endStation?.stationName?.toPlainString())}")
+        val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString?.toPlainString()
         sb.appendLine("        fare: ${yamlValue(fareStr)}")
         if (trip.isTransfer) sb.appendLine("        transfer: true")
         if (trip.isRejected) sb.appendLine("        rejected: true")
@@ -239,15 +239,15 @@ class SampleTransitDataDumpTest {
         sub: Subscription,
         sb: StringBuilder,
     ) {
-        sb.appendLine("      - name: ${yamlValue(sub.subscriptionName)}")
-        sb.appendLine("        agency: ${yamlValue(sub.agencyName)}")
-        sb.appendLine("        validity: ${yamlValue(sub.formatValidity())}")
+        sb.appendLine("      - name: ${yamlValue(sub.subscriptionName?.toPlainString())}")
+        sb.appendLine("        agency: ${yamlValue(sub.agencyName?.toPlainString())}")
+        sb.appendLine("        validity: ${yamlValue(sub.formatValidity()?.toPlainString())}")
         if (sub.subscriptionState != Subscription.SubscriptionState.UNKNOWN) {
             sb.appendLine("        state: ${sub.subscriptionState}")
         }
         val remaining = sub.formatRemainingTrips()
         if (remaining != null) {
-            sb.appendLine("        remaining: \"${yamlEscape(remaining)}\"")
+            sb.appendLine("        remaining: \"${yamlEscape(remaining.toPlainString())}\"")
         }
     }
 
@@ -256,10 +256,10 @@ class SampleTransitDataDumpTest {
         sb: StringBuilder,
     ) {
         if (item is HeaderListItem) {
-            sb.appendLine("      - header: ${yamlValue(item.text1)}")
+            sb.appendLine("      - header: ${yamlValue(item.text1?.toPlainString())}")
         } else {
-            sb.appendLine("      - label: ${yamlValue(item.text1)}")
-            sb.appendLine("        value: ${yamlValue(item.text2)}")
+            sb.appendLine("      - label: ${yamlValue(item.text1?.toPlainString())}")
+            sb.appendLine("        value: ${yamlValue(item.text2?.toPlainString())}")
         }
     }
 

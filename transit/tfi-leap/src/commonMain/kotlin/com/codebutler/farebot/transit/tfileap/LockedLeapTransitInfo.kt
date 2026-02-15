@@ -23,7 +23,6 @@ package com.codebutler.farebot.transit.tfileap
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -32,13 +31,14 @@ import farebot.transit.tfi_leap.generated.resources.Res
 import farebot.transit.tfi_leap.generated.resources.transit_leap_card_name
 import farebot.transit.tfi_leap.generated.resources.transit_leap_locked_warning
 import farebot.transit.tfi_leap.generated.resources.transit_leap_warning
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit data for a Leap card that could not be unlocked / read.
  */
 class LockedLeapTransitInfo : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.transit_leap_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.transit_leap_card_name)
 
     override val serialNumber: String? = null
 

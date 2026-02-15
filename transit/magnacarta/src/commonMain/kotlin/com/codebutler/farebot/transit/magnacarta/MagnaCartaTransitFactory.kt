@@ -23,7 +23,6 @@
 package com.codebutler.farebot.transit.magnacarta
 
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
 import com.codebutler.farebot.transit.CardInfo
@@ -31,6 +30,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import farebot.transit.magnacarta.generated.resources.Res
 import farebot.transit.magnacarta.generated.resources.magnacarta_card_name
+import com.codebutler.farebot.base.util.FormattedString
 
 class MagnaCartaTransitFactory : TransitFactory<DesfireCard, MagnaCartaTransitInfo> {
     override val allCards: List<CardInfo> = emptyList()
@@ -38,7 +38,7 @@ class MagnaCartaTransitFactory : TransitFactory<DesfireCard, MagnaCartaTransitIn
     override fun check(card: DesfireCard): Boolean = card.getApplication(MagnaCartaTransitInfo.APP_ID_BALANCE) != null
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity =
-        TransitIdentity.create(getStringBlocking(Res.string.magnacarta_card_name), null)
+        TransitIdentity.create(FormattedString(Res.string.magnacarta_card_name), null)
 
     override fun parseInfo(card: DesfireCard): MagnaCartaTransitInfo {
         val file2 =

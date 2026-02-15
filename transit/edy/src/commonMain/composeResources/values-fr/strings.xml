@@ -2,4 +2,6 @@
   <string name="edy_transaction_sequence">#</string>
   <string name="felica_process_charge">Frais</string>
   <string name="felica_process_merchandise_purchase">Marchandise</string>
+  <string name="edy_agency_charge_seq">Frais #%1$s</string>
+  <string name="edy_agency_purchase_seq">Marchandise #%1$s</string>
 </resources>

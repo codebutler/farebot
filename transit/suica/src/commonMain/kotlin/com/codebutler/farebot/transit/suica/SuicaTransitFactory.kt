@@ -35,7 +35,6 @@
 package com.codebutler.farebot.transit.suica
 
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.card.CardType
@@ -47,9 +46,9 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.suica.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class SuicaTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<FelicaCard, SuicaTransitInfo> {
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
@@ -83,7 +82,7 @@ class SuicaTransitFactory(
                     -1
                 }
 
-            val trip = SuicaTrip.parse(block, previousBalance, stringResource)
+            val trip = SuicaTrip.parse(block, previousBalance)
 
             if (trip.startTimestamp == null) {
                 continue
@@ -174,17 +173,17 @@ class SuicaTransitFactory(
         )
     }
 
-    private fun detectCardName(card: FelicaCard): String {
+    private fun detectCardName(card: FelicaCard): FormattedString {
         val system =
             card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA)
-                ?: return stringResource.getString(Res.string.card_name_suica)
+                ?: return FormattedString(Res.string.card_name_suica)
         // Use allServiceCodes (includes services without readable data) for card type detection.
         // Fall back to services list for backward compatibility with old serialized cards.
         val serviceCodes =
             system.allServiceCodes.ifEmpty {
                 system.services.map { it.serviceCode }.toSet()
             }
-        return SuicaUtil.getCardName(stringResource, serviceCodes)
+        return SuicaUtil.getCardName(serviceCodes)
     }
 
     companion object {

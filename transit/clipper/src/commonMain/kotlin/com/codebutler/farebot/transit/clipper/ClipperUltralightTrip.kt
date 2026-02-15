@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 import kotlin.time.Instant
@@ -57,10 +58,10 @@ class ClipperUltralightTrip(
     override val startStation: Station?
         get() = ClipperData.getStation(agency, station, false)
 
-    override val agencyName: String
+    override val agencyName: FormattedString
         get() = ClipperData.getAgencyName(agency)
 
-    override val shortAgencyName: String
+    override val shortAgencyName: FormattedString
         get() = ClipperData.getShortAgencyName(agency)
 
     override val mode: Mode get() = ClipperData.getMode(agency)

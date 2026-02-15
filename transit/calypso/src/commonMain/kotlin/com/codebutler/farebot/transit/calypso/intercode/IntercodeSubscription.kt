@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
@@ -31,7 +30,6 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 internal class IntercodeSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val ctr: Int?,
     private val networkId: Int,
 ) : En1545Subscription() {
@@ -77,13 +75,11 @@ internal class IntercodeSubscription(
             type: Int,
             networkId: Int,
             ctr: Int?,
-            stringResource: StringResource,
         ): IntercodeSubscription {
             val parsed = En1545Parser.parse(data, IntercodeFields.getSubscriptionFields(type))
             val nid = parsed.getInt(CONTRACT_NETWORK_ID)
             return IntercodeSubscription(
                 parsed = parsed,
-                stringResource = stringResource,
                 ctr = ctr,
                 networkId =
                     nid ?: networkId,

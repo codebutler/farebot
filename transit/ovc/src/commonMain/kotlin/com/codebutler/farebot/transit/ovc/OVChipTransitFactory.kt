@@ -24,8 +24,8 @@
 
 package com.codebutler.farebot.transit.ovc
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
 import com.codebutler.farebot.card.CardType
@@ -45,7 +45,6 @@ import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.transit.ovc.generated.resources.*
 
 class OVChipTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, OVChipTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -115,7 +114,6 @@ class OVChipTransitFactory(
             banbits = mBanbits,
             trips = trips,
             subscriptions = subscriptions,
-            stringResource = stringResource,
         )
     }
 
@@ -194,12 +192,12 @@ class OVChipTransitFactory(
                     (card.getSector(32 + subscriptionAddress / 5) as DataClassicSector)
                         .readBlocks(subscriptionAddress % 5 * 3, 3)
 
-                OVChipSubscription.parse(subData, type1, used, stringResource)
+                OVChipSubscription.parse(subData, type1, used)
             }.sortedWith { s1, s2 -> (s1.id ?: 0).compareTo(s2.id ?: 0) }
     }
 
     companion object {
-        private const val NAME = "OV-chipkaart"
+        private val NAME = FormattedString("OV-chipkaart")
 
         private val CARD_INFO =
             CardInfo(

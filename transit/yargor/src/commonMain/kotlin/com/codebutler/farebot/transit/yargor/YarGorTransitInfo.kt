@@ -22,7 +22,6 @@
 package com.codebutler.farebot.transit.yargor
 
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.Subscription
@@ -31,6 +30,7 @@ import com.codebutler.farebot.transit.Trip
 import farebot.transit.yargor.generated.resources.Res
 import farebot.transit.yargor.generated.resources.yargor_card_name
 import kotlinx.datetime.TimeZone
+import com.codebutler.farebot.base.util.FormattedString
 
 class YarGorTransitInfo(
     private val mSerial: Long,
@@ -40,8 +40,8 @@ class YarGorTransitInfo(
     override val serialNumber: String
         get() = formatSerial(mSerial)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.yargor_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.yargor_card_name)
 
     override val trips: List<Trip>
         get() = listOfNotNull(mLastTrip)

@@ -23,7 +23,6 @@ package com.codebutler.farebot.transit.kiev
 
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -34,6 +33,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class KievTrip(
     override val startTimestamp: Instant?,
@@ -51,11 +51,11 @@ class KievTrip(
     override val mode: Mode
         get() = if (mTransactionType == "84/04/40/53") Mode.METRO else Mode.OTHER
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when {
-                mTransactionType == "84/04/40/53" -> getStringBlocking(Res.string.kiev_agency_metro)
-                mTransactionType != null -> getStringBlocking(Res.string.kiev_agency_unknown, mTransactionType)
+                mTransactionType == "84/04/40/53" -> FormattedString(Res.string.kiev_agency_metro)
+                mTransactionType != null -> FormattedString(Res.string.kiev_agency_unknown, mTransactionType)
                 else -> null
             }
 

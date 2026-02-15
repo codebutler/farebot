@@ -23,8 +23,6 @@
 
 package com.codebutler.farebot.transit.troika
 
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.transit.CardInfo
@@ -34,6 +32,7 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.podorozhnik.PodorozhnikTransitFactory
 import com.codebutler.farebot.transit.serialonly.StrelkaTransitFactory
 import farebot.transit.troika.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Hybrid factory for Troika cards that may also contain Podorozhnik or Strelka.
@@ -45,13 +44,12 @@ import farebot.transit.troika.generated.resources.*
  * Faithful port of Metrodroid's TroikaHybridTransitData.FACTORY companion object.
  */
 class TroikaHybridTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<ClassicCard, TroikaHybridTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
     private val troikaFactory = TroikaTransitFactory()
-    private val podorozhnikFactory = PodorozhnikTransitFactory(stringResource)
+    private val podorozhnikFactory = PodorozhnikTransitFactory()
     private val strelkaFactory = StrelkaTransitFactory()
 
     override fun check(card: ClassicCard): Boolean = troikaFactory.check(card)
@@ -61,9 +59,9 @@ class TroikaHybridTransitFactory(
         val cardName =
             when {
                 podorozhnikFactory.check(card) ->
-                    getStringBlocking(Res.string.card_name_troika_podorozhnik_hybrid)
+                    FormattedString(Res.string.card_name_troika_podorozhnik_hybrid)
                 strelkaFactory.check(card) ->
-                    getStringBlocking(Res.string.card_name_troika_strelka_hybrid)
+                    FormattedString(Res.string.card_name_troika_strelka_hybrid)
                 else -> TroikaTransitFactory.CARD_NAME
             }
 

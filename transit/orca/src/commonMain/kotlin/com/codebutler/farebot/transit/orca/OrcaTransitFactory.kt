@@ -30,8 +30,6 @@
 package com.codebutler.farebot.transit.orca
 
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.RecordDesfireFile
@@ -43,9 +41,9 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.orca.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class OrcaTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<DesfireCard, OrcaTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -55,7 +53,7 @@ class OrcaTransitFactory(
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         try {
             val data = (card.getApplication(0xffffff)!!.getFile(0x0f) as StandardDesfireFile).data
-            val cardName = getStringBlocking(Res.string.transit_orca_card_name)
+            val cardName = FormattedString(Res.string.transit_orca_card_name)
             return TransitIdentity.create(cardName, ByteUtils.byteArrayToInt(data, 4, 4).toString())
         } catch (ex: Exception) {
             throw RuntimeException("Error parsing ORCA serial", ex)
@@ -95,7 +93,7 @@ class OrcaTransitFactory(
 
         val transactions =
             file.records.map { record ->
-                OrcaTransaction.parse(record.data, isTopup, stringResource)
+                OrcaTransaction.parse(record.data, isTopup)
             }
         return TransactionTrip.merge(transactions)
     }

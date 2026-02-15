@@ -2,4 +2,6 @@
   <string name="edy_transaction_sequence">順序</string>
   <string name="felica_process_charge">チャージ</string>
   <string name="felica_process_merchandise_purchase">物販</string>
+  <string name="edy_agency_charge_seq">チャージ 順序%1$s</string>
+  <string name="edy_agency_purchase_seq">物販 順序%1$s</string>
 </resources>

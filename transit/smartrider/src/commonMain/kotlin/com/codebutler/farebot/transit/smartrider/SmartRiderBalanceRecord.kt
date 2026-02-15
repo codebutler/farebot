@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.smartrider
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.sliceOffLen
@@ -49,7 +48,6 @@ import com.codebutler.farebot.card.classic.DataClassicSector
 class SmartRiderBalanceRecord(
     smartRiderType: SmartRiderType,
     sector: DataClassicSector,
-    stringResource: StringResource,
 ) {
     private val b: ByteArray = sector.readBlocks(0, 3)
     val bitfield = SmartRiderTripBitfield(smartRiderType, b[2].toInt())
@@ -60,13 +58,11 @@ class SmartRiderBalanceRecord(
         SmartRiderTagRecord.parseRecentTransaction(
             smartRiderType,
             b.sliceOffLen(5, 14),
-            stringResource,
         )
     val recentTagOn =
         SmartRiderTagRecord.parseRecentTransaction(
             smartRiderType,
             b.sliceOffLen(19, 14),
-            stringResource,
         )
 
     val totalFarePaid = b.byteArrayToIntReversed(33, 2)

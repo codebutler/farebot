@@ -22,13 +22,12 @@
 
 package com.codebutler.farebot.transit.nextfare
 
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.nextfare.record.NextfareTopupRecord
 import farebot.transit.nextfare.generated.resources.Res
 import farebot.transit.nextfare.generated.resources.nextfare_agency_name
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Represents a refill/top-up on a Nextfare card.
@@ -39,13 +38,13 @@ open class NextfareRefill(
 ) : Refill() {
     override fun getTimestamp(): Long = record.timestamp.epochSeconds
 
-    override fun getAgencyName(stringResource: StringResource): String =
-        getStringBlocking(Res.string.nextfare_agency_name)
+    override fun getAgencyName(): FormattedString =
+        FormattedString(Res.string.nextfare_agency_name)
 
-    override fun getShortAgencyName(stringResource: StringResource): String? = getAgencyName(stringResource)
+    override fun getShortAgencyName(): FormattedString? = getAgencyName()
 
     override fun getAmount(): Long = record.credit.toLong()
 
-    override fun getAmountString(stringResource: StringResource): String =
+    override fun getAmountString(): String =
         currencyFactory(record.credit).formatCurrencyString()
 }

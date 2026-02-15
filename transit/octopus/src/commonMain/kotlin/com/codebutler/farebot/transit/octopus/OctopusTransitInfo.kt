@@ -23,12 +23,11 @@
 package com.codebutler.farebot.transit.octopus
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.octopus.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Reader for Octopus (Hong Kong)
@@ -75,23 +74,23 @@ class OctopusTransitInfo(
             return null
         }
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() =
             if (hasShenzhen) {
                 if (hasOctopus) {
-                    getStringBlocking(Res.string.octopus_dual_card_name)
+                    FormattedString(Res.string.octopus_dual_card_name)
                 } else {
-                    getStringBlocking(Res.string.octopus_szt_card_name)
+                    FormattedString(Res.string.octopus_szt_card_name)
                 }
             } else {
-                getStringBlocking(Res.string.octopus_card_name)
+                FormattedString(Res.string.octopus_card_name)
             }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
         // Dual-mode card, show the CNY balance here.
         val szt = shenzhenBalance
         if (hasOctopus && szt != null) {
-            val uiBuilder = FareBotUiTree.builder(stringResource)
+            val uiBuilder = FareBotUiTree.builder()
             val apbUiBuilder =
                 uiBuilder
                     .item()

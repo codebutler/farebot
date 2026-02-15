@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.util.DateFormatStyle
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.base.util.formatHumanDate
 import com.codebutler.farebot.base.util.formatTime
@@ -36,7 +35,6 @@ import kotlin.time.Instant
 class CardViewModel(
     private val transitFactoryRegistry: TransitFactoryRegistry,
     private val navDataHolder: NavDataHolder,
-    private val stringResource: StringResource,
     private val analytics: Analytics,
     private val cardSerializer: CardSerializer,
     private val cardPersister: CardPersister,
@@ -92,11 +90,12 @@ class CardViewModel(
                     }
 
                 if (transitInfo != null) {
+                    val cardNameResolved = transitInfo.cardName.resolveAsync()
                     if (!isSample) {
                         analytics.logEvent(
                             "view_card",
                             mapOf(
-                                "card_name" to transitInfo.cardName,
+                                "card_name" to cardNameResolved,
                             ),
                         )
                     }
@@ -110,13 +109,13 @@ class CardViewModel(
                     _uiState.value =
                         CardUiState(
                             isLoading = false,
-                            cardName = sampleTitle ?: transitInfo.cardName,
+                            cardName = sampleTitle ?: cardNameResolved,
                             serialNumber = transitInfo.serialNumber,
                             balances = balances,
                             transactions = transactions,
                             infoItems = infoItems,
-                            warning = transitInfo.warning,
-                            emptyStateMessage = transitInfo.emptyStateMessage,
+                            warning = transitInfo.warning?.resolveAsync(),
+                            emptyStateMessage = transitInfo.emptyStateMessage?.resolveAsync(),
                             hasAdvancedData = true,
                             isSample = isSample,
                             scanCount = currentScanIds.size.coerceAtLeast(1),
@@ -138,7 +137,7 @@ class CardViewModel(
                     _uiState.value =
                         CardUiState(
                             isLoading = false,
-                            cardName = sampleTitle ?: unknownInfo.cardName,
+                            cardName = sampleTitle ?: unknownInfo.cardName.resolveAsync(),
                             serialNumber = unknownInfo.serialNumber,
                             balances = createBalanceItems(unknownInfo),
                             hasAdvancedData = true,
@@ -217,33 +216,33 @@ class CardViewModel(
 
     fun getTripKey(tripItem: TransactionItem.TripItem): String? = tripItem.tripKey
 
-    private fun createBalanceItems(transitInfo: TransitInfo): List<BalanceItem> {
+    private suspend fun createBalanceItems(transitInfo: TransitInfo): List<BalanceItem> {
         val balances = transitInfo.balances ?: return emptyList()
         return balances.map { tb ->
             BalanceItem(
-                name = tb.name,
+                name = tb.formattedName?.resolveAsync() ?: tb.name,
                 balance = tb.balance.formatCurrencyString(isBalance = true),
             )
         }
     }
 
-    private fun createInfoItems(transitInfo: TransitInfo): List<InfoItem> {
+    private suspend fun createInfoItems(transitInfo: TransitInfo): List<InfoItem> {
         val items = transitInfo.info ?: return emptyList()
         return items.map { item ->
             InfoItem(
-                title = item.text1,
-                value = item.text2,
+                title = item.text1?.resolveAsync(),
+                value = item.text2?.resolveAsync(),
                 isHeader = item is HeaderListItem,
             )
         }
     }
 
-    private fun createTransactionItems(transitInfo: TransitInfo): List<TransactionItem> {
+    private suspend fun createTransactionItems(transitInfo: TransitInfo): List<TransactionItem> {
         val subscriptions =
             transitInfo.subscriptions?.map { sub ->
                 TransactionItem.SubscriptionItem(
-                    name = sub.subscriptionName,
-                    agency = sub.shortAgencyName,
+                    name = sub.subscriptionName?.resolveAsync(),
+                    agency = sub.shortAgencyName?.resolveAsync(),
                     validRange = formatSubscriptionRange(sub),
                     remainingTrips = sub.remainingTripCount?.let { "$it trips remaining" },
                     state = formatSubscriptionState(sub),
@@ -253,7 +252,7 @@ class CardViewModel(
         val trips =
             transitInfo.trips?.map { trip ->
                 val ts = trip.startTimestamp?.epochSeconds ?: 0L
-                val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString
+                val fareStr = trip.fare?.formatCurrencyString() ?: trip.fareString?.resolveAsync()
 
                 // Ticket machine / vending machine with negative fare = refill/top-up
                 val isRefill =
@@ -262,7 +261,7 @@ class CardViewModel(
 
                 if (isRefill) {
                     TransactionItem.RefillItem(
-                        agency = trip.shortAgencyName,
+                        agency = trip.shortAgencyName?.resolveAsync(),
                         amount = fareStr ?: "",
                         time = formatTimestamp(ts),
                         epochSeconds = ts,
@@ -274,8 +273,8 @@ class CardViewModel(
                     val tripKey = if (hasLocation) navDataHolder.put(trip) else null
                     val stationsStr = buildStationsString(trip)
                     TransactionItem.TripItem(
-                        route = trip.routeName,
-                        agency = trip.shortAgencyName,
+                        route = trip.routeName?.resolveAsync(),
+                        agency = trip.shortAgencyName?.resolveAsync(),
                         fare = fareStr,
                         stations = stationsStr,
                         time = formatTimestamp(ts),
@@ -343,9 +342,9 @@ class CardViewModel(
         }
     }
 
-    private fun buildStationsString(trip: Trip): String? {
-        val start = trip.startStation?.stationName
-        val end = trip.endStation?.stationName
+    private suspend fun buildStationsString(trip: Trip): String? {
+        val start = trip.startStation?.stationName?.resolveAsync()
+        val end = trip.endStation?.stationName?.resolveAsync()
         return when {
             start != null && end != null -> "$start \u2192 $end"
             start != null -> start

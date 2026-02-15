@@ -20,8 +20,8 @@
 package com.codebutler.farebot.transit.opal
 
 import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
@@ -39,7 +39,6 @@ import farebot.transit.opal.generated.resources.*
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/Opal
  */
 class OpalTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<DesfireCard, OpalTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -52,7 +51,7 @@ class OpalTransitFactory(
 
         val lastDigit = ByteUtils.getBitsFromBuffer(data, 4, 4)
         val serialNumber = ByteUtils.getBitsFromBuffer(data, 8, 32)
-        return TransitIdentity.create(OpalTransitInfo.NAME, formatSerialNumber(serialNumber, lastDigit))
+        return TransitIdentity.create(FormattedString(OpalTransitInfo.NAME), formatSerialNumber(serialNumber, lastDigit))
     }
 
     override fun parseInfo(card: DesfireCard): OpalTransitInfo {
@@ -87,7 +86,6 @@ class OpalTransitFactory(
                 minute = minute,
                 day = day,
                 lastTransactionNumber = transactionNumber,
-                stringResource = stringResource,
             )
         } catch (ex: Exception) {
             throw RuntimeException("Error parsing Opal data", ex)

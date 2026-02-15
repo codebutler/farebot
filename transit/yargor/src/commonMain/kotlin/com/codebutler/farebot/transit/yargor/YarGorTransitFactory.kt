@@ -22,7 +22,6 @@
 package com.codebutler.farebot.transit.yargor
 
 import com.codebutler.farebot.base.util.HashUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -31,6 +30,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.yargor.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
     override val allCards: List<CardInfo>
@@ -49,7 +49,7 @@ class YarGorTransitFactory : TransitFactory<ClassicCard, YarGorTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity(
-            getStringBlocking(Res.string.yargor_card_name),
+            FormattedString(Res.string.yargor_card_name),
             YarGorTransitInfo.formatSerial(YarGorTransitInfo.getSerial(card)),
         )
 

@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.bonobus
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -33,11 +32,12 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.bonobus.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 class BonobusTransitFactory : TransitFactory<ClassicCard, BonobusTransitInfo> {
     companion object {
-        val NAME: String
-            get() = getStringBlocking(Res.string.card_name_bonobus)
+        val NAME: FormattedString
+            get() = FormattedString(Res.string.card_name_bonobus)
 
         private val CARD_INFO =
             CardInfo(

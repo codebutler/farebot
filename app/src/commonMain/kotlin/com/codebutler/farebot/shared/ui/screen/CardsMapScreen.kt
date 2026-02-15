@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.codebutler.farebot.base.util.FormattedString
 
 data class CardsMapMarker(
-    val name: String,
-    val location: String,
+    val name: FormattedString,
+    val location: FormattedString,
     val latitude: Double,
     val longitude: Double,
 )

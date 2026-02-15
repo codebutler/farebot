@@ -24,7 +24,6 @@
 package com.codebutler.farebot.card.iso7816
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -52,8 +51,8 @@ data class ISO7816Card(
     fun getApplicationByName(appName: ByteArray): ISO7816Application? =
         applications.firstOrNull { it.appName?.toHexString() == appName.toHexString() }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val cardUiBuilder = FareBotUiTree.builder()
 
         val appsUiBuilder = cardUiBuilder.item().title("Applications")
         for (app in applications) {

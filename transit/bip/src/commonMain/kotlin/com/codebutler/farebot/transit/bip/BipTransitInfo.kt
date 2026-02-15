@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.bip
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -35,6 +34,7 @@ import farebot.transit.bip.generated.resources.bip_card_holders_name
 import farebot.transit.bip.generated.resources.bip_card_type
 import farebot.transit.bip.generated.resources.bip_card_type_anonymous
 import farebot.transit.bip.generated.resources.bip_card_type_personal
+import com.codebutler.farebot.base.util.FormattedString
 
 private const val NAME = "bip!"
 
@@ -48,8 +48,8 @@ class BipTransitInfo(
     override val serialNumber: String
         get() = mSerial.toString()
 
-    override val cardName: String
-        get() = NAME
+    override val cardName: FormattedString
+        get() = FormattedString(NAME)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.CLP(mBalance))
@@ -60,9 +60,9 @@ class BipTransitInfo(
                 ListItem(
                     Res.string.bip_card_type,
                     if (mHolderId == 0) {
-                        getStringBlocking(Res.string.bip_card_type_anonymous)
+                        FormattedString(Res.string.bip_card_type_anonymous)
                     } else {
-                        getStringBlocking(Res.string.bip_card_type_personal)
+                        FormattedString(Res.string.bip_card_type_personal)
                     },
                 ),
                 if (mHolderName != null) {

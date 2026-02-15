@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.FormattedString
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
@@ -36,4 +37,6 @@ data class TransitBalance(
     val name: String? = null,
     val validFrom: Instant? = null,
     val validTo: Instant? = null,
+    @kotlinx.serialization.Transient
+    val formattedName: FormattedString? = null,
 )

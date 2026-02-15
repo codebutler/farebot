@@ -27,7 +27,6 @@ package com.codebutler.farebot.transit.china
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -43,6 +42,7 @@ import farebot.transit.china.generated.resources.card_name_t_union
 import farebot.transit.china.generated.resources.card_name_tunion
 import farebot.transit.china.generated.resources.tunion
 import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Transit info implementation for T-Union (交通联合) cards.
@@ -64,8 +64,8 @@ class TUnionTransitInfo(
     val validityStart: Int?,
     val validityEnd: Int?,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_tunion)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_tunion)
 
     override val balance: TransitBalance
         get() =
@@ -115,7 +115,7 @@ class TUnionTransitInfo(
 
                 override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
                     TransitIdentity(
-                        getStringBlocking(Res.string.card_name_tunion),
+                        FormattedString(Res.string.card_name_tunion),
                         parseSerial(card),
                     )
 

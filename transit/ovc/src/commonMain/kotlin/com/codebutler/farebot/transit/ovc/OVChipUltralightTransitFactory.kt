@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.ovc
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
@@ -42,7 +42,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
 import kotlinx.datetime.TimeZone
 
-private const val NAME = "OV-chipkaart (single-use)"
+private val NAME = FormattedString("OV-chipkaart (single-use)")
 
 /**
  * OV-chipkaart single-use Ultralight cards (Netherlands).
@@ -72,7 +72,7 @@ class OVChipUltralightTransitFactory : TransitFactory<UltralightCard, OVChipUltr
 class OVChipUltralightTransitInfo(
     override val trips: List<Trip> = emptyList(),
 ) : TransitInfo() {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = NAME
     override val serialNumber: String? = null
 }
 
@@ -181,7 +181,7 @@ private object OvcUltralightLookup : En1545Lookup {
     override fun getAgencyName(
         agency: Int?,
         isShort: Boolean,
-    ): String? = null
+    ): FormattedString? = null
 
     override fun getStation(
         station: Int,
@@ -195,10 +195,9 @@ private object OvcUltralightLookup : En1545Lookup {
     }
 
     override fun getSubscriptionName(
-        stringResource: StringResource,
         agency: Int?,
         contractTariff: Int?,
-    ): String? = null
+    ): FormattedString? = null
 
     override fun getMode(
         agency: Int?,

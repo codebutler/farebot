@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.FormattedString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -138,20 +139,15 @@ class TransitSerializationTest {
     }
 
     @Test
-    fun testTransitIdentitySerializationRoundTrip() {
-        val original =
-            TransitIdentity(
-                name = "Clipper",
+    fun testTransitIdentityCreation() {
+        val identity =
+            TransitIdentity.create(
+                name = FormattedString("Clipper"),
                 serialNumber = "572691763",
             )
 
-        val jsonString = json.encodeToString(TransitIdentity.serializer(), original)
-        assertTrue(jsonString.contains("Clipper"))
-        assertTrue(jsonString.contains("572691763"))
-
-        val deserialized = json.decodeFromString(TransitIdentity.serializer(), jsonString)
-        assertEquals(original.name, deserialized.name)
-        assertEquals(original.serialNumber, deserialized.serialNumber)
+        assertEquals("Clipper", identity.name.toPlainString())
+        assertEquals("572691763", identity.serialNumber)
     }
 
     // TODO: Re-enable once Trip.Mode and Subscription.SubscriptionState are @Serializable
@@ -216,7 +212,7 @@ class TransitSerializationTest {
         val jsonString = json.encodeToString(Station.serializer(), original)
         val deserialized = json.decodeFromString(Station.serializer(), jsonString)
 
-        assertEquals("San Jos\u00e9 Diridon", deserialized.stationName)
+        assertEquals("San Jos\u00e9 Diridon", deserialized.stationName?.toPlainString())
     }
 
     @Test
@@ -276,7 +272,7 @@ class TransitSerializationTest {
     @Test
     fun testStationNameOnlyPreservesRawName() {
         val station = Station.nameOnly("Bayfront")
-        assertEquals("Bayfront", station.stationName)
+        assertEquals("Bayfront", station.stationName?.toPlainString())
         assertEquals(false, station.isUnknown)
         assertEquals(null, station.humanReadableId)
     }

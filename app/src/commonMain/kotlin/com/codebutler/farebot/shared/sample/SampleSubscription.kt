@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.shared.sample
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -35,11 +36,11 @@ class SampleSubscription : Subscription() {
 
     override val validTo: Instant get() = LocalDate(2017, 7, 1).atStartOfDayIn(TimeZone.UTC)
 
-    override val agencyName: String get() = "Municipal Robot Railway"
+    override val agencyName: FormattedString? get() = FormattedString("Municipal Robot Railway")
 
-    override val shortAgencyName: String get() = "Muni"
+    override val shortAgencyName: FormattedString? get() = FormattedString("Muni")
 
     override val machineId: Int = 1
 
-    override val subscriptionName: String get() = "Monthly Pass"
+    override val subscriptionName: FormattedString? get() = FormattedString("Monthly Pass")
 }

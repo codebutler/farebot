@@ -22,8 +22,6 @@
 
 package com.codebutler.farebot.transit.rkf
 
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getBitsFromBufferLeBits
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545Field
@@ -35,7 +33,6 @@ class RkfTicket(
     override val parsed: En1545Parsed,
     override val lookup: RkfLookup,
 ) : En1545Subscription() {
-    override val stringResource: StringResource = DefaultStringResource()
 
     companion object {
         fun parse(

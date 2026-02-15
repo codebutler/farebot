@@ -89,7 +89,7 @@ class HistoryViewModel(
                             val card = rawCard.parse()
                             val cardInfo = transitFactoryRegistry.findCardInfo(card)
                             val identity = transitFactoryRegistry.parseTransitIdentity(card)
-                            cardName = identity?.name
+                            cardName = identity?.name?.toPlainString()
                             brandColor = cardInfo?.brandColor
                             keysRequired = cardInfo?.keysRequired ?: false
                             keyBundle = cardInfo?.keyBundle

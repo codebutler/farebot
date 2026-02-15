@@ -24,13 +24,13 @@
 package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.serialonly.generated.resources.Res
 import farebot.transit.serialonly.generated.resources.serial_only_card_description_locked
 import farebot.transit.serialonly.generated.resources.serial_only_card_description_more_research
 import farebot.transit.serialonly.generated.resources.serial_only_card_description_not_stored
+import com.codebutler.farebot.base.util.FormattedString
 
 abstract class SerialOnlyTransitInfo : TransitInfo() {
     protected open val extraInfo: List<ListItemInterface>?
@@ -41,13 +41,13 @@ abstract class SerialOnlyTransitInfo : TransitInfo() {
     final override val info: List<ListItemInterface>?
         get() = extraInfo
 
-    override val emptyStateMessage: String
+    override val emptyStateMessage: FormattedString
         get() =
             when (reason) {
-                Reason.NOT_STORED -> getStringBlocking(Res.string.serial_only_card_description_not_stored)
-                Reason.LOCKED -> getStringBlocking(Res.string.serial_only_card_description_locked)
-                Reason.MORE_RESEARCH_NEEDED -> getStringBlocking(Res.string.serial_only_card_description_more_research)
-                else -> getStringBlocking(Res.string.serial_only_card_description_more_research)
+                Reason.NOT_STORED -> FormattedString(Res.string.serial_only_card_description_not_stored)
+                Reason.LOCKED -> FormattedString(Res.string.serial_only_card_description_locked)
+                Reason.MORE_RESEARCH_NEEDED -> FormattedString(Res.string.serial_only_card_description_more_research)
+                else -> FormattedString(Res.string.serial_only_card_description_more_research)
             }
 
     override val trips: List<Trip>? get() = null

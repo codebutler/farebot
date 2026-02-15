@@ -24,6 +24,7 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.FormattedString
 import kotlin.time.Instant
 
 abstract class Trip {
@@ -43,11 +44,11 @@ abstract class Trip {
      * The default implementation attempts to get the route name based on the start and end
      * stations' line names, finding a common line between them.
      */
-    open val routeName: String?
+    open val routeName: FormattedString?
         get() {
             val startLines = startStation?.lineNames.orEmpty()
             val endLines = endStation?.lineNames.orEmpty()
-            return getRouteName(startLines, endLines)
+            return getRouteName(startLines, endLines)?.let { FormattedString(it) }
         }
 
     /**
@@ -64,7 +65,7 @@ abstract class Trip {
 
     open val fare: TransitCurrency? get() = null
 
-    open val fareString: String? get() = null
+    open val fareString: FormattedString? get() = null
 
     abstract val mode: Mode
 
@@ -72,13 +73,13 @@ abstract class Trip {
      * Full name of the agency for the trip.
      * If this is not known (or there is only one agency for the card), then return null.
      */
-    open val agencyName: String? get() = null
+    open val agencyName: FormattedString? get() = null
 
     /**
      * Short name of the agency for the trip, for use in compact displays.
      * By default, this returns [agencyName].
      */
-    open val shortAgencyName: String? get() = agencyName
+    open val shortAgencyName: FormattedString? get() = agencyName
 
     /**
      * Vehicle number where the event was recorded.
@@ -208,14 +209,16 @@ abstract class Trip {
          *
          * @return null if both start and end stations are unknown.
          */
-        fun formatStationNames(trip: Trip): String? {
-            val startStationName = trip.startStation?.stationName
+        suspend fun formatStationNames(trip: Trip): String? {
+            val startStationName = trip.startStation?.stationName?.resolveAsync()
 
             val endStationName: String?
-            if (trip.endStation?.getStationName(false) == trip.startStation?.getStationName(false)) {
+            if (trip.endStation?.stationNameRaw == trip.startStation?.stationNameRaw &&
+                trip.endStation?.shortStationNameRaw == trip.startStation?.shortStationNameRaw
+            ) {
                 endStationName = null
             } else {
-                endStationName = trip.endStation?.stationName
+                endStationName = trip.endStation?.stationName?.resolveAsync()
             }
 
             return when {

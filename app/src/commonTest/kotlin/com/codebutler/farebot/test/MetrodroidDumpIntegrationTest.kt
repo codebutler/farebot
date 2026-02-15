@@ -97,7 +97,7 @@ class MetrodroidDumpIntegrationTest {
         assertTrue(factory.check(card), "Ventra factory should recognize this card")
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Ventra", identity.name)
+        assertFormattedEquals("Ventra", identity.name)
         assertNotNull(identity.serialNumber, "Should have a serial number")
 
         val info = factory.parseInfo(card)
@@ -134,7 +134,7 @@ class MetrodroidDumpIntegrationTest {
         assertTrue(factory.check(card), "Troika factory should recognize this card (E/3)")
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Troika", identity.name)
+        assertFormattedEquals("Troika", identity.name)
         assertNotNull(identity.serialNumber, "Should have serial number")
 
         val info = factory.parseInfo(card)
@@ -166,7 +166,7 @@ class MetrodroidDumpIntegrationTest {
         assertTrue(factory.check(card), "Troika factory should recognize this card (E/5)")
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Troika", identity.name)
+        assertFormattedEquals("Troika", identity.name)
         assertNotNull(identity.serialNumber, "Should have serial number")
 
         val info = factory.parseInfo(card)

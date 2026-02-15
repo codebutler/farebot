@@ -23,7 +23,6 @@
 package com.codebutler.farebot.transit.smartrider
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
@@ -37,6 +36,7 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.smartrider.generated.resources.*
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Represents a single "tag on" / "tag off" event on a SmartRider or MyWay card.
@@ -51,7 +51,6 @@ class SmartRiderTagRecord(
     private val mSmartRiderType: SmartRiderType,
     private val mStopId: Int = 0,
     private val mZone: Int = 0,
-    private val stringResource: StringResource,
 ) : Transaction() {
     val isValid: Boolean
         get() = mTimestamp != 0L
@@ -87,12 +86,12 @@ class SmartRiderTagRecord(
                 super.shouldBeMerged(other)
         )
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when (mSmartRiderType) {
-                SmartRiderType.MYWAY -> stringResource.getString(Res.string.agency_name_action)
-                SmartRiderType.SMARTRIDER -> stringResource.getString(Res.string.agency_name_transperth)
-                else -> stringResource.getString(Res.string.unknown)
+                SmartRiderType.MYWAY -> FormattedString(Res.string.agency_name_action)
+                SmartRiderType.SMARTRIDER -> FormattedString(Res.string.agency_name_transperth)
+                else -> FormattedString(Res.string.unknown)
             }
 
     override fun isSameTrip(other: Transaction): Boolean =
@@ -115,7 +114,6 @@ class SmartRiderTagRecord(
             isTransfer = isTransfer,
             mZone = other.mZone,
             mStopId = other.mStopId,
-            stringResource = stringResource,
         )
     }
 
@@ -153,7 +151,6 @@ class SmartRiderTagRecord(
         fun parse(
             smartRiderType: SmartRiderType,
             record: ByteArray,
-            stringResource: StringResource,
         ): SmartRiderTagRecord {
             val mTimestamp = record.byteArrayToLongReversed(3, 4)
             val bitfield = SmartRiderTripBitfield(smartRiderType, record[7].toInt())
@@ -168,7 +165,6 @@ class SmartRiderTagRecord(
                 mRoute = route,
                 mode = bitfield.mode,
                 isTransfer = bitfield.isTransfer,
-                stringResource = stringResource,
             )
         }
 
@@ -178,7 +174,6 @@ class SmartRiderTagRecord(
         fun parseRecentTransaction(
             smartRiderType: SmartRiderType,
             record: ByteArray,
-            stringResource: StringResource,
         ): SmartRiderTagRecord {
             require(record.size == 14) { "Recent transactions must be 14 bytes" }
             val timestamp = record.byteArrayToLongReversed(0, 4)
@@ -200,7 +195,6 @@ class SmartRiderTagRecord(
                 mZone = zone,
                 mode = Trip.Mode.OTHER,
                 isTransfer = false,
-                stringResource = stringResource,
             )
         }
     }

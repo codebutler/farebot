@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -34,7 +35,7 @@ import com.codebutler.farebot.transit.en1545.CalypsoParseResult
 abstract class CalypsoTransitInfo(
     protected val result: CalypsoParseResult,
 ) : TransitInfo() {
-    abstract override val cardName: String
+    abstract override val cardName: FormattedString
 
     override val balances: List<TransitBalance>?
         get() {

@@ -24,7 +24,7 @@
 
 package com.codebutler.farebot.transit.ezlink
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.cepas.CEPASCard
@@ -35,7 +35,6 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.ezlink.generated.resources.*
 
 class EZLinkTransitFactory(
-    private val stringResource: StringResource,
 ) : TransitFactory<CEPASCard, EZLinkTransitInfo> {
     override val allCards: List<CardInfo>
         get() = ALL_CARDS
@@ -45,11 +44,11 @@ class EZLinkTransitFactory(
     override fun parseIdentity(card: CEPASCard): TransitIdentity {
         val purse =
             card.getPurse(3) ?: return TransitIdentity.create(
-                EZLinkData.getCardIssuer(null, stringResource),
+                EZLinkData.getCardIssuer(null),
                 null,
             )
         val canNo = purse.can!!.hex()
-        return TransitIdentity.create(EZLinkData.getCardIssuer(canNo, stringResource), canNo)
+        return TransitIdentity.create(EZLinkData.getCardIssuer(canNo), canNo)
     }
 
     override fun parseInfo(card: CEPASCard): EZLinkTransitInfo {
@@ -58,26 +57,24 @@ class EZLinkTransitFactory(
             return EZLinkTransitInfo(
                 serialNumber = null,
                 mBalance = null,
-                trips = parseTrips(card, EZLinkData.getCardIssuer(null, stringResource)),
-                stringResource = stringResource,
+                trips = parseTrips(card, EZLinkData.getCardIssuer(null)),
             )
         }
         val canNo = purse.can!!.hex()
         return EZLinkTransitInfo(
             serialNumber = canNo,
             mBalance = purse.purseBalance,
-            trips = parseTrips(card, EZLinkData.getCardIssuer(canNo, stringResource)),
-            stringResource = stringResource,
+            trips = parseTrips(card, EZLinkData.getCardIssuer(canNo)),
         )
     }
 
     private fun parseTrips(
         card: CEPASCard,
-        cardName: String,
+        cardName: FormattedString,
     ): List<EZLinkTrip> {
         val history = card.getHistory(3) ?: return emptyList()
         val transactions = history.transactions ?: return emptyList()
-        return transactions.map { EZLinkTrip(it, cardName, stringResource) }
+        return transactions.map { EZLinkTrip(it, cardName) }
     }
 
     companion object {

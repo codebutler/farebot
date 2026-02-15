@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.card.classic.InvalidClassicSector
@@ -35,6 +34,7 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.serialonly.generated.resources.*
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Detects blank MIFARE Classic cards with no meaningful data.
@@ -88,7 +88,7 @@ class BlankClassicTransitFactory : TransitFactory<ClassicCard, BlankClassicTrans
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
-        val name = getStringBlocking(Res.string.blank_mfc_card)
+        val name = FormattedString(Res.string.blank_mfc_card)
         return TransitIdentity.create(name, null)
     }
 
@@ -96,7 +96,7 @@ class BlankClassicTransitFactory : TransitFactory<ClassicCard, BlankClassicTrans
 }
 
 class BlankClassicTransitInfo : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.blank_mfc_card)
+    override val cardName: FormattedString = FormattedString(Res.string.blank_mfc_card)
 
     override val serialNumber: String? = null
 

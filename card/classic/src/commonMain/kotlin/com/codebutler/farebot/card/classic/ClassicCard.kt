@@ -27,11 +27,11 @@
 package com.codebutler.farebot.card.classic
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import farebot.card.classic.generated.resources.*
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class ClassicCard(
     override val tagId: ByteArray,
@@ -56,15 +56,15 @@ class ClassicCard(
             return ClassicManufacturingInfo.parse(block0.data, tagId)
         }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val cardUiBuilder = FareBotUiTree.builder()
         for (sector in sectors) {
             val sectorIndexString = sector.index.toString(16)
             val sectorUiBuilder = cardUiBuilder.item()
             when (sector) {
                 is UnauthorizedClassicSector -> {
                     sectorUiBuilder.title(
-                        stringResource.getString(
+                        FormattedString(
                             Res.string.classic_unauthorized_sector_title_format,
                             sectorIndexString,
                         ),
@@ -72,7 +72,7 @@ class ClassicCard(
                 }
                 is InvalidClassicSector -> {
                     sectorUiBuilder.title(
-                        stringResource.getString(
+                        FormattedString(
                             Res.string.classic_invalid_sector_title_format,
                             sectorIndexString,
                             sector.error,
@@ -82,13 +82,13 @@ class ClassicCard(
                 else -> {
                     val dataClassicSector = sector as DataClassicSector
                     sectorUiBuilder.title(
-                        stringResource.getString(Res.string.classic_sector_title_format, sectorIndexString),
+                        FormattedString(Res.string.classic_sector_title_format, sectorIndexString),
                     )
                     for (block in dataClassicSector.blocks) {
                         sectorUiBuilder
                             .item()
                             .title(
-                                stringResource.getString(
+                                FormattedString(
                                     Res.string.classic_block_title_format,
                                     block.index.toString(),
                                 ),

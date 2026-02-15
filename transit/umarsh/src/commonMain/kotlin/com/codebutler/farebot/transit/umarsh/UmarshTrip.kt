@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.TransitCurrency
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.zolotayakorona.RussiaTaxCodes
 import kotlinx.datetime.LocalDate
@@ -41,7 +42,7 @@ class UmarshTrip(
 ) : Trip() {
     override val startTimestamp: Instant get() = timestamp
 
-    override val routeName: String get() = routeNameValue
+    override val routeName: FormattedString get() = FormattedString(routeNameValue)
 
     override val vehicleID: String get() = vehicleIDValue
 

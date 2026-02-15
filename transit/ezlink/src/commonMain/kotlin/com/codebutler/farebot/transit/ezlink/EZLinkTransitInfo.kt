@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.ezlink
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -33,10 +33,9 @@ class EZLinkTransitInfo(
     override val serialNumber: String?,
     private val mBalance: Int?,
     override val trips: List<Trip>,
-    private val stringResource: StringResource,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = EZLinkData.getCardIssuer(serialNumber, stringResource)
+    override val cardName: FormattedString
+        get() = EZLinkData.getCardIssuer(serialNumber)
 
     // This is stored in cents of SGD
     override val balance: TransitBalance?

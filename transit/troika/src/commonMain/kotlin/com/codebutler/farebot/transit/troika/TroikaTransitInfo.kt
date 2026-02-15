@@ -24,7 +24,6 @@
 package com.codebutler.farebot.transit.troika
 
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -33,6 +32,7 @@ import com.codebutler.farebot.transit.Trip
 import farebot.transit.troika.generated.resources.Res
 import farebot.transit.troika.generated.resources.card_name_troika
 import farebot.transit.troika.generated.resources.troika_unformatted
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Troika, Moscow, Russia.
@@ -44,8 +44,8 @@ import farebot.transit.troika.generated.resources.troika_unformatted
 class TroikaTransitInfo internal constructor(
     private val blocks: List<Pair<Int, TroikaBlock>>,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_troika)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_troika)
 
     override val serialNumber: String?
         get() = blocks.firstOrNull()?.second?.serialNumber
@@ -64,10 +64,10 @@ class TroikaTransitInfo internal constructor(
     override val info: List<ListItemInterface>?
         get() = blocks.flatMap { (_, block) -> block.info.orEmpty() }.ifEmpty { null }
 
-    override val warning: String?
+    override val warning: FormattedString?
         get() =
             if (blocks.firstOrNull()?.second?.balance == null && subscriptions.isEmpty()) {
-                getStringBlocking(Res.string.troika_unformatted)
+                FormattedString(Res.string.troika_unformatted)
             } else {
                 null
             }

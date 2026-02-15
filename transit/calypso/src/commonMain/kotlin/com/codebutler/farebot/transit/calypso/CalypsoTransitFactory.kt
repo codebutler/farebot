@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816Card
 import com.codebutler.farebot.transit.CardInfo
@@ -35,12 +35,10 @@ import com.codebutler.farebot.transit.en1545.CalypsoConstants
  * Base class for Calypso ISO 7816 transit system factories.
  * Subclasses implement [checkTenv] to match on the ticket environment data.
  */
-abstract class CalypsoTransitFactory(
-    protected val stringResource: StringResource,
-) : TransitFactory<ISO7816Card, TransitInfo> {
+abstract class CalypsoTransitFactory : TransitFactory<ISO7816Card, TransitInfo> {
     override val allCards: List<CardInfo> = emptyList()
 
-    abstract val name: String
+    abstract val name: FormattedString
 
     abstract fun checkTenv(tenv: ByteArray): Boolean
 

@@ -31,7 +31,6 @@ import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.base.util.getBitsFromBufferLeBits
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -66,6 +65,7 @@ import farebot.transit.rkf.generated.resources.rkf_status_not_ok
 import farebot.transit.rkf.generated.resources.rkf_status_ok
 import farebot.transit.rkf.generated.resources.rkf_status_temp_disabled
 import farebot.transit.rkf.generated.resources.rkf_unknown_format
+import com.codebutler.farebot.base.util.FormattedString
 
 // Record types
 sealed class RkfRecord
@@ -113,10 +113,10 @@ class RkfTransitInfo internal constructor(
     private val mSerial: RkfSerial,
     private val mSubscriptions: List<RkfTicket>,
 ) : TransitInfo() {
-    override val cardName: String get() =
+    override val cardName: FormattedString get() =
         issuerMap[aid]?.let {
-            getStringBlocking(it.nameRes)
-        } ?: getStringBlocking(Res.string.rkf_card_name_default)
+            FormattedString(it.nameRes)
+        } ?: FormattedString(Res.string.rkf_card_name_default)
 
     private val aid
         get() = mTcci.getIntOrZero(En1545TransitData.ENV_APPLICATION_ISSUER_ID)
@@ -143,15 +143,15 @@ class RkfTransitInfo internal constructor(
     private val expiryDate
         get() = mTcci.getTimeStamp(En1545TransitData.ENV_APPLICATION_VALIDITY_END, mLookup.timeZone)
 
-    val cardStatus: String
+    val cardStatus: FormattedString
         get() =
             when (mTcci.getIntOrZero(STATUS)) {
-                0x01 -> getStringBlocking(Res.string.rkf_status_ok)
-                0x21 -> getStringBlocking(Res.string.rkf_status_action_pending)
-                0x3f -> getStringBlocking(Res.string.rkf_status_temp_disabled)
-                0x58 -> getStringBlocking(Res.string.rkf_status_not_ok)
+                0x01 -> FormattedString(Res.string.rkf_status_ok)
+                0x21 -> FormattedString(Res.string.rkf_status_action_pending)
+                0x3f -> FormattedString(Res.string.rkf_status_temp_disabled)
+                0x58 -> FormattedString(Res.string.rkf_status_not_ok)
                 else ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.rkf_unknown_format,
                         NumberUtils.intToHex(mTcci.getIntOrZero(STATUS)),
                     )
@@ -482,8 +482,8 @@ class RkfTransitFactory : TransitFactory<ClassicCard, RkfTransitInfo> {
         val serial = RkfTransitInfo.getSerial(card)
         val issuerName =
             RkfTransitInfo.issuerMap[serial.mCompany]?.let {
-                getStringBlocking(it.nameRes)
-            } ?: getStringBlocking(Res.string.rkf_card_name_default)
+                FormattedString(it.nameRes)
+            } ?: FormattedString(Res.string.rkf_card_name_default)
         return TransitIdentity(issuerName, serial.formatted)
     }
 

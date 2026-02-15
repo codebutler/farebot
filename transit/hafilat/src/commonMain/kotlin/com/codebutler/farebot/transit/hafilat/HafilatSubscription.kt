@@ -21,7 +21,6 @@
 
 package com.codebutler.farebot.transit.hafilat
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
@@ -29,7 +28,6 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 class HafilatSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
 ) : En1545Subscription() {
     override val lookup: HafilatLookup
         get() = HafilatLookup
@@ -40,8 +38,7 @@ class HafilatSubscription(
     companion object {
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
         ): HafilatSubscription =
-            HafilatSubscription(En1545Parser.parse(data, IntercodeFields.SUB_FIELDS_TYPE_46), stringResource)
+            HafilatSubscription(En1545Parser.parse(data, IntercodeFields.SUB_FIELDS_TYPE_46))
     }
 }

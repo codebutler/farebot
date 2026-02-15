@@ -25,7 +25,6 @@
 
 package com.codebutler.farebot.transit.opal
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import farebot.transit.opal.generated.resources.Res
 import farebot.transit.opal.generated.resources.opal_agency_tfnsw
@@ -35,6 +34,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Class describing auto-topup on Opal.
@@ -55,14 +55,14 @@ internal class OpalSubscription private constructor() : Subscription() {
     // Maximum possible date representable on the card
     override val validTo: Instant get() = LocalDate(2159, 6, 6).atStartOfDayIn(TimeZone.UTC)
 
-    override val subscriptionName: String
-        get() = getStringBlocking(Res.string.opal_automatic_top_up)
+    override val subscriptionName: FormattedString
+        get() = FormattedString(Res.string.opal_automatic_top_up)
 
     override val paymentMethod: PaymentMethod get() = PaymentMethod.CREDIT_CARD
 
-    override val agencyName: String
-        get() = getStringBlocking(Res.string.opal_agency_tfnsw)
+    override val agencyName: FormattedString
+        get() = FormattedString(Res.string.opal_agency_tfnsw)
 
-    override val shortAgencyName: String
-        get() = getStringBlocking(Res.string.opal_agency_tfnsw_short)
+    override val shortAgencyName: FormattedString
+        get() = FormattedString(Res.string.opal_agency_tfnsw_short)
 }

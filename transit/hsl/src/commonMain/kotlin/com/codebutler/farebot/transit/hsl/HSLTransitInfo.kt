@@ -25,12 +25,12 @@
 package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.hsl.generated.resources.*
 
 class HSLTransitInfo(
@@ -44,14 +44,14 @@ class HSLTransitInfo(
     val securityLevel: Int?,
     val cardNameOverride: String,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = cardNameOverride
+    override val cardName: FormattedString
+        get() = FormattedString(cardNameOverride)
 
     override val balance: TransitBalance?
         get() = TransitBalance(balance = TransitCurrency.EUR(mBalance))
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
-        val b = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
+        val b = FareBotUiTree.builder()
         applicationVersion?.let { b.item().title(Res.string.hsl_application_version).value(it) }
         applicationKeyVersion?.let { b.item().title(Res.string.hsl_application_key_version).value(it) }
         platformType?.let { b.item().title(Res.string.hsl_platform_type).value(it) }

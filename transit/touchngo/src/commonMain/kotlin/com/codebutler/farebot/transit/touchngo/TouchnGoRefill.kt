@@ -26,6 +26,7 @@
 package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.isASCII
@@ -56,11 +57,12 @@ internal class TouchnGoRefill(
 
     override val mode: Mode get() = Mode.TICKET_MACHINE
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() {
             val operatorId = agencyRaw.byteArrayToInt()
             val mdstName = MdstStationLookup.getOperatorName(TNG_STR, operatorId)
-            return mdstName ?: if (agencyRaw.isASCII()) agencyRaw.readASCII() else agencyRaw.hex()
+            val name = mdstName ?: if (agencyRaw.isASCII()) agencyRaw.readASCII() else agencyRaw.hex()
+            return FormattedString(name)
         }
 
     companion object {

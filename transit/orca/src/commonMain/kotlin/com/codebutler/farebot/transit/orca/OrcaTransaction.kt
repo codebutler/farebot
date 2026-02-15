@@ -32,8 +32,6 @@ import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
@@ -41,6 +39,7 @@ import com.codebutler.farebot.transit.Trip
 import farebot.transit.orca.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class OrcaTransaction(
     private val mTimestamp: Long,
@@ -51,7 +50,6 @@ class OrcaTransaction(
     private val mAgency: Int,
     private val mTransType: Int,
     private val mIsTopup: Boolean,
-    private val stringResource: StringResource,
 ) : Transaction() {
     override val timestamp: Instant?
         get() = if (mTimestamp == 0L) null else Instant.fromEpochSeconds(mTimestamp)
@@ -68,40 +66,32 @@ class OrcaTransaction(
     override val routeNames: List<String>
         get() =
             when {
-                mIsTopup -> listOf(stringResource.getString(Res.string.transit_orca_route_topup))
+                mIsTopup -> listOf("Top-up")
                 isLink ->
                     super.routeNames.ifEmpty {
-                        listOf(
-                            stringResource.getString(Res.string.transit_orca_route_link),
-                        )
+                        listOf("Link Light Rail")
                     }
                 isSounder ->
                     super.routeNames.ifEmpty {
-                        listOf(
-                            stringResource.getString(Res.string.transit_orca_route_sounder),
-                        )
+                        listOf("Sounder Train")
                     }
                 isSeattleStreetcar ->
                     super.routeNames.ifEmpty {
-                        listOf(stringResource.getString(Res.string.transit_orca_route_streetcar))
+                        listOf("Streetcar")
                     }
-                mAgency == AGENCY_ST -> listOf(stringResource.getString(Res.string.transit_orca_route_express_bus))
-                isMonorail -> listOf(stringResource.getString(Res.string.transit_orca_route_monorail))
-                isWaterTaxi -> listOf(stringResource.getString(Res.string.transit_orca_route_water_taxi))
+                mAgency == AGENCY_ST -> listOf("Express Bus")
+                isMonorail -> listOf("Seattle Monorail")
+                isWaterTaxi -> listOf("Water Taxi")
                 isSwift ->
                     super.routeNames.ifEmpty {
-                        listOf(
-                            stringResource.getString(Res.string.transit_orca_route_brt),
-                        )
+                        listOf("Bus Rapid Transit")
                     }
                 mAgency == AGENCY_KCM ->
                     when (mFtpType) {
-                        FTP_TYPE_BUS -> listOf(stringResource.getString(Res.string.transit_orca_route_bus))
+                        FTP_TYPE_BUS -> listOf("Bus")
                         FTP_TYPE_BRT ->
                             super.routeNames.ifEmpty {
-                                listOf(
-                                    stringResource.getString(Res.string.transit_orca_route_brt),
-                                )
+                                listOf("Bus Rapid Transit")
                             }
                         else -> emptyList()
                     }
@@ -157,62 +147,62 @@ class OrcaTransaction(
                     }
             }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when {
                 mIsTopup -> null
                 // Seattle Monorail Services uses KCM's agency ID.
-                isMonorail -> stringResource.getString(Res.string.transit_orca_agency_sms)
+                isMonorail -> FormattedString(Res.string.transit_orca_agency_sms)
                 // The King County Water Taxi is now a separate agency but uses KCM's agency ID
-                isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt)
+                isWaterTaxi -> FormattedString(Res.string.transit_orca_agency_kcwt)
                 else ->
-                    MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = false)
+                    MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = false)?.let { FormattedString(it) }
                         ?: getAgencyNameFallback(false)
-                        ?: getStringBlocking(Res.string.transit_orca_agency_unknown, mAgency.toString())
+                        ?: FormattedString(Res.string.transit_orca_agency_unknown, mAgency.toString())
             }
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() =
             when {
                 mIsTopup -> null
                 // Seattle Monorail Services uses KCM's agency ID.
-                isMonorail -> stringResource.getString(Res.string.transit_orca_agency_sms_short)
+                isMonorail -> FormattedString(Res.string.transit_orca_agency_sms_short)
                 // The King County Water Taxi is now a separate agency but uses KCM's agency ID
-                isWaterTaxi -> stringResource.getString(Res.string.transit_orca_agency_kcwt_short)
+                isWaterTaxi -> FormattedString(Res.string.transit_orca_agency_kcwt_short)
                 else ->
-                    MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = true)
+                    MdstStationLookup.getOperatorName(ORCA_STR, mAgency, isShort = true)?.let { FormattedString(it) }
                         ?: getAgencyNameFallback(true)
-                        ?: getStringBlocking(Res.string.transit_orca_agency_unknown_short)
+                        ?: FormattedString(Res.string.transit_orca_agency_unknown_short)
             }
 
-    private fun getAgencyNameFallback(isShort: Boolean): String? =
+    private fun getAgencyNameFallback(isShort: Boolean): FormattedString? =
         when (mAgency) {
             AGENCY_CT ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_ct_short else Res.string.transit_orca_agency_ct,
                 )
             AGENCY_ET ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_et_short else Res.string.transit_orca_agency_et,
                 )
             AGENCY_KCM ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_kcm_short else Res.string.transit_orca_agency_kcm,
                 )
             AGENCY_KT ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_kt_short else Res.string.transit_orca_agency_kt,
                 )
             AGENCY_PT ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_pt_short else Res.string.transit_orca_agency_pt,
                 )
             AGENCY_ST ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_st_short else Res.string.transit_orca_agency_st,
                 )
             AGENCY_WSF ->
-                stringResource.getString(
+                FormattedString(
                     if (isShort) Res.string.transit_orca_agency_wsf_short else Res.string.transit_orca_agency_wsf,
                 )
             else -> null
@@ -312,7 +302,6 @@ class OrcaTransaction(
         fun parse(
             data: ByteArray,
             isTopup: Boolean,
-            stringResource: StringResource,
         ): OrcaTransaction {
             val agency = ByteUtils.getBitsFromBuffer(data, 24, 4)
             val timestamp = ByteUtils.getBitsFromBuffer(data, 28, 32).toLong() and 0xFFFFFFFFL
@@ -331,7 +320,6 @@ class OrcaTransaction(
                 mAgency = agency,
                 mTransType = transType,
                 mIsTopup = isTopup,
-                stringResource = stringResource,
             )
         }
     }

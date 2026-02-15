@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.krocap
 
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.iso7816.ISO7816TLV
 import com.codebutler.farebot.card.ksx6924.KROCAPData
 import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
@@ -46,7 +47,7 @@ data class KROCAPTransitInfo(
     override val serialNumber: String?
         get() = getSerial(pdata)
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = NAME
 
     override val extraInfo: List<ListItemInterface>?
@@ -62,7 +63,7 @@ data class KROCAPTransitInfo(
     override fun hashCode(): Int = pdata.contentHashCode()
 
     companion object {
-        const val NAME = "One Card All Pass"
+        val NAME = FormattedString("One Card All Pass")
 
         @OptIn(ExperimentalStdlibApi::class)
         private fun getSerial(pdata: ByteArray): String? {

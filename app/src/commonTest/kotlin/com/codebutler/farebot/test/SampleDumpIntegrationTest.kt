@@ -86,7 +86,6 @@ import kotlin.test.assertTrue
  * These sample files are the same ones used on the Explore screen.
  */
 class SampleDumpIntegrationTest : CardDumpTest() {
-    private val stringResource = TestStringResource()
 
     // --- Opal (DESFire) ---
     // Source: Metrodroid test asset opal-transit-litter.json
@@ -95,7 +94,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
 
     @Test
     fun testOpalDump() {
-        val factory = OpalTransitFactory(stringResource)
+        val factory = OpalTransitFactory()
         val (card, info) =
             loadAndParseMetrodroidJson<DesfireCard, OpalTransitInfo>(
                 "opal/Opal.json",
@@ -103,7 +102,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Opal", identity.name)
+        assertFormattedEquals("Opal", identity.name)
         assertEquals("3085 2200 7856 2242", identity.serialNumber)
 
         // Balance: -$1.82 AUD (-182 cents)
@@ -129,7 +128,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
 
     @Test
     fun testHSLv2Dump() {
-        val factory = HSLTransitFactory(stringResource)
+        val factory = HSLTransitFactory()
         val (card, info) =
             loadAndParseMetrodroidJson<DesfireCard, HSLTransitInfo>(
                 "hsl/HSLv2.json",
@@ -137,7 +136,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("HSL", identity.name)
+        assertFormattedEquals("HSL", identity.name)
         assertEquals("924620 0011 2345 6789", identity.serialNumber)
 
         // Balance: €0.40 (40 EUR cents)
@@ -172,7 +171,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("HSL Ultralight", identity.name)
+        assertFormattedEquals("HSL Ultralight", identity.name)
 
         // 1 trip
         val trips = info.trips
@@ -200,7 +199,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Troika", identity.name)
+        assertFormattedEquals("Troika", identity.name)
         assertNotNull(identity.serialNumber)
 
         // Should have trips
@@ -229,7 +228,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("T-Money", identity.name)
+        assertFormattedEquals("T-Money", identity.name)
         assertNotNull(identity.serialNumber)
 
         // Balance: 17,650 KRW
@@ -251,7 +250,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
 
     @Test
     fun testEZLinkDump() {
-        val factory = EZLinkTransitFactory(stringResource)
+        val factory = EZLinkTransitFactory()
         val (card, info) =
             loadAndParseMetrodroidJson<CEPASCard, EZLinkTransitInfo>(
                 "cepas/EZLink.json",
@@ -310,7 +309,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("HOLO", identity.name)
+        assertFormattedEquals("HOLO", identity.name)
         assertNotNull(identity.serialNumber)
 
         // Serial-only card: no balance, no trips, but has emptyStateMessage
@@ -331,13 +330,13 @@ class SampleDumpIntegrationTest : CardDumpTest() {
 
     @Test
     fun testMobibDump() {
-        val factory = MobibTransitInfo.Factory(stringResource)
+        val factory = MobibTransitInfo.Factory()
         val rawCard = TestAssetLoader.loadMetrodroidJsonCard("mobib/Mobib.json")
         val card = rawCard.parse() as ISO7816Card
         assertTrue(factory.check(card), "Mobib factory should recognize this card")
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Mobib", identity.name)
+        assertFormattedEquals("Mobib", identity.name)
         assertNotNull(identity.serialNumber)
 
         val info = factory.parseInfo(card)
@@ -372,7 +371,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
         val rawCard = (result as ImportResult.Success).cards.first()
         val card = rawCard.parse() as ClassicCard
 
-        val factory = EasyCardTransitFactory(stringResource)
+        val factory = EasyCardTransitFactory()
         assertTrue(factory.check(card), "EasyCard factory should recognize this card")
 
         val identity = factory.parseIdentity(card)
@@ -549,7 +548,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             )
 
         val identity = factory.parseIdentity(card)
-        assertEquals("Hop Fastpass", identity.name)
+        assertFormattedEquals("Hop Fastpass", identity.name)
         assertEquals("01-001-12345678-RA", identity.serialNumber)
 
         assertTrue(info is TrimetHopTransitInfo)

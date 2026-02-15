@@ -25,7 +25,6 @@ package com.codebutler.farebot.transit.mrtj
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -35,6 +34,7 @@ import farebot.transit.mrtj.generated.resources.mrtj_last_transaction_amount
 import farebot.transit.mrtj.generated.resources.mrtj_longname
 import farebot.transit.mrtj.generated.resources.mrtj_other_data
 import farebot.transit.mrtj.generated.resources.mrtj_transaction_counter
+import com.codebutler.farebot.base.util.FormattedString
 
 class MRTJTransitInfo(
     private val currentBalance: Int,
@@ -46,7 +46,7 @@ class MRTJTransitInfo(
 
     override val serialNumber: String? = null
 
-    override val cardName: String = getStringBlocking(Res.string.mrtj_longname)
+    override val cardName: FormattedString = FormattedString(Res.string.mrtj_longname)
 
     override val trips: List<Trip> = emptyList()
 

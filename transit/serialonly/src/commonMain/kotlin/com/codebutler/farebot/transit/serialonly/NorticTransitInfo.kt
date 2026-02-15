@@ -14,7 +14,6 @@ import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import farebot.transit.serialonly.generated.resources.Res
 import farebot.transit.serialonly.generated.resources.country
 import farebot.transit.serialonly.generated.resources.country_code_format
@@ -23,6 +22,7 @@ import farebot.transit.serialonly.generated.resources.owner_company
 import farebot.transit.serialonly.generated.resources.retailer_company
 import farebot.transit.serialonly.generated.resources.unknown_company
 import kotlinx.datetime.LocalDate
+import com.codebutler.farebot.base.util.FormattedString
 
 class NorticTransitInfo(
     private val mCountry: Int,
@@ -47,7 +47,7 @@ class NorticTransitInfo(
                 }
 
             return listOf(
-                ListItem(Res.string.country, getStringBlocking(Res.string.country_code_format, mCountry)),
+                ListItem(Res.string.country, FormattedString(Res.string.country_code_format, mCountry)),
                 ListItem(Res.string.expiry_date, expiryStr),
                 ListItem(Res.string.owner_company, getCompanyName(mOwnerCompany)),
                 ListItem(Res.string.retailer_company, getCompanyName(mRetailerCompany)),
@@ -68,17 +68,17 @@ class NorticTransitInfo(
                 190 to "Troms fylkestraffikk",
             )
 
-        private fun getCompanyName(company: Int): String =
-            operators[company] ?: getStringBlocking(Res.string.unknown_company, company)
+        private fun getCompanyName(company: Int): FormattedString =
+            operators[company]?.let { FormattedString(it) } ?: FormattedString(Res.string.unknown_company, company)
 
-        internal fun getName(ownerCompany: Int): String =
+        internal fun getName(ownerCompany: Int): FormattedString =
             when (ownerCompany) {
-                1 -> "Ruter Travelcard"
-                120 -> "Norrbotten Bus Pass"
-                121 -> "LLT Bus Pass"
-                160 -> "t:card"
-                190 -> "Tromskortet"
-                else -> "Nortic"
+                1 -> FormattedString("Ruter Travelcard")
+                120 -> FormattedString("Norrbotten Bus Pass")
+                121 -> FormattedString("LLT Bus Pass")
+                160 -> FormattedString("t:card")
+                190 -> FormattedString("Tromskortet")
+                else -> FormattedString("Nortic")
             }
 
         internal fun formatSerial(

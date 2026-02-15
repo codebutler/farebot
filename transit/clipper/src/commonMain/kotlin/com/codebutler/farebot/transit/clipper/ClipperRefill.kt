@@ -23,6 +23,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import kotlin.time.Instant
@@ -45,10 +46,10 @@ class ClipperRefill(
     override val mode: Mode
         get() = Mode.TICKET_MACHINE
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() = ClipperData.getAgencyName(agency)
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() = ClipperData.getShortAgencyName(agency)
 
     companion object {

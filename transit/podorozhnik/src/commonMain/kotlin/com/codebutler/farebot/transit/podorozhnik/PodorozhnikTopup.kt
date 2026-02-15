@@ -24,19 +24,18 @@
 package com.codebutler.farebot.transit.podorozhnik
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.podorozhnik.generated.resources.*
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 internal class PodorozhnikTopup(
     private val mTimestamp: Int,
     private val mFare: Int,
     private val mAgency: Int,
     private val mTopupMachine: Int,
-    private val stringResource: StringResource,
 ) : Trip() {
     override val startTimestamp: Instant?
         get() = PodorozhnikTransitInfo.convertDate(mTimestamp)
@@ -62,11 +61,11 @@ internal class PodorozhnikTopup(
             return Station.unknown(mAgency.toString(16) + "/" + mTopupMachine.toString(16))
         }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when (mAgency) {
-                1 -> stringResource.getString(Res.string.podorozhnik_topup)
-                else -> stringResource.getString(Res.string.podorozhnik_unknown_format, mAgency.toString())
+                1 -> FormattedString(Res.string.podorozhnik_topup)
+                else -> FormattedString(Res.string.podorozhnik_unknown_format, mAgency.toString())
             }
 
     private fun lookupMdstStation(

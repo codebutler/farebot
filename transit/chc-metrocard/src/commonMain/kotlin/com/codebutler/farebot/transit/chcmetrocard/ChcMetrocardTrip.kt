@@ -26,6 +26,7 @@ import com.codebutler.farebot.base.mdst.TransportType
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.erg.ErgTrip
 import com.codebutler.farebot.transit.erg.record.ErgPurseRecord
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Trip for CHC Metrocard (Christchurch, NZ).
@@ -34,8 +35,8 @@ class ChcMetrocardTrip(
     purse: ErgPurseRecord,
     epochDate: Int,
 ) : ErgTrip(purse, epochDate, { TransitCurrency.NZD(it) }) {
-    override val agencyName: String?
-        get() = MdstStationLookup.getOperatorName(CHC_METROCARD_STR, purse.agency)
+    override val agencyName: FormattedString?
+        get() = MdstStationLookup.getOperatorName(CHC_METROCARD_STR, purse.agency)?.let { FormattedString(it) }
 
     override val mode: Mode
         get() {

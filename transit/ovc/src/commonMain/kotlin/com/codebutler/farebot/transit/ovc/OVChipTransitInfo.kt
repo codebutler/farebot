@@ -28,8 +28,6 @@ import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -41,6 +39,7 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.transit.ovc.generated.resources.*
 import kotlinx.datetime.TimeZone
+import com.codebutler.farebot.base.util.FormattedString
 
 class OVChipTransitInfo(
     private val parsed: En1545Parsed,
@@ -53,9 +52,8 @@ class OVChipTransitInfo(
     private val banbits: Int,
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>,
-    private val stringResource: StringResource,
 ) : TransitInfo() {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = NAME
 
     override val balance: TransitBalance
         get() =
@@ -63,9 +61,9 @@ class OVChipTransitInfo(
                 balance = TransitCurrency.EUR(credit),
                 name =
                     if (type == 2) {
-                        getStringBlocking(Res.string.card_type_personal)
+                        "Personal"
                     } else {
-                        getStringBlocking(Res.string.card_type_anonymous)
+                        "Anonymous"
                     },
                 validTo = convertDate(expdate),
             )
@@ -110,9 +108,9 @@ class OVChipTransitInfo(
                 ListItem(
                     Res.string.ovc_banned,
                     if (banbits and 0xC0 == 0xC0) {
-                        getStringBlocking(Res.string.ovc_yes)
+                        FormattedString(Res.string.ovc_yes)
                     } else {
-                        getStringBlocking(Res.string.ovc_no)
+                        FormattedString(Res.string.ovc_no)
                     },
                 ),
             )
@@ -122,9 +120,9 @@ class OVChipTransitInfo(
                 ListItem(
                     Res.string.ovc_autocharge,
                     if (parsed.getIntOrZero(OVChipTransitFactory.AUTOCHARGE_ACTIVE) == 0x05) {
-                        getStringBlocking(Res.string.ovc_yes)
+                        FormattedString(Res.string.ovc_yes)
                     } else {
-                        getStringBlocking(Res.string.ovc_no)
+                        FormattedString(Res.string.ovc_no)
                     },
                 ),
             )
@@ -148,8 +146,8 @@ class OVChipTransitInfo(
             return li
         }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val b = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val b = FareBotUiTree.builder()
         b.item().title("Credit Slot ID").value(creditSlotId.toString())
         b.item().title("Last Credit ID").value(creditId.toString())
         val slotsItem = b.item().title("Recent Slots")
@@ -158,7 +156,7 @@ class OVChipTransitInfo(
     }
 
     companion object {
-        private const val NAME = "OV-chipkaart"
+        private val NAME = FormattedString("OV-chipkaart")
 
         fun convertDate(date: Int) = En1545FixedInteger.parseDate(date, TimeZone.of("Europe/Amsterdam"))
     }

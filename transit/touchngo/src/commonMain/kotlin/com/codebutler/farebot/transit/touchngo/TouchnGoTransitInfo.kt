@@ -27,6 +27,7 @@ package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -51,7 +52,7 @@ class TouchnGoTransitInfo(
     private val issueDate: LocalDate,
     private val expiryDate: LocalDate,
 ) : TransitInfo() {
-    override val cardName: String = TouchnGoTransitFactory.NAME
+    override val cardName: FormattedString = TouchnGoTransitFactory.NAME
 
     override val serialNumber: String
         get() = NumberUtils.zeroPad(serial, 10)

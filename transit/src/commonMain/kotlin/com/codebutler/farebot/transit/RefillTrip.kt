@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -35,7 +35,6 @@ import kotlin.time.Instant
 @Serializable
 data class RefillTrip(
     @Contextual val refill: Refill,
-    private val stringResource: StringResource,
 ) : Trip() {
     override val startTimestamp: Instant?
         get() {
@@ -43,13 +42,13 @@ data class RefillTrip(
             return if (ts > 0) Instant.fromEpochSeconds(ts) else null
         }
 
-    override val agencyName: String? get() = refill.getAgencyName(stringResource)
+    override val agencyName: FormattedString? get() = refill.getAgencyName()
 
-    override val shortAgencyName: String? get() = refill.getShortAgencyName(stringResource)
+    override val shortAgencyName: FormattedString? get() = refill.getShortAgencyName()
 
     override val fare: TransitCurrency?
         get() {
-            val amountStr = refill.getAmountString(stringResource)
+            val amountStr = refill.getAmountString()
             // RefillTrip delegates fare formatting to the Refill, which returns a pre-formatted string.
             // Until Refill is refactored to return TransitCurrency, we return null here.
             // The amount is displayed via the TransitInfo's refill list instead.
@@ -61,7 +60,6 @@ data class RefillTrip(
     companion object {
         fun create(
             refill: Refill,
-            stringResource: StringResource,
-        ): RefillTrip = RefillTrip(refill, stringResource)
+        ): RefillTrip = RefillTrip(refill)
     }
 }

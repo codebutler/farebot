@@ -25,9 +25,9 @@
 
 package com.codebutler.farebot.transit.opal
 
-import com.codebutler.farebot.base.util.StringResource
 import farebot.transit.opal.generated.resources.*
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
+import com.codebutler.farebot.base.util.FormattedString
 
 object OpalData {
     // Opal travel modes
@@ -75,18 +75,16 @@ object OpalData {
         )
 
     fun getLocalisedMode(
-        stringResource: StringResource,
         mode: Int,
-    ): String {
-        MODES[mode]?.let { return stringResource.getString(it) }
-        return stringResource.getString(Res.string.opal_unknown_format, "0x${mode.toString(16)}")
+    ): FormattedString {
+        MODES[mode]?.let { return FormattedString(it) }
+        return FormattedString(Res.string.opal_unknown_format, "0x${mode.toString(16)}")
     }
 
     fun getLocalisedAction(
-        stringResource: StringResource,
         action: Int,
-    ): String {
-        ACTIONS[action]?.let { return stringResource.getString(it) }
-        return stringResource.getString(Res.string.opal_unknown_format, "0x${action.toString(16)}")
+    ): FormattedString {
+        ACTIONS[action]?.let { return FormattedString(it) }
+        return FormattedString(Res.string.opal_unknown_format, "0x${action.toString(16)}")
     }
 }

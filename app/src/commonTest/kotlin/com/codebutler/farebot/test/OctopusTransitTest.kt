@@ -86,7 +86,7 @@ class OctopusTransitTest {
 
         // Test TransitIdentity
         val identity = factory.parseIdentity(card)
-        assertEquals(OctopusTransitInfo.OCTOPUS_NAME, identity.name)
+        assertFormattedEquals(OctopusTransitInfo.OCTOPUS_NAME, identity.name)
 
         // Test TransitData
         val info = factory.parseInfo(card)

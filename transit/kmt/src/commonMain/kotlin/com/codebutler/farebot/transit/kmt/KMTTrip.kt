@@ -20,7 +20,6 @@
 
 package com.codebutler.farebot.transit.kmt
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.felica.FeliCaUtil
 import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.transit.Station
@@ -31,6 +30,7 @@ import farebot.transit.kmt.generated.resources.kmt_agency
 import farebot.transit.kmt.generated.resources.kmt_agency_short
 import farebot.transit.kmt.generated.resources.kmt_defroute
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class KMTTrip(
     private val processType: Int,
@@ -61,14 +61,14 @@ class KMTTrip(
             return TransitCurrency.IDR(tripFare)
         }
 
-    override val agencyName: String
-        get() = getStringBlocking(Res.string.kmt_agency)
+    override val agencyName: FormattedString
+        get() = FormattedString(Res.string.kmt_agency)
 
-    override val shortAgencyName: String
-        get() = getStringBlocking(Res.string.kmt_agency_short)
+    override val shortAgencyName: FormattedString
+        get() = FormattedString(Res.string.kmt_agency_short)
 
-    override val routeName: String
-        get() = getStringBlocking(Res.string.kmt_defroute)
+    override val routeName: FormattedString
+        get() = FormattedString(Res.string.kmt_defroute)
 
     override val startStation: Station?
         get() =

@@ -23,6 +23,7 @@
  */
 package com.codebutler.farebot.card.ksx6924
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 
 /**
@@ -43,66 +44,63 @@ object KSX6924PurseInfoDefaultResolver : KSX6924PurseInfoResolver()
  * See https://github.com/micolous/metrodroid/wiki/T-Money for more information about these fields.
  */
 abstract class KSX6924PurseInfoResolver {
-    fun resolveCryptoAlgo(algo: Byte): String = getOrNone(cryptoAlgos[algo.toInt() and 0xFF], algo)
+    fun resolveCryptoAlgo(algo: Byte): FormattedString = getOrNone(cryptoAlgos[algo.toInt() and 0xFF], algo)
 
-    fun resolveCardType(type: Byte): String = getOrNone(cardTypes[type.toInt() and 0xFF], type)
+    fun resolveCardType(type: Byte): FormattedString = getOrNone(cardTypes[type.toInt() and 0xFF], type)
 
     /**
      * Maps an `IDCENTER` (issuer ID) into a name of the issuer.
      */
-    protected open val issuers: Map<Int, String> = emptyMap()
+    protected open val issuers: Map<Int, FormattedString> = emptyMap()
 
     /**
      * Looks up the name of an issuer, and returns an "unknown" value when it is not known.
      */
-    fun resolveIssuer(issuer: Byte): String = getOrNone(issuers[issuer.toInt() and 0xFF], issuer)
+    fun resolveIssuer(issuer: Byte): FormattedString = getOrNone(issuers[issuer.toInt() and 0xFF], issuer)
 
     /**
      * Maps a `USERCODE` (card holder type) into a name of the card type.
      */
-    protected open val userCodes: Map<Int, String> = emptyMap()
+    protected open val userCodes: Map<Int, FormattedString> = emptyMap()
 
-    fun resolveUserCode(code: Byte): String = getOrNone(userCodes[code.toInt() and 0xFF], code)
+    fun resolveUserCode(code: Byte): FormattedString = getOrNone(userCodes[code.toInt() and 0xFF], code)
 
     /**
      * Maps a `DISRATE` (discount rate ID) into a name of the type of discount.
      */
-    protected open val disRates: Map<Int, String> = emptyMap()
+    protected open val disRates: Map<Int, FormattedString> = emptyMap()
 
-    fun resolveDisRate(code: Byte): String = getOrNone(disRates[code.toInt() and 0xFF], code)
+    fun resolveDisRate(code: Byte): FormattedString = getOrNone(disRates[code.toInt() and 0xFF], code)
 
     /**
      * Maps a `TCODE` (telecommunications carrier ID) into a name of the carrier.
      */
-    protected open val tCodes: Map<Int, String> = emptyMap()
+    protected open val tCodes: Map<Int, FormattedString> = emptyMap()
 
-    fun resolveTCode(code: Byte): String = getOrNone(tCodes[code.toInt() and 0xFF], code)
+    fun resolveTCode(code: Byte): FormattedString = getOrNone(tCodes[code.toInt() and 0xFF], code)
 
     /**
      * Maps a `CCODE` (credit card / bank ID) into a name of the entity.
      */
-    protected open val cCodes: Map<Int, String> = emptyMap()
+    protected open val cCodes: Map<Int, FormattedString> = emptyMap()
 
-    fun resolveCCode(code: Byte): String = getOrNone(cCodes[code.toInt() and 0xFF], code)
+    fun resolveCCode(code: Byte): FormattedString = getOrNone(cCodes[code.toInt() and 0xFF], code)
 
     private fun getOrNone(
-        res: String?,
+        res: FormattedString?,
         value: Byte,
-    ): String {
+    ): FormattedString {
         val hexId = NumberUtils.byteToHex(value)
-        return when {
-            res == null -> "Unknown ($hexId)"
-            else -> res
-        }
+        return res ?: FormattedString("Unknown ($hexId)")
     }
 
     /**
      * Maps a `ALG` (encryption algorithm type) into a name of the algorithm.
      */
-    private val cryptoAlgos: Map<Int, String> =
+    private val cryptoAlgos: Map<Int, FormattedString> =
         mapOf(
-            0x00 to "SEED",
-            0x10 to "3DES",
+            0x00 to FormattedString("SEED"),
+            0x10 to FormattedString("3DES"),
         )
 
     /**
@@ -110,10 +108,10 @@ abstract class KSX6924PurseInfoResolver {
      *
      * Specifically, this describes the payment terms of the card (pre-paid, post-paid, etc.)
      */
-    private val cardTypes: Map<Int, String> =
+    private val cardTypes: Map<Int, FormattedString> =
         mapOf(
-            0x00 to "Pre-paid",
-            0x10 to "Post-pay",
-            0x15 to "Mobile Post-pay",
+            0x00 to FormattedString("Pre-paid"),
+            0x10 to FormattedString("Post-pay"),
+            0x15 to FormattedString("Mobile Post-pay"),
         )
 }

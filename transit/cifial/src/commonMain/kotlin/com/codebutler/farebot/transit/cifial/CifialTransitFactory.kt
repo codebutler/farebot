@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit.cifial
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
@@ -36,6 +35,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
     override val allCards: List<CardInfo> = emptyList()
@@ -46,7 +46,7 @@ class CifialTransitFactory : TransitFactory<ClassicCard, CifialTransitInfo> {
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
-        TransitIdentity.create(getStringBlocking(Res.string.cifial_card_name), null)
+        TransitIdentity.create(FormattedString(Res.string.cifial_card_name), null)
 
     override fun parseInfo(card: ClassicCard): CifialTransitInfo {
         val sector0 = card.getSector(0) as DataClassicSector

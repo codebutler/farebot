@@ -26,13 +26,13 @@
 package com.codebutler.farebot.card.ultralight
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import farebot.card.ultralight.generated.resources.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
+import com.codebutler.farebot.base.util.FormattedString
 
 /**
  * Utility class for reading Mifare Ultralight / Ultralight C
@@ -68,8 +68,8 @@ data class UltralightCard(
         return result
     }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val builder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val builder = FareBotUiTree.builder()
         val pagesBuilder =
             builder
                 .item()
@@ -77,7 +77,7 @@ data class UltralightCard(
         for (page in pages) {
             pagesBuilder
                 .item()
-                .title(stringResource.getString(Res.string.ultralight_page_title_format, page.index.toString()))
+                .title(FormattedString(Res.string.ultralight_page_title_format, page.index.toString()))
                 .value(page.data)
         }
         return builder.build()
