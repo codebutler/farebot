@@ -88,8 +88,8 @@ object UltralightCardReader {
      *
      * Falls back to UNKNOWN if detection fails.
      */
-    private fun detectCardType(tech: UltralightTechnology): UltralightCard.UltralightType {
-        return try {
+    private fun detectCardType(tech: UltralightTechnology): UltralightCard.UltralightType =
+        try {
             val protocol = UltralightProtocol(tech)
             val rawType = protocol.getCardType()
             rawType.parse()
@@ -97,5 +97,4 @@ object UltralightCardReader {
             println("UltralightCardReader: Card type detection failed, falling back to UNKNOWN: $e")
             UltralightCard.UltralightType.UNKNOWN
         }
-    }
 }
