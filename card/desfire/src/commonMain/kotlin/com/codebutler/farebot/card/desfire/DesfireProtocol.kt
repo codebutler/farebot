@@ -32,11 +32,11 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
 
 open class DesfireAccessControlException(
     message: String,
-) : Exception(message)
+) : UnauthorizedException(message)
 
 class DesfireNotFoundException(
     message: String,
-) : Exception(message)
+) : NotFoundException(message)
 
 internal class DesfireProtocol(
     private val mTransceiver: CardTransceiver,
