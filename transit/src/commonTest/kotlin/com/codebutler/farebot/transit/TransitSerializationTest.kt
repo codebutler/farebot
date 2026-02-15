@@ -24,7 +24,6 @@ package com.codebutler.farebot.transit
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -267,12 +266,11 @@ class TransitSerializationTest {
     }
 
     @Test
-    fun testStationUnknownStationNameFormat() {
+    fun testStationUnknownPreservesId() {
         val station = Station.unknown("0x1a2b")
-        val name = station.stationName
-        assertNotNull(name)
-        // Station.unknown() uses Res.string.unknown_station_format which renders as "Unknown (id)"
-        assertTrue(name.contains("0x1a2b"), "Unknown station name should contain the ID, got: $name")
+        assertEquals(true, station.isUnknown)
+        assertEquals("0x1a2b", station.humanReadableId)
+        assertEquals(null, station.stationNameRaw)
     }
 
     @Test

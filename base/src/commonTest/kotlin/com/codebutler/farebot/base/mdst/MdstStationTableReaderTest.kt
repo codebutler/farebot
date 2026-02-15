@@ -22,6 +22,8 @@
 
 package com.codebutler.farebot.base.mdst
 
+import farebot.base.generated.resources.Res
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -81,8 +83,7 @@ class MdstStationTableReaderTest {
     @OptIn(ExperimentalSerializationApi::class)
     @Test
     fun testMdstProtobufParsing() {
-        val bytes = loadTestFile("base/src/commonMain/composeResources/files/seq_go.mdst")
-        assertNotNull(bytes, "Could not load seq_go.mdst")
+        val bytes = runBlocking { Res.readBytes("files/seq_go.mdst") }
 
         val reader = MdstStationTableReader.fromByteArray(bytes)
         assertNotNull(reader.notice, "License notice should exist")
@@ -99,8 +100,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSuicaRailStationLookup() {
-        val bytes = loadTestFile("base/src/commonMain/composeResources/files/suica_rail.mdst")
-        assertNotNull(bytes, "Could not load suica_rail.mdst")
+        val bytes = runBlocking { Res.readBytes("files/suica_rail.mdst") }
 
         val reader = MdstStationTableReader.fromByteArray(bytes)
 
@@ -121,8 +121,7 @@ class MdstStationTableReaderTest {
      */
     @Test
     fun testSuicaBusStationLookup() {
-        val bytes = loadTestFile("base/src/commonMain/composeResources/files/suica_bus.mdst")
-        assertNotNull(bytes, "Could not load suica_bus.mdst")
+        val bytes = runBlocking { Res.readBytes("files/suica_bus.mdst") }
 
         // Just verify it parses without error and can look up stations
         val reader = MdstStationTableReader.fromByteArray(bytes)

@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew ktlintCheck checkstyle
 
       - name: Run tests
-        run: ./gradlew allTests
+        run: xvfb-run ./gradlew allTests
 
       - name: Build Android APK
         run: ./gradlew :app:android:assembleDebug
@@ -40,7 +40,7 @@ jobs:
 
   ios:
     name: Build & Test (iOS)
-    runs-on: macos-latest
+    runs-on: nscloud-macos-sequoia-arm64-6x14
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,7 +54,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build iOS framework
-        run: ./gradlew linkReleaseFrameworkIosArm64
+        run: ./gradlew linkDebugFrameworkIosArm64
 
       - name: Run iOS simulator tests
         run: ./gradlew iosSimulatorArm64Test

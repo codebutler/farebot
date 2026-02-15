@@ -33,16 +33,51 @@ import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitInfo
+import farebot.app.generated.resources.Res
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Instant
 
 /**
- * Platform-specific function to load a test resource as bytes.
+ * Mapping from old test resource paths to Compose Resource paths in files/samples/.
+ */
+private val testResourceMapping =
+    mapOf(
+        "opal/Opal.json" to "files/samples/Opal.json",
+        "hsl/HSLv2.json" to "files/samples/HSL.json",
+        "hsl/HSL_UL.json" to "files/samples/HSL_UL.json",
+        "troika/TroikaUL.json" to "files/samples/Troika.json",
+        "tmoney/TMoney.json" to "files/samples/TMoney.json",
+        "cepas/EZLink.json" to "files/samples/EZLink.json",
+        "holo/Holo.json" to "files/samples/Holo.json",
+        "mobib/Mobib.json" to "files/samples/Mobib.json",
+        "compass/Compass.json" to "files/samples/Compass.json",
+        "seqgo/SeqGo.json" to "files/samples/SeqGo.json",
+        "laxtap/LaxTap.json" to "files/samples/LaxTap.json",
+        "mspgoto/MspGoTo.json" to "files/samples/MspGoTo.json",
+        "myki/Myki.json" to "files/samples/Myki.json",
+        "octopus/Octopus.json" to "files/samples/Octopus.json",
+        "trimethop/TrimetHop.json" to "files/samples/TrimetHop.json",
+        "bilhete/BilheteUnico.json" to "files/samples/BilheteUnico.json",
+        "ventra/Ventra.json" to "files/samples/Ventra.json",
+        "easycard/deadbeef.mfc" to "files/samples/EasyCard.mfc",
+        "flipper/Clipper.nfc" to "files/samples/Clipper.nfc",
+        "flipper/ICOCA.nfc" to "files/samples/ICOCA.nfc",
+        "flipper/ORCA.nfc" to "files/samples/ORCA.nfc",
+        "flipper/PASMO.nfc" to "files/samples/PASMO.nfc",
+        "flipper/Suica.nfc" to "files/samples/Suica.nfc",
+    )
+
+/**
+ * Loads a test resource as bytes using Compose Resources.
  * The path is relative to the test resources root (e.g., "easycard/deadbeef.mfc").
  */
-expect fun loadTestResource(path: String): ByteArray?
+fun loadTestResource(path: String): ByteArray? {
+    val resPath = testResourceMapping[path] ?: return null
+    return runBlocking { Res.readBytes(resPath) }
+}
 
 /**
  * Utility for loading card dump files from test resources.
