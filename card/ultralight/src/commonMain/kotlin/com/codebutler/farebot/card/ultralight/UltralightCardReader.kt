@@ -42,7 +42,7 @@ object UltralightCardReader {
         var pageNumber = 0
         var pageBuffer = ByteArray(0)
         val pages = mutableListOf<UltralightPage>()
-        while (pageNumber <= size) {
+        while (pageNumber < size) {
             if (pageNumber % 4 == 0) {
                 pageBuffer = tech.readPages(pageNumber)
             }

@@ -30,13 +30,11 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
 import com.codebutler.farebot.card.nfc.CardTransceiver
 
-open class UnauthorizedException(
+open class DesfireAccessControlException(
     message: String,
 ) : Exception(message)
 
-class PermissionDeniedException : UnauthorizedException("Permission denied")
-
-class NotFoundException(
+class DesfireNotFoundException(
     message: String,
 ) : Exception(message)
 
@@ -175,7 +173,7 @@ internal class DesfireProtocol(
         var recvBuffer = mTransceiver.transceive(wrapMessage(command, parameters))
 
         while (true) {
-            if (recvBuffer[recvBuffer.size - 2] != 0x91.toByte()) {
+            if (recvBuffer.size < 2 || recvBuffer[recvBuffer.size - 2] != 0x91.toByte()) {
                 throw Exception("Invalid response")
             }
 
@@ -208,10 +206,10 @@ internal class DesfireProtocol(
                     }
                     recvBuffer = mTransceiver.transceive(wrapMessage(GET_ADDITIONAL_FRAME, null))
                 }
-                PERMISSION_DENIED -> throw PermissionDeniedException()
-                AUTHENTICATION_ERROR -> throw UnauthorizedException("Authentication error")
-                AID_NOT_FOUND -> throw NotFoundException("AID not found")
-                FILE_NOT_FOUND -> throw NotFoundException("File not found")
+                PERMISSION_DENIED -> throw DesfireAccessControlException("Permission denied")
+                AUTHENTICATION_ERROR -> throw DesfireAccessControlException("Authentication error")
+                AID_NOT_FOUND -> throw DesfireNotFoundException("AID not found")
+                FILE_NOT_FOUND -> throw DesfireNotFoundException("File not found")
                 else -> throw Exception("Unknown status code: " + (status.toInt() and 0xFF).toString(16))
             }
         }
@@ -258,9 +256,9 @@ internal class DesfireProtocol(
         // Status codes (Section 3.4)
         private const val OPERATION_OK: Byte = 0x00.toByte()
         private val PERMISSION_DENIED: Byte = 0x9D.toByte()
+        private val AID_NOT_FOUND: Byte = 0xA0.toByte()
         private val AUTHENTICATION_ERROR: Byte = 0xAE.toByte()
         private val ADDITIONAL_FRAME: Byte = 0xAF.toByte()
-        private val AID_NOT_FOUND: Byte = 0xA0.toByte()
         private val FILE_NOT_FOUND: Byte = 0xF0.toByte()
     }
 }
