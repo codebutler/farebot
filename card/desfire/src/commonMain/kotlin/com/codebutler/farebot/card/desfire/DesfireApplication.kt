@@ -28,6 +28,8 @@ import kotlinx.serialization.Serializable
 data class DesfireApplication(
     val id: Int,
     val files: List<DesfireFile>,
+    val authLog: List<DesfireAuthLog> = emptyList(),
+    val dirListLocked: Boolean = false,
 ) {
     fun getFile(fileId: Int): DesfireFile? = files.firstOrNull { it.id == fileId }
 
@@ -35,6 +37,8 @@ data class DesfireApplication(
         fun create(
             id: Int,
             files: List<DesfireFile>,
-        ): DesfireApplication = DesfireApplication(id, files)
+            authLog: List<DesfireAuthLog> = emptyList(),
+            dirListLocked: Boolean = false,
+        ): DesfireApplication = DesfireApplication(id, files, authLog, dirListLocked)
     }
 }

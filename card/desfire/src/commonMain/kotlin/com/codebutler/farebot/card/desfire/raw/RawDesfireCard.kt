@@ -70,6 +70,7 @@ data class RawDesfireCard(
             date: Instant,
             apps: List<RawDesfireApplication>,
             manufData: RawDesfireManufacturingData,
-        ): RawDesfireCard = RawDesfireCard(tagId, date, apps, manufData)
+            appListLocked: Boolean = false,
+        ): RawDesfireCard = RawDesfireCard(tagId, date, apps, manufData, appListLocked)
     }
 }
