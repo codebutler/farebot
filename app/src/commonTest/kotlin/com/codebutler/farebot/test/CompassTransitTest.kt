@@ -58,7 +58,7 @@ class CompassTransitTest {
             // Each block is 16 bytes = 4 pages of 4 bytes
             for (p in 0..3) {
                 val pageData = hexToBytes(cardData[block].substring(p * 8, (p + 1) * 8))
-                pages.add(UltralightPage(index = pageIndex++, data = pageData))
+                pages.add(UltralightPage.create(index = pageIndex++, data = pageData))
             }
         }
 
