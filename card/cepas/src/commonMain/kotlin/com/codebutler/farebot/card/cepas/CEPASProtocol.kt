@@ -32,14 +32,13 @@ internal class CEPASProtocol(
 ) {
     fun getPurse(purseId: Int): ByteArray? =
         try {
-            val result =
-                protocol.sendRequest(
-                    ISO7816Protocol.CLASS_90,
-                    0x32.toByte(),
-                    purseId.toByte(),
-                    0.toByte(),
-                    0.toByte(),
-                )
+            val result = protocol.sendRequest(
+                ISO7816Protocol.CLASS_90,
+                0x32.toByte(),
+                purseId.toByte(),
+                0.toByte(),
+                0.toByte(),
+            )
             if (result.isEmpty()) null else result
         } catch (ex: ISO7816Exception) {
             null
@@ -48,29 +47,27 @@ internal class CEPASProtocol(
     fun getHistory(purseId: Int): ByteArray? {
         var historyBuff: ByteArray
         try {
-            historyBuff =
-                protocol.sendRequest(
-                    ISO7816Protocol.CLASS_90,
-                    0x32.toByte(),
-                    purseId.toByte(),
-                    0.toByte(),
-                    0.toByte(),
-                    byteArrayOf(0.toByte()),
-                )
+            historyBuff = protocol.sendRequest(
+                ISO7816Protocol.CLASS_90,
+                0x32.toByte(),
+                purseId.toByte(),
+                0.toByte(),
+                0.toByte(),
+                byteArrayOf(0.toByte()),
+            )
         } catch (ex: ISO7816Exception) {
             return null
         }
 
         try {
-            val historyBuff2 =
-                protocol.sendRequest(
-                    ISO7816Protocol.CLASS_90,
-                    0x32.toByte(),
-                    purseId.toByte(),
-                    0.toByte(),
-                    0.toByte(),
-                    byteArrayOf((historyBuff.size / 16).toByte()),
-                )
+            val historyBuff2 = protocol.sendRequest(
+                ISO7816Protocol.CLASS_90,
+                0x32.toByte(),
+                purseId.toByte(),
+                0.toByte(),
+                0.toByte(),
+                byteArrayOf((historyBuff.size / 16).toByte()),
+            )
             historyBuff = historyBuff + historyBuff2
         } catch (ex: ISO7816Exception) {
             // Error reading 2nd purse history
