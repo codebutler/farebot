@@ -25,6 +25,7 @@ package com.codebutler.farebot.card.cepas
 import com.codebutler.farebot.card.cepas.raw.RawCEPASCard
 import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory
 import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse
+import com.codebutler.farebot.card.iso7816.ISO7816Protocol
 import com.codebutler.farebot.card.nfc.CardTransceiver
 import kotlin.time.Clock
 
@@ -37,17 +38,26 @@ object CEPASCardReader {
         val purses = arrayOfNulls<RawCEPASPurse>(16)
         val histories = arrayOfNulls<RawCEPASHistory>(16)
 
-        val protocol = CEPASProtocol(tech)
+        val protocol = CEPASProtocol(ISO7816Protocol(tech))
 
         for (purseId in purses.indices) {
-            purses[purseId] = protocol.getPurse(purseId)
+            val purseData = protocol.getPurse(purseId)
+            purses[purseId] = if (purseData != null) {
+                RawCEPASPurse.create(purseId, purseData)
+            } else {
+                RawCEPASPurse.create(purseId, "No purse found")
+            }
         }
 
         for (historyId in histories.indices) {
             val rawCEPASPurse = purses[historyId]!!
             if (rawCEPASPurse.isValid) {
-                val recordCount = rawCEPASPurse.logfileRecordCount().toString().toInt()
-                histories[historyId] = protocol.getHistory(historyId, recordCount)
+                val historyData = protocol.getHistory(historyId)
+                histories[historyId] = if (historyData != null) {
+                    RawCEPASHistory.create(historyId, historyData)
+                } else {
+                    RawCEPASHistory.create(historyId, "No history found")
+                }
             } else {
                 histories[historyId] = RawCEPASHistory.create(historyId, "Invalid Purse")
             }
