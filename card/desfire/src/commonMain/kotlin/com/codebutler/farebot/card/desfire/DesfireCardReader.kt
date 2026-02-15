@@ -41,16 +41,17 @@ object DesfireCardReader {
 
         // Try to read app list, fall back to empty list if locked
         var appListLocked: Boolean
-        val appIds: IntArray = try {
-            val ids = desfireProtocol.getAppList()
-            appListLocked = false
-            ids
-        } catch (e: UnauthorizedException) {
-            // TODO: When DesfireCardTransitFactory infrastructure is added, probe hiddenAppIds
-            // from all registered factories instead of using empty array
-            appListLocked = true
-            intArrayOf()
-        }
+        val appIds: IntArray =
+            try {
+                val ids = desfireProtocol.getAppList()
+                appListLocked = false
+                ids
+            } catch (e: UnauthorizedException) {
+                // TODO: When DesfireCardTransitFactory infrastructure is added, probe hiddenAppIds
+                // from all registered factories instead of using empty array
+                appListLocked = true
+                intArrayOf()
+            }
 
         val apps = readApplications(desfireProtocol, appIds)
         return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData, appListLocked)
@@ -59,7 +60,7 @@ object DesfireCardReader {
     @Throws(Exception::class)
     private fun readApplications(
         desfireProtocol: DesfireProtocol,
-        appIds: IntArray
+        appIds: IntArray,
     ): List<RawDesfireApplication> {
         val apps = ArrayList<RawDesfireApplication>()
 
@@ -86,21 +87,22 @@ object DesfireCardReader {
     @Throws(Exception::class)
     private fun readFiles(
         desfireProtocol: DesfireProtocol,
-        authLog: MutableList<DesfireAuthLog>
+        authLog: MutableList<DesfireAuthLog>,
     ): Pair<List<RawDesfireFile>, Boolean> {
         val files = ArrayList<RawDesfireFile>()
 
         // Try to read file list, fall back to scanning 0-31 if locked
         var dirListLocked: Boolean
-        val fileIds: IntArray = try {
-            val ids = desfireProtocol.getFileList()
-            dirListLocked = false
-            ids
-        } catch (e: UnauthorizedException) {
-            // Directory list is locked, scan all possible file IDs (0-31)
-            dirListLocked = true
-            IntArray(0x20) { it }
-        }
+        val fileIds: IntArray =
+            try {
+                val ids = desfireProtocol.getFileList()
+                dirListLocked = false
+                ids
+            } catch (e: UnauthorizedException) {
+                // Directory list is locked, scan all possible file IDs (0-31)
+                dirListLocked = true
+                IntArray(0x20) { it }
+            }
 
         for (fileId in fileIds) {
             try {

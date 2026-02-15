@@ -28,7 +28,7 @@ data class DesfireAuthLog(
     val keyId: Int,
     val challenge: ByteArray,
     val response: ByteArray,
-    val confirm: ByteArray
+    val confirm: ByteArray,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

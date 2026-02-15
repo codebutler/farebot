@@ -23,9 +23,16 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
 
 internal interface DesfireUnlocker {
     // get the order for file reading as some keys may depend on reading some files
-    fun getOrder(desfireTag: DesfireProtocol, fileIds: IntArray): IntArray
+    fun getOrder(
+        desfireTag: DesfireProtocol,
+        fileIds: IntArray,
+    ): IntArray
 
     // Unlock a given file.
-    fun unlock(desfireTag: DesfireProtocol, files: Map<Int, RawDesfireFile>,
-               fileId: Int, authLog: MutableList<DesfireAuthLog>)
+    fun unlock(
+        desfireTag: DesfireProtocol,
+        files: Map<Int, RawDesfireFile>,
+        fileId: Int,
+        authLog: MutableList<DesfireAuthLog>,
+    )
 }
