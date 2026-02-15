@@ -11,11 +11,11 @@ import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun loadTestFile(relativePath: String): ByteArray? {
-    // Try common locations for the project root
     val possibleRoots =
         listOf(
-            "/Users/eric/Code/farebot",
+            getEnv("GITHUB_WORKSPACE") ?: "",
             getEnv("PROJECT_DIR") ?: "",
+            "/Users/eric/Code/farebot",
             ".",
         )
 
