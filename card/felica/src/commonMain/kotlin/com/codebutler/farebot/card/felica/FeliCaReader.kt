@@ -164,13 +164,9 @@ object FeliCaReader {
                 if (blocks.isNotEmpty()) {
                     services.add(FelicaService.create(serviceCode, blocks))
                 }
-
-                if (isPartialRead) break
             }
 
             systems.add(FelicaSystem.create(systemCode, services, (serviceCodes + excludedCodes).toSet()))
-
-            if (isPartialRead) break
         }
 
         return RawFelicaCard.create(tagId, Clock.System.now(), idm, pmm, systems, isPartialRead)
