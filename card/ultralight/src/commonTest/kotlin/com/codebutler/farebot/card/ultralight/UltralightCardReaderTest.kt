@@ -179,3 +179,4 @@ class UltralightCardReaderTest {
         assertTrue(tech.readPageOffsets.all { it < detectedPageCount })
     }
 }
+
