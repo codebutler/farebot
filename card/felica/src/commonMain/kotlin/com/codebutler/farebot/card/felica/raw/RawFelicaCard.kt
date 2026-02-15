@@ -39,6 +39,7 @@ data class RawFelicaCard(
     @Contextual val idm: FeliCaIdm,
     @Contextual val pmm: FeliCaPmm,
     val systems: List<FelicaSystem>,
+    val isPartialRead: Boolean = false,
 ) : RawCard<FelicaCard> {
     override fun cardType(): CardType = CardType.FeliCa
 
@@ -48,7 +49,7 @@ data class RawFelicaCard(
 
     override fun isUnauthorized(): Boolean = false
 
-    override fun parse(): FelicaCard = FelicaCard.create(_tagId, _scannedAt, idm, pmm, systems)
+    override fun parse(): FelicaCard = FelicaCard.create(_tagId, _scannedAt, idm, pmm, systems, isPartialRead)
 
     companion object {
         fun create(
@@ -57,6 +58,7 @@ data class RawFelicaCard(
             idm: FeliCaIdm,
             pmm: FeliCaPmm,
             systems: List<FelicaSystem>,
-        ): RawFelicaCard = RawFelicaCard(tagId, scannedAt, idm, pmm, systems)
+            isPartialRead: Boolean = false,
+        ): RawFelicaCard = RawFelicaCard(tagId, scannedAt, idm, pmm, systems, isPartialRead)
     }
 }
