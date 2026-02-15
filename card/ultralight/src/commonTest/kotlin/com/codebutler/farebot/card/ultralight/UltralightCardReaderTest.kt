@@ -96,8 +96,8 @@ class UltralightCardReaderTest {
 
         val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // Protocol detection identifies as MF0ICU1 (16 pages)
-        assertEquals(UltralightCard.UltralightType.MF0ICU1.pageCount, result.pages.size)
+        // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
+        assertEquals(UltralightCard.UltralightType.MF0ICU1.pageCount - 1, result.pages.size)
     }
 
     @Test
@@ -110,8 +110,8 @@ class UltralightCardReaderTest {
 
         val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // Protocol detection identifies as MF0ICU2 (44 pages)
-        assertEquals(UltralightCard.UltralightType.MF0ICU2.pageCount, result.pages.size)
+        // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
+        assertEquals(UltralightCard.UltralightType.MF0ICU2.pageCount - 1, result.pages.size)
     }
 
     @Test
