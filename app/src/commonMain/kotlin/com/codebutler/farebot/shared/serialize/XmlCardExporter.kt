@@ -123,10 +123,13 @@ object XmlCardExporter {
                 append(">\n")
 
                 // Settings - export raw bytes
-                append("$fileIndent  ")
-                append("<settings>")
-                append(file.fileSettings.data.toBase64())
-                append("</settings>\n")
+                val fileSettings = file.fileSettings
+                if (fileSettings != null) {
+                    append("$fileIndent  ")
+                    append("<settings>")
+                    append(fileSettings.data.toBase64())
+                    append("</settings>\n")
+                }
 
                 val error = file.error
                 val fileData = file.fileData
