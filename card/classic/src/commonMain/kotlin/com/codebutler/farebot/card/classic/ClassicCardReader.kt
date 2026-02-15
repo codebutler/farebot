@@ -53,14 +53,22 @@ object ClassicCardReader {
         for (sectorIndex in 0 until tech.sectorCount) {
             try {
                 var authSuccess = false
+                var successfulKeyA: ByteArray? = null
+                var successfulKeyB: ByteArray? = null
 
                 // Try the default keys first
                 if (!authSuccess && sectorIndex == 0) {
                     authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY)
+                    if (authSuccess) {
+                        successfulKeyA = PREAMBLE_KEY
+                    }
                 }
 
                 if (!authSuccess) {
                     authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, ClassicTechnology.KEY_DEFAULT)
+                    if (authSuccess) {
+                        successfulKeyA = ClassicTechnology.KEY_DEFAULT
+                    }
                 }
 
                 if (cardKeys != null) {
@@ -69,8 +77,13 @@ object ClassicCardReader {
                         val sectorKey: ClassicSectorKey? = cardKeys.keyForSector(sectorIndex)
                         if (sectorKey != null) {
                             authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.keyA)
-                            if (!authSuccess) {
+                            if (authSuccess) {
+                                successfulKeyA = sectorKey.keyA
+                            } else {
                                 authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.keyB)
+                                if (authSuccess) {
+                                    successfulKeyB = sectorKey.keyB
+                                }
                             }
                         }
                     }
@@ -94,12 +107,17 @@ object ClassicCardReader {
                                     keys[keyIndex].keyA,
                                 )
 
-                            if (!authSuccess) {
+                            if (authSuccess) {
+                                successfulKeyA = keys[keyIndex].keyA
+                            } else {
                                 authSuccess =
                                     tech.authenticateSectorWithKeyB(
                                         sectorIndex,
                                         keys[keyIndex].keyB,
                                     )
+                                if (authSuccess) {
+                                    successfulKeyB = keys[keyIndex].keyB
+                                }
                             }
 
                             if (authSuccess) {
@@ -118,7 +136,14 @@ object ClassicCardReader {
                         val data = tech.readBlock(firstBlockIndex + blockIndex)
                         blocks.add(RawClassicBlock.create(blockIndex, data))
                     }
-                    sectors.add(RawClassicSector.createData(sectorIndex, blocks))
+                    sectors.add(
+                        RawClassicSector.createData(
+                            sectorIndex,
+                            blocks,
+                            successfulKeyA,
+                            successfulKeyB,
+                        ),
+                    )
                 } else {
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
                 }
