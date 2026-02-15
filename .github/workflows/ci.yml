@@ -10,9 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-env:
-  JAVA_TOOL_OPTIONS: -Djava.awt.headless=true
-
 jobs:
   build-and-test:
     name: Build & Test (JVM + Android)
@@ -33,7 +30,7 @@ jobs:
         run: ./gradlew ktlintCheck checkstyle
 
       - name: Run tests
-        run: ./gradlew allTests
+        run: xvfb-run ./gradlew allTests
 
       - name: Build Android APK
         run: ./gradlew :app:android:assembleDebug
