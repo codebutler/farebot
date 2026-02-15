@@ -1,0 +1,37 @@
+{
+  "name": "Claude Code Sandbox",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "TZ": "${localEnv:TZ:America/Los_Angeles}",
+      "GIT_DELTA_VERSION": "0.18.2",
+      "ZSH_IN_DOCKER_VERSION": "1.2.0"
+    }
+  },
+  "runArgs": [
+    "--cap-add=NET_ADMIN",
+    "--cap-add=NET_RAW",
+    "--memory=16g",
+    "--cpus=8"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installGradle": "true"
+    }
+  },
+  "remoteUser": "bun",
+  "mounts": [
+    "source=claude-code-history-${devcontainerId},target=/commandhistory,type=volume",
+    "source=claude-code-ghconfig-${devcontainerId},target=/home/bun/.config/gh,type=volume",
+    "source=${localEnv:HOME}/.tmux.conf,target=/home/bun/.tmux.conf,type=bind,readonly"
+  ],
+  "containerEnv": {
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "/workspace/.devcontainer/on-create.sh",
+  "postStartCommand": "/workspace/.devcontainer/on-start.sh",
+  "waitFor": "postStartCommand"
+}

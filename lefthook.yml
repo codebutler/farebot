@@ -1,0 +1,5 @@
+pre-commit:
+  commands:
+    ktlint-format:
+      run: ./gradlew ktlintFormat
+      stage_fixed: true
