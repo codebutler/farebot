@@ -124,6 +124,7 @@ class DesktopCardScanner : CardScanner {
         } else {
             transports.forEachIndexed { index, transport ->
                 transport.flush()
+                transport.sendAck() // RC-S956 needs ACK before first command
                 val probe = PN533(transport)
                 val fw = probe.getFirmwareVersion()
                 val label = "PN53x #${index + 1}"

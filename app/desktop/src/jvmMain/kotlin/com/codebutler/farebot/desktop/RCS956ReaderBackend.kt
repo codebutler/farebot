@@ -41,12 +41,26 @@ class RCS956ReaderBackend(
     override val name: String = deviceLabel
 
     override fun initDevice(pn533: PN533) {
+        // nfcpy rcs956.py init(transport) + Device.__init__() sequence.
+        //
+        // 1. ACK clears device state after USB connect (init function)
+        // 2. resetMode #1 switches to Mode 0 (Device.__init__)
+        // 3. getFirmwareVersion identifies device
+        // 4. mute() = resetMode #2 + rfConfig auto-RFCA (Device.__init__)
+        // 5. RF configuration
+        // 6. resetMode #3 after config (Device.__init__)
+        // 7. writeRegister CIU setup
+
+        pn533.sendAck() // nfcpy init(transport): transport.write(Chipset.ACK)
+        pn533.resetMode()
+
         val fw = pn533.getFirmwareVersion()
         println("[$name] Firmware: $fw (RC-S956)")
 
-        // nfcpy rcs956.py Device.__init__() sequence:
+        // mute() = resetMode + super().mute()
         pn533.resetMode()
-        pn533.rfConfiguration(0x01, byteArrayOf(0x02)) // mute: auto RFCA
+        pn533.rfConfiguration(0x01, byteArrayOf(0x02)) // super().mute(): auto RFCA
+
         pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A)) // timings
         pn533.rfConfiguration(0x04, byteArrayOf(0x00)) // MaxRtyCOM
         pn533.rfConfiguration(0x05, byteArrayOf(0x00, 0x00, 0x01)) // MaxRetries

@@ -167,6 +167,10 @@ class PN533(
         transport.sendCommand(CMD_IN_RELEASE, byteArrayOf(tg.toByte()))
     }
 
+    fun sendAck() {
+        transport.sendAck()
+    }
+
     fun close() {
         transport.close()
     }
