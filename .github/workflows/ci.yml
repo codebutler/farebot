@@ -43,7 +43,7 @@ jobs:
 
   ios:
     name: Build & Test (iOS)
-    runs-on: macos-13
+    runs-on: nscloud-macos-sequoia-arm64-6x14
     steps:
       - uses: actions/checkout@v4
         with:
