@@ -62,7 +62,6 @@ class PN533(
     fun resetMode() {
         transport.sendCommand(CMD_RESET_MODE, byteArrayOf(0x01))
         transport.sendAck()
-        Thread.sleep(10)
     }
 
     fun writeRegister(
@@ -153,7 +152,7 @@ class PN533(
         if (resp.isEmpty()) throw PN533Exception("InDataExchange: empty response")
         val status = resp[0].toInt() and 0xFF
         if (status != 0x00) {
-            throw PN533Exception("InDataExchange error: status=0x%02X".format(status))
+            throw PN533Exception("InDataExchange error: status=0x${status.hexByte()}")
         }
         return resp.copyOfRange(1, resp.size)
     }
@@ -164,7 +163,7 @@ class PN533(
         if (resp.isEmpty()) throw PN533Exception("InCommunicateThru: empty response")
         val status = resp[0].toInt() and 0xFF
         if (status != 0x00) {
-            throw PN533Exception("InCommunicateThru error: status=0x%02X".format(status))
+            throw PN533Exception("InCommunicateThru error: status=0x${status.hexByte()}")
         }
         return resp.copyOfRange(1, resp.size)
     }
@@ -221,7 +220,7 @@ class PN533(
         val revision: Int,
         val support: Int,
     ) {
-        override fun toString(): String = "IC=0x%02X v%d.%d support=0x%02X".format(ic, version, revision, support)
+        override fun toString(): String = "IC=0x${ic.hexByte()} v$version.$revision support=0x${support.hexByte()}"
     }
 
     sealed class TargetInfo(
@@ -268,5 +267,12 @@ class PN533(
 
         // Timeout for InListPassiveTarget polling (ms)
         const val POLL_TIMEOUT_MS = 2000
+
+        private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
+
+        internal fun Int.hexByte(): String {
+            val v = this and 0xFF
+            return "${HEX_CHARS[v ushr 4]}${HEX_CHARS[v and 0x0F]}"
+        }
     }
 }

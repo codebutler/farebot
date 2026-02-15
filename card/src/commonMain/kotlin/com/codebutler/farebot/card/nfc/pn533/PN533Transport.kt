@@ -1,5 +1,5 @@
 /*
- * PN533ReaderBackend.kt
+ * PN533Transport.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -20,23 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.codebutler.farebot.desktop
-
-import com.codebutler.farebot.card.nfc.pn533.PN533
-import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
+package com.codebutler.farebot.card.nfc.pn533
 
 /**
- * NXP PN533 reader backend (e.g., SCM SCL3711).
+ * Platform-specific transport layer for PN533 NFC reader communication.
+ * Handles USB frame serialization and bulk I/O.
  */
-class PN533ReaderBackend(
-    transport: Usb4JavaPN533Transport? = null,
-) : PN53xReaderBackend(transport) {
-    override val name: String = "PN533"
+interface PN533Transport {
+    fun sendCommand(code: Byte, data: ByteArray = byteArrayOf(), timeoutMs: Int = 5000): ByteArray
+    fun sendAck()
+    fun flush()
+    fun close()
+}
 
-    override fun initDevice(pn533: PN533) {
-        val fw = pn533.getFirmwareVersion()
-        println("[$name] Firmware: $fw")
-        pn533.samConfiguration()
-        pn533.setMaxRetries(passiveActivation = 0x02)
-    }
+open class PN533Exception(
+    message: String,
+) : Exception(message)
+
+class PN533CommandException(
+    val errorCode: Int,
+) : PN533Exception("PN53x command error: 0x${hexByte(errorCode)}")
+
+private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
+
+private fun hexByte(value: Int): String {
+    val v = value and 0xFF
+    return "${HEX_CHARS[v ushr 4]}${HEX_CHARS[v and 0x0F]}"
 }
