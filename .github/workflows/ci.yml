@@ -57,4 +57,6 @@ jobs:
         run: ./gradlew linkDebugFrameworkIosArm64
 
       - name: Run iOS simulator tests
+        env:
+          SIMCTL_CHILD_GITHUB_WORKSPACE: ${{ github.workspace }}
         run: ./gradlew iosSimulatorArm64Test
