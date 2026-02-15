@@ -9,6 +9,7 @@ import com.codebutler.farebot.persist.db.model.SavedKey
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import com.codebutler.farebot.shared.ui.screen.AddKeyUiState
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,9 +18,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+@Inject
 class AddKeyViewModel(
     private val keysPersister: CardKeysPersister,
-    private val cardScanner: CardScanner?,
+    private val cardScanner: CardScanner? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddKeyUiState(hasNfc = cardScanner != null))
     val uiState: StateFlow<AddKeyUiState> = _uiState.asStateFlow()

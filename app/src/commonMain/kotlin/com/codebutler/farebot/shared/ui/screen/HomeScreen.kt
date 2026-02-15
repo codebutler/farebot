@@ -78,6 +78,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.shared.di.LocalAppGraph
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NfcStatus
 import com.codebutler.farebot.shared.viewmodel.ScanError
@@ -114,7 +115,6 @@ import farebot.app.generated.resources.tab_explore
 import farebot.app.generated.resources.tab_scan
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,7 +144,7 @@ fun HomeScreen(
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
     onToggleShowAllScans: () -> Unit = {},
 ) {
-    val appPreferences = koinInject<AppPreferences>()
+    val appPreferences = LocalAppGraph.current.appPreferences
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var menuExpanded by remember { mutableStateOf(false) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }

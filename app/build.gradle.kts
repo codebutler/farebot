@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.metro)
 }
 
 kotlin {
@@ -36,7 +37,6 @@ kotlin {
             implementation(libs.maps.compose)
             implementation(libs.play.services.maps)
             implementation(libs.sqldelight.android.driver)
-            implementation(libs.koin.android)
             implementation(libs.activity.compose)
         }
         iosMain.dependencies {
@@ -57,10 +57,6 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.core)
-            api(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
-            implementation(libs.koin.compose.viewmodel.navigation)
             api(project(":base"))
             api(project(":card"))
             api(project(":card:cepas"))

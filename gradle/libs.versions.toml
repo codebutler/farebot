@@ -14,7 +14,7 @@ activity = "1.10.1"
 material = "1.13.0"
 appcompat = "1.7.1"
 kotlincrypto-hash = "0.8.0"
-koin = "4.1.1"
+metro = "0.10.4"
 checkstyle = "13.0.0"
 guava = "33.5.0-android"
 play-services-maps = "20.0.0"
@@ -43,12 +43,6 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 # KotlinCrypto
 kotlincrypto-hash-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto-hash" }
 
-# Koin
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
-koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
-koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin" }
 
 # Compose BOM
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
@@ -89,3 +83,4 @@ compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-m
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "14.0.1" }
+metro = { id = "dev.zacsweers.metro", version.ref = "metro" }

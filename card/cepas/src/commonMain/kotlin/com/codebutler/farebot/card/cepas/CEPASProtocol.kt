@@ -4,10 +4,9 @@
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
  *
- * Copyright (C) 2011-2012, 2015-2016 Eric Butler <eric@codebutler.com>
  * Copyright (C) 2011 Sean Cross <sean@chumby.com>
- * Copyright (C) 2012 tbonang <bonang@gmail.com>
- * Copyright (C) 2016 Michael Farrell <micolous+git@gmail.com>
+ * Copyright (C) 2013-2014, 2016 Eric Butler <eric@codebutler.com>
+ * Copyright (C) 2018 Michael Farrell <micolous+git@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,152 +24,55 @@
 
 package com.codebutler.farebot.card.cepas
 
-import com.codebutler.farebot.card.cepas.raw.RawCEPASHistory
-import com.codebutler.farebot.card.cepas.raw.RawCEPASPurse
-import com.codebutler.farebot.card.nfc.CardTransceiver
+import com.codebutler.farebot.card.iso7816.ISO7816Exception
+import com.codebutler.farebot.card.iso7816.ISO7816Protocol
 
 internal class CEPASProtocol(
-    private val mTransceiver: CardTransceiver,
+    private val protocol: ISO7816Protocol,
 ) {
-    fun getPurse(purseId: Int): RawCEPASPurse {
+    fun getPurse(purseId: Int): ByteArray? =
         try {
-            sendSelectFile()
-            val purseBuff =
-                sendRequest(0x32.toByte(), purseId.toByte(), 0.toByte(), 0.toByte(), byteArrayOf(0.toByte()))
-            return if (purseBuff != null) {
-                RawCEPASPurse.create(purseId, purseBuff)
-            } else {
-                RawCEPASPurse.create(purseId, "No purse found")
-            }
-        } catch (ex: CEPASException) {
-            return RawCEPASPurse.create(purseId, ex.message ?: "Unknown error")
+            val result = protocol.sendRequest(
+                ISO7816Protocol.CLASS_90,
+                0x32.toByte(),
+                purseId.toByte(),
+                0.toByte(),
+                0.toByte(),
+            )
+            if (result.isEmpty()) null else result
+        } catch (ex: ISO7816Exception) {
+            null
         }
-    }
 
-    fun getHistory(
-        purseId: Int,
-        recordCount: Int,
-    ): RawCEPASHistory {
+    fun getHistory(purseId: Int): ByteArray? {
+        var historyBuff: ByteArray
         try {
-            var fullHistoryBuff: ByteArray? = null
-            val historyBuff =
-                sendRequest(
-                    0x32.toByte(),
-                    purseId.toByte(),
-                    0.toByte(),
-                    1.toByte(),
-                    byteArrayOf(0.toByte(), (if (recordCount <= 15) recordCount * 16 else 15 * 16).toByte()),
-                )
-
-            if (historyBuff != null) {
-                if (recordCount > 15) {
-                    var historyBuff2: ByteArray? = null
-                    try {
-                        historyBuff2 =
-                            sendRequest(
-                                0x32.toByte(),
-                                purseId.toByte(),
-                                0.toByte(),
-                                1.toByte(),
-                                byteArrayOf(0x0F.toByte(), ((recordCount - 15) * 16).toByte()),
-                            )
-                    } catch (ex: CEPASException) {
-                        // Error reading 2nd purse history
-                    }
-                    fullHistoryBuff = ByteArray(historyBuff.size + (historyBuff2?.size ?: 0))
-
-                    historyBuff.copyInto(fullHistoryBuff, 0)
-                    if (historyBuff2 != null) {
-                        historyBuff2.copyInto(fullHistoryBuff, historyBuff.size)
-                    }
-                } else {
-                    fullHistoryBuff = historyBuff
-                }
-            }
-
-            return if (fullHistoryBuff != null) {
-                RawCEPASHistory.create(purseId, fullHistoryBuff)
-            } else {
-                RawCEPASHistory.create(purseId, "No history found")
-            }
-        } catch (ex: CEPASException) {
-            return RawCEPASHistory.create(purseId, ex.message ?: "Unknown error")
-        }
-    }
-
-    private fun sendSelectFile(): ByteArray = mTransceiver.transceive(CEPAS_SELECT_FILE_COMMAND)
-
-    @Throws(CEPASException::class)
-    private fun sendRequest(
-        command: Byte,
-        p1: Byte,
-        p2: Byte,
-        lc: Byte,
-        parameters: ByteArray,
-    ): ByteArray? {
-        val recvBuffer = mTransceiver.transceive(wrapMessage(command, p1, p2, lc, parameters))
-
-        if (recvBuffer[recvBuffer.size - 2] != 0x90.toByte()) {
-            if (recvBuffer[recvBuffer.size - 2] == 0x6b.toByte()) {
-                throw CEPASException("File $p1 was an invalid file.")
-            } else if (recvBuffer[recvBuffer.size - 2] == 0x67.toByte()) {
-                throw CEPASException("Got invalid file size response.")
-            }
-
-            throw CEPASException(
-                "Got generic invalid response: " +
-                    (recvBuffer[recvBuffer.size - 2].toInt() and 0xff).toString(16),
+            historyBuff = protocol.sendRequest(
+                ISO7816Protocol.CLASS_90,
+                0x32.toByte(),
+                purseId.toByte(),
+                0.toByte(),
+                0.toByte(),
+                byteArrayOf(0.toByte()),
             )
+        } catch (ex: ISO7816Exception) {
+            return null
         }
 
-        val output = recvBuffer.copyOfRange(0, recvBuffer.size - 2)
-
-        val status = recvBuffer[recvBuffer.size - 1]
-        return when (status) {
-            OPERATION_OK -> output
-            PERMISSION_DENIED -> throw CEPASException("Permission denied")
-            else -> throw CEPASException("Unknown status code: " + (status.toInt() and 0xFF).toString(16))
-        }
-    }
-
-    private fun wrapMessage(
-        command: Byte,
-        p1: Byte,
-        p2: Byte,
-        lc: Byte,
-        parameters: ByteArray?,
-    ): ByteArray {
-        val paramSize = parameters?.size ?: 0
-        val result = ByteArray(5 + paramSize)
-        var offset = 0
-
-        result[offset++] = 0x90.toByte() // CLA
-        result[offset++] = command // INS
-        result[offset++] = p1 // P1
-        result[offset++] = p2 // P2
-        result[offset++] = lc // Lc
-
-        if (parameters != null) {
-            parameters.copyInto(result, offset)
-        }
-
-        return result
-    }
-
-    companion object {
-        private val CEPAS_SELECT_FILE_COMMAND =
-            byteArrayOf(
-                0x00.toByte(),
-                0xA4.toByte(),
-                0x00.toByte(),
-                0x00.toByte(),
-                0x02.toByte(),
-                0x40.toByte(),
-                0x00.toByte(),
+        try {
+            val historyBuff2 = protocol.sendRequest(
+                ISO7816Protocol.CLASS_90,
+                0x32.toByte(),
+                purseId.toByte(),
+                0.toByte(),
+                0.toByte(),
+                byteArrayOf((historyBuff.size / 16).toByte()),
             )
+            historyBuff = historyBuff + historyBuff2
+        } catch (ex: ISO7816Exception) {
+            // Error reading 2nd purse history
+        }
 
-        // Status codes
-        private const val OPERATION_OK: Byte = 0x00.toByte()
-        private val PERMISSION_DENIED: Byte = 0x9D.toByte()
+        return historyBuff
     }
 }

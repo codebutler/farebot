@@ -24,6 +24,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":card"))
+            implementation(project(":card:iso7816"))
             implementation(libs.kotlinx.serialization.json)
         }
     }

@@ -14,20 +14,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.savedstate.read
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.card.serialize.CardSerializer
-import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
-import com.codebutler.farebot.shared.core.NavDataHolder
+import com.codebutler.farebot.shared.di.LocalAppGraph
+import com.codebutler.farebot.shared.di.graphViewModel
 import com.codebutler.farebot.shared.platform.PlatformActions
 import com.codebutler.farebot.shared.platform.getDeviceRegion
-import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
-import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.navigation.Screen
 import com.codebutler.farebot.shared.ui.screen.AddKeyScreen
 import com.codebutler.farebot.shared.ui.screen.AdvancedTab
@@ -40,11 +36,6 @@ import com.codebutler.farebot.shared.ui.screen.KeysScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapUiState
 import com.codebutler.farebot.shared.ui.theme.FareBotTheme
-import com.codebutler.farebot.shared.viewmodel.AddKeyViewModel
-import com.codebutler.farebot.shared.viewmodel.CardViewModel
-import com.codebutler.farebot.shared.viewmodel.HistoryViewModel
-import com.codebutler.farebot.shared.viewmodel.HomeViewModel
-import com.codebutler.farebot.shared.viewmodel.KeysViewModel
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
 import farebot.app.generated.resources.*
@@ -52,13 +43,7 @@ import farebot.app.generated.resources.Res
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
 
-/**
- * FareBot app entry point using Koin DI and shared ViewModels.
- * Used by both Android and iOS platforms.
- */
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun FareBotApp(
@@ -69,13 +54,14 @@ fun FareBotApp(
 ) {
     FareBotTheme {
         val navController = rememberNavController()
-        val navDataHolder = koinInject<NavDataHolder>()
-        val stringResource = koinInject<StringResource>()
-        val transitFactoryRegistry = koinInject<TransitFactoryRegistry>()
+        val graph = LocalAppGraph.current
+        val navDataHolder = graph.navDataHolder
+        val stringResource = graph.stringResource
+        val transitFactoryRegistry = graph.transitFactoryRegistry
         val supportedCards = remember { transitFactoryRegistry.allCards }
-        val cardImporter = koinInject<CardImporter>()
-        val cardPersister = koinInject<CardPersister>()
-        val cardSerializer = koinInject<CardSerializer>()
+        val cardImporter = graph.cardImporter
+        val cardPersister = graph.cardPersister
+        val cardSerializer = graph.cardSerializer
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
@@ -107,11 +93,11 @@ fun FareBotApp(
             }
         }
 
-        val historyViewModel = koinViewModel<HistoryViewModel>()
+        val historyViewModel = graphViewModel { historyViewModel }
 
         NavHost(navController = navController, startDestination = Screen.Home.route) {
             composable(Screen.Home.route) {
-                val homeViewModel = koinViewModel<HomeViewModel>()
+                val homeViewModel = graphViewModel { homeViewModel }
                 val homeUiState by homeViewModel.uiState.collectAsState()
                 val errorMessage by homeViewModel.errorMessage.collectAsState()
 
@@ -286,7 +272,7 @@ fun FareBotApp(
             }
 
             composable(Screen.Keys.route) {
-                val viewModel = koinViewModel<KeysViewModel>()
+                val viewModel = graphViewModel { keysViewModel }
                 val uiState by viewModel.uiState.collectAsState()
 
                 LaunchedEffect(Unit) {
@@ -320,7 +306,7 @@ fun FareBotApp(
                         },
                     ),
             ) { backStackEntry ->
-                val viewModel = koinViewModel<AddKeyViewModel>()
+                val viewModel = graphViewModel { addKeyViewModel }
                 val uiState by viewModel.uiState.collectAsState()
 
                 val prefillTagId = backStackEntry.arguments?.read { getStringOrNull("tagId") }
@@ -391,7 +377,7 @@ fun FareBotApp(
 
                 @Suppress("UNCHECKED_CAST")
                 val scanIds = scanIdsKey?.let { navDataHolder.get<List<String>>(it) } ?: emptyList()
-                val viewModel = koinViewModel<CardViewModel>()
+                val viewModel = graphViewModel { cardViewModel }
                 val uiState by viewModel.uiState.collectAsState()
 
                 LaunchedEffect(cardKey) {
@@ -452,7 +438,7 @@ fun FareBotApp(
             ) { backStackEntry ->
                 val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
                 val cardName = backStackEntry.arguments?.read { getStringOrNull("cardName") } ?: return@composable
-                val viewModel = koinViewModel<CardViewModel>()
+                val viewModel = graphViewModel { cardViewModel }
                 val uiState by viewModel.uiState.collectAsState()
 
                 LaunchedEffect(cardKey) {
