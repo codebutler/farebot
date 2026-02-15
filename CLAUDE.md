@@ -141,6 +141,14 @@ When continuing from a previous session, read these files to recover context rat
 5. Register factory in `MainViewController.kt` (iOS, non-Classic cards only)
 6. Add string resources in `composeResources/values/strings.xml`
 
+## Agent Teams
+
+Prefer experimental agent teams (TeamCreate/SendMessage) over sub-agents (Task tool) for parallel work.
+
+## Git Worktrees
+
+Prefer git worktrees for any non-trivial work. **Always** use a worktree when implementing a plan. Use the `.worktrees/` directory (already in `.gitignore`) and always invoke the `/using-git-worktrees` superpowers skill.
+
 ## Kotlin/Native Gotchas
 
 - `internal` types cannot be exposed in public APIs (stricter than JVM)

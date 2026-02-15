@@ -1,0 +1,51 @@
+#!/bin/bash
+set -euo pipefail
+
+WORKSPACE="$(cd "$(dirname "$0")/.." && pwd)"
+TMUX_SESSION="claude"
+
+container_id() {
+  docker ps -q --filter label=devcontainer.local_folder="$WORKSPACE" | head -1
+}
+
+up()    { devcontainer up --workspace-folder "$WORKSPACE"; }
+down()  { docker stop "$(container_id)" 2>/dev/null || echo "No running container"; }
+shell() { docker exec -it -u bun -w /workspace "$(container_id)" zsh; }
+auth()  { docker exec -it -u bun -w /workspace "$(container_id)" gh auth login; }
+run()   { docker exec -it -u bun -w /workspace "$(container_id)" "$@"; }
+
+claude() {
+  local cid
+  cid="$(container_id)"
+  # Attach to existing tmux session, or create one running claude
+  docker exec -it -u bun -w /workspace "$cid" \
+    tmux new-session -As "$TMUX_SESSION" \
+    "claude --dangerously-skip-permissions $*; exec zsh"
+}
+
+case "${1:-help}" in
+  up)      up ;;
+  down)    down ;;
+  shell)   shell ;;
+  claude)  shift; claude "$@" ;;
+  auth)    auth ;;
+  run)     shift; run "$@" ;;
+  help|*)
+    cat <<'USAGE'
+Usage: .devcontainer/dc <command>
+
+  up       Build and start the container
+  down     Stop the container
+  shell    Open a zsh shell in the container
+  claude   Run Claude Code in tmux (--dangerously-skip-permissions, resumes existing session)
+  auth     Authenticate with GitHub (one-time)
+  run      Run an arbitrary command in the container
+
+Examples:
+  .devcontainer/dc up
+  .devcontainer/dc claude
+  .devcontainer/dc claude -p "fix the failing tests"
+  .devcontainer/dc run ./gradlew allTests
+USAGE
+    ;;
+esac

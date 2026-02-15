@@ -175,6 +175,10 @@ class ISO7816Protocol(
             null
         }
 
+    fun unselectFile() {
+        sendRequest(CLASS_ISO7816, INSTRUCTION_ISO7816_SELECT, 0.toByte(), 0.toByte(), 0.toByte())
+    }
+
     fun selectById(fileId: Int): ByteArray {
         val file = byteArrayOf((fileId shr 8).toByte(), fileId.toByte())
         return sendRequest(

@@ -22,6 +22,9 @@ kotlin {
     iosSimulatorArm64()
 
     sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
         commonMain.dependencies {
             implementation(project(":card"))
             implementation(libs.kotlinx.serialization.json)

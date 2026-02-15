@@ -54,20 +54,31 @@ object UltralightCardReader {
         var pageNumber = 0
         var pageBuffer = ByteArray(0)
         val pages = mutableListOf<UltralightPage>()
-        while (pageNumber <= size) {
+        var unauthorized = false
+        while (pageNumber < size) {
             if (pageNumber % 4 == 0) {
-                pageBuffer = tech.readPages(pageNumber)
+                try {
+                    pageBuffer = tech.readPages(pageNumber)
+                    unauthorized = false
+                } catch (e: Exception) {
+                    // Transceive failure, maybe authentication problem
+                    unauthorized = true
+                }
             }
 
-            pages.add(
-                UltralightPage.create(
-                    pageNumber,
-                    pageBuffer.copyOfRange(
-                        (pageNumber % 4) * UltralightTechnology.PAGE_SIZE,
-                        ((pageNumber % 4) + 1) * UltralightTechnology.PAGE_SIZE,
+            if (!unauthorized) {
+                pages.add(
+                    UltralightPage.create(
+                        pageNumber,
+                        pageBuffer.copyOfRange(
+                            (pageNumber % 4) * UltralightTechnology.PAGE_SIZE,
+                            ((pageNumber % 4) + 1) * UltralightTechnology.PAGE_SIZE,
+                        ),
                     ),
-                ),
-            )
+                )
+            } else {
+                pages.add(UltralightPage.unauthorized(pageNumber))
+            }
             pageNumber++
         }
 

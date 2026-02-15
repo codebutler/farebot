@@ -35,6 +35,7 @@ data class RawClassicCard(
     @Contextual private val tagId: ByteArray,
     private val scannedAt: Instant,
     private val sectors: List<RawClassicSector>,
+    private val isPartialRead: Boolean = false,
 ) : RawCard<ClassicCard> {
     override fun cardType(): CardType = CardType.MifareClassic
 
@@ -53,7 +54,7 @@ data class RawClassicCard(
 
     override fun parse(): ClassicCard {
         val parsedSectors = sectors.map { it.parse() }
-        return ClassicCard.create(tagId, scannedAt, parsedSectors)
+        return ClassicCard.create(tagId, scannedAt, parsedSectors, isPartialRead)
     }
 
     fun sectors(): List<RawClassicSector> = sectors
@@ -63,6 +64,7 @@ data class RawClassicCard(
             tagId: ByteArray,
             scannedAt: Instant,
             sectors: List<RawClassicSector>,
-        ): RawClassicCard = RawClassicCard(tagId, scannedAt, sectors)
+            isPartialRead: Boolean = false,
+        ): RawClassicCard = RawClassicCard(tagId, scannedAt, sectors, isPartialRead)
     }
 }

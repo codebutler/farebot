@@ -28,8 +28,10 @@ import com.codebutler.farebot.card.felica.FeliCaReader
 import com.codebutler.farebot.card.felica.IosFeliCaTagAdapter
 import com.codebutler.farebot.card.nfc.IosCardTransceiver
 import com.codebutler.farebot.card.nfc.IosUltralightTechnology
+import com.codebutler.farebot.card.nfc.IosVicinityTechnology
 import com.codebutler.farebot.card.nfc.toByteArray
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
+import com.codebutler.farebot.card.vicinity.VicinityCardReader
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import platform.CoreNFC.NFCFeliCaTagProtocol
+import platform.CoreNFC.NFCISO15693TagProtocol
 import platform.CoreNFC.NFCMiFareDESFire
 import platform.CoreNFC.NFCMiFareTagProtocol
 import platform.CoreNFC.NFCMiFareUltralight
@@ -197,12 +200,25 @@ class IosNfcScanner : CardScanner {
             when (tag) {
                 is NFCFeliCaTagProtocol -> readFelicaTag(tag)
                 is NFCMiFareTagProtocol -> readMiFareTag(tag)
+                is NFCISO15693TagProtocol -> readVicinityTag(tag)
                 else -> throw Exception("Unsupported NFC tag type")
             }
 
         private fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()
-            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag))
+            /*
+             * onlyFirst = true is an iOS-specific hack to work around
+             * https://github.com/metrodroid/metrodroid/issues/613
+             *
+             * _NFReaderSession._validateFelicaCommand asserts that you're talking to the exact
+             * IDm that the system discovered -- including the upper 4 bits (which indicate the
+             * system number).
+             *
+             * Tell FeliCaReader to only dump the first service.
+             *
+             * Once iOS fixes this, do an iOS version check instead.
+             */
+            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag), onlyFirst = true)
         }
 
         private fun readMiFareTag(tag: NFCMiFareTagProtocol): RawCard<*> {
@@ -251,6 +267,22 @@ class IosNfcScanner : CardScanner {
                             } catch (_: Exception) {
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        private fun readVicinityTag(tag: NFCISO15693TagProtocol): RawCard<*> {
+            val tagId = tag.identifier.toByteArray().reversedArray()
+            val tech = IosVicinityTechnology(tag)
+            tech.connect()
+            try {
+                return VicinityCardReader.readCard(tagId, tech)
+            } finally {
+                if (tech.isConnected) {
+                    try {
+                        tech.close()
+                    } catch (_: Exception) {
                     }
                 }
             }
