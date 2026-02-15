@@ -44,6 +44,10 @@ subprojects {
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
         extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
             jvm()
+            @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+            wasmJs {
+                browser()
+            }
             compilerOptions {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
@@ -56,9 +60,11 @@ subprojects {
                 val composeExt = extensions.findByType<org.jetbrains.compose.ComposeExtension>()
                 if (composeExt != null) {
                     extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
-                        sourceSets.named("jvmMain") {
-                            dependencies {
-                                implementation(composeExt.dependencies.desktop.currentOs)
+                        if (targets.findByName("jvm") != null) {
+                            sourceSets.named("jvmMain") {
+                                dependencies {
+                                    implementation(composeExt.dependencies.desktop.currentOs)
+                                }
                             }
                         }
                     }
