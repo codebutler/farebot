@@ -117,6 +117,9 @@ class PN533(
                     byteArrayOf(maxTargets, baudRate) + initiatorData,
                     timeoutMs = POLL_TIMEOUT_MS,
                 )
+            } catch (e: PN533CommandException) {
+                // RC-S956 returns error frame 0x7F for unsupported baud rates
+                return null
             } catch (e: PN533Exception) {
                 if (e.message?.contains("TIMEOUT") == true) return null
                 throw e

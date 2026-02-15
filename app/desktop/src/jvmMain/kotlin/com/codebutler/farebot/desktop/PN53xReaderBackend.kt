@@ -83,9 +83,13 @@ abstract class PN53xReaderBackend(
             // Try ISO 14443-A (106 kbps) first — covers Classic, Ultralight, DESFire
             var target = pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
 
-            // Try FeliCa (212 kbps) if no Type A card found
+            // Try FeliCa (212 kbps) if no Type A card found.
+            // SENSF_REQ initiator data is required for RC-S956; PN533 generates defaults internally.
             if (target == null) {
-                target = pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_212_FELICA)
+                target = pn533.inListPassiveTarget(
+                    baudRate = PN533.BAUD_RATE_212_FELICA,
+                    initiatorData = SENSF_REQ,
+                )
             }
 
             if (target == null) {
@@ -187,7 +191,10 @@ abstract class PN53xReaderBackend(
             val target =
                 try {
                     pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
-                        ?: pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_212_FELICA)
+                        ?: pn533.inListPassiveTarget(
+                            baudRate = PN533.BAUD_RATE_212_FELICA,
+                            initiatorData = SENSF_REQ,
+                        )
                 } catch (_: PN533Exception) {
                     null
                 }
@@ -205,6 +212,11 @@ abstract class PN53xReaderBackend(
     companion object {
         private const val POLL_INTERVAL_MS = 250L
         private const val REMOVAL_POLL_INTERVAL_MS = 300L
+
+        // Default SENSF_REQ for FeliCa polling: length=5, code=0x00 (SENSF_REQ),
+        // system code=0xFFFF (wildcard), request code=0x01 (with PMm), time slot=0x00.
+        // PN533 generates this internally, but RC-S956 requires it explicitly.
+        private val SENSF_REQ = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte(), 0x01, 0x00)
 
         private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }

@@ -62,10 +62,14 @@ class PN533Transport(
         val payload = byteArrayOf(TFI_HOST_TO_PN533, code) + data
         val frame = buildFrame(payload)
 
+        if (DEBUG) println("[PN53x TX] cmd=0x%02X frame=${frame.hex()}".format(code))
         bulkWrite(frame)
         val staleResponse = readAck()
         // If readAck got a response frame instead of an ACK, use it directly
-        if (staleResponse != null) return parseFrame(staleResponse)
+        if (staleResponse != null) {
+            if (DEBUG) println("[PN53x RX] (stale) ${staleResponse.hex()}")
+            return parseFrame(staleResponse)
+        }
         return readResponse(timeoutMs)
     }
 
@@ -149,6 +153,7 @@ class PN533Transport(
         val bytes = ByteArray(count)
         buf.rewind()
         buf.get(bytes)
+        if (DEBUG) println("[PN53x RX] ${bytes.hex()}")
         return parseFrame(bytes)
     }
 
@@ -224,6 +229,8 @@ class PN533Transport(
                 0xFF.toByte(),
                 0x00,
             )
+
+        const val DEBUG = false
 
         private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }
