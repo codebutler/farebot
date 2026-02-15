@@ -87,4 +87,25 @@ class IosUltralightTechnology(
         return result?.toByteArray()
             ?: throw Exception("Ultralight read returned null at page $pageOffset")
     }
+
+    override fun transceive(data: ByteArray): ByteArray {
+        val semaphore = dispatch_semaphore_create(0)
+        var result: NSData? = null
+        var nfcError: NSError? = null
+
+        tag.sendMiFareCommand(data.toNSData()) { response: NSData?, error: NSError? ->
+            result = response
+            nfcError = error
+            dispatch_semaphore_signal(semaphore)
+        }
+
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+
+        nfcError?.let {
+            throw Exception("Ultralight transceive failed: ${it.localizedDescription}")
+        }
+
+        return result?.toByteArray()
+            ?: throw Exception("Ultralight transceive returned null")
+    }
 }

@@ -42,4 +42,11 @@ class AndroidUltralightTechnology(
         get() = mifareUltralight.type
 
     override fun readPages(pageOffset: Int): ByteArray = mifareUltralight.readPages(pageOffset)
+
+    override fun transceive(data: ByteArray): ByteArray = mifareUltralight.transceive(data)
+
+    override fun reconnect() {
+        mifareUltralight.close()
+        mifareUltralight.connect()
+    }
 }

@@ -27,6 +27,22 @@ interface UltralightTechnology : NfcTechnology {
 
     fun readPages(pageOffset: Int): ByteArray
 
+    /**
+     * Sends raw data to the card and receives the response.
+     * Used for protocol-level commands like GET_VERSION and AUTH_1.
+     */
+    fun transceive(data: ByteArray): ByteArray
+
+    /**
+     * Reconnects to the card after a disconnect.
+     * Some protocol commands (GET_VERSION, AUTH_1) may cause the card to disconnect.
+     */
+    fun reconnect() {
+        // Default implementation: close and connect
+        close()
+        connect()
+    }
+
     companion object {
         const val PAGE_SIZE = 4
         const val TYPE_ULTRALIGHT = 1
