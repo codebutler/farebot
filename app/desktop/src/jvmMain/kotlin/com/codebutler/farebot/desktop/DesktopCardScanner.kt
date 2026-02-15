@@ -23,6 +23,7 @@
 package com.codebutler.farebot.desktop
 
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ScannedTag
@@ -122,7 +123,16 @@ class DesktopCardScanner : CardScanner {
             backends.add(PN533ReaderBackend())
         } else {
             transports.forEachIndexed { index, transport ->
-                backends.add(PN533ReaderBackend(transport, "PN53x #${index + 1}"))
+                transport.flush()
+                val probe = PN533(transport)
+                val fw = probe.getFirmwareVersion()
+                val label = "PN53x #${index + 1}"
+                println("[DesktopCardScanner] $label firmware: $fw")
+                if (fw.version >= 2) {
+                    backends.add(PN533ReaderBackend(transport))
+                } else {
+                    backends.add(RCS956ReaderBackend(transport, label))
+                }
             }
         }
         return backends
