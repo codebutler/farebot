@@ -24,4 +24,6 @@
 
 package com.codebutler.farebot.card
 
-open class UnauthorizedException(override val message: String = "Unauthorized") : IllegalStateException()
+open class UnauthorizedException(
+    override val message: String = "Unauthorized",
+) : IllegalStateException()
