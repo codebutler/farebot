@@ -55,6 +55,9 @@ class PN533UltralightTechnology(
             byteArrayOf(MIFARE_CMD_READ, pageOffset.toByte()),
         )
 
+    override fun transceive(data: ByteArray): ByteArray =
+        pn533.inDataExchange(tg, data)
+
     companion object {
         const val MIFARE_CMD_READ: Byte = 0x30
     }
