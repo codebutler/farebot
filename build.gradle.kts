@@ -107,7 +107,8 @@ subprojects {
     plugins.withId("com.android.kotlin.multiplatform.library") {
         plugins.withId("org.jetbrains.compose") {
             plugins.withId("org.jetbrains.kotlin.multiplatform") {
-                val resourceNamespace = "farebot" + project.path.replace(":", ".").replace("-", "_") + ".generated.resources"
+                val resourceNamespace =
+                    "farebot" + project.path.replace(":", ".").replace("-", "_") + ".generated.resources"
                 val outputBaseDir = layout.buildDirectory.dir("compose-android-classpath-resources")
 
                 val copyTask =
