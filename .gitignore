@@ -37,6 +37,7 @@ gradle/gradle-daemon-jvm.properties
 
 # Git worktrees
 .worktrees/
+worktrees/
 
 # Generated review pages
 scripts/card-image-review.html

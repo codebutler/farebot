@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.oyster
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransactionTrip
 import com.codebutler.farebot.transit.TransitBalance
@@ -45,8 +45,8 @@ class OysterTransitInfo internal constructor(
     private val refills: List<OysterRefill>,
     private val passes: List<OysterTravelPass>,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.oyster_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.oyster_card_name)
 
     override val serialNumber: String = OysterTransitFactory.formatSerial(serial)
 

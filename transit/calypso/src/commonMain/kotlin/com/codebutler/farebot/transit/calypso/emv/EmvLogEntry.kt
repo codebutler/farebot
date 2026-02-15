@@ -23,6 +23,7 @@
 
 package com.codebutler.farebot.transit.calypso.emv
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.convertBCDtoInteger
@@ -80,7 +81,7 @@ class EmvLogEntry(
 
     override val mode: Mode get() = Mode.POS
 
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() {
             val extras =
                 values.entries
@@ -91,7 +92,8 @@ class EmvLogEntry(
                         val v = tag.interpretTagString(it.value)
                         if (v.isEmpty()) null else "${tag.name}=$v"
                     }
-            return extras.joinToString().ifEmpty { null }
+            val joined = extras.joinToString()
+            return if (joined.isEmpty()) null else FormattedString(joined)
         }
 
     companion object {

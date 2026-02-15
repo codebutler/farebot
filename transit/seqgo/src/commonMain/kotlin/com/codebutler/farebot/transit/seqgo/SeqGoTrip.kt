@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.seqgo
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.seqgo.generated.resources.*
@@ -48,18 +48,18 @@ class SeqGoTrip(
 
     override val mode: Mode get() = modeValue
 
-    override val agencyName: String
+    override val agencyName: FormattedString
         get() =
             when (mode) {
-                Mode.FERRY -> getStringBlocking(Res.string.seqgo_agency_transdev)
+                Mode.FERRY -> FormattedString(Res.string.seqgo_agency_transdev)
                 Mode.TRAIN -> {
                     if (startStationId == 9 || endStationId == 9) {
-                        getStringBlocking(Res.string.seqgo_agency_airtrain)
+                        FormattedString(Res.string.seqgo_agency_airtrain)
                     } else {
-                        getStringBlocking(Res.string.seqgo_agency_qr)
+                        FormattedString(Res.string.seqgo_agency_qr)
                     }
                 }
-                else -> getStringBlocking(Res.string.seqgo_agency_translink)
+                else -> FormattedString(Res.string.seqgo_agency_translink)
             }
 
     override val startStation: Station?

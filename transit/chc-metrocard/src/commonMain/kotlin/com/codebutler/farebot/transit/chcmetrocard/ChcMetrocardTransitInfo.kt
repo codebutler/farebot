@@ -21,7 +21,7 @@
 
 package com.codebutler.farebot.transit.chcmetrocard
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
 import com.codebutler.farebot.transit.erg.ErgTransitInfoCapsule
@@ -40,8 +40,8 @@ import farebot.transit.chc_metrocard.generated.resources.chc_metrocard_card_name
 class ChcMetrocardTransitInfo(
     capsule: ErgTransitInfoCapsule,
 ) : ErgTransitInfo(capsule, { TransitCurrency.NZD(it) }) {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.chc_metrocard_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.chc_metrocard_card_name)
 
     override val serialNumber: String?
         get() = capsule.cardSerial?.let { internalFormatSerialNumber(it) }

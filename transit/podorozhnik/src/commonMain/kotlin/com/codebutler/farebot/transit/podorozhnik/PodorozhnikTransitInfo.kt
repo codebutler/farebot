@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit.podorozhnik
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -43,10 +43,9 @@ class PodorozhnikTransitInfo(
     private val tripList: List<Trip>,
     private val groundCounter: Int?,
     private val subwayCounter: Int?,
-    private val stringResource: StringResource,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = stringResource.getString(Res.string.podorozhnik_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.podorozhnik_card_name)
 
     override val trips: List<Trip> = tripList
 
@@ -57,7 +56,7 @@ class PodorozhnikTransitInfo(
             val b = balanceValue ?: return null
             return TransitBalance(
                 balance = TransitCurrency.RUB(b),
-                name = stringResource.getString(Res.string.podorozhnik_card_name),
+                name = FormattedString("Podorozhnik"),
             )
         }
 
@@ -66,11 +65,11 @@ class PodorozhnikTransitInfo(
             if (groundCounter == null || subwayCounter == null) return null
             return listOf(
                 ListItem(
-                    stringResource.getString(Res.string.podorozhnik_ground_trips),
+                    Res.string.podorozhnik_ground_trips,
                     groundCounter.toString(),
                 ),
                 ListItem(
-                    stringResource.getString(Res.string.podorozhnik_subway_trips),
+                    Res.string.podorozhnik_subway_trips,
                     subwayCounter.toString(),
                 ),
             )

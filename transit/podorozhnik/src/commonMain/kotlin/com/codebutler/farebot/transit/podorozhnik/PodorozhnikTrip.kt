@@ -24,7 +24,7 @@
 package com.codebutler.farebot.transit.podorozhnik
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -36,7 +36,6 @@ internal class PodorozhnikTrip(
     private val mFare: Int?,
     private val mLastTransport: Int,
     private val mLastValidator: Int,
-    private val stringResource: StringResource,
 ) : Trip() {
     override val startTimestamp: Instant?
         get() = PodorozhnikTransitInfo.convertDate(mTimestamp)
@@ -70,9 +69,7 @@ internal class PodorozhnikTrip(
                 stationId = stationId and 0x3f.inv()
                 val result = lookupMdstStation(PODOROZHNIK_STR, stationId)
                 return if (result != null) {
-                    result.addAttribute(
-                        stringResource.getString(Res.string.podorozhnik_gate, gate.toString()),
-                    )
+                    result.addAttribute(FormattedString("Gate $gate"))
                 } else {
                     Station.unknown((mLastValidator shr 6).toString())
                 }
@@ -81,7 +78,7 @@ internal class PodorozhnikTrip(
                 ?: Station.unknown("$mLastTransport/$mLastValidator")
         }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             // Always include "Saint Petersburg" in names here to distinguish from Troika (Moscow)
             // trips on hybrid cards
@@ -90,14 +87,14 @@ internal class PodorozhnikTrip(
                 // Assume bus.
                 TRANSPORT_METRO ->
                     if (mLastValidator == 0) {
-                        stringResource.getString(Res.string.podorozhnik_led_bus)
+                        FormattedString(Res.string.podorozhnik_led_bus)
                     } else {
-                        stringResource.getString(Res.string.podorozhnik_led_metro)
+                        FormattedString(Res.string.podorozhnik_led_metro)
                     }
-                TRANSPORT_BUS, TRANSPORT_BUS_MOBILE -> stringResource.getString(Res.string.podorozhnik_led_bus)
-                TRANSPORT_SHARED_TAXI -> stringResource.getString(Res.string.podorozhnik_led_shared_taxi)
+                TRANSPORT_BUS, TRANSPORT_BUS_MOBILE -> FormattedString(Res.string.podorozhnik_led_bus)
+                TRANSPORT_SHARED_TAXI -> FormattedString(Res.string.podorozhnik_led_shared_taxi)
                 // TODO: Handle trams
-                else -> stringResource.getString(Res.string.podorozhnik_unknown_format, mLastTransport.toString())
+                else -> FormattedString(Res.string.podorozhnik_unknown_format, mLastTransport.toString())
             }
 
     private fun lookupMdstStation(

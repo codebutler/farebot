@@ -20,7 +20,7 @@
 
 package com.codebutler.farebot.transit.manlyfastferry
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -62,7 +62,7 @@ class ManlyFastFerryTransitFactory : TransitFactory<ClassicCard, ManlyFastFerryT
                 }
                 result.toString()
             }
-        return TransitIdentity.create(getStringBlocking(Res.string.manly_card_name), serial)
+        return TransitIdentity.create(FormattedString(Res.string.manly_card_name), serial)
     }
 
     override fun parseInfo(card: ClassicCard): ManlyFastFerryTransitInfo {

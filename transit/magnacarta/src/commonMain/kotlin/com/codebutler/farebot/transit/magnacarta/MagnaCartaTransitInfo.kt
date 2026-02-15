@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.magnacarta
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -34,7 +34,7 @@ import farebot.transit.magnacarta.generated.resources.magnacarta_card_name
 class MagnaCartaTransitInfo(
     private val mBalance: Int?, // cents
 ) : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.magnacarta_card_name)
+    override val cardName: FormattedString = FormattedString(Res.string.magnacarta_card_name)
 
     override val serialNumber: String? = null
 

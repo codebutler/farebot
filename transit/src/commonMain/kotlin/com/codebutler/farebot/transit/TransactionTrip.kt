@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.FormattedString
 import kotlin.time.Instant
 
 class TransactionTripCapsule(
@@ -75,11 +76,11 @@ abstract class TransactionTripAbstract : Trip() {
     private val any: Transaction?
         get() = start ?: end
 
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() {
             val startLines = start?.routeNames ?: emptyList()
             val endLines = end?.routeNames ?: emptyList()
-            return getRouteName(startLines, endLines)
+            return getRouteName(startLines, endLines)?.let { FormattedString(it) }
         }
 
     override val humanReadableRouteID: String?
@@ -121,10 +122,10 @@ abstract class TransactionTripAbstract : Trip() {
     override val isRejected: Boolean
         get() = any?.isRejected ?: false
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() = any?.agencyName
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() = any?.shortAgencyName
 
     companion object {

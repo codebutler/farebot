@@ -22,11 +22,9 @@
 
 package com.codebutler.farebot.transit.hafilat
 
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.StandardDesfireFile
@@ -40,9 +38,7 @@ import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import farebot.transit.hafilat.generated.resources.*
 
-class HafilatTransitFactory(
-    private val stringResource: StringResource = DefaultStringResource(),
-) : TransitFactory<DesfireCard, HafilatTransitInfo> {
+class HafilatTransitFactory : TransitFactory<DesfireCard, HafilatTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -50,7 +46,7 @@ class HafilatTransitFactory(
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity =
         TransitIdentity.create(
-            getStringBlocking(Res.string.card_name_hafilat),
+            FormattedString(Res.string.card_name_hafilat),
             HafilatTransitInfo.formatSerial(getSerial(card.tagId)),
         )
 
@@ -84,7 +80,7 @@ class HafilatTransitFactory(
             val file = app.getFile(fileId) as? StandardDesfireFile ?: continue
             val data = file.data
             if (data.getBitsFromBuffer(0, 7) == 0) continue
-            val sub = HafilatSubscription.parse(data, stringResource)
+            val sub = HafilatSubscription.parse(data)
             if (sub.isPurse) {
                 purse = sub
             } else {

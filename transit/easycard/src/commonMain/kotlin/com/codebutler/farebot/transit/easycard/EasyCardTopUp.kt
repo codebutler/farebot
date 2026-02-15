@@ -27,6 +27,7 @@
 
 package com.codebutler.farebot.transit.easycard
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -62,7 +63,7 @@ data class EasyCardTopUp(
 
     override val mode: Mode get() = Mode.TICKET_MACHINE
 
-    override val routeName: String? get() = null
+    override val routeName: FormattedString? get() = null
 
     override val humanReadableRouteID: String? get() = null
 

@@ -22,11 +22,11 @@
 
 package com.codebutler.farebot.transit.umarsh
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.TransitBalance
@@ -66,14 +66,14 @@ data class UmarshSector(
 
     private val tariff get() = system?.tariffs?.get(tariffRaw)
 
-    val cardName: String
-        get() = tariff?.cardName ?: system?.cardName ?: getStringBlocking(Res.string.umarsh_card_name)
+    val cardName: FormattedString
+        get() = tariff?.cardName ?: system?.cardName ?: FormattedString(Res.string.umarsh_card_name)
 
     internal val denomination: UmarshDenomination
         get() = tariff?.denomination ?: if (total == 0) UmarshDenomination.RUB else UmarshDenomination.TRIPS
 
-    val subscriptionName: String?
-        get() = tariff?.name ?: getStringBlocking(Res.string.umarsh_unknown, NumberUtils.intToHex(tariffRaw))
+    val subscriptionName: FormattedString?
+        get() = tariff?.name ?: FormattedString(Res.string.umarsh_unknown, NumberUtils.intToHex(tariffRaw))
 
     val remainingTripCount: Int?
         get() = if (denomination == UmarshDenomination.TRIPS) balanceRaw else null

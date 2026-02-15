@@ -33,6 +33,7 @@ import com.codebutler.farebot.transit.orca.OrcaTransitFactory
 import com.codebutler.farebot.transit.orca.OrcaTransitInfo
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitInfo
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -47,8 +48,6 @@ import kotlin.time.Instant
  * asserting on exact trip data, balances, fares, timestamps, stations, and modes.
  */
 class FlipperIntegrationTest {
-    private val stringResource = TestStringResource()
-
     private fun loadFlipperDump(name: String): String {
         val bytes = loadTestResource("flipper/$name")
         assertNotNull(bytes, "Test resource not found: flipper/$name")
@@ -58,812 +57,817 @@ class FlipperIntegrationTest {
     // --- ORCA (DESFire) ---
 
     @Test
-    fun testOrcaFromFlipper() {
-        val data = loadFlipperDump("ORCA.nfc")
-        val rawCard = FlipperNfcParser.parse(data)
-        assertNotNull(rawCard, "Failed to parse ORCA Flipper dump")
+    fun testOrcaFromFlipper() =
+        runBlocking {
+            val data = loadFlipperDump("ORCA.nfc")
+            val rawCard = FlipperNfcParser.parse(data)
+            assertNotNull(rawCard, "Failed to parse ORCA Flipper dump")
 
-        val card = rawCard.parse()
-        assertTrue(card is DesfireCard, "Expected DesfireCard, got ${card::class.simpleName}")
+            val card = rawCard.parse()
+            assertTrue(card is DesfireCard, "Expected DesfireCard, got ${card::class.simpleName}")
 
-        val factory = OrcaTransitFactory(stringResource)
-        assertTrue(factory.check(card), "ORCA factory should recognize this card")
+            val factory = OrcaTransitFactory()
+            assertTrue(factory.check(card), "ORCA factory should recognize this card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("ORCA", identity.name)
-        assertEquals("10043012", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("ORCA", identity.name.resolveAsync())
+            assertEquals("10043012", identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse ORCA transit info")
-        assertTrue(info is OrcaTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse ORCA transit info")
+            assertTrue(info is OrcaTransitInfo)
 
-        // Balance: $26.25 USD
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.USD(2625), balances[0].balance)
+            // Balance: $26.25 USD
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.USD(2625), balances[0].balance)
 
-        // This dump has 0 trips in the history
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(0, trips.size)
+            // This dump has 0 trips in the history
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(0, trips.size)
 
-        assertNull(info.subscriptions)
-    }
+            assertNull(info.subscriptions)
+        }
 
     // --- Clipper (DESFire) ---
 
     @Test
-    fun testClipperFromFlipper() {
-        val data = loadFlipperDump("Clipper.nfc")
-        val rawCard = FlipperNfcParser.parse(data)
-        assertNotNull(rawCard, "Failed to parse Clipper Flipper dump")
+    fun testClipperFromFlipper() =
+        runBlocking {
+            val data = loadFlipperDump("Clipper.nfc")
+            val rawCard = FlipperNfcParser.parse(data)
+            assertNotNull(rawCard, "Failed to parse Clipper Flipper dump")
 
-        val card = rawCard.parse()
-        assertTrue(card is DesfireCard, "Expected DesfireCard, got ${card::class.simpleName}")
+            val card = rawCard.parse()
+            assertTrue(card is DesfireCard, "Expected DesfireCard, got ${card::class.simpleName}")
 
-        val factory = ClipperTransitFactory()
-        assertTrue(factory.check(card), "Clipper factory should recognize this card")
+            val factory = ClipperTransitFactory()
+            assertTrue(factory.check(card), "Clipper factory should recognize this card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Clipper", identity.name)
-        assertEquals("1205019883", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Clipper", identity.name.resolveAsync())
+            assertEquals("1205019883", identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse Clipper transit info")
-        assertTrue(info is ClipperTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse Clipper transit info")
+            assertTrue(info is ClipperTransitInfo)
 
-        // Balance: $2.25 USD
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.USD(225), balances[0].balance)
+            // Balance: $2.25 USD
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.USD(225), balances[0].balance)
 
-        // 16 trips — all Muni (San Francisco Municipal)
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(16, trips.size)
+            // 16 trips — all Muni (San Francisco Municipal)
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(16, trips.size)
 
-        assertNull(info.subscriptions)
+            assertNull(info.subscriptions)
 
-        // Trip 0: Bus ride on Muni
-        trips[0].let { t ->
-            assertEquals(Trip.Mode.BUS, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-28T23:18:27Z"), t.startTimestamp)
-            assertNull(t.endTimestamp)
-            assertEquals("San Francisco Municipal", t.agencyName)
-            assertEquals("Muni", t.shortAgencyName)
-            assertNull(t.routeName)
-            assertNull(t.startStation)
-            assertNull(t.endStation)
-            assertNull(t.machineID)
-            assertEquals("6705", t.vehicleID)
+            // Trip 0: Bus ride on Muni
+            trips[0].let { t ->
+                assertEquals(Trip.Mode.BUS, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-28T23:18:27Z"), t.startTimestamp)
+                assertNull(t.endTimestamp)
+                assertEquals("San Francisco Municipal", t.agencyName?.resolveAsync())
+                assertEquals("Muni", t.shortAgencyName?.resolveAsync())
+                assertNull(t.routeName)
+                assertNull(t.startStation)
+                assertNull(t.endStation)
+                assertNull(t.machineID)
+                assertEquals("6705", t.vehicleID)
+            }
+
+            // Trip 1: Muni Metro at Powell
+            trips[1].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-28T02:58:32Z"), t.startTimestamp)
+                assertNull(t.endTimestamp)
+                assertEquals("San Francisco Municipal", t.agencyName?.resolveAsync())
+                assertEquals("Muni", t.shortAgencyName?.resolveAsync())
+                assertEquals("Powell", t.startStation?.displayName?.resolveAsync())
+                assertNull(t.endStation)
+                assertNull(t.vehicleID)
+            }
+
+            // Trip 2: Muni Metro at Van Ness
+            trips[2].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-28T01:22:17Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 3: Muni Metro at Powell
+            trips[3].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-27T01:49:56Z"), t.startTimestamp)
+                assertEquals("Powell", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 4: Muni Metro at Van Ness
+            trips[4].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-27T00:15:46Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 5: Muni Metro at Powell
+            trips[5].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-25T05:50:32Z"), t.startTimestamp)
+                assertEquals("Powell", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 6: Muni Metro at Van Ness
+            trips[6].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-25T02:58:08Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 7: Muni Metro at Powell — $0 fare (transfer)
+            trips[7].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(0), t.fare)
+                assertEquals(Instant.parse("2017-03-23T23:38:53Z"), t.startTimestamp)
+                assertEquals("Powell", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 8: Muni Metro at Van Ness
+            trips[8].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-23T23:28:14Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 9: Muni Metro at Powell — $0 fare
+            trips[9].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(0), t.fare)
+                assertEquals(Instant.parse("2017-03-22T16:31:56Z"), t.startTimestamp)
+                assertEquals("Powell", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 10: Muni Metro at Van Ness
+            trips[10].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-22T15:20:10Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 11: Muni Metro at Castro
+            trips[11].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-22T04:31:30Z"), t.startTimestamp)
+                assertEquals("Castro", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 12: Muni Metro at Van Ness
+            trips[12].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-22T01:47:07Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 13: Muni Metro at Van Ness
+            trips[13].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-21T01:50:06Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 14: Muni Metro at Powell
+            trips[14].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-19T21:01:16Z"), t.startTimestamp)
+                assertEquals("Powell", t.startStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 15: Muni Metro at Van Ness
+            trips[15].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.USD(225), t.fare)
+                assertEquals(Instant.parse("2017-03-19T19:28:38Z"), t.startTimestamp)
+                assertEquals("Van Ness", t.startStation?.displayName?.resolveAsync())
+            }
         }
-
-        // Trip 1: Muni Metro at Powell
-        trips[1].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-28T02:58:32Z"), t.startTimestamp)
-            assertNull(t.endTimestamp)
-            assertEquals("San Francisco Municipal", t.agencyName)
-            assertEquals("Muni", t.shortAgencyName)
-            assertEquals("Powell", t.startStation?.stationName)
-            assertNull(t.endStation)
-            assertNull(t.vehicleID)
-        }
-
-        // Trip 2: Muni Metro at Van Ness
-        trips[2].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-28T01:22:17Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 3: Muni Metro at Powell
-        trips[3].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-27T01:49:56Z"), t.startTimestamp)
-            assertEquals("Powell", t.startStation?.stationName)
-        }
-
-        // Trip 4: Muni Metro at Van Ness
-        trips[4].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-27T00:15:46Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 5: Muni Metro at Powell
-        trips[5].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-25T05:50:32Z"), t.startTimestamp)
-            assertEquals("Powell", t.startStation?.stationName)
-        }
-
-        // Trip 6: Muni Metro at Van Ness
-        trips[6].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-25T02:58:08Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 7: Muni Metro at Powell — $0 fare (transfer)
-        trips[7].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(0), t.fare)
-            assertEquals(Instant.parse("2017-03-23T23:38:53Z"), t.startTimestamp)
-            assertEquals("Powell", t.startStation?.stationName)
-        }
-
-        // Trip 8: Muni Metro at Van Ness
-        trips[8].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-23T23:28:14Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 9: Muni Metro at Powell — $0 fare
-        trips[9].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(0), t.fare)
-            assertEquals(Instant.parse("2017-03-22T16:31:56Z"), t.startTimestamp)
-            assertEquals("Powell", t.startStation?.stationName)
-        }
-
-        // Trip 10: Muni Metro at Van Ness
-        trips[10].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-22T15:20:10Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 11: Muni Metro at Castro
-        trips[11].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-22T04:31:30Z"), t.startTimestamp)
-            assertEquals("Castro", t.startStation?.stationName)
-        }
-
-        // Trip 12: Muni Metro at Van Ness
-        trips[12].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-22T01:47:07Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 13: Muni Metro at Van Ness
-        trips[13].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-21T01:50:06Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-
-        // Trip 14: Muni Metro at Powell
-        trips[14].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-19T21:01:16Z"), t.startTimestamp)
-            assertEquals("Powell", t.startStation?.stationName)
-        }
-
-        // Trip 15: Muni Metro at Van Ness
-        trips[15].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.USD(225), t.fare)
-            assertEquals(Instant.parse("2017-03-19T19:28:38Z"), t.startTimestamp)
-            assertEquals("Van Ness", t.startStation?.stationName)
-        }
-    }
 
     // --- Suica (FeliCa) ---
 
     @Test
-    fun testSuicaFromFlipper() {
-        val data = loadFlipperDump("Suica.nfc")
-        val rawCard = FlipperNfcParser.parse(data)
-        assertNotNull(rawCard, "Failed to parse Suica Flipper dump")
+    fun testSuicaFromFlipper() =
+        runBlocking {
+            val data = loadFlipperDump("Suica.nfc")
+            val rawCard = FlipperNfcParser.parse(data)
+            assertNotNull(rawCard, "Failed to parse Suica Flipper dump")
 
-        val card = rawCard.parse()
-        assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
+            val card = rawCard.parse()
+            assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
 
-        val factory = SuicaTransitFactory(stringResource)
-        assertTrue(factory.check(card), "Suica factory should recognize this card")
+            val factory = SuicaTransitFactory()
+            assertTrue(factory.check(card), "Suica factory should recognize this card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Suica", identity.name)
-        assertNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Suica", identity.name.resolveAsync())
+            assertNull(identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse Suica transit info")
-        assertTrue(info is SuicaTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse Suica transit info")
+            assertTrue(info is SuicaTransitInfo)
 
-        // Balance: 870 JPY
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.JPY(870), balances[0].balance)
+            // Balance: 870 JPY
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.JPY(870), balances[0].balance)
 
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(20, trips.size)
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(20, trips.size)
 
-        assertNull(info.subscriptions)
+            assertNull(info.subscriptions)
 
-        // Trip 0: Tokyu Toyoko — Shibuya to Toritsudaigaku, 0 JPY
-        trips[0].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(0), t.fare)
-            assertEquals("Tokyu", t.agencyName)
-            assertEquals("Tōkyūtōyoko", t.routeName)
-            assertEquals("Shibuya", t.startStation?.stationName)
-            assertEquals("Toritsudaigaku", t.endStation?.stationName)
+            // Trip 0: Tokyu Toyoko — Shibuya to Toritsudaigaku, 0 JPY
+            trips[0].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(0), t.fare)
+                assertEquals("Tokyu", t.agencyName?.resolveAsync())
+                assertEquals("Tōkyūtōyoko", t.routeName?.resolveAsync())
+                assertEquals("Shibuya", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Toritsudaigaku", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 1: Tokyu Toyoko — Toritsudaigaku to Shibuya, 150 JPY
+            trips[1].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(150), t.fare)
+                assertEquals("Tokyu", t.agencyName?.resolveAsync())
+                assertEquals("Tōkyūtōyoko", t.routeName?.resolveAsync())
+                assertEquals("Toritsudaigaku", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shibuya", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 2: JR East Yamate — Shibuya to Koenji, 160 JPY
+            trips[2].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("JR East", t.agencyName?.resolveAsync())
+                assertEquals("Yamate", t.routeName?.resolveAsync())
+                assertEquals("Shibuya", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Kōenji", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 3: JR East Chuo — Koenji to Shinjuku, 150 JPY
+            trips[3].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(150), t.fare)
+                assertEquals("JR East", t.agencyName?.resolveAsync())
+                assertEquals("Chūō", t.routeName?.resolveAsync())
+                assertEquals("Kōenji", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinjuku", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 4: JR East Chuo — Shinjuku to Koenji, 150 JPY
+            trips[4].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(150), t.fare)
+                assertEquals("JR East", t.agencyName?.resolveAsync())
+                assertEquals("Chūō", t.routeName?.resolveAsync())
+                assertEquals("Shinjuku", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Kōenji", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 5: JR East Chuo — Koenji to Shinjuku, 150 JPY
+            trips[5].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(150), t.fare)
+                assertEquals("JR East", t.agencyName?.resolveAsync())
+                assertEquals("Chūō", t.routeName?.resolveAsync())
+                assertEquals("Kōenji", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinjuku", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 6: Tokyo Metro Marunouchi — Tokyo, ticket machine, 110 JPY
+            trips[6].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(110), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#4 Marunouchi", t.routeName?.resolveAsync())
+                assertEquals("Tōkyō", t.startStation?.displayName?.resolveAsync())
+                assertNull(t.endStation)
+            }
+
+            // Trip 7: Ticket Machine Charge — -2000 JPY
+            trips[7].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-2000), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Ticket Machine Charge", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+            }
+
+            // Trip 8: Tokyo Metro Ginza — Aoyamaitchome to Jimbocho, 160 JPY
+            trips[8].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Jinbōchō", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 9: Vending Machine — 120 JPY
+            trips[9].let { t ->
+                assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(120), t.fare)
+                assertEquals(Instant.parse("2011-03-04T06:28:00Z"), t.startTimestamp)
+                assertNull(t.agencyName)
+                assertEquals("Vending Machine Merchandise", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+            }
+
+            // Trip 10: Toei Sanda — Jimbocho to Iwamotomachi, 100 JPY
+            trips[10].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(100), t.fare)
+                assertEquals("Toei", t.agencyName?.resolveAsync())
+                assertEquals("#6 Sanda", t.routeName?.resolveAsync())
+                assertEquals("Jinbōchō", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Iwamotomachi", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 11: JR East Sobu — Asakusabashi to Shibuya, 210 JPY
+            trips[11].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(210), t.fare)
+                assertEquals("JR East", t.agencyName?.resolveAsync())
+                assertEquals("Sōbu", t.routeName?.resolveAsync())
+                assertEquals("Asakusabashi", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shibuya", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 12: Toei Oedo — Aoyamaitchome to Shinjuku, 170 JPY
+            trips[12].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(170), t.fare)
+                assertEquals("Toei", t.agencyName?.resolveAsync())
+                assertEquals("#12 Ōedo", t.routeName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinjuku", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 13: Toei Shinjuku — Shinjuku to Roppongi, 210 JPY
+            trips[13].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(210), t.fare)
+                assertEquals("Toei", t.agencyName?.resolveAsync())
+                assertEquals("#10 Shinjuku", t.routeName?.resolveAsync())
+                assertEquals("Shinjuku", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Roppongi", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 14: Tokyo Metro Ginza — Aoyamaitchome to Shibuya, 160 JPY
+            trips[14].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shibuya", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 15: Tokyo Metro Ginza — Shibuya to Shinnakano, 190 JPY
+            trips[15].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(190), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Shibuya", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinnakano", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 16: Tokyo Metro Marunouchi — Shinnakano to Omotesando, 190 JPY
+            trips[16].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(190), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#4 Marunouchi", t.routeName?.resolveAsync())
+                assertEquals("Shinnakano", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Omotesandō", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 17: Tokyo Metro Ginza — Aoyamaitchome to Ginza, 160 JPY
+            trips[17].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Ginza", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 18: Tokyo Metro Ginza — Ginza to Toranomon, 160 JPY
+            trips[18].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Ginza", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Toranomon", t.endStation?.displayName?.resolveAsync())
+                assertEquals(Instant.parse("2011-03-10T15:00:00Z"), t.startTimestamp)
+                assertEquals(Instant.parse("2011-03-11T05:57:00Z"), t.endTimestamp)
+            }
+
+            // Trip 19: Tokyo Metro Ginza — Aoyamaitchome to Shibuya, 160 JPY (latest with precise timestamps)
+            trips[19].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shibuya", t.endStation?.displayName?.resolveAsync())
+                assertEquals(Instant.parse("2011-03-12T03:42:00Z"), t.startTimestamp)
+                assertEquals(Instant.parse("2011-03-12T03:52:00Z"), t.endTimestamp)
+            }
         }
-
-        // Trip 1: Tokyu Toyoko — Toritsudaigaku to Shibuya, 150 JPY
-        trips[1].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(150), t.fare)
-            assertEquals("Tokyu", t.agencyName)
-            assertEquals("Tōkyūtōyoko", t.routeName)
-            assertEquals("Toritsudaigaku", t.startStation?.stationName)
-            assertEquals("Shibuya", t.endStation?.stationName)
-        }
-
-        // Trip 2: JR East Yamate — Shibuya to Koenji, 160 JPY
-        trips[2].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("JR East", t.agencyName)
-            assertEquals("Yamate", t.routeName)
-            assertEquals("Shibuya", t.startStation?.stationName)
-            assertEquals("Kōenji", t.endStation?.stationName)
-        }
-
-        // Trip 3: JR East Chuo — Koenji to Shinjuku, 150 JPY
-        trips[3].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(150), t.fare)
-            assertEquals("JR East", t.agencyName)
-            assertEquals("Chūō", t.routeName)
-            assertEquals("Kōenji", t.startStation?.stationName)
-            assertEquals("Shinjuku", t.endStation?.stationName)
-        }
-
-        // Trip 4: JR East Chuo — Shinjuku to Koenji, 150 JPY
-        trips[4].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(150), t.fare)
-            assertEquals("JR East", t.agencyName)
-            assertEquals("Chūō", t.routeName)
-            assertEquals("Shinjuku", t.startStation?.stationName)
-            assertEquals("Kōenji", t.endStation?.stationName)
-        }
-
-        // Trip 5: JR East Chuo — Koenji to Shinjuku, 150 JPY
-        trips[5].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(150), t.fare)
-            assertEquals("JR East", t.agencyName)
-            assertEquals("Chūō", t.routeName)
-            assertEquals("Kōenji", t.startStation?.stationName)
-            assertEquals("Shinjuku", t.endStation?.stationName)
-        }
-
-        // Trip 6: Tokyo Metro Marunouchi — Tokyo, ticket machine, 110 JPY
-        trips[6].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(110), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#4 Marunouchi", t.routeName)
-            assertEquals("Tōkyō", t.startStation?.stationName)
-            assertNull(t.endStation)
-        }
-
-        // Trip 7: Ticket Machine Charge — -2000 JPY
-        trips[7].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-2000), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Ticket Machine Charge", t.routeName)
-            assertNull(t.startStation)
-        }
-
-        // Trip 8: Tokyo Metro Ginza — Aoyamaitchome to Jimbocho, 160 JPY
-        trips[8].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Aoyamaitchōme", t.startStation?.stationName)
-            assertEquals("Jinbōchō", t.endStation?.stationName)
-        }
-
-        // Trip 9: Vending Machine — 120 JPY
-        trips[9].let { t ->
-            assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(120), t.fare)
-            assertEquals(Instant.parse("2011-03-04T06:28:00Z"), t.startTimestamp)
-            assertNull(t.agencyName)
-            assertEquals("Vending Machine Merchandise", t.routeName)
-            assertNull(t.startStation)
-        }
-
-        // Trip 10: Toei Sanda — Jimbocho to Iwamotomachi, 100 JPY
-        trips[10].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(100), t.fare)
-            assertEquals("Toei", t.agencyName)
-            assertEquals("#6 Sanda", t.routeName)
-            assertEquals("Jinbōchō", t.startStation?.stationName)
-            assertEquals("Iwamotomachi", t.endStation?.stationName)
-        }
-
-        // Trip 11: JR East Sobu — Asakusabashi to Shibuya, 210 JPY
-        trips[11].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(210), t.fare)
-            assertEquals("JR East", t.agencyName)
-            assertEquals("Sōbu", t.routeName)
-            assertEquals("Asakusabashi", t.startStation?.stationName)
-            assertEquals("Shibuya", t.endStation?.stationName)
-        }
-
-        // Trip 12: Toei Oedo — Aoyamaitchome to Shinjuku, 170 JPY
-        trips[12].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(170), t.fare)
-            assertEquals("Toei", t.agencyName)
-            assertEquals("#12 Ōedo", t.routeName)
-            assertEquals("Aoyamaitchōme", t.startStation?.stationName)
-            assertEquals("Shinjuku", t.endStation?.stationName)
-        }
-
-        // Trip 13: Toei Shinjuku — Shinjuku to Roppongi, 210 JPY
-        trips[13].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(210), t.fare)
-            assertEquals("Toei", t.agencyName)
-            assertEquals("#10 Shinjuku", t.routeName)
-            assertEquals("Shinjuku", t.startStation?.stationName)
-            assertEquals("Roppongi", t.endStation?.stationName)
-        }
-
-        // Trip 14: Tokyo Metro Ginza — Aoyamaitchome to Shibuya, 160 JPY
-        trips[14].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Aoyamaitchōme", t.startStation?.stationName)
-            assertEquals("Shibuya", t.endStation?.stationName)
-        }
-
-        // Trip 15: Tokyo Metro Ginza — Shibuya to Shinnakano, 190 JPY
-        trips[15].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(190), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Shibuya", t.startStation?.stationName)
-            assertEquals("Shinnakano", t.endStation?.stationName)
-        }
-
-        // Trip 16: Tokyo Metro Marunouchi — Shinnakano to Omotesando, 190 JPY
-        trips[16].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(190), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#4 Marunouchi", t.routeName)
-            assertEquals("Shinnakano", t.startStation?.stationName)
-            assertEquals("Omotesandō", t.endStation?.stationName)
-        }
-
-        // Trip 17: Tokyo Metro Ginza — Aoyamaitchome to Ginza, 160 JPY
-        trips[17].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Aoyamaitchōme", t.startStation?.stationName)
-            assertEquals("Ginza", t.endStation?.stationName)
-        }
-
-        // Trip 18: Tokyo Metro Ginza — Ginza to Toranomon, 160 JPY
-        trips[18].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Ginza", t.startStation?.stationName)
-            assertEquals("Toranomon", t.endStation?.stationName)
-            assertEquals(Instant.parse("2011-03-10T15:00:00Z"), t.startTimestamp)
-            assertEquals(Instant.parse("2011-03-11T05:57:00Z"), t.endTimestamp)
-        }
-
-        // Trip 19: Tokyo Metro Ginza — Aoyamaitchome to Shibuya, 160 JPY (latest with precise timestamps)
-        trips[19].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Aoyamaitchōme", t.startStation?.stationName)
-            assertEquals("Shibuya", t.endStation?.stationName)
-            assertEquals(Instant.parse("2011-03-12T03:42:00Z"), t.startTimestamp)
-            assertEquals(Instant.parse("2011-03-12T03:52:00Z"), t.endTimestamp)
-        }
-    }
 
     // --- PASMO (FeliCa) ---
 
     @Test
-    fun testPasmoFromFlipper() {
-        val data = loadFlipperDump("PASMO.nfc")
-        val rawCard = FlipperNfcParser.parse(data)
-        assertNotNull(rawCard, "Failed to parse PASMO Flipper dump")
+    fun testPasmoFromFlipper() =
+        runBlocking {
+            val data = loadFlipperDump("PASMO.nfc")
+            val rawCard = FlipperNfcParser.parse(data)
+            assertNotNull(rawCard, "Failed to parse PASMO Flipper dump")
 
-        val card = rawCard.parse()
-        assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
+            val card = rawCard.parse()
+            assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
 
-        val factory = SuicaTransitFactory(stringResource)
-        assertTrue(factory.check(card), "Suica factory should recognize PASMO card")
+            val factory = SuicaTransitFactory()
+            assertTrue(factory.check(card), "Suica factory should recognize PASMO card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("PASMO", identity.name)
-        assertNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("PASMO", identity.name.resolveAsync())
+            assertNull(identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse PASMO transit info")
-        assertTrue(info is SuicaTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse PASMO transit info")
+            assertTrue(info is SuicaTransitInfo)
 
-        // Balance: 500 JPY
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.JPY(500), balances[0].balance)
+            // Balance: 500 JPY
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.JPY(500), balances[0].balance)
 
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(11, trips.size)
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(11, trips.size)
 
-        assertNull(info.subscriptions)
+            assertNull(info.subscriptions)
 
-        // Trip 0: New Issue (ticket machine), -500 JPY
-        trips[0].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-500), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Ticket Machine New Issue", t.routeName)
-            assertNull(t.startStation)
+            // Trip 0: New Issue (ticket machine), -500 JPY
+            trips[0].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-500), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Ticket Machine New Issue", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+            }
+
+            // Trip 1: Tokyo Metro Ginza — Shibuya to Aoyamaitchome, 160 JPY
+            trips[1].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(160), t.fare)
+                assertEquals("Tokyo Metro", t.agencyName?.resolveAsync())
+                assertEquals("#3 Ginza", t.routeName?.resolveAsync())
+                assertEquals("Shibuya", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 2: Toei Oedo — Aoyamaitchome to Tsukijishijo, 100 JPY
+            trips[2].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(100), t.fare)
+                assertEquals("Toei", t.agencyName?.resolveAsync())
+                assertEquals("#12 Ōedo", t.routeName?.resolveAsync())
+                assertEquals("Aoyamaitchōme", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Tsukijiichiba", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 3: Simple Deposit Machine Charge, -1000 JPY
+            trips[3].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-1000), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Simple Deposit Machine Charge", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+            }
+
+            // Trip 4: Toei Oedo — Tsukijishijo to Kuramae, 210 JPY
+            trips[4].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(210), t.fare)
+                assertEquals("Toei", t.agencyName?.resolveAsync())
+                assertEquals("#12 Ōedo", t.routeName?.resolveAsync())
+                assertEquals("Tsukijiichiba", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Kuramae", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 5: Toei Asakusa — Asakusa to Shinbashi, 210 JPY
+            trips[5].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(210), t.fare)
+                assertEquals("Toei", t.agencyName?.resolveAsync())
+                assertEquals("#1 Asakusa", t.routeName?.resolveAsync())
+                assertEquals("Asakusa", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinbashi", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 6: Yurikamome — Shinbashi to Oumi, 370 JPY (with end timestamp next day)
+            trips[6].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(370), t.fare)
+                assertEquals("Yurikamome", t.agencyName?.resolveAsync())
+                assertEquals("Tokyo Waterfront New Transit", t.routeName?.resolveAsync())
+                assertEquals("Shinbashi", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Oumi", t.endStation?.displayName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-12T15:00:00Z"), t.startTimestamp)
+                assertEquals(Instant.parse("2011-06-13T05:45:00Z"), t.endTimestamp)
+            }
+
+            // Trip 7: Fare Adjustment Machine Charge, -1000 JPY
+            trips[7].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-1000), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Fare Adjustment Machine Charge", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+            }
+
+            // Trip 8: TWR Rinkai — Tokyo Teleport to Shinjuku, 480 JPY
+            trips[8].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(480), t.fare)
+                assertEquals("Tokyo Waterfront Area Rapid Transit", t.agencyName?.resolveAsync())
+                assertEquals("Rinkai", t.routeName?.resolveAsync())
+                assertEquals("Tokyo Teleport", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinjuku", t.endStation?.displayName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-13T07:37:00Z"), t.startTimestamp)
+                assertEquals(Instant.parse("2011-06-13T08:19:00Z"), t.endTimestamp)
+            }
+
+            // Trip 9: POS purchase, 550 JPY
+            trips[9].let { t ->
+                assertEquals(Trip.Mode.POS, t.mode)
+                assertEquals(TransitCurrency.JPY(550), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Point of Sale Terminal Merchandise", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+                assertEquals(Instant.parse("2011-06-14T06:39:00Z"), t.startTimestamp)
+            }
+
+            // Trip 10: POS purchase, 420 JPY
+            trips[10].let { t ->
+                assertEquals(Trip.Mode.POS, t.mode)
+                assertEquals(TransitCurrency.JPY(420), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Point of Sale Terminal Merchandise", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+                assertEquals(Instant.parse("2011-06-14T06:59:00Z"), t.startTimestamp)
+            }
         }
-
-        // Trip 1: Tokyo Metro Ginza — Shibuya to Aoyamaitchome, 160 JPY
-        trips[1].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(160), t.fare)
-            assertEquals("Tokyo Metro", t.agencyName)
-            assertEquals("#3 Ginza", t.routeName)
-            assertEquals("Shibuya", t.startStation?.stationName)
-            assertEquals("Aoyamaitchōme", t.endStation?.stationName)
-        }
-
-        // Trip 2: Toei Oedo — Aoyamaitchome to Tsukijishijo, 100 JPY
-        trips[2].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(100), t.fare)
-            assertEquals("Toei", t.agencyName)
-            assertEquals("#12 Ōedo", t.routeName)
-            assertEquals("Aoyamaitchōme", t.startStation?.stationName)
-            assertEquals("Tsukijiichiba", t.endStation?.stationName)
-        }
-
-        // Trip 3: Simple Deposit Machine Charge, -1000 JPY
-        trips[3].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-1000), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Simple Deposit Machine Charge", t.routeName)
-            assertNull(t.startStation)
-        }
-
-        // Trip 4: Toei Oedo — Tsukijishijo to Kuramae, 210 JPY
-        trips[4].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(210), t.fare)
-            assertEquals("Toei", t.agencyName)
-            assertEquals("#12 Ōedo", t.routeName)
-            assertEquals("Tsukijiichiba", t.startStation?.stationName)
-            assertEquals("Kuramae", t.endStation?.stationName)
-        }
-
-        // Trip 5: Toei Asakusa — Asakusa to Shinbashi, 210 JPY
-        trips[5].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(210), t.fare)
-            assertEquals("Toei", t.agencyName)
-            assertEquals("#1 Asakusa", t.routeName)
-            assertEquals("Asakusa", t.startStation?.stationName)
-            assertEquals("Shinbashi", t.endStation?.stationName)
-        }
-
-        // Trip 6: Yurikamome — Shinbashi to Oumi, 370 JPY (with end timestamp next day)
-        trips[6].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(370), t.fare)
-            assertEquals("Yurikamome", t.agencyName)
-            assertEquals("Tokyo Waterfront New Transit", t.routeName)
-            assertEquals("Shinbashi", t.startStation?.stationName)
-            assertEquals("Oumi", t.endStation?.stationName)
-            assertEquals(Instant.parse("2011-06-12T15:00:00Z"), t.startTimestamp)
-            assertEquals(Instant.parse("2011-06-13T05:45:00Z"), t.endTimestamp)
-        }
-
-        // Trip 7: Fare Adjustment Machine Charge, -1000 JPY
-        trips[7].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-1000), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Fare Adjustment Machine Charge", t.routeName)
-            assertNull(t.startStation)
-        }
-
-        // Trip 8: TWR Rinkai — Tokyo Teleport to Shinjuku, 480 JPY
-        trips[8].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(480), t.fare)
-            assertEquals("Tokyo Waterfront Area Rapid Transit", t.agencyName)
-            assertEquals("Rinkai", t.routeName)
-            assertEquals("Tokyo Teleport", t.startStation?.stationName)
-            assertEquals("Shinjuku", t.endStation?.stationName)
-            assertEquals(Instant.parse("2011-06-13T07:37:00Z"), t.startTimestamp)
-            assertEquals(Instant.parse("2011-06-13T08:19:00Z"), t.endTimestamp)
-        }
-
-        // Trip 9: POS purchase, 550 JPY
-        trips[9].let { t ->
-            assertEquals(Trip.Mode.POS, t.mode)
-            assertEquals(TransitCurrency.JPY(550), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Point of Sale Terminal Merchandise", t.routeName)
-            assertNull(t.startStation)
-            assertEquals(Instant.parse("2011-06-14T06:39:00Z"), t.startTimestamp)
-        }
-
-        // Trip 10: POS purchase, 420 JPY
-        trips[10].let { t ->
-            assertEquals(Trip.Mode.POS, t.mode)
-            assertEquals(TransitCurrency.JPY(420), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Point of Sale Terminal Merchandise", t.routeName)
-            assertNull(t.startStation)
-            assertEquals(Instant.parse("2011-06-14T06:59:00Z"), t.startTimestamp)
-        }
-    }
 
     // --- ICOCA (FeliCa) ---
 
     @Test
-    fun testIcocaFromFlipper() {
-        val data = loadFlipperDump("ICOCA.nfc")
-        val rawCard = FlipperNfcParser.parse(data)
-        assertNotNull(rawCard, "Failed to parse ICOCA Flipper dump")
+    fun testIcocaFromFlipper() =
+        runBlocking {
+            val data = loadFlipperDump("ICOCA.nfc")
+            val rawCard = FlipperNfcParser.parse(data)
+            assertNotNull(rawCard, "Failed to parse ICOCA Flipper dump")
 
-        val card = rawCard.parse()
-        assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
+            val card = rawCard.parse()
+            assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
 
-        val factory = SuicaTransitFactory(stringResource)
-        assertTrue(factory.check(card), "Suica factory should recognize ICOCA card")
+            val factory = SuicaTransitFactory()
+            assertTrue(factory.check(card), "Suica factory should recognize ICOCA card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("ICOCA", identity.name)
-        assertNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("ICOCA", identity.name.resolveAsync())
+            assertNull(identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse ICOCA transit info")
-        assertTrue(info is SuicaTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse ICOCA transit info")
+            assertTrue(info is SuicaTransitInfo)
 
-        // Balance: 827 JPY
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.JPY(827), balances[0].balance)
+            // Balance: 827 JPY
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.JPY(827), balances[0].balance)
 
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(20, trips.size)
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(20, trips.size)
 
-        assertNull(info.subscriptions)
+            assertNull(info.subscriptions)
 
-        // Trip 0: Vending Machine, 0 JPY
-        trips[0].let { t ->
-            assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(0), t.fare)
-            assertNull(t.agencyName)
-            assertEquals("Vending Machine Merchandise", t.routeName)
-            assertNull(t.startStation)
-            assertEquals(Instant.parse("2011-06-05T23:46:00Z"), t.startTimestamp)
+            // Trip 0: Vending Machine, 0 JPY
+            trips[0].let { t ->
+                assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(0), t.fare)
+                assertNull(t.agencyName)
+                assertEquals("Vending Machine Merchandise", t.routeName?.resolveAsync())
+                assertNull(t.startStation)
+                assertEquals(Instant.parse("2011-06-05T23:46:00Z"), t.startTimestamp)
+            }
+
+            // Trip 1: POS, 734 JPY
+            trips[1].let { t ->
+                assertEquals(Trip.Mode.POS, t.mode)
+                assertEquals(TransitCurrency.JPY(734), t.fare)
+                assertEquals("Point of Sale Terminal Merchandise", t.routeName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-07T00:33:00Z"), t.startTimestamp)
+            }
+
+            // Trip 2: Ticket Machine Charge, -2000 JPY
+            trips[2].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-2000), t.fare)
+                assertEquals("Ticket Machine Charge", t.routeName?.resolveAsync())
+            }
+
+            // Trip 3: POS, 958 JPY
+            trips[3].let { t ->
+                assertEquals(Trip.Mode.POS, t.mode)
+                assertEquals(TransitCurrency.JPY(958), t.fare)
+                assertEquals("Point of Sale Terminal Merchandise", t.routeName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-07T00:57:00Z"), t.startTimestamp)
+            }
+
+            // Trip 4: Keihan — Tofukuji to Demachiyanagi, 260 JPY
+            trips[4].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(260), t.fare)
+                assertEquals("Keihan Electric Railway", t.agencyName?.resolveAsync())
+                assertEquals("Keihanhon", t.routeName?.resolveAsync())
+                assertEquals("Tōfukuji", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Demachiyanagi", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 5: Console 0x21 Charge, -1000 JPY
+            trips[5].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-1000), t.fare)
+                assertEquals("Console 0x21 Charge", t.routeName?.resolveAsync())
+            }
+
+            // Trip 6: Kyoto Subway Karasuma — Kyoto to Nijojomae, 250 JPY
+            trips[6].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(250), t.fare)
+                assertEquals("Kyoto Subway", t.agencyName?.resolveAsync())
+                assertEquals("Karasuma", t.routeName?.resolveAsync())
+                assertEquals("Kyōto", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Nijōjōmae", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 7: Osaka Subway #1 — Shinosaka to Namba, 270 JPY
+            trips[7].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(270), t.fare)
+                assertEquals("Osaka Subway", t.agencyName?.resolveAsync())
+                assertEquals("#1", t.routeName?.resolveAsync())
+                assertEquals("Shinōsaka", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Nanba", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 8: Osaka Subway #1 — Namba to Bentencho, 230 JPY
+            trips[8].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(230), t.fare)
+                assertEquals("Osaka Subway", t.agencyName?.resolveAsync())
+                assertEquals("#1", t.routeName?.resolveAsync())
+                assertEquals("Nanba", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Bentenchō", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 9: POS, 700 JPY
+            trips[9].let { t ->
+                assertEquals(Trip.Mode.POS, t.mode)
+                assertEquals(TransitCurrency.JPY(700), t.fare)
+                assertEquals("Point of Sale Terminal Merchandise", t.routeName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-08T07:35:00Z"), t.startTimestamp)
+            }
+
+            // Trip 10: Simple Deposit Machine Charge, -2000 JPY
+            trips[10].let { t ->
+                assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(-2000), t.fare)
+                assertEquals("Simple Deposit Machine Charge", t.routeName?.resolveAsync())
+            }
+
+            // Trip 11: JR West Osaka Loop — Bentencho to Palace of cherry, 170 JPY
+            trips[11].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(170), t.fare)
+                assertEquals("JR West", t.agencyName?.resolveAsync())
+                assertEquals("Ōsaka Loop", t.routeName?.resolveAsync())
+                assertEquals("Bentenchō", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Palace of cherry", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 12: Osaka Subway #1 — Umeda to Shinsaibashi, 230 JPY
+            trips[12].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(230), t.fare)
+                assertEquals("Osaka Subway", t.agencyName?.resolveAsync())
+                assertEquals("#1", t.routeName?.resolveAsync())
+                assertEquals("Umeda", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Shinsaibashi", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 13: Osaka Subway #1 — Yodoyabashi to Namba, 200 JPY
+            trips[13].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(200), t.fare)
+                assertEquals("Osaka Subway", t.agencyName?.resolveAsync())
+                assertEquals("#1", t.routeName?.resolveAsync())
+                assertEquals("Yodoyabashi", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Nanba", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 14: Kintetsu Namba — Osakanamba to Kintetsunara, 540 JPY
+            trips[14].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(540), t.fare)
+                assertEquals("Kintetsu", t.agencyName?.resolveAsync())
+                assertEquals("Nanba", t.routeName?.resolveAsync())
+                assertEquals("Ōsakananba", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Kintetsunara", t.endStation?.displayName?.resolveAsync())
+            }
+
+            // Trip 15: Nara Kotsu bus — Nitta, 200 JPY
+            trips[15].let { t ->
+                assertEquals(Trip.Mode.BUS, t.mode)
+                assertEquals(TransitCurrency.JPY(200), t.fare)
+                assertEquals("Narakōtsū", t.agencyName?.resolveAsync())
+                assertNull(t.routeName)
+                assertEquals("Nitta", t.startStation?.displayName?.resolveAsync())
+                assertNull(t.endStation)
+            }
+
+            // Trip 16: Vending Machine, 400 JPY
+            trips[16].let { t ->
+                assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(400), t.fare)
+                assertEquals("Vending Machine Merchandise", t.routeName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-11T05:21:00Z"), t.startTimestamp)
+            }
+
+            // Trip 17: Vending Machine, 150 JPY
+            trips[17].let { t ->
+                assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(150), t.fare)
+                assertEquals("Vending Machine Merchandise", t.routeName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-11T07:32:00Z"), t.startTimestamp)
+            }
+
+            // Trip 18: Vending Machine, 100 JPY
+            trips[18].let { t ->
+                assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
+                assertEquals(TransitCurrency.JPY(100), t.fare)
+                assertEquals("Vending Machine Merchandise", t.routeName?.resolveAsync())
+                assertEquals(Instant.parse("2011-06-14T03:19:00Z"), t.startTimestamp)
+            }
+
+            // Trip 19: Kyoto Subway Tozai — Higashiyama to Kyoto, 260 JPY (most recent, 2018)
+            trips[19].let { t ->
+                assertEquals(Trip.Mode.METRO, t.mode)
+                assertEquals(TransitCurrency.JPY(260), t.fare)
+                assertEquals("Kyoto Subway", t.agencyName?.resolveAsync())
+                assertEquals("Tōzai", t.routeName?.resolveAsync())
+                assertEquals("Higashiyama", t.startStation?.displayName?.resolveAsync())
+                assertEquals("Kyōto", t.endStation?.displayName?.resolveAsync())
+                assertEquals(Instant.parse("2018-09-17T00:11:00Z"), t.startTimestamp)
+                assertEquals(Instant.parse("2018-09-17T00:29:00Z"), t.endTimestamp)
+            }
         }
-
-        // Trip 1: POS, 734 JPY
-        trips[1].let { t ->
-            assertEquals(Trip.Mode.POS, t.mode)
-            assertEquals(TransitCurrency.JPY(734), t.fare)
-            assertEquals("Point of Sale Terminal Merchandise", t.routeName)
-            assertEquals(Instant.parse("2011-06-07T00:33:00Z"), t.startTimestamp)
-        }
-
-        // Trip 2: Ticket Machine Charge, -2000 JPY
-        trips[2].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-2000), t.fare)
-            assertEquals("Ticket Machine Charge", t.routeName)
-        }
-
-        // Trip 3: POS, 958 JPY
-        trips[3].let { t ->
-            assertEquals(Trip.Mode.POS, t.mode)
-            assertEquals(TransitCurrency.JPY(958), t.fare)
-            assertEquals("Point of Sale Terminal Merchandise", t.routeName)
-            assertEquals(Instant.parse("2011-06-07T00:57:00Z"), t.startTimestamp)
-        }
-
-        // Trip 4: Keihan — Tofukuji to Demachiyanagi, 260 JPY
-        trips[4].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(260), t.fare)
-            assertEquals("Keihan Electric Railway", t.agencyName)
-            assertEquals("Keihanhon", t.routeName)
-            assertEquals("Tōfukuji", t.startStation?.stationName)
-            assertEquals("Demachiyanagi", t.endStation?.stationName)
-        }
-
-        // Trip 5: Console 0x21 Charge, -1000 JPY
-        trips[5].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-1000), t.fare)
-            assertEquals("Console 0x21 Charge", t.routeName)
-        }
-
-        // Trip 6: Kyoto Subway Karasuma — Kyoto to Nijojomae, 250 JPY
-        trips[6].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(250), t.fare)
-            assertEquals("Kyoto Subway", t.agencyName)
-            assertEquals("Karasuma", t.routeName)
-            assertEquals("Kyōto", t.startStation?.stationName)
-            assertEquals("Nijōjōmae", t.endStation?.stationName)
-        }
-
-        // Trip 7: Osaka Subway #1 — Shinosaka to Namba, 270 JPY
-        trips[7].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(270), t.fare)
-            assertEquals("Osaka Subway", t.agencyName)
-            assertEquals("#1", t.routeName)
-            assertEquals("Shinōsaka", t.startStation?.stationName)
-            assertEquals("Nanba", t.endStation?.stationName)
-        }
-
-        // Trip 8: Osaka Subway #1 — Namba to Bentencho, 230 JPY
-        trips[8].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(230), t.fare)
-            assertEquals("Osaka Subway", t.agencyName)
-            assertEquals("#1", t.routeName)
-            assertEquals("Nanba", t.startStation?.stationName)
-            assertEquals("Bentenchō", t.endStation?.stationName)
-        }
-
-        // Trip 9: POS, 700 JPY
-        trips[9].let { t ->
-            assertEquals(Trip.Mode.POS, t.mode)
-            assertEquals(TransitCurrency.JPY(700), t.fare)
-            assertEquals("Point of Sale Terminal Merchandise", t.routeName)
-            assertEquals(Instant.parse("2011-06-08T07:35:00Z"), t.startTimestamp)
-        }
-
-        // Trip 10: Simple Deposit Machine Charge, -2000 JPY
-        trips[10].let { t ->
-            assertEquals(Trip.Mode.TICKET_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(-2000), t.fare)
-            assertEquals("Simple Deposit Machine Charge", t.routeName)
-        }
-
-        // Trip 11: JR West Osaka Loop — Bentencho to Palace of cherry, 170 JPY
-        trips[11].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(170), t.fare)
-            assertEquals("JR West", t.agencyName)
-            assertEquals("Ōsaka Loop", t.routeName)
-            assertEquals("Bentenchō", t.startStation?.stationName)
-            assertEquals("Palace of cherry", t.endStation?.stationName)
-        }
-
-        // Trip 12: Osaka Subway #1 — Umeda to Shinsaibashi, 230 JPY
-        trips[12].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(230), t.fare)
-            assertEquals("Osaka Subway", t.agencyName)
-            assertEquals("#1", t.routeName)
-            assertEquals("Umeda", t.startStation?.stationName)
-            assertEquals("Shinsaibashi", t.endStation?.stationName)
-        }
-
-        // Trip 13: Osaka Subway #1 — Yodoyabashi to Namba, 200 JPY
-        trips[13].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(200), t.fare)
-            assertEquals("Osaka Subway", t.agencyName)
-            assertEquals("#1", t.routeName)
-            assertEquals("Yodoyabashi", t.startStation?.stationName)
-            assertEquals("Nanba", t.endStation?.stationName)
-        }
-
-        // Trip 14: Kintetsu Namba — Osakanamba to Kintetsunara, 540 JPY
-        trips[14].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(540), t.fare)
-            assertEquals("Kintetsu", t.agencyName)
-            assertEquals("Nanba", t.routeName)
-            assertEquals("Ōsakananba", t.startStation?.stationName)
-            assertEquals("Kintetsunara", t.endStation?.stationName)
-        }
-
-        // Trip 15: Nara Kotsu bus — Nitta, 200 JPY
-        trips[15].let { t ->
-            assertEquals(Trip.Mode.BUS, t.mode)
-            assertEquals(TransitCurrency.JPY(200), t.fare)
-            assertEquals("Narakōtsū", t.agencyName)
-            assertNull(t.routeName)
-            assertEquals("Nitta", t.startStation?.stationName)
-            assertNull(t.endStation)
-        }
-
-        // Trip 16: Vending Machine, 400 JPY
-        trips[16].let { t ->
-            assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(400), t.fare)
-            assertEquals("Vending Machine Merchandise", t.routeName)
-            assertEquals(Instant.parse("2011-06-11T05:21:00Z"), t.startTimestamp)
-        }
-
-        // Trip 17: Vending Machine, 150 JPY
-        trips[17].let { t ->
-            assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(150), t.fare)
-            assertEquals("Vending Machine Merchandise", t.routeName)
-            assertEquals(Instant.parse("2011-06-11T07:32:00Z"), t.startTimestamp)
-        }
-
-        // Trip 18: Vending Machine, 100 JPY
-        trips[18].let { t ->
-            assertEquals(Trip.Mode.VENDING_MACHINE, t.mode)
-            assertEquals(TransitCurrency.JPY(100), t.fare)
-            assertEquals("Vending Machine Merchandise", t.routeName)
-            assertEquals(Instant.parse("2011-06-14T03:19:00Z"), t.startTimestamp)
-        }
-
-        // Trip 19: Kyoto Subway Tozai — Higashiyama to Kyoto, 260 JPY (most recent, 2018)
-        trips[19].let { t ->
-            assertEquals(Trip.Mode.METRO, t.mode)
-            assertEquals(TransitCurrency.JPY(260), t.fare)
-            assertEquals("Kyoto Subway", t.agencyName)
-            assertEquals("Tōzai", t.routeName)
-            assertEquals("Higashiyama", t.startStation?.stationName)
-            assertEquals("Kyōto", t.endStation?.stationName)
-            assertEquals(Instant.parse("2018-09-17T00:11:00Z"), t.startTimestamp)
-            assertEquals(Instant.parse("2018-09-17T00:29:00Z"), t.endTimestamp)
-        }
-    }
 }

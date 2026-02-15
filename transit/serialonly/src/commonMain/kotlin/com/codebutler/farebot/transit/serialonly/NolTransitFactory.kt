@@ -9,6 +9,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
@@ -40,7 +41,7 @@ class NolTransitFactory : TransitFactory<DesfireCard, NolTransitInfo> {
 
     companion object {
         private const val APP_ID_SERIAL = 0xffffff
-        internal const val NAME = "Nol"
+        internal val NAME = FormattedString("Nol")
 
         internal fun getSerial(card: DesfireCard): Int? {
             val file =

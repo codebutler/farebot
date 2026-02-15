@@ -22,16 +22,15 @@
 
 package com.codebutler.farebot.transit
 
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 
-@Serializable
 data class TransitIdentity(
-    val name: String,
+    val name: FormattedString,
     val serialNumber: String?,
 ) {
     companion object {
         fun create(
-            name: String,
+            name: FormattedString,
             serialNumber: String?,
         ): TransitIdentity = TransitIdentity(name, serialNumber)
     }

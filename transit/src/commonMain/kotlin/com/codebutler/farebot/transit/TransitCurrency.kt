@@ -23,8 +23,6 @@
 package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.base.util.CurrencyFormatter
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Represents a monetary value on a transit card.
@@ -34,13 +32,9 @@ import kotlinx.serialization.Serializable
  * @param divisor Value to divide by to get the currency's major unit. Default is 100.
  *                For currencies with no fractional part (e.g., JPY, KRW), use 1.
  */
-@Serializable
 data class TransitCurrency(
-    @SerialName("value")
     val currency: Int,
-    @SerialName("currencyCode")
     val currencyCode: String,
-    @SerialName("divisor")
     val divisor: Int = DEFAULT_DIVISOR,
 ) {
     constructor(currency: Int, currencyCode: String) : this(currency, currencyCode, DEFAULT_DIVISOR)

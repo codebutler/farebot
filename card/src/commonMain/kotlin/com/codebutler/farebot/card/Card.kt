@@ -23,7 +23,6 @@
 package com.codebutler.farebot.card
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import kotlin.time.Instant
 
 abstract class Card {
@@ -33,5 +32,5 @@ abstract class Card {
 
     abstract val scannedAt: Instant
 
-    abstract fun getAdvancedUi(stringResource: StringResource): FareBotUiTree
+    abstract suspend fun getAdvancedUi(): FareBotUiTree
 }

@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.opus
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
@@ -34,7 +33,6 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription.Companion.CONTRA
 
 internal class OpusSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val ctr: Int?,
 ) : En1545Subscription() {
     override val lookup: En1545Lookup

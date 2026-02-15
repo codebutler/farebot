@@ -22,98 +22,96 @@
 
 package com.codebutler.farebot.transit.suica
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
+import farebot.transit.suica.generated.resources.Res
+import farebot.transit.suica.generated.resources.card_name_hayakaken
+import farebot.transit.suica.generated.resources.card_name_icoca
+import farebot.transit.suica.generated.resources.card_name_japan_ic
+import farebot.transit.suica.generated.resources.card_name_kitaca
+import farebot.transit.suica.generated.resources.card_name_manaca
+import farebot.transit.suica.generated.resources.card_name_nimoca
+import farebot.transit.suica.generated.resources.card_name_pasmo
+import farebot.transit.suica.generated.resources.card_name_pitapa
+import farebot.transit.suica.generated.resources.card_name_suica
+import farebot.transit.suica.generated.resources.card_name_toica
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import org.jetbrains.compose.resources.StringResource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import org.jetbrains.compose.resources.StringResource as ComposeStringResource
+import kotlin.test.assertTrue
 
 /**
- * Test implementation of StringResource that returns the resource key name.
+ * Helper to assert that a FormattedString is a Resource wrapping the expected StringResource.
  */
-private class TestStringResource : StringResource {
-    override fun getString(resource: ComposeStringResource): String = resource.key
-
-    override fun getString(
-        resource: ComposeStringResource,
-        vararg formatArgs: Any,
-    ): String = "${resource.key}: ${formatArgs.joinToString(", ")}"
+private fun assertResourceEquals(
+    expected: StringResource,
+    actual: FormattedString,
+    message: String? = null,
+) {
+    assertTrue(actual is FormattedString.Resource, message ?: "Expected FormattedString.Resource but got $actual")
+    assertEquals(expected.key, actual.resource.key, message ?: "Resource key mismatch")
 }
 
 class SuicaUtilTest {
-    private val stringResource = TestStringResource()
-
     @Test
     fun testSuicaCardDetection() {
-        // Suica has unique services: 0x1808, 0x180a, 0x18c8, 0x18ca
         val suicaServices = setOf(0x1808, 0x180a, 0x1848, 0x184b, 0x18c8, 0x18ca)
-        assertEquals("card_name_suica", SuicaUtil.getCardName(stringResource, suicaServices))
+        assertResourceEquals(Res.string.card_name_suica, SuicaUtil.getCardName(suicaServices))
     }
 
     @Test
     fun testPASMOCardDetection() {
-        // PASMO has unique services: 0x1cc8, 0x1cca, 0x1d08, 0x1d0a
         val pasmoServices = setOf(0x1848, 0x184b, 0x1cc8, 0x1cca, 0x1d08, 0x1d0a)
-        assertEquals("card_name_pasmo", SuicaUtil.getCardName(stringResource, pasmoServices))
+        assertResourceEquals(Res.string.card_name_pasmo, SuicaUtil.getCardName(pasmoServices))
     }
 
     @Test
     fun testICOCACardDetection() {
-        // ICOCA has unique services: 0x1a48, 0x1a4a, 0x1a88, 0x1a8a, 0x9608, 0x960a
         val icocaServices = setOf(0x1a48, 0x1a4a, 0x1a88, 0x1a8a, 0x9608, 0x960a)
-        assertEquals("card_name_icoca", SuicaUtil.getCardName(stringResource, icocaServices))
+        assertResourceEquals(Res.string.card_name_icoca, SuicaUtil.getCardName(icocaServices))
     }
 
     @Test
     fun testTOICACardDetection() {
-        // TOICA has unique services: 0x1e08, 0x1e0a, 0x1e48, etc.
         val toicaServices = setOf(0x1848, 0x184b, 0x1e08, 0x1e0a, 0x1e48, 0x1e4a)
-        assertEquals("card_name_toica", SuicaUtil.getCardName(stringResource, toicaServices))
+        assertResourceEquals(Res.string.card_name_toica, SuicaUtil.getCardName(toicaServices))
     }
 
     @Test
     fun testManacaCardDetection() {
-        // manaca has unique services: 0x9888, 0x988b, etc.
         val manacaServices = setOf(0x9888, 0x988b, 0x98cc, 0x98cf)
-        assertEquals("card_name_manaca", SuicaUtil.getCardName(stringResource, manacaServices))
+        assertResourceEquals(Res.string.card_name_manaca, SuicaUtil.getCardName(manacaServices))
     }
 
     @Test
     fun testKitacaCardDetection() {
-        // Kitaca has unique services: 0x2088, 0x208b, 0x20c8, etc.
         val kitacaServices = setOf(0x1848, 0x184b, 0x2088, 0x208b, 0x20c8, 0x20cb)
-        assertEquals("card_name_kitaca", SuicaUtil.getCardName(stringResource, kitacaServices))
+        assertResourceEquals(Res.string.card_name_kitaca, SuicaUtil.getCardName(kitacaServices))
     }
 
     @Test
     fun testPiTaPaCardDetection() {
-        // PiTaPa has unique services: 0x1b88, 0x1b8a, 0x9748, 0x974a
         val pitapaServices = setOf(0x1b88, 0x1b8a, 0x9748, 0x974a)
-        assertEquals("card_name_pitapa", SuicaUtil.getCardName(stringResource, pitapaServices))
+        assertResourceEquals(Res.string.card_name_pitapa, SuicaUtil.getCardName(pitapaServices))
     }
 
     @Test
     fun testSuicaDetectionFailsWithReadOnlyServicesOnly() {
-        // When only read-only service codes (attrs 0x09, 0x0B, 0x0F, 0x17) are available,
-        // Suica's unique codes (attrs 0x08, 0x0A) are missing and detection falls back to "Japan IC".
-        // This was the bug on iOS before expanding the probe attributes.
-        val readOnlyServices = setOf(0x090f, 0x108f) // SERVICE_SUICA_HISTORY, SERVICE_SUICA_INOUT
-        assertEquals("card_name_japan_ic", SuicaUtil.getCardName(stringResource, readOnlyServices))
+        val readOnlyServices = setOf(0x090f, 0x108f)
+        assertResourceEquals(Res.string.card_name_japan_ic, SuicaUtil.getCardName(readOnlyServices))
     }
 
     @Test
     fun testUnknownCardReturnsJapanIC() {
-        // Empty or unrecognized service codes should return "Japan IC"
-        assertEquals("card_name_japan_ic", SuicaUtil.getCardName(stringResource, emptySet()))
-        assertEquals("card_name_japan_ic", SuicaUtil.getCardName(stringResource, setOf(0x1234, 0x5678)))
+        assertResourceEquals(Res.string.card_name_japan_ic, SuicaUtil.getCardName(emptySet()))
+        assertResourceEquals(Res.string.card_name_japan_ic, SuicaUtil.getCardName(setOf(0x1234, 0x5678)))
     }
 
     @Test
     fun testHayakakenCardDetection() {
-        // Full Hayakaken service ID set from a card in the wild (Metrodroid SuicaTest)
         val hayakakenServices =
             setOf(
                 0x48,
@@ -169,12 +167,11 @@ class SuicaUtilTest {
                 0x2548,
                 0x254a,
             )
-        assertEquals("card_name_hayakaken", SuicaUtil.getCardName(stringResource, hayakakenServices))
+        assertResourceEquals(Res.string.card_name_hayakaken, SuicaUtil.getCardName(hayakakenServices))
     }
 
     @Test
     fun testNimocaCardDetection() {
-        // Full NIMOCA service ID set from a card in the wild (Metrodroid SuicaTest)
         val nimocaServices =
             setOf(
                 0x48,
@@ -226,43 +223,26 @@ class SuicaUtilTest {
                 0x2048,
                 0x204a,
             )
-        assertEquals("card_name_nimoca", SuicaUtil.getCardName(stringResource, nimocaServices))
+        assertResourceEquals(Res.string.card_name_nimoca, SuicaUtil.getCardName(nimocaServices))
     }
 
     @Test
     fun testAmbiguousCardReturnsJapanIC() {
-        // Ambiguous service ID lists from older Metrodroid dumps that didn't record locked services.
-        // When multiple card types match, getCardName() should fall back to "Japan IC".
-
-        // Case 1: Hayakaken and ICOCA both have only these open services
-        assertEquals(
-            "card_name_japan_ic",
-            SuicaUtil.getCardName(stringResource, setOf(0x8b, 0x90f, 0x108f, 0x10cb)),
+        assertResourceEquals(
+            Res.string.card_name_japan_ic,
+            SuicaUtil.getCardName(setOf(0x8b, 0x90f, 0x108f, 0x10cb)),
         )
 
-        // Case 2: PASMO and Suica both only have these open services
-        assertEquals(
-            "card_name_japan_ic",
+        assertResourceEquals(
+            Res.string.card_name_japan_ic,
             SuicaUtil.getCardName(
-                stringResource,
-                setOf(
-                    0x8b,
-                    0x90f,
-                    0x108f,
-                    0x10cb,
-                    0x184b,
-                    0x194b,
-                    0x234b,
-                    0x238b,
-                    0x23cb,
-                ),
+                setOf(0x8b, 0x90f, 0x108f, 0x10cb, 0x184b, 0x194b, 0x234b, 0x238b, 0x23cb),
             ),
         )
     }
 
     @Test
     fun testExtractDateNullForZero() {
-        // When date bytes are both zero, extractDate should return null
         val data = ByteArray(16)
         val result = SuicaUtil.extractDate(false, data)
         assertEquals(null, result)
@@ -270,14 +250,11 @@ class SuicaUtilTest {
 
     @Test
     fun testExtractDate() {
-        // Encode date: year=20 (2020), month=6, day=15
-        // date = (20 << 9) | (6 << 5) | 15 = 10240 + 192 + 15 = 10447 = 0x28CF
         val data = ByteArray(16)
         data[4] = 0x28.toByte()
         data[5] = 0xCF.toByte()
         val result = SuicaUtil.extractDate(false, data)
         assertNotNull(result)
-        // 2020-06-15T00:00 Asia/Tokyo
         val expected =
             LocalDateTime(2020, 6, 15, 0, 0)
                 .toInstant(TimeZone.of("Asia/Tokyo"))

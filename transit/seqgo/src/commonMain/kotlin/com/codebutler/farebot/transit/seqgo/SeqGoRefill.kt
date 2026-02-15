@@ -24,7 +24,7 @@
 package com.codebutler.farebot.transit.seqgo
 
 import com.codebutler.farebot.base.util.CurrencyFormatter
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Refill
 import com.codebutler.farebot.transit.seqgo.record.SeqGoTopupRecord
 import farebot.transit.seqgo.generated.resources.*
@@ -37,10 +37,10 @@ class SeqGoRefill(
 ) : Refill() {
     override fun getTimestamp(): Long = topup.timestamp.toEpochMilliseconds() / 1000
 
-    override fun getAgencyName(stringResource: StringResource): String = ""
+    override fun getAgencyName(): FormattedString = FormattedString("")
 
-    override fun getShortAgencyName(stringResource: StringResource): String =
-        stringResource.getString(
+    override fun getShortAgencyName(): FormattedString =
+        FormattedString(
             if (topup.automatic) {
                 Res.string.seqgo_refill_automatic
             } else {
@@ -50,8 +50,7 @@ class SeqGoRefill(
 
     override fun getAmount(): Long = topup.credit.toLong()
 
-    override fun getAmountString(stringResource: StringResource): String =
-        CurrencyFormatter.formatAmount(getAmount(), "AUD")
+    override fun getAmountString(): String = CurrencyFormatter.formatAmount(getAmount(), "AUD")
 
     companion object {
         fun create(topup: SeqGoTopupRecord): SeqGoRefill = SeqGoRefill(topup)

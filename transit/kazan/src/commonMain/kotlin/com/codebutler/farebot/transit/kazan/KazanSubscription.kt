@@ -21,7 +21,7 @@
 
 package com.codebutler.farebot.transit.kazan
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -56,13 +56,13 @@ class KazanSubscription(
     override val remainingTripCount: Int?
         get() = if (isUnlimited) null else mCounter
 
-    override val subscriptionName: String
+    override val subscriptionName: FormattedString
         get() =
             when (mType) {
-                0 -> getStringBlocking(Res.string.kazan_blank)
+                0 -> FormattedString(Res.string.kazan_blank)
                 // Could be unlimited buses, unlimited tram, unlimited trolleybus
                 // or unlimited tram+trolleybus
-                0x60 -> getStringBlocking(Res.string.kazan_unknown_unlimited)
-                else -> getStringBlocking(Res.string.kazan_unknown_type, mType.toString(16))
+                0x60 -> FormattedString(Res.string.kazan_unknown_unlimited)
+                else -> FormattedString(Res.string.kazan_unknown_type, mType.toString(16))
             }
 }

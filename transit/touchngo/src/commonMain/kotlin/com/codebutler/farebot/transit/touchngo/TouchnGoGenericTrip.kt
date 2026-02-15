@@ -26,6 +26,7 @@
 package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.isASCII
@@ -41,7 +42,7 @@ import kotlin.time.Instant
  */
 internal class TouchnGoGenericTrip(
     private val header: ByteArray,
-    override val routeName: String?,
+    override val routeName: FormattedString?,
     override val mode: Mode,
 ) : Trip() {
     private val agencyRaw: ByteArray
@@ -56,18 +57,19 @@ internal class TouchnGoGenericTrip(
     override val fare: TransitCurrency
         get() = TransitCurrency.MYR(amount)
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() {
             val operatorId = agencyRaw.byteArrayToInt()
             val mdstName = MdstStationLookup.getOperatorName(TNG_STR, operatorId)
-            return mdstName ?: if (agencyRaw.isASCII()) agencyRaw.readASCII() else agencyRaw.hex()
+            val name = mdstName ?: if (agencyRaw.isASCII()) agencyRaw.readASCII() else agencyRaw.hex()
+            return FormattedString(name)
         }
 
     companion object {
         fun parse(
             sector: DataClassicSector,
             mode: Mode,
-            routeName: String? = null,
+            routeName: FormattedString? = null,
         ): TouchnGoGenericTrip? {
             if (sector.getBlock(0).isEmpty && sector.getBlock(1).isEmpty && sector.getBlock(2).isEmpty) {
                 return null

@@ -1,7 +1,5 @@
 package com.codebutler.farebot.shared.transit
 
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.sample.SampleTransitFactory
 import com.codebutler.farebot.transit.adelaide.AdelaideTransitFactory
@@ -104,24 +102,24 @@ import com.codebutler.farebot.transit.yargor.YarGorTransitFactory
 import com.codebutler.farebot.transit.yvrcompass.CompassUltralightTransitInfo
 import com.codebutler.farebot.transit.zolotayakorona.ZolotayaKoronaTransitFactory
 
-fun createTransitFactoryRegistry(stringResource: StringResource = DefaultStringResource()): TransitFactoryRegistry {
+fun createTransitFactoryRegistry(): TransitFactoryRegistry {
     ChinaTransitRegistry.registerAll()
 
     val registry = TransitFactoryRegistry()
 
     // FeliCa factories
-    registry.registerFactory(CardType.FeliCa, SuicaTransitFactory(stringResource))
-    registry.registerFactory(CardType.FeliCa, EdyTransitFactory(stringResource))
+    registry.registerFactory(CardType.FeliCa, SuicaTransitFactory())
+    registry.registerFactory(CardType.FeliCa, EdyTransitFactory())
     registry.registerFactory(CardType.FeliCa, OctopusTransitFactory())
     registry.registerFactory(CardType.FeliCa, KMTTransitFactory())
     registry.registerFactory(CardType.FeliCa, MRTJTransitFactory())
     registry.registerFactory(CardType.FeliCa, NdefFelicaTransitFactory())
 
     // DESFire factories
-    registry.registerFactory(CardType.MifareDesfire, OrcaTransitFactory(stringResource))
+    registry.registerFactory(CardType.MifareDesfire, OrcaTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, ClipperTransitFactory())
-    registry.registerFactory(CardType.MifareDesfire, HSLTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareDesfire, OpalTransitFactory(stringResource))
+    registry.registerFactory(CardType.MifareDesfire, HSLTransitFactory())
+    registry.registerFactory(CardType.MifareDesfire, OpalTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, MykiTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, LeapTransitFactory())
     registry.registerFactory(CardType.MifareDesfire, AdelaideTransitFactory())
@@ -143,21 +141,21 @@ fun createTransitFactoryRegistry(stringResource: StringResource = DefaultStringR
     registry.registerFactory(CardType.MifareDesfire, UnauthorizedDesfireTransitFactory())
 
     // Classic factories
-    registry.registerFactory(CardType.MifareClassic, OVChipTransitFactory(stringResource))
+    registry.registerFactory(CardType.MifareClassic, OVChipTransitFactory())
     registry.registerFactory(CardType.MifareClassic, BilheteUnicoSPTransitFactory())
     registry.registerFactory(CardType.MifareClassic, ManlyFastFerryTransitFactory())
     registry.registerFactory(CardType.MifareClassic, SeqGoTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, EasyCardTransitFactory(stringResource))
-    registry.registerFactory(CardType.MifareClassic, TroikaHybridTransitFactory(stringResource))
+    registry.registerFactory(CardType.MifareClassic, EasyCardTransitFactory())
+    registry.registerFactory(CardType.MifareClassic, TroikaHybridTransitFactory())
     registry.registerFactory(CardType.MifareClassic, OysterTransitFactory())
     registry.registerFactory(CardType.MifareClassic, CharlieCardTransitFactory())
     registry.registerFactory(CardType.MifareClassic, GautrainTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, SmartRiderTransitFactory(stringResource))
+    registry.registerFactory(CardType.MifareClassic, SmartRiderTransitFactory())
     // Nextfare-specific factories must come before generic NextfareTransitFactory
     registry.registerFactory(CardType.MifareClassic, LaxTapTransitFactory())
     registry.registerFactory(CardType.MifareClassic, MspGotoTransitFactory())
     registry.registerFactory(CardType.MifareClassic, NextfareTransitInfo.NextfareTransitFactory())
-    registry.registerFactory(CardType.MifareClassic, PodorozhnikTransitFactory(stringResource))
+    registry.registerFactory(CardType.MifareClassic, PodorozhnikTransitFactory())
     registry.registerFactory(CardType.MifareClassic, TouchnGoTransitFactory())
     registry.registerFactory(CardType.MifareClassic, RicaricaMiTransitFactory())
     registry.registerFactory(CardType.MifareClassic, YarGorTransitFactory())
@@ -188,13 +186,13 @@ fun createTransitFactoryRegistry(stringResource: StringResource = DefaultStringR
     registry.registerFactory(CardType.MifareClassic, UnauthorizedClassicTransitFactory())
 
     // ISO7816 / Calypso factories
-    registry.registerFactory(CardType.ISO7816, OpusTransitFactory(stringResource))
-    registry.registerFactory(CardType.ISO7816, RavKavTransitFactory(stringResource))
-    registry.registerFactory(CardType.ISO7816, MobibTransitInfo.Factory(stringResource))
-    registry.registerFactory(CardType.ISO7816, VeneziaTransitFactory(stringResource))
-    registry.registerFactory(CardType.ISO7816, PisaTransitFactory(stringResource))
-    registry.registerFactory(CardType.ISO7816, LisboaVivaTransitInfo.Factory(stringResource))
-    registry.registerFactory(CardType.ISO7816, IntercodeTransitFactory(stringResource))
+    registry.registerFactory(CardType.ISO7816, OpusTransitFactory())
+    registry.registerFactory(CardType.ISO7816, RavKavTransitFactory())
+    registry.registerFactory(CardType.ISO7816, MobibTransitInfo.Factory())
+    registry.registerFactory(CardType.ISO7816, VeneziaTransitFactory())
+    registry.registerFactory(CardType.ISO7816, PisaTransitFactory())
+    registry.registerFactory(CardType.ISO7816, LisboaVivaTransitInfo.Factory())
+    registry.registerFactory(CardType.ISO7816, IntercodeTransitFactory())
     registry.registerFactory(CardType.ISO7816, TMoneyTransitFactory())
     registry.registerFactory(CardType.ISO7816, KROCAPTransitFactory())
     registry.registerFactory(CardType.ISO7816, SnapperTransitFactory())
@@ -203,7 +201,7 @@ fun createTransitFactoryRegistry(stringResource: StringResource = DefaultStringR
     registry.registerFactory(CardType.ISO7816, EmvTransitFactory)
 
     // CEPAS factories
-    registry.registerFactory(CardType.CEPAS, EZLinkTransitFactory(stringResource))
+    registry.registerFactory(CardType.CEPAS, EZLinkTransitFactory())
 
     // Ultralight factories (order matters - specific checks first, catch-alls last)
     registry.registerFactory(CardType.MifareUltralight, TroikaUltralightTransitFactory())

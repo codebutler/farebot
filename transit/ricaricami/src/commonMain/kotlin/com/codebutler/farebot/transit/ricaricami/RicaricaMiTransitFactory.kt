@@ -21,11 +21,9 @@
 
 package com.codebutler.farebot.transit.ricaricami
 
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -43,9 +41,7 @@ import com.codebutler.farebot.transit.en1545.En1545Repeat
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import farebot.transit.ricaricami.generated.resources.*
 
-class RicaricaMiTransitFactory(
-    private val stringResource: StringResource = DefaultStringResource(),
-) : TransitFactory<ClassicCard, RicaricaMiTransitInfo> {
+class RicaricaMiTransitFactory : TransitFactory<ClassicCard, RicaricaMiTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -64,11 +60,11 @@ class RicaricaMiTransitFactory(
 
     override fun parseIdentity(card: ClassicCard) =
         TransitIdentity(
-            getStringBlocking(Res.string.ricaricami_card_name),
+            FormattedString(Res.string.ricaricami_card_name),
             null,
         )
 
-    override fun parseInfo(card: ClassicCard): RicaricaMiTransitInfo = parse(card, stringResource)
+    override fun parseInfo(card: ClassicCard): RicaricaMiTransitInfo = parse(card)
 
     companion object {
         private val CARD_INFO =
@@ -155,10 +151,7 @@ class RicaricaMiTransitFactory(
             return 1
         }
 
-        private fun parse(
-            card: ClassicCard,
-            stringResource: StringResource,
-        ): RicaricaMiTransitInfo {
+        private fun parse(card: ClassicCard): RicaricaMiTransitInfo {
             val sector1 = card.getSector(1) as DataClassicSector
             val ticketEnvParsed = En1545Parser.parse(sector1.getBlock(0).data, BLOCK_1_0_FIELDS)
             ticketEnvParsed.append(sector1.getBlock(1).data, BLOCK_1_1_FIELDS)
@@ -176,7 +169,7 @@ class RicaricaMiTransitFactory(
                     if (tripData.isAllZero()) {
                         null
                     } else {
-                        RicaricaMiTransaction.parse(tripData, stringResource)
+                        RicaricaMiTransaction.parse(tripData)
                     }
                 }
             val mergedTrips = TransactionTrip.merge(trips)
@@ -196,7 +189,6 @@ class RicaricaMiTransitFactory(
                         subData[sel],
                         (card.getSector(i + 2) as DataClassicSector).getBlock(sel).data,
                         (card.getSector(i + 2) as DataClassicSector).getBlock(2).data,
-                        stringResource,
                     ),
                 )
             }
@@ -211,7 +203,6 @@ class RicaricaMiTransitFactory(
                         subData[sel],
                         (card.getSector(5) as DataClassicSector).getBlock(1).data,
                         (card.getSector(5) as DataClassicSector).getBlock(2).data,
-                        stringResource,
                     ),
                 )
             }

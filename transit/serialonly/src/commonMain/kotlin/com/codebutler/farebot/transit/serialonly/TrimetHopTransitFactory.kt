@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.card.CardType
@@ -42,7 +43,7 @@ class TrimetHopTransitFactory : TransitFactory<DesfireCard, TrimetHopTransitInfo
 
     companion object {
         internal const val APP_ID = 0xe010f2
-        internal const val NAME = "Hop Fastpass"
+        internal val NAME = FormattedString("Hop Fastpass")
 
         internal fun parseSerial(app: DesfireApplication?): Int? =
             (app?.getFile(0) as? StandardDesfireFile)?.data?.byteArrayToInt(0xc, 4)

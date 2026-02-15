@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.rkf
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
@@ -35,10 +36,10 @@ data class RkfTripLeg(
     override val fare: TransitCurrency?,
     override val mode: Mode,
     override val passengerCount: Int,
-    private val mShortAgencyName: String?,
+    private val mShortAgencyName: FormattedString?,
     override val isTransfer: Boolean,
-    private val mAgencyName: String?,
+    private val mAgencyName: FormattedString?,
 ) : Trip() {
-    override val agencyName: String? get() = mAgencyName
-    override val shortAgencyName: String? get() = mShortAgencyName
+    override val agencyName: FormattedString? get() = mAgencyName
+    override val shortAgencyName: FormattedString? get() = mShortAgencyName
 }

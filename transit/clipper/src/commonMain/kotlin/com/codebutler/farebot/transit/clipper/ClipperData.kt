@@ -28,14 +28,11 @@ package com.codebutler.farebot.transit.clipper
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
 import com.codebutler.farebot.base.mdst.TransportType
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.clipper.generated.resources.Res
 import farebot.transit.clipper.generated.resources.clipper_unknown_agency
-import farebot.transit.clipper.generated.resources.clipper_unknown_station
-import farebot.transit.clipper.generated.resources.clipper_zone
-import farebot.transit.clipper.generated.resources.transit_clipper_station_eol
 
 internal object ClipperData {
     private const val CLIPPER_STR = "clipper"
@@ -53,16 +50,16 @@ internal object ClipperData {
     const val AGENCY_SF_BAY_FERRY = 0x1b
     const val AGENCY_CALTRAIN_8RIDE = 0x173
 
-    fun getAgencyName(agency: Int): String {
+    fun getAgencyName(agency: Int): FormattedString {
         val result = MdstStationLookup.getOperatorName(CLIPPER_STR, agency)
-        if (result != null) return result
-        return getStringBlocking(Res.string.clipper_unknown_agency, agency.toString(16))
+        if (result != null) return FormattedString(result)
+        return FormattedString(Res.string.clipper_unknown_agency, agency.toString(16))
     }
 
-    fun getShortAgencyName(agency: Int): String {
+    fun getShortAgencyName(agency: Int): FormattedString {
         val result = MdstStationLookup.getOperatorName(CLIPPER_STR, agency, isShort = true)
-        if (result != null) return result
-        return getStringBlocking(Res.string.clipper_unknown_agency, agency.toString(16))
+        if (result != null) return FormattedString(result)
+        return FormattedString(Res.string.clipper_unknown_agency, agency.toString(16))
     }
 
     fun getStation(
@@ -90,21 +87,17 @@ internal object ClipperData {
             agency == AGENCY_SMART
         ) {
             if (stationId == 0xffff) {
-                return Station.nameOnly(
-                    getStringBlocking(Res.string.transit_clipper_station_eol),
-                )
+                return Station.nameOnly("(End of line)")
             }
             if (agency != AGENCY_GG_FERRY) {
-                return Station.nameOnly(
-                    getStringBlocking(Res.string.clipper_zone, stationId.toString()),
-                )
+                return Station.nameOnly("Zone $stationId")
             }
         }
 
         // Placeholders
         if (stationId == (if (isEnd) 0xffff else 0)) return null
         return Station.nameOnly(
-            getStringBlocking(Res.string.clipper_unknown_station, agency.toString(16), stationId.toString(16)),
+            "0x${agency.toString(16)}/0x${stationId.toString(16)}",
         )
     }
 

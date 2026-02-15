@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.shared.sample
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Refill
 
 class SampleRefill(
@@ -30,11 +30,11 @@ class SampleRefill(
 ) : Refill() {
     override fun getTimestamp(): Long = epochSeconds
 
-    override fun getAgencyName(stringResource: StringResource): String = "Agency"
+    override fun getAgencyName(): FormattedString = FormattedString("Agency")
 
-    override fun getShortAgencyName(stringResource: StringResource): String = "Agency"
+    override fun getShortAgencyName(): FormattedString = FormattedString("Agency")
 
     override fun getAmount(): Long = 40L
 
-    override fun getAmountString(stringResource: StringResource): String = "$40.00"
+    override fun getAmountString(): String = "$40.00"
 }

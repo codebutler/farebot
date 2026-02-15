@@ -23,8 +23,8 @@ package com.codebutler.farebot.transit.metromoney
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -46,8 +46,8 @@ class MetroMoneyTransitInfo(
     override val serialNumber: String
         get() = NumberUtils.zeroPad(mSerial, 10)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_metromoney)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_metromoney)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency(mBalance, "GEL"))

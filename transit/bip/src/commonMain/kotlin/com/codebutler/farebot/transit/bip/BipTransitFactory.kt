@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.bip
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
@@ -59,7 +60,7 @@ class BipTransitFactory : TransitFactory<ClassicCard, BipTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        return TransitIdentity.create(NAME, formatSerial(serial))
+        return TransitIdentity.create(FormattedString(NAME), formatSerial(serial))
     }
 
     override fun parseInfo(card: ClassicCard): BipTransitInfo {

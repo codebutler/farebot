@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit.en1545
 
 import com.codebutler.farebot.base.mdst.MdstStationTableReader
 import com.codebutler.farebot.base.mdst.TransportType
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.en1545.generated.resources.Res
@@ -53,15 +53,17 @@ abstract class En1545LookupSTR protected constructor(
     override fun getAgencyName(
         agency: Int?,
         isShort: Boolean,
-    ): String? {
+    ): FormattedString? {
         if (agency == null || agency == 0) return null
         val reader = MdstStationTableReader.getReader(dbName) ?: return null
         val operator = reader.getOperator(agency)
-        return if (isShort) {
-            operator?.name?.englishShort ?: operator?.name?.english
-        } else {
-            operator?.name?.english
-        }
+        val name =
+            if (isShort) {
+                operator?.name?.englishShort ?: operator?.name?.english
+            } else {
+                operator?.name?.english
+            }
+        return name?.let { FormattedString(it) }
     }
 
     override fun getStation(
@@ -107,18 +109,17 @@ abstract class En1545LookupSTR protected constructor(
     }
 
     override fun getSubscriptionName(
-        stringResource: StringResource,
         agency: Int?,
         contractTariff: Int?,
-    ): String? {
+    ): FormattedString? {
         if (contractTariff == null) return null
         val res =
             subscriptionMapByAgency[Pair(agency, contractTariff)]
                 ?: subscriptionMap[contractTariff]
         return if (res != null) {
-            stringResource.getString(res)
+            FormattedString(res)
         } else {
-            stringResource.getString(Res.string.en1545_unknown_format, contractTariff.toString())
+            FormattedString(Res.string.en1545_unknown_format, contractTariff.toString())
         }
     }
 

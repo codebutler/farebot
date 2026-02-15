@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.transit.bonobus
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -39,7 +40,7 @@ class BonobusTransitInfo(
     override val serialNumber: String
         get() = mSerial.toString()
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = BonobusTransitFactory.NAME
 
     override val balance: TransitBalance

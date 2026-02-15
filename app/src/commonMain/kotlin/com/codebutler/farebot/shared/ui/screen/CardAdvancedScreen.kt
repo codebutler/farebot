@@ -73,7 +73,7 @@ fun CardAdvancedScreen(
                         Tab(
                             selected = selectedTab == index,
                             onClick = { selectedTab = index },
-                            text = { Text(tab.title) },
+                            text = { Text(tab.title.resolve()) },
                         )
                     }
                 }

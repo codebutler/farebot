@@ -22,9 +22,9 @@
 package com.codebutler.farebot.transit.yargor
 
 import com.codebutler.farebot.base.mdst.MdstStationTableReader
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.yargor.generated.resources.Res
@@ -67,22 +67,22 @@ class YarGorTrip(
             }
         }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when (mode) {
-                Mode.TRAM -> getStringBlocking(Res.string.yargor_mode_tram)
-                Mode.TROLLEYBUS -> getStringBlocking(Res.string.yargor_mode_trolleybus)
-                Mode.BUS -> getStringBlocking(Res.string.yargor_mode_bus)
-                else -> getStringBlocking(Res.string.yargor_unknown_format, (mRoute / 100).toString())
+                Mode.TRAM -> FormattedString(Res.string.yargor_mode_tram)
+                Mode.TROLLEYBUS -> FormattedString(Res.string.yargor_mode_trolleybus)
+                Mode.BUS -> FormattedString(Res.string.yargor_mode_bus)
+                else -> FormattedString(Res.string.yargor_unknown_format, (mRoute / 100).toString())
             }
 
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() {
             val reader = MdstStationTableReader.getReader(YARGOR_STR)
             val line = reader?.getLine(mRoute)
             val name = line?.name?.english
-            if (!name.isNullOrEmpty()) return name
-            return (mRoute % 100).toString()
+            if (!name.isNullOrEmpty()) return FormattedString(name)
+            return FormattedString((mRoute % 100).toString())
         }
 
     override val vehicleID: String?

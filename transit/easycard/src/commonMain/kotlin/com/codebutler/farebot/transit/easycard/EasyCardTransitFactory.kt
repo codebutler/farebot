@@ -28,7 +28,7 @@
 package com.codebutler.farebot.transit.easycard
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -43,12 +43,9 @@ import farebot.transit.easycard.generated.resources.*
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 
-class EasyCardTransitFactory(
-    private val stringResource: StringResource,
-) : TransitFactory<ClassicCard, EasyCardTransitInfo> {
+class EasyCardTransitFactory : TransitFactory<ClassicCard, EasyCardTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -149,7 +146,7 @@ class EasyCardTransitFactory(
     }
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
-        TransitIdentity.create(stringResource.getString(Res.string.easycard_card_name), null)
+        TransitIdentity.create(FormattedString(Res.string.easycard_card_name), null)
 
     override fun parseInfo(card: ClassicCard): EasyCardTransitInfo {
         val balance = parseBalance(card)

@@ -24,7 +24,6 @@ package com.codebutler.farebot.shared.sample
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.uiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlin.time.Instant
@@ -38,8 +37,8 @@ class SampleCard(
 
     override val scannedAt: Instant = rawCard.scannedAt()
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree =
-        uiTree(stringResource) {
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
             item {
                 title = "Sample Transit Section 1"
                 item {

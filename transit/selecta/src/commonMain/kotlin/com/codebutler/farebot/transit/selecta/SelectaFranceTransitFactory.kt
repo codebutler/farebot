@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit.selecta
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -50,7 +50,7 @@ class SelectaFranceTransitFactory : TransitFactory<ClassicCard, SelectaFranceTra
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        return TransitIdentity.create(getStringBlocking(Res.string.selecta_card_name), serial.toString())
+        return TransitIdentity.create(FormattedString(Res.string.selecta_card_name), serial.toString())
     }
 
     override fun parseInfo(card: ClassicCard): SelectaFranceTransitInfo {

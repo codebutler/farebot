@@ -26,8 +26,8 @@
 package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import farebot.transit.touchngo.generated.resources.Res
 import farebot.transit.touchngo.generated.resources.touchngo_machine
@@ -49,8 +49,8 @@ internal data class TouchnGoStationId(
         val baseStation =
             if (result != null) {
                 Station(
-                    stationNameRaw = result.stationName,
-                    shortStationNameRaw = result.shortStationName,
+                    stationName = result.stationName,
+                    shortStationName = result.shortStationName,
                     companyName = result.companyName,
                     lineNames = result.lineNames,
                     latitude = if (result.hasLocation) result.latitude else null,
@@ -59,7 +59,7 @@ internal data class TouchnGoStationId(
             } else {
                 Station.unknown(station.toString())
             }
-        val machineAttr = getStringBlocking(Res.string.touchngo_machine, machine)
+        val machineAttr = FormattedString(Res.string.touchngo_machine, machine)
         return baseStation.addAttribute(machineAttr)
     }
 

@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.mspgoto
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfoCapsule
@@ -41,6 +41,6 @@ class MspGotoTransitInfo(
         capsule = capsule,
         currencyFactory = { TransitCurrency.USD(it) },
     ) {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.msp_goto_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.msp_goto_card_name)
 }

@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.laxtap
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfoCapsule
@@ -36,14 +36,14 @@ import farebot.transit.lax_tap.generated.resources.lax_tap_card_name
 class LaxTapTransitInfo(
     capsule: NextfareTransitInfoCapsule,
 ) : NextfareTransitInfo(capsule, currencyFactory = { TransitCurrency.USD(it) }) {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.lax_tap_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.lax_tap_card_name)
 
     override val onlineServicesPage: String
         get() = "https://www.taptogo.net/"
 
     companion object {
-        val NAME: String
-            get() = getStringBlocking(Res.string.lax_tap_card_name)
+        val NAME: FormattedString
+            get() = FormattedString(Res.string.lax_tap_card_name)
     }
 }

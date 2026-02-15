@@ -26,7 +26,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -42,8 +42,8 @@ class ClipperTransitInfo(
     private val balanceValue: Int,
     private val expiryTimestamp: Instant? = null,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.transit_clipper_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.transit_clipper_card_name)
 
     override val balance: TransitBalance
         get() =

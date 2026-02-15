@@ -27,8 +27,8 @@ package com.codebutler.farebot.transit.bilheteunico
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.formatDate
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -47,8 +47,8 @@ class BilheteUnicoSPTransitInfo(
     private val refillTransactionCounter: Int,
     private val day2: Int,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.bilhete_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.bilhete_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.BRL(credit))

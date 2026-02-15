@@ -23,24 +23,20 @@
 
 package com.codebutler.farebot.base.ui
 
-import com.codebutler.farebot.base.util.getStringBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 import org.jetbrains.compose.resources.StringResource
 
-@Serializable
-@SerialName("header")
 data class HeaderListItem(
-    override val text1: String?,
+    override val text1: FormattedString?,
     val headingLevel: Int = 2,
 ) : ListItemInterface() {
-    constructor(title: String) : this(title, 2)
+    constructor(title: String) : this(FormattedString(title), 2)
 
     constructor(titleRes: StringResource) : this(
-        text1 = getStringBlocking(titleRes),
+        text1 = FormattedString(titleRes),
         headingLevel = 2,
     )
 
-    override val text2: String?
+    override val text2: FormattedString?
         get() = null
 }

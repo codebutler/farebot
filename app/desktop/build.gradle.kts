@@ -6,6 +6,8 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(25)
+
     sourceSets {
         jvmMain.dependencies {
             implementation(project(":app"))

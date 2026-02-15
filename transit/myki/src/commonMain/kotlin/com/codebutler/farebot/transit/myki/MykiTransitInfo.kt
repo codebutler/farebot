@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.myki
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
 import farebot.transit.myki.generated.resources.Res
 import farebot.transit.myki.generated.resources.myki_card_name
@@ -40,7 +40,7 @@ class MykiTransitInfo(
     private val serialNumberValue: String,
 ) : SerialOnlyTransitInfo() {
     companion object {
-        const val NAME = "Myki"
+        val NAME = FormattedString("Myki")
 
         fun create(serialNumber: String): MykiTransitInfo = MykiTransitInfo(serialNumber)
     }
@@ -49,7 +49,7 @@ class MykiTransitInfo(
 
     override val serialNumber: String? = serialNumberValue
 
-    override val cardName: String = getStringBlocking(Res.string.myki_card_name)
+    override val cardName: FormattedString = FormattedString(Res.string.myki_card_name)
 
     override val moreInfoPage: String
         get() = "https://micolous.github.io/metrodroid/myki"

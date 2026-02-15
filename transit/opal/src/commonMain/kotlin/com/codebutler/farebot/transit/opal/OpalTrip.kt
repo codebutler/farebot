@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.opal
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.opal.generated.resources.Res
 import farebot.transit.opal.generated.resources.opal_agency_tfnsw
@@ -33,7 +33,6 @@ class OpalTrip(
     private val timestamp: Instant,
     private val transactionMode: Int,
     private val transactionType: Int,
-    private val stringResource: StringResource,
 ) : Trip() {
     override val startTimestamp: Instant = timestamp
 
@@ -45,14 +44,14 @@ class OpalTrip(
                 else -> Mode.FERRY // MODE_FERRY_LR
             }
 
-    override val agencyName: String
-        get() = stringResource.getString(Res.string.opal_agency_tfnsw)
+    override val agencyName: FormattedString
+        get() = FormattedString(Res.string.opal_agency_tfnsw)
 
-    override val shortAgencyName: String
-        get() = stringResource.getString(Res.string.opal_agency_tfnsw_short)
+    override val shortAgencyName: FormattedString
+        get() = FormattedString(Res.string.opal_agency_tfnsw_short)
 
-    override val routeName: String
-        get() = OpalData.getLocalisedAction(stringResource, transactionType)
+    override val routeName: FormattedString
+        get() = OpalData.getLocalisedAction(transactionType)
 
     override val isTransfer: Boolean
         get() =

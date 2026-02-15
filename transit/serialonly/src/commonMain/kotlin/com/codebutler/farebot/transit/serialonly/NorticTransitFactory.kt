@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.desfire.DesfireCard
@@ -47,7 +48,7 @@ class NorticTransitFactory : TransitFactory<DesfireCard, NorticTransitInfo> {
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         val ciHeader =
             (card.getApplication(APP_ID)?.getFile(0xc) as? StandardDesfireFile)?.data
-                ?: return TransitIdentity.create("Nortic", null)
+                ?: return TransitIdentity.create(FormattedString("Nortic"), null)
         val serial = ciHeader.byteArrayToLong(4, 4)
         val ownerCompany = ciHeader.getBitsFromBuffer(78, 20)
         return TransitIdentity.create(

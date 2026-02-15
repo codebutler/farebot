@@ -31,6 +31,7 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.opal.OpalData
 import com.codebutler.farebot.transit.opal.OpalTransitFactory
 import com.codebutler.farebot.transit.opal.OpalTransitInfo
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.Test
@@ -40,8 +41,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Instant
 
 class OpalTransitTest {
-    private val stringResource = TestStringResource()
-    private val factory = OpalTransitFactory(stringResource)
+    private val factory = OpalTransitFactory()
 
     private fun createOpalCard(fileData: ByteArray) =
         desfireCard(
@@ -70,32 +70,33 @@ class OpalTransitTest {
     }
 
     @Test
-    fun testOpalParseIdentity() {
-        // Construct a 16-byte Opal file.
-        // After reverseBuffer(0..5), bits 4..8 = lastDigit, bits 8..40 = serialNumber.
-        // We'll construct raw data that when reversed gives us known values.
-        // The data is stored LSB-first in the file, reversed for parsing.
-        // For simplicity, use a data blob that produces known serial.
-        val data = ByteArray(16)
-        // After reverseBuffer(0,5), we need:
-        // bits[4..8] = lastDigit (4 bits), bits[8..40] = serialNumber (32 bits)
-        // Let's set bytes after reversal: byte0 has bits[0..7], byte1 has bits[8..15], etc.
-        // lastDigit in bits[4..7] of byte0
-        // serialNumber in bytes 1-4
+    fun testOpalParseIdentity() =
+        runTest {
+            // Construct a 16-byte Opal file.
+            // After reverseBuffer(0..5), bits 4..8 = lastDigit, bits 8..40 = serialNumber.
+            // We'll construct raw data that when reversed gives us known values.
+            // The data is stored LSB-first in the file, reversed for parsing.
+            // For simplicity, use a data blob that produces known serial.
+            val data = ByteArray(16)
+            // After reverseBuffer(0,5), we need:
+            // bits[4..8] = lastDigit (4 bits), bits[8..40] = serialNumber (32 bits)
+            // Let's set bytes after reversal: byte0 has bits[0..7], byte1 has bits[8..15], etc.
+            // lastDigit in bits[4..7] of byte0
+            // serialNumber in bytes 1-4
 
-        // Before reversal (bytes 0-4 reversed):
-        // After reversal byte[0] = original byte[4], byte[1] = original byte[3], etc.
-        // Set original bytes so reversed gives: 0x05 (lastDigit=0, upper nibble=0), then serial=1 in bytes 1-4
-        data[4] = 0x50 // after reverse -> byte[0] = 0x50 -> lastDigit (bits 4-7) = 5
-        data[3] = 0x00
-        data[2] = 0x00
-        data[1] = 0x00
-        data[0] = 0x01 // after reverse -> byte[4] = 0x01
+            // Before reversal (bytes 0-4 reversed):
+            // After reversal byte[0] = original byte[4], byte[1] = original byte[3], etc.
+            // Set original bytes so reversed gives: 0x05 (lastDigit=0, upper nibble=0), then serial=1 in bytes 1-4
+            data[4] = 0x50 // after reverse -> byte[0] = 0x50 -> lastDigit (bits 4-7) = 5
+            data[3] = 0x00
+            data[2] = 0x00
+            data[1] = 0x00
+            data[0] = 0x01 // after reverse -> byte[4] = 0x01
 
-        val card = createOpalCard(data)
-        val identity = factory.parseIdentity(card)
-        assertEquals("Opal", identity.name)
-    }
+            val card = createOpalCard(data)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Opal", identity.name.resolveAsync())
+        }
 
     @Test
     fun testOpalCardName() {
@@ -122,7 +123,6 @@ class OpalTransitTest {
                 minute = 0,
                 day = 0,
                 lastTransactionNumber = 0,
-                stringResource = stringResource,
             )
         val balanceStr = info.formatBalanceString()
         // Should contain AUD formatting, not USD
@@ -138,40 +138,41 @@ class OpalTransitTest {
      * Ported from Metrodroid's OpalTest.testDemoCard().
      */
     @Test
-    fun testDemoCard() {
-        // This is mocked-up data, probably has a wrong checksum.
-        val card = createOpalCard(hexToBytes("87d61200e004002a0014cc44a4133930"))
+    fun testDemoCard() =
+        runTest {
+            // This is mocked-up data, probably has a wrong checksum.
+            val card = createOpalCard(hexToBytes("87d61200e004002a0014cc44a4133930"))
 
-        // Test TransitIdentity
-        val identity = factory.parseIdentity(card)
-        assertNotNull(identity)
-        assertEquals(OpalTransitInfo.NAME, identity.name)
-        assertEquals("3085 2200 1234 5670", identity.serialNumber)
+            // Test TransitIdentity
+            val identity = factory.parseIdentity(card)
+            assertNotNull(identity)
+            assertEquals(OpalTransitInfo.NAME, identity.name.resolveAsync())
+            assertEquals("3085 2200 1234 5670", identity.serialNumber)
 
-        // Test TransitInfo
-        val info = factory.parseInfo(card)
-        assertTrue(info is OpalTransitInfo, "TransitData must be instance of OpalTransitInfo")
+            // Test TransitInfo
+            val info = factory.parseInfo(card)
+            assertTrue(info is OpalTransitInfo, "TransitData must be instance of OpalTransitInfo")
 
-        assertEquals("3085 2200 1234 5670", info.serialNumber)
-        assertEquals(TransitCurrency.AUD(336), info.balances?.first()?.balance)
-        assertEquals(0, info.subscriptions?.size ?: 0)
+            assertEquals("3085 2200 1234 5670", info.serialNumber)
+            assertEquals(TransitCurrency.AUD(336), info.balances?.first()?.balance)
+            assertEquals(0, info.subscriptions?.size ?: 0)
 
-        // 2015-10-05 09:06 UTC+11 = 2015-10-04 22:06 UTC
-        val expectedTime = Instant.parse("2015-10-04T22:06:00Z")
-        assertEquals(expectedTime, info.lastTransactionTime)
-        assertEquals(OpalData.MODE_BUS, info.lastTransactionMode)
-        assertEquals(OpalData.ACTION_JOURNEY_COMPLETED_DISTANCE, info.lastTransaction)
-        assertEquals(39, info.lastTransactionNumber)
-        assertEquals(1, info.weeklyTrips)
+            // 2015-10-05 09:06 UTC+11 = 2015-10-04 22:06 UTC
+            val expectedTime = Instant.parse("2015-10-04T22:06:00Z")
+            assertEquals(expectedTime, info.lastTransactionTime)
+            assertEquals(OpalData.MODE_BUS, info.lastTransactionMode)
+            assertEquals(OpalData.ACTION_JOURNEY_COMPLETED_DISTANCE, info.lastTransaction)
+            assertEquals(39, info.lastTransactionNumber)
+            assertEquals(1, info.weeklyTrips)
 
-        // Last transaction exposed as trip via OpalTrip
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(1, trips.size)
-        assertEquals(Trip.Mode.BUS, trips[0].mode)
-        assertEquals(expectedTime, trips[0].startTimestamp)
-        assertNotNull(trips[0].routeName, "OpalTrip should have a route name (action description)")
-    }
+            // Last transaction exposed as trip via OpalTrip
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(1, trips.size)
+            assertEquals(Trip.Mode.BUS, trips[0].mode)
+            assertEquals(expectedTime, trips[0].startTimestamp)
+            assertNotNull(trips[0].routeName, "OpalTrip should have a route name (action description)")
+        }
 
     /**
      * Test daylight savings time transitions.

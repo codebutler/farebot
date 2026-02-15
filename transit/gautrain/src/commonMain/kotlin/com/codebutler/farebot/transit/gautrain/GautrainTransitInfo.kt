@@ -22,10 +22,10 @@
 
 package com.codebutler.farebot.transit.gautrain
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -46,8 +46,8 @@ class GautrainTransitInfo internal constructor(
     private val expdate: Int,
     private val mBalanceBlocks: List<GautrainBalanceBlock>,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.gautrain_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.gautrain_card_name)
 
     override val serialNumber: String = formatSerial(serial)
 

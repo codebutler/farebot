@@ -22,11 +22,11 @@
 package com.codebutler.farebot.transit.bonobus
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
@@ -64,8 +64,8 @@ class BonobusTrip(
     override val vehicleID: String?
         get() = if (mVehicleNumber == 0) null else NumberUtils.zeroPad(mVehicleNumber, 4)
 
-    override val routeName: String?
-        get() = if (mMode == MODE_BUS) (mLine - 10).toString() else null
+    override val routeName: FormattedString?
+        get() = if (mMode == MODE_BUS) FormattedString((mLine - 10).toString()) else null
 
     override val startStation: Station?
         get() {
@@ -73,8 +73,8 @@ class BonobusTrip(
             val result = MdstStationLookup.getStation(BONOBUS_STR, mStation)
             return if (result != null) {
                 Station(
-                    stationNameRaw = result.stationName,
-                    shortStationNameRaw = result.shortStationName,
+                    stationName = result.stationName,
+                    shortStationName = result.shortStationName,
                     companyName = result.companyName,
                     lineNames = result.lineNames,
                     latitude = if (result.hasLocation) result.latitude else null,
@@ -86,8 +86,8 @@ class BonobusTrip(
             }
         }
 
-    override val agencyName: String?
-        get() = if (mMode == MODE_BUS) getStringBlocking(Res.string.bonobus_agency_tranvia) else null
+    override val agencyName: FormattedString?
+        get() = if (mMode == MODE_BUS) FormattedString(Res.string.bonobus_agency_tranvia) else null
 
     companion object {
         fun parse(raw: ByteArray): BonobusTrip? {

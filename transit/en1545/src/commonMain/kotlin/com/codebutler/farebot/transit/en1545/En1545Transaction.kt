@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.en1545
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
@@ -138,10 +139,10 @@ abstract class En1545Transaction : Transaction() {
     override val isRejected: Boolean
         get() = parsed.getIntOrZero(EVENT_RESULT) != 0
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() = lookup.getAgencyName(agency, false)
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() = lookup.getAgencyName(agency, true)
 
     open fun getStation(station: Int?): Station? =

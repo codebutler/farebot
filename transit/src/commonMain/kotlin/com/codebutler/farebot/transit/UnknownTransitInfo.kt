@@ -21,6 +21,8 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.FormattedString
+
 /**
  * Fallback TransitInfo for cards that no transit factory recognized.
  * Shows basic card metadata (type, tag ID) instead of a raw error message.
@@ -32,10 +34,10 @@ class UnknownTransitInfo(
 ) : TransitInfo() {
     override val serialNumber: String = tagIdHex
 
-    override val cardName: String =
+    override val cardName: FormattedString =
         if (isPartialRead) {
-            "$cardTypeName (Partial Read)"
+            FormattedString("$cardTypeName (Partial Read)")
         } else {
-            "$cardTypeName (Unrecognized)"
+            FormattedString("$cardTypeName (Unrecognized)")
         }
 }

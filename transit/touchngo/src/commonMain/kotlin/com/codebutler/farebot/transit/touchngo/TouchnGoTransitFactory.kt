@@ -26,11 +26,11 @@
 package com.codebutler.farebot.transit.touchngo
 
 import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -121,8 +121,8 @@ class TouchnGoTransitFactory : TransitFactory<ClassicCard, TouchnGoTransitInfo> 
                 credits = listOf("Metrodroid Project"),
             )
 
-        internal val NAME: String
-            get() = getStringBlocking(Res.string.touchngo_card_name)
+        internal val NAME: FormattedString
+            get() = FormattedString(Res.string.touchngo_card_name)
 
         private val EXPECTED_BLOCK1 = ByteUtils.hexStringToByteArray("000102030405060708090a0b0c0d0e0f")
 

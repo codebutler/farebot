@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.CardType
@@ -52,7 +53,7 @@ class AtHopTransitFactory : TransitFactory<DesfireCard, AtHopTransitInfo> {
 
     companion object {
         private const val APP_ID_SERIAL = 0xffffff
-        internal const val NAME = "AT HOP"
+        internal val NAME = FormattedString("AT HOP")
 
         internal fun getSerial(card: DesfireCard): Int? {
             val file =

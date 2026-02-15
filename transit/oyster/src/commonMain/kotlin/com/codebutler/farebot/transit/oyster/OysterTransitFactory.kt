@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.oyster
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.isAllFF
@@ -75,7 +76,7 @@ class OysterTransitFactory : TransitFactory<ClassicCard, OysterTransitInfo> {
     }
 
     companion object {
-        private const val NAME = "Oyster"
+        private val NAME = FormattedString("Oyster")
 
         private val CARD_INFO =
             CardInfo(

@@ -22,10 +22,9 @@
 
 package com.codebutler.farebot.base.ui
 
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 
-@Serializable
 sealed class ListItemInterface {
-    abstract val text1: String?
-    abstract val text2: String?
+    abstract val text1: FormattedString?
+    abstract val text2: FormattedString?
 }

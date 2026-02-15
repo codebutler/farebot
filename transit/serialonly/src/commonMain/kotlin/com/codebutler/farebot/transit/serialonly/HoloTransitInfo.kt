@@ -13,8 +13,7 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.serialonly.generated.resources.Res
 import farebot.transit.serialonly.generated.resources.last_transaction
 import farebot.transit.serialonly.generated.resources.manufacture_id
@@ -34,18 +33,18 @@ class HoloTransitInfo(
                 ListItem(
                     Res.string.last_transaction,
                     when (mLastTransactionTimestamp) {
-                        0 -> getStringBlocking(Res.string.never)
+                        0 -> FormattedString(Res.string.never)
                         else -> {
                             val instant = Instant.fromEpochSeconds(mLastTransactionTimestamp.toLong())
                             val local = instant.toLocalDateTime(TimeZone.of("Pacific/Honolulu"))
-                            "${local.date} ${local.hour}:${local.minute.toString().padStart(2, '0')}"
+                            FormattedString("${local.date} ${local.hour}:${local.minute.toString().padStart(2, '0')}")
                         }
                     },
                 ),
             )
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val b = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val b = FareBotUiTree.builder()
         b.item().title(Res.string.manufacture_id).value(mManufacturingId)
         return b.build()
     }

@@ -23,7 +23,6 @@
 package com.codebutler.farebot.card.vicinity
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -78,8 +77,8 @@ data class VicinityCard(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val builder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val builder = FareBotUiTree.builder()
         if (sysInfo != null) {
             builder
                 .item()

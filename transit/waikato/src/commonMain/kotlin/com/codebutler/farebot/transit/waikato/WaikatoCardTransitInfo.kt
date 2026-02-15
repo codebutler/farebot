@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.waikato
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -37,12 +38,12 @@ import kotlinx.datetime.LocalDate
  */
 class WaikatoCardTransitInfo(
     private val serialNumberValue: String,
-    private val cardNameValue: String,
+    private val cardNameValue: FormattedString,
     private val balanceValue: Int,
     private val tripList: List<WaikatoCardTrip>,
     private val lastTransactionDate: LocalDate,
 ) : TransitInfo() {
-    override val cardName: String = cardNameValue
+    override val cardName: FormattedString = cardNameValue
 
     override val serialNumber: String = serialNumberValue
 

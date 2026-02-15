@@ -24,7 +24,7 @@
 
 package com.codebutler.farebot.transit.edy
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -57,7 +57,7 @@ class EdyTransitInfo(
 
     override val subscriptions: List<Subscription>? = null
 
-    override val cardName: String get() = getStringBlocking(Res.string.card_name_edy)
+    override val cardName: FormattedString get() = FormattedString(Res.string.card_name_edy)
 
     fun getSerialNumberData(): ByteArray = serialNumberData
 

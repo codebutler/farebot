@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.shared.sample
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
@@ -33,7 +34,7 @@ class SampleTransitFactory : TransitFactory<SampleCard, SampleTransitInfo> {
     override fun check(card: SampleCard): Boolean = true
 
     override fun parseIdentity(card: SampleCard): TransitIdentity =
-        TransitIdentity.create(card.cardType.toString(), card.tagId.hex())
+        TransitIdentity.create(FormattedString(card.cardType.toString()), card.tagId.hex())
 
     override fun parseInfo(card: SampleCard): SampleTransitInfo = SampleTransitInfo()
 }

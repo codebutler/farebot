@@ -23,19 +23,15 @@
 
 package com.codebutler.farebot.transit
 
-import com.codebutler.farebot.base.util.StringResource
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 import kotlin.time.Instant
 
 /**
  * Wrapper around Refills to make them like Trips, so Trips become like history. This is similar
  * to what the Japanese cards (Edy, Suica) already had implemented for themselves.
  */
-@Serializable
 data class RefillTrip(
-    @Contextual val refill: Refill,
-    private val stringResource: StringResource,
+    val refill: Refill,
 ) : Trip() {
     override val startTimestamp: Instant?
         get() {
@@ -43,13 +39,13 @@ data class RefillTrip(
             return if (ts > 0) Instant.fromEpochSeconds(ts) else null
         }
 
-    override val agencyName: String? get() = refill.getAgencyName(stringResource)
+    override val agencyName: FormattedString? get() = refill.getAgencyName()
 
-    override val shortAgencyName: String? get() = refill.getShortAgencyName(stringResource)
+    override val shortAgencyName: FormattedString? get() = refill.getShortAgencyName()
 
     override val fare: TransitCurrency?
         get() {
-            val amountStr = refill.getAmountString(stringResource)
+            val amountStr = refill.getAmountString()
             // RefillTrip delegates fare formatting to the Refill, which returns a pre-formatted string.
             // Until Refill is refactored to return TransitCurrency, we return null here.
             // The amount is displayed via the TransitInfo's refill list instead.
@@ -59,9 +55,6 @@ data class RefillTrip(
     override val mode: Mode get() = Mode.TICKET_MACHINE
 
     companion object {
-        fun create(
-            refill: Refill,
-            stringResource: StringResource,
-        ): RefillTrip = RefillTrip(refill, stringResource)
+        fun create(refill: Refill): RefillTrip = RefillTrip(refill)
     }
 }

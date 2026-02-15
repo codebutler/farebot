@@ -34,7 +34,7 @@
 
 package com.codebutler.farebot.transit.suica
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -50,7 +50,7 @@ class SuicaTransitInfo(
     override val serialNumber: String?,
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>?,
-    override val cardName: String = getStringBlocking(Res.string.card_name_suica),
+    override val cardName: FormattedString = FormattedString(Res.string.card_name_suica),
 ) : TransitInfo() {
     override val balance: TransitBalance?
         get() {

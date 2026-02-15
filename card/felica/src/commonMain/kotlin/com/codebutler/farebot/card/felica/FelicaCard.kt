@@ -27,7 +27,6 @@
 package com.codebutler.farebot.card.felica
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -51,8 +50,8 @@ data class FelicaCard(
 
     fun getSystem(systemCode: Int): FelicaSystem? = systemsByCode[systemCode]
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val cardUiBuilder = FareBotUiTree.builder()
         cardUiBuilder.item().title("IDm").value(idm)
         cardUiBuilder.item().title("PMm").value(pmm)
         val systemsUiBuilder = cardUiBuilder.item().title("Systems")

@@ -25,8 +25,7 @@ package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getPluralStringBlocking
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.generated.resources.*
 import kotlin.time.Instant
 
@@ -73,7 +72,7 @@ abstract class Subscription {
      * A name (or description) of the subscription.
      * eg: "Travel Ten", "Multi-trip", "City Pass"...
      */
-    open val subscriptionName: String?
+    open val subscriptionName: FormattedString?
         get() = null
 
     /**
@@ -90,14 +89,14 @@ abstract class Subscription {
      * Full name of the agency for the subscription.
      * By default, this returns null (and doesn't display any information).
      */
-    open val agencyName: String?
+    open val agencyName: FormattedString?
         get() = null
 
     /**
      * Short name of the agency for the subscription, for use in compact displays.
      * By default, this returns [agencyName].
      */
-    open val shortAgencyName: String?
+    open val shortAgencyName: FormattedString?
         get() = agencyName
 
     /**
@@ -105,7 +104,7 @@ abstract class Subscription {
      * the retailer.
      * By default, this returns null (and doesn't display any information).
      */
-    open val saleAgencyName: String?
+    open val saleAgencyName: FormattedString?
         get() = null
 
     /**
@@ -185,7 +184,7 @@ abstract class Subscription {
             val items = mutableListOf<ListItem>()
 
             saleAgencyName?.let {
-                items.add(ListItem(Res.string.subscription_seller_agency, it))
+                items.add(ListItem(FormattedString(Res.string.subscription_seller_agency), it))
             }
 
             machineId?.let {
@@ -209,7 +208,7 @@ abstract class Subscription {
             }
 
             if (paymentMethod != PaymentMethod.UNKNOWN) {
-                items.add(ListItem(Res.string.subscription_payment_method, paymentMethod.description))
+                items.add(ListItem(FormattedString(Res.string.subscription_payment_method), paymentMethod.description))
             }
 
             transferEndTimestamp?.let { transferEnd ->
@@ -242,36 +241,36 @@ abstract class Subscription {
             return items.ifEmpty { null }
         }
 
-    fun formatRemainingTrips(): String? {
+    fun formatRemainingTrips(): FormattedString? {
         val remainingTrips = remainingTripCount
         val totalTrips = totalTripCount
 
         return when {
             remainingTrips != null && totalTrips != null ->
-                getPluralStringBlocking(
+                FormattedString.plural(
                     Res.plurals.subscription_trips_remaining_total,
                     remainingTrips,
                     remainingTrips,
                     totalTrips,
                 )
             remainingTrips != null ->
-                getPluralStringBlocking(Res.plurals.subscription_trips_remaining, remainingTrips, remainingTrips)
+                FormattedString.plural(Res.plurals.subscription_trips_remaining, remainingTrips, remainingTrips)
             else -> null
         }
     }
 
-    fun formatValidity(): String? {
+    fun formatValidity(): FormattedString? {
         val from = validFrom
         val to = validTo
         return when {
             from != null && to != null ->
-                getStringBlocking(
+                FormattedString(
                     Res.string.subscription_valid_format,
                     from.toString(),
                     to.toString(),
                 )
-            to != null -> getStringBlocking(Res.string.subscription_valid_to_format, to.toString())
-            from != null -> getStringBlocking(Res.string.subscription_valid_from_format, from.toString())
+            to != null -> FormattedString(Res.string.subscription_valid_to_format, to.toString())
+            from != null -> FormattedString(Res.string.subscription_valid_from_format, from.toString())
             else -> null
         }
     }
@@ -315,6 +314,6 @@ abstract class Subscription {
         FREE(Res.string.payment_method_free),
         ;
 
-        val description: String get() = getStringBlocking(descriptionRes)
+        val description: FormattedString get() = FormattedString(descriptionRes)
     }
 }

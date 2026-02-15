@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.venezia
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
 import com.codebutler.farebot.transit.en1545.En1545FixedInteger
@@ -33,7 +32,6 @@ import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 
 internal class VeneziaSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val counter: Int?,
 ) : En1545Subscription() {
     override val lookup get() = VeneziaLookup
@@ -54,7 +52,6 @@ internal class VeneziaSubscription(
 
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
             counter: Int?,
         ): VeneziaSubscription? {
             if (data.getBitsFromBuffer(0, 22) == 0) {
@@ -62,7 +59,7 @@ internal class VeneziaSubscription(
             }
 
             val parsed = En1545Parser.parse(data, SUBSCRIPTION_FIELDS)
-            return VeneziaSubscription(parsed, stringResource, counter)
+            return VeneziaSubscription(parsed, counter)
         }
     }
 }

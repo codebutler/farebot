@@ -25,8 +25,8 @@ package com.codebutler.farebot.transit.umarsh
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitInfo
@@ -47,7 +47,7 @@ class UmarshTransitInfo(
     override val serialNumber: String
         get() = formatSerial(sectors.first().serialNumber)
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = sectors.first().cardName
 
     override val balances: List<TransitBalance>?
@@ -79,10 +79,10 @@ class UmarshTransitInfo(
                     }
             }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
         val rubSectors = sectors.filter { it.denomination == UmarshDenomination.RUB }
         if (rubSectors.isEmpty()) return null
-        val b = FareBotUiTree.builder(stringResource)
+        val b = FareBotUiTree.builder()
         for (sec in rubSectors) {
             b.item().title(Res.string.umarsh_machine_id).value(sec.machineId.toString())
         }
@@ -100,7 +100,7 @@ class UmarshTransitInfo(
 private class UmarshSubscription(
     private val sector: UmarshSector,
 ) : Subscription() {
-    override val subscriptionName: String?
+    override val subscriptionName: FormattedString?
         get() = sector.subscriptionName
 
     override val remainingTripCount: Int?

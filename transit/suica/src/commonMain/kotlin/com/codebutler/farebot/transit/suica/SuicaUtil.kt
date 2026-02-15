@@ -30,8 +30,8 @@
 package com.codebutler.farebot.transit.suica
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.transit.Station
 import farebot.transit.suica.generated.resources.*
@@ -374,15 +374,12 @@ internal object SuicaUtil {
      * Detect the card type from the set of service codes present on the card.
      * Returns the card name (e.g., "Suica", "PASMO", "ICOCA") or "Japan IC" if unknown.
      */
-    fun getCardName(
-        stringResource: StringResource,
-        serviceCodes: Set<Int>,
-    ): String {
+    fun getCardName(serviceCodes: Set<Int>): FormattedString {
         val nameRes = getCardNameResource(serviceCodes)
         return if (nameRes != null) {
-            stringResource.getString(nameRes)
+            FormattedString(nameRes)
         } else {
-            stringResource.getString(Res.string.card_name_japan_ic)
+            FormattedString(Res.string.card_name_japan_ic)
         }
     }
 
@@ -419,35 +416,32 @@ internal object SuicaUtil {
      * @param cType コンソールタイプをセット
      * @return String 機器タイプが文字列で戻ります
      */
-    fun getConsoleTypeName(
-        stringResource: StringResource,
-        cType: Int,
-    ): String =
+    fun getConsoleTypeName(cType: Int): FormattedString =
         when (cType and 0xff) {
-            0x03 -> stringResource.getString(Res.string.felica_terminal_fare_adjustment)
-            0x04 -> stringResource.getString(Res.string.felica_terminal_portable)
-            0x05 -> stringResource.getString(Res.string.felica_terminal_vehicle) // bus
-            0x07 -> stringResource.getString(Res.string.felica_terminal_ticket)
-            0x08 -> stringResource.getString(Res.string.felica_terminal_ticket)
-            0x09 -> stringResource.getString(Res.string.felica_terminal_deposit_quick_charge)
-            0x12 -> stringResource.getString(Res.string.felica_terminal_tvm_tokyo_monorail)
-            0x13 -> stringResource.getString(Res.string.felica_terminal_tvm_etc)
-            0x14 -> stringResource.getString(Res.string.felica_terminal_tvm_etc)
-            0x15 -> stringResource.getString(Res.string.felica_terminal_tvm_etc)
-            0x16 -> stringResource.getString(Res.string.felica_terminal_turnstile)
-            0x17 -> stringResource.getString(Res.string.felica_terminal_ticket_validator)
-            0x18 -> stringResource.getString(Res.string.felica_terminal_ticket_booth)
-            0x19 -> stringResource.getString(Res.string.felica_terminal_ticket_office_green)
-            0x1a -> stringResource.getString(Res.string.felica_terminal_ticket_gate_terminal)
-            0x1b -> stringResource.getString(Res.string.felica_terminal_mobile_phone)
-            0x1c -> stringResource.getString(Res.string.felica_terminal_connection_adjustment)
-            0x1d -> stringResource.getString(Res.string.felica_terminal_transfer_adjustment)
-            0x1f -> stringResource.getString(Res.string.felica_terminal_simple_deposit)
-            0x46 -> stringResource.getString(Res.string.felica_terminal_view_altte)
-            0x48 -> stringResource.getString(Res.string.felica_terminal_view_altte)
-            0xc7 -> stringResource.getString(Res.string.felica_terminal_pos) // sales
-            0xc8 -> stringResource.getString(Res.string.felica_terminal_vending) // sales
-            else -> stringResource.getString(Res.string.suica_unknown_console, cType.toString(16))
+            0x03 -> FormattedString(Res.string.felica_terminal_fare_adjustment)
+            0x04 -> FormattedString(Res.string.felica_terminal_portable)
+            0x05 -> FormattedString(Res.string.felica_terminal_vehicle) // bus
+            0x07 -> FormattedString(Res.string.felica_terminal_ticket)
+            0x08 -> FormattedString(Res.string.felica_terminal_ticket)
+            0x09 -> FormattedString(Res.string.felica_terminal_deposit_quick_charge)
+            0x12 -> FormattedString(Res.string.felica_terminal_tvm_tokyo_monorail)
+            0x13 -> FormattedString(Res.string.felica_terminal_tvm_etc)
+            0x14 -> FormattedString(Res.string.felica_terminal_tvm_etc)
+            0x15 -> FormattedString(Res.string.felica_terminal_tvm_etc)
+            0x16 -> FormattedString(Res.string.felica_terminal_turnstile)
+            0x17 -> FormattedString(Res.string.felica_terminal_ticket_validator)
+            0x18 -> FormattedString(Res.string.felica_terminal_ticket_booth)
+            0x19 -> FormattedString(Res.string.felica_terminal_ticket_office_green)
+            0x1a -> FormattedString(Res.string.felica_terminal_ticket_gate_terminal)
+            0x1b -> FormattedString(Res.string.felica_terminal_mobile_phone)
+            0x1c -> FormattedString(Res.string.felica_terminal_connection_adjustment)
+            0x1d -> FormattedString(Res.string.felica_terminal_transfer_adjustment)
+            0x1f -> FormattedString(Res.string.felica_terminal_simple_deposit)
+            0x46 -> FormattedString(Res.string.felica_terminal_view_altte)
+            0x48 -> FormattedString(Res.string.felica_terminal_view_altte)
+            0xc7 -> FormattedString(Res.string.felica_terminal_pos) // sales
+            0xc8 -> FormattedString(Res.string.felica_terminal_vending) // sales
+            else -> FormattedString(Res.string.suica_unknown_console, cType.toString(16))
         }
 
     /**
@@ -457,37 +451,34 @@ internal object SuicaUtil {
      * @param proc 処理タイプをセット
      * @return String 処理タイプが文字列で戻ります
      */
-    fun getProcessTypeName(
-        stringResource: StringResource,
-        proc: Int,
-    ): String =
+    fun getProcessTypeName(proc: Int): FormattedString =
         when (proc and 0xff) {
-            0x01 -> stringResource.getString(Res.string.felica_process_fare_exit_gate)
-            0x02 -> stringResource.getString(Res.string.felica_process_charge)
-            0x03 -> stringResource.getString(Res.string.felica_process_purchase_magnetic)
-            0x04 -> stringResource.getString(Res.string.felica_process_fare_adjustment)
-            0x05 -> stringResource.getString(Res.string.felica_process_admission_payment)
-            0x06 -> stringResource.getString(Res.string.felica_process_booth_exit)
-            0x07 -> stringResource.getString(Res.string.felica_process_issue_new)
-            0x08 -> stringResource.getString(Res.string.felica_process_booth_deduction)
-            0x0d -> stringResource.getString(Res.string.felica_process_bus_pitapa) // Bus
-            0x0f -> stringResource.getString(Res.string.felica_process_bus_iruca) // Bus
-            0x11 -> stringResource.getString(Res.string.felica_process_reissue)
-            0x13 -> stringResource.getString(Res.string.felica_process_payment_shinkansen)
-            0x14 -> stringResource.getString(Res.string.felica_process_entry_a_autocharge)
-            0x15 -> stringResource.getString(Res.string.felica_process_exit_a_autocharge)
-            0x1f -> stringResource.getString(Res.string.felica_process_deposit_bus) // Bus
-            0x23 -> stringResource.getString(Res.string.felica_process_purchase_special_ticket) // Bus
-            0x46 -> stringResource.getString(Res.string.felica_process_merchandise_purchase) // Sales
-            0x48 -> stringResource.getString(Res.string.felica_process_bonus_charge)
-            0x49 -> stringResource.getString(Res.string.felica_process_register_deposit) // Sales
-            0x4a -> stringResource.getString(Res.string.felica_process_merchandise_cancel) // Sales
-            0x4b -> stringResource.getString(Res.string.felica_process_merchandise_admission) // Sales
-            0xc6 -> stringResource.getString(Res.string.felica_process_merchandise_purchase_cash) // Sales
-            0xcb -> stringResource.getString(Res.string.felica_process_merchandise_admission_cash) // Sales
-            0x84 -> stringResource.getString(Res.string.felica_process_payment_thirdparty)
-            0x85 -> stringResource.getString(Res.string.felica_process_admission_thirdparty)
-            else -> stringResource.getString(Res.string.suica_unknown_process, proc.toString(16))
+            0x01 -> FormattedString(Res.string.felica_process_fare_exit_gate)
+            0x02 -> FormattedString(Res.string.felica_process_charge)
+            0x03 -> FormattedString(Res.string.felica_process_purchase_magnetic)
+            0x04 -> FormattedString(Res.string.felica_process_fare_adjustment)
+            0x05 -> FormattedString(Res.string.felica_process_admission_payment)
+            0x06 -> FormattedString(Res.string.felica_process_booth_exit)
+            0x07 -> FormattedString(Res.string.felica_process_issue_new)
+            0x08 -> FormattedString(Res.string.felica_process_booth_deduction)
+            0x0d -> FormattedString(Res.string.felica_process_bus_pitapa) // Bus
+            0x0f -> FormattedString(Res.string.felica_process_bus_iruca) // Bus
+            0x11 -> FormattedString(Res.string.felica_process_reissue)
+            0x13 -> FormattedString(Res.string.felica_process_payment_shinkansen)
+            0x14 -> FormattedString(Res.string.felica_process_entry_a_autocharge)
+            0x15 -> FormattedString(Res.string.felica_process_exit_a_autocharge)
+            0x1f -> FormattedString(Res.string.felica_process_deposit_bus) // Bus
+            0x23 -> FormattedString(Res.string.felica_process_purchase_special_ticket) // Bus
+            0x46 -> FormattedString(Res.string.felica_process_merchandise_purchase) // Sales
+            0x48 -> FormattedString(Res.string.felica_process_bonus_charge)
+            0x49 -> FormattedString(Res.string.felica_process_register_deposit) // Sales
+            0x4a -> FormattedString(Res.string.felica_process_merchandise_cancel) // Sales
+            0x4b -> FormattedString(Res.string.felica_process_merchandise_admission) // Sales
+            0xc6 -> FormattedString(Res.string.felica_process_merchandise_purchase_cash) // Sales
+            0xcb -> FormattedString(Res.string.felica_process_merchandise_admission_cash) // Sales
+            0x84 -> FormattedString(Res.string.felica_process_payment_thirdparty)
+            0x85 -> FormattedString(Res.string.felica_process_admission_thirdparty)
+            else -> FormattedString(Res.string.suica_unknown_process, proc.toString(16))
         }
 
     private const val SUICA_BUS_STR = "suica_bus"

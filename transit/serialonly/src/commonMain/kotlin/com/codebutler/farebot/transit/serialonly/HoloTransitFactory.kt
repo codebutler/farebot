@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.card.CardType
@@ -42,7 +43,7 @@ class HoloTransitFactory : TransitFactory<DesfireCard, HoloTransitInfo> {
 
     companion object {
         internal const val APP_ID = 0x6013f2
-        internal const val NAME = "HOLO"
+        internal val NAME = FormattedString("HOLO")
 
         internal fun parseSerial(app: DesfireApplication?): Int? {
             val data = (app?.getFile(0) as? StandardDesfireFile)?.data ?: return null

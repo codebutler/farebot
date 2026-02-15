@@ -25,6 +25,7 @@ package com.codebutler.farebot.transit.calypso.emv
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.card.iso7816.ISO7816Application
@@ -72,12 +73,12 @@ object EmvTransitFactory : TransitFactory<ISO7816Card, EmvTransitInfo> {
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun parseIdentity(card: ISO7816Card): TransitIdentity {
-        val app = findEmvApp(card) ?: return TransitIdentity.create("EMV", null)
+        val app = findEmvApp(card) ?: return TransitIdentity.create(FormattedString("EMV"), null)
         val allTlv = getAllTlv(app)
         val name = findName(allTlv)
         val t2 = findT2Data(allTlv)
         val pan = getPan(t2)
-        return TransitIdentity.create(name, splitby4(pan))
+        return TransitIdentity.create(FormattedString(name), splitby4(pan))
     }
 
     override fun parseInfo(card: ISO7816Card): EmvTransitInfo {
@@ -219,7 +220,7 @@ class EmvTransitInfo(
     private val logEntries: List<EmvLogEntry>?,
     private val t2: ByteArray?,
 ) : TransitInfo() {
-    override val cardName: String = name
+    override val cardName: FormattedString = FormattedString(name)
 
     override val serialNumber: String? = mSerialNumber
 

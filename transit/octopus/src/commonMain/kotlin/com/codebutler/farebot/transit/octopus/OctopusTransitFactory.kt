@@ -23,7 +23,7 @@
 package com.codebutler.farebot.transit.octopus
 
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FeliCaConstants
 import com.codebutler.farebot.card.felica.FelicaCard
@@ -45,14 +45,14 @@ class OctopusTransitFactory : TransitFactory<FelicaCard, OctopusTransitInfo> {
         if (card.getSystem(FeliCaConstants.SYSTEMCODE_SZT) != null) {
             if (card.getSystem(FeliCaConstants.SYSTEMCODE_OCTOPUS) != null) {
                 // Dual-mode card.
-                TransitIdentity.create(getStringBlocking(Res.string.octopus_dual_card_name), null)
+                TransitIdentity.create(FormattedString(Res.string.octopus_dual_card_name), null)
             } else {
                 // SZT-only card.
-                TransitIdentity.create(getStringBlocking(Res.string.octopus_szt_card_name), null)
+                TransitIdentity.create(FormattedString(Res.string.octopus_szt_card_name), null)
             }
         } else {
             // Octopus-only card.
-            TransitIdentity.create(getStringBlocking(Res.string.octopus_card_name), null)
+            TransitIdentity.create(FormattedString(Res.string.octopus_card_name), null)
         }
 
     override fun parseInfo(card: FelicaCard): OctopusTransitInfo {

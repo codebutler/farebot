@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.edy
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.felica.FeliCaUtil
 import com.codebutler.farebot.card.felica.FelicaBlock
 import com.codebutler.farebot.transit.TransitCurrency
@@ -37,7 +37,6 @@ class EdyTrip(
     private val timestampData: Instant,
     private val transactionAmount: Int,
     private val balance: Int,
-    private val stringResource: StringResource,
 ) : Trip() {
     override val startTimestamp: Instant get() = timestampData
 
@@ -58,16 +57,14 @@ class EdyTrip(
                 TransitCurrency.JPY(transactionAmount)
             }
 
-    override val agencyName: String
+    override val agencyName: FormattedString
         get() {
-            val str =
-                if (processType != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
-                    stringResource.getString(Res.string.felica_process_charge)
-                } else {
-                    stringResource.getString(Res.string.felica_process_merchandise_purchase)
-                }
-            return str + " " + stringResource.getString(Res.string.edy_transaction_sequence) +
-                sequenceNumber.toString().padStart(8, '0')
+            val padded = sequenceNumber.toString().padStart(8, '0')
+            return if (processType != EdyTransitInfo.FELICA_MODE_EDY_DEBIT) {
+                FormattedString(Res.string.edy_agency_charge_seq, padded)
+            } else {
+                FormattedString(Res.string.edy_agency_purchase_seq, padded)
+            }
         }
 
     fun getProcessType(): Int = processType
@@ -81,10 +78,7 @@ class EdyTrip(
     fun getBalance(): Int = balance
 
     companion object {
-        fun create(
-            block: FelicaBlock,
-            stringResource: StringResource,
-        ): EdyTrip {
+        fun create(block: FelicaBlock): EdyTrip {
             val data = block.data
 
             val processType = data[0].toInt()
@@ -93,7 +87,7 @@ class EdyTrip(
             val transactionAmount = FeliCaUtil.toInt(data[8], data[9], data[10], data[11])
             val balance = FeliCaUtil.toInt(data[12], data[13], data[14], data[15])
 
-            return EdyTrip(processType, sequenceNumber, timestampData, transactionAmount, balance, stringResource)
+            return EdyTrip(processType, sequenceNumber, timestampData, transactionAmount, balance)
         }
     }
 }

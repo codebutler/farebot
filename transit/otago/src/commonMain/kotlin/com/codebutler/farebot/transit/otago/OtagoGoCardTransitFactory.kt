@@ -22,11 +22,11 @@
 
 package com.codebutler.farebot.transit.otago
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.CardType
@@ -76,7 +76,7 @@ class OtagoGoCardTransitFactory : TransitFactory<ClassicCard, OtagoGoCardTransit
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        val cardName = getStringBlocking(Res.string.otago_card_name)
+        val cardName = FormattedString(Res.string.otago_card_name)
         return TransitIdentity.create(cardName, serial.toString(16))
     }
 

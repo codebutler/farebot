@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBuffer
@@ -41,7 +42,7 @@ class PrestoTransitFactory : TransitFactory<DesfireCard, PrestoTransitInfo> {
 
     companion object {
         private const val APP_ID_SERIAL = 0xff30ff
-        internal const val NAME = "PRESTO"
+        internal val NAME = FormattedString("PRESTO")
 
         internal fun getSerial(card: DesfireCard): Int? {
             val file =

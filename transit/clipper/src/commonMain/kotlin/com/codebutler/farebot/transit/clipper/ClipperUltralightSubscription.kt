@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.clipper
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import farebot.transit.clipper.generated.resources.Res
 import farebot.transit.clipper.generated.resources.clipper_return
@@ -41,50 +41,50 @@ class ClipperUltralightSubscription(
 ) : Subscription() {
     override val id: Int = 0
 
-    override val subscriptionName: String
+    override val subscriptionName: FormattedString
         get() =
             when (product and 0xf) {
                 0x3 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_single,
-                        getStringBlocking(Res.string.clipper_ticket_type_adult),
+                        FormattedString(Res.string.clipper_ticket_type_adult),
                     )
                 0x4 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_return,
-                        getStringBlocking(Res.string.clipper_ticket_type_adult),
+                        FormattedString(Res.string.clipper_ticket_type_adult),
                     )
                 0x5 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_single,
-                        getStringBlocking(Res.string.clipper_ticket_type_senior),
+                        FormattedString(Res.string.clipper_ticket_type_senior),
                     )
                 0x6 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_return,
-                        getStringBlocking(Res.string.clipper_ticket_type_senior),
+                        FormattedString(Res.string.clipper_ticket_type_senior),
                     )
                 0x7 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_single,
-                        getStringBlocking(Res.string.clipper_ticket_type_rtc),
+                        FormattedString(Res.string.clipper_ticket_type_rtc),
                     )
                 0x8 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_return,
-                        getStringBlocking(Res.string.clipper_ticket_type_rtc),
+                        FormattedString(Res.string.clipper_ticket_type_rtc),
                     )
                 0x9 ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_single,
-                        getStringBlocking(Res.string.clipper_ticket_type_youth),
+                        FormattedString(Res.string.clipper_ticket_type_youth),
                     )
                 0xa ->
-                    getStringBlocking(
+                    FormattedString(
                         Res.string.clipper_return,
-                        getStringBlocking(Res.string.clipper_ticket_type_youth),
+                        FormattedString(Res.string.clipper_ticket_type_youth),
                     )
-                else -> product.toString(16)
+                else -> FormattedString(product.toString(16))
             }
 
     override val remainingTripCount: Int?
@@ -117,13 +117,13 @@ class ClipperUltralightSubscription(
             return if (expiryEpoch > 0) Instant.fromEpochSeconds(expiryEpoch) else null
         }
 
-    override val agencyName: String
+    override val agencyName: FormattedString
         get() {
             val agencyCode = if (product shr 4 == 0x21) ClipperData.AGENCY_MUNI else product shr 4
             return ClipperData.getAgencyName(agencyCode)
         }
 
-    override val shortAgencyName: String
+    override val shortAgencyName: FormattedString
         get() {
             val agencyCode = if (product shr 4 == 0x21) ClipperData.AGENCY_MUNI else product shr 4
             return ClipperData.getShortAgencyName(agencyCode)

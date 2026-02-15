@@ -23,7 +23,7 @@ package com.codebutler.farebot.transit.cifial
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.cifial.generated.resources.Res
 import farebot.transit.cifial.generated.resources.cifial_card_name
@@ -47,5 +47,5 @@ class CifialTransitInfo(
                 ListItem(Res.string.cifial_hotel_checkout, mCheckOut.toString()),
             )
 
-    override val cardName: String get() = getStringBlocking(Res.string.cifial_card_name)
+    override val cardName: FormattedString get() = FormattedString(Res.string.cifial_card_name)
 }

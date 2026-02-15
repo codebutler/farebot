@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.lisboaviva
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
@@ -42,7 +42,6 @@ import kotlin.time.Instant
 internal class LisboaVivaSubscription private constructor(
     override val parsed: En1545Parsed,
     override val lookup: En1545Lookup,
-    override val stringResource: StringResource,
     private val counter: Int?,
 ) : En1545Subscription() {
     private val isZapping: Boolean
@@ -84,7 +83,7 @@ internal class LisboaVivaSubscription private constructor(
             return super.validTo
         }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             if (contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY) {
                 null
@@ -92,7 +91,7 @@ internal class LisboaVivaSubscription private constructor(
                 super.agencyName
             }
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() =
             if (contractProvider == LisboaVivaLookup.INTERAGENCY31_AGENCY) {
                 null
@@ -120,12 +119,11 @@ internal class LisboaVivaSubscription private constructor(
 
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
             counter: Int?,
         ): LisboaVivaSubscription? {
             if (data.all { it == 0.toByte() }) return null
             val parsed = En1545Parser.parse(data, CONTRACT_FIELDS)
-            return LisboaVivaSubscription(parsed, LisboaVivaLookup, stringResource, counter)
+            return LisboaVivaSubscription(parsed, LisboaVivaLookup, counter)
         }
     }
 }

@@ -25,9 +25,8 @@ package com.codebutler.farebot.transit.tmoney
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ksx6924.KSX6924Application
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfo
 import com.codebutler.farebot.card.ksx6924.KSX6924PurseInfoResolver
@@ -69,14 +68,13 @@ open class TMoneyTransitInfo protected constructor(
                 null
             }
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = getCardName()
 
     override val info: List<ListItemInterface>?
         get() = mPurseInfo?.getInfo(purseInfoResolver)
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? =
-        mPurseInfo?.getAdvancedInfo(stringResource, purseInfoResolver)
+    override suspend fun getAdvancedUi(): FareBotUiTree? = mPurseInfo?.getAdvancedInfo(purseInfoResolver)
 
     override val trips: List<Trip>
         get() = mTrips
@@ -91,7 +89,7 @@ open class TMoneyTransitInfo protected constructor(
     companion object {
         private val TZ = TimeZone.of("Asia/Seoul")
 
-        fun getCardName(): String = getStringBlocking(Res.string.card_name_tmoney)
+        fun getCardName(): FormattedString = FormattedString(Res.string.card_name_tmoney)
 
         /**
          * Creates a [TMoneyTransitInfo] from a [KSX6924Application].

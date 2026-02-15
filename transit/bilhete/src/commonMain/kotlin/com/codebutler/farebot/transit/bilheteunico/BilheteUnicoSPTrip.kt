@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.bilheteunico
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.Station
@@ -55,14 +56,23 @@ internal class BilheteUnicoSPTrip(
                 else -> Mode.OTHER
             }
 
-    override val routeName: String?
-        get() = if (mTransport == BUS && mLine == 0x38222) mLocation.toString(16) else mLine.toString(16)
+    override val routeName: FormattedString?
+        get() =
+            FormattedString(
+                if (mTransport == BUS &&
+                    mLine == 0x38222
+                ) {
+                    mLocation.toString(16)
+                } else {
+                    mLine.toString(16)
+                },
+            )
 
     override val startStation: Station?
         get() = if (mTransport == BUS && mLine == 0x38222) null else Station.unknown(mLocation.toString(16))
 
-    override val agencyName: String?
-        get() = mTransport.toString(16)
+    override val agencyName: FormattedString?
+        get() = FormattedString(mTransport.toString(16))
 
     companion object {
         private const val BUS = 0xb4

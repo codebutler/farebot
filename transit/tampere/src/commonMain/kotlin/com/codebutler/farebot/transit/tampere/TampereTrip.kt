@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.tampere
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.transit.TransitCurrency
@@ -65,14 +66,14 @@ class TampereTrip(
     override val humanReadableRouteID: String
         get() = "${mRoute / 100}/${mRoute % 100}"
 
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() = getRouteName(mRoute)
 
     companion object {
-        private fun getRouteName(routeNumber: Int): String? =
+        private fun getRouteName(routeNumber: Int): FormattedString? =
             when {
                 routeNumber == 0 || routeNumber == 1 -> null
-                else -> "${routeNumber / 100}"
+                else -> FormattedString("${routeNumber / 100}")
             }
 
         fun parse(raw: ByteArray): TampereTrip {

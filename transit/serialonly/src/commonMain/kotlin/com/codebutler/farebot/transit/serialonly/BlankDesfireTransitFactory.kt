@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
@@ -51,7 +51,7 @@ class BlankDesfireTransitFactory : TransitFactory<DesfireCard, BlankDesfireTrans
     }
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        val name = getStringBlocking(Res.string.blank_mfd_card)
+        val name = FormattedString(Res.string.blank_mfd_card)
         return TransitIdentity.create(name, null)
     }
 
@@ -59,7 +59,7 @@ class BlankDesfireTransitFactory : TransitFactory<DesfireCard, BlankDesfireTrans
 }
 
 class BlankDesfireTransitInfo : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.blank_mfd_card)
+    override val cardName: FormattedString = FormattedString(Res.string.blank_mfd_card)
 
     override val serialNumber: String? = null
 

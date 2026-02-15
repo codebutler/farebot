@@ -21,12 +21,12 @@
 
 package com.codebutler.farebot.transit.metromoney
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -53,7 +53,7 @@ class MetroMoneyTransitFactory : TransitFactory<ClassicCard, MetroMoneyTransitIn
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity =
         TransitIdentity.create(
-            getStringBlocking(Res.string.card_name_metromoney),
+            FormattedString(Res.string.card_name_metromoney),
             NumberUtils.zeroPad(getSerial(card), 10),
         )
 
