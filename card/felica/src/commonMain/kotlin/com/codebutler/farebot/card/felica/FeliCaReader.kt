@@ -33,11 +33,18 @@ import kotlin.time.Clock
  *
  * Uses a [FeliCaTagAdapter] to communicate with the tag, producing
  * a [RawFelicaCard] with all discovered systems, services, and blocks.
+ *
+ * @param tagId The tag identifier
+ * @param adapter The adapter for communicating with the tag
+ * @param onlyFirst If `true`, only read the first system code on the card. If not set
+ * (`false`), read all system codes. Setting this to `true` will result in an incomplete
+ * read, but is needed to work around a bug in iOS.
  */
 object FeliCaReader {
     fun readTag(
         tagId: ByteArray,
         adapter: FeliCaTagAdapter,
+        onlyFirst: Boolean = false,
     ): RawFelicaCard {
         val idmBytes = adapter.getIDm()
         val idm = FeliCaIdm(idmBytes)
@@ -77,9 +84,20 @@ object FeliCaReader {
 
         val systems = mutableListOf<FelicaSystem>()
 
-        for (systemCode in systemCodes) {
+        for ((systemNumber, systemCode) in systemCodes.withIndex()) {
             // We can get System Code 0 from magic fallbacks -- drop this.
             if (systemCode == 0) continue
+
+            if (onlyFirst && systemNumber > 0) {
+                // We aren't going to read secondary system codes. Instead, insert a dummy
+                // service with no service codes.
+                // This is an iOS-specific hack to work around CoreNFC bug where
+                // _NFReaderSession._validateFelicaCommand asserts that you're talking to the exact
+                // IDm that the system discovered -- including the upper 4 bits (which indicate the
+                // system number).
+                systems.add(FelicaSystem.skipped(systemCode))
+                continue
+            }
 
             // Select (poll) this system
             adapter.selectSystem(systemCode)
@@ -146,13 +164,9 @@ object FeliCaReader {
                 if (blocks.isNotEmpty()) {
                     services.add(FelicaService.create(serviceCode, blocks))
                 }
-
-                if (isPartialRead) break
             }
 
             systems.add(FelicaSystem.create(systemCode, services, (serviceCodes + excludedCodes).toSet()))
-
-            if (isPartialRead) break
         }
 
         return RawFelicaCard.create(tagId, Clock.System.now(), idm, pmm, systems, isPartialRead)
