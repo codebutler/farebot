@@ -23,6 +23,7 @@
 
 package com.codebutler.farebot.card.classic
 
+import com.codebutler.farebot.card.CardLostException
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
@@ -53,21 +54,23 @@ object ClassicCardReader {
         for (sectorIndex in 0 until tech.sectorCount) {
             try {
                 var authSuccess = false
-                var successfulKeyA: ByteArray? = null
-                var successfulKeyB: ByteArray? = null
+                var successfulKey: ByteArray? = null
+                var isKeyA = true
 
                 // Try the default keys first
                 if (!authSuccess && sectorIndex == 0) {
                     authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY)
                     if (authSuccess) {
-                        successfulKeyA = PREAMBLE_KEY
+                        successfulKey = PREAMBLE_KEY
+                        isKeyA = true
                     }
                 }
 
                 if (!authSuccess) {
                     authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, ClassicTechnology.KEY_DEFAULT)
                     if (authSuccess) {
-                        successfulKeyA = ClassicTechnology.KEY_DEFAULT
+                        successfulKey = ClassicTechnology.KEY_DEFAULT
+                        isKeyA = true
                     }
                 }
 
@@ -78,11 +81,13 @@ object ClassicCardReader {
                         if (sectorKey != null) {
                             authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.keyA)
                             if (authSuccess) {
-                                successfulKeyA = sectorKey.keyA
+                                successfulKey = sectorKey.keyA
+                                isKeyA = true
                             } else {
                                 authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.keyB)
                                 if (authSuccess) {
-                                    successfulKeyB = sectorKey.keyB
+                                    successfulKey = sectorKey.keyB
+                                    isKeyA = false
                                 }
                             }
                         }
@@ -108,15 +113,18 @@ object ClassicCardReader {
                                 )
 
                             if (authSuccess) {
-                                successfulKeyA = keys[keyIndex].keyA
+                                successfulKey = keys[keyIndex].keyA
+                                isKeyA = true
                             } else {
                                 authSuccess =
                                     tech.authenticateSectorWithKeyB(
                                         sectorIndex,
                                         keys[keyIndex].keyB,
                                     )
+
                                 if (authSuccess) {
-                                    successfulKeyB = keys[keyIndex].keyB
+                                    successfulKey = keys[keyIndex].keyB
+                                    isKeyA = false
                                 }
                             }
 
@@ -128,25 +136,41 @@ object ClassicCardReader {
                     }
                 }
 
-                if (authSuccess) {
+                if (authSuccess && successfulKey != null) {
                     val blocks = ArrayList<RawClassicBlock>()
                     // FIXME: First read trailer block to get type of other blocks.
                     val firstBlockIndex = tech.sectorToBlock(sectorIndex)
                     for (blockIndex in 0 until tech.getBlockCountInSector(sectorIndex)) {
-                        val data = tech.readBlock(firstBlockIndex + blockIndex)
+                        var data = tech.readBlock(firstBlockIndex + blockIndex)
+
+                        // Sometimes the result is just a single byte 0x04
+                        // Reauthenticate and retry if that happens (up to 3 times)
+                        repeat(3) {
+                            if (data.size == 1) {
+                                if (isKeyA) {
+                                    tech.authenticateSectorWithKeyA(sectorIndex, successfulKey)
+                                } else {
+                                    tech.authenticateSectorWithKeyB(sectorIndex, successfulKey)
+                                }
+                                data = tech.readBlock(firstBlockIndex + blockIndex)
+                            }
+                        }
+
                         blocks.add(RawClassicBlock.create(blockIndex, data))
                     }
-                    sectors.add(
-                        RawClassicSector.createData(
-                            sectorIndex,
-                            blocks,
-                            successfulKeyA,
-                            successfulKeyB,
-                        ),
-                    )
+                    sectors.add(RawClassicSector.createData(sectorIndex, blocks))
+
+                    // TODO: Metrodroid enhancement - retry with alternate key if blocks are unauthorized
+                    // After reading, if blocks are unauthorized, retry authentication with Key B (if we used A)
+                    // or Key A (if we used B) and re-read the sector. Requires tracking unauthorized blocks
+                    // in RawClassicBlock (see Metrodroid ClassicReader.kt lines 118-139).
                 } else {
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
                 }
+            } catch (ex: CardLostException) {
+                // Card was lost during reading - return immediately with partial data
+                sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.message ?: "Card lost"))
+                return RawClassicCard.create(tagId, Clock.System.now(), sectors, isPartialRead = true)
             } catch (ex: Exception) {
                 sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.message ?: "Unknown error"))
             }
