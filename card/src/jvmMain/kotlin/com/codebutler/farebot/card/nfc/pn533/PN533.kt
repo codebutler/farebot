@@ -55,6 +55,25 @@ class PN533(
         )
     }
 
+    fun setParameters(flags: Int) {
+        transport.sendCommand(CMD_SET_PARAMETERS, byteArrayOf(flags.toByte()))
+    }
+
+    fun resetMode() {
+        transport.sendCommand(CMD_RESET_MODE, byteArrayOf(0x01))
+    }
+
+    fun writeRegister(address: Int, value: Int) {
+        transport.sendCommand(
+            CMD_WRITE_REGISTER,
+            byteArrayOf(
+                ((address shr 8) and 0xFF).toByte(),
+                (address and 0xFF).toByte(),
+                value.toByte(),
+            ),
+        )
+    }
+
     fun rfConfiguration(
         item: Byte,
         data: ByteArray,
@@ -213,7 +232,10 @@ class PN533(
     companion object {
         // PN533 command codes (host-to-PN533, TFI=0xD4)
         const val CMD_GET_FIRMWARE_VERSION: Byte = 0x02
+        const val CMD_WRITE_REGISTER: Byte = 0x08
+        const val CMD_SET_PARAMETERS: Byte = 0x12
         const val CMD_SAM_CONFIGURATION: Byte = 0x14
+        const val CMD_RESET_MODE: Byte = 0x18
         const val CMD_RF_CONFIGURATION: Byte = 0x32
         const val CMD_IN_LIST_PASSIVE_TARGET: Byte = 0x4A
         const val CMD_IN_DATA_EXCHANGE: Byte = 0x40

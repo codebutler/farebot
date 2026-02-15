@@ -175,6 +175,11 @@ class PN533Transport(
             payload = frame.copyOfRange(5, 5 + len)
         }
 
+        // Error frame: 1-byte payload with error code (e.g., 0x7F = command not supported)
+        if (payload.size == 1) {
+            throw PN533CommandException(payload[0].toInt() and 0xFF)
+        }
+
         // payload[0] = TFI (0xD5 for PN533-to-host), payload[1] = response code
         if (payload.size < 2 || payload[0] != TFI_PN533_TO_HOST) {
             throw PN533Exception("Invalid TFI in response: ${payload.hex()}")
@@ -220,6 +225,10 @@ class PN533Transport(
     }
 }
 
-class PN533Exception(
+open class PN533Exception(
     message: String,
 ) : Exception(message)
+
+class PN533CommandException(
+    val errorCode: Int,
+) : PN533Exception("PN53x command error: 0x%02X".format(errorCode))

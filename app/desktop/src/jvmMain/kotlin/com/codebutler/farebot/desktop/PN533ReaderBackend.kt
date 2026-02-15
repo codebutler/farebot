@@ -32,8 +32,10 @@ import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
 import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
+import com.codebutler.farebot.card.nfc.pn533.PN533CommandException
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.card.nfc.pn533.PN533Transport
 import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
@@ -45,17 +47,20 @@ import com.codebutler.farebot.shared.nfc.ScannedTag
  * Communicates with PN533-based NFC readers (e.g., SCM SCL3711)
  * directly over USB bulk transfers, bypassing the PC/SC subsystem.
  */
-class PN533ReaderBackend : NfcReaderBackend {
-    override val name: String = "PN533"
+class PN533ReaderBackend(
+    private val preOpenedTransport: PN533Transport? = null,
+    private val deviceLabel: String = "PN533",
+) : NfcReaderBackend {
+    override val name: String = deviceLabel
 
     override fun scanLoop(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
     ) {
-        val transport =
-            PN533Device.open()
-                ?: throw Exception("PN533 device not found")
+        val transport = preOpenedTransport
+            ?: PN533Device.open()
+            ?: throw Exception("PN533 device not found")
 
         transport.flush()
         val pn533 = PN533(transport)
@@ -69,10 +74,26 @@ class PN533ReaderBackend : NfcReaderBackend {
 
     private fun initDevice(pn533: PN533) {
         val fw = pn533.getFirmwareVersion()
-        println("[PN533] Firmware: $fw")
+        println("[$name] Firmware: $fw")
 
-        pn533.samConfiguration()
-        pn533.setMaxRetries()
+        try {
+            pn533.samConfiguration()
+        } catch (e: PN533CommandException) {
+            // RC-S956 (Sony PaSoRi): no SAM module, use alternative init
+            println("[$name] SAM not available, using RC-S956 init sequence")
+            pn533.resetMode()
+            pn533.setParameters(0x08) // disable auto ATR_RES
+            pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A)) // timeouts
+            pn533.rfConfiguration(
+                0x0A,
+                byteArrayOf(
+                    0x59, 0xF4.toByte(), 0x3F, 0x11, 0x4D,
+                    0x85.toByte(), 0x61, 0x6F, 0x26, 0x62, 0x87.toByte(),
+                ),
+            ) // 106kbps Type A RF settings
+            pn533.writeRegister(0x0328, 0x59) // CIU register for passive 106A
+        }
+        pn533.setMaxRetries(passiveActivation = 0x02)
     }
 
     private fun pollLoop(
@@ -82,7 +103,7 @@ class PN533ReaderBackend : NfcReaderBackend {
         onError: (Throwable) -> Unit,
     ) {
         while (true) {
-            println("[PN533] Polling for cards...")
+            println("[$name] Polling for cards...")
 
             // Try ISO 14443-A (106 kbps) first — covers Classic, Ultralight, DESFire
             var target = pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
@@ -112,9 +133,9 @@ class PN533ReaderBackend : NfcReaderBackend {
             try {
                 val rawCard = readTarget(pn533, target)
                 onCardRead(rawCard)
-                println("[PN533] Card read successfully")
+                println("[$name] Card read successfully")
             } catch (e: Exception) {
-                println("[PN533] Read error: ${e.message}")
+                println("[$name] Read error: ${e.message}")
                 onError(e)
             }
 
@@ -125,7 +146,7 @@ class PN533ReaderBackend : NfcReaderBackend {
             }
 
             // Wait for card removal by polling until no target detected
-            println("[PN533] Waiting for card removal...")
+            println("[$name] Waiting for card removal...")
             waitForRemoval(pn533)
         }
     }
@@ -145,7 +166,7 @@ class PN533ReaderBackend : NfcReaderBackend {
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
-        println("[PN533] Type A card: type=${info.cardType}, SAK=0x%02X, UID=${tagId.hex()}".format(target.sak))
+        println("[$name] Type A card: type=${info.cardType}, SAK=0x%02X, UID=${tagId.hex()}".format(target.sak))
 
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
@@ -180,7 +201,7 @@ class PN533ReaderBackend : NfcReaderBackend {
         target: PN533.TargetInfo.FeliCa,
     ): RawCard<*> {
         val tagId = target.idm
-        println("[PN533] FeliCa card: IDm=${tagId.hex()}")
+        println("[$name] FeliCa card: IDm=${tagId.hex()}")
         val adapter = PN533FeliCaTagAdapter(pn533, target.idm)
         return FeliCaReader.readTag(tagId, adapter)
     }
