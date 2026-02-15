@@ -68,18 +68,30 @@ class HomeViewModel(
 
         viewModelScope.launch {
             cardScanner.isScanning.collect { scanning ->
-                _uiState.value = _uiState.value.copy(isLoading = scanning)
+                _uiState.value =
+                    _uiState.value.copy(
+                        isLoading = scanning,
+                        isReadingCard = if (!scanning) false else _uiState.value.isReadingCard,
+                    )
+            }
+        }
+
+        viewModelScope.launch {
+            cardScanner.scannedTags.collect {
+                _uiState.value = _uiState.value.copy(isReadingCard = true)
             }
         }
 
         viewModelScope.launch {
             cardScanner.scannedCards.collect { rawCard ->
+                _uiState.value = _uiState.value.copy(isReadingCard = false)
                 processScannedCard(rawCard)
             }
         }
 
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
+                _uiState.value = _uiState.value.copy(isReadingCard = false)
                 val scanError = categorizeError(error)
                 analytics.logEvent(
                     "scan_card_error",
@@ -124,6 +136,9 @@ class HomeViewModel(
 
     private suspend fun processScannedCard(rawCard: RawCard<*>) {
         try {
+            // Stop active scan after reading a card so the user can press Scan again
+            cardScanner?.stopActiveScan()
+
             cardPersister.insertCard(
                 SavedCard(
                     type = rawCard.cardType(),

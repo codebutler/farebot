@@ -22,19 +22,9 @@
 
 package com.codebutler.farebot.desktop
 
-import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
-import com.codebutler.farebot.card.cepas.CEPASCardReader
-import com.codebutler.farebot.card.classic.ClassicCardReader
-import com.codebutler.farebot.card.felica.FeliCaReader
-import com.codebutler.farebot.card.felica.PCSCFeliCaTagAdapter
-import com.codebutler.farebot.card.nfc.PCSCCardInfo
-import com.codebutler.farebot.card.nfc.PCSCCardTransceiver
-import com.codebutler.farebot.card.nfc.PCSCClassicTechnology
-import com.codebutler.farebot.card.nfc.PCSCUltralightTechnology
-import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.CardScanner
-import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
+import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,18 +36,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.smartcardio.CardException
-import javax.smartcardio.CommandAPDU
-import javax.smartcardio.TerminalFactory
 
 /**
- * Desktop NFC card scanner using PC/SC (javax.smartcardio).
+ * Desktop NFC card scanner that coordinates multiple reader backends.
  *
- * Polls USB NFC readers for card presence, determines card type from ATR,
- * dispatches to the appropriate shared card reader, then waits for card removal.
+ * Launches one coroutine per [NfcReaderBackend] (PC/SC, PN533, etc.).
+ * Each backend runs independently — if one fails to find hardware,
+ * the error is logged and the other backends continue scanning.
+ * Results from any backend are emitted to the shared [scannedCards] flow.
  */
 class DesktopCardScanner : CardScanner {
     override val requiresActiveScan: Boolean = true
+
+    private val _scannedTags = MutableSharedFlow<ScannedTag>(extraBufferCapacity = 1)
+    override val scannedTags: SharedFlow<ScannedTag> = _scannedTags.asSharedFlow()
 
     private val _scannedCards = MutableSharedFlow<RawCard<*>>(extraBufferCapacity = 1)
     override val scannedCards: SharedFlow<RawCard<*>> = _scannedCards.asSharedFlow()
@@ -71,21 +63,52 @@ class DesktopCardScanner : CardScanner {
     private var scanJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
+    private val backends: List<NfcReaderBackend> =
+        listOf(
+            PcscReaderBackend(),
+            PN533ReaderBackend(),
+        )
+
     override fun startActiveScan() {
         if (scanJob?.isActive == true) return
         _isScanning.value = true
 
         scanJob =
             scope.launch {
-                try {
-                    scanLoop()
-                } catch (e: Exception) {
-                    if (isActive) {
-                        _scanErrors.tryEmit(e)
+                val backendJobs =
+                    backends.map { backend ->
+                        launch {
+                            println("[DesktopCardScanner] Starting ${backend.name} backend")
+                            try {
+                                backend.scanLoop(
+                                    onCardDetected = { tag ->
+                                        _scannedTags.tryEmit(tag)
+                                    },
+                                    onCardRead = { rawCard ->
+                                        _scannedCards.tryEmit(rawCard)
+                                    },
+                                    onError = { error ->
+                                        _scanErrors.tryEmit(error)
+                                    },
+                                )
+                            } catch (e: Exception) {
+                                if (isActive) {
+                                    println("[DesktopCardScanner] ${backend.name} backend failed: ${e.message}")
+                                }
+                            } catch (e: Error) {
+                                // Catch LinkageError / UnsatisfiedLinkError from native libs
+                                println("[DesktopCardScanner] ${backend.name} backend unavailable: ${e.message}")
+                            }
+                        }
                     }
-                } finally {
-                    _isScanning.value = false
+
+                backendJobs.forEach { it.join() }
+
+                // All backends exited — emit error only if none ran successfully
+                if (isActive) {
+                    _scanErrors.tryEmit(Exception("All NFC reader backends failed. Is a USB NFC reader connected?"))
                 }
+                _isScanning.value = false
             }
     }
 
@@ -93,105 +116,5 @@ class DesktopCardScanner : CardScanner {
         scanJob?.cancel()
         scanJob = null
         _isScanning.value = false
-    }
-
-    private fun scanLoop() {
-        val factory = TerminalFactory.getDefault()
-        val terminals =
-            try {
-                factory.terminals().list()
-            } catch (e: CardException) {
-                throw Exception("No PC/SC readers found. Is a USB NFC reader connected?", e)
-            }
-
-        if (terminals.isEmpty()) {
-            throw Exception("No PC/SC readers found. Is a USB NFC reader connected?")
-        }
-
-        val terminal = terminals.first()
-        println("[DesktopCardScanner] Using reader: ${terminal.name}")
-
-        while (true) {
-            println("[DesktopCardScanner] Waiting for card…")
-            terminal.waitForCardPresent(0)
-
-            try {
-                val card = terminal.connect("*")
-                try {
-                    val atr = card.atr.bytes
-                    val info = PCSCCardInfo.fromATR(atr)
-                    println("[DesktopCardScanner] Card detected: type=${info.cardType}, ATR=${atr.hex()}")
-
-                    val channel = card.basicChannel
-
-                    // Get UID via PC/SC GET DATA: FF CA 00 00 00
-                    val uidCommand = CommandAPDU(0xFF, 0xCA, 0x00, 0x00, 0)
-                    val uidResponse = channel.transmit(uidCommand)
-                    val tagId =
-                        if (uidResponse.sW1 == 0x90 && uidResponse.sW2 == 0x00) {
-                            uidResponse.data
-                        } else {
-                            byteArrayOf()
-                        }
-                    println("[DesktopCardScanner] Tag ID: ${tagId.hex()}")
-
-                    val rawCard = readCard(info, channel, tagId)
-                    _scannedCards.tryEmit(rawCard)
-                    println("[DesktopCardScanner] Card read successfully")
-                } finally {
-                    try {
-                        card.disconnect(false)
-                    } catch (_: Exception) {
-                    }
-                }
-            } catch (e: Exception) {
-                println("[DesktopCardScanner] Read error: ${e.message}")
-                _scanErrors.tryEmit(e)
-            }
-
-            println("[DesktopCardScanner] Waiting for card removal…")
-            terminal.waitForCardAbsent(0)
-        }
-    }
-
-    private fun readCard(
-        info: PCSCCardInfo,
-        channel: javax.smartcardio.CardChannel,
-        tagId: ByteArray,
-    ): RawCard<*> =
-        when (info.cardType) {
-            CardType.MifareDesfire, CardType.ISO7816 -> {
-                val transceiver = PCSCCardTransceiver(channel)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
-            }
-
-            CardType.MifareClassic -> {
-                val tech = PCSCClassicTechnology(channel, info)
-                ClassicCardReader.readCard(tagId, tech, null)
-            }
-
-            CardType.MifareUltralight -> {
-                val tech = PCSCUltralightTechnology(channel, info)
-                UltralightCardReader.readCard(tagId, tech)
-            }
-
-            CardType.FeliCa -> {
-                val adapter = PCSCFeliCaTagAdapter(channel)
-                FeliCaReader.readTag(tagId, adapter)
-            }
-
-            CardType.CEPAS -> {
-                val transceiver = PCSCCardTransceiver(channel)
-                CEPASCardReader.readCard(tagId, transceiver)
-            }
-
-            else -> {
-                val transceiver = PCSCCardTransceiver(channel)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
-            }
-        }
-
-    companion object {
-        private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }
 }
