@@ -152,9 +152,7 @@ class ISO7816CardReaderTest {
             }
 
         // At least one unselectFile command should have been sent
-        assert(unselectCommands.isNotEmpty()) {
-            "Expected unselectFile APDU to be sent before file selection"
-        }
+        assertTrue(unselectCommands.isNotEmpty(), "Expected unselectFile APDU to be sent before file selection")
     }
 
     @OptIn(ExperimentalStdlibApi::class)
