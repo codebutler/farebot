@@ -6,8 +6,9 @@ import os
 import subprocess
 import sys
 
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(BASE, "card-image-review.html")
+SCRIPTS = os.path.dirname(os.path.abspath(__file__))
+BASE = os.path.dirname(SCRIPTS)
+OUT = os.path.join(SCRIPTS, "card-image-review.html")
 
 KNOWN_ISSUES = {
     "ximedes.png": "Not a card (text banner)",
