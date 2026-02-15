@@ -108,11 +108,28 @@ object ISO7816Dispatcher {
         return selectors
     }
 
-    private fun buildKSX6924FileSelectors(): List<ISO7816CardReader.FileSelector> =
-        (1..5).map { fileId ->
-            ISO7816CardReader.FileSelector(
-                parentDf = null,
-                fileId = fileId,
+    private fun buildKSX6924FileSelectors(): List<ISO7816CardReader.FileSelector> {
+        val selectors = mutableListOf<ISO7816CardReader.FileSelector>()
+
+        // Files 1-5
+        for (fileId in 1..5) {
+            selectors.add(
+                ISO7816CardReader.FileSelector(
+                    parentDf = null,
+                    fileId = fileId,
+                )
             )
         }
+
+        // File 0xdf00 (T-Money cards)
+        // This file may not exist on all cards, but ISO7816CardReader handles failures gracefully
+        selectors.add(
+            ISO7816CardReader.FileSelector(
+                parentDf = null,
+                fileId = 0xdf00,
+            )
+        )
+
+        return selectors
+    }
 }
