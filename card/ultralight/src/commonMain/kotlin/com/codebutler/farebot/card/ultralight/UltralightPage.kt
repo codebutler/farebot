@@ -25,7 +25,9 @@
 
 package com.codebutler.farebot.card.ultralight
 
+import com.codebutler.farebot.card.UnauthorizedException
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -34,12 +36,24 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UltralightPage(
     val index: Int,
-    @Contextual val data: ByteArray,
+    @SerialName("data")
+    @Contextual private val dataRaw: ByteArray,
+    val isUnauthorized: Boolean = false,
 ) {
+    val data: ByteArray
+        get() {
+            if (isUnauthorized) {
+                throw UnauthorizedException()
+            }
+            return dataRaw
+        }
+
     companion object {
         fun create(
             index: Int,
             data: ByteArray,
-        ): UltralightPage = UltralightPage(index, data)
+        ): UltralightPage = UltralightPage(index, data, false)
+
+        fun unauthorized(index: Int): UltralightPage = UltralightPage(index, ByteArray(0), true)
     }
 }
