@@ -61,6 +61,8 @@ class PN533(
 
     fun resetMode() {
         transport.sendCommand(CMD_RESET_MODE, byteArrayOf(0x01))
+        transport.sendAck()
+        Thread.sleep(10)
     }
 
     fun writeRegister(address: Int, value: Int) {

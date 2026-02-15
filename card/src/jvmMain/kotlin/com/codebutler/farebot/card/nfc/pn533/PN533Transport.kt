@@ -69,6 +69,10 @@ class PN533Transport(
         return readResponse(timeoutMs)
     }
 
+    fun sendAck() {
+        bulkWrite(ACK_FRAME)
+    }
+
     fun close() {
         LibUsb.releaseInterface(handle, 0)
         LibUsb.close(handle)

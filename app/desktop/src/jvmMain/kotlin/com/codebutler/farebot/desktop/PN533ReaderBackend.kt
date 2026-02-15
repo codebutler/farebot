@@ -32,7 +32,6 @@ import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
 import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
-import com.codebutler.farebot.card.nfc.pn533.PN533CommandException
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
 import com.codebutler.farebot.card.nfc.pn533.PN533Transport
@@ -76,32 +75,40 @@ class PN533ReaderBackend(
         val fw = pn533.getFirmwareVersion()
         println("[$name] Firmware: $fw")
 
-        tryCommand("SAMConfiguration") { pn533.samConfiguration() }
-        tryCommand("SetParameters") { pn533.setParameters(0x08) }
-        tryCommand("RFConfiguration(timeouts)") {
-            pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A))
+        if (fw.version >= 2) {
+            initPN533(pn533)
+        } else {
+            initRCS956(pn533)
         }
-        tryCommand("RFConfiguration(maxRetries)") {
-            pn533.setMaxRetries(passiveActivation = 0x02)
-        }
-        tryCommand("RFConfiguration(106A)") {
-            pn533.rfConfiguration(
-                0x0A,
-                byteArrayOf(
-                    0x59, 0xF4.toByte(), 0x3F, 0x11, 0x4D,
-                    0x85.toByte(), 0x61, 0x6F, 0x26, 0x62, 0x87.toByte(),
-                ),
-            )
-        }
-        tryCommand("WriteRegister") { pn533.writeRegister(0x0328, 0x59) }
     }
 
-    private fun tryCommand(label: String, block: () -> Unit) {
-        try {
-            block()
-        } catch (e: PN533CommandException) {
-            println("[$name] $label not supported (0x${e.errorCode.toString(16)}), skipping")
-        }
+    private fun initPN533(pn533: PN533) {
+        pn533.samConfiguration()
+        pn533.setMaxRetries(passiveActivation = 0x02)
+    }
+
+    /**
+     * Initialize Sony RC-S956 chipset (RC-S370/P, RC-S380).
+     * Follows nfcpy rcs956.py Device.__init__() sequence exactly.
+     * No SAMConfiguration — the RC-S956 does not have a SAM module.
+     */
+    private fun initRCS956(pn533: PN533) {
+        println("[$name] Using RC-S956 init sequence")
+        pn533.resetMode()
+        pn533.rfFieldOff()
+        pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A)) // timings
+        pn533.rfConfiguration(0x04, byteArrayOf(0x00)) // MaxRtyCOM
+        pn533.rfConfiguration(0x05, byteArrayOf(0x00, 0x00, 0x01)) // MaxRetries
+        pn533.rfConfiguration(
+            0x0A,
+            byteArrayOf(
+                0x5A, 0xF4.toByte(), 0x3F, 0x11, 0x4D,
+                0x85.toByte(), 0x61, 0x6F, 0x26, 0x62, 0x87.toByte(),
+            ),
+        ) // 106kbps Type A
+        pn533.setParameters(0x08)
+        pn533.resetMode()
+        pn533.writeRegister(0x0328, 0x59)
     }
 
     private fun pollLoop(
