@@ -202,7 +202,19 @@ class IosNfcScanner : CardScanner {
 
         private fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()
-            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag))
+            /*
+             * onlyFirst = true is an iOS-specific hack to work around
+             * https://github.com/metrodroid/metrodroid/issues/613
+             *
+             * _NFReaderSession._validateFelicaCommand asserts that you're talking to the exact
+             * IDm that the system discovered -- including the upper 4 bits (which indicate the
+             * system number).
+             *
+             * Tell FeliCaReader to only dump the first service.
+             *
+             * Once iOS fixes this, do an iOS version check instead.
+             */
+            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag), onlyFirst = true)
         }
 
         private fun readMiFareTag(tag: NFCMiFareTagProtocol): RawCard<*> {
