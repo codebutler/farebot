@@ -46,7 +46,7 @@ class RCS956ReaderBackend(
 
         // nfcpy rcs956.py Device.__init__() sequence:
         pn533.resetMode()
-        pn533.rfFieldOff()
+        pn533.rfConfiguration(0x01, byteArrayOf(0x02)) // mute: auto RFCA
         pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A)) // timings
         pn533.rfConfiguration(0x04, byteArrayOf(0x00)) // MaxRtyCOM
         pn533.rfConfiguration(0x05, byteArrayOf(0x00, 0x00, 0x01)) // MaxRetries
