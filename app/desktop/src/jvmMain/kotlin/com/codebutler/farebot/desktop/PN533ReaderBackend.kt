@@ -81,7 +81,6 @@ class PN533ReaderBackend(
         } catch (e: PN533CommandException) {
             // RC-S956 (Sony PaSoRi): no SAM module, use alternative init
             println("[$name] SAM not available, using RC-S956 init sequence")
-            pn533.resetMode()
             pn533.setParameters(0x08) // disable auto ATR_RES
             pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A)) // timeouts
             pn533.rfConfiguration(
@@ -91,7 +90,10 @@ class PN533ReaderBackend(
                     0x85.toByte(), 0x61, 0x6F, 0x26, 0x62, 0x87.toByte(),
                 ),
             ) // 106kbps Type A RF settings
-            pn533.writeRegister(0x0328, 0x59) // CIU register for passive 106A
+            try {
+                pn533.writeRegister(0x0328, 0x59) // CIU register for passive 106A
+            } catch (_: PN533CommandException) {
+            }
         }
         pn533.setMaxRetries(passiveActivation = 0x02)
     }
