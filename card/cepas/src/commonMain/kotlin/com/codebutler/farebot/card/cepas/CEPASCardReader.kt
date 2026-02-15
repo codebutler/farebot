@@ -42,22 +42,24 @@ object CEPASCardReader {
 
         for (purseId in purses.indices) {
             val purseData = protocol.getPurse(purseId)
-            purses[purseId] = if (purseData != null) {
-                RawCEPASPurse.create(purseId, purseData)
-            } else {
-                RawCEPASPurse.create(purseId, "No purse found")
-            }
+            purses[purseId] =
+                if (purseData != null) {
+                    RawCEPASPurse.create(purseId, purseData)
+                } else {
+                    RawCEPASPurse.create(purseId, "No purse found")
+                }
         }
 
         for (historyId in histories.indices) {
             val rawCEPASPurse = purses[historyId]!!
             if (rawCEPASPurse.isValid) {
                 val historyData = protocol.getHistory(historyId)
-                histories[historyId] = if (historyData != null) {
-                    RawCEPASHistory.create(historyId, historyData)
-                } else {
-                    RawCEPASHistory.create(historyId, "No history found")
-                }
+                histories[historyId] =
+                    if (historyData != null) {
+                        RawCEPASHistory.create(historyId, historyData)
+                    } else {
+                        RawCEPASHistory.create(historyId, "No history found")
+                    }
             } else {
                 histories[historyId] = RawCEPASHistory.create(historyId, "Invalid Purse")
             }
