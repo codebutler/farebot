@@ -26,12 +26,29 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
+/**
+ * Tests for DESFire protocol status code handling and authentication.
+ */
 class DesfireProtocolTest {
-    private class MockTransceiver(
-        private val responses: MutableList<ByteArray>,
-    ) : CardTransceiver {
+    /**
+     * A mock [CardTransceiver] that returns pre-configured responses.
+     * Supports both single response and multiple response patterns.
+     */
+    private class MockTransceiver : CardTransceiver {
+        private val responses = mutableListOf<ByteArray>()
+
+        constructor(response: ByteArray) {
+            responses.add(response)
+        }
+
+        constructor(responses: MutableList<ByteArray>) {
+            this.responses.addAll(responses)
+        }
+
         override fun transceive(data: ByteArray): ByteArray = responses.removeFirst()
 
         override val maxTransceiveLength: Int = 253
@@ -43,11 +60,29 @@ class DesfireProtocolTest {
         override val isConnected: Boolean = true
     }
 
+    // -- Buffer size guard --
+
+    @Test
+    fun testEmptyResponseThrows() {
+        val protocol = DesfireProtocol(MockTransceiver(byteArrayOf()))
+        assertFails {
+            protocol.getFileList()
+        }
+    }
+
     @Test
     fun testEmptyResponseThrowsInvalidResponse() {
         val protocol = DesfireProtocol(MockTransceiver(mutableListOf(byteArrayOf())))
         val exception = assertFailsWith<Exception> { protocol.getAppList() }
         assertEquals("Invalid response", exception.message)
+    }
+
+    @Test
+    fun testSingleByteResponseThrows() {
+        val protocol = DesfireProtocol(MockTransceiver(byteArrayOf(0x91.toByte())))
+        assertFails {
+            protocol.getFileList()
+        }
     }
 
     @Test
@@ -65,6 +100,31 @@ class DesfireProtocolTest {
     }
 
     @Test
+    fun testResponseWithWrongMarkerThrowsInvalidResponse() {
+        // Response has 2 bytes but the second-to-last is not 0x91
+        val response = byteArrayOf(0x90.toByte(), 0x00)
+        val protocol = DesfireProtocol(MockTransceiver(response))
+        val ex =
+            assertFailsWith<Exception> {
+                protocol.getFileList()
+            }
+        assertTrue(ex.message!!.contains("Invalid response"))
+    }
+
+    // -- Status code: OPERATION_OK --
+
+    @Test
+    fun testOperationOkReturnsData() {
+        // Response: [data byte 0x42] [0x91] [0x00 = OPERATION_OK]
+        val response = byteArrayOf(0x42, 0x91.toByte(), 0x00)
+        val protocol = DesfireProtocol(MockTransceiver(response))
+        val result = protocol.getFileList()
+        // getFileList converts each byte to an int
+        assertTrue(result.size == 1)
+        assertTrue(result[0] == 0x42)
+    }
+
+    @Test
     fun testOperationOkReturnsPayload() {
         // Response: [0x01, 0x02, 0x03, 0x91, 0x00] -> payload = [0x01, 0x02, 0x03]
         val response = byteArrayOf(0x01, 0x02, 0x03, 0x91.toByte(), 0x00)
@@ -75,39 +135,128 @@ class DesfireProtocolTest {
     }
 
     @Test
+    fun testMinimalOkResponseReturnsEmptyData() {
+        // Response: [0x91] [0x00 = OPERATION_OK] -- no data bytes before status
+        val response = byteArrayOf(0x91.toByte(), 0x00)
+        val protocol = DesfireProtocol(MockTransceiver(response))
+        val result = protocol.getFileList()
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun testEmptyPayloadWithOperationOk() {
+        // Response with no payload, just status OK
+        val response = byteArrayOf(0x91.toByte(), 0x00)
+        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val result = protocol.getAppList()
+        assertEquals(0, result.size)
+    }
+
+    // -- Status code: PERMISSION_DENIED (0x9D) --
+
+    @Test
     fun testPermissionDeniedThrowsAccessControlException() {
         // Status 0x9D = PERMISSION_DENIED
         val response = byteArrayOf(0x91.toByte(), 0x9D.toByte())
-        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val protocol = DesfireProtocol(MockTransceiver(response))
         val exception = assertFailsWith<DesfireAccessControlException> { protocol.getAppList() }
         assertEquals("Permission denied", exception.message)
     }
 
     @Test
+    fun testPermissionDeniedThrowsDesfireAccessControlException() {
+        // Response: [0x91] [0x9D = PERMISSION_DENIED]
+        val response = byteArrayOf(0x91.toByte(), 0x9D.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val ex =
+            assertFailsWith<DesfireAccessControlException> {
+                protocol.getFileList()
+            }
+        assertTrue(ex.message!!.contains("Permission denied"))
+    }
+
+    // -- Status code: AUTHENTICATION_ERROR (0xAE) --
+
+    @Test
     fun testAuthenticationErrorThrowsAccessControlException() {
         // Status 0xAE = AUTHENTICATION_ERROR
         val response = byteArrayOf(0x91.toByte(), 0xAE.toByte())
-        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val protocol = DesfireProtocol(MockTransceiver(response))
         val exception = assertFailsWith<DesfireAccessControlException> { protocol.getAppList() }
         assertEquals("Authentication error", exception.message)
     }
 
     @Test
+    fun testAuthenticationErrorThrowsDesfireAccessControlException() {
+        // Response: [0x91] [0xAE = AUTHENTICATION_ERROR]
+        val response = byteArrayOf(0x91.toByte(), 0xAE.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val ex =
+            assertFailsWith<DesfireAccessControlException> {
+                protocol.getFileList()
+            }
+        assertTrue(ex.message!!.contains("Authentication error"))
+    }
+
+    // -- Status code: AID_NOT_FOUND (0xA0) --
+
+    @Test
     fun testAidNotFoundThrowsNotFoundException() {
         // Status 0xA0 = AID_NOT_FOUND
         val response = byteArrayOf(0x91.toByte(), 0xA0.toByte())
-        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val protocol = DesfireProtocol(MockTransceiver(response))
         val exception = assertFailsWith<DesfireNotFoundException> { protocol.getAppList() }
         assertEquals("AID not found", exception.message)
     }
 
     @Test
+    fun testAidNotFoundThrowsDesfireNotFoundException() {
+        // Response: [0x91] [0xA0 = AID_NOT_FOUND]
+        val response = byteArrayOf(0x91.toByte(), 0xA0.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val ex =
+            assertFailsWith<DesfireNotFoundException> {
+                protocol.selectApp(0x000001)
+            }
+        assertTrue(ex.message!!.contains("AID not found"))
+    }
+
+    // -- Status code: FILE_NOT_FOUND (0xF0) --
+
+    @Test
     fun testFileNotFoundThrowsNotFoundException() {
         // Status 0xF0 = FILE_NOT_FOUND
         val response = byteArrayOf(0x91.toByte(), 0xF0.toByte())
-        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val protocol = DesfireProtocol(MockTransceiver(response))
         val exception = assertFailsWith<DesfireNotFoundException> { protocol.getFileList() }
         assertEquals("File not found", exception.message)
+    }
+
+    @Test
+    fun testFileNotFoundThrowsDesfireNotFoundException() {
+        // Response: [0x91] [0xF0 = FILE_NOT_FOUND]
+        val response = byteArrayOf(0x91.toByte(), 0xF0.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
+        val ex =
+            assertFailsWith<DesfireNotFoundException> {
+                protocol.readFile(1)
+            }
+        assertTrue(ex.message!!.contains("File not found"))
+    }
+
+    // -- Status code: unknown --
+
+    @Test
+    fun testUnknownStatusCodeThrowsException() {
+        // Response: [0x91] [0xBB = unknown]
+        val response = byteArrayOf(0x91.toByte(), 0xBB.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(response))
+        val ex =
+            assertFailsWith<Exception> {
+                protocol.getFileList()
+            }
+        assertTrue(ex.message!!.contains("Unknown status code"))
+        assertTrue(ex.message!!.contains("bb"))
     }
 
     @Test
@@ -118,6 +267,8 @@ class DesfireProtocolTest {
         val exception = assertFailsWith<Exception> { protocol.getAppList() }
         assertEquals("Unknown status code: cd", exception.message)
     }
+
+    // -- ADDITIONAL_FRAME chaining --
 
     @Test
     fun testAdditionalFrameChaining() {
@@ -134,6 +285,32 @@ class DesfireProtocolTest {
         assertEquals(2, result.size)
     }
 
+    // -- ADDITIONAL_FRAME with getAdditionalFrame=false (authentication) --
+
+    @Test
+    fun testSendUnlockReturnsOnAdditionalFrame() {
+        // sendUnlock uses getAdditionalFrame=false, so when we get ADDITIONAL_FRAME status
+        // it should return the data so far instead of requesting more
+        // Response: [8 bytes challenge data] [0x91] [0xAF = ADDITIONAL_FRAME]
+        val challengeData = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+        val response = challengeData + byteArrayOf(0x91.toByte(), 0xAF.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(response))
+        val result = protocol.sendUnlock(0)
+        assertTrue(result.contentEquals(challengeData))
+    }
+
+    @Test
+    fun testSendAdditionalFrameReturnsOnAdditionalFrame() {
+        // sendAdditionalFrame also uses getAdditionalFrame=false
+        val responseData = byteArrayOf(0x0A, 0x0B, 0x0C, 0x0D)
+        val response = responseData + byteArrayOf(0x91.toByte(), 0xAF.toByte())
+        val protocol = DesfireProtocol(MockTransceiver(response))
+        val result = protocol.sendAdditionalFrame(byteArrayOf(0x01, 0x02))
+        assertTrue(result.contentEquals(responseData))
+    }
+
+    // -- Read operations --
+
     @Test
     fun testReadFileReturnsPayload() {
         // Simulate reading a file: 4 bytes of data + status OK
@@ -141,14 +318,5 @@ class DesfireProtocolTest {
         val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
         val result = protocol.readFile(0)
         assertContentEquals(byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte()), result)
-    }
-
-    @Test
-    fun testEmptyPayloadWithOperationOk() {
-        // Response with no payload, just status OK
-        val response = byteArrayOf(0x91.toByte(), 0x00)
-        val protocol = DesfireProtocol(MockTransceiver(mutableListOf(response)))
-        val result = protocol.getAppList()
-        assertEquals(0, result.size)
     }
 }

@@ -30,13 +30,13 @@ import com.codebutler.farebot.card.desfire.raw.RawDesfireFileSettings
 import com.codebutler.farebot.card.desfire.raw.RawDesfireManufacturingData
 import com.codebutler.farebot.card.nfc.CardTransceiver
 
-class DesfireAccessControlException(
+open class DesfireAccessControlException(
     message: String,
-) : Exception(message)
+) : UnauthorizedException(message)
 
 class DesfireNotFoundException(
     message: String,
-) : Exception(message)
+) : NotFoundException(message)
 
 internal class DesfireProtocol(
     private val mTransceiver: CardTransceiver,
@@ -136,12 +136,37 @@ internal class DesfireProtocol(
         )
 
     @Throws(Exception::class)
-    private fun sendRequest(command: Byte): ByteArray = sendRequest(command, null)
+    fun sendUnlock(keyNum: Int): ByteArray =
+        sendRequest(
+            UNLOCK,
+            byteArrayOf(
+                keyNum.toByte(),
+            ),
+            getAdditionalFrame = false,
+        )
+
+    @Throws(Exception::class)
+    fun sendAdditionalFrame(bytes: ByteArray): ByteArray =
+        sendRequest(
+            ADDITIONAL_FRAME,
+            bytes,
+            getAdditionalFrame = false,
+        )
+
+    @Throws(Exception::class)
+    private fun sendRequest(command: Byte): ByteArray = sendRequest(command, null, getAdditionalFrame = true)
 
     @Throws(Exception::class)
     private fun sendRequest(
         command: Byte,
         parameters: ByteArray?,
+    ): ByteArray = sendRequest(command, parameters, getAdditionalFrame = true)
+
+    @Throws(Exception::class)
+    private fun sendRequest(
+        command: Byte,
+        parameters: ByteArray?,
+        getAdditionalFrame: Boolean,
     ): ByteArray {
         val outputChunks = mutableListOf<ByteArray>()
 
@@ -167,10 +192,23 @@ internal class DesfireProtocol(
                     }
                     return result
                 }
-                ADDITIONAL_FRAME -> recvBuffer = mTransceiver.transceive(wrapMessage(GET_ADDITIONAL_FRAME, null))
+                ADDITIONAL_FRAME -> {
+                    if (!getAdditionalFrame) {
+                        var totalSize = 0
+                        for (chunk in outputChunks) totalSize += chunk.size
+                        val result = ByteArray(totalSize)
+                        var offset = 0
+                        for (chunk in outputChunks) {
+                            chunk.copyInto(result, offset)
+                            offset += chunk.size
+                        }
+                        return result
+                    }
+                    recvBuffer = mTransceiver.transceive(wrapMessage(GET_ADDITIONAL_FRAME, null))
+                }
                 PERMISSION_DENIED -> throw DesfireAccessControlException("Permission denied")
-                AID_NOT_FOUND -> throw DesfireNotFoundException("AID not found")
                 AUTHENTICATION_ERROR -> throw DesfireAccessControlException("Authentication error")
+                AID_NOT_FOUND -> throw DesfireNotFoundException("AID not found")
                 FILE_NOT_FOUND -> throw DesfireNotFoundException("File not found")
                 else -> throw Exception("Unknown status code: " + (status.toInt() and 0xFF).toString(16))
             }
@@ -204,6 +242,7 @@ internal class DesfireProtocol(
     companion object {
         // Reference: http://neteril.org/files/M075031_desfire.pdf
         // Commands
+        private const val UNLOCK: Byte = 0x0A.toByte()
         private const val GET_MANUFACTURING_DATA: Byte = 0x60.toByte()
         private const val GET_APPLICATION_DIRECTORY: Byte = 0x6A.toByte()
         private val GET_ADDITIONAL_FRAME: Byte = 0xAF.toByte()

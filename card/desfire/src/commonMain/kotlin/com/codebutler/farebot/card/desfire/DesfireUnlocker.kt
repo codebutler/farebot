@@ -1,10 +1,7 @@
 /*
- * InvalidDesfireFile.kt
+ * DesfireUnlocker.kt
  *
- * This file is part of FareBot.
- * Learn more at: https://codebutler.github.io/farebot/
- *
- * Copyright (C) 2014, 2016 Eric Butler <eric@codebutler.com>
+ * Copyright 2018 Google
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,20 +19,20 @@
 
 package com.codebutler.farebot.card.desfire
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
 
-@Serializable
-data class InvalidDesfireFile(
-    override val id: Int,
-    @Contextual override val fileSettings: DesfireFileSettings?,
-    val errorMessage: String?,
-) : DesfireFile {
-    companion object {
-        fun create(
-            id: Int,
-            fileSettings: DesfireFileSettings?,
-            errorMessage: String,
-        ): InvalidDesfireFile = InvalidDesfireFile(id, fileSettings, errorMessage)
-    }
+internal interface DesfireUnlocker {
+    // get the order for file reading as some keys may depend on reading some files
+    fun getOrder(
+        desfireTag: DesfireProtocol,
+        fileIds: IntArray,
+    ): IntArray
+
+    // Unlock a given file.
+    fun unlock(
+        desfireTag: DesfireProtocol,
+        files: Map<Int, RawDesfireFile>,
+        fileId: Int,
+        authLog: MutableList<DesfireAuthLog>,
+    )
 }

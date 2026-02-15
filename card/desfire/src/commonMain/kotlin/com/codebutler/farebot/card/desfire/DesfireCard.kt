@@ -60,40 +60,42 @@ data class DesfireCard(
                         .item()
                         .title("File: 0x${file.id.toString(16)}")
                 val fileSettings = file.fileSettings
-                val settingsUiBuilder = fileUiBuilder.item().title("Settings")
-                settingsUiBuilder
-                    .item()
-                    .title("Type")
-                    .value(fileSettings.fileTypeName)
-                if (fileSettings is StandardDesfireFileSettings) {
+                if (fileSettings != null) {
+                    val settingsUiBuilder = fileUiBuilder.item().title("Settings")
                     settingsUiBuilder
                         .item()
-                        .title("Size")
-                        .value(fileSettings.fileSize)
-                } else if (fileSettings is RecordDesfireFileSettings) {
-                    settingsUiBuilder
-                        .item()
-                        .title("Cur Records")
-                        .value(fileSettings.curRecords)
-                    settingsUiBuilder
-                        .item()
-                        .title("Max Records")
-                        .value(fileSettings.maxRecords)
-                    settingsUiBuilder
-                        .item()
-                        .title("Record Size")
-                        .value(fileSettings.recordSize)
-                } else if (fileSettings is ValueDesfireFileSettings) {
-                    settingsUiBuilder
-                        .item()
-                        .title("Range")
-                        .value("${fileSettings.lowerLimit} - ${fileSettings.upperLimit}")
-                    settingsUiBuilder
-                        .item()
-                        .title("Limited Credit")
-                        .value(
-                            "${fileSettings.limitedCreditValue} (${if (fileSettings.limitedCreditEnabled) "enabled" else "disabled"})",
-                        )
+                        .title("Type")
+                        .value(fileSettings.fileTypeName)
+                    if (fileSettings is StandardDesfireFileSettings) {
+                        settingsUiBuilder
+                            .item()
+                            .title("Size")
+                            .value(fileSettings.fileSize)
+                    } else if (fileSettings is RecordDesfireFileSettings) {
+                        settingsUiBuilder
+                            .item()
+                            .title("Cur Records")
+                            .value(fileSettings.curRecords)
+                        settingsUiBuilder
+                            .item()
+                            .title("Max Records")
+                            .value(fileSettings.maxRecords)
+                        settingsUiBuilder
+                            .item()
+                            .title("Record Size")
+                            .value(fileSettings.recordSize)
+                    } else if (fileSettings is ValueDesfireFileSettings) {
+                        settingsUiBuilder
+                            .item()
+                            .title("Range")
+                            .value("${fileSettings.lowerLimit} - ${fileSettings.upperLimit}")
+                        settingsUiBuilder
+                            .item()
+                            .title("Limited Credit")
+                            .value(
+                                "${fileSettings.limitedCreditValue} (${if (fileSettings.limitedCreditEnabled) "enabled" else "disabled"})",
+                            )
+                    }
                 }
                 if (file is StandardDesfireFile) {
                     fileUiBuilder

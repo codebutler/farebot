@@ -23,12 +23,15 @@
 package com.codebutler.farebot.card.desfire.raw
 
 import com.codebutler.farebot.card.desfire.DesfireApplication
+import com.codebutler.farebot.card.desfire.DesfireAuthLog
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class RawDesfireApplication(
     val appId: Int,
     val files: List<RawDesfireFile>,
+    val authLog: List<DesfireAuthLog> = emptyList(),
+    val dirListLocked: Boolean = false,
 ) {
     fun appId(): Int = appId
 
@@ -36,13 +39,15 @@ data class RawDesfireApplication(
 
     fun parse(): DesfireApplication {
         val parsedFiles = files.map { it.parse() }
-        return DesfireApplication.create(appId, parsedFiles)
+        return DesfireApplication.create(appId, parsedFiles, authLog, dirListLocked)
     }
 
     companion object {
         fun create(
             appId: Int,
             rawDesfireFiles: List<RawDesfireFile>,
-        ): RawDesfireApplication = RawDesfireApplication(appId, rawDesfireFiles)
+            authLog: List<DesfireAuthLog> = emptyList(),
+            dirListLocked: Boolean = false,
+        ): RawDesfireApplication = RawDesfireApplication(appId, rawDesfireFiles, authLog, dirListLocked)
     }
 }

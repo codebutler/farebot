@@ -39,13 +39,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RawDesfireFile(
     val fileId: Int,
-    val fileSettings: RawDesfireFileSettings,
+    val fileSettings: RawDesfireFileSettings?,
     @Contextual val fileData: ByteArray?,
     val error: Error?,
 ) {
     fun fileId(): Int = fileId
 
-    fun fileSettings(): RawDesfireFileSettings = fileSettings
+    fun fileSettings(): RawDesfireFileSettings? = fileSettings
 
     fun fileData(): ByteArray? = fileData
 
@@ -54,14 +54,16 @@ data class RawDesfireFile(
     fun parse(): DesfireFile {
         val error = error
         if (error != null) {
+            val parsedSettings = fileSettings?.parse()
             return if (error.type == Error.TYPE_UNAUTHORIZED) {
-                UnauthorizedDesfireFile.create(fileId, fileSettings.parse(), error.message ?: "")
+                UnauthorizedDesfireFile.create(fileId, parsedSettings, error.message ?: "")
             } else {
-                InvalidDesfireFile.create(fileId, fileSettings.parse(), error.message ?: "")
+                InvalidDesfireFile.create(fileId, parsedSettings, error.message ?: "")
             }
         }
         val data = fileData ?: throw RuntimeException("fileData was null")
-        val parsedFileSettings = fileSettings.parse()
+        val settings = fileSettings ?: throw RuntimeException("fileSettings was null")
+        val parsedFileSettings = settings.parse()
         return when (parsedFileSettings.fileType) {
             STANDARD_DATA_FILE, BACKUP_DATA_FILE ->
                 StandardDesfireFile.create(fileId, parsedFileSettings, data)
@@ -98,13 +100,13 @@ data class RawDesfireFile(
     companion object {
         fun create(
             fileId: Int,
-            fileSettings: RawDesfireFileSettings,
+            fileSettings: RawDesfireFileSettings?,
             fileData: ByteArray,
         ): RawDesfireFile = RawDesfireFile(fileId, fileSettings, fileData, null)
 
         fun createUnauthorized(
             fileId: Int,
-            fileSettings: RawDesfireFileSettings,
+            fileSettings: RawDesfireFileSettings?,
             errorMessage: String,
         ): RawDesfireFile {
             val error = Error.create(Error.TYPE_UNAUTHORIZED, errorMessage)
@@ -113,7 +115,7 @@ data class RawDesfireFile(
 
         fun createInvalid(
             fileId: Int,
-            fileSettings: RawDesfireFileSettings,
+            fileSettings: RawDesfireFileSettings?,
             errorMessage: String,
         ): RawDesfireFile {
             val error = Error.create(Error.TYPE_INVALID, errorMessage)

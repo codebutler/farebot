@@ -36,29 +36,88 @@ object DesfireCardReader {
         tech: CardTransceiver,
     ): RawDesfireCard {
         val desfireProtocol = DesfireProtocol(tech)
-        val apps = readApplications(desfireProtocol)
+
         val manufData = desfireProtocol.getManufacturingData()
-        return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData)
+
+        // Try to read app list, fall back to empty list if locked
+        var appListLocked: Boolean
+        val appIds: IntArray =
+            try {
+                val ids = desfireProtocol.getAppList()
+                appListLocked = false
+                ids
+            } catch (e: UnauthorizedException) {
+                // TODO: When DesfireCardTransitFactory infrastructure is added, probe hiddenAppIds
+                // from all registered factories instead of using empty array
+                appListLocked = true
+                intArrayOf()
+            }
+
+        val apps = readApplications(desfireProtocol, appIds)
+        return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData, appListLocked)
     }
 
     @Throws(Exception::class)
-    private fun readApplications(desfireProtocol: DesfireProtocol): List<RawDesfireApplication> {
+    private fun readApplications(
+        desfireProtocol: DesfireProtocol,
+        appIds: IntArray,
+    ): List<RawDesfireApplication> {
         val apps = ArrayList<RawDesfireApplication>()
-        for (appId in desfireProtocol.getAppList()) {
-            desfireProtocol.selectApp(appId)
-            apps.add(RawDesfireApplication.create(appId, readFiles(desfireProtocol)))
+
+        // TODO: When DesfireCardTransitFactory infrastructure is added:
+        // - Find matching factory via earlyCheck(appIds)
+        // - Create unlocker via factory.createUnlocker(appId, manufData)
+        // - Use unlocker.getOrder() to reorder file IDs
+        // - Call unlocker.unlock() before reading each file
+
+        for (appId in appIds) {
+            try {
+                desfireProtocol.selectApp(appId)
+            } catch (e: NotFoundException) {
+                continue
+            }
+
+            val authLog = mutableListOf<DesfireAuthLog>()
+            val files = readFiles(desfireProtocol, authLog)
+            apps.add(RawDesfireApplication.create(appId, files.first, authLog, files.second))
         }
         return apps
     }
 
     @Throws(Exception::class)
-    private fun readFiles(desfireProtocol: DesfireProtocol): List<RawDesfireFile> {
+    private fun readFiles(
+        desfireProtocol: DesfireProtocol,
+        authLog: MutableList<DesfireAuthLog>,
+    ): Pair<List<RawDesfireFile>, Boolean> {
         val files = ArrayList<RawDesfireFile>()
-        for (fileId in desfireProtocol.getFileList()) {
-            val settings = desfireProtocol.getFileSettings(fileId)
-            files.add(readFile(desfireProtocol, fileId, settings))
+
+        // Try to read file list, fall back to scanning 0-31 if locked
+        var dirListLocked: Boolean
+        val fileIds: IntArray =
+            try {
+                val ids = desfireProtocol.getFileList()
+                dirListLocked = false
+                ids
+            } catch (e: UnauthorizedException) {
+                // Directory list is locked, scan all possible file IDs (0-31)
+                dirListLocked = true
+                IntArray(0x20) { it }
+            }
+
+        for (fileId in fileIds) {
+            try {
+                val settings = desfireProtocol.getFileSettings(fileId)
+                files.add(readFile(desfireProtocol, fileId, settings))
+            } catch (e: NotFoundException) {
+                // File doesn't exist, skip it
+                continue
+            } catch (e: UnauthorizedException) {
+                // File settings are locked, try reading without settings
+                files.add(tryReadFileWithoutSettings(desfireProtocol, fileId))
+            }
         }
-        return files
+
+        return Pair(files, dirListLocked)
     }
 
     @Throws(Exception::class)
@@ -70,11 +129,51 @@ object DesfireCardReader {
         try {
             val fileData = readFileData(desfireProtocol, fileId, fileSettings)
             RawDesfireFile.create(fileId, fileSettings, fileData)
-        } catch (ex: DesfireAccessControlException) {
+        } catch (ex: UnauthorizedException) {
             RawDesfireFile.createUnauthorized(fileId, fileSettings, ex.message ?: "Access denied")
         } catch (ex: Exception) {
             RawDesfireFile.createInvalid(fileId, fileSettings, ex.toString())
         }
+
+    @Throws(Exception::class)
+    private fun tryReadFileWithoutSettings(
+        desfireProtocol: DesfireProtocol,
+        fileId: Int,
+    ): RawDesfireFile {
+        // Try each read command and see which one works
+        var lastException: Exception? = null
+
+        // Try standard data file read
+        try {
+            val data = desfireProtocol.readFile(fileId)
+            return RawDesfireFile.create(fileId, null, data)
+        } catch (e: Exception) {
+            lastException = e
+        }
+
+        // Try value file read
+        try {
+            val data = desfireProtocol.getValue(fileId)
+            return RawDesfireFile.create(fileId, null, data)
+        } catch (e: Exception) {
+            lastException = e
+        }
+
+        // Try record file read
+        try {
+            val data = desfireProtocol.readRecord(fileId)
+            return RawDesfireFile.create(fileId, null, data)
+        } catch (e: Exception) {
+            lastException = e
+        }
+
+        // All commands failed
+        return if (lastException is UnauthorizedException) {
+            RawDesfireFile.createUnauthorized(fileId, null, lastException.message ?: "Access denied")
+        } else {
+            RawDesfireFile.createInvalid(fileId, null, lastException.toString())
+        }
+    }
 
     @Throws(Exception::class)
     private fun readFileData(
