@@ -204,6 +204,13 @@ object ISO7816CardReader {
                 protocol.selectById(selector.parentDf)
             }
 
+            // Unselect before selecting to avoid stale state
+            try {
+                protocol.unselectFile()
+            } catch (e: ISO7816Exception) {
+                // Unselect failed, continue with select
+            }
+
             val fci = protocol.selectById(selector.fileId)
             val records = mutableMapOf<Int, ByteArray>()
 
