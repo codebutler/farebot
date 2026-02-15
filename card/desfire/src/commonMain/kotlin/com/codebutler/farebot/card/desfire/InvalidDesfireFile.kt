@@ -28,13 +28,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class InvalidDesfireFile(
     override val id: Int,
-    @Contextual override val fileSettings: DesfireFileSettings,
+    @Contextual override val fileSettings: DesfireFileSettings?,
     val errorMessage: String?,
 ) : DesfireFile {
     companion object {
         fun create(
             id: Int,
-            fileSettings: DesfireFileSettings,
+            fileSettings: DesfireFileSettings?,
             errorMessage: String,
         ): InvalidDesfireFile = InvalidDesfireFile(id, fileSettings, errorMessage)
     }

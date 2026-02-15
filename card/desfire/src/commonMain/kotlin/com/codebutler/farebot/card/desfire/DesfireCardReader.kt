@@ -40,7 +40,7 @@ object DesfireCardReader {
         val manufData = desfireProtocol.getManufacturingData()
 
         // Try to read app list, fall back to empty list if locked
-        val appListLocked: Boolean
+        var appListLocked: Boolean
         val appIds: IntArray = try {
             val ids = desfireProtocol.getAppList()
             appListLocked = false
@@ -91,7 +91,7 @@ object DesfireCardReader {
         val files = ArrayList<RawDesfireFile>()
 
         // Try to read file list, fall back to scanning 0-31 if locked
-        val dirListLocked: Boolean
+        var dirListLocked: Boolean
         val fileIds: IntArray = try {
             val ids = desfireProtocol.getFileList()
             dirListLocked = false
@@ -169,7 +169,7 @@ object DesfireCardReader {
         return if (lastException is UnauthorizedException) {
             RawDesfireFile.createUnauthorized(fileId, null, lastException.message ?: "Access denied")
         } else {
-            RawDesfireFile.createInvalid(fileId, null, lastException?.toString() ?: "No command worked")
+            RawDesfireFile.createInvalid(fileId, null, lastException.toString())
         }
     }
 

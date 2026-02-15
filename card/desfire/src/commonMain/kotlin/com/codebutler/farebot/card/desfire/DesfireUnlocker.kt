@@ -21,7 +21,7 @@ package com.codebutler.farebot.card.desfire
 
 import com.codebutler.farebot.card.desfire.raw.RawDesfireFile
 
-interface DesfireUnlocker {
+internal interface DesfireUnlocker {
     // get the order for file reading as some keys may depend on reading some files
     fun getOrder(desfireTag: DesfireProtocol, fileIds: IntArray): IntArray
 

@@ -35,13 +35,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UnauthorizedDesfireFile(
     override val id: Int,
-    @Contextual override val fileSettings: DesfireFileSettings,
+    @Contextual override val fileSettings: DesfireFileSettings?,
     val errorMessage: String,
 ) : DesfireFile {
     companion object {
         fun create(
             fileId: Int,
-            settings: DesfireFileSettings,
+            settings: DesfireFileSettings?,
             errorMessage: String,
         ): UnauthorizedDesfireFile = UnauthorizedDesfireFile(fileId, settings, errorMessage)
     }
