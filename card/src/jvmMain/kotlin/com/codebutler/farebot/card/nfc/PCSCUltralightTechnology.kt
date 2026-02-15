@@ -58,4 +58,15 @@ class PCSCUltralightTechnology(
         }
         return response.data
     }
+
+    override fun transceive(data: ByteArray): ByteArray {
+        // For raw transceive, we need to send the data as-is through PC/SC
+        // This is used for GET_VERSION (0x60) and AUTH_1 (0x1A) commands
+        val command = CommandAPDU(0xFF, 0x00, 0x00, 0x00, data)
+        val response = channel.transmit(command)
+        if (response.sW1 != 0x90 || response.sW2 != 0x00) {
+            throw Exception("Transceive failed: SW=%02X%02X".format(response.sW1, response.sW2))
+        }
+        return response.data
+    }
 }

@@ -32,11 +32,23 @@ object UltralightCardReader {
         tagId: ByteArray,
         tech: UltralightTechnology,
     ): RawUltralightCard {
+        // Detect card type using protocol commands (GET_VERSION, AUTH_1)
+        val detectedType = detectCardType(tech)
+        println("UltralightCardReader: Detected card type: $detectedType")
+
+        // Determine page count based on detected type
+        val pageCount = detectedType.pageCount
         val size: Int =
-            when (tech.type) {
-                UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
-                UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
-                else -> throw IllegalArgumentException("Unknown Ultralight type " + tech.type)
+            if (pageCount > 0) {
+                // Use detected page count (subtract 1 because we read pages 0..size inclusive)
+                pageCount - 1
+            } else {
+                // Fall back to platform-reported type if detection failed
+                when (tech.type) {
+                    UltralightTechnology.TYPE_ULTRALIGHT -> UltralightCard.ULTRALIGHT_SIZE
+                    UltralightTechnology.TYPE_ULTRALIGHT_C -> UltralightCard.ULTRALIGHT_C_SIZE
+                    else -> throw IllegalArgumentException("Unknown Ultralight type " + tech.type)
+                }
             }
 
         var pageNumber = 0
@@ -72,4 +84,28 @@ object UltralightCardReader {
 
         return RawUltralightCard.create(tagId, Clock.System.now(), pages, tech.type)
     }
+
+    /**
+     * Detects the Ultralight card type using protocol commands.
+     *
+     * This uses GET_VERSION (0x60) and AUTH_1 (0x1a) commands to distinguish between:
+     * - MF0ICU1 (Ultralight) - 16 pages
+     * - MF0ICU2 (Ultralight C) - 44 pages
+     * - EV1_MF0UL11 (Ultralight EV1 48 bytes) - 20 pages
+     * - EV1_MF0UL21 (Ultralight EV1 128 bytes) - 41 pages
+     * - NTAG213 - 45 pages
+     * - NTAG215 - 135 pages
+     * - NTAG216 - 231 pages
+     *
+     * Falls back to UNKNOWN if detection fails.
+     */
+    private fun detectCardType(tech: UltralightTechnology): UltralightCard.UltralightType =
+        try {
+            val protocol = UltralightProtocol(tech)
+            val rawType = protocol.getCardType()
+            rawType.parse()
+        } catch (e: Exception) {
+            println("UltralightCardReader: Card type detection failed, falling back to UNKNOWN: $e")
+            UltralightCard.UltralightType.UNKNOWN
+        }
 }

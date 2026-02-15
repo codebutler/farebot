@@ -34,6 +34,15 @@ class UltralightCardReaderTest {
      * Fake UltralightTechnology that tracks which page offsets were read.
      * Each readPages call returns 16 bytes (4 pages), where each page's first byte
      * is the page number for easy verification.
+     *
+     * transceive() simulates protocol-level commands:
+     * - GET_VERSION (0x60) always throws (not an EV1 card)
+     * - AUTH_1 (0x1a) returns a nonce for TYPE_ULTRALIGHT_C, throws for others
+     * - HALT (0x50) always throws (expected behavior)
+     *
+     * This causes detectCardType to identify:
+     * - TYPE_ULTRALIGHT -> MF0ICU1 (16 pages)
+     * - TYPE_ULTRALIGHT_C -> MF0ICU2 (44 pages)
      */
     private class FakeUltralightTechnology(
         override val type: Int,
@@ -56,6 +65,20 @@ class UltralightCardReaderTest {
             return buffer
         }
 
+        override fun transceive(data: ByteArray): ByteArray {
+            val cmd = data[0].toInt() and 0xFF
+            when (cmd) {
+                0x1a -> {
+                    // AUTH_1: Ultralight C cards reply with an 8-byte nonce
+                    if (type == UltralightTechnology.TYPE_ULTRALIGHT_C) {
+                        return ByteArray(8)
+                    }
+                }
+            }
+            // GET_VERSION (0x60), HALT (0x50), and all other commands: not supported
+            throw UnsupportedOperationException("FakeUltralightTechnology: unsupported command 0x${cmd.toString(16)}")
+        }
+
         override fun connect() {}
 
         override fun close() {}
@@ -68,12 +91,13 @@ class UltralightCardReaderTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.ULTRALIGHT_SIZE,
+                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
             )
 
         val result = UltralightCardReader.readCard(testTagId, tech)
 
-        assertEquals(UltralightCard.ULTRALIGHT_SIZE, result.pages.size)
+        // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
+        assertEquals(UltralightCard.UltralightType.MF0ICU1.pageCount - 1, result.pages.size)
     }
 
     @Test
@@ -81,12 +105,13 @@ class UltralightCardReaderTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT_C,
-                totalPages = UltralightCard.ULTRALIGHT_C_SIZE,
+                totalPages = UltralightCard.UltralightType.MF0ICU2.pageCount,
             )
 
         val result = UltralightCardReader.readCard(testTagId, tech)
 
-        assertEquals(UltralightCard.ULTRALIGHT_C_SIZE, result.pages.size)
+        // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
+        assertEquals(UltralightCard.UltralightType.MF0ICU2.pageCount - 1, result.pages.size)
     }
 
     @Test
@@ -94,7 +119,7 @@ class UltralightCardReaderTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.ULTRALIGHT_SIZE,
+                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
             )
 
         val result = UltralightCardReader.readCard(testTagId, tech)
@@ -109,7 +134,7 @@ class UltralightCardReaderTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.ULTRALIGHT_SIZE,
+                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
             )
 
         val result = UltralightCardReader.readCard(testTagId, tech)
@@ -126,30 +151,31 @@ class UltralightCardReaderTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.ULTRALIGHT_SIZE,
+                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
             )
 
         UltralightCardReader.readCard(testTagId, tech)
 
-        // readPages should be called every 4 pages
-        val expectedOffsets = (0 until UltralightCard.ULTRALIGHT_SIZE step 4).toList()
+        // readPages should be called every 4 pages (MF0ICU1 = 16 pages, size = 15, pages 0..15)
+        val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
+        val expectedOffsets = (0 until detectedPageCount step 4).toList()
         assertEquals(expectedOffsets, tech.readPageOffsets)
     }
 
     @Test
     fun testDoesNotReadBeyondCardSize() {
-        val size = UltralightCard.ULTRALIGHT_SIZE
+        val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = size,
+                totalPages = detectedPageCount,
             )
 
         val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // Verify no page with index >= size exists
-        assertTrue(result.pages.all { it.index < size })
-        // Verify readPages was never called with an offset >= size
-        assertTrue(tech.readPageOffsets.all { it < size })
+        // Verify no page with index >= detectedPageCount exists
+        assertTrue(result.pages.all { it.index < detectedPageCount })
+        // Verify readPages was never called with an offset >= detectedPageCount
+        assertTrue(tech.readPageOffsets.all { it < detectedPageCount })
     }
 }
