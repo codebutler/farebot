@@ -76,26 +76,32 @@ class PN533ReaderBackend(
         val fw = pn533.getFirmwareVersion()
         println("[$name] Firmware: $fw")
 
-        try {
-            pn533.samConfiguration()
-        } catch (e: PN533CommandException) {
-            // RC-S956 (Sony PaSoRi): no SAM module, use alternative init
-            println("[$name] SAM not available, using RC-S956 init sequence")
-            pn533.setParameters(0x08) // disable auto ATR_RES
-            pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A)) // timeouts
+        tryCommand("SAMConfiguration") { pn533.samConfiguration() }
+        tryCommand("SetParameters") { pn533.setParameters(0x08) }
+        tryCommand("RFConfiguration(timeouts)") {
+            pn533.rfConfiguration(0x02, byteArrayOf(0x0B, 0x0B, 0x0A))
+        }
+        tryCommand("RFConfiguration(maxRetries)") {
+            pn533.setMaxRetries(passiveActivation = 0x02)
+        }
+        tryCommand("RFConfiguration(106A)") {
             pn533.rfConfiguration(
                 0x0A,
                 byteArrayOf(
                     0x59, 0xF4.toByte(), 0x3F, 0x11, 0x4D,
                     0x85.toByte(), 0x61, 0x6F, 0x26, 0x62, 0x87.toByte(),
                 ),
-            ) // 106kbps Type A RF settings
-            try {
-                pn533.writeRegister(0x0328, 0x59) // CIU register for passive 106A
-            } catch (_: PN533CommandException) {
-            }
+            )
         }
-        pn533.setMaxRetries(passiveActivation = 0x02)
+        tryCommand("WriteRegister") { pn533.writeRegister(0x0328, 0x59) }
+    }
+
+    private fun tryCommand(label: String, block: () -> Unit) {
+        try {
+            block()
+        } catch (e: PN533CommandException) {
+            println("[$name] $label not supported (0x${e.errorCode.toString(16)}), skipping")
+        }
     }
 
     private fun pollLoop(
