@@ -27,6 +27,7 @@ import com.codebutler.farebot.card.classic.ClassicSector
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.card.classic.InvalidClassicSector
 import com.codebutler.farebot.card.classic.UnauthorizedClassicSector
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -34,6 +35,8 @@ data class RawClassicSector(
     val type: String,
     val index: Int,
     val blocks: List<RawClassicBlock>? = null,
+    @Contextual val keyA: ByteArray? = null,
+    @Contextual val keyB: ByteArray? = null,
     val errorMessage: String? = null,
 ) {
     fun parse(): ClassicSector =
@@ -55,13 +58,21 @@ data class RawClassicSector(
         fun createData(
             index: Int,
             blocks: List<RawClassicBlock>,
-        ): RawClassicSector = RawClassicSector(TYPE_DATA, index, blocks, null)
+            keyA: ByteArray? = null,
+            keyB: ByteArray? = null,
+        ): RawClassicSector = RawClassicSector(TYPE_DATA, index, blocks, keyA, keyB, null)
 
         fun createInvalid(
             index: Int,
             errorMessage: String,
-        ): RawClassicSector = RawClassicSector(TYPE_INVALID, index, null, errorMessage)
+            keyA: ByteArray? = null,
+            keyB: ByteArray? = null,
+        ): RawClassicSector = RawClassicSector(TYPE_INVALID, index, null, keyA, keyB, errorMessage)
 
-        fun createUnauthorized(index: Int): RawClassicSector = RawClassicSector(TYPE_UNAUTHORIZED, index, null, null)
+        fun createUnauthorized(
+            index: Int,
+            keyA: ByteArray? = null,
+            keyB: ByteArray? = null,
+        ): RawClassicSector = RawClassicSector(TYPE_UNAUTHORIZED, index, null, keyA, keyB, null)
     }
 }

@@ -34,6 +34,10 @@ class DesfireAccessControlException(
     message: String,
 ) : Exception(message)
 
+class DesfireNotFoundException(
+    message: String,
+) : Exception(message)
+
 internal class DesfireProtocol(
     private val mTransceiver: CardTransceiver,
 ) {
@@ -144,7 +148,7 @@ internal class DesfireProtocol(
         var recvBuffer = mTransceiver.transceive(wrapMessage(command, parameters))
 
         while (true) {
-            if (recvBuffer[recvBuffer.size - 2] != 0x91.toByte()) {
+            if (recvBuffer.size < 2 || recvBuffer[recvBuffer.size - 2] != 0x91.toByte()) {
                 throw Exception("Invalid response")
             }
 
@@ -165,7 +169,9 @@ internal class DesfireProtocol(
                 }
                 ADDITIONAL_FRAME -> recvBuffer = mTransceiver.transceive(wrapMessage(GET_ADDITIONAL_FRAME, null))
                 PERMISSION_DENIED -> throw DesfireAccessControlException("Permission denied")
+                AID_NOT_FOUND -> throw DesfireNotFoundException("AID not found")
                 AUTHENTICATION_ERROR -> throw DesfireAccessControlException("Authentication error")
+                FILE_NOT_FOUND -> throw DesfireNotFoundException("File not found")
                 else -> throw Exception("Unknown status code: " + (status.toInt() and 0xFF).toString(16))
             }
         }
@@ -211,7 +217,9 @@ internal class DesfireProtocol(
         // Status codes (Section 3.4)
         private const val OPERATION_OK: Byte = 0x00.toByte()
         private val PERMISSION_DENIED: Byte = 0x9D.toByte()
+        private val AID_NOT_FOUND: Byte = 0xA0.toByte()
         private val AUTHENTICATION_ERROR: Byte = 0xAE.toByte()
         private val ADDITIONAL_FRAME: Byte = 0xAF.toByte()
+        private val FILE_NOT_FOUND: Byte = 0xF0.toByte()
     }
 }

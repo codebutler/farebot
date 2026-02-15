@@ -183,7 +183,7 @@ Some MIFARE Classic cards require encryption keys to read. You can obtain keys u
 
 * **Android:** NFC-enabled device running Android 6.0 (API 23) or later
 * **iOS:** iPhone 7 or later with iOS support for CoreNFC
-* **macOS** (experimental): Mac with a PC/SC-compatible NFC smart card reader (e.g., ACR122U) or a PN533-based USB NFC controller (e.g., SCL3711)
+* **macOS** (experimental): Mac with a PC/SC-compatible NFC smart card reader (e.g., ACR122U), a PN533-based USB NFC controller (e.g., SCL3711), or a Sony RC-S956 (PaSoRi) USB NFC reader
 
 ## Building
 
@@ -223,7 +223,7 @@ $ make              # show all targets
 - `app/` — KMP app framework (UI, ViewModels, DI, platform code)
 - `app/android/` — Android app shell (Activities, manifest, resources)
 - `app/ios/` — iOS app shell (Swift entry point, assets, config)
-- `app/desktop/` — macOS desktop app (experimental, PC/SC + PN533 USB NFC)
+- `app/desktop/` — macOS desktop app (experimental, PC/SC + PN533 + RC-S956 USB NFC)
 
 ## Written By
 
