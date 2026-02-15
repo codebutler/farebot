@@ -26,6 +26,10 @@ kotlin {
             api(project(":base"))
             implementation(libs.kotlinx.serialization.json)
         }
+        jvmMain.dependencies {
+            compileOnly(libs.usb4java)
+            compileOnly(libs.usb4java.native)
+        }
     }
 }
 

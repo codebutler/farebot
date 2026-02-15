@@ -15,6 +15,8 @@ material = "1.13.0"
 appcompat = "1.7.1"
 kotlincrypto-hash = "0.8.0"
 metro = "0.10.4"
+usb4java = "1.3.5"
+usb4java-native = "1.3.3"
 checkstyle = "13.0.0"
 guava = "33.5.0-android"
 play-services-maps = "20.0.0"
@@ -43,6 +45,9 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 # KotlinCrypto
 kotlincrypto-hash-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto-hash" }
 
+# USB4Java (DSheirer fork with Apple Silicon support)
+usb4java = { module = "io.github.dsheirer:usb4java", version.ref = "usb4java" }
+usb4java-native = { module = "io.github.dsheirer:usb4java-native-libraries", version.ref = "usb4java-native" }
 
 # Compose BOM
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }

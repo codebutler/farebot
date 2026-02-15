@@ -30,6 +30,9 @@ kotlin {
             implementation(project(":card"))
             implementation(libs.kotlinx.serialization.json)
         }
+        jvmMain.dependencies {
+            implementation(libs.usb4java)
+        }
     }
 }
 

@@ -14,6 +14,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.sqldelight.sqlite.driver)
+            implementation(libs.usb4java)
+            implementation(libs.usb4java.native)
         }
     }
 }
@@ -41,5 +43,17 @@ compose.desktop {
                 bundleID = "com.codebutler.farebot.desktop"
             }
         }
+    }
+}
+
+// usb4java's bundled libusb4java.dylib links against /opt/local/lib/libusb-1.0.0.dylib
+// (MacPorts path). On Homebrew systems, libusb lives in /opt/homebrew/lib/ (Apple Silicon)
+// or /usr/local/lib/ (Intel). Tell dyld where to find it.
+afterEvaluate {
+    tasks.withType<JavaExec> {
+        environment(
+            "DYLD_FALLBACK_LIBRARY_PATH",
+            listOf("/opt/homebrew/lib", "/usr/local/lib").joinToString(":"),
+        )
     }
 }

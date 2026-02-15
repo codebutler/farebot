@@ -102,6 +102,7 @@ import farebot.app.generated.resources.nfc_listening_subtitle
 import farebot.app.generated.resources.nfc_listening_title
 import farebot.app.generated.resources.nfc_settings
 import farebot.app.generated.resources.ok
+import farebot.app.generated.resources.reading_card
 import farebot.app.generated.resources.scan
 import farebot.app.generated.resources.search_supported_cards
 import farebot.app.generated.resources.show
@@ -591,7 +592,13 @@ fun HomeScreen(
                             Icon(Icons.Default.Nfc, contentDescription = null)
                         }
                     },
-                    text = { Text(stringResource(Res.string.scan)) },
+                    text = {
+                        Text(
+                            stringResource(
+                                if (homeUiState.isReadingCard) Res.string.reading_card else Res.string.scan,
+                            ),
+                        )
+                    },
                 )
             }
         },
