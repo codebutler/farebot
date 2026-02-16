@@ -23,8 +23,8 @@ package com.codebutler.farebot.transit.calypso.lisboaviva
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.readLatin1
 import com.codebutler.farebot.card.CardType
@@ -50,7 +50,7 @@ class LisboaVivaTransitInfo internal constructor(
     private val holderName: String?,
     private val tagId: Long?,
 ) : CalypsoTransitInfo(result) {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = FormattedString(NAME)
 
     override val info: List<ListItemInterface>
         get() {
@@ -58,9 +58,9 @@ class LisboaVivaTransitInfo internal constructor(
             return listOf(ListItem(Res.string.calypso_holder_name, holderName))
         }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
         if (tagId == null) return null
-        val b = FareBotUiTree.builder(stringResource)
+        val b = FareBotUiTree.builder()
         b.item().title(Res.string.calypso_engraved_serial).value(tagId.toString())
         return b.build()
     }
@@ -69,13 +69,11 @@ class LisboaVivaTransitInfo internal constructor(
         const val NAME = "Viva"
     }
 
-    class Factory(
-        stringResource: StringResource,
-    ) : CalypsoTransitFactory(stringResource) {
+    class Factory : CalypsoTransitFactory() {
         override val allCards: List<CardInfo>
             get() = listOf(CARD_INFO)
 
-        override val name: String = NAME
+        override val name: FormattedString = FormattedString(NAME)
 
         override fun checkTenv(tenv: ByteArray): Boolean {
             val countryCode = tenv.getBitsFromBuffer(13, 12)
@@ -98,7 +96,7 @@ class LisboaVivaTransitInfo internal constructor(
                         _,
                         _,
                         ->
-                        LisboaVivaSubscription.parse(data, stringResource, counter)
+                        LisboaVivaSubscription.parse(data, counter)
                     },
                     createTrip = { data -> LisboaVivaTransaction.parse(data) },
                 )

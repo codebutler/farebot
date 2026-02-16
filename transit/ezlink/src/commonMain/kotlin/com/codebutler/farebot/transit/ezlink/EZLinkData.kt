@@ -23,7 +23,7 @@
 package com.codebutler.farebot.transit.ezlink
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import farebot.transit.ezlink.generated.resources.*
 
@@ -67,13 +67,10 @@ internal object EZLinkData {
         return Station.unknown(code)
     }
 
-    fun getCardIssuer(
-        canNo: String?,
-        stringResource: StringResource,
-    ): String =
+    fun getCardIssuer(canNo: String?): FormattedString =
         when (canNo?.substring(0, 3)) {
-            "100" -> stringResource.getString(Res.string.ezlink_issuer_ezlink)
-            "111" -> stringResource.getString(Res.string.ezlink_issuer_nets)
-            else -> stringResource.getString(Res.string.ezlink_issuer_cepas)
+            "100" -> FormattedString(Res.string.ezlink_issuer_ezlink)
+            "111" -> FormattedString(Res.string.ezlink_issuer_nets)
+            else -> FormattedString(Res.string.ezlink_issuer_cepas)
         }
 }

@@ -24,10 +24,7 @@ package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getPluralStringBlocking
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -43,15 +40,13 @@ class HSLKausi(
 ) : En1545Subscription() {
     override val lookup: En1545Lookup
         get() = HSLLookup
-    override val stringResource: StringResource
-        get() = DefaultStringResource()
 
-    internal fun formatPeriod(): String {
+    internal fun formatPeriod(): FormattedString {
         val period = parsed.getIntOrZero(CONTRACT_PERIOD_DAYS)
-        return getPluralStringBlocking(Res.plurals.hsl_valid_days_calendar, period, period)
+        return FormattedString.plural(Res.plurals.hsl_valid_days_calendar, period, period)
     }
 
-    override val subscriptionName: String?
+    override val subscriptionName: FormattedString?
         get() {
             val area =
                 HSLLookup.getArea(
@@ -59,7 +54,7 @@ class HSLKausi(
                     prefix = CONTRACT_PREFIX,
                     isValidity = true,
                 )
-            return getStringBlocking(Res.string.hsl_kausi_format, area ?: "")
+            return FormattedString(Res.string.hsl_kausi_format, area ?: "")
         }
 
     override val info: List<ListItemInterface>?

@@ -21,7 +21,7 @@
 
 package com.codebutler.farebot.transit.chcmetrocard
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -68,7 +68,7 @@ class ChcMetrocardTransitFactory : TransitFactory<ClassicCard, ChcMetrocardTrans
                 }
                 result.toString()
             }
-        return TransitIdentity.create(getStringBlocking(Res.string.chc_metrocard_card_name), serial)
+        return TransitIdentity.create(FormattedString(Res.string.chc_metrocard_card_name), serial)
     }
 
     override fun parseInfo(card: ClassicCard): ChcMetrocardTransitInfo {

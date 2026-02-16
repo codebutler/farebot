@@ -9,6 +9,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.card.CardType
@@ -38,7 +39,7 @@ class SunCardTransitFactory : TransitFactory<ClassicCard, SunCardTransitInfo> {
         )
 
     companion object {
-        internal const val NAME = "SunRail SunCard"
+        internal val NAME = FormattedString("SunRail SunCard")
 
         internal fun getSerial(card: ClassicCard): Int =
             (card.getSector(0) as DataClassicSector).getBlock(1).data.byteArrayToInt(3, 4)

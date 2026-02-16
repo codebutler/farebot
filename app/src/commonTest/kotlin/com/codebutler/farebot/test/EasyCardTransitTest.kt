@@ -28,6 +28,7 @@ package com.codebutler.farebot.test
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.Test
@@ -49,8 +50,7 @@ import kotlin.time.Instant
  * or filesystem (iOS native).
  */
 class EasyCardTransitTest : CardDumpTest() {
-    private val stringResource = TestStringResource()
-    private val factory = EasyCardTransitFactory(stringResource)
+    private val factory = EasyCardTransitFactory()
 
     /**
      * Format an Instant as ISO date-time in Taipei timezone (like Metrodroid's test).
@@ -67,62 +67,63 @@ class EasyCardTransitTest : CardDumpTest() {
     }
 
     @Test
-    fun testDeadbeefEnglish() {
-        val card = loadMfcCard("easycard/deadbeef.mfc")
+    fun testDeadbeefEnglish() =
+        runTest {
+            val card = loadMfcCard("easycard/deadbeef.mfc")
 
-        // Verify card is detected as EasyCard
-        assertTrue(factory.check(card), "Card should be detected as EasyCard")
+            // Verify card is detected as EasyCard
+            assertTrue(factory.check(card), "Card should be detected as EasyCard")
 
-        val transitInfo = factory.parseInfo(card)
-        assertNotNull(transitInfo, "Transit info should not be null")
+            val transitInfo = factory.parseInfo(card)
+            assertNotNull(transitInfo, "Transit info should not be null")
 
-        // Check balance - 245 TWD
-        val balances = transitInfo.balances
-        assertNotNull(balances, "Balances should not be null")
-        assertTrue(balances.isNotEmpty(), "Should have at least one balance")
-        assertEquals(TransitCurrency.TWD(245), balances[0].balance)
+            // Check balance - 245 TWD
+            val balances = transitInfo.balances
+            assertNotNull(balances, "Balances should not be null")
+            assertTrue(balances.isNotEmpty(), "Should have at least one balance")
+            assertEquals(TransitCurrency.TWD(245), balances[0].balance)
 
-        // Check trips - should have 3 trips: bus, train (merged tap-on/off), and refill
-        val trips = transitInfo.trips
-        assertNotNull(trips, "Trips should not be null")
-        assertEquals(3, trips.size, "Should have 3 trips")
+            // Check trips - should have 3 trips: bus, train (merged tap-on/off), and refill
+            val trips = transitInfo.trips
+            assertNotNull(trips, "Trips should not be null")
+            assertEquals(3, trips.size, "Should have 3 trips")
 
-        // Trip 0: Bus trip
-        val busTrip = trips[0]
-        assertEquals("2013-10-28 20:33", busTrip.startTimestamp?.toTaipeiDateTime())
-        assertEquals(TransitCurrency.TWD(10), busTrip.fare)
-        assertEquals(Trip.Mode.BUS, busTrip.mode)
-        assertNull(busTrip.startStation, "Bus trip should not have a station")
-        assertEquals("0x332211", busTrip.machineID)
+            // Trip 0: Bus trip
+            val busTrip = trips[0]
+            assertEquals("2013-10-28 20:33", busTrip.startTimestamp?.toTaipeiDateTime())
+            assertEquals(TransitCurrency.TWD(10), busTrip.fare)
+            assertEquals(Trip.Mode.BUS, busTrip.mode)
+            assertNull(busTrip.startStation, "Bus trip should not have a station")
+            assertEquals("0x332211", busTrip.machineID)
 
-        // Trip 1: Metro train trip (merged tap-on at Taipei Main Station, tap-off at NTU Hospital)
-        val trainTrip = trips[1]
-        assertEquals("2013-10-28 20:41", trainTrip.startTimestamp?.toTaipeiDateTime())
-        assertEquals("2013-10-28 20:46", trainTrip.endTimestamp?.toTaipeiDateTime())
-        assertEquals(TransitCurrency.TWD(15), trainTrip.fare)
-        assertEquals(Trip.Mode.METRO, trainTrip.mode)
-        assertNotNull(trainTrip.startStation, "Train trip should have a start station")
-        assertEquals("Taipei Main Station", trainTrip.startStation?.stationName)
-        assertNotNull(trainTrip.endStation, "Train trip should have an end station")
-        assertEquals("NTU Hospital", trainTrip.endStation?.stationName)
-        assertEquals("0xccbbaa", trainTrip.machineID)
+            // Trip 1: Metro train trip (merged tap-on at Taipei Main Station, tap-off at NTU Hospital)
+            val trainTrip = trips[1]
+            assertEquals("2013-10-28 20:41", trainTrip.startTimestamp?.toTaipeiDateTime())
+            assertEquals("2013-10-28 20:46", trainTrip.endTimestamp?.toTaipeiDateTime())
+            assertEquals(TransitCurrency.TWD(15), trainTrip.fare)
+            assertEquals(Trip.Mode.METRO, trainTrip.mode)
+            assertNotNull(trainTrip.startStation, "Train trip should have a start station")
+            assertEquals("Taipei Main Station", trainTrip.startStation?.displayName?.resolveAsync())
+            assertNotNull(trainTrip.endStation, "Train trip should have an end station")
+            assertEquals("NTU Hospital", trainTrip.endStation?.displayName?.resolveAsync())
+            assertEquals("0xccbbaa", trainTrip.machineID)
 
-        // Route name comes from MDST line data — the common line between start and end stations
-        val routeName = trainTrip.routeName
-        if (routeName != null) {
-            assertEquals("Red", routeName)
+            // Route name comes from MDST line data — the common line between start and end stations
+            val routeName = trainTrip.routeName
+            if (routeName != null) {
+                assertEquals("Red", routeName.resolveAsync())
+            }
+
+            // Trip 2: Top-up/refill at Yongan Market
+            val refill = trips[2]
+            assertEquals("2013-07-27 08:58", refill.startTimestamp?.toTaipeiDateTime())
+            assertEquals(TransitCurrency.TWD(-100), refill.fare, "Refill fare should be negative (money added)")
+            assertEquals(Trip.Mode.TICKET_MACHINE, refill.mode)
+            assertNotNull(refill.startStation, "Refill should have a station")
+            assertEquals("Yongan Market", refill.startStation?.displayName?.resolveAsync())
+            assertNull(refill.routeName, "Refill should not have a route name")
+            assertEquals("0x31c046", refill.machineID)
         }
-
-        // Trip 2: Top-up/refill at Yongan Market
-        val refill = trips[2]
-        assertEquals("2013-07-27 08:58", refill.startTimestamp?.toTaipeiDateTime())
-        assertEquals(TransitCurrency.TWD(-100), refill.fare, "Refill fare should be negative (money added)")
-        assertEquals(Trip.Mode.TICKET_MACHINE, refill.mode)
-        assertNotNull(refill.startStation, "Refill should have a station")
-        assertEquals("Yongan Market", refill.startStation?.stationName)
-        assertNull(refill.routeName, "Refill should not have a route name")
-        assertEquals("0x31c046", refill.machineID)
-    }
 
     /**
      * Tests that MDST station data contains Chinese Traditional names.
@@ -136,38 +137,40 @@ class EasyCardTransitTest : CardDumpTest() {
      * works correctly for the refill station.
      */
     @Test
-    fun testDeadbeefChineseTraditional() {
-        val card = loadMfcCard("easycard/deadbeef.mfc")
+    fun testDeadbeefChineseTraditional() =
+        runTest {
+            val card = loadMfcCard("easycard/deadbeef.mfc")
 
-        assertTrue(factory.check(card), "Card should be detected as EasyCard")
+            assertTrue(factory.check(card), "Card should be detected as EasyCard")
 
-        val transitInfo = factory.parseInfo(card)
-        assertNotNull(transitInfo, "Transit info should not be null")
+            val transitInfo = factory.parseInfo(card)
+            assertNotNull(transitInfo, "Transit info should not be null")
 
-        val trips = transitInfo.trips
-        assertNotNull(trips, "Trips should not be null")
+            val trips = transitInfo.trips
+            assertNotNull(trips, "Trips should not be null")
 
-        // Last trip is the refill at Yongan Market (永安市場)
-        val refill = trips.last()
-        assertNotNull(refill.startStation, "Refill should have a station")
-        // In the test environment, MDST returns English names.
-        // Verify the station is correctly resolved (Yongan Market).
-        assertEquals("Yongan Market", refill.startStation?.stationName)
-        assertNull(refill.routeName, "Refill should not have a route name")
-    }
+            // Last trip is the refill at Yongan Market (永安市場)
+            val refill = trips.last()
+            assertNotNull(refill.startStation, "Refill should have a station")
+            // In the test environment, MDST returns English names.
+            // Verify the station is correctly resolved (Yongan Market).
+            assertEquals("Yongan Market", refill.startStation?.displayName?.resolveAsync())
+            assertNull(refill.routeName, "Refill should not have a route name")
+        }
 
     @Test
-    fun testAssetLoaderBasicFunctionality() {
-        // Test that loading an MFC file works
-        val rawCard = TestAssetLoader.loadMfcCard("easycard/deadbeef.mfc")
-        assertNotNull(rawCard, "Should load MFC card")
+    fun testAssetLoaderBasicFunctionality() =
+        runTest {
+            // Test that loading an MFC file works
+            val rawCard = TestAssetLoader.loadMfcCard("easycard/deadbeef.mfc")
+            assertNotNull(rawCard, "Should load MFC card")
 
-        // Check UID extraction
-        val tagId = rawCard.tagId()
-        assertEquals(4, tagId.size, "Standard UID should be 4 bytes")
+            // Check UID extraction
+            val tagId = rawCard.tagId()
+            assertEquals(4, tagId.size, "Standard UID should be 4 bytes")
 
-        // Check sector parsing
-        val parsed = rawCard.parse()
-        assertEquals(16, parsed.sectors.size, "Should have 16 sectors (1K card)")
-    }
+            // Check sector parsing
+            val parsed = rawCard.parse()
+            assertEquals(16, parsed.sectors.size, "Should have 16 sectors (1K card)")
+        }
 }

@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
@@ -40,7 +41,7 @@ class StrelkaTransitFactory : TransitFactory<ClassicCard, StrelkaTransitInfo> {
         )
 
     companion object {
-        internal const val NAME = "Strelka"
+        internal val NAME = FormattedString("Strelka")
 
         internal fun getSerial(card: ClassicCard): String =
             (card.getSector(12) as DataClassicSector)

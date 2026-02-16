@@ -23,8 +23,8 @@
 package com.codebutler.farebot.transit.charlie
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -57,7 +57,7 @@ class CharlieCardTransitInfo internal constructor(
     private val startDate: Int,
     override val trips: List<CharlieCardTrip>,
 ) : TransitInfo() {
-    override val cardName: String = CharlieCardTransitFactory.NAME
+    override val cardName: FormattedString = CharlieCardTransitFactory.NAME
 
     override val serialNumber: String = CharlieCardTransitFactory.formatSerial(serial)
 
@@ -86,9 +86,9 @@ class CharlieCardTransitInfo internal constructor(
 
     override val hasUnknownStations: Boolean = true
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? {
+    override suspend fun getAdvancedUi(): FareBotUiTree? {
         if (secondSerial == 0L || secondSerial == 0xffffffffL) return null
-        val b = FareBotUiTree.builder(stringResource)
+        val b = FareBotUiTree.builder()
         b.item().title(Res.string.charlie_2nd_card_number).value("A" + NumberUtils.zeroPad(secondSerial, 10))
         return b.build()
     }

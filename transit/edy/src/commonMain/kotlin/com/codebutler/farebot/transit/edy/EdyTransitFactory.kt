@@ -24,8 +24,7 @@
 
 package com.codebutler.farebot.transit.edy
 
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FeliCaConstants
 import com.codebutler.farebot.card.felica.FeliCaUtil
@@ -37,9 +36,7 @@ import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
 import farebot.transit.edy.generated.resources.*
 
-class EdyTransitFactory(
-    private val stringResource: StringResource,
-) : TransitFactory<FelicaCard, EdyTransitInfo> {
+class EdyTransitFactory : TransitFactory<FelicaCard, EdyTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -65,7 +62,7 @@ class EdyTransitFactory(
     override fun check(card: FelicaCard): Boolean = card.getSystem(FeliCaConstants.SYSTEMCODE_EDY) != null
 
     override fun parseIdentity(card: FelicaCard): TransitIdentity =
-        TransitIdentity.create(getStringBlocking(Res.string.card_name_edy), null)
+        TransitIdentity.create(FormattedString(Res.string.card_name_edy), null)
 
     override fun parseInfo(card: FelicaCard): EdyTransitInfo {
         // card ID is in block 0, bytes 2-9, big-endian ordering
@@ -93,7 +90,7 @@ class EdyTransitFactory(
         val blocks = serviceHistory.blocks
         for (i in blocks.indices) {
             val block = blocks[i]
-            val trip = EdyTrip.create(block, stringResource)
+            val trip = EdyTrip.create(block)
             trips.add(trip)
         }
 

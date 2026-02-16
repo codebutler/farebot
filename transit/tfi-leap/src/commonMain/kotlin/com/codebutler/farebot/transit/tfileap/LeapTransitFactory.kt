@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.transit.tfileap
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
@@ -45,9 +46,9 @@ class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
             val app = card.getApplication(LeapTransitInfo.APP_ID)!!
             val file2 = (app.getFile(2) as StandardDesfireFile).data
             val file6 = (app.getFile(6) as StandardDesfireFile).data
-            TransitIdentity("Leap", LeapTransitInfo.getSerial(file2, file6))
+            TransitIdentity(FormattedString(Res.string.transit_leap_card_name), LeapTransitInfo.getSerial(file2, file6))
         } catch (e: Exception) {
-            TransitIdentity("Locked Leap", null)
+            TransitIdentity(FormattedString(Res.string.transit_leap_card_name), null)
         }
 
     override fun parseInfo(card: DesfireCard): TransitInfo {

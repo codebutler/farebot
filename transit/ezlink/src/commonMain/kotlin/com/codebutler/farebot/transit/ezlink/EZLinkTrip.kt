@@ -25,7 +25,7 @@
 
 package com.codebutler.farebot.transit.ezlink
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.cepas.CEPASTransaction
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitCurrency
@@ -38,22 +38,21 @@ private fun String.toStationOrNull(): Station? = trim().ifEmpty { null }?.let { 
 internal data class EZUserData(
     val startStation: Station?,
     val endStation: Station?,
-    val routeName: String,
+    val routeName: FormattedString,
 ) {
     companion object {
         fun parse(
             userData: String,
             type: CEPASTransaction.TransactionType,
-            stringResource: StringResource,
         ): EZUserData {
             if ((type == CEPASTransaction.TransactionType.BUS || type == CEPASTransaction.TransactionType.BUS_REFUND) &&
                 (userData.startsWith("SVC") || userData.startsWith("BUS"))
             ) {
                 val routeName =
                     if (type == CEPASTransaction.TransactionType.BUS_REFUND) {
-                        stringResource.getString(Res.string.ez_bus_refund)
+                        FormattedString(Res.string.ez_bus_refund)
                     } else {
-                        stringResource.getString(Res.string.ez_bus_number, userData.substring(3, 7).replace(" ", ""))
+                        FormattedString(Res.string.ez_bus_number, userData.substring(3, 7).replace(" ", ""))
                     }
                 return EZUserData(
                     startStation = null,
@@ -62,28 +61,28 @@ internal data class EZUserData(
                 )
             }
             if (type == CEPASTransaction.TransactionType.CREATION) {
-                return EZUserData(userData.toStationOrNull(), null, stringResource.getString(Res.string.ez_first_use))
+                return EZUserData(userData.toStationOrNull(), null, FormattedString(Res.string.ez_first_use))
             }
             if (type == CEPASTransaction.TransactionType.RETAIL) {
                 return EZUserData(
                     userData.toStationOrNull(),
                     null,
-                    stringResource.getString(Res.string.ez_retail_purchase),
+                    FormattedString(Res.string.ez_retail_purchase),
                 )
             }
 
             val routeName =
                 when (type) {
                     CEPASTransaction.TransactionType.BUS ->
-                        stringResource.getString(
+                        FormattedString(
                             Res.string.ez_unknown_format,
                             userData,
                         )
-                    CEPASTransaction.TransactionType.BUS_REFUND -> stringResource.getString(Res.string.ez_bus_refund)
-                    CEPASTransaction.TransactionType.MRT -> stringResource.getString(Res.string.ez_mrt)
-                    CEPASTransaction.TransactionType.TOP_UP -> stringResource.getString(Res.string.ez_topup)
-                    CEPASTransaction.TransactionType.SERVICE -> stringResource.getString(Res.string.ez_service_charge)
-                    else -> stringResource.getString(Res.string.ez_unknown_format, type.toString())
+                    CEPASTransaction.TransactionType.BUS_REFUND -> FormattedString(Res.string.ez_bus_refund)
+                    CEPASTransaction.TransactionType.MRT -> FormattedString(Res.string.ez_mrt)
+                    CEPASTransaction.TransactionType.TOP_UP -> FormattedString(Res.string.ez_topup)
+                    CEPASTransaction.TransactionType.SERVICE -> FormattedString(Res.string.ez_service_charge)
+                    else -> FormattedString(Res.string.ez_unknown_format, type.toString())
                 }
 
             if (userData.length > 6 && (userData[3] == '-' || userData[3] == ' ')) {
@@ -102,14 +101,13 @@ internal data class EZUserData(
 
 class EZLinkTrip(
     private val transaction: CEPASTransaction,
-    private val cardName: String,
-    private val stringResource: StringResource,
+    private val cardName: FormattedString,
 ) : Trip() {
     override val startTimestamp: Instant
         get() = Instant.fromEpochSeconds(transaction.timestamp.toLong())
 
-    override val routeName: String
-        get() = EZUserData.parse(transaction.userData, transaction.type, stringResource).routeName
+    override val routeName: FormattedString
+        get() = EZUserData.parse(transaction.userData, transaction.type).routeName
 
     override val humanReadableRouteID: String?
         get() = transaction.userData
@@ -123,19 +121,19 @@ class EZLinkTrip(
             }
 
     override val startStation: Station?
-        get() = EZUserData.parse(transaction.userData, transaction.type, stringResource).startStation
+        get() = EZUserData.parse(transaction.userData, transaction.type).startStation
 
     override val endStation: Station?
-        get() = EZUserData.parse(transaction.userData, transaction.type, stringResource).endStation
+        get() = EZUserData.parse(transaction.userData, transaction.type).endStation
 
     override val mode: Mode
         get() = getMode(transaction.type)
 
-    override val agencyName: String
-        get() = getAgencyName(transaction.type, cardName, isShort = false, stringResource)
+    override val agencyName: FormattedString
+        get() = getAgencyName(transaction.type, cardName, isShort = false)
 
-    override val shortAgencyName: String
-        get() = getAgencyName(transaction.type, cardName, isShort = true, stringResource)
+    override val shortAgencyName: FormattedString
+        get() = getAgencyName(transaction.type, cardName, isShort = true)
 
     companion object {
         fun getMode(type: CEPASTransaction.TransactionType): Mode =
@@ -153,25 +151,24 @@ class EZLinkTrip(
 
         fun getAgencyName(
             type: CEPASTransaction.TransactionType,
-            cardName: String,
+            cardName: FormattedString,
             isShort: Boolean,
-            stringResource: StringResource,
-        ): String =
+        ): FormattedString =
             when (type) {
                 CEPASTransaction.TransactionType.BUS,
                 CEPASTransaction.TransactionType.BUS_REFUND,
-                -> stringResource.getString(Res.string.ezlink_agency_bus)
+                -> FormattedString(Res.string.ezlink_agency_bus)
                 CEPASTransaction.TransactionType.CREATION,
                 CEPASTransaction.TransactionType.TOP_UP,
                 CEPASTransaction.TransactionType.SERVICE,
                 ->
-                    if (isShort && cardName == stringResource.getString(Res.string.ezlink_issuer_ezlink)) {
-                        stringResource.getString(Res.string.ezlink_agency_ez)
+                    if (isShort && cardName == FormattedString(Res.string.ezlink_issuer_ezlink)) {
+                        FormattedString(Res.string.ezlink_agency_ez)
                     } else {
                         cardName
                     }
-                CEPASTransaction.TransactionType.RETAIL -> stringResource.getString(Res.string.ezlink_agency_pos)
-                else -> stringResource.getString(Res.string.ezlink_agency_smrt)
+                CEPASTransaction.TransactionType.RETAIL -> FormattedString(Res.string.ezlink_agency_pos)
+                else -> FormattedString(Res.string.ezlink_agency_smrt)
             }
     }
 }

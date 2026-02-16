@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.umarsh
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
@@ -41,7 +42,7 @@ class UmarshTrip(
 ) : Trip() {
     override val startTimestamp: Instant get() = timestamp
 
-    override val routeName: String get() = routeNameValue
+    override val routeName: FormattedString get() = FormattedString(routeNameValue)
 
     override val vehicleID: String get() = vehicleIDValue
 

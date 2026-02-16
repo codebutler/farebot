@@ -1,5 +1,5 @@
 /*
- * PN533Transport.kt
+ * Usb4JavaPN533Transport.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/
@@ -28,7 +28,7 @@ import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
 /**
- * Raw USB frame I/O for the PN533 NFC controller.
+ * Raw USB frame I/O for the PN533 NFC controller via usb4java.
  *
  * Implements the PN533 normal information frame format:
  * - Normal:   [00 00 FF] [LEN] [LCS] [TFI CMD DATA...] [DCS] [00]
@@ -36,14 +36,14 @@ import java.nio.IntBuffer
  *
  * Reference: NXP PN533 User Manual, libnfc pn53x_usb.c, nfcpy pn533.py
  */
-class PN533Transport(
+class Usb4JavaPN533Transport(
     private val handle: DeviceHandle,
-) {
+) : PN533Transport {
     /**
      * Drain any stale data from the USB read buffer.
      * Call after opening the device to clear leftovers from previous sessions.
      */
-    fun flush() {
+    override fun flush() {
         val buf = ByteBuffer.allocateDirect(64)
         val transferred = IntBuffer.allocate(1)
         repeat(MAX_FLUSH_READS) {
@@ -54,10 +54,10 @@ class PN533Transport(
         }
     }
 
-    fun sendCommand(
+    override fun sendCommand(
         code: Byte,
-        data: ByteArray = byteArrayOf(),
-        timeoutMs: Int = TIMEOUT_MS,
+        data: ByteArray,
+        timeoutMs: Int,
     ): ByteArray {
         val payload = byteArrayOf(TFI_HOST_TO_PN533, code) + data
         val frame = buildFrame(payload)
@@ -73,11 +73,11 @@ class PN533Transport(
         return readResponse(timeoutMs)
     }
 
-    fun sendAck() {
+    override fun sendAck() {
         bulkWrite(ACK_FRAME)
     }
 
-    fun close() {
+    override fun close() {
         LibUsb.releaseInterface(handle, 0)
         LibUsb.close(handle)
     }
@@ -235,11 +235,3 @@ class PN533Transport(
         private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }
 }
-
-open class PN533Exception(
-    message: String,
-) : Exception(message)
-
-class PN533CommandException(
-    val errorCode: Int,
-) : PN533Exception("PN53x command error: 0x%02X".format(errorCode))

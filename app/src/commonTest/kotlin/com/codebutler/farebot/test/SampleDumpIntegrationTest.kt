@@ -66,6 +66,7 @@ import com.codebutler.farebot.transit.tmoney.TMoneyTransitInfo
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitFactory
 import com.codebutler.farebot.transit.troika.TroikaUltralightTransitInfo
 import com.codebutler.farebot.transit.yvrcompass.CompassUltralightTransitInfo
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -86,41 +87,40 @@ import kotlin.test.assertTrue
  * These sample files are the same ones used on the Explore screen.
  */
 class SampleDumpIntegrationTest : CardDumpTest() {
-    private val stringResource = TestStringResource()
-
     // --- Opal (DESFire) ---
     // Source: Metrodroid test asset opal-transit-litter.json
     // Card: Opal, Sydney, Australia
     // Balance: -$1.82 AUD, 2 weekly trips, serial: 3085 2200 7856 2242
 
     @Test
-    fun testOpalDump() {
-        val factory = OpalTransitFactory(stringResource)
-        val (card, info) =
-            loadAndParseMetrodroidJson<DesfireCard, OpalTransitInfo>(
-                "opal/Opal.json",
-                factory,
-            )
+    fun testOpalDump() =
+        runTest {
+            val factory = OpalTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<DesfireCard, OpalTransitInfo>(
+                    "opal/Opal.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Opal", identity.name)
-        assertEquals("3085 2200 7856 2242", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Opal", identity.name.resolveAsync())
+            assertEquals("3085 2200 7856 2242", identity.serialNumber)
 
-        // Balance: -$1.82 AUD (-182 cents)
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.AUD(-182), balances[0].balance)
+            // Balance: -$1.82 AUD (-182 cents)
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.AUD(-182), balances[0].balance)
 
-        assertEquals(2, info.weeklyTrips)
+            assertEquals(2, info.weeklyTrips)
 
-        // Last transaction is now exposed as a Trip (OpalTrip)
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(1, trips.size)
-        assertEquals(Trip.Mode.TRAIN, trips[0].mode)
-        assertNotNull(trips[0].startTimestamp)
-    }
+            // Last transaction is now exposed as a Trip (OpalTrip)
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(1, trips.size)
+            assertEquals(Trip.Mode.TRAIN, trips[0].mode)
+            assertNotNull(trips[0].startTimestamp)
+        }
 
     // --- HSL v2 (DESFire) ---
     // Source: Metrodroid test asset hslv2.json
@@ -128,34 +128,35 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Balance: €0.40, 2 trips, 2 subscriptions, serial: 924620 0011 2345 6789
 
     @Test
-    fun testHSLv2Dump() {
-        val factory = HSLTransitFactory(stringResource)
-        val (card, info) =
-            loadAndParseMetrodroidJson<DesfireCard, HSLTransitInfo>(
-                "hsl/HSLv2.json",
-                factory,
-            )
+    fun testHSLv2Dump() =
+        runTest {
+            val factory = HSLTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<DesfireCard, HSLTransitInfo>(
+                    "hsl/HSLv2.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("HSL", identity.name)
-        assertEquals("924620 0011 2345 6789", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("HSL", identity.name.resolveAsync())
+            assertEquals("924620 0011 2345 6789", identity.serialNumber)
 
-        // Balance: €0.40 (40 EUR cents)
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.EUR(40), balances[0].balance)
+            // Balance: €0.40 (40 EUR cents)
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.EUR(40), balances[0].balance)
 
-        // 2 trips
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(2, trips.size)
+            // 2 trips
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(2, trips.size)
 
-        // 2 subscriptions
-        val subs = info.subscriptions
-        assertNotNull(subs)
-        assertEquals(2, subs.size)
-    }
+            // 2 subscriptions
+            val subs = info.subscriptions
+            assertNotNull(subs)
+            assertEquals(2, subs.size)
+        }
 
     // --- HSL Ultralight ---
     // Source: Metrodroid test asset hslul.json
@@ -163,27 +164,28 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // 1 trip, 1 subscription, serial: 924621 0011 2376 7806
 
     @Test
-    fun testHSLUltralightDump() {
-        val factory = HSLUltralightTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<UltralightCard, HSLUltralightTransitInfo>(
-                "hsl/HSL_UL.json",
-                factory,
-            )
+    fun testHSLUltralightDump() =
+        runTest {
+            val factory = HSLUltralightTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<UltralightCard, HSLUltralightTransitInfo>(
+                    "hsl/HSL_UL.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("HSL Ultralight", identity.name)
+            val identity = factory.parseIdentity(card)
+            assertEquals("HSL Ultralight", identity.name.resolveAsync())
 
-        // 1 trip
-        val trips = info.trips
-        assertNotNull(trips)
-        assertTrue(trips.isNotEmpty(), "Should have at least one trip")
+            // 1 trip
+            val trips = info.trips
+            assertNotNull(trips)
+            assertTrue(trips.isNotEmpty(), "Should have at least one trip")
 
-        // 1 subscription
-        val subs = info.subscriptions
-        assertNotNull(subs)
-        assertTrue(subs.isNotEmpty(), "Should have at least one subscription")
-    }
+            // 1 subscription
+            val subs = info.subscriptions
+            assertNotNull(subs)
+            assertTrue(subs.isNotEmpty(), "Should have at least one subscription")
+        }
 
     // --- Troika UL (Ultralight) ---
     // Source: Metrodroid test asset troikaul.json
@@ -191,28 +193,29 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // 1 trip (bus), 1 subscription, serial: 0305 419 896
 
     @Test
-    fun testTroikaUltralightDump() {
-        val factory = TroikaUltralightTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<UltralightCard, TroikaUltralightTransitInfo>(
-                "troika/TroikaUL.json",
-                factory,
-            )
+    fun testTroikaUltralightDump() =
+        runTest {
+            val factory = TroikaUltralightTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<UltralightCard, TroikaUltralightTransitInfo>(
+                    "troika/TroikaUL.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Troika", identity.name)
-        assertNotNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Troika", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber)
 
-        // Should have trips
-        val trips = info.trips
-        assertNotNull(trips)
-        assertTrue(trips.isNotEmpty(), "Should have at least one trip")
+            // Should have trips
+            val trips = info.trips
+            assertNotNull(trips)
+            assertTrue(trips.isNotEmpty(), "Should have at least one trip")
 
-        // Should have subscriptions
-        val subs = info.subscriptions
-        assertNotNull(subs)
-        assertTrue(subs.isNotEmpty(), "Should have at least one subscription")
-    }
+            // Should have subscriptions
+            val subs = info.subscriptions
+            assertNotNull(subs)
+            assertTrue(subs.isNotEmpty(), "Should have at least one subscription")
+        }
 
     // --- T-Money (ISO7816) ---
     // Source: Metrodroid test asset oldtmoney.json
@@ -220,29 +223,30 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Balance: 17,650 KRW, 5 trips, serial: 1010 0300 0012 3456
 
     @Test
-    fun testTMoneyDump() {
-        val factory = TMoneyTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<ISO7816Card, TMoneyTransitInfo>(
-                "tmoney/TMoney.json",
-                factory,
-            )
+    fun testTMoneyDump() =
+        runTest {
+            val factory = TMoneyTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<ISO7816Card, TMoneyTransitInfo>(
+                    "tmoney/TMoney.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("T-Money", identity.name)
-        assertNotNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("T-Money", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber)
 
-        // Balance: 17,650 KRW
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.KRW(17650), balances[0].balance)
+            // Balance: 17,650 KRW
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.KRW(17650), balances[0].balance)
 
-        // 5 trips
-        val trips = info.trips
-        assertNotNull(trips)
-        assertTrue(trips.isNotEmpty(), "Should have trips")
-    }
+            // 5 trips
+            val trips = info.trips
+            assertNotNull(trips)
+            assertTrue(trips.isNotEmpty(), "Should have trips")
+        }
 
     // --- EZ-Link/NETS (CEPAS) ---
     // Source: Metrodroid test asset legacy.json
@@ -250,50 +254,51 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Balance: $8.97 SGD (897 cents), 4 trips, serial: 1123456789123456
 
     @Test
-    fun testEZLinkDump() {
-        val factory = EZLinkTransitFactory(stringResource)
-        val (card, info) =
-            loadAndParseMetrodroidJson<CEPASCard, EZLinkTransitInfo>(
-                "cepas/EZLink.json",
-                factory,
-            )
+    fun testEZLinkDump() =
+        runTest {
+            val factory = EZLinkTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<CEPASCard, EZLinkTransitInfo>(
+                    "cepas/EZLink.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        // CAN "112..." maps to generic CEPAS issuer (not specifically EZ-Link "100...")
-        assertNotNull(identity.name)
-        assertNotNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            // CAN "112..." maps to generic CEPAS issuer (not specifically EZ-Link "100...")
+            assertNotNull(identity.name)
+            assertNotNull(identity.serialNumber)
 
-        // Balance: $8.97 SGD (897 cents)
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.SGD(897), balances[0].balance)
+            // Balance: $8.97 SGD (897 cents)
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.SGD(897), balances[0].balance)
 
-        // 4 trips: BUS, BUS_REFUND, MRT, CREATION
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(4, trips.size)
+            // 4 trips: BUS, BUS_REFUND, MRT, CREATION
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(4, trips.size)
 
-        // Verify expected modes are present
-        val modes = trips.map { it.mode }
-        assertEquals(2, modes.count { it == Trip.Mode.BUS }, "Should have 2 BUS trips (bus + refund)")
-        assertEquals(1, modes.count { it == Trip.Mode.METRO }, "Should have 1 MRT trip")
-        assertEquals(1, modes.count { it == Trip.Mode.OTHER }, "Should have 1 OTHER trip (creation)")
+            // Verify expected modes are present
+            val modes = trips.map { it.mode }
+            assertEquals(2, modes.count { it == Trip.Mode.BUS }, "Should have 2 BUS trips (bus + refund)")
+            assertEquals(1, modes.count { it == Trip.Mode.METRO }, "Should have 1 MRT trip")
+            assertEquals(1, modes.count { it == Trip.Mode.OTHER }, "Should have 1 OTHER trip (creation)")
 
-        // MRT trip should have stations
-        val mrtTrip = trips.first { it.mode == Trip.Mode.METRO }
-        assertNotNull(mrtTrip.startStation, "MRT trip should have a start station")
-        assertNotNull(mrtTrip.endStation, "MRT trip should have an end station")
+            // MRT trip should have stations
+            val mrtTrip = trips.first { it.mode == Trip.Mode.METRO }
+            assertNotNull(mrtTrip.startStation, "MRT trip should have a start station")
+            assertNotNull(mrtTrip.endStation, "MRT trip should have an end station")
 
-        // Bus trips should not have stations (BUS_REFUND userData handled via toStationOrNull)
-        trips.filter { it.mode == Trip.Mode.BUS }.forEach { busTrip ->
-            assertNull(busTrip.startStation, "Bus trip should not have a station")
+            // Bus trips should not have stations (BUS_REFUND userData handled via toStationOrNull)
+            trips.filter { it.mode == Trip.Mode.BUS }.forEach { busTrip ->
+                assertNull(busTrip.startStation, "Bus trip should not have a station")
+            }
+
+            // CREATION trip should not have a station (blank userData nullified by toStationOrNull)
+            val creationTrip = trips.first { it.mode == Trip.Mode.OTHER }
+            assertNull(creationTrip.startStation, "CREATION trip should not have a station for blank userData")
         }
-
-        // CREATION trip should not have a station (blank userData nullified by toStationOrNull)
-        val creationTrip = trips.first { it.mode == Trip.Mode.OTHER }
-        assertNull(creationTrip.startStation, "CREATION trip should not have a station for blank userData")
-    }
 
     // --- Holo (DESFire, serial-only) ---
     // Source: Metrodroid test asset unused.json
@@ -301,28 +306,29 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial-only card (balance/history stored in central database)
 
     @Test
-    fun testHoloDump() {
-        val factory = HoloTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<DesfireCard, HoloTransitInfo>(
-                "holo/Holo.json",
-                factory,
-            )
+    fun testHoloDump() =
+        runTest {
+            val factory = HoloTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<DesfireCard, HoloTransitInfo>(
+                    "holo/Holo.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("HOLO", identity.name)
-        assertNotNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("HOLO", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber)
 
-        // Serial-only card: no balance, no trips, but has emptyStateMessage
-        assertTrue(info is SerialOnlyTransitInfo)
-        assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
-        assertNull(info.trips, "Serial-only card should have null trips")
-        assertTrue(info.balances.isNullOrEmpty(), "Serial-only card should have no balances")
+            // Serial-only card: no balance, no trips, but has emptyStateMessage
+            assertTrue(info is SerialOnlyTransitInfo)
+            assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
+            assertNull(info.trips, "Serial-only card should have null trips")
+            assertTrue(info.balances.isNullOrEmpty(), "Serial-only card should have no balances")
 
-        // Holo has extraInfo (last transaction, manufacturing ID)
-        assertNotNull(info.info, "Holo should have info items")
-        assertTrue(info.info!!.isNotEmpty(), "Holo should have at least one info item")
-    }
+            // Holo has extraInfo (last transaction, manufacturing ID)
+            assertNotNull(info.info, "Holo should have info items")
+            assertTrue(info.info!!.isNotEmpty(), "Holo should have at least one info item")
+        }
 
     // --- Mobib (Calypso, blank card) ---
     // Source: Metrodroid test asset mobib_blank.json
@@ -330,25 +336,26 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Blank card: 0 trips, 0 subscriptions
 
     @Test
-    fun testMobibDump() {
-        val factory = MobibTransitInfo.Factory(stringResource)
-        val rawCard = TestAssetLoader.loadMetrodroidJsonCard("mobib/Mobib.json")
-        val card = rawCard.parse() as ISO7816Card
-        assertTrue(factory.check(card), "Mobib factory should recognize this card")
+    fun testMobibDump() =
+        runTest {
+            val factory = MobibTransitInfo.Factory()
+            val rawCard = TestAssetLoader.loadMetrodroidJsonCard("mobib/Mobib.json")
+            val card = rawCard.parse() as ISO7816Card
+            assertTrue(factory.check(card), "Mobib factory should recognize this card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Mobib", identity.name)
-        assertNotNull(identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Mobib", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse Mobib transit info")
-        assertTrue(info is MobibTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse Mobib transit info")
+            assertTrue(info is MobibTransitInfo)
 
-        // Blank card — no trips
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(0, trips.size)
-    }
+            // Blank card — no trips
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(0, trips.size)
+        }
 
     // --- EasyCard (Classic, MFC binary) ---
     // Source: Test asset deadbeef.mfc (from Metrodroid's EasyCard test)
@@ -356,46 +363,47 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Tests the CardImporter.importMfcDump() path used by the Explore screen
 
     @Test
-    fun testEasyCardMfcDump() {
-        val bytes = loadTestResource("easycard/deadbeef.mfc")
-        assertNotNull(bytes, "Test resource not found: easycard/deadbeef.mfc")
+    fun testEasyCardMfcDump() =
+        runTest {
+            val bytes = loadTestResource("easycard/deadbeef.mfc")
+            assertNotNull(bytes, "Test resource not found: easycard/deadbeef.mfc")
 
-        val json =
-            Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-            }
-        val importer = CardImporter.create(KotlinxCardSerializer(json))
-        val result = importer.importMfcDump(bytes)
-        assertTrue(result is ImportResult.Success, "Failed to import MFC dump: $result")
+            val json =
+                Json {
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            val importer = CardImporter.create(KotlinxCardSerializer(json))
+            val result = importer.importMfcDump(bytes)
+            assertTrue(result is ImportResult.Success, "Failed to import MFC dump: $result")
 
-        val rawCard = (result as ImportResult.Success).cards.first()
-        val card = rawCard.parse() as ClassicCard
+            val rawCard = (result as ImportResult.Success).cards.first()
+            val card = rawCard.parse() as ClassicCard
 
-        val factory = EasyCardTransitFactory(stringResource)
-        assertTrue(factory.check(card), "EasyCard factory should recognize this card")
+            val factory = EasyCardTransitFactory()
+            assertTrue(factory.check(card), "EasyCard factory should recognize this card")
 
-        val identity = factory.parseIdentity(card)
-        assertNotNull(identity.name)
+            val identity = factory.parseIdentity(card)
+            assertNotNull(identity.name)
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse EasyCard transit info")
-        assertTrue(info is EasyCardTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse EasyCard transit info")
+            assertTrue(info is EasyCardTransitInfo)
 
-        // Balance: 245 TWD
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.TWD(245), balances[0].balance)
+            // Balance: 245 TWD
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.TWD(245), balances[0].balance)
 
-        // 3 trips: bus, metro (merged tap-on/off), refill
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(3, trips.size)
-        assertEquals(Trip.Mode.BUS, trips[0].mode)
-        assertEquals(Trip.Mode.METRO, trips[1].mode)
-        assertEquals(Trip.Mode.TICKET_MACHINE, trips[2].mode)
-    }
+            // 3 trips: bus, metro (merged tap-on/off), refill
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(3, trips.size)
+            assertEquals(Trip.Mode.BUS, trips[0].mode)
+            assertEquals(Trip.Mode.METRO, trips[1].mode)
+            assertEquals(Trip.Mode.TICKET_MACHINE, trips[2].mode)
+        }
 
     // --- Compass (Ultralight) ---
     // Source: CompassTransitTest LENREK_TEST_DATA[0]
@@ -403,25 +411,26 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial: 0001 0084 2851 9244 6735
 
     @Test
-    fun testCompassDump() {
-        val factory = CompassUltralightTransitInfo.FACTORY
-        val (card, info) =
-            loadAndParseMetrodroidJson<UltralightCard, CompassUltralightTransitInfo>(
-                "compass/Compass.json",
-                factory,
-            )
+    fun testCompassDump() =
+        runTest {
+            val factory = CompassUltralightTransitInfo.FACTORY
+            val (card, info) =
+                loadAndParseMetrodroidJson<UltralightCard, CompassUltralightTransitInfo>(
+                    "compass/Compass.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertNotNull(identity.name)
-        assertEquals("0001 0084 2851 9244 6735", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertNotNull(identity.name)
+            assertEquals("0001 0084 2851 9244 6735", identity.serialNumber)
 
-        assertNotNull(info.serialNumber)
+            assertNotNull(info.serialNumber)
 
-        // Should have trips (this card has 2 transaction records)
-        val trips = info.trips
-        assertNotNull(trips)
-        assertTrue(trips.isNotEmpty(), "Should have at least one trip")
-    }
+            // Should have trips (this card has 2 transaction records)
+            val trips = info.trips
+            assertNotNull(trips)
+            assertTrue(trips.isNotEmpty(), "Should have at least one trip")
+        }
 
     // --- SEQ Go (Classic, Nextfare) ---
     // Source: NextfareTransitTest test data
@@ -429,20 +438,21 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial: 0160 0012 3456 7893
 
     @Test
-    fun testSeqGoDump() {
-        val factory = SeqGoTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<ClassicCard, SeqGoTransitInfo>(
-                "seqgo/SeqGo.json",
-                factory,
-            )
+    fun testSeqGoDump() =
+        runTest {
+            val factory = SeqGoTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<ClassicCard, SeqGoTransitInfo>(
+                    "seqgo/SeqGo.json",
+                    factory,
+                )
 
-        assertEquals("0160 0012 3456 7893", info.serialNumber)
+            assertEquals("0160 0012 3456 7893", info.serialNumber)
 
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals("AUD", balances.first().balance.currencyCode)
-    }
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals("AUD", balances.first().balance.currencyCode)
+        }
 
     // --- LAX TAP (Classic, Nextfare) ---
     // Source: NextfareTransitTest test data
@@ -450,20 +460,21 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial: 0160 0323 4663 8769
 
     @Test
-    fun testLaxTapDump() {
-        val factory = LaxTapTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<ClassicCard, LaxTapTransitInfo>(
-                "laxtap/LaxTap.json",
-                factory,
-            )
+    fun testLaxTapDump() =
+        runTest {
+            val factory = LaxTapTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<ClassicCard, LaxTapTransitInfo>(
+                    "laxtap/LaxTap.json",
+                    factory,
+                )
 
-        assertEquals("0160 0323 4663 8769", info.serialNumber)
+            assertEquals("0160 0323 4663 8769", info.serialNumber)
 
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals("USD", balances.first().balance.currencyCode)
-    }
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals("USD", balances.first().balance.currencyCode)
+        }
 
     // --- MSP GoTo (Classic, Nextfare) ---
     // Source: NextfareTransitTest test data
@@ -471,20 +482,21 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial: 0160 0112 3581 3212
 
     @Test
-    fun testMspGoToDump() {
-        val factory = MspGotoTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<ClassicCard, MspGotoTransitInfo>(
-                "mspgoto/MspGoTo.json",
-                factory,
-            )
+    fun testMspGoToDump() =
+        runTest {
+            val factory = MspGotoTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<ClassicCard, MspGotoTransitInfo>(
+                    "mspgoto/MspGoTo.json",
+                    factory,
+                )
 
-        assertEquals("0160 0112 3581 3212", info.serialNumber)
+            assertEquals("0160 0112 3581 3212", info.serialNumber)
 
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals("USD", balances.first().balance.currencyCode)
-    }
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals("USD", balances.first().balance.currencyCode)
+        }
 
     // --- Myki (DESFire, serial-only) ---
     // Source: MykiTransitTest test data
@@ -492,23 +504,24 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial: 308425123456780
 
     @Test
-    fun testMykiDump() {
-        val factory = MykiTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<DesfireCard, MykiTransitInfo>(
-                "myki/Myki.json",
-                factory,
-            )
+    fun testMykiDump() =
+        runTest {
+            val factory = MykiTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<DesfireCard, MykiTransitInfo>(
+                    "myki/Myki.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertNotNull(identity.name)
-        assertEquals("308425123456780", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertNotNull(identity.name)
+            assertEquals("308425123456780", identity.serialNumber)
 
-        // Serial-only card: has emptyStateMessage, no trips
-        assertTrue(info is SerialOnlyTransitInfo)
-        assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
-        assertNull(info.trips, "Serial-only card should have null trips")
-    }
+            // Serial-only card: has emptyStateMessage, no trips
+            assertTrue(info is SerialOnlyTransitInfo)
+            assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
+            assertNull(info.trips, "Serial-only card should have null trips")
+        }
 
     // --- Octopus (FeliCa) ---
     // Source: OctopusTransitTest test data
@@ -517,22 +530,23 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // scannedAt: 2017-10-02 (post-offset-change date)
 
     @Test
-    fun testOctopusDump() {
-        val factory = OctopusTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<FelicaCard, OctopusTransitInfo>(
-                "octopus/Octopus.json",
-                factory,
-            )
+    fun testOctopusDump() =
+        runTest {
+            val factory = OctopusTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<FelicaCard, OctopusTransitInfo>(
+                    "octopus/Octopus.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertNotNull(identity.name)
+            val identity = factory.parseIdentity(card)
+            assertNotNull(identity.name)
 
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.HKD(-1440), balances[0].balance)
-    }
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.HKD(-1440), balances[0].balance)
+        }
 
     // --- TriMet Hop (DESFire, serial-only) ---
     // Source: Synthetic dump based on TrimetHopTransitFactory data format
@@ -540,26 +554,27 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Serial: 01-001-12345678-RA, issue date: 2023-06-15
 
     @Test
-    fun testTrimetHopDump() {
-        val factory = TrimetHopTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<DesfireCard, TrimetHopTransitInfo>(
-                "trimethop/TrimetHop.json",
-                factory,
-            )
+    fun testTrimetHopDump() =
+        runTest {
+            val factory = TrimetHopTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<DesfireCard, TrimetHopTransitInfo>(
+                    "trimethop/TrimetHop.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Hop Fastpass", identity.name)
-        assertEquals("01-001-12345678-RA", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertEquals("Hop Fastpass", identity.name.resolveAsync())
+            assertEquals("01-001-12345678-RA", identity.serialNumber)
 
-        assertTrue(info is TrimetHopTransitInfo)
-        assertEquals("01-001-12345678-RA", info.serialNumber)
+            assertTrue(info is TrimetHopTransitInfo)
+            assertEquals("01-001-12345678-RA", info.serialNumber)
 
-        // Serial-only card: has emptyStateMessage, no trips
-        assertTrue(info is SerialOnlyTransitInfo)
-        assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
-        assertNull(info.trips, "Serial-only card should have null trips")
-    }
+            // Serial-only card: has emptyStateMessage, no trips
+            assertTrue(info is SerialOnlyTransitInfo)
+            assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
+            assertNull(info.trips, "Serial-only card should have null trips")
+        }
 
     // --- Bilhete Unico (Classic) ---
     // Source: Synthetic dump based on BilheteUnicoSPTransitFactory data format
@@ -567,27 +582,28 @@ class SampleDumpIntegrationTest : CardDumpTest() {
     // Balance: R$24.00 (2400 cents BRL), serial: 110 242901149
 
     @Test
-    fun testBilheteUnicoDump() {
-        val factory = BilheteUnicoSPTransitFactory()
-        val (card, info) =
-            loadAndParseMetrodroidJson<ClassicCard, BilheteUnicoSPTransitInfo>(
-                "bilhete/BilheteUnico.json",
-                factory,
-            )
+    fun testBilheteUnicoDump() =
+        runTest {
+            val factory = BilheteUnicoSPTransitFactory()
+            val (card, info) =
+                loadAndParseMetrodroidJson<ClassicCard, BilheteUnicoSPTransitInfo>(
+                    "bilhete/BilheteUnico.json",
+                    factory,
+                )
 
-        val identity = factory.parseIdentity(card)
-        assertNotNull(identity.name)
-        assertEquals("110 242901149", identity.serialNumber)
+            val identity = factory.parseIdentity(card)
+            assertNotNull(identity.name)
+            assertEquals("110 242901149", identity.serialNumber)
 
-        // Balance: R$24.00 (2400 cents BRL)
-        val balances = info.balances
-        assertNotNull(balances)
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.BRL(2400), balances[0].balance)
+            // Balance: R$24.00 (2400 cents BRL)
+            val balances = info.balances
+            assertNotNull(balances)
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.BRL(2400), balances[0].balance)
 
-        // Synthetic card has no trips
-        val trips = info.trips
-        assertNotNull(trips)
-        assertEquals(0, trips.size)
-    }
+            // Synthetic card has no trips
+            val trips = info.trips
+            assertNotNull(trips)
+            assertEquals(0, trips.size)
+        }
 }

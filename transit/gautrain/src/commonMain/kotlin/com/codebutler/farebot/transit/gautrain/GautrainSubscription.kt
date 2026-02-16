@@ -24,7 +24,6 @@
 
 package com.codebutler.farebot.transit.gautrain
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
@@ -80,7 +79,6 @@ internal val GAUTRAIN_SUB_FIELDS =
 
 class GautrainSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val mType1: Int,
     private val mUsed: Int,
 ) : En1545Subscription() {
@@ -97,13 +95,11 @@ class GautrainSubscription(
     companion object {
         fun parse(
             data: ByteArray,
-            stringResource: StringResource,
             type1: Int,
             used: Int,
         ): GautrainSubscription =
             GautrainSubscription(
                 parsed = En1545Parser.parse(data, GAUTRAIN_SUB_FIELDS),
-                stringResource = stringResource,
                 mType1 = type1,
                 mUsed = used,
             )

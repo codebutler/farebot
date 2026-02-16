@@ -27,6 +27,7 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.ui.ListItemRecursive
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.indexOf
@@ -300,7 +301,7 @@ object ISO7816TLV {
                 if (id[0].toInt() and 0xe0 == 0xa0) {
                     try {
                         ListItemRecursive(
-                            id.hex(),
+                            FormattedString(id.hex()),
                             null,
                             infoBerTLV(header + data, multihead),
                         )
@@ -316,7 +317,7 @@ object ISO7816TLV {
         listOfNotNull(
             ListItemRecursive.collapsedValue("Raw", buf.toHexDump()),
             try {
-                ListItemRecursive("TLV", null, infoBerTLV(buf))
+                ListItemRecursive(FormattedString("TLV"), null, infoBerTLV(buf))
             } catch (e: Exception) {
                 null
             },

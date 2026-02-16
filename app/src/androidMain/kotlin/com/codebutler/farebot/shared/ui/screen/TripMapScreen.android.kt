@@ -81,7 +81,7 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
         if (startLatLng != null) {
             Marker(
                 state = remember { MarkerState(position = startLatLng) },
-                title = startStation.stationName,
+                title = startStation.shortStationName ?: startStation.stationName,
                 snippet = startStation.companyName,
                 icon = startIcon,
                 anchor = Offset(0.5f, 0.5f),
@@ -90,7 +90,7 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
         if (endLatLng != null) {
             Marker(
                 state = remember { MarkerState(position = endLatLng) },
-                title = endStation.stationName,
+                title = endStation.shortStationName ?: endStation.stationName,
                 snippet = endStation.companyName,
                 icon = endIcon,
                 anchor = Offset(0.5f, 0.5f),

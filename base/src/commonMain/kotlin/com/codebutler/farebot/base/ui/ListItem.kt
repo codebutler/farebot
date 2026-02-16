@@ -23,26 +23,34 @@
 
 package com.codebutler.farebot.base.ui
 
-import com.codebutler.farebot.base.util.getStringBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 import org.jetbrains.compose.resources.StringResource
 
-@Serializable
-@SerialName("normal")
 data class ListItem(
-    override val text1: String?,
-    override val text2: String?,
+    override val text1: FormattedString?,
+    override val text2: FormattedString?,
 ) : ListItemInterface() {
-    constructor(name: String) : this(name, null)
+    constructor(text1: FormattedString) : this(text1, null)
+
+    constructor(name: String) : this(FormattedString(name), null)
+
+    constructor(name: String, value: String?) : this(
+        text1 = FormattedString(name),
+        text2 = value?.let { FormattedString(it) },
+    )
 
     constructor(nameRes: StringResource, value: String?) : this(
-        text1 = getStringBlocking(nameRes),
+        text1 = FormattedString(nameRes),
+        text2 = value?.let { FormattedString(it) },
+    )
+
+    constructor(nameRes: StringResource, value: FormattedString?) : this(
+        text1 = FormattedString(nameRes),
         text2 = value,
     )
 
     constructor(nameRes: StringResource) : this(
-        text1 = getStringBlocking(nameRes),
+        text1 = FormattedString(nameRes),
         text2 = null,
     )
 
@@ -51,15 +59,15 @@ data class ListItem(
      * The nameRes should be a format string like "%s spend".
      */
     constructor(nameRes: StringResource, value: String?, vararg formatArgs: Any) : this(
-        text1 = getStringBlocking(nameRes, *formatArgs),
-        text2 = value,
+        text1 = FormattedString(nameRes, *formatArgs),
+        text2 = value?.let { FormattedString(it) },
     )
 
     /**
      * Constructor for two StringResources.
      */
     constructor(nameRes: StringResource, valueRes: StringResource) : this(
-        text1 = getStringBlocking(nameRes),
-        text2 = getStringBlocking(valueRes),
+        text1 = FormattedString(nameRes),
+        text2 = FormattedString(valueRes),
     )
 }

@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 
 abstract class TransitInfo {
     /**
@@ -78,7 +78,7 @@ abstract class TransitInfo {
     open val info: List<ListItemInterface>?
         get() = null
 
-    abstract val cardName: String
+    abstract val cardName: FormattedString
 
     /**
      * You can optionally add a link to an FAQ page for the card.
@@ -92,14 +92,14 @@ abstract class TransitInfo {
     open val onlineServicesPage: String?
         get() = null
 
-    open val warning: String?
+    open val warning: FormattedString?
         get() = null
 
     /**
      * Message to display as an empty state when the card has no trips, subscriptions, or
      * other displayable data. Used for serial-only cards to explain why no data is available.
      */
-    open val emptyStateMessage: String?
+    open val emptyStateMessage: FormattedString?
         get() = null
 
     /**
@@ -124,5 +124,5 @@ abstract class TransitInfo {
         }
     }
 
-    open fun getAdvancedUi(stringResource: StringResource): FareBotUiTree? = null
+    open suspend fun getAdvancedUi(): FareBotUiTree? = null
 }

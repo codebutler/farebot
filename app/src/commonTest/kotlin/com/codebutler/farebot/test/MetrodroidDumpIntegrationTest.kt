@@ -33,6 +33,7 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.troika.TroikaTransitFactory
 import com.codebutler.farebot.transit.troika.TroikaTransitInfo
 import com.codebutler.farebot.transit.ventra.VentraUltralightTransitInfo
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -57,128 +58,131 @@ class MetrodroidDumpIntegrationTest {
     // Balance: $8.44 USD, 2 transactions
 
     @Test
-    fun testVentraUltralight() {
-        val pages =
-            listOf(
-                UltralightPage.create(0, "04898386".hexToByteArray()),
-                UltralightPage.create(1, "ba8a1494".hexToByteArray()),
-                UltralightPage.create(2, "b0480000".hexToByteArray()),
-                UltralightPage.create(3, "00000000".hexToByteArray()),
-                UltralightPage.create(4, "0a04009a".hexToByteArray()),
-                UltralightPage.create(5, "30013f00".hexToByteArray()),
-                UltralightPage.create(6, "000000a4".hexToByteArray()),
-                UltralightPage.create(7, "7b7b1681".hexToByteArray()),
-                UltralightPage.create(8, "00000000".hexToByteArray()),
-                UltralightPage.create(9, "83690100".hexToByteArray()),
-                UltralightPage.create(10, "59300001".hexToByteArray()),
-                UltralightPage.create(11, "00001940".hexToByteArray()),
-                UltralightPage.create(12, "665a5a07".hexToByteArray()),
-                UltralightPage.create(13, "82690100".hexToByteArray()),
-                UltralightPage.create(14, "593d0001".hexToByteArray()),
-                UltralightPage.create(15, "00009e4f".hexToByteArray()),
-                UltralightPage.create(16, "000000ff".hexToByteArray()),
-                UltralightPage.create(17, "00050000".hexToByteArray()),
-                UltralightPage.create(18, "00000000".hexToByteArray()),
-                UltralightPage.create(19, "00000000".hexToByteArray()),
-            )
+    fun testVentraUltralight() =
+        runTest {
+            val pages =
+                listOf(
+                    UltralightPage.create(0, "04898386".hexToByteArray()),
+                    UltralightPage.create(1, "ba8a1494".hexToByteArray()),
+                    UltralightPage.create(2, "b0480000".hexToByteArray()),
+                    UltralightPage.create(3, "00000000".hexToByteArray()),
+                    UltralightPage.create(4, "0a04009a".hexToByteArray()),
+                    UltralightPage.create(5, "30013f00".hexToByteArray()),
+                    UltralightPage.create(6, "000000a4".hexToByteArray()),
+                    UltralightPage.create(7, "7b7b1681".hexToByteArray()),
+                    UltralightPage.create(8, "00000000".hexToByteArray()),
+                    UltralightPage.create(9, "83690100".hexToByteArray()),
+                    UltralightPage.create(10, "59300001".hexToByteArray()),
+                    UltralightPage.create(11, "00001940".hexToByteArray()),
+                    UltralightPage.create(12, "665a5a07".hexToByteArray()),
+                    UltralightPage.create(13, "82690100".hexToByteArray()),
+                    UltralightPage.create(14, "593d0001".hexToByteArray()),
+                    UltralightPage.create(15, "00009e4f".hexToByteArray()),
+                    UltralightPage.create(16, "000000ff".hexToByteArray()),
+                    UltralightPage.create(17, "00050000".hexToByteArray()),
+                    UltralightPage.create(18, "00000000".hexToByteArray()),
+                    UltralightPage.create(19, "00000000".hexToByteArray()),
+                )
 
-        val rawCard =
-            RawUltralightCard.create(
-                tagId = "048983ba8a1494".hexToByteArray(),
-                scannedAt = Instant.fromEpochMilliseconds(1708017434025),
-                pages = pages,
-                type = 1, // EV1
-            )
+            val rawCard =
+                RawUltralightCard.create(
+                    tagId = "048983ba8a1494".hexToByteArray(),
+                    scannedAt = Instant.fromEpochMilliseconds(1708017434025),
+                    pages = pages,
+                    type = 1, // EV1
+                )
 
-        val card = rawCard.parse()
-        assertTrue(card is UltralightCard, "Expected UltralightCard")
+            val card = rawCard.parse()
+            assertTrue(card is UltralightCard, "Expected UltralightCard")
 
-        val factory = VentraUltralightTransitInfo.FACTORY
-        assertTrue(factory.check(card), "Ventra factory should recognize this card")
+            val factory = VentraUltralightTransitInfo.FACTORY
+            assertTrue(factory.check(card), "Ventra factory should recognize this card")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Ventra", identity.name)
-        assertNotNull(identity.serialNumber, "Should have a serial number")
+            val identity = factory.parseIdentity(card)
+            assertEquals("Ventra", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber, "Should have a serial number")
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse Ventra transit info")
-        assertTrue(info is VentraUltralightTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse Ventra transit info")
+            assertTrue(info is VentraUltralightTransitInfo)
 
-        // Balance: $8.44 USD (844 cents)
-        val balances = info.balances
-        assertNotNull(balances, "Should have balances")
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.USD(844), balances[0].balance)
+            // Balance: $8.44 USD (844 cents)
+            val balances = info.balances
+            assertNotNull(balances, "Should have balances")
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.USD(844), balances[0].balance)
 
-        // Should have trips
-        val trips = info.trips
-        assertNotNull(trips, "Should have trips")
-        assertTrue(trips.isNotEmpty(), "Should have at least one trip")
-    }
+            // Should have trips
+            val trips = info.trips
+            assertNotNull(trips, "Should have trips")
+            assertTrue(trips.isNotEmpty(), "Should have at least one trip")
+        }
 
     // --- Troika Classic (E/3 format, balance 0 RUB) ---
     // Source: https://github.com/metrodroid/metrodroid/issues/735
     // Card: Troika classic, layout E sublayout 3, Moscow Metro
 
     @Test
-    fun testTroikaClassicE3() {
-        val card =
-            buildTroikaClassicCard(
-                // Sector 8 data: layout E, sublayout 3, balance 0 kopeks
-                sector8Block0 = "45DB101958FBCE19768AA40000000000".hexToByteArray(),
-                sector8Block1 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
-                sector8Block2 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
-            )
+    fun testTroikaClassicE3() =
+        runTest {
+            val card =
+                buildTroikaClassicCard(
+                    // Sector 8 data: layout E, sublayout 3, balance 0 kopeks
+                    sector8Block0 = "45DB101958FBCE19768AA40000000000".hexToByteArray(),
+                    sector8Block1 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
+                    sector8Block2 = "2C013D460A001400000010009BB56E63".hexToByteArray(),
+                )
 
-        val factory = TroikaTransitFactory()
-        assertTrue(factory.check(card), "Troika factory should recognize this card (E/3)")
+            val factory = TroikaTransitFactory()
+            assertTrue(factory.check(card), "Troika factory should recognize this card (E/3)")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Troika", identity.name)
-        assertNotNull(identity.serialNumber, "Should have serial number")
+            val identity = factory.parseIdentity(card)
+            assertEquals("Troika", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber, "Should have serial number")
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse Troika transit info")
-        assertTrue(info is TroikaTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse Troika transit info")
+            assertTrue(info is TroikaTransitInfo)
 
-        // Balance: 0.00 RUB (0 kopeks)
-        val balances = info.balances
-        assertNotNull(balances, "Should have balances")
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.RUB(0), balances[0].balance)
-    }
+            // Balance: 0.00 RUB (0 kopeks)
+            val balances = info.balances
+            assertNotNull(balances, "Should have balances")
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.RUB(0), balances[0].balance)
+        }
 
     // --- Troika Classic (E/5 format, balance 50 RUB) ---
     // Source: https://github.com/metrodroid/metrodroid/issues/735#issuecomment-637891248
     // Card: Troika classic, layout E sublayout 5, Moscow Metro
 
     @Test
-    fun testTroikaClassicE5() {
-        val card =
-            buildTroikaClassicCard(
-                // Sector 8 data: layout E, sublayout 5, balance 5000 kopeks (50 RUB)
-                sector8Block0 = "45DB101958FBCE2A4915216AA1A00800".hexToByteArray(),
-                sector8Block1 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
-                sector8Block2 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
-            )
+    fun testTroikaClassicE5() =
+        runTest {
+            val card =
+                buildTroikaClassicCard(
+                    // Sector 8 data: layout E, sublayout 5, balance 5000 kopeks (50 RUB)
+                    sector8Block0 = "45DB101958FBCE2A4915216AA1A00800".hexToByteArray(),
+                    sector8Block1 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
+                    sector8Block2 = "0D1C0A000004E20B004001001EB7ADDE".hexToByteArray(),
+                )
 
-        val factory = TroikaTransitFactory()
-        assertTrue(factory.check(card), "Troika factory should recognize this card (E/5)")
+            val factory = TroikaTransitFactory()
+            assertTrue(factory.check(card), "Troika factory should recognize this card (E/5)")
 
-        val identity = factory.parseIdentity(card)
-        assertEquals("Troika", identity.name)
-        assertNotNull(identity.serialNumber, "Should have serial number")
+            val identity = factory.parseIdentity(card)
+            assertEquals("Troika", identity.name.resolveAsync())
+            assertNotNull(identity.serialNumber, "Should have serial number")
 
-        val info = factory.parseInfo(card)
-        assertNotNull(info, "Failed to parse Troika transit info")
-        assertTrue(info is TroikaTransitInfo)
+            val info = factory.parseInfo(card)
+            assertNotNull(info, "Failed to parse Troika transit info")
+            assertTrue(info is TroikaTransitInfo)
 
-        // Balance: 50.00 RUB (5000 kopeks)
-        val balances = info.balances
-        assertNotNull(balances, "Should have balances")
-        assertEquals(1, balances.size)
-        assertEquals(TransitCurrency.RUB(5000), balances[0].balance)
-    }
+            // Balance: 50.00 RUB (5000 kopeks)
+            val balances = info.balances
+            assertNotNull(balances, "Should have balances")
+            assertEquals(1, balances.size)
+            assertEquals(TransitCurrency.RUB(5000), balances[0].balance)
+        }
 
     /**
      * Builds a minimal Classic card with Troika data in sector 8.

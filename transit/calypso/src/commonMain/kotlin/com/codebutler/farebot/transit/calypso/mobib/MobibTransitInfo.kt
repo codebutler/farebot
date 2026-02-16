@@ -25,8 +25,8 @@ package com.codebutler.farebot.transit.calypso.mobib
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.formatDate
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
@@ -66,7 +66,7 @@ class MobibTransitInfo internal constructor(
     private val purchase: Int,
     private val totalTrips: Int,
 ) : TransitInfo() {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = FormattedString(NAME)
 
     override val info: List<ListItemInterface>
         get() {
@@ -110,13 +110,11 @@ class MobibTransitInfo internal constructor(
         val TZ = TimeZone.of("Europe/Brussels")
     }
 
-    class Factory(
-        stringResource: StringResource,
-    ) : CalypsoTransitFactory(stringResource) {
+    class Factory : CalypsoTransitFactory() {
         override val allCards: List<CardInfo>
             get() = listOf(CARD_INFO)
 
-        override val name: String = NAME
+        override val name: FormattedString = FormattedString(NAME)
 
         override fun checkTenv(tenv: ByteArray): Boolean {
             val networkId = tenv.getBitsFromBuffer(13, 24)
@@ -171,7 +169,7 @@ class MobibTransitInfo internal constructor(
 
             for ((idx, record) in contracts.withIndex()) {
                 val sub =
-                    MobibSubscription.parse(record, stringResource, Calypso1545TransitData.getCounter(app, idx + 1))
+                    MobibSubscription.parse(record, Calypso1545TransitData.getCounter(app, idx + 1))
                         ?: continue
                 val bal = sub.cost
                 if (bal != null) {

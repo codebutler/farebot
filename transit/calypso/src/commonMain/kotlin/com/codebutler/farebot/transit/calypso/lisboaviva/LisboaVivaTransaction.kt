@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.transit.calypso.lisboaviva
 
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -32,9 +31,6 @@ import com.codebutler.farebot.transit.en1545.En1545Lookup
 import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545Parser
 import com.codebutler.farebot.transit.en1545.En1545Transaction
-import farebot.transit.calypso.generated.resources.Res
-import farebot.transit.calypso.generated.resources.lisboa_route_cascais
-import farebot.transit.calypso.generated.resources.lisboa_route_sado
 
 internal class LisboaVivaTransaction private constructor(
     override val parsed: En1545Parsed,
@@ -54,9 +50,9 @@ internal class LisboaVivaTransaction private constructor(
             val routeNumber = parsed.getInt(EVENT_ROUTE_NUMBER) ?: return emptyList()
             if (agency == LisboaVivaLookup.AGENCY_CP && routeNumber == LisboaVivaLookup.ROUTE_CASCAIS_SADO) {
                 return if ((stationId ?: 0) <= 54) {
-                    listOf(getStringBlocking(Res.string.lisboa_route_cascais))
+                    listOf("Cascais")
                 } else {
-                    listOf(getStringBlocking(Res.string.lisboa_route_sado))
+                    listOf("Sado")
                 }
             }
             return super.routeNames

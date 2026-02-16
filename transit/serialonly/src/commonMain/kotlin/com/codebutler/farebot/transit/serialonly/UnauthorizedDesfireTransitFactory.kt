@@ -25,7 +25,7 @@ package com.codebutler.farebot.transit.serialonly
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.desfire.UnauthorizedDesfireFile
 import com.codebutler.farebot.transit.CardInfo
@@ -59,15 +59,10 @@ class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, Unauthoriz
         }
     }
 
-    override fun parseIdentity(card: DesfireCard): TransitIdentity {
-        val cardName = getName(card)
-        return TransitIdentity.create(cardName, null)
-    }
+    override fun parseIdentity(card: DesfireCard): TransitIdentity = TransitIdentity.create(getName(card), null)
 
-    override fun parseInfo(card: DesfireCard): UnauthorizedDesfireTransitInfo {
-        val cardName = getName(card)
-        return UnauthorizedDesfireTransitInfo(cardName = cardName)
-    }
+    override fun parseInfo(card: DesfireCard): UnauthorizedDesfireTransitInfo =
+        UnauthorizedDesfireTransitInfo(cardNameStr = getNameString(card))
 
     companion object {
         /**
@@ -93,21 +88,28 @@ class UnauthorizedDesfireTransitFactory : TransitFactory<DesfireCard, Unauthoriz
          */
         val HIDDEN_APP_IDS: List<Int> = List(32) { 0x425300 + it }
 
-        private fun getName(card: DesfireCard): String {
+        private fun getNameString(card: DesfireCard): String? {
             for ((appId, name) in TYPES) {
                 if (card.getApplication(appId) != null) {
                     return name
                 }
             }
-            return getStringBlocking(Res.string.locked_mfd_card)
+            return null
+        }
+
+        private fun getName(card: DesfireCard): FormattedString {
+            val name = getNameString(card)
+            return if (name != null) FormattedString(name) else FormattedString(Res.string.locked_mfd_card)
         }
     }
 }
 
 @Serializable
 data class UnauthorizedDesfireTransitInfo(
-    override val cardName: String,
+    val cardNameStr: String? = null,
 ) : TransitInfo() {
+    override val cardName: FormattedString
+        get() = if (cardNameStr != null) FormattedString(cardNameStr) else FormattedString(Res.string.locked_mfd_card)
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>

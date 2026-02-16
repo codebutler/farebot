@@ -21,7 +21,7 @@
 
 package com.codebutler.farebot.transit.ricaricami
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
@@ -38,5 +38,5 @@ class RicaricaMiTransitInfo(
 ) : TransitInfo() {
     override val serialNumber: String? get() = null
 
-    override val cardName: String get() = getStringBlocking(Res.string.ricaricami_card_name)
+    override val cardName: FormattedString get() = FormattedString(Res.string.ricaricami_card_name)
 }

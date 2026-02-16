@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build-and-test:
-    name: Build & Test (JVM + Android)
+    name: Build & Test (JVM + Android + Web)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +37,9 @@ jobs:
 
       - name: Build Desktop
         run: ./gradlew :app:desktop:assemble
+
+      - name: Build Web
+        run: ./gradlew :app:web:wasmJsBrowserDistribution
 
   ios:
     name: Build & Test (iOS)

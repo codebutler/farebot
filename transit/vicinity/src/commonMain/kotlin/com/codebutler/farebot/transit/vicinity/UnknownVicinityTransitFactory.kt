@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit.vicinity
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.vicinity.VicinityCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
@@ -42,7 +42,7 @@ class UnknownVicinityTransitFactory : TransitFactory<VicinityCard, UnknownVicini
     override fun check(card: VicinityCard): Boolean = card.pages.isNotEmpty()
 
     override fun parseIdentity(card: VicinityCard): TransitIdentity {
-        val name = getStringBlocking(Res.string.unknown_nfcv_card)
+        val name = FormattedString(Res.string.unknown_nfcv_card)
         return TransitIdentity.create(name, null)
     }
 
@@ -50,7 +50,7 @@ class UnknownVicinityTransitFactory : TransitFactory<VicinityCard, UnknownVicini
 }
 
 class UnknownVicinityTransitInfo : TransitInfo() {
-    override val cardName: String = getStringBlocking(Res.string.unknown_nfcv_card)
+    override val cardName: FormattedString = FormattedString(Res.string.unknown_nfcv_card)
 
     override val serialNumber: String? = null
 

@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.TransitFactory
@@ -39,7 +39,7 @@ class MRTUltralightTransitFactory : TransitFactory<UltralightCard, MRTUltralight
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
         val serial = formatSerial(getSerial(card))
-        return TransitIdentity.create(getStringBlocking(Res.string.ultralight_mrt), serial)
+        return TransitIdentity.create(FormattedString(Res.string.ultralight_mrt), serial)
     }
 
     override fun parseInfo(card: UltralightCard): MRTUltralightTransitInfo = MRTUltralightTransitInfo(getSerial(card))
@@ -75,7 +75,7 @@ class MRTUltralightTransitInfo(
 ) : SerialOnlyTransitInfo() {
     override val reason: Reason = Reason.LOCKED
 
-    override val cardName: String = getStringBlocking(Res.string.ultralight_mrt)
+    override val cardName: FormattedString = FormattedString(Res.string.ultralight_mrt)
 
     override val serialNumber: String = MRTUltralightTransitFactory.formatSerial(serial)
 }

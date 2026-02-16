@@ -21,7 +21,7 @@
 
 package com.codebutler.farebot.transit.ricaricami
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
@@ -35,7 +35,6 @@ import kotlin.time.Instant
 
 class RicaricaMiTransaction(
     override val parsed: En1545Parsed,
-    private val stringResource: StringResource,
 ) : En1545Transaction() {
     private val transactionType: Int
         get() = parsed.getIntOrZero(TRANSACTION_TYPE)
@@ -70,30 +69,24 @@ class RicaricaMiTransaction(
         }
     }
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when (transport) {
                 RicaricaMiLookup.TRANSPORT_METRO, RicaricaMiLookup.TRANSPORT_TRAM, RicaricaMiLookup.TRANSPORT_BUS ->
-                    stringResource
-                        .getString(
-                            Res.string.ricaricami_agency_atm,
-                        )
-                RicaricaMiLookup.TRANSPORT_TRENORD1 -> stringResource.getString(Res.string.ricaricami_agency_trenord_1)
-                RicaricaMiLookup.TRANSPORT_TRENORD2 -> stringResource.getString(Res.string.ricaricami_agency_trenord_2)
-                else -> "$transport"
+                    FormattedString(Res.string.ricaricami_agency_atm)
+                RicaricaMiLookup.TRANSPORT_TRENORD1 -> FormattedString(Res.string.ricaricami_agency_trenord_1)
+                RicaricaMiLookup.TRANSPORT_TRENORD2 -> FormattedString(Res.string.ricaricami_agency_trenord_2)
+                else -> FormattedString("$transport")
             }
 
-    override val shortAgencyName: String?
+    override val shortAgencyName: FormattedString?
         get() =
             when (transport) {
                 RicaricaMiLookup.TRANSPORT_METRO, RicaricaMiLookup.TRANSPORT_TRAM, RicaricaMiLookup.TRANSPORT_BUS ->
-                    stringResource
-                        .getString(
-                            Res.string.ricaricami_agency_atm_short,
-                        )
-                RicaricaMiLookup.TRANSPORT_TRENORD1 -> stringResource.getString(Res.string.ricaricami_agency_trenord_1)
-                RicaricaMiLookup.TRANSPORT_TRENORD2 -> stringResource.getString(Res.string.ricaricami_agency_trenord_2)
-                else -> "$transport"
+                    FormattedString(Res.string.ricaricami_agency_atm_short)
+                RicaricaMiLookup.TRANSPORT_TRENORD1 -> FormattedString(Res.string.ricaricami_agency_trenord_1)
+                RicaricaMiLookup.TRANSPORT_TRENORD2 -> FormattedString(Res.string.ricaricami_agency_trenord_2)
+                else -> FormattedString("$transport")
             }
 
     override val stationId get(): Int? {
@@ -208,12 +201,9 @@ class RicaricaMiTransaction(
         private const val TRANSACTION_TAP_ON_TRANSFER = 2
         private const val TRANSACTION_TAP_OFF = 3
 
-        fun parse(
-            tripData: ByteArray,
-            stringResource: StringResource,
-        ) = RicaricaMiTransaction(
-            En1545Parser.parse(tripData, TRIP_FIELDS),
-            stringResource,
-        )
+        fun parse(tripData: ByteArray) =
+            RicaricaMiTransaction(
+                En1545Parser.parse(tripData, TRIP_FIELDS),
+            )
     }
 }

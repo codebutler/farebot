@@ -23,7 +23,7 @@ package com.codebutler.farebot.transit.kmt
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -49,8 +49,8 @@ class KMTTransitInfo(
 
     override val subscriptions: List<Subscription>? = null
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.kmt_longname)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.kmt_longname)
 
     override val info: List<ListItemInterface>
         get() =

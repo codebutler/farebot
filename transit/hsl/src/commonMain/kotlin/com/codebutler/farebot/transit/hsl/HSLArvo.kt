@@ -24,11 +24,8 @@ package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.DefaultStringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
-import com.codebutler.farebot.base.util.getPluralStringBlocking
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.transit.en1545.En1545Container
 import com.codebutler.farebot.transit.en1545.En1545FixedHex
@@ -47,30 +44,28 @@ class HSLArvo(
 ) : En1545Subscription() {
     override val lookup: En1545Lookup
         get() = HSLLookup
-    override val stringResource: StringResource
-        get() = DefaultStringResource()
 
-    internal fun formatPeriod(): String {
+    internal fun formatPeriod(): FormattedString {
         val period = parsed.getIntOrZero(CONTRACT_PERIOD)
         return when (parsed.getIntOrZero(CONTRACT_PERIOD_UNITS)) {
-            0 -> getPluralStringBlocking(Res.plurals.hsl_valid_mins, period, period)
-            1 -> getPluralStringBlocking(Res.plurals.hsl_valid_hours, period, period)
-            2 -> getPluralStringBlocking(Res.plurals.hsl_valid_days_24h, period, period)
-            else -> getPluralStringBlocking(Res.plurals.hsl_valid_days_calendar, period, period)
+            0 -> FormattedString.plural(Res.plurals.hsl_valid_mins, period, period)
+            1 -> FormattedString.plural(Res.plurals.hsl_valid_hours, period, period)
+            2 -> FormattedString.plural(Res.plurals.hsl_valid_days_24h, period, period)
+            else -> FormattedString.plural(Res.plurals.hsl_valid_days_calendar, period, period)
         }
     }
 
-    internal val profile: String?
+    internal val profile: FormattedString?
         get() {
             val prof = parsed.getInt(CUSTOMER_PROFILE)
             when (prof) {
                 null -> {}
-                1 -> return getStringBlocking(Res.string.hsl_adult)
-                else -> return getStringBlocking(Res.string.hsl_unknown_format, prof.toString())
+                1 -> return FormattedString(Res.string.hsl_adult)
+                else -> return FormattedString(Res.string.hsl_unknown_format, prof.toString())
             }
             return when (parsed.getInt(CHILD)) {
-                0 -> getStringBlocking(Res.string.hsl_adult)
-                1 -> getStringBlocking(Res.string.hsl_child)
+                0 -> FormattedString(Res.string.hsl_adult)
+                1 -> FormattedString(Res.string.hsl_child)
                 else -> null
             }
         }
@@ -98,7 +93,7 @@ class HSLArvo(
                     },
                 )
 
-    override val subscriptionName: String?
+    override val subscriptionName: FormattedString?
         get() {
             val area =
                 HSLLookup.getArea(
@@ -107,7 +102,7 @@ class HSLArvo(
                     isValidity = true,
                     ultralightCity = ultralightCity,
                 )
-            return getStringBlocking(Res.string.hsl_arvo_format, area ?: "")
+            return FormattedString(Res.string.hsl_arvo_format, area ?: "")
         }
 
     companion object {

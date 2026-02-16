@@ -26,9 +26,9 @@ package com.codebutler.farebot.transit.china
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -83,7 +83,7 @@ class CityUnionTransitInfo(
     override val serialNumber: String
         get() = mSerial.toString()
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = nameCity(mCity)
 
     override val info: List<ListItemInterface>?
@@ -95,15 +95,15 @@ class CityUnionTransitInfo(
             return if (cityInfo != null) {
                 listOf(
                     ListItem(
-                        getStringBlocking(Res.string.city_union_city),
-                        getStringBlocking(cityInfo.locationId),
+                        FormattedString(Res.string.city_union_city),
+                        FormattedString(cityInfo.locationId),
                     ),
                 )
             } else {
                 listOf(
                     ListItem(
-                        getStringBlocking(Res.string.city_union_city),
-                        getStringBlocking(Res.string.unknown_format, mCity.toString(16)),
+                        FormattedString(Res.string.city_union_city),
+                        FormattedString(Res.string.unknown_format, mCity.toString(16)),
                     ),
                 )
             }
@@ -176,12 +176,12 @@ class CityUnionTransitInfo(
                 override fun parseTransitData(card: ChinaCard): TransitInfo = parse(card)
             }
 
-        private fun nameCity(city: Int?): String {
+        private fun nameCity(city: Int?): FormattedString {
             val cityInfo = cities[city]
             return if (cityInfo != null) {
-                getStringBlocking(cityInfo.nameId)
+                FormattedString(cityInfo.nameId)
             } else {
-                getStringBlocking(Res.string.card_name_cityunion)
+                FormattedString(Res.string.card_name_cityunion)
             }
         }
 

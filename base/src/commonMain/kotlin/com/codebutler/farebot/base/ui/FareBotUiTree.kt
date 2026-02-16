@@ -1,32 +1,30 @@
 package com.codebutler.farebot.base.ui
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.StringResource as ComposeStringResource
+import org.jetbrains.compose.resources.StringResource
 
 @Serializable
 data class FareBotUiTree(
     val items: List<Item>,
 ) {
     companion object {
-        fun builder(stringResource: StringResource): Builder = Builder(stringResource)
+        fun builder(): Builder = Builder()
 
-        private fun buildItems(itemBuilders: List<Item.Builder>): List<Item> = itemBuilders.map { it.build() }
+        private suspend fun buildItems(itemBuilders: List<Item.Builder>): List<Item> = itemBuilders.map { it.build() }
     }
 
-    class Builder(
-        private val stringResource: StringResource,
-    ) {
+    class Builder {
         private val itemBuilders = mutableListOf<Item.Builder>()
 
         fun item(): Item.Builder {
-            val builder = Item.builder(stringResource)
+            val builder = Item.builder()
             itemBuilders.add(builder)
             return builder
         }
 
-        fun build(): FareBotUiTree = FareBotUiTree(buildItems(itemBuilders))
+        suspend fun build(): FareBotUiTree = FareBotUiTree(buildItems(itemBuilders))
     }
 
     @Serializable
@@ -36,22 +34,28 @@ data class FareBotUiTree(
         val children: List<Item>,
     ) {
         companion object {
-            fun builder(stringResource: StringResource): Builder = Builder(stringResource)
+            fun builder(): Builder = Builder()
         }
 
-        class Builder(
-            private val stringResource: StringResource,
-        ) {
-            private var title: String = ""
+        class Builder {
+            private var title: FormattedString = FormattedString("")
             private var value: Any? = null
             private val childBuilders = mutableListOf<Builder>()
 
             fun title(text: String): Builder {
-                this.title = text
+                this.title = FormattedString(text)
                 return this
             }
 
-            fun title(textRes: ComposeStringResource): Builder = title(stringResource.getString(textRes))
+            fun title(textRes: StringResource): Builder {
+                this.title = FormattedString(textRes)
+                return this
+            }
+
+            fun title(formattedString: FormattedString): Builder {
+                this.title = formattedString
+                return this
+            }
 
             fun value(value: Any?): Builder {
                 this.value = value
@@ -59,7 +63,7 @@ data class FareBotUiTree(
             }
 
             fun item(): Builder {
-                val builder = Item.builder(stringResource)
+                val builder = Item.builder()
                 childBuilders.add(builder)
                 return builder
             }
@@ -73,13 +77,17 @@ data class FareBotUiTree(
                     .value(value)
 
             fun item(
-                title: ComposeStringResource,
+                title: StringResource,
                 value: Any?,
-            ): Builder = item(stringResource.getString(title), value)
+            ): Builder =
+                item().also {
+                    it.title = FormattedString(title)
+                    it.value(value)
+                }
 
-            fun build(): Item =
+            suspend fun build(): Item =
                 Item(
-                    title = title,
+                    title = title.resolveAsync(),
                     value = value,
                     children = buildItems(childBuilders),
                 )

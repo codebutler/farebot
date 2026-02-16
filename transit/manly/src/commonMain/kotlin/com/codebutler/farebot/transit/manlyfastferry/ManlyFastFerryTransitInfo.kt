@@ -23,7 +23,7 @@
 
 package com.codebutler.farebot.transit.manlyfastferry
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.erg.ErgTransitInfo
 import com.codebutler.farebot.transit.erg.ErgTransitInfoCapsule
@@ -43,8 +43,8 @@ import farebot.transit.manly.generated.resources.manly_card_name
 class ManlyFastFerryTransitInfo(
     capsule: ErgTransitInfoCapsule,
 ) : ErgTransitInfo(capsule, { TransitCurrency.AUD(it) }) {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.manly_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.manly_card_name)
 
     companion object {
         internal const val AGENCY_ID = 0x0227

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.calypso.CalypsoTransitInfo
 import com.codebutler.farebot.transit.calypso.IntercodeFields
 import com.codebutler.farebot.transit.en1545.CalypsoParseResult
@@ -31,7 +32,7 @@ import com.codebutler.farebot.transit.en1545.En1545TransitData
 internal class IntercodeTransitInfo(
     result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-    override val cardName: String
+    override val cardName: FormattedString
         get() {
             val networkId = result.ticketEnv.getIntOrZero(En1545TransitData.ENV_NETWORK_ID)
             return getLookup(networkId).cardName { result.ticketEnv }
@@ -62,24 +63,24 @@ internal class IntercodeTransitInfo(
 
         fun isIntercode(networkId: Int): Boolean = NETWORKS[networkId] != null || COUNTRY_ID_FRANCE == networkId shr 12
 
-        internal fun fallbackCardName(networkId: Int): String =
+        internal fun fallbackCardName(networkId: Int): FormattedString =
             if (networkId shr 12 == COUNTRY_ID_FRANCE) {
-                "Intercode-France-" + (networkId and 0xfff).toString(16)
+                FormattedString("Intercode-France-" + (networkId and 0xfff).toString(16))
             } else {
-                "Intercode-" + networkId.toString(16)
+                FormattedString("Intercode-" + networkId.toString(16))
             }
 
         internal fun getCardName(
             networkId: Int,
             env: ByteArray,
-        ): String =
+        ): FormattedString =
             getLookup(networkId).cardName { parseTicketEnv(env) }
                 ?: fallbackCardName(networkId)
 
         internal fun parseTicketEnv(tenv: ByteArray) =
             En1545Parser.parse(tenv, IntercodeFields.TICKET_ENV_HOLDER_FIELDS)
 
-        val allCardNames: List<String>
+        val allCardNames: List<FormattedString>
             get() = NETWORKS.values.flatMap { it.allCardNames }
     }
 }

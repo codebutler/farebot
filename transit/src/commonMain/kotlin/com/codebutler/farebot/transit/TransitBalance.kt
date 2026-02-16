@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit
 
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 import kotlin.time.Instant
 
 /**
@@ -30,10 +30,9 @@ import kotlin.time.Instant
  *
  * Some cards have multiple balances (e.g., a stored value purse and a day pass).
  */
-@Serializable
 data class TransitBalance(
     val balance: TransitCurrency,
-    val name: String? = null,
+    val name: FormattedString? = null,
     val validFrom: Instant? = null,
     val validTo: Instant? = null,
 )

@@ -23,8 +23,8 @@
 package com.codebutler.farebot.transit.ndef
 
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.classic.ClassicBlock
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -46,7 +46,7 @@ data class NdefData(
     override val serialNumber: String?
         get() = null
 
-    override val cardName: String
+    override val cardName: FormattedString
         get() = NAME
 
     override val info: List<ListItemInterface>?
@@ -58,8 +58,8 @@ data class NdefData(
     fun getEntryExtType(type: String): NdefExtType? = getEntryExtType(type.encodeToByteArray())
 
     companion object {
-        val NAME: String
-            get() = getStringBlocking(Res.string.ndef_card_name)
+        val NAME: FormattedString
+            get() = FormattedString(Res.string.ndef_card_name)
 
         fun checkClassic(card: ClassicCard): Boolean =
             MifareClassicAccessDirectory

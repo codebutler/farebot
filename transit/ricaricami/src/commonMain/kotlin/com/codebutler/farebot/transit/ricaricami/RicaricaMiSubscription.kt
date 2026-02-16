@@ -21,7 +21,6 @@
 
 package com.codebutler.farebot.transit.ricaricami
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -35,7 +34,6 @@ import kotlin.time.Instant
 
 class RicaricaMiSubscription(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val counter: Int,
 ) : En1545Subscription() {
     private val numValidated: Int
@@ -110,13 +108,11 @@ class RicaricaMiSubscription(
             data: ByteArray,
             counter: ByteArray,
             xdata: ByteArray,
-            stringResource: StringResource,
         ): RicaricaMiSubscription {
             val parsed = En1545Parser.parse(data, DYN_FIELDS)
             parsed.append(xdata, STAT_FIELDS) // Last 16 bits: hash
             return RicaricaMiSubscription(
                 parsed = parsed,
-                stringResource = stringResource,
                 counter = counter.byteArrayToIntReversed(0, 4),
             )
         }

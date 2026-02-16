@@ -22,9 +22,12 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.en1545.En1545LookupUnknown
 
 class IntercodeLookupUnknown(
-    override val cardName: String?,
+    name: String?,
 ) : En1545LookupUnknown(),
-    IntercodeLookupSingle
+    IntercodeLookupSingle {
+    override val cardName: FormattedString? = name?.let { FormattedString(it) }
+}

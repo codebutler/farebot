@@ -25,12 +25,11 @@ package com.codebutler.farebot.transit.nextfareul
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
 import com.codebutler.farebot.base.util.byteArrayToLong
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.TransactionTrip
@@ -88,9 +87,9 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
             val items = mutableListOf<ListItem>()
             val ticketTypeValue =
                 if (capsule.mType.toInt() == 8) {
-                    getStringBlocking(Res.string.nextfareul_ticket_type_concession)
+                    FormattedString(Res.string.nextfareul_ticket_type_concession)
                 } else {
-                    getStringBlocking(Res.string.nextfareul_ticket_type_regular)
+                    FormattedString(Res.string.nextfareul_ticket_type_regular)
                 }
             items.add(ListItem(Res.string.nextfareul_ticket_type, ticketTypeValue))
 
@@ -103,15 +102,15 @@ abstract class NextfareUltralightTransitData : TransitInfo() {
             return items
         }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val b = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val b = FareBotUiTree.builder()
         b.item().title(Res.string.nextfareul_machine_code).value(capsule.mMachineCode.toString(16))
         return b.build()
     }
 
     protected abstract fun makeCurrency(value: Int): TransitCurrency
 
-    protected abstract fun getProductName(productCode: Int): String?
+    protected abstract fun getProductName(productCode: Int): FormattedString?
 
     companion object {
         fun parse(

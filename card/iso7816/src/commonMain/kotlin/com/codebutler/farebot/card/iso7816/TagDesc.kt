@@ -26,6 +26,7 @@ package com.codebutler.farebot.card.iso7816
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.ui.ListItemRecursive
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.base.util.getHexString
@@ -115,7 +116,15 @@ enum class TagContents : TagContentsInterface {
             if (data.size < 8) {
                 data.hex()
             } else {
-                subList(data).map { "${it.text1.orEmpty()}: ${it.text2.orEmpty()}" }.joinToString(", ")
+                val version = data.byteArrayToInt(0, 1).toString()
+                val unpredictable = data.getHexString(1, 4)
+                val qualifiers = data.getHexString(5, 2)
+                val rfu = data.getHexString(7, 1)
+                val parts = mutableListOf("v=$version", "un=$unpredictable", "tq=$qualifiers", "rfu=$rfu")
+                if (data.size > 8) {
+                    parts.add("tail=${data.sliceOffLen(8, data.size - 8).toHexDump()}")
+                }
+                parts.joinToString(", ")
             }
 
         override fun interpretTag(
@@ -125,7 +134,7 @@ enum class TagContents : TagContentsInterface {
             if (data.size < 8) {
                 return ListItem(name, data.getHexString(0, data.size))
             }
-            return ListItemRecursive(name, null, subList(data))
+            return ListItemRecursive(FormattedString(name), null, subList(data))
         }
     },
     CONTENTS_DATE {

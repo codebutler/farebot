@@ -27,7 +27,7 @@ package com.codebutler.farebot.transit.opal
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -61,7 +61,6 @@ class OpalTransitInfo(
     private val minute: Int,
     private val day: Int,
     val lastTransactionNumber: Int,
-    private val stringResource: StringResource,
 ) : TransitInfo() {
     companion object {
         const val NAME = "Opal"
@@ -72,7 +71,7 @@ class OpalTransitInfo(
         private val OPAL_AUTOMATIC_TOP_UP = OpalSubscription.instance
     }
 
-    override val cardName: String = NAME
+    override val cardName: FormattedString get() = FormattedString(NAME)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.AUD(balanceValue))
@@ -93,7 +92,6 @@ class OpalTransitInfo(
                     timestamp = lastTransactionTime,
                     transactionMode = lastTransactionMode,
                     transactionType = lastTransaction,
-                    stringResource = stringResource,
                 ),
             )
 
@@ -104,7 +102,7 @@ class OpalTransitInfo(
         get() =
             listOf(
                 ListItem(
-                    stringResource.getString(Res.string.opal_weekly_trips),
+                    Res.string.opal_weekly_trips,
                     weeklyTrips.toString(),
                 ),
             )
@@ -130,7 +128,7 @@ class OpalTransitInfo(
         get() =
             listOf(
                 ListItem(
-                    stringResource.getString(Res.string.opal_checksum),
+                    Res.string.opal_checksum,
                     checksum.toString(),
                 ),
             )

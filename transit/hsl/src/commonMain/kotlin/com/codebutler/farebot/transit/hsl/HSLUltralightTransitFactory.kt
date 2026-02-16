@@ -24,11 +24,11 @@ package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
@@ -42,9 +42,9 @@ import farebot.transit.hsl.generated.resources.*
 
 private fun getNameUL(city: Int) =
     if (city == HSLLookup.CITY_UL_TAMPERE) {
-        getStringBlocking(Res.string.tampere_ultralight_card_name)
+        FormattedString(Res.string.tampere_ultralight_card_name)
     } else {
-        getStringBlocking(Res.string.hsl_ultralight_card_name)
+        FormattedString(Res.string.hsl_ultralight_card_name)
     }
 
 /**
@@ -114,7 +114,7 @@ class HSLUltralightTransitInfo internal constructor(
     val securityLevel: Int,
     val city: Int,
 ) : TransitInfo() {
-    override val cardName: String get() = getNameUL(city)
+    override val cardName: FormattedString get() = getNameUL(city)
 
     override val info: List<ListItemInterface>
         get() =

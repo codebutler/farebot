@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-FareBot is a Kotlin Multiplatform (KMP) Android/iOS app for reading NFC transit cards. It is being ported from/aligned with [Metrodroid](https://github.com/metrodroid/metrodroid).
+FareBot is a Kotlin Multiplatform (KMP) Android/iOS/Web app for reading NFC transit cards. It is being ported from/aligned with [Metrodroid](https://github.com/metrodroid/metrodroid). The web target uses Kotlin/Wasm (wasmJs) with WebUSB for NFC reader support.
 
 **Metrodroid source code is in the `metrodroid/` directory in this repo.** Always use this local copy for comparisons and porting — do not fetch from GitHub.
 
@@ -32,10 +32,11 @@ When porting code from Metrodroid: **do a faithful port**. Do not simplify, abbr
 
 - `ImmutableByteArray` → `ByteArray`
 - `Parcelize`/`Parcelable` → `kotlinx.serialization.Serializable`
-- `Localizer.localizeString(R.string.x)` → `stringResource.getString(Res.string.x)`
+- `Localizer.localizeString(R.string.x)` → `FormattedString(Res.string.x)`
 - `Timestamp`/`TimestampFull`/`Daystamp` → `kotlinx.datetime.Instant`
 - `TransitData` → `TransitInfo`
 - `CardTransitFactory` → `TransitFactory<CardType, TransitInfoType>`
+- `String` (user-facing) → `FormattedString` (sealed class in `base/util/`)
 
 Do NOT:
 - Skip features "for later"
@@ -57,24 +58,30 @@ Do NOT make speculative changes hoping they fix the issue. Each failed guess was
 
 ### 5. All code in commonMain unless it requires OS APIs
 
-Write all code in `src/commonMain/kotlin/`. Only use `androidMain` or `iosMain` for code that directly interfaces with platform APIs (NFC hardware, file system, UI system dialogs). No Objective-C. Tests use `kotlin.test`.
+Write all code in `src/commonMain/kotlin/`. Only use `androidMain`, `iosMain`, or `wasmJsMain` for code that directly interfaces with platform APIs (NFC hardware, file system, UI system dialogs, WebUSB). No Objective-C. Tests use `kotlin.test`.
 
-### 6. Use StringResource for all user-facing strings
+### 6. Use FormattedString for all user-facing strings
 
-All user-facing strings must go through Compose Multiplatform resources:
+All user-facing strings use the `FormattedString` sealed class, which defers string resolution to the UI layer (avoiding `runBlocking` that blocks the JS event loop on wasmJs).
+
 - Define strings in `src/commonMain/composeResources/values/strings.xml`
-- For UI labels in `TransitInfo.getInfo()`, use `ListItem(Res.string.xxx, value)` or `HeaderListItem(Res.string.xxx)` directly
-- For dynamic string formatting, use `runBlocking { getString(Res.string.xxx) }`
-- Legacy pattern: Pass `StringResource` to factories — still works but not required for new code
+- Use `FormattedString(Res.string.xxx)` for resource-backed strings
+- Use `FormattedString("literal")` for dynamic/computed strings
+- Use `FormattedString(Res.string.xxx, arg1, arg2)` for formatted strings
+- Use `FormattedString.plural(Res.plurals.xxx, count, args...)` for plurals
+- Concatenate with `+` operator: `FormattedString("a") + FormattedString("b")`
+
+The UI resolves strings via `@Composable formattedString.resolve()` or `suspend formattedString.resolveAsync()`.
 
 Example patterns:
 ```kotlin
-// Preferred for static labels
-ListItem(Res.string.card_type, cardType)
-HeaderListItem(Res.string.card_details)
+// In transit modules — return FormattedString, not String
+override val cardName: FormattedString get() = FormattedString(Res.string.card_name)
+override val warning: FormattedString? get() = FormattedString(Res.string.some_warning, count)
 
-// For dynamic values
-val formatted = runBlocking { getString(Res.string.balance_format) }
+// For ListItem/HeaderListItem
+ListItem(Res.string.card_type, value)
+HeaderListItem(Res.string.card_details)
 ```
 
 Do NOT hardcode English strings in Kotlin files.
@@ -103,32 +110,29 @@ Do NOT claim work is complete without verification.
 
 ### 9. Preserve context across sessions
 
-Key project state is in:
-- `/Users/eric/.claude/plans/` — implementation plans (check newest first)
-- `/Users/eric/Code/farebot/REMAINING-WORK.md` — tracked remaining work
-- Session transcripts in `/Users/eric/.claude/projects/-Users-eric-Code-farebot/`
-
-When continuing from a previous session, read these files to recover context rather than starting from scratch.
+When continuing from a previous session, check for implementation plans and session transcripts in `~/.claude/` to recover context rather than starting from scratch.
 
 ## Build Commands
 
 ```bash
-./gradlew allTests          # Run all tests
-./gradlew assemble          # Full build (Android + iOS frameworks)
+./gradlew allTests                    # Run all tests
+./gradlew assemble                    # Full build (Android + iOS + Web)
 ./gradlew :app:android:assembleDebug  # Android only
+./gradlew :app:web:wasmJsBrowserDistribution  # Web (Wasm) only
 ```
 
 ## Module Structure
 
 - `base/` — Core utilities, MDST reader, ByteArray extensions (`:base`)
 - `card/` — Shared card abstractions (`:card`)
-- `card/*/` — Card type implementations: classic, desfire, felica, ultralight, iso7816, cepas, vicinity (`:card:*`)
+- `card/*/` — Card type implementations: classic, desfire, felica, ultralight, iso7816, cepas, china, ksx6924, vicinity (`:card:*`)
 - `transit/` — Shared transit abstractions: Trip, Station, TransitInfo, TransitCurrency (`:transit`)
 - `transit/*/` — Transit system implementations, one per system (`:transit:*`)
 - `transit/serialonly/` — Identification-only systems (serial number + reason, matches Metrodroid's `serialonly/`)
 - `app/` — KMP app framework: UI, ViewModels, DI, platform code (`:app`)
 - `app/android/` — Android app shell: Activities, manifest, resources (`:app:android`)
 - `app/desktop/` — Desktop app shell (`:app:desktop`)
+- `app/web/` — Web app shell: Kotlin/Wasm entry point, WebUSB NFC support, localStorage persistence (`:app:web`)
 - `app/ios/` — iOS app shell: Swift entry point, assets, config (Xcode project, not a Gradle module)
 - `tools/mdst/` — JVM CLI for MDST station databases: lookup, dump, compile (`:tools:mdst`)
 
@@ -137,9 +141,16 @@ When continuing from a previous session, read these files to recover context rat
 1. Create `transit/{name}/build.gradle.kts`
 2. Add `include(":transit:{name}")` to `settings.gradle.kts`
 3. Add `api(project(":transit:{name}"))` to `app/build.gradle.kts`
-4. Register factory in `TransitFactoryRegistry.kt` (Android)
-5. Register factory in `MainViewController.kt` (iOS, non-Classic cards only)
-6. Add string resources in `composeResources/values/strings.xml`
+4. Register factory in `TransitFactoryRegistryBuilder.kt` (shared, used by all platforms)
+5. Add string resources in `composeResources/values/strings.xml`
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`). Runs tests and builds on push/PR.
+
+## Development Environment
+
+A devcontainer is available (`.devcontainer/`) with Android SDK, JDK 25, and sandboxed networking. This is the default environment for Claude Code.
 
 ## Agent Teams
 

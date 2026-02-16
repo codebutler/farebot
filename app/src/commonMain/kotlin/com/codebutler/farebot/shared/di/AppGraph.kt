@@ -1,6 +1,5 @@
 package com.codebutler.farebot.shared.di
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
@@ -22,7 +21,6 @@ interface AppGraph {
     val cardImporter: CardImporter
     val analytics: Analytics
     val appPreferences: AppPreferences
-    val stringResource: StringResource
     val json: Json
     val cardSerializer: CardSerializer
     val cardPersister: CardPersister

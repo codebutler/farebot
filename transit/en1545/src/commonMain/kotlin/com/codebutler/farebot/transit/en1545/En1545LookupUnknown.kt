@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.en1545
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Trip
 
@@ -44,7 +44,7 @@ abstract class En1545LookupUnknown : En1545Lookup {
     override fun getAgencyName(
         agency: Int?,
         isShort: Boolean,
-    ): String? = if (agency == null || agency == 0) null else agency.toString()
+    ): FormattedString? = if (agency == null || agency == 0) null else FormattedString(agency.toString())
 
     override fun getStation(
         station: Int,
@@ -53,10 +53,9 @@ abstract class En1545LookupUnknown : En1545Lookup {
     ): Station? = if (station == 0) null else Station.unknown(station.toString())
 
     override fun getSubscriptionName(
-        stringResource: StringResource,
         agency: Int?,
         contractTariff: Int?,
-    ): String? = contractTariff?.toString()
+    ): FormattedString? = contractTariff?.let { FormattedString(it.toString()) }
 
     override fun getMode(
         agency: Int?,

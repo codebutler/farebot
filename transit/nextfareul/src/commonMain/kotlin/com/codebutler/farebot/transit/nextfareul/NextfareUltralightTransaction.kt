@@ -22,14 +22,12 @@
 
 package com.codebutler.farebot.transit.nextfareul
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.Transaction
 import com.codebutler.farebot.transit.TransitCurrency
-import farebot.transit.nextfareul.generated.resources.Res
-import farebot.transit.nextfareul.generated.resources.nextfareul_unknown_route
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -62,7 +60,7 @@ abstract class NextfareUltralightTransaction(
     }
 
     override val routeNames: List<String>
-        get() = listOf(getStringBlocking(Res.string.nextfareul_unknown_route, mRoute.toString(16)))
+        get() = listOf("Route 0x${mRoute.toString(16)}")
 
     override val station: Station?
         get() =
@@ -113,6 +111,6 @@ abstract class NextfareUltralightTransaction(
                 mRoute == other.mRoute
         )
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() = null
 }

@@ -2,7 +2,7 @@
 
 Read your remaining balance, recent trips, and other information from contactless public transit cards using your NFC-enabled Android or iOS device.
 
-FareBot is a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) app built with [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/), targeting Android (NFC), iOS (CoreNFC), and macOS (experimental, via PC/SC smart card readers or PN533 raw USB NFC controllers).
+FareBot is a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) app built with [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/), targeting Android (NFC), iOS (CoreNFC), macOS (experimental, via PC/SC smart card readers or PN533 raw USB NFC controllers), and Web (experimental, via WebAssembly).
 
 ## Platform Compatibility
 
@@ -184,6 +184,7 @@ Some MIFARE Classic cards require encryption keys to read. You can obtain keys u
 * **Android:** NFC-enabled device running Android 6.0 (API 23) or later
 * **iOS:** iPhone 7 or later with iOS support for CoreNFC
 * **macOS** (experimental): Mac with a PC/SC-compatible NFC smart card reader (e.g., ACR122U), a PN533-based USB NFC controller (e.g., SCL3711), or a Sony RC-S956 (PaSoRi) USB NFC reader
+* **Web** (experimental): Any modern browser with WebAssembly support. Card data can be imported from JSON files exported by other platforms. NFC reading via WebUSB is planned but not yet implemented.
 
 ## Building
 
@@ -201,6 +202,8 @@ $ make              # show all targets
 | `make ios-sim` | Build iOS app for simulator |
 | `make ios-install` | Build and install on connected iOS device (auto-detects device) |
 | `make desktop` | Run macOS desktop app (experimental) |
+| `make web` | Build web app (experimental, WebAssembly) |
+| `make web-run` | Run web app dev server with hot reload |
 | `make test` | Run all tests |
 | `make clean` | Clean all build artifacts |
 
@@ -257,6 +260,7 @@ Compatible with [Zed](https://zed.dev/docs/dev-containers), VS Code (Remote - Co
 - `app/android/` — Android app shell (Activities, manifest, resources)
 - `app/ios/` — iOS app shell (Swift entry point, assets, config)
 - `app/desktop/` — macOS desktop app (experimental, PC/SC + PN533 + RC-S956 USB NFC)
+- `app/web/` — Web app (experimental, WebAssembly via Kotlin/Wasm)
 
 ## Written By
 

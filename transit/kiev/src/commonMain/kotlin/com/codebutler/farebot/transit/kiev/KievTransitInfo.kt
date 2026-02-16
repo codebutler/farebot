@@ -21,8 +21,8 @@
 
 package com.codebutler.farebot.transit.kiev
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.transit.kiev.generated.resources.Res
 import farebot.transit.kiev.generated.resources.kiev_card_name
@@ -34,12 +34,12 @@ class KievTransitInfo(
     override val serialNumber: String
         get() = formatSerial(mSerial)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.kiev_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.kiev_card_name)
 
     companion object {
-        val NAME: String
-            get() = getStringBlocking(Res.string.kiev_card_name)
+        val NAME: FormattedString
+            get() = FormattedString(Res.string.kiev_card_name)
 
         fun formatSerial(serial: String): String = NumberUtils.groupString(serial, " ", 4, 4, 4)
     }

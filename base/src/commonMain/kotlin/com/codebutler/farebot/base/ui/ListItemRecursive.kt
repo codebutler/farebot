@@ -22,14 +22,11 @@
 
 package com.codebutler.farebot.base.ui
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.codebutler.farebot.base.util.FormattedString
 
-@Serializable
-@SerialName("recursive")
 data class ListItemRecursive(
-    override val text1: String?,
-    override val text2: String?,
+    override val text1: FormattedString?,
+    override val text2: FormattedString?,
     val subTree: List<ListItemInterface>?,
 ) : ListItemInterface() {
     companion object {
@@ -44,9 +41,9 @@ data class ListItemRecursive(
             value: String?,
         ): ListItemInterface =
             ListItemRecursive(
-                title,
-                subtitle,
-                if (value != null) listOf(ListItem(null, value)) else null,
+                FormattedString(title),
+                subtitle?.let { FormattedString(it) },
+                if (value != null) listOf(ListItem(FormattedString(value))) else null,
             )
     }
 }

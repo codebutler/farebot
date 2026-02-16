@@ -22,14 +22,14 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.calypso.generated.resources.Res
 import farebot.transit.calypso.generated.resources.card_name_oura
 import farebot.transit.calypso.generated.resources.oura_billet_tarif_normal
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
 internal object IntercodeLookupOura : IntercodeLookupSTR("oura"), IntercodeLookupSingle {
-    override val cardName: String = getStringBlocking(Res.string.card_name_oura)
+    override val cardName: FormattedString = FormattedString(Res.string.card_name_oura)
 
     override val subscriptionMapByAgency: Map<Pair<Int?, Int>, ComposeStringResource> =
         mapOf(

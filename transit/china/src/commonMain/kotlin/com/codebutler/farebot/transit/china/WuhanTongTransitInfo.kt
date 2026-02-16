@@ -24,9 +24,9 @@
 
 package com.codebutler.farebot.transit.china
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.getHexString
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.china.ChinaCard
 import com.codebutler.farebot.card.china.ChinaCardTransitFactory
@@ -60,8 +60,8 @@ class WuhanTongTransitInfo(
     override val trips: List<ChinaTrip>?,
     val mBalance: Int?,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_wuhantong)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_wuhantong)
 
     override val balance: TransitBalance?
         get() =
@@ -109,7 +109,7 @@ class WuhanTongTransitInfo(
 
                 override fun parseTransitIdentity(card: ChinaCard): TransitIdentity =
                     TransitIdentity(
-                        getStringBlocking(Res.string.card_name_wuhantong),
+                        FormattedString(Res.string.card_name_wuhantong),
                         parseSerial(card),
                     )
 

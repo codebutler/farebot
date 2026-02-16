@@ -22,8 +22,8 @@
 
 package com.codebutler.farebot.transit.ventra
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
@@ -39,21 +39,21 @@ import kotlinx.datetime.TimeZone
 class VentraUltralightTransitInfo(
     override val capsule: NextfareUltralightTransitDataCapsule,
 ) : NextfareUltralightTransitData() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.ventra_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.ventra_card_name)
 
     override val timeZone: TimeZone
         get() = TZ
 
     override fun makeCurrency(value: Int) = TransitCurrency.USD(value)
 
-    override fun getProductName(productCode: Int): String? = null
+    override fun getProductName(productCode: Int): FormattedString? = null
 
     companion object {
         internal val TZ = TimeZone.of("America/Chicago")
 
-        private val NAME: String
-            get() = getStringBlocking(Res.string.ventra_card_name)
+        private val NAME: FormattedString
+            get() = FormattedString(Res.string.ventra_card_name)
 
         val FACTORY: TransitFactory<UltralightCard, VentraUltralightTransitInfo> =
             object : TransitFactory<UltralightCard, VentraUltralightTransitInfo> {

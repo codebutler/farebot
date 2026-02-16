@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit
 
+import com.codebutler.farebot.base.util.FormattedString
 import kotlin.time.Instant
 
 abstract class Transaction : Comparable<Transaction> {
@@ -70,9 +71,9 @@ abstract class Transaction : Comparable<Transaction> {
     open val isTransparent: Boolean
         get() = mode in listOf(Trip.Mode.TICKET_MACHINE, Trip.Mode.VENDING_MACHINE)
 
-    open val agencyName: String? get() = null
+    open val agencyName: FormattedString? get() = null
 
-    open val shortAgencyName: String? get() = agencyName
+    open val shortAgencyName: FormattedString? get() = agencyName
 
     open fun shouldBeMerged(other: Transaction): Boolean =
         isTapOn && (other.isTapOff || other.isCancel) && isSameTrip(other)

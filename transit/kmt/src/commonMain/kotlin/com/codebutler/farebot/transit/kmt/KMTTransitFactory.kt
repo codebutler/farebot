@@ -20,7 +20,7 @@
 
 package com.codebutler.farebot.transit.kmt
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.felica.FeliCaUtil
 import com.codebutler.farebot.card.felica.FelicaCard
@@ -69,7 +69,7 @@ class KMTTransitFactory : TransitFactory<FelicaCard, KMTTransitInfo> {
             serialNumber = serviceID.blocks[0].data.decodeToString()
         }
 
-        return TransitIdentity.create(getStringBlocking(Res.string.kmt_longname), serialNumber)
+        return TransitIdentity.create(FormattedString(Res.string.kmt_longname), serialNumber)
     }
 
     override fun parseInfo(card: FelicaCard): KMTTransitInfo {

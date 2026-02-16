@@ -35,6 +35,7 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
 import com.codebutler.farebot.transit.clipper.ClipperTransitInfo
 import com.codebutler.farebot.transit.clipper.ClipperTrip
+import kotlinx.coroutines.test.runTest
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -225,65 +226,72 @@ class ClipperTransitTest {
     }
 
     @Test
-    fun testDemoCard() {
-        assertEquals(32 * 2, REFILL.length)
+    fun testDemoCard() =
+        runTest {
+            assertEquals(32 * 2, REFILL.length)
 
-        // This is mocked-up data, probably has a wrong checksum.
-        val card = constructClipperCard()
+            // This is mocked-up data, probably has a wrong checksum.
+            val card = constructClipperCard()
 
-        // Test TransitIdentity
-        val identity = factory.parseIdentity(card)
-        assertEquals("Clipper", identity.name)
-        assertEquals("572691763", identity.serialNumber)
+            // Test TransitIdentity
+            val identity = factory.parseIdentity(card)
+            assertEquals("Clipper", identity.name.resolveAsync())
+            assertEquals("572691763", identity.serialNumber)
 
-        val info = factory.parseInfo(card)
-        assertTrue(info is ClipperTransitInfo, "TransitData must be instance of ClipperTransitInfo")
+            val info = factory.parseInfo(card)
+            assertTrue(info is ClipperTransitInfo, "TransitData must be instance of ClipperTransitInfo")
 
-        assertEquals("572691763", info.serialNumber)
-        assertEquals("Clipper", info.cardName)
-        assertEquals(TransitCurrency.USD(30583), info.balances?.firstOrNull()?.balance)
-        assertNull(info.subscriptions)
+            assertEquals("572691763", info.serialNumber)
+            assertEquals("Clipper", info.cardName.resolveAsync())
+            assertEquals(TransitCurrency.USD(30583), info.balances?.firstOrNull()?.balance)
+            assertNull(info.subscriptions)
 
-        val trips = info.trips
-        assertNotNull(trips)
-        // Note: FareBot doesn't include refills in trips list (unlike Metrodroid)
-        // So we only have the BART trip here
-        assertTrue(trips.isNotEmpty(), "Should have at least 1 trip")
+            val trips = info.trips
+            assertNotNull(trips)
+            // Note: FareBot doesn't include refills in trips list (unlike Metrodroid)
+            // So we only have the BART trip here
+            assertTrue(trips.isNotEmpty(), "Should have at least 1 trip")
 
-        // Find the BART trip
-        val bartTrip =
-            trips.find { it.agencyName?.contains("BART") == true || it.shortAgencyName == "BART" }
-                ?: trips.first()
-
-        // BART trip verification
-        assertEquals(Trip.Mode.METRO, bartTrip.mode)
-        assertEquals(TransitCurrency.USD(630), bartTrip.fare)
-
-        // Verify timestamp - 1521320320 seconds Unix time
-        assertNotNull(bartTrip.startTimestamp)
-        assertEquals(1521320320L, bartTrip.startTimestamp!!.epochSeconds)
-
-        // Verify station names if MDST is available
-        if (bartTrip.startStation != null) {
-            val startStationName = bartTrip.startStation?.stationName ?: ""
-            val endStationName = bartTrip.endStation?.stationName ?: ""
-            // These may be resolved names from MDST, or hex placeholders if not available
-            assertTrue(startStationName.isNotEmpty(), "Start station should have a name")
-            if (startStationName == "Powell Street") {
-                // MDST is available, verify coordinates
-                assertNotNull(bartTrip.startStation?.latitude)
-                assertNotNull(bartTrip.startStation?.longitude)
-                assertNear(37.78447, bartTrip.startStation!!.latitude!!.toDouble(), 0.001)
-                assertNear(-122.40797, bartTrip.startStation!!.longitude!!.toDouble(), 0.001)
+            // Find the BART trip
+            var bartTrip = trips.first()
+            for (trip in trips) {
+                val agency = trip.agencyName?.resolveAsync()
+                val shortAgency = trip.shortAgencyName?.resolveAsync()
+                if (agency?.contains("BART") == true || shortAgency == "BART") {
+                    bartTrip = trip
+                    break
+                }
             }
-            if (endStationName == "Dublin / Pleasanton") {
-                assertNotNull(bartTrip.endStation?.latitude)
-                assertNotNull(bartTrip.endStation?.longitude)
-                assertNear(37.70169, bartTrip.endStation!!.latitude!!.toDouble(), 0.001)
-                assertNear(-121.89918, bartTrip.endStation!!.longitude!!.toDouble(), 0.001)
+
+            // BART trip verification
+            assertEquals(Trip.Mode.METRO, bartTrip.mode)
+            assertEquals(TransitCurrency.USD(630), bartTrip.fare)
+
+            // Verify timestamp - 1521320320 seconds Unix time
+            assertNotNull(bartTrip.startTimestamp)
+            assertEquals(1521320320L, bartTrip.startTimestamp!!.epochSeconds)
+
+            // Verify station names if MDST is available
+            if (bartTrip.startStation != null) {
+                val startStationName = bartTrip.startStation?.displayName?.resolveAsync() ?: ""
+                val endStationName = bartTrip.endStation?.displayName?.resolveAsync() ?: ""
+                // These may be resolved names from MDST, or hex placeholders if not available
+                assertTrue(startStationName.isNotEmpty(), "Start station should have a name")
+                if (startStationName == "Powell Street") {
+                    // MDST is available, verify coordinates
+                    assertNotNull(bartTrip.startStation?.latitude)
+                    assertNotNull(bartTrip.startStation?.longitude)
+                    assertNear(37.78447, bartTrip.startStation!!.latitude!!.toDouble(), 0.001)
+                    assertNear(-122.40797, bartTrip.startStation!!.longitude!!.toDouble(), 0.001)
+                }
+                if (endStationName == "Dublin / Pleasanton") {
+                    assertNotNull(bartTrip.endStation?.latitude)
+                    assertNotNull(bartTrip.endStation?.longitude)
+                    assertNear(37.70169, bartTrip.endStation!!.latitude!!.toDouble(), 0.001)
+                    assertNear(-121.89918, bartTrip.endStation!!.longitude!!.toDouble(), 0.001)
+                }
             }
         }
-    }
 
     @Test
     fun testVehicleNumbers() {

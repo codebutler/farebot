@@ -22,10 +22,10 @@
 
 package com.codebutler.farebot.transit.tampere
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
@@ -47,7 +47,7 @@ class TampereTransitFactory : TransitFactory<DesfireCard, TampereTransitInfo> {
 
     override fun parseIdentity(card: DesfireCard): TransitIdentity {
         val serialNumber = getSerialNumber(card)
-        return TransitIdentity.create(getStringBlocking(Res.string.tampere_card_name), serialNumber)
+        return TransitIdentity.create(FormattedString(Res.string.tampere_card_name), serialNumber)
     }
 
     override fun parseInfo(card: DesfireCard): TampereTransitInfo {

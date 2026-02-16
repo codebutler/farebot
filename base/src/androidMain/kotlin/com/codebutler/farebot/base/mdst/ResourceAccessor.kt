@@ -30,7 +30,7 @@ actual object ResourceAccessor {
             runBlocking {
                 Res.readBytes("files/$dbName.mdst")
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
 }

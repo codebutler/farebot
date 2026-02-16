@@ -23,8 +23,7 @@
 package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
-import com.codebutler.farebot.base.util.getPluralStringBlocking
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.en1545.En1545LookupUnknown
 import com.codebutler.farebot.transit.en1545.En1545Parsed
@@ -47,10 +46,10 @@ object HSLLookup : En1545LookupUnknown() {
 
     fun languageCode(input: Int?) =
         when (input) {
-            0 -> getStringBlocking(Res.string.hsl_finnish)
-            1 -> getStringBlocking(Res.string.hsl_swedish)
-            2 -> getStringBlocking(Res.string.hsl_english)
-            else -> getStringBlocking(Res.string.hsl_unknown_format, input.toString())
+            0 -> FormattedString(Res.string.hsl_finnish)
+            1 -> FormattedString(Res.string.hsl_swedish)
+            2 -> FormattedString(Res.string.hsl_english)
+            else -> FormattedString(Res.string.hsl_unknown_format, input.toString())
         }
 
     private val areaMap =
@@ -132,7 +131,7 @@ object HSLLookup : En1545LookupUnknown() {
         isValidity: Boolean,
         walttiRegion: Int? = null,
         ultralightCity: Int? = null,
-    ): String? {
+    ): FormattedString? {
         if (parsed.getInt(contractAreaName(prefix)) == null &&
             parsed.getInt(contractWalttiZoneName(prefix)) != null
         ) {
@@ -143,10 +142,10 @@ object HSLLookup : En1545LookupUnknown() {
                 return null
             }
             if (!isValidity && zone in 1..10) {
-                return getStringBlocking(Res.string.waltti_city_zone, regionName, mapWalttiZone(region, zone))
+                return FormattedString(Res.string.waltti_city_zone, regionName, mapWalttiZone(region, zone))
             }
             val (start, end) = walttiValiditySplit[zone]
-            return getStringBlocking(
+            return FormattedString(
                 Res.string.waltti_city_zones,
                 regionName,
                 mapWalttiZone(region, start) + " - " + mapWalttiZone(region, end),
@@ -163,9 +162,9 @@ object HSLLookup : En1545LookupUnknown() {
                 val to = value / 6
                 val num = to - from + 1
                 val zones = (from..to).map { ('A'.code + it).toChar() }.toCharArray().concatToString()
-                return getPluralStringBlocking(Res.plurals.hsl_zones, num, zones)
+                return FormattedString.plural(Res.plurals.hsl_zones, num, zones)
             } else {
-                return getStringBlocking(
+                return FormattedString(
                     Res.string.hsl_zone_station,
                     charArrayOf(('A'.code + from).toChar()).concatToString(),
                 )
@@ -177,16 +176,16 @@ object HSLLookup : En1545LookupUnknown() {
                 val from = value shr 3
                 val num = to - from + 1
                 val zones = (from..to).map { ('A'.code + it).toChar() }.toCharArray().concatToString()
-                return getPluralStringBlocking(Res.plurals.hsl_zones, num, zones)
+                return FormattedString.plural(Res.plurals.hsl_zones, num, zones)
             } else {
-                return getStringBlocking(
+                return FormattedString(
                     Res.string.hsl_zone_station,
                     charArrayOf(('A'.code + to).toChar()).concatToString(),
                 )
             }
         }
         return areaMap[Pair(type, value)]?.let {
-            getStringBlocking(it)
-        } ?: getStringBlocking(Res.string.hsl_unknown_format, "$type/$value")
+            FormattedString(it)
+        } ?: FormattedString(Res.string.hsl_unknown_format, "$type/$value")
     }
 }

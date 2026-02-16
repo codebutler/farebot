@@ -25,8 +25,8 @@ package com.codebutler.farebot.card.ksx6924
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.convertBCDtoInteger
 import com.codebutler.farebot.base.util.convertBCDtoLong
@@ -118,7 +118,7 @@ data class KSX6924PurseInfo(
     ): TransitBalance =
         TransitBalance(
             balance = balance,
-            name = label,
+            name = label?.let { FormattedString(it) },
             validFrom = issueDate?.let { KSX6924Utils.localDateToInstant(it, tz) },
             validTo = expiryDate?.let { KSX6924Utils.localDateToInstant(it, tz) },
         )
@@ -133,11 +133,8 @@ data class KSX6924PurseInfo(
             ListItem(Res.string.ksx6924_discount_type, resolver.resolveDisRate(disRate)),
         )
 
-    fun getAdvancedInfo(
-        stringResource: StringResource,
-        resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver,
-    ): FareBotUiTree {
-        val b = FareBotUiTree.builder(stringResource)
+    suspend fun getAdvancedInfo(resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver): FareBotUiTree {
+        val b = FareBotUiTree.builder()
         b.item().title(Res.string.ksx6924_crypto_algorithm).value(resolver.resolveCryptoAlgo(alg))
         b.item().title(Res.string.ksx6924_encryption_key_version).value(vk.hexString)
         b.item().title(Res.string.ksx6924_auth_id).value(idtr.hexString)

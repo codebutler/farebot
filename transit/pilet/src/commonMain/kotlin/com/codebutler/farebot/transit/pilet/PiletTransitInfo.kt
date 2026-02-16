@@ -24,6 +24,7 @@ package com.codebutler.farebot.transit.pilet
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.readASCII
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.base.util.toHexDump
@@ -48,7 +49,7 @@ import org.jetbrains.compose.resources.StringResource
  */
 class PiletTransitInfo(
     private val serial: String?,
-    override val cardName: String,
+    override val cardName: FormattedString,
     private val berTlvData: ByteArray?,
 ) : TransitInfo() {
     override val serialNumber: String?

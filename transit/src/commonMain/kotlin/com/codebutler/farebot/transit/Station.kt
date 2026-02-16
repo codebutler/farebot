@@ -23,44 +23,41 @@
 
 package com.codebutler.farebot.transit
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.generated.resources.Res
 import farebot.transit.generated.resources.unknown_station
 import farebot.transit.generated.resources.unknown_station_format
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class Station(
     val humanReadableId: String? = null,
     val companyName: String? = null,
     val lineNames: List<String> = emptyList(),
-    val stationNameRaw: String? = null,
-    val shortStationNameRaw: String? = null,
     val latitude: Float? = null,
     val longitude: Float? = null,
     val isUnknown: Boolean = false,
     val humanReadableLineIds: List<String> = emptyList(),
-    val attributes: List<String> = emptyList(),
+    val stationName: String? = null,
+    val shortStationName: String? = null,
+    val formattedStationName: FormattedString? = null,
+    val attributes: List<FormattedString> = emptyList(),
 ) {
-    fun getStationName(showRawIds: Boolean = false): String? {
-        if (isUnknown) {
-            val id =
-                humanReadableId
-                    ?: return getStringBlocking(Res.string.unknown_station)
-            return getStringBlocking(Res.string.unknown_station_format, id)
+    val displayName: FormattedString?
+        get() {
+            if (formattedStationName != null) return formattedStationName
+            val name = shortStationName ?: stationName
+            if (name != null) return FormattedString(name)
+            if (isUnknown) {
+                val id =
+                    humanReadableId
+                        ?: return FormattedString(Res.string.unknown_station)
+                return FormattedString(Res.string.unknown_station_format, id)
+            }
+            return null
         }
-        val base = shortStationNameRaw ?: stationNameRaw
-        if (showRawIds && humanReadableId != null && base != null) {
-            return "$base [$humanReadableId]"
-        }
-        return base
-    }
-
-    val stationName: String? get() = getStationName()
 
     fun hasLocation(): Boolean = latitude != null && longitude != null
 
-    fun addAttribute(attr: String): Station = copy(attributes = attributes + attr)
+    fun addAttribute(attr: FormattedString): Station = copy(attributes = attributes + attr)
 
     companion object {
         fun unknown(id: String): Station =
@@ -71,10 +68,13 @@ data class Station(
 
         fun nameOnly(name: String): Station =
             Station(
-                stationNameRaw = name,
+                stationName = name,
             )
 
-        // Backwards-compatible factory methods
+        fun nameOnly(name: FormattedString): Station =
+            Station(
+                formattedStationName = name,
+            )
 
         fun create(
             stationName: String?,
@@ -83,8 +83,8 @@ data class Station(
             longitude: String?,
         ): Station =
             Station(
-                stationNameRaw = stationName,
-                shortStationNameRaw = shortStationName,
+                stationName = stationName,
+                shortStationName = shortStationName,
                 latitude = latitude?.toFloatOrNull(),
                 longitude = longitude?.toFloatOrNull(),
             )
@@ -97,8 +97,8 @@ data class Station(
             longitude: String?,
         ): Station =
             Station(
-                stationNameRaw = name,
-                shortStationNameRaw = abbreviation,
+                stationName = name,
+                shortStationName = abbreviation,
                 humanReadableId = code,
                 latitude = latitude?.toFloatOrNull(),
                 longitude = longitude?.toFloatOrNull(),
@@ -159,8 +159,8 @@ data class Station(
 
         fun build(): Station =
             Station(
-                stationNameRaw = stationName,
-                shortStationNameRaw = shortStationName ?: abbreviation,
+                stationName = stationName,
+                shortStationName = shortStationName ?: abbreviation,
                 companyName = companyName,
                 lineNames = lineNames,
                 latitude = latitude?.toFloatOrNull(),

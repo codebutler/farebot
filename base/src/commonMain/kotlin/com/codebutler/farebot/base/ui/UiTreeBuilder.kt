@@ -22,44 +22,36 @@
 
 package com.codebutler.farebot.base.ui
 
-import com.codebutler.farebot.base.util.StringResource
-import org.jetbrains.compose.resources.StringResource as ComposeStringResource
+import org.jetbrains.compose.resources.StringResource
 
 @DslMarker
 private annotation class UiTreeBuilderMarker
 
-fun uiTree(
-    stringResource: StringResource,
-    init: TreeScope.() -> Unit,
-): FareBotUiTree {
-    val uiBuilder = FareBotUiTree.builder(stringResource)
-    TreeScope(stringResource, uiBuilder).init()
+suspend fun uiTree(init: TreeScope.() -> Unit): FareBotUiTree {
+    val uiBuilder = FareBotUiTree.builder()
+    TreeScope(uiBuilder).init()
     return uiBuilder.build()
 }
 
 @UiTreeBuilderMarker
 class TreeScope(
-    private val stringResource: StringResource,
     private val uiBuilder: FareBotUiTree.Builder,
 ) {
     fun item(init: ItemScope.() -> Unit) {
-        ItemScope(stringResource, uiBuilder.item()).init()
+        ItemScope(uiBuilder.item()).init()
     }
 }
 
 @UiTreeBuilderMarker
 class ItemScope(
-    private val stringResource: StringResource,
     private val item: FareBotUiTree.Item.Builder,
 ) {
     var title: Any? = null
         set(value) {
-            item.title(
-                when (value) {
-                    is ComposeStringResource -> stringResource.getString(value)
-                    else -> value.toString()
-                },
-            )
+            when (value) {
+                is StringResource -> item.title(value)
+                else -> item.title(value.toString())
+            }
         }
 
     var value: Any? = null
@@ -68,6 +60,6 @@ class ItemScope(
         }
 
     fun item(init: ItemScope.() -> Unit) {
-        ItemScope(stringResource, item.item()).init()
+        ItemScope(item.item()).init()
     }
 }

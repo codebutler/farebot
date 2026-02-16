@@ -41,7 +41,7 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
                     if (hasStart) {
                         MKPointAnnotation().apply {
                             setCoordinate(CLLocationCoordinate2DMake(startLat, startLng))
-                            setTitle(startStation.stationName ?: "Start")
+                            setTitle(startStation.shortStationName ?: startStation.stationName ?: "Start")
                             setSubtitle(startStation.companyName)
                         }
                     } else {
@@ -52,7 +52,7 @@ actual fun PlatformTripMap(uiState: TripMapUiState) {
                     if (hasEnd) {
                         MKPointAnnotation().apply {
                             setCoordinate(CLLocationCoordinate2DMake(endLat, endLng))
-                            setTitle(endStation.stationName ?: "End")
+                            setTitle(endStation.shortStationName ?: endStation.stationName ?: "End")
                             setSubtitle(endStation.companyName)
                         }
                     } else {

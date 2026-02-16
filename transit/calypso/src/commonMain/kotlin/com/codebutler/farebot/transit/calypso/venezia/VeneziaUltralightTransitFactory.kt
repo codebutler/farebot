@@ -22,11 +22,9 @@
 
 package com.codebutler.farebot.transit.calypso.venezia
 
-import com.codebutler.farebot.base.util.DefaultStringResource
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLongReversed
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.base.util.isAllZero
 import com.codebutler.farebot.base.util.sliceOffLen
 import com.codebutler.farebot.card.ultralight.UltralightCard
@@ -50,11 +48,10 @@ import com.codebutler.farebot.transit.en1545.En1545Transaction
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.transit.calypso.generated.resources.*
 import kotlinx.datetime.TimeZone
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Instant
 import org.jetbrains.compose.resources.StringResource as ComposeStringResource
 
-private val NAME by lazy { getStringBlocking(Res.string.venezia_ultralight_card_name) }
+private val NAME by lazy { FormattedString(Res.string.venezia_ultralight_card_name) }
 private const val TRANSPORT_TYPE = "TransportType"
 private const val Y_VALUE = "Y"
 
@@ -135,7 +132,7 @@ class VeneziaUltralightTransitInfo internal constructor(
     override val trips: List<Trip>,
     override val subscriptions: List<Subscription>?,
 ) : TransitInfo() {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = NAME
     override val serialNumber: String = serial.toString()
 }
 
@@ -145,7 +142,6 @@ internal class VeneziaUltralightSubscription(
     private val otp: Int,
 ) : En1545Subscription() {
     override val lookup: En1545Lookup = VeneziaUltralightLookup
-    override val stringResource: StringResource = DefaultStringResource()
 
     override val validTo: Instant? get() = validToOverride
 
@@ -230,7 +226,7 @@ private object VeneziaUltralightLookup : En1545Lookup {
     override fun getAgencyName(
         agency: Int?,
         isShort: Boolean,
-    ): String? = null
+    ): FormattedString? = null
 
     override fun getStation(
         station: Int,
@@ -239,16 +235,15 @@ private object VeneziaUltralightLookup : En1545Lookup {
     ): Station? = null
 
     override fun getSubscriptionName(
-        stringResource: StringResource,
         agency: Int?,
         contractTariff: Int?,
-    ): String? {
+    ): FormattedString? {
         if (contractTariff == null) return null
         val res = SUBSCRIPTION_MAP[contractTariff]
         return if (res != null) {
-            stringResource.getString(res)
+            FormattedString(res)
         } else {
-            stringResource.getString(Res.string.venezia_ul_unknown_subscription, contractTariff.toString())
+            FormattedString(Res.string.venezia_ul_unknown_subscription, contractTariff.toString())
         }
     }
 

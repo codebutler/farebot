@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit.clipper
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Subscription
@@ -45,7 +45,7 @@ class ClipperUltralightTransitFactory : TransitFactory<UltralightCard, ClipperUl
     override fun check(card: UltralightCard): Boolean = card.getPage(4).data[0].toInt() == 0x13
 
     override fun parseIdentity(card: UltralightCard): TransitIdentity {
-        val cardName = getStringBlocking(Res.string.clipper_ul_card_name)
+        val cardName = FormattedString(Res.string.clipper_ul_card_name)
         return TransitIdentity.create(cardName, getSerial(card).toString())
     }
 
@@ -127,8 +127,8 @@ class ClipperUltralightTransitInfo(
     private val ticketType: Int,
     private val baseDate: Int,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.clipper_ul_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.clipper_ul_card_name)
 
     override val serialNumber: String = serial.toString()
 

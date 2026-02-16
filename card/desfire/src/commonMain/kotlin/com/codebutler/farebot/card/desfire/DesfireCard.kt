@@ -26,7 +26,6 @@
 package com.codebutler.farebot.card.desfire
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -45,8 +44,8 @@ data class DesfireCard(
 
     fun getApplication(appId: Int): DesfireApplication? = applications.firstOrNull { it.id == appId }
 
-    override fun getAdvancedUi(stringResource: StringResource): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder(stringResource)
+    override suspend fun getAdvancedUi(): FareBotUiTree {
+        val cardUiBuilder = FareBotUiTree.builder()
         val appsUiBuilder = cardUiBuilder.item().title("Applications")
         for (app in applications) {
             val appUiBuilder =

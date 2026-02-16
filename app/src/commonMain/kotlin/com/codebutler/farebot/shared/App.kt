@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavType
@@ -14,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.savedstate.read
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
@@ -43,6 +44,7 @@ import farebot.app.generated.resources.Res
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -56,7 +58,6 @@ fun FareBotApp(
         val navController = rememberNavController()
         val graph = LocalAppGraph.current
         val navDataHolder = graph.navDataHolder
-        val stringResource = graph.stringResource
         val transitFactoryRegistry = graph.transitFactoryRegistry
         val supportedCards = remember { transitFactoryRegistry.allCards }
         val cardImporter = graph.cardImporter
@@ -160,15 +161,25 @@ fun FareBotApp(
                                             val navKey = navDataHolder.put(rawCard)
                                             navController.navigate(Screen.Card.createRoute(navKey))
                                         }
-                                        platformActions.showToast(
-                                            getStringBlocking(Res.string.imported_cards, result.cards.size),
-                                        )
+                                        scope.launch {
+                                            platformActions.showToast(
+                                                FormattedString(
+                                                    Res.string.imported_cards,
+                                                    result.cards.size,
+                                                ).resolveAsync(),
+                                            )
+                                        }
                                         historyViewModel.loadCards()
                                     }
                                     is ImportResult.Error -> {
-                                        platformActions.showToast(
-                                            getStringBlocking(Res.string.import_failed, result.message),
-                                        )
+                                        scope.launch {
+                                            platformActions.showToast(
+                                                FormattedString(
+                                                    Res.string.import_failed,
+                                                    result.message,
+                                                ).resolveAsync(),
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -182,20 +193,20 @@ fun FareBotApp(
                     deviceRegion = getDeviceRegion(),
                     loadedKeyBundles = loadedKeyBundles,
                     mapMarkers =
-                        remember(supportedCards) {
-                            supportedCards
-                                .filter { it.latitude != null && it.longitude != null }
-                                .map { card ->
-                                    CardsMapMarker(
-                                        name = getStringBlocking(card.nameRes),
-                                        location = getStringBlocking(card.locationRes),
-                                        latitude = card.latitude!!.toDouble(),
-                                        longitude = card.longitude!!.toDouble(),
-                                    )
-                                }
-                        },
+                        supportedCards
+                            .filter { it.latitude != null && it.longitude != null }
+                            .map { card ->
+                                CardsMapMarker(
+                                    name = stringResource(card.nameRes),
+                                    location = stringResource(card.locationRes),
+                                    latitude = card.latitude!!.toDouble(),
+                                    longitude = card.longitude!!.toDouble(),
+                                )
+                            },
                     onKeysRequiredTap = {
-                        platformActions.showToast(getStringBlocking(Res.string.keys_required))
+                        scope.launch {
+                            platformActions.showToast(FormattedString(Res.string.keys_required).resolveAsync())
+                        }
                     },
                     onStatusChipTap = { message ->
                         platformActions.showToast(message)
@@ -471,20 +482,19 @@ fun FareBotApp(
                 val card = data?.first
                 val transitInfo = data?.second
 
-                val tabs =
-                    remember {
-                        val tabList = mutableListOf<AdvancedTab>()
-                        if (transitInfo != null) {
-                            val transitInfoUi = transitInfo.getAdvancedUi(stringResource)
-                            if (transitInfoUi != null) {
-                                tabList.add(AdvancedTab(transitInfo.cardName, transitInfoUi))
-                            }
+                val tabs by produceState(emptyList<AdvancedTab>()) {
+                    val tabList = mutableListOf<AdvancedTab>()
+                    if (transitInfo != null) {
+                        val transitInfoUi = transitInfo.getAdvancedUi()
+                        if (transitInfoUi != null) {
+                            tabList.add(AdvancedTab(transitInfo.cardName, transitInfoUi))
                         }
-                        if (card != null) {
-                            tabList.add(AdvancedTab(card.cardType.toString(), card.getAdvancedUi(stringResource)))
-                        }
-                        tabList
                     }
+                    if (card != null) {
+                        tabList.add(AdvancedTab(FormattedString(card.cardType.toString()), card.getAdvancedUi()))
+                    }
+                    value = tabList
+                }
 
                 CardAdvancedScreen(
                     uiState = CardAdvancedUiState(tabs = tabs),

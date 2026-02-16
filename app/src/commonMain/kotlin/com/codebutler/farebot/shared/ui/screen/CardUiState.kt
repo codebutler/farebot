@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.ui.screen
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Trip
 
 data class CardUiState(
@@ -83,6 +84,6 @@ data class CardAdvancedUiState(
 )
 
 data class AdvancedTab(
-    val title: String,
+    val title: FormattedString,
     val tree: FareBotUiTree,
 )

@@ -24,10 +24,9 @@ package com.codebutler.farebot.transit.calypso.pisa
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Station
@@ -47,7 +46,7 @@ import com.codebutler.farebot.transit.en1545.En1545Transaction
 import farebot.transit.calypso.generated.resources.*
 import kotlinx.datetime.TimeZone
 
-private val NAME by lazy { getStringBlocking(Res.string.pisa_ultralight_card_name) }
+private val NAME by lazy { FormattedString(Res.string.pisa_ultralight_card_name) }
 
 /**
  * Pisa Ultralight transit cards (Pisa, Italy).
@@ -86,7 +85,7 @@ class PisaUltralightTransitInfo(
     private val mB: Long,
     override val trips: List<Trip> = emptyList(),
 ) : TransitInfo() {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = NAME
     override val serialNumber: String? = null
 
     override val info: List<ListItemInterface>
@@ -137,7 +136,7 @@ private object PisaUltralightLookup : En1545Lookup {
     override fun getAgencyName(
         agency: Int?,
         isShort: Boolean,
-    ): String? = null
+    ): FormattedString? = null
 
     override fun getStation(
         station: Int,
@@ -146,10 +145,9 @@ private object PisaUltralightLookup : En1545Lookup {
     ): Station? = null
 
     override fun getSubscriptionName(
-        stringResource: StringResource,
         agency: Int?,
         contractTariff: Int?,
-    ): String? = null
+    ): FormattedString? = null
 
     override fun getMode(
         agency: Int?,

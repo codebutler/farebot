@@ -24,8 +24,8 @@
 
 package com.codebutler.farebot.transit.hsl
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.base.util.getBitsFromBuffer
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
@@ -39,9 +39,7 @@ import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.hsl.generated.resources.*
 
-class HSLTransitFactory(
-    private val stringResource: StringResource,
-) : TransitFactory<DesfireCard, HSLTransitInfo> {
+class HSLTransitFactory : TransitFactory<DesfireCard, HSLTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
@@ -60,7 +58,7 @@ class HSLTransitFactory(
                     ?.let { it as? StandardDesfireFile }
                     ?.data
         if (dataHSL != null) {
-            return TransitIdentity.create(CARD_NAME_HSL, formatSerial(dataHSL.hex().substring(2, 20)))
+            return TransitIdentity.create(FormattedString(CARD_NAME_HSL), formatSerial(dataHSL.hex().substring(2, 20)))
         }
         val dataWaltti =
             card
@@ -69,9 +67,12 @@ class HSLTransitFactory(
                 ?.let { it as? StandardDesfireFile }
                 ?.data
         if (dataWaltti != null) {
-            return TransitIdentity.create(CARD_NAME_WALTTI, formatSerial(dataWaltti.hex().substring(2, 20)))
+            return TransitIdentity.create(
+                FormattedString(CARD_NAME_WALTTI),
+                formatSerial(dataWaltti.hex().substring(2, 20)),
+            )
         }
-        return TransitIdentity.create(CARD_NAME_HSL, null)
+        return TransitIdentity.create(FormattedString(CARD_NAME_HSL), null)
     }
 
     override fun parseInfo(card: DesfireCard): HSLTransitInfo =

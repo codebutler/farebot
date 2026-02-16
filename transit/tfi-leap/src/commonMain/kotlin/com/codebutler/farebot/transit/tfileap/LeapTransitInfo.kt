@@ -26,12 +26,12 @@ import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.formatDateTime
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -80,8 +80,8 @@ class LeapTransitInfo(
     private val dailyAccumulators: AccumulatorBlock,
     private val weeklyAccumulators: AccumulatorBlock,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.transit_leap_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.transit_leap_card_name)
 
     override val balance: TransitBalance
         get() =

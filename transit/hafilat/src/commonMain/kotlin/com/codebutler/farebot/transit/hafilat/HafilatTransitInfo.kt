@@ -24,7 +24,7 @@ package com.codebutler.farebot.transit.hafilat
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitInfo
 import com.codebutler.farebot.transit.Trip
@@ -44,8 +44,8 @@ class HafilatTransitInfo(
     override val serialNumber: String
         get() = formatSerial(serial)
 
-    override val cardName: String
-        get() = getStringBlocking(Res.string.card_name_hafilat)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.card_name_hafilat)
 
     override val info: List<ListItemInterface>?
         get() {

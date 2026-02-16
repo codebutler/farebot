@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.selecta
 
-import com.codebutler.farebot.base.util.getStringBlocking
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.TransitInfo
@@ -41,7 +41,7 @@ class SelectaFranceTransitInfo(
     override val serialNumber: String
         get() = serial.toString()
 
-    override val cardName: String get() = getStringBlocking(Res.string.selecta_card_name)
+    override val cardName: FormattedString get() = FormattedString(Res.string.selecta_card_name)
 
     override val balance: TransitBalance
         get() = TransitBalance(balance = TransitCurrency.EUR(balanceValue))

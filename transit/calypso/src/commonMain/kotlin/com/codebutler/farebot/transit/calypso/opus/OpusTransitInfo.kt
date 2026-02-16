@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.opus
 
-import com.codebutler.farebot.base.util.StringResource
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.transit.CardInfo
@@ -46,7 +46,7 @@ import farebot.transit.calypso.generated.resources.*
 internal class OpusTransitInfo(
     result: CalypsoParseResult,
 ) : CalypsoTransitInfo(result) {
-    override val cardName: String = NAME
+    override val cardName: FormattedString = FormattedString(NAME)
 
     companion object {
         const val NAME = "Opus"
@@ -81,14 +81,12 @@ internal class OpusTransitInfo(
     }
 }
 
-class OpusTransitFactory(
-    stringResource: StringResource,
-) : CalypsoTransitFactory(stringResource) {
+class OpusTransitFactory : CalypsoTransitFactory() {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
 
-    override val name: String
-        get() = OpusTransitInfo.NAME
+    override val name: FormattedString
+        get() = FormattedString(OpusTransitInfo.NAME)
 
     override fun checkTenv(tenv: ByteArray): Boolean {
         val networkId = tenv.getBitsFromBuffer(13, 24)
@@ -143,7 +141,6 @@ class OpusTransitFactory(
                     } else {
                         OpusSubscription(
                             parsed = En1545Parser.parse(data, OpusSubscription.FIELDS),
-                            stringResource = stringResource,
                             ctr = ctr,
                         )
                     }

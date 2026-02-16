@@ -30,6 +30,7 @@ import com.codebutler.farebot.test.CardTestHelper.hexToBytes
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.octopus.OctopusTransitFactory
 import com.codebutler.farebot.transit.octopus.OctopusTransitInfo
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -77,7 +78,7 @@ class OctopusTransitTest {
         return felicaCard(systems = listOf(system), scannedAt = scannedAt)
     }
 
-    private fun checkCard(
+    private suspend fun checkCard(
         card: com.codebutler.farebot.card.felica.FelicaCard,
         expectedBalance: TransitCurrency,
     ) {
@@ -86,7 +87,7 @@ class OctopusTransitTest {
 
         // Test TransitIdentity
         val identity = factory.parseIdentity(card)
-        assertEquals(OctopusTransitInfo.OCTOPUS_NAME, identity.name)
+        assertEquals(OctopusTransitInfo.OCTOPUS_NAME, identity.name.resolveAsync())
 
         // Test TransitData
         val info = factory.parseInfo(card)
@@ -98,22 +99,24 @@ class OctopusTransitTest {
     }
 
     @Test
-    fun test2018Card() {
-        // This data is from a card last used in 2018, but we've adjusted the date here to
-        // 2017-10-02 to test the behaviour of OctopusData.getOctopusOffset.
-        // Hex 00000164 = 356 decimal. Post-2017-10-01 offset = 500.
-        // Balance = (356 - 500) * 10 = -1440 cents
-        val scannedAt = LocalDateTime(2017, 10, 2, 0, 0).toInstant(TimeZone.UTC)
-        val card = octopusCardFromHex("00000164000000000000000000000021", scannedAt)
-        checkCard(card, TransitCurrency.HKD(-1440))
-    }
+    fun test2018Card() =
+        runTest {
+            // This data is from a card last used in 2018, but we've adjusted the date here to
+            // 2017-10-02 to test the behaviour of OctopusData.getOctopusOffset.
+            // Hex 00000164 = 356 decimal. Post-2017-10-01 offset = 500.
+            // Balance = (356 - 500) * 10 = -1440 cents
+            val scannedAt = LocalDateTime(2017, 10, 2, 0, 0).toInstant(TimeZone.UTC)
+            val card = octopusCardFromHex("00000164000000000000000000000021", scannedAt)
+            checkCard(card, TransitCurrency.HKD(-1440))
+        }
 
     @Test
-    fun test2016Card() {
-        // Hex 00000152 = 338 decimal. Pre-2017-10-01 offset = 350.
-        // Balance = (338 - 350) * 10 = -120 cents
-        val scannedAt = LocalDateTime(2016, 1, 1, 0, 0).toInstant(TimeZone.UTC)
-        val card = octopusCardFromHex("000001520000000000000000000086B1", scannedAt)
-        checkCard(card, TransitCurrency.HKD(-120))
-    }
+    fun test2016Card() =
+        runTest {
+            // Hex 00000152 = 338 decimal. Pre-2017-10-01 offset = 350.
+            // Balance = (338 - 350) * 10 = -120 cents
+            val scannedAt = LocalDateTime(2016, 1, 1, 0, 0).toInstant(TimeZone.UTC)
+            val card = octopusCardFromHex("000001520000000000000000000086B1", scannedAt)
+            checkCard(card, TransitCurrency.HKD(-120))
+        }
 }

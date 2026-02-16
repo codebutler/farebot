@@ -24,7 +24,6 @@
 
 package com.codebutler.farebot.transit.ovc
 
-import com.codebutler.farebot.base.util.StringResource
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.en1545.En1545Bitmap
 import com.codebutler.farebot.transit.en1545.En1545Container
@@ -37,7 +36,6 @@ import com.codebutler.farebot.transit.en1545.En1545Subscription
 
 class OVChipSubscription internal constructor(
     override val parsed: En1545Parsed,
-    override val stringResource: StringResource,
     private val mType1: Int,
     private val mUsed: Int,
 ) : En1545Subscription() {
@@ -98,11 +96,9 @@ class OVChipSubscription internal constructor(
             data: ByteArray,
             type1: Int,
             used: Int,
-            stringResource: StringResource,
         ): OVChipSubscription =
             OVChipSubscription(
                 parsed = En1545Parser.parse(data, fields()),
-                stringResource = stringResource,
                 mType1 = type1,
                 mUsed = used,
             )

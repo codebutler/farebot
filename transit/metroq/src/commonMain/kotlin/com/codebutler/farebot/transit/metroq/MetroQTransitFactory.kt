@@ -22,11 +22,11 @@
 
 package com.codebutler.farebot.transit.metroq
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.byteArrayToLong
 import com.codebutler.farebot.base.util.getBitsFromBuffer
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -75,7 +75,7 @@ class MetroQTransitFactory : TransitFactory<ClassicCard, MetroQTransitInfo> {
 
     override fun parseIdentity(card: ClassicCard): TransitIdentity {
         val serial = getSerial(card)
-        val cardName = getStringBlocking(Res.string.metroq_card_name)
+        val cardName = FormattedString(Res.string.metroq_card_name)
         return TransitIdentity.create(
             cardName,
             NumberUtils.zeroPad(serial, 8),

@@ -24,9 +24,9 @@ package com.codebutler.farebot.transit.komuterlink
 
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.Luhn
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -46,8 +46,8 @@ class KomuterLinkTransitInfo(
     private val mCardNo: Int,
     private val mStoredLuhn: Int,
 ) : TransitInfo() {
-    override val cardName: String
-        get() = getStringBlocking(Res.string.komuterlink_card_name)
+    override val cardName: FormattedString
+        get() = FormattedString(Res.string.komuterlink_card_name)
 
     override val serialNumber: String
         get() = NumberUtils.zeroPad(mSerial, 10)

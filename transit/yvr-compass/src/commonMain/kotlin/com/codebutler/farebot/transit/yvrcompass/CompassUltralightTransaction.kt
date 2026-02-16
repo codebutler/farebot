@@ -38,8 +38,8 @@ class CompassUltralightTransaction(
             val result = MdstStationLookup.getStation(COMPASS_STR, mLocation)
             return if (result != null) {
                 Station(
-                    stationNameRaw = result.stationName,
-                    shortStationNameRaw = result.shortStationName,
+                    stationName = result.stationName,
+                    shortStationName = result.shortStationName,
                     companyName = result.companyName,
                     lineNames = result.lineNames,
                     latitude = if (result.hasLocation) result.latitude else null,

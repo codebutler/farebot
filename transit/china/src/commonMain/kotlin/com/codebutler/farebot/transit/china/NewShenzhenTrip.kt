@@ -23,13 +23,12 @@
 package com.codebutler.farebot.transit.china
 
 import com.codebutler.farebot.base.mdst.MdstStationLookup
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
-import com.codebutler.farebot.base.util.getStringBlocking
 import com.codebutler.farebot.transit.Station
 import farebot.transit.china.generated.resources.Res
 import farebot.transit.china.generated.resources.szt_bus
 import farebot.transit.china.generated.resources.szt_metro
-import farebot.transit.china.generated.resources.szt_station_gate
 import farebot.transit.china.generated.resources.unknown_format
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -51,16 +50,15 @@ class NewShenzhenTrip(
                     val result = MdstStationLookup.getStation(SHENZHEN_STR, stationId)
                     if (result != null) {
                         val gate = (mStation and 0xff).toString(16)
-                        val gateAttr = getStringBlocking(Res.string.szt_station_gate, gate)
                         Station(
-                            stationNameRaw = result.stationName,
-                            shortStationNameRaw = result.shortStationName,
+                            stationName = result.stationName,
+                            shortStationName = result.shortStationName,
                             companyName = result.companyName,
                             lineNames = result.lineNames,
                             latitude = if (result.hasLocation) result.latitude else null,
                             longitude = if (result.hasLocation) result.longitude else null,
                             humanReadableId = (mStation shr 8).toString(16),
-                            attributes = listOf(gateAttr),
+                            attributes = listOf(FormattedString("Gate $gate")),
                         )
                     } else {
                         Station.unknown((mStation shr 8).toString(16))
@@ -81,12 +79,14 @@ class NewShenzhenTrip(
             }
         }
 
-    override val routeName: String?
+    override val routeName: FormattedString?
         get() =
             when (transport) {
                 SZT_BUS -> {
-                    MdstStationLookup.getLineName(SHENZHEN_STR, mStation.toInt())
-                        ?: mStation.toString()
+                    val name =
+                        MdstStationLookup.getLineName(SHENZHEN_STR, mStation.toInt())
+                            ?: mStation.toString()
+                    FormattedString(name)
                 }
                 else -> null
             }
@@ -106,12 +106,12 @@ class NewShenzhenTrip(
 
     constructor(data: ByteArray) : this(ChinaTripCapsule(data))
 
-    override val agencyName: String?
+    override val agencyName: FormattedString?
         get() =
             when (transport) {
-                SZT_METRO -> getStringBlocking(Res.string.szt_metro)
-                SZT_BUS -> getStringBlocking(Res.string.szt_bus)
-                else -> getStringBlocking(Res.string.unknown_format, transport.toString())
+                SZT_METRO -> FormattedString(Res.string.szt_metro)
+                SZT_BUS -> FormattedString(Res.string.szt_bus)
+                else -> FormattedString(Res.string.unknown_format, transport.toString())
             }
 
     companion object {

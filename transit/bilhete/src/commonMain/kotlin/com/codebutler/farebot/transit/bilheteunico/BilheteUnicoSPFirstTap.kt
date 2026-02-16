@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.bilheteunico
 
+import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import kotlin.time.Instant
@@ -45,6 +46,6 @@ internal class BilheteUnicoSPFirstTap(
                 else -> Mode.OTHER
             }
 
-    override val routeName: String?
-        get() = mLine.toString(16)
+    override val routeName: FormattedString?
+        get() = FormattedString(mLine.toString(16))
 }
