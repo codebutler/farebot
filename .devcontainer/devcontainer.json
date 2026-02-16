@@ -15,16 +15,16 @@
     "--cpus=8"
   ],
   "features": {
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "21",
-      "installGradle": "true"
-    }
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "remoteUser": "bun",
+  "remoteUser": "dev",
   "mounts": [
     "source=claude-code-history-${devcontainerId},target=/commandhistory,type=volume",
-    "source=claude-code-ghconfig-${devcontainerId},target=/home/bun/.config/gh,type=volume",
-    "source=${localEnv:HOME}/.tmux.conf,target=/home/bun/.tmux.conf,type=bind,readonly"
+    "source=claude-code-ghconfig-${devcontainerId},target=/home/dev/.config/gh,type=volume",
+    "source=farebot-claude-auth,target=/home/dev/.claude,type=volume",
+    "source=farebot-gradle-cache,target=/home/dev/.gradle,type=volume",
+    "source=${localEnv:HOME}/.tmux.conf,target=/home/dev/.tmux.conf,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.devcontainer/local.properties,target=/workspace/local.properties,type=bind"
   ],
   "containerEnv": {
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"

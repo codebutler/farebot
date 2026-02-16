@@ -28,6 +28,12 @@ tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>("compileKotlinJv
 
 compose.desktop {
     application {
+        javaHome =
+            javaToolchains
+                .launcherFor {
+                    languageVersion.set(JavaLanguageVersion.of(25))
+                }.map { it.metadata.installationPath.asFile.absolutePath }
+                .get()
         mainClass = "com.codebutler.farebot.desktop.MainKt"
         jvmArgs(
             "-Dsun.security.smartcardio.t0GetResponse=false",
