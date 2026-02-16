@@ -41,5 +41,5 @@ interface VicinityTechnology : NfcTechnology {
      * @return The response from the tag
      * @throws Exception if communication fails
      */
-    fun transceive(data: ByteArray): ByteArray
+    suspend fun transceive(data: ByteArray): ByteArray
 }

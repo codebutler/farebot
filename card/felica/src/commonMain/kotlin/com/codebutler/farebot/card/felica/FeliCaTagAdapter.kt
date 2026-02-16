@@ -34,16 +34,16 @@ interface FeliCaTagAdapter {
     fun getIDm(): ByteArray
 
     /** Returns the list of system codes reported by the tag. */
-    fun getSystemCodes(): List<Int>
+    suspend fun getSystemCodes(): List<Int>
 
     /** Polls the tag with [systemCode] and returns the 8-byte PMm, or null on failure. */
-    fun selectSystem(systemCode: Int): ByteArray?
+    suspend fun selectSystem(systemCode: Int): ByteArray?
 
     /** Returns the list of service codes for the currently-selected system. */
-    fun getServiceCodes(): List<Int>
+    suspend fun getServiceCodes(): List<Int>
 
     /** Reads a single 16-byte block from [serviceCode] at [blockAddr], or null on failure. */
-    fun readBlock(
+    suspend fun readBlock(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray?

@@ -25,13 +25,13 @@ package com.codebutler.farebot.card.nfc
 interface UltralightTechnology : NfcTechnology {
     val type: Int
 
-    fun readPages(pageOffset: Int): ByteArray
+    suspend fun readPages(pageOffset: Int): ByteArray
 
     /**
      * Sends raw data to the card and receives the response.
      * Used for protocol-level commands like GET_VERSION and AUTH_1.
      */
-    fun transceive(data: ByteArray): ByteArray
+    suspend fun transceive(data: ByteArray): ByteArray
 
     /**
      * Reconnects to the card after a disconnect.

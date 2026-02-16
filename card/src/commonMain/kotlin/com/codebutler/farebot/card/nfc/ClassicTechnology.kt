@@ -25,17 +25,17 @@ package com.codebutler.farebot.card.nfc
 interface ClassicTechnology : NfcTechnology {
     val sectorCount: Int
 
-    fun authenticateSectorWithKeyA(
+    suspend fun authenticateSectorWithKeyA(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean
 
-    fun authenticateSectorWithKeyB(
+    suspend fun authenticateSectorWithKeyB(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean
 
-    fun readBlock(blockIndex: Int): ByteArray
+    suspend fun readBlock(blockIndex: Int): ByteArray
 
     fun sectorToBlock(sectorIndex: Int): Int
 

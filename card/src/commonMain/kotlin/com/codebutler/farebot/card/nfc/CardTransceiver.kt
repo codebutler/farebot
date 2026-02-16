@@ -23,7 +23,7 @@
 package com.codebutler.farebot.card.nfc
 
 interface CardTransceiver : NfcTechnology {
-    fun transceive(data: ByteArray): ByteArray
+    suspend fun transceive(data: ByteArray): ByteArray
 
     val maxTransceiveLength: Int
 }
