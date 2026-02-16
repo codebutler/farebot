@@ -106,11 +106,10 @@ class ClipperTransitTest {
     fun testClipperTripModeDetection_BART() {
         // BART with transportCode 0x6f -> METRO
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x04) // AGENCY_BART
-                .transportCode(0x6f)
-                .build()
+            ClipperTrip(
+                agency = 0x04, // AGENCY_BART
+                transportCode = 0x6f,
+            )
         assertEquals(Trip.Mode.METRO, trip.mode)
     }
 
@@ -118,11 +117,10 @@ class ClipperTransitTest {
     fun testClipperTripModeDetection_MuniLightRail() {
         // Muni with transportCode 0x62 -> TRAM (default)
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x12) // AGENCY_MUNI
-                .transportCode(0x62)
-                .build()
+            ClipperTrip(
+                agency = 0x12, // AGENCY_MUNI
+                transportCode = 0x62,
+            )
         assertEquals(Trip.Mode.TRAM, trip.mode)
     }
 
@@ -130,11 +128,10 @@ class ClipperTransitTest {
     fun testClipperTripModeDetection_Caltrain() {
         // Caltrain with transportCode 0x62 -> TRAIN
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x06) // AGENCY_CALTRAIN
-                .transportCode(0x62)
-                .build()
+            ClipperTrip(
+                agency = 0x06, // AGENCY_CALTRAIN
+                transportCode = 0x62,
+            )
         assertEquals(Trip.Mode.TRAIN, trip.mode)
     }
 
@@ -142,11 +139,10 @@ class ClipperTransitTest {
     fun testClipperTripModeDetection_SMART() {
         // SMART with transportCode 0x62 -> TRAIN
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x0c) // AGENCY_SMART
-                .transportCode(0x62)
-                .build()
+            ClipperTrip(
+                agency = 0x0c, // AGENCY_SMART
+                transportCode = 0x62,
+            )
         assertEquals(Trip.Mode.TRAIN, trip.mode)
     }
 
@@ -154,11 +150,10 @@ class ClipperTransitTest {
     fun testClipperTripModeDetection_GGFerry() {
         // GG Ferry with transportCode 0x62 -> FERRY
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x19) // AGENCY_GG_FERRY
-                .transportCode(0x62)
-                .build()
+            ClipperTrip(
+                agency = 0x19, // AGENCY_GG_FERRY
+                transportCode = 0x62,
+            )
         assertEquals(Trip.Mode.FERRY, trip.mode)
     }
 
@@ -166,44 +161,40 @@ class ClipperTransitTest {
     fun testClipperTripModeDetection_SFBayFerry() {
         // SF Bay Ferry with transportCode 0x62 -> FERRY
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x1b) // AGENCY_SF_BAY_FERRY
-                .transportCode(0x62)
-                .build()
+            ClipperTrip(
+                agency = 0x1b, // AGENCY_SF_BAY_FERRY
+                transportCode = 0x62,
+            )
         assertEquals(Trip.Mode.FERRY, trip.mode)
     }
 
     @Test
     fun testClipperTripModeDetection_Bus() {
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x01) // AGENCY_ACTRAN
-                .transportCode(0x61)
-                .build()
+            ClipperTrip(
+                agency = 0x01, // AGENCY_ACTRAN
+                transportCode = 0x61,
+            )
         assertEquals(Trip.Mode.BUS, trip.mode)
     }
 
     @Test
     fun testClipperTripModeDetection_Unknown() {
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x04) // AGENCY_BART
-                .transportCode(0xFF)
-                .build()
+            ClipperTrip(
+                agency = 0x04, // AGENCY_BART
+                transportCode = 0xFF,
+            )
         assertEquals(Trip.Mode.OTHER, trip.mode)
     }
 
     @Test
     fun testClipperTripFareCurrency() {
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x04)
-                .fare(350)
-                .build()
+            ClipperTrip(
+                agency = 0x04,
+                fareValue = 350,
+            )
         val fareStr = trip.fare?.formatCurrencyString() ?: ""
         // Should format as USD
         assertTrue(
@@ -215,12 +206,11 @@ class ClipperTransitTest {
     @Test
     fun testClipperTripWithBalance() {
         val trip =
-            ClipperTrip
-                .builder()
-                .agency(0x04)
-                .fare(200)
-                .balance(1000)
-                .build()
+            ClipperTrip(
+                agency = 0x04,
+                fareValue = 200,
+                balance = 1000,
+            )
         val updated = trip.withBalance(500)
         assertEquals(500L, updated.getBalance())
     }
@@ -297,58 +287,52 @@ class ClipperTransitTest {
     fun testVehicleNumbers() {
         // Test null vehicle number (0)
         val trip0 =
-            ClipperTrip
-                .builder()
-                .agency(0x12) // Muni
-                .vehicleNum(0)
-                .build()
+            ClipperTrip(
+                agency = 0x12, // Muni
+                vehicleNum = 0,
+            )
         assertNull(trip0.vehicleID)
 
         // Test null vehicle number (0xffff)
         val tripFfff =
-            ClipperTrip
-                .builder()
-                .agency(0x12)
-                .vehicleNum(0xffff)
-                .build()
+            ClipperTrip(
+                agency = 0x12,
+                vehicleNum = 0xffff,
+            )
         assertNull(tripFfff.vehicleID)
 
         // Test regular vehicle number
         val trip1058 =
-            ClipperTrip
-                .builder()
-                .agency(0x12)
-                .vehicleNum(1058)
-                .build()
+            ClipperTrip(
+                agency = 0x12,
+                vehicleNum = 1058,
+            )
         assertEquals("1058", trip1058.vehicleID)
 
         // Test regular vehicle number
         val trip1525 =
-            ClipperTrip
-                .builder()
-                .agency(0x12)
-                .vehicleNum(1525)
-                .build()
+            ClipperTrip(
+                agency = 0x12,
+                vehicleNum = 1525,
+            )
         assertEquals("1525", trip1525.vehicleID)
 
         // Test LRV4 Muni vehicle numbers (5 digits, encoded as number*10 + letter)
         // 2010A = 20100 + 1 - 1 = 20101? No, the encoding is: number/10 gives the vehicle, %10 gives letter offset
         // 20101: 20101/10 = 2010, 20101%10 = 1, letter = 9+1 = A (in hex, 10 = A)
         val trip2010A =
-            ClipperTrip
-                .builder()
-                .agency(0x12)
-                .vehicleNum(20101)
-                .build()
+            ClipperTrip(
+                agency = 0x12,
+                vehicleNum = 20101,
+            )
         assertEquals("2010A", trip2010A.vehicleID)
 
         // 2061B = vehicle/10 = 2061, letter offset = 2 -> 9+2 = B (11 in hex = B)
         val trip2061B =
-            ClipperTrip
-                .builder()
-                .agency(0x12)
-                .vehicleNum(20612)
-                .build()
+            ClipperTrip(
+                agency = 0x12,
+                vehicleNum = 20612,
+            )
         assertEquals("2061B", trip2061B.vehicleID)
     }
 
@@ -356,28 +340,25 @@ class ClipperTransitTest {
     fun testHumanReadableRouteID() {
         // Golden Gate Ferry should display route ID in hex
         val ggFerryTrip =
-            ClipperTrip
-                .builder()
-                .agency(0x19) // AGENCY_GG_FERRY
-                .route(0x1234)
-                .build()
+            ClipperTrip(
+                agency = 0x19, // AGENCY_GG_FERRY
+                route = 0x1234,
+            )
         assertEquals("0x1234", ggFerryTrip.humanReadableRouteID)
 
         // Other agencies should not have humanReadableRouteID
         val bartTrip =
-            ClipperTrip
-                .builder()
-                .agency(0x04) // AGENCY_BART
-                .route(0x5678)
-                .build()
+            ClipperTrip(
+                agency = 0x04, // AGENCY_BART
+                route = 0x5678,
+            )
         assertNull(bartTrip.humanReadableRouteID)
 
         val muniTrip =
-            ClipperTrip
-                .builder()
-                .agency(0x12) // AGENCY_MUNI
-                .route(0xABCD)
-                .build()
+            ClipperTrip(
+                agency = 0x12, // AGENCY_MUNI
+                route = 0xABCD,
+            )
         assertNull(muniTrip.humanReadableRouteID)
     }
 

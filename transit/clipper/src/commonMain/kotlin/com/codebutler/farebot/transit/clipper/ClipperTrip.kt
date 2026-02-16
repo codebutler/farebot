@@ -34,14 +34,14 @@ import com.codebutler.farebot.transit.Trip
 import kotlin.time.Instant
 
 class ClipperTrip(
-    private val timestamp: Long,
-    private val exitTimestampValue: Long,
-    private val balance: Long,
-    private val fareValue: Long,
-    private val agency: Long,
-    private val from: Long,
-    private val to: Long,
-    private val route: Long,
+    private val timestamp: Long = 0,
+    private val exitTimestampValue: Long = 0,
+    private val balance: Long = 0,
+    private val fareValue: Long = 0,
+    private val agency: Long = 0,
+    private val from: Long = 0,
+    private val to: Long = 0,
+    private val route: Long = 0,
     private val vehicleNum: Long = 0,
     private val transportCode: Long = 0,
 ) : Trip() {
@@ -127,54 +127,4 @@ class ClipperTrip(
             transportCode,
         )
 
-    companion object {
-        fun builder(): Builder = Builder()
-    }
-
-    class Builder {
-        private var timestamp: Long = 0
-        private var exitTimestamp: Long = 0
-        private var balance: Long = 0
-        private var fare: Long = 0
-        private var agency: Long = 0
-        private var from: Long = 0
-        private var to: Long = 0
-        private var route: Long = 0
-        private var vehicleNum: Long = 0
-        private var transportCode: Long = 0
-
-        fun timestamp(timestamp: Long): Builder = apply { this.timestamp = timestamp }
-
-        fun exitTimestamp(exitTimestamp: Long): Builder = apply { this.exitTimestamp = exitTimestamp }
-
-        fun balance(balance: Long): Builder = apply { this.balance = balance }
-
-        fun fare(fare: Long): Builder = apply { this.fare = fare }
-
-        fun agency(agency: Long): Builder = apply { this.agency = agency }
-
-        fun from(from: Long): Builder = apply { this.from = from }
-
-        fun to(to: Long): Builder = apply { this.to = to }
-
-        fun route(route: Long): Builder = apply { this.route = route }
-
-        fun vehicleNum(vehicleNum: Long): Builder = apply { this.vehicleNum = vehicleNum }
-
-        fun transportCode(transportCode: Long): Builder = apply { this.transportCode = transportCode }
-
-        fun build(): ClipperTrip =
-            ClipperTrip(
-                timestamp,
-                exitTimestamp,
-                balance,
-                fare,
-                agency,
-                from,
-                to,
-                route,
-                vehicleNum,
-                transportCode,
-            )
-    }
 }
