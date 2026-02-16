@@ -84,6 +84,8 @@ ALLOWED_DOMAINS=(
     "cache-redirector.jetbrains.com"
     "maven.pkg.jetbrains.space"
     "packages.jetbrains.team"
+    # Node.js (Kotlin/Wasm test runner)
+    "nodejs.org"
 )
 
 for domain in "${ALLOWED_DOMAINS[@]}"; do
