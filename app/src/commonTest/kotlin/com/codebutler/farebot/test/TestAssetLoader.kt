@@ -124,7 +124,7 @@ object TestAssetLoader {
         val importer = CardImporter.create(KotlinxCardSerializer(json))
         val result = importer.importCards(jsonString)
         assertTrue(result is ImportResult.Success, "Failed to import card from $resourcePath: $result")
-        return (result as ImportResult.Success).cards.first()
+        return result.cards.first()
     }
 
     /**
@@ -247,8 +247,6 @@ abstract class CardDumpTest {
         val card = rawCard.parse()
         assertTrue(factory.check(card), "Card did not match factory: ${factory::class.simpleName}")
         val transitInfo = factory.parseInfo(card)
-        assertNotNull(transitInfo, "Failed to parse transit info")
-        assertTrue(transitInfo is T, "Transit info is not of expected type")
         return transitInfo
     }
 
@@ -273,8 +271,6 @@ abstract class CardDumpTest {
         val card = rawCard.parse() as C
         assertTrue(factory.check(card), "Card did not match factory: ${factory::class.simpleName}")
         val transitInfo = factory.parseInfo(card)
-        assertNotNull(transitInfo, "Failed to parse transit info")
-        assertTrue(transitInfo is T, "Transit info is not of expected type")
         return transitInfo
     }
 
@@ -291,8 +287,6 @@ abstract class CardDumpTest {
         val card = rawCard.parse() as C
         assertTrue(factory.check(card), "Card did not match factory: ${factory::class.simpleName}")
         val transitInfo = factory.parseInfo(card)
-        assertNotNull(transitInfo, "Failed to parse transit info")
-        assertTrue(transitInfo is T, "Transit info is not of expected type")
         return Pair(card, transitInfo)
     }
 }

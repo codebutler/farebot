@@ -29,7 +29,6 @@ import com.codebutler.farebot.test.CardTestHelper.standardFile
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.orca.OrcaTransitFactory
-import com.codebutler.farebot.transit.orca.OrcaTransitInfo
 import kotlinx.coroutines.test.runTest
 import kotlin.math.abs
 import kotlin.test.Test
@@ -94,7 +93,6 @@ class OrcaTransitTest {
 
             // Test TransitInfo
             val info = factory.parseInfo(card)
-            assertTrue(info is OrcaTransitInfo, "TransitData must be instance of OrcaTransitInfo")
             assertEquals("12030625", info.serialNumber)
             assertEquals("ORCA", info.cardName.resolveAsync())
             assertEquals(TransitCurrency.USD(23432), info.balances?.firstOrNull()?.balance)

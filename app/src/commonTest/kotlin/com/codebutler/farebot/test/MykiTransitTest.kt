@@ -73,7 +73,6 @@ class MykiTransitTest {
 
         // Test TransitData
         val info = factory.parseInfo(card)
-        assertTrue(info is MykiTransitInfo, "TransitData must be instance of MykiTransitInfo")
         assertEquals("308425123456780", info.serialNumber)
     }
 }

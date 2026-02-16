@@ -26,12 +26,9 @@ import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.test.CardTestHelper.hexToBytes
 import com.codebutler.farebot.transit.laxtap.LaxTapTransitFactory
-import com.codebutler.farebot.transit.laxtap.LaxTapTransitInfo
 import com.codebutler.farebot.transit.mspgoto.MspGotoTransitFactory
-import com.codebutler.farebot.transit.mspgoto.MspGotoTransitInfo
 import com.codebutler.farebot.transit.nextfare.NextfareTransitInfo
 import com.codebutler.farebot.transit.seqgo.SeqGoTransitFactory
-import com.codebutler.farebot.transit.seqgo.SeqGoTransitInfo
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -175,7 +172,6 @@ class NextfareTransitTest {
         val seqGoFactory = SeqGoTransitFactory()
         assertTrue(seqGoFactory.check(c1), "Card is seqgo")
         val d1 = seqGoFactory.parseInfo(c1)
-        assertTrue(d1 is SeqGoTransitInfo, "Card is SeqGoTransitInfo")
         assertEquals("0160 0012 3456 7893", d1.serialNumber)
         val balances1 = d1.balances
         assertNotNull(balances1)
@@ -190,7 +186,6 @@ class NextfareTransitTest {
             )
         assertTrue(seqGoFactory.check(c2), "Card is seqgo")
         val d2 = seqGoFactory.parseInfo(c2)
-        assertTrue(d2 is SeqGoTransitInfo, "Card is SeqGoTransitInfo")
         assertEquals("0160 0098 7654 3213", d2.serialNumber)
         val balances2 = d2.balances
         assertNotNull(balances2)
@@ -211,7 +206,6 @@ class NextfareTransitTest {
         val laxTapFactory = LaxTapTransitFactory()
         assertTrue(laxTapFactory.check(c), "Card is laxtap")
         val d = laxTapFactory.parseInfo(c)
-        assertTrue(d is LaxTapTransitInfo, "Card is LaxTapTransitInfo")
         assertEquals("0160 0323 4663 8769", d.serialNumber)
         val balances = d.balances
         assertNotNull(balances)
@@ -231,7 +225,6 @@ class NextfareTransitTest {
         val mspGotoFactory = MspGotoTransitFactory()
         assertTrue(mspGotoFactory.check(c), "Card is mspgoto")
         val d = mspGotoFactory.parseInfo(c)
-        assertTrue(d is MspGotoTransitInfo, "Card is MspGotoTransitInfo")
         assertEquals("0160 0112 3581 3212", d.serialNumber)
         val balances = d.balances
         assertNotNull(balances)
