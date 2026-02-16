@@ -70,15 +70,14 @@ internal object ClipperData {
         val id = (agency shl 16) or stationId
         val result = MdstStationLookup.getStation(CLIPPER_STR, id)
         if (result != null) {
-            return Station
-                .Builder()
-                .stationName(result.stationName)
-                .shortStationName(result.shortStationName)
-                .companyName(result.companyName)
-                .lineNames(result.lineNames)
-                .latitude(if (result.hasLocation) result.latitude.toString() else null)
-                .longitude(if (result.hasLocation) result.longitude.toString() else null)
-                .build()
+            return Station(
+                stationName = result.stationName,
+                shortStationName = result.shortStationName,
+                companyName = result.companyName,
+                lineNames = result.lineNames,
+                latitude = if (result.hasLocation) result.latitude else null,
+                longitude = if (result.hasLocation) result.longitude else null,
+            )
         }
 
         if (agency == AGENCY_GGT ||

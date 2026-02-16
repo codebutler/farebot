@@ -496,13 +496,12 @@ internal object SuicaUtil {
 
         val result = MdstStationLookup.getStation(SUICA_BUS_STR, stationId)
         if (result != null) {
-            return Station
-                .builder()
-                .companyName(result.companyName)
-                .stationName(result.stationName)
-                .latitude(if (result.hasLocation) result.latitude.toString() else null)
-                .longitude(if (result.hasLocation) result.longitude.toString() else null)
-                .build()
+            return Station(
+                companyName = result.companyName,
+                stationName = result.stationName,
+                latitude = if (result.hasLocation) result.latitude else null,
+                longitude = if (result.hasLocation) result.longitude else null,
+            )
         }
 
         // Return unknown station with formatted ID
@@ -526,14 +525,13 @@ internal object SuicaUtil {
 
         val result = MdstStationLookup.getStation(SUICA_RAIL_STR, stationId)
         if (result != null) {
-            return Station
-                .builder()
-                .companyName(result.companyName)
-                .lineNames(result.lineNames)
-                .stationName(result.stationName)
-                .latitude(if (result.hasLocation) result.latitude.toString() else null)
-                .longitude(if (result.hasLocation) result.longitude.toString() else null)
-                .build()
+            return Station(
+                companyName = result.companyName,
+                lineNames = result.lineNames,
+                stationName = result.stationName,
+                latitude = if (result.hasLocation) result.latitude else null,
+                longitude = if (result.hasLocation) result.longitude else null,
+            )
         }
 
         // Return unknown station with formatted ID

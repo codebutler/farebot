@@ -52,16 +52,15 @@ internal object EZLinkData {
         val result = MdstStationLookup.getStation(EZLINK_STR, stationId)
 
         if (result != null) {
-            return Station
-                .Builder()
-                .stationName(result.stationName)
-                .shortStationName(result.shortStationName)
-                .companyName(result.companyName)
-                .lineNames(result.lineNames)
-                .latitude(if (result.hasLocation) result.latitude.toString() else null)
-                .longitude(if (result.hasLocation) result.longitude.toString() else null)
-                .code(code)
-                .build()
+            return Station(
+                stationName = result.stationName,
+                shortStationName = result.shortStationName,
+                companyName = result.companyName,
+                lineNames = result.lineNames,
+                latitude = if (result.hasLocation) result.latitude else null,
+                longitude = if (result.hasLocation) result.longitude else null,
+                humanReadableId = code,
+            )
         }
 
         return Station.unknown(code)

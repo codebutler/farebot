@@ -85,11 +85,10 @@ object SeqGoUtil {
 
         val result = MdstStationLookup.getStation(SEQ_GO_STR, stationId) ?: return null
 
-        return Station
-            .builder()
-            .stationName(result.stationName)
-            .latitude(if (result.hasLocation) result.latitude.toString() else null)
-            .longitude(if (result.hasLocation) result.longitude.toString() else null)
-            .build()
+        return Station(
+            stationName = result.stationName,
+            latitude = if (result.hasLocation) result.latitude else null,
+            longitude = if (result.hasLocation) result.longitude else null,
+        )
     }
 }

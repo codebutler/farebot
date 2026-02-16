@@ -257,15 +257,14 @@ class OrcaTransaction(
         stationId: Int,
     ): Station? {
         val result = MdstStationLookup.getStation(dbName, stationId) ?: return null
-        return Station
-            .Builder()
-            .stationName(result.stationName)
-            .shortStationName(result.shortStationName)
-            .companyName(result.companyName)
-            .lineNames(result.lineNames)
-            .latitude(if (result.hasLocation) result.latitude.toString() else null)
-            .longitude(if (result.hasLocation) result.longitude.toString() else null)
-            .build()
+        return Station(
+            stationName = result.stationName,
+            shortStationName = result.shortStationName,
+            companyName = result.companyName,
+            lineNames = result.lineNames,
+            latitude = if (result.hasLocation) result.latitude else null,
+            longitude = if (result.hasLocation) result.longitude else null,
+        )
     }
 
     companion object {
