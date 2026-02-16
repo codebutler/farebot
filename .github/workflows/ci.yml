@@ -99,7 +99,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build Web
-        run: ./gradlew :app:web:wasmJsBrowserDistribution
+        run: ./gradlew :app:web:wasmJsBrowserDevelopmentExecutableDistribution
 
   ios:
     name: Build & Test (iOS)
