@@ -33,7 +33,7 @@ class PN533ReaderBackend(
 ) : PN53xReaderBackend(transport) {
     override val name: String = "PN533"
 
-    override fun initDevice(pn533: PN533) {
+    override suspend fun initDevice(pn533: PN533) {
         val fw = pn533.getFirmwareVersion()
         println("[$name] Firmware: $fw")
         pn533.samConfiguration()

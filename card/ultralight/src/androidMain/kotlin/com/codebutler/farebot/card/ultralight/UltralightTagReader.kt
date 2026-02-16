@@ -37,7 +37,7 @@ class UltralightTagReader(
     override fun getTech(tag: Tag): UltralightTechnology = AndroidUltralightTechnology(MifareUltralight.get(tag))
 
     @Throws(Exception::class)
-    override fun readTag(
+    override suspend fun readTag(
         tagId: ByteArray,
         tag: Tag,
         tech: UltralightTechnology,

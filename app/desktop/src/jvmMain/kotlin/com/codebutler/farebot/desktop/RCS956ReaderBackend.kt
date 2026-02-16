@@ -47,7 +47,7 @@ class RCS956ReaderBackend(
         tg: Int,
     ): CardTransceiver = PN533CommunicateThruTransceiver(pn533)
 
-    override fun initDevice(pn533: PN533) {
+    override suspend fun initDevice(pn533: PN533) {
         // nfcpy rcs956.py init(transport) + Device.__init__() sequence.
         //
         // 1. ACK clears device state after USB connect (init function)
