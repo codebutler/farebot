@@ -8,23 +8,25 @@ container_id() {
   docker ps -q --filter label=devcontainer.local_folder="$WORKSPACE" | head -1
 }
 
-up()    { devcontainer up --workspace-folder "$WORKSPACE"; }
-down()  { docker stop "$(container_id)" 2>/dev/null || echo "No running container"; }
-shell() { docker exec -it -u bun -w /workspace "$(container_id)" zsh; }
-auth()  { docker exec -it -u bun -w /workspace "$(container_id)" gh auth login; }
-run()   { docker exec -it -u bun -w /workspace "$(container_id)" "$@"; }
+up()      { devcontainer up --workspace-folder "$WORKSPACE"; }
+rebuild() { devcontainer up --workspace-folder "$WORKSPACE" --remove-existing-container; }
+down()    { docker stop "$(container_id)" 2>/dev/null || echo "No running container"; }
+shell() { docker exec -it -u dev -w /workspace "$(container_id)" zsh; }
+auth()  { docker exec -it -u dev -w /workspace "$(container_id)" gh auth login; }
+run()   { docker exec -it -u dev -w /workspace "$(container_id)" "$@"; }
 
 claude() {
   local cid
   cid="$(container_id)"
   # Attach to existing tmux session, or create one running claude
-  docker exec -it -u bun -w /workspace "$cid" \
+  docker exec -it -u dev -w /workspace "$cid" \
     tmux new-session -As "$TMUX_SESSION" \
     "claude --dangerously-skip-permissions $*; exec zsh"
 }
 
 case "${1:-help}" in
   up)      up ;;
+  rebuild) rebuild ;;
   down)    down ;;
   shell)   shell ;;
   claude)  shift; claude "$@" ;;
@@ -35,6 +37,7 @@ case "${1:-help}" in
 Usage: .devcontainer/dc <command>
 
   up       Build and start the container
+  rebuild  Rebuild container from scratch (picks up Dockerfile/config changes)
   down     Stop the container
   shell    Open a zsh shell in the container
   claude   Run Claude Code in tmux (--dangerously-skip-permissions, resumes existing session)
