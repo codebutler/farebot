@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.card.felica
 
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -47,19 +48,19 @@ class MockFeliCaTagAdapter(
 
     override fun getIDm(): ByteArray = idm
 
-    override fun getSystemCodes(): List<Int> = systemCodes
+    override suspend fun getSystemCodes(): List<Int> = systemCodes
 
-    override fun selectSystem(systemCode: Int): ByteArray? {
+    override suspend fun selectSystem(systemCode: Int): ByteArray? {
         selectSystemCalls.add(systemCode)
         return selectResponses[systemCode]
     }
 
-    override fun getServiceCodes(): List<Int> {
+    override suspend fun getServiceCodes(): List<Int> {
         val lastSelected = selectSystemCalls.lastOrNull() ?: return emptyList()
         return serviceCodesBySystem[lastSelected] ?: emptyList()
     }
 
-    override fun readBlock(
+    override suspend fun readBlock(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray? {
@@ -74,7 +75,7 @@ class FeliCaReaderTest {
     private val dummyBlockData = ByteArray(16) { 0xFF.toByte() }
 
     @Test
-    fun testNormalCardWithSystemCodes() {
+    fun testNormalCardWithSystemCodes() = runTest {
         // When system codes are reported, they are used directly (no magic fallback)
         val adapter =
             MockFeliCaTagAdapter(
@@ -105,7 +106,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testFelicaLiteDetection() {
+    fun testFelicaLiteDetection() = runTest {
         // When no system codes are reported, reader should try FeliCa Lite first
         val adapter =
             MockFeliCaTagAdapter(
@@ -141,7 +142,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testFelicaLitePreventsOctopusSztProbing() {
+    fun testFelicaLitePreventsOctopusSztProbing() = runTest {
         // When FeliCa Lite is detected, Octopus/SZT should NOT be probed
         val adapter =
             MockFeliCaTagAdapter(
@@ -176,7 +177,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testOctopusMagicFallback() {
+    fun testOctopusMagicFallback() = runTest {
         // When FeliCa Lite is NOT detected, fall back to Octopus/SZT
         val adapter =
             MockFeliCaTagAdapter(
@@ -203,7 +204,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testSystemCode0Skipped() {
+    fun testSystemCode0Skipped() = runTest {
         // System code 0 should be skipped
         val adapter =
             MockFeliCaTagAdapter(
@@ -231,7 +232,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testAuthenticatedServicesExcluded() {
+    fun testAuthenticatedServicesExcluded() = runTest {
         // Services with bit 0 == 0 require authentication and should be marked as skipped
         val authServiceCode = 0x0008 // bit 0 = 0 → requires auth
         val openServiceCode = 0x000b // bit 0 = 1 → no auth required
@@ -271,7 +272,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testPartialReadOnBlockFailure() {
+    fun testPartialReadOnBlockFailure() = runTest {
         // When a block read fails mid-read, isPartialRead should be set
         val adapter =
             MockFeliCaTagAdapter(
@@ -301,7 +302,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testFelicaLiteBlockLimit() {
+    fun testFelicaLiteBlockLimit() = runTest {
         // FeliCa Lite should stop reading regular blocks at 0x20
         val adapter =
             MockFeliCaTagAdapter(
@@ -341,7 +342,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testPartialReadOnExtraBlockFailure() {
+    fun testPartialReadOnExtraBlockFailure() = runTest {
         // When a FeliCa Lite extra block read fails, isPartialRead should be set
         val adapter =
             MockFeliCaTagAdapter(
@@ -371,7 +372,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testIsPartialReadPropagatedToFelicaCard() {
+    fun testIsPartialReadPropagatedToFelicaCard() = runTest {
         // Verify isPartialRead propagates from RawFelicaCard.parse() to FelicaCard
         val adapter =
             MockFeliCaTagAdapter(
@@ -400,7 +401,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testNoPartialReadWhenNoBlocksRead() {
+    fun testNoPartialReadWhenNoBlocksRead() = runTest {
         // When readBlock returns null immediately (no blocks), isPartialRead stays false
         val adapter =
             MockFeliCaTagAdapter(
@@ -427,7 +428,7 @@ class FeliCaReaderTest {
     // Tests for the `onlyFirst` parameter (iOS CoreNFC multi-system workaround)
 
     @Test
-    fun testDefaultReadsAllSystems() {
+    fun testDefaultReadsAllSystems() = runTest {
         val testTagId = ByteArray(8) { it.toByte() }
         val testIdm = ByteArray(8) { (0x01 + it).toByte() }
         val testPmm = ByteArray(8) { (0x10 + it).toByte() }
@@ -471,7 +472,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testOnlyFirstReadsFirstSystemOnly() {
+    fun testOnlyFirstReadsFirstSystemOnly() = runTest {
         val testTagId = ByteArray(8) { it.toByte() }
         val testIdm = ByteArray(8) { (0x01 + it).toByte() }
         val testPmm = ByteArray(8) { (0x10 + it).toByte() }
@@ -514,7 +515,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testOnlyFirstDoesNotCallAdapterForSkippedSystems() {
+    fun testOnlyFirstDoesNotCallAdapterForSkippedSystems() = runTest {
         val testTagId = ByteArray(8) { it.toByte() }
         val testIdm = ByteArray(8) { (0x01 + it).toByte() }
         val testPmm = ByteArray(8) { (0x10 + it).toByte() }
@@ -560,7 +561,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testOnlyFirstWithSingleSystemBehavesLikeDefault() {
+    fun testOnlyFirstWithSingleSystemBehavesLikeDefault() = runTest {
         val testTagId = ByteArray(8) { it.toByte() }
         val testIdm = ByteArray(8) { (0x01 + it).toByte() }
         val testPmm = ByteArray(8) { (0x10 + it).toByte() }
@@ -597,7 +598,7 @@ class FeliCaReaderTest {
     }
 
     @Test
-    fun testOnlyFirstWithThreeSystemsSkipsSecondAndThird() {
+    fun testOnlyFirstWithThreeSystemsSkipsSecondAndThird() = runTest {
         val testTagId = ByteArray(8) { it.toByte() }
         val testIdm = ByteArray(8) { (0x01 + it).toByte() }
         val testPmm = ByteArray(8) { (0x10 + it).toByte() }

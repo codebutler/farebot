@@ -20,6 +20,7 @@
 package com.codebutler.farebot.card.iso7816
 
 import com.codebutler.farebot.card.nfc.CardTransceiver
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -55,7 +56,7 @@ class ISO7816ProtocolTest {
             responses.add(byteArrayOf(sw1, sw2))
         }
 
-        override fun transceive(data: ByteArray): ByteArray {
+        override suspend fun transceive(data: ByteArray): ByteArray {
             sentCommands.add(data.copyOf())
             check(responses.isNotEmpty()) { "No more responses enqueued" }
             return responses.removeFirst()
@@ -75,7 +76,7 @@ class ISO7816ProtocolTest {
     }
 
     @Test
-    fun testUnselectFileSendsCorrectApdu() {
+    fun testUnselectFileSendsCorrectApdu() = runTest {
         val transceiver = MockTransceiver()
         val protocol = ISO7816Protocol(transceiver)
 
@@ -102,7 +103,7 @@ class ISO7816ProtocolTest {
     }
 
     @Test
-    fun testUnselectFileThrowsOnError() {
+    fun testUnselectFileThrowsOnError() = runTest {
         val transceiver = MockTransceiver()
         val protocol = ISO7816Protocol(transceiver)
 
@@ -115,7 +116,7 @@ class ISO7816ProtocolTest {
     }
 
     @Test
-    fun testUnselectFileThrowsOnInstructionNotSupported() {
+    fun testUnselectFileThrowsOnInstructionNotSupported() = runTest {
         val transceiver = MockTransceiver()
         val protocol = ISO7816Protocol(transceiver)
 
@@ -128,7 +129,7 @@ class ISO7816ProtocolTest {
     }
 
     @Test
-    fun testSelectByIdSendsCorrectApdu() {
+    fun testSelectByIdSendsCorrectApdu() = runTest {
         val transceiver = MockTransceiver()
         val protocol = ISO7816Protocol(transceiver)
 
@@ -153,7 +154,7 @@ class ISO7816ProtocolTest {
     }
 
     @Test
-    fun testUnselectFileApduDiffersFromSelectById() {
+    fun testUnselectFileApduDiffersFromSelectById() = runTest {
         // Verify that unselectFile and selectById produce distinct APDUs.
         // unselectFile: no parameters (5-byte APDU)
         // selectById: has 2-byte file ID parameter (8-byte APDU)

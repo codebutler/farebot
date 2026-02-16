@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.ultralight
 
 import com.codebutler.farebot.card.nfc.UltralightTechnology
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -50,7 +51,7 @@ class UltralightCardReaderTest {
     ) : UltralightTechnology {
         val readPageOffsets = mutableListOf<Int>()
 
-        override fun readPages(pageOffset: Int): ByteArray {
+        override suspend fun readPages(pageOffset: Int): ByteArray {
             readPageOffsets.add(pageOffset)
             check(pageOffset < totalPages) {
                 "readPages called with offset $pageOffset, but card only has $totalPages pages"
@@ -65,7 +66,7 @@ class UltralightCardReaderTest {
             return buffer
         }
 
-        override fun transceive(data: ByteArray): ByteArray {
+        override suspend fun transceive(data: ByteArray): ByteArray {
             val cmd = data[0].toInt() and 0xFF
             when (cmd) {
                 0x1a -> {
@@ -87,7 +88,7 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testUltralightReadsCorrectNumberOfPages() {
+    fun testUltralightReadsCorrectNumberOfPages() = runTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
@@ -101,7 +102,7 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testUltralightCReadsCorrectNumberOfPages() {
+    fun testUltralightCReadsCorrectNumberOfPages() = runTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT_C,
@@ -115,7 +116,7 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testPageIndicesAreSequential() {
+    fun testPageIndicesAreSequential() = runTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
@@ -130,7 +131,7 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testPageDataExtractedCorrectly() {
+    fun testPageDataExtractedCorrectly() = runTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
@@ -147,7 +148,7 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testReadPagesCalledAtCorrectOffsets() {
+    fun testReadPagesCalledAtCorrectOffsets() = runTest {
         val tech =
             FakeUltralightTechnology(
                 type = UltralightTechnology.TYPE_ULTRALIGHT,
@@ -163,7 +164,7 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testDoesNotReadBeyondCardSize() {
+    fun testDoesNotReadBeyondCardSize() = runTest {
         val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
         val tech =
             FakeUltralightTechnology(

@@ -20,6 +20,7 @@
 package com.codebutler.farebot.card.iso7816
 
 import com.codebutler.farebot.card.nfc.CardTransceiver
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -63,7 +64,7 @@ class ISO7816CardReaderTest {
             script.add(Exchange(description, matcher, response))
         }
 
-        override fun transceive(data: ByteArray): ByteArray {
+        override suspend fun transceive(data: ByteArray): ByteArray {
             sentCommands.add(data.copyOf())
             for (i in script.indices) {
                 if (script[i].matcher(data)) {
@@ -123,7 +124,7 @@ class ISO7816CardReaderTest {
             data[1] == 0xB0.toByte()
 
     @Test
-    fun testReadCardWithFileSelectorCallsUnselectFile() {
+    fun testReadCardWithFileSelectorCallsUnselectFile() = runTest {
         val transceiver = ScriptedTransceiver()
 
         // Set up responses for a card read with a file selector
@@ -181,7 +182,7 @@ class ISO7816CardReaderTest {
     }
 
     @Test
-    fun testReadCardFileSelectorContinuesWhenUnselectFails() {
+    fun testReadCardFileSelectorContinuesWhenUnselectFails() = runTest {
         val transceiver = ScriptedTransceiver()
 
         // Application selection succeeds
@@ -232,7 +233,7 @@ class ISO7816CardReaderTest {
     }
 
     @Test
-    fun testReadCardWithParentDfFileSelectorCallsUnselectFile() {
+    fun testReadCardWithParentDfFileSelectorCallsUnselectFile() = runTest {
         val transceiver = ScriptedTransceiver()
 
         // Application selection succeeds

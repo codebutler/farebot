@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.vicinity
 
 import com.codebutler.farebot.card.nfc.VicinityTechnology
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -35,7 +36,7 @@ class VicinityCardReaderTest {
     private val testTagId = byteArrayOf(0x0A, 0x0B, 0x0C, 0x0D)
 
     @Test
-    fun testReadCard_multiplePages() {
+    fun testReadCard_multiplePages() = runTest {
         val pageData =
             mapOf(
                 0 to byteArrayOf(0x11, 0x22, 0x33, 0x44),
@@ -60,7 +61,7 @@ class VicinityCardReaderTest {
     }
 
     @Test
-    fun testReadCard_withSysInfo() {
+    fun testReadCard_withSysInfo() = runTest {
         val sysInfoBytes = byteArrayOf(0x0F, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
         val pageData = mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44))
         val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = sysInfoBytes)
@@ -75,7 +76,7 @@ class VicinityCardReaderTest {
     }
 
     @Test
-    fun testReadCard_sysInfoFails() {
+    fun testReadCard_sysInfoFails() = runTest {
         val pageData = mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44))
         val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null, sysInfoThrows = true)
 
@@ -86,7 +87,7 @@ class VicinityCardReaderTest {
     }
 
     @Test
-    fun testReadCard_partialRead() {
+    fun testReadCard_partialRead() = runTest {
         // Pages 0 and 1 succeed, page 2 throws (simulating tag lost)
         val pageData =
             mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44), 1 to byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte()))
@@ -99,7 +100,7 @@ class VicinityCardReaderTest {
     }
 
     @Test
-    fun testReadCard_emptyCard() {
+    fun testReadCard_emptyCard() = runTest {
         // No readable pages — first read returns error status
         val tech = FakeVicinityTechnology(testUid, emptyMap(), sysInfoResponse = null)
 
@@ -110,7 +111,7 @@ class VicinityCardReaderTest {
     }
 
     @Test
-    fun testReadCard_errorResponseStopsReading() {
+    fun testReadCard_errorResponseStopsReading() = runTest {
         // Page 0 returns error status (non-zero first byte)
         val tech = FakeVicinityTechnology(testUid, emptyMap(), sysInfoResponse = null, errorOnPage = 0)
 
@@ -143,7 +144,7 @@ class VicinityCardReaderTest {
 
         override val isConnected: Boolean = true
 
-        override fun transceive(data: ByteArray): ByteArray {
+        override suspend fun transceive(data: ByteArray): ByteArray {
             require(data.size >= 2)
 
             val command = data[1]

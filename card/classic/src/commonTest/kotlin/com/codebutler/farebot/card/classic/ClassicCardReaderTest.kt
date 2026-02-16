@@ -26,6 +26,7 @@ import com.codebutler.farebot.card.CardLostException
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.nfc.ClassicTechnology
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -52,7 +53,7 @@ class ClassicCardReaderTest {
         val authKeyBCalls = mutableListOf<Pair<Int, ByteArray>>()
         val readBlockCalls = mutableListOf<Int>()
 
-        override fun authenticateSectorWithKeyA(
+        override suspend fun authenticateSectorWithKeyA(
             sectorIndex: Int,
             key: ByteArray,
         ): Boolean {
@@ -60,7 +61,7 @@ class ClassicCardReaderTest {
             return authKeyAResult(sectorIndex, key)
         }
 
-        override fun authenticateSectorWithKeyB(
+        override suspend fun authenticateSectorWithKeyB(
             sectorIndex: Int,
             key: ByteArray,
         ): Boolean {
@@ -68,7 +69,7 @@ class ClassicCardReaderTest {
             return authKeyBResult(sectorIndex, key)
         }
 
-        override fun readBlock(blockIndex: Int): ByteArray {
+        override suspend fun readBlock(blockIndex: Int): ByteArray {
             readBlockCalls.add(blockIndex)
             return readBlockResult(blockIndex)
         }
@@ -83,7 +84,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testNormalReadWithDefaultKey() {
+    fun testNormalReadWithDefaultKey() = runTest {
         val blockData = ByteArray(16) { 0xAB.toByte() }
         val tech =
             MockClassicTechnology(
@@ -101,7 +102,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testUnauthorizedSectorWhenAuthFails() {
+    fun testUnauthorizedSectorWhenAuthFails() = runTest {
         val tech =
             MockClassicTechnology(
                 sectorCount = 1,
@@ -117,7 +118,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testRetryOnSingleByteRead() {
+    fun testRetryOnSingleByteRead() = runTest {
         var readCount = 0
         val normalData = ByteArray(16) { 0xCC.toByte() }
         val tech =
@@ -149,7 +150,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testRetryExhaustedKeepsSingleByteData() {
+    fun testRetryExhaustedKeepsSingleByteData() = runTest {
         val singleByte = byteArrayOf(0x04)
         val tech =
             MockClassicTechnology(
@@ -170,7 +171,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testCardLostExceptionReturnsPartialData() {
+    fun testCardLostExceptionReturnsPartialData() = runTest {
         var sectorReadCount = 0
         val tech =
             MockClassicTechnology(
@@ -198,7 +199,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testKeyBFallbackAndRetryUsesKeyB() {
+    fun testKeyBFallbackAndRetryUsesKeyB() = runTest {
         val keyA = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
         val keyB = byteArrayOf(0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F)
         val cardKeys = ClassicCardKeys.fromProxmark3(keyA + keyB)
@@ -237,7 +238,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testMultipleSectorsWithMixedAuth() {
+    fun testMultipleSectorsWithMixedAuth() = runTest {
         val tech =
             MockClassicTechnology(
                 sectorCount = 3,
@@ -261,7 +262,7 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testGenericExceptionCreatesInvalidSector() {
+    fun testGenericExceptionCreatesInvalidSector() = runTest {
         val tech =
             MockClassicTechnology(
                 sectorCount = 2,
