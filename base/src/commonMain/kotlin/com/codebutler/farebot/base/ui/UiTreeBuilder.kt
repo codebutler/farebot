@@ -51,11 +51,12 @@ class ItemScope {
     var title: Any?
         get() = _title
         set(value) {
-            _title = when (value) {
-                is FormattedString -> value
-                is StringResource -> FormattedString(value)
-                else -> FormattedString(value.toString())
-            }
+            _title =
+                when (value) {
+                    is FormattedString -> value
+                    is StringResource -> FormattedString(value)
+                    else -> FormattedString(value.toString())
+                }
         }
 
     var value: Any? = null
@@ -72,9 +73,10 @@ class ItemScope {
         children.addAll(items)
     }
 
-    internal fun build(): FareBotUiTree.Item = FareBotUiTree.Item(
-        title = _title,
-        value = value,
-        children = children.toList(),
-    )
+    internal fun build(): FareBotUiTree.Item =
+        FareBotUiTree.Item(
+            title = _title,
+            value = value,
+            children = children.toList(),
+        )
 }

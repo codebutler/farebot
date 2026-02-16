@@ -23,9 +23,9 @@
 package com.codebutler.farebot.transit.umarsh
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.transit.Subscription
@@ -85,7 +85,10 @@ class UmarshTransitInfo(
         if (rubSectors.isEmpty()) return null
         return uiTree {
             for (sec in rubSectors) {
-                item { title = Res.string.umarsh_machine_id; value = sec.machineId.toString() }
+                item {
+                    title = Res.string.umarsh_machine_id
+                    value = sec.machineId.toString()
+                }
             }
         }
     }

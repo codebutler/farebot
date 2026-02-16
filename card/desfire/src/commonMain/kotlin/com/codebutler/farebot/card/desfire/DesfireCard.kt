@@ -45,92 +45,182 @@ data class DesfireCard(
 
     fun getApplication(appId: Int): DesfireApplication? = applications.firstOrNull { it.id == appId }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item {
-            title = "Applications"
-            for (app in applications) {
-                item {
-                    title = "Application: 0x${app.id.toString(16)}"
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "Applications"
+                for (app in applications) {
                     item {
-                        title = "Files"
-                        for (file in app.files) {
-                            item {
-                                title = "File: 0x${file.id.toString(16)}"
-                                val fileSettings = file.fileSettings
-                                if (fileSettings != null) {
-                                    item {
-                                        title = "Settings"
-                                        item { title = "Type"; value = fileSettings.fileTypeName }
-                                        if (fileSettings is StandardDesfireFileSettings) {
-                                            item { title = "Size"; value = fileSettings.fileSize }
-                                        } else if (fileSettings is RecordDesfireFileSettings) {
-                                            item { title = "Cur Records"; value = fileSettings.curRecords }
-                                            item { title = "Max Records"; value = fileSettings.maxRecords }
-                                            item { title = "Record Size"; value = fileSettings.recordSize }
-                                        } else if (fileSettings is ValueDesfireFileSettings) {
-                                            item { title = "Range"; value = "${fileSettings.lowerLimit} - ${fileSettings.upperLimit}" }
+                        title = "Application: 0x${app.id.toString(16)}"
+                        item {
+                            title = "Files"
+                            for (file in app.files) {
+                                item {
+                                    title = "File: 0x${file.id.toString(16)}"
+                                    val fileSettings = file.fileSettings
+                                    if (fileSettings != null) {
+                                        item {
+                                            title = "Settings"
                                             item {
-                                                title = "Limited Credit"
-                                                value = "${fileSettings.limitedCreditValue} (${if (fileSettings.limitedCreditEnabled) "enabled" else "disabled"})"
+                                                title = "Type"
+                                                value = fileSettings.fileTypeName
+                                            }
+                                            if (fileSettings is StandardDesfireFileSettings) {
+                                                item {
+                                                    title = "Size"
+                                                    value = fileSettings.fileSize
+                                                }
+                                            } else if (fileSettings is RecordDesfireFileSettings) {
+                                                item {
+                                                    title = "Cur Records"
+                                                    value = fileSettings.curRecords
+                                                }
+                                                item {
+                                                    title = "Max Records"
+                                                    value = fileSettings.maxRecords
+                                                }
+                                                item {
+                                                    title = "Record Size"
+                                                    value = fileSettings.recordSize
+                                                }
+                                            } else if (fileSettings is ValueDesfireFileSettings) {
+                                                item {
+                                                    title = "Range"
+                                                    value =
+                                                        "${fileSettings.lowerLimit} - ${fileSettings.upperLimit}"
+                                                }
+                                                item {
+                                                    title = "Limited Credit"
+                                                    value =
+                                                        "${fileSettings.limitedCreditValue} (${if (fileSettings.limitedCreditEnabled) "enabled" else "disabled"})"
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                if (file is StandardDesfireFile) {
-                                    item { title = "Data"; value = file.data }
-                                } else if (file is RecordDesfireFile) {
-                                    item {
-                                        title = "Records"
-                                        val records = file.records
-                                        for (i in records.indices) {
-                                            val record = records[i]
-                                            item { title = "Record $i"; value = record.data }
+                                    if (file is StandardDesfireFile) {
+                                        item {
+                                            title = "Data"
+                                            value = file.data
+                                        }
+                                    } else if (file is RecordDesfireFile) {
+                                        item {
+                                            title = "Records"
+                                            val records = file.records
+                                            for (i in records.indices) {
+                                                val record = records[i]
+                                                item {
+                                                    title = "Record $i"
+                                                    value = record.data
+                                                }
+                                            }
+                                        }
+                                    } else if (file is ValueDesfireFile) {
+                                        item {
+                                            title = "Value"
+                                            value = file.value
+                                        }
+                                    } else if (file is InvalidDesfireFile) {
+                                        item {
+                                            title = "Error"
+                                            value = file.errorMessage
+                                        }
+                                    } else if (file is UnauthorizedDesfireFile) {
+                                        item {
+                                            title = "Error"
+                                            value = file.errorMessage
                                         }
                                     }
-                                } else if (file is ValueDesfireFile) {
-                                    item { title = "Value"; value = file.value }
-                                } else if (file is InvalidDesfireFile) {
-                                    item { title = "Error"; value = file.errorMessage }
-                                } else if (file is UnauthorizedDesfireFile) {
-                                    item { title = "Error"; value = file.errorMessage }
                                 }
                             }
                         }
                     }
                 }
             }
+            item {
+                title = "Manufacturing Data"
+                item {
+                    title = "Hardware Information"
+                    item {
+                        title = "Vendor ID"
+                        value = manufacturingData.hwVendorID
+                    }
+                    item {
+                        title = "Type"
+                        value = manufacturingData.hwType
+                    }
+                    item {
+                        title = "Subtype"
+                        value = manufacturingData.hwSubType
+                    }
+                    item {
+                        title = "Major Version"
+                        value = manufacturingData.hwMajorVersion
+                    }
+                    item {
+                        title = "Minor Version"
+                        value = manufacturingData.hwMinorVersion
+                    }
+                    item {
+                        title = "Storage Size"
+                        value = manufacturingData.hwStorageSize
+                    }
+                    item {
+                        title = "Protocol"
+                        value = manufacturingData.hwProtocol
+                    }
+                }
+                item {
+                    title = "Software Information"
+                    item {
+                        title = "Vendor ID"
+                        value = manufacturingData.swVendorID
+                    }
+                    item {
+                        title = "Type"
+                        value = manufacturingData.swType
+                    }
+                    item {
+                        title = "Subtype"
+                        value = manufacturingData.swSubType
+                    }
+                    item {
+                        title = "Major Version"
+                        value = manufacturingData.swMajorVersion
+                    }
+                    item {
+                        title = "Minor Version"
+                        value = manufacturingData.swMinorVersion
+                    }
+                    item {
+                        title = "Storage Size"
+                        value = manufacturingData.swStorageSize
+                    }
+                    item {
+                        title = "Protocol"
+                        value = manufacturingData.swProtocol
+                    }
+                }
+                item {
+                    title = "General Information"
+                    item {
+                        title = "Serial Number"
+                        value = manufacturingData.uidHex
+                    }
+                    item {
+                        title = "Batch Number"
+                        value = manufacturingData.batchNoHex
+                    }
+                    item {
+                        title = "Week of Production"
+                        value = manufacturingData.weekProd.toString(16)
+                    }
+                    item {
+                        title = "Year of Production"
+                        value = manufacturingData.yearProd.toString(16)
+                    }
+                }
+            }
         }
-        item {
-            title = "Manufacturing Data"
-            item {
-                title = "Hardware Information"
-                item { title = "Vendor ID"; value = manufacturingData.hwVendorID }
-                item { title = "Type"; value = manufacturingData.hwType }
-                item { title = "Subtype"; value = manufacturingData.hwSubType }
-                item { title = "Major Version"; value = manufacturingData.hwMajorVersion }
-                item { title = "Minor Version"; value = manufacturingData.hwMinorVersion }
-                item { title = "Storage Size"; value = manufacturingData.hwStorageSize }
-                item { title = "Protocol"; value = manufacturingData.hwProtocol }
-            }
-            item {
-                title = "Software Information"
-                item { title = "Vendor ID"; value = manufacturingData.swVendorID }
-                item { title = "Type"; value = manufacturingData.swType }
-                item { title = "Subtype"; value = manufacturingData.swSubType }
-                item { title = "Major Version"; value = manufacturingData.swMajorVersion }
-                item { title = "Minor Version"; value = manufacturingData.swMinorVersion }
-                item { title = "Storage Size"; value = manufacturingData.swStorageSize }
-                item { title = "Protocol"; value = manufacturingData.swProtocol }
-            }
-            item {
-                title = "General Information"
-                item { title = "Serial Number"; value = manufacturingData.uidHex }
-                item { title = "Batch Number"; value = manufacturingData.batchNoHex }
-                item { title = "Week of Production"; value = manufacturingData.weekProd.toString(16) }
-                item { title = "Year of Production"; value = manufacturingData.yearProd.toString(16) }
-            }
-        }
-    }
 
     companion object {
         fun create(

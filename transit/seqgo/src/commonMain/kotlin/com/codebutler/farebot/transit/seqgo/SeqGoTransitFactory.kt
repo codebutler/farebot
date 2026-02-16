@@ -32,12 +32,12 @@ import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
 import com.codebutler.farebot.transit.Trip
-import kotlin.time.Instant
 import com.codebutler.farebot.transit.seqgo.record.SeqGoBalanceRecord
 import com.codebutler.farebot.transit.seqgo.record.SeqGoRecord
 import com.codebutler.farebot.transit.seqgo.record.SeqGoTapRecord
 import com.codebutler.farebot.transit.seqgo.record.SeqGoTopupRecord
 import farebot.transit.seqgo.generated.resources.*
+import kotlin.time.Instant
 
 class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
     override val allCards: List<CardInfo>
@@ -138,7 +138,7 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
                         endStationId = endStationId,
                         startStationValue = SeqGoUtil.getStation(tapOn.station),
                         endStationValue = endStation,
-                    )
+                    ),
                 )
                 i++
             }

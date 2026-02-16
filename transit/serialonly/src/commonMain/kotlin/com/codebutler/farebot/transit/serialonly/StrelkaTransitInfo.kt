@@ -20,9 +20,13 @@ import farebot.transit.serialonly.generated.resources.strelka_long_serial
 class StrelkaTransitInfo(
     private val mSerial: String,
 ) : SerialOnlyTransitInfo() {
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item { title = Res.string.strelka_long_serial; value = mSerial }
-    }
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = Res.string.strelka_long_serial
+                value = mSerial
+            }
+        }
 
     override val reason get() = Reason.MORE_RESEARCH_NEEDED
     override val serialNumber get() = StrelkaTransitFactory.formatShortSerial(mSerial)

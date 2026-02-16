@@ -106,14 +106,18 @@ class TroikaHybridTransitInfo(
         get() = troika.warning
 
     override suspend fun getAdvancedUi(): FareBotUiTree? {
-        val trees = listOfNotNull(
-            troika.getAdvancedUi(),
-            podorozhnik?.getAdvancedUi(),
-            strelka?.getAdvancedUi(),
-        )
+        val trees =
+            listOfNotNull(
+                troika.getAdvancedUi(),
+                podorozhnik?.getAdvancedUi(),
+                strelka?.getAdvancedUi(),
+            )
         if (trees.isEmpty()) return null
-        return FareBotUiTree(items = trees.flatMap { tree ->
-            tree.items.map { FareBotUiTree.Item(title = it.title, value = it.value) }
-        })
+        return FareBotUiTree(
+            items =
+                trees.flatMap { tree ->
+                    tree.items.map { FareBotUiTree.Item(title = it.title, value = it.value) }
+                },
+        )
     }
 }

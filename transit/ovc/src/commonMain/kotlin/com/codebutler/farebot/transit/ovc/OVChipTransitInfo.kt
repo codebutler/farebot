@@ -25,10 +25,10 @@
 package com.codebutler.farebot.transit.ovc
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
-import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -149,14 +149,21 @@ class OVChipTransitInfo(
             return li
         }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item { title = "Credit Slot ID"; value = creditSlotId.toString() }
-        item { title = "Last Credit ID"; value = creditId.toString() }
-        item {
-            title = "Recent Slots"
-            addChildren(index.advancedItems())
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "Credit Slot ID"
+                value = creditSlotId.toString()
+            }
+            item {
+                title = "Last Credit ID"
+                value = creditId.toString()
+            }
+            item {
+                title = "Recent Slots"
+                addChildren(index.advancedItems())
+            }
         }
-    }
 
     companion object {
         private val NAME = FormattedString("OV-chipkaart")

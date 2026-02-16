@@ -69,17 +69,18 @@ data class UltralightCard(
         return result
     }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item {
-            title = Res.string.ultralight_pages
-            for (page in pages) {
-                item {
-                    title = FormattedString(Res.string.ultralight_page_title_format, page.index.toString())
-                    value = page.data
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = Res.string.ultralight_pages
+                for (page in pages) {
+                    item {
+                        title = FormattedString(Res.string.ultralight_page_title_format, page.index.toString())
+                        value = page.data
+                    }
                 }
             }
         }
-    }
 
     /**
      * Known Ultralight card type variants, detected via GET_VERSION command.

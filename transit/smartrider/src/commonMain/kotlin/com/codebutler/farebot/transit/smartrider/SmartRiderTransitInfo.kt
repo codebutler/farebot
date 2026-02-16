@@ -102,11 +102,23 @@ class SmartRiderTransitInfo(
 
     override val subscriptions: List<Subscription>? = null
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item { title = Res.string.smartrider_ticket_type; value = mTokenType.toString() }
-        if (mSmartRiderType == SmartRiderType.SMARTRIDER) {
-            item { title = Res.string.smartrider_autoload_threshold; value = TransitCurrency.AUD(mAutoloadThreshold).formatCurrencyString(true) }
-            item { title = Res.string.smartrider_autoload_value; value = TransitCurrency.AUD(mAutoloadValue).formatCurrencyString(true) }
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = Res.string.smartrider_ticket_type
+                value = mTokenType.toString()
+            }
+            if (mSmartRiderType == SmartRiderType.SMARTRIDER) {
+                item {
+                    title = Res.string.smartrider_autoload_threshold
+                    value =
+                        TransitCurrency.AUD(mAutoloadThreshold).formatCurrencyString(true)
+                }
+                item {
+                    title = Res.string.smartrider_autoload_value
+                    value =
+                        TransitCurrency.AUD(mAutoloadValue).formatCurrencyString(true)
+                }
+            }
         }
-    }
 }

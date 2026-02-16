@@ -103,6 +103,5 @@ data class Station(
                 latitude = latitude?.toFloatOrNull(),
                 longitude = longitude?.toFloatOrNull(),
             )
-
     }
 }

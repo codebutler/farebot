@@ -52,44 +52,58 @@ data class ISO7816Card(
     fun getApplicationByName(appName: ByteArray): ISO7816Application? =
         applications.firstOrNull { it.appName?.toHexString() == appName.toHexString() }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item {
-            title = "Applications"
-            for (app in applications) {
-                item {
-                    val appNameStr = app.appName?.let { formatAID(it) } ?: "Unknown"
-                    title = "Application: $appNameStr (${app.type})"
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "Applications"
+                for (app in applications) {
+                    item {
+                        val appNameStr = app.appName?.let { formatAID(it) } ?: "Unknown"
+                        title = "Application: $appNameStr (${app.type})"
 
-                    // Show files
-                    if (app.files.isNotEmpty()) {
-                        item {
-                            title = "Files"
-                            for ((selector, file) in app.files) {
-                                item {
-                                    title = "File: $selector"
-                                    if (file.binaryData != null) {
-                                        item { title = "Binary Data"; value = file.binaryData }
-                                    }
-                                    for ((index, record) in file.records.entries.sortedBy { it.key }) {
-                                        item { title = "Record $index"; value = record }
+                        // Show files
+                        if (app.files.isNotEmpty()) {
+                            item {
+                                title = "Files"
+                                for ((selector, file) in app.files) {
+                                    item {
+                                        title = "File: $selector"
+                                        if (file.binaryData != null) {
+                                            item {
+                                                title = "Binary Data"
+                                                value = file.binaryData
+                                            }
+                                        }
+                                        for ((index, record) in file.records.entries.sortedBy { it.key }) {
+                                            item {
+                                                title = "Record $index"
+                                                value = record
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Show SFI files
-                    if (app.sfiFiles.isNotEmpty()) {
-                        item {
-                            title = "SFI Files"
-                            for ((sfi, file) in app.sfiFiles.entries.sortedBy { it.key }) {
-                                item {
-                                    title = "SFI 0x${sfi.toString(16)}"
-                                    if (file.binaryData != null) {
-                                        item { title = "Binary Data"; value = file.binaryData }
-                                    }
-                                    for ((index, record) in file.records.entries.sortedBy { it.key }) {
-                                        item { title = "Record $index"; value = record }
+                        // Show SFI files
+                        if (app.sfiFiles.isNotEmpty()) {
+                            item {
+                                title = "SFI Files"
+                                for ((sfi, file) in app.sfiFiles.entries.sortedBy { it.key }) {
+                                    item {
+                                        title = "SFI 0x${sfi.toString(16)}"
+                                        if (file.binaryData != null) {
+                                            item {
+                                                title = "Binary Data"
+                                                value = file.binaryData
+                                            }
+                                        }
+                                        for ((index, record) in file.records.entries.sortedBy { it.key }) {
+                                            item {
+                                                title = "Record $index"
+                                                value = record
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -98,7 +112,6 @@ data class ISO7816Card(
                 }
             }
         }
-    }
 
     companion object {
         fun create(

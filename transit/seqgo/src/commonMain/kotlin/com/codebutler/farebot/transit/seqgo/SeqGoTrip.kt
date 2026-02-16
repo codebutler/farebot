@@ -74,5 +74,4 @@ class SeqGoTrip(
     fun getStartStationId(): Int = startStationId
 
     fun getEndStationId(): Int = endStationId
-
 }

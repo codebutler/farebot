@@ -57,45 +57,49 @@ class ClassicCard(
             return ClassicManufacturingInfo.parse(block0.data, tagId)
         }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        for (sector in sectors) {
-            val sectorIndexString = sector.index.toString(16)
-            when (sector) {
-                is UnauthorizedClassicSector -> {
-                    item {
-                        title = FormattedString(
-                            Res.string.classic_unauthorized_sector_title_format,
-                            sectorIndexString,
-                        )
-                    }
-                }
-                is InvalidClassicSector -> {
-                    item {
-                        title = FormattedString(
-                            Res.string.classic_invalid_sector_title_format,
-                            sectorIndexString,
-                            sector.error,
-                        )
-                    }
-                }
-                else -> {
-                    val dataClassicSector = sector as DataClassicSector
-                    item {
-                        title = FormattedString(Res.string.classic_sector_title_format, sectorIndexString)
-                        for (block in dataClassicSector.blocks) {
-                            item {
-                                title = FormattedString(
-                                    Res.string.classic_block_title_format,
-                                    block.index.toString(),
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            for (sector in sectors) {
+                val sectorIndexString = sector.index.toString(16)
+                when (sector) {
+                    is UnauthorizedClassicSector -> {
+                        item {
+                            title =
+                                FormattedString(
+                                    Res.string.classic_unauthorized_sector_title_format,
+                                    sectorIndexString,
                                 )
-                                value = block.data
+                        }
+                    }
+                    is InvalidClassicSector -> {
+                        item {
+                            title =
+                                FormattedString(
+                                    Res.string.classic_invalid_sector_title_format,
+                                    sectorIndexString,
+                                    sector.error,
+                                )
+                        }
+                    }
+                    else -> {
+                        val dataClassicSector = sector as DataClassicSector
+                        item {
+                            title = FormattedString(Res.string.classic_sector_title_format, sectorIndexString)
+                            for (block in dataClassicSector.blocks) {
+                                item {
+                                    title =
+                                        FormattedString(
+                                            Res.string.classic_block_title_format,
+                                            block.index.toString(),
+                                        )
+                                    value = block.data
+                                }
                             }
                         }
                     }
                 }
             }
         }
-    }
 
     companion object {
         fun create(

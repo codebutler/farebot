@@ -38,13 +38,23 @@ data class OVChipIndex internal constructor(
     val recentCreditSlot: Boolean, // Most recent credit index slot (0xF90(false) or 0xFA0(true))
     val subscriptionIndex: List<Int>,
 ) {
-    fun advancedItems(): List<FareBotUiTree.Item> = listOf(
-        FareBotUiTree.Item(title = FormattedString("Transaction Slot"), value = if (recentTransactionSlot) "B" else "A"),
-        FareBotUiTree.Item(title = FormattedString("Info Slot"), value = if (recentInfoSlot) "B" else "A"),
-        FareBotUiTree.Item(title = FormattedString("Subscription Slot"), value = if (recentSubscriptionSlot) "B" else "A"),
-        FareBotUiTree.Item(title = FormattedString("Travelhistory Slot"), value = if (recentTravelhistorySlot) "B" else "A"),
-        FareBotUiTree.Item(title = FormattedString("Credit Slot"), value = if (recentCreditSlot) "B" else "A"),
-    )
+    fun advancedItems(): List<FareBotUiTree.Item> =
+        listOf(
+            FareBotUiTree.Item(
+                title = FormattedString("Transaction Slot"),
+                value = if (recentTransactionSlot) "B" else "A",
+            ),
+            FareBotUiTree.Item(title = FormattedString("Info Slot"), value = if (recentInfoSlot) "B" else "A"),
+            FareBotUiTree.Item(
+                title = FormattedString("Subscription Slot"),
+                value = if (recentSubscriptionSlot) "B" else "A",
+            ),
+            FareBotUiTree.Item(
+                title = FormattedString("Travelhistory Slot"),
+                value = if (recentTravelhistorySlot) "B" else "A",
+            ),
+            FareBotUiTree.Item(title = FormattedString("Credit Slot"), value = if (recentCreditSlot) "B" else "A"),
+        )
 
     companion object {
         fun parse(data: ByteArray): OVChipIndex {

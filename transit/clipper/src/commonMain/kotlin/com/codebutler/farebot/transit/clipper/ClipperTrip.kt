@@ -126,5 +126,4 @@ class ClipperTrip(
             vehicleNum,
             transportCode,
         )
-
 }

@@ -51,23 +51,31 @@ data class FelicaCard(
 
     fun getSystem(systemCode: Int): FelicaSystem? = systemsByCode[systemCode]
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item { title = "IDm"; value = idm }
-        item { title = "PMm"; value = pmm }
-        item {
-            title = "Systems"
-            for (system in systems) {
-                item {
-                    title = "System: ${system.code.toString(16)}"
-                    for (service in system.services) {
-                        item {
-                            title = "Service: 0x${service.serviceCode.toString(
-                                16,
-                            )} (${FelicaUtils.getFriendlyServiceName(system.code, service.serviceCode)})"
-                            for (block in service.blocks) {
-                                item {
-                                    title = "Block ${block.address.toString().padStart(2, '0')}"
-                                    value = block.data
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "IDm"
+                value = idm
+            }
+            item {
+                title = "PMm"
+                value = pmm
+            }
+            item {
+                title = "Systems"
+                for (system in systems) {
+                    item {
+                        title = "System: ${system.code.toString(16)}"
+                        for (service in system.services) {
+                            item {
+                                title = "Service: 0x${service.serviceCode.toString(
+                                    16,
+                                )} (${FelicaUtils.getFriendlyServiceName(system.code, service.serviceCode)})"
+                                for (block in service.blocks) {
+                                    item {
+                                        title = "Block ${block.address.toString().padStart(2, '0')}"
+                                        value = block.data
+                                    }
                                 }
                             }
                         }
@@ -75,7 +83,6 @@ data class FelicaCard(
                 }
             }
         }
-    }
 
     companion object {
         fun create(

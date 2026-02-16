@@ -52,12 +52,33 @@ class HSLTransitInfo(
         get() = TransitBalance(balance = TransitCurrency.EUR(mBalance))
 
     override suspend fun getAdvancedUi(): FareBotUiTree? {
-        val tree = uiTree {
-            applicationVersion?.let { item { title = Res.string.hsl_application_version; value = it } }
-            applicationKeyVersion?.let { item { title = Res.string.hsl_application_key_version; value = it } }
-            platformType?.let { item { title = Res.string.hsl_platform_type; value = it } }
-            securityLevel?.let { item { title = Res.string.hsl_security_level; value = it } }
-        }
+        val tree =
+            uiTree {
+                applicationVersion?.let {
+                    item {
+                        title = Res.string.hsl_application_version
+                        value = it
+                    }
+                }
+                applicationKeyVersion?.let {
+                    item {
+                        title = Res.string.hsl_application_key_version
+                        value = it
+                    }
+                }
+                platformType?.let {
+                    item {
+                        title = Res.string.hsl_platform_type
+                        value = it
+                    }
+                }
+                securityLevel?.let {
+                    item {
+                        title = Res.string.hsl_security_level
+                        value = it
+                    }
+                }
+            }
         return if (tree.items.isEmpty()) null else tree
     }
 }

@@ -134,18 +134,49 @@ data class KSX6924PurseInfo(
             ListItem(Res.string.ksx6924_discount_type, resolver.resolveDisRate(disRate)),
         )
 
-    suspend fun getAdvancedInfo(resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver): FareBotUiTree = uiTree {
-        item { title = Res.string.ksx6924_crypto_algorithm; value = resolver.resolveCryptoAlgo(alg) }
-        item { title = Res.string.ksx6924_encryption_key_version; value = vk.hexString }
-        item { title = Res.string.ksx6924_auth_id; value = idtr.hexString }
-        item { title = Res.string.ksx6924_ticket_type; value = resolver.resolveUserCode(userCode) }
-        item { title = Res.string.ksx6924_max_balance; value = balMax.toString() }
-        item { title = Res.string.ksx6924_branch_code; value = bra.hexString }
-        item { title = Res.string.ksx6924_one_time_limit; value = mmax.toString() }
-        item { title = Res.string.ksx6924_mobile_carrier; value = resolver.resolveTCode(tcode) }
-        item { title = Res.string.ksx6924_financial_institution; value = resolver.resolveCCode(ccode) }
-        item { title = Res.string.ksx6924_rfu; value = rfu.hex() }
-    }
+    suspend fun getAdvancedInfo(resolver: KSX6924PurseInfoResolver = KSX6924PurseInfoDefaultResolver): FareBotUiTree =
+        uiTree {
+            item {
+                title = Res.string.ksx6924_crypto_algorithm
+                value = resolver.resolveCryptoAlgo(alg)
+            }
+            item {
+                title = Res.string.ksx6924_encryption_key_version
+                value = vk.hexString
+            }
+            item {
+                title = Res.string.ksx6924_auth_id
+                value = idtr.hexString
+            }
+            item {
+                title = Res.string.ksx6924_ticket_type
+                value = resolver.resolveUserCode(userCode)
+            }
+            item {
+                title = Res.string.ksx6924_max_balance
+                value = balMax.toString()
+            }
+            item {
+                title = Res.string.ksx6924_branch_code
+                value = bra.hexString
+            }
+            item {
+                title = Res.string.ksx6924_one_time_limit
+                value = mmax.toString()
+            }
+            item {
+                title = Res.string.ksx6924_mobile_carrier
+                value = resolver.resolveTCode(tcode)
+            }
+            item {
+                title = Res.string.ksx6924_financial_institution
+                value = resolver.resolveCCode(ccode)
+            }
+            item {
+                title = Res.string.ksx6924_rfu
+                value = rfu.hex()
+            }
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

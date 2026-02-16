@@ -90,7 +90,10 @@ class CharlieCardTransitInfo internal constructor(
     override suspend fun getAdvancedUi(): FareBotUiTree? {
         if (secondSerial == 0L || secondSerial == 0xffffffffL) return null
         return uiTree {
-            item { title = Res.string.charlie_2nd_card_number; value = "A" + NumberUtils.zeroPad(secondSerial, 10) }
+            item {
+                title = Res.string.charlie_2nd_card_number
+                value = "A" + NumberUtils.zeroPad(secondSerial, 10)
+            }
         }
     }
 

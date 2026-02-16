@@ -47,48 +47,93 @@ data class CEPASCard(
 
     fun getHistory(purse: Int): CEPASHistory? = histories[purse]
 
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        item {
-            title = "Purses"
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "Purses"
+                for (purse in purses) {
+                    item {
+                        title = "Purse ID ${purse.id}"
+                        item {
+                            title = "CEPAS Version"
+                            value = purse.cepasVersion
+                        }
+                        item {
+                            title = "Purse Status"
+                            value = purse.purseStatus
+                        }
+                        item {
+                            title = "Purse Balance"
+                            value = CurrencyFormatter.formatValue(purse.purseBalance / 100.0, "SGD")
+                        }
+                        item {
+                            title = "Purse Creation Date"
+                            value =
+                                formatDate(
+                                    Instant.fromEpochMilliseconds(purse.purseCreationDate * 1000L),
+                                    DateFormatStyle.LONG,
+                                )
+                        }
+                        item {
+                            title = "Purse Expiry Date"
+                            value =
+                                formatDate(
+                                    Instant.fromEpochMilliseconds(purse.purseExpiryDate * 1000L),
+                                    DateFormatStyle.LONG,
+                                )
+                        }
+                        item {
+                            title = "Autoload Amount"
+                            value = purse.autoLoadAmount
+                        }
+                        item {
+                            title = "CAN"
+                            value = purse.can
+                        }
+                        item {
+                            title = "CSN"
+                            value = purse.csn
+                        }
+                    }
+                }
+            }
             for (purse in purses) {
                 item {
-                    title = "Purse ID ${purse.id}"
-                    item { title = "CEPAS Version"; value = purse.cepasVersion }
-                    item { title = "Purse Status"; value = purse.purseStatus }
+                    title = "Last Transaction Information"
                     item {
-                        title = "Purse Balance"
-                        value = CurrencyFormatter.formatValue(purse.purseBalance / 100.0, "SGD")
+                        title = "TRP"
+                        value = purse.lastTransactionTRP
                     }
                     item {
-                        title = "Purse Creation Date"
-                        value = formatDate(Instant.fromEpochMilliseconds(purse.purseCreationDate * 1000L), DateFormatStyle.LONG)
+                        title = "Credit TRP"
+                        value = purse.lastCreditTransactionTRP
                     }
                     item {
-                        title = "Purse Expiry Date"
-                        value = formatDate(Instant.fromEpochMilliseconds(purse.purseExpiryDate * 1000L), DateFormatStyle.LONG)
+                        title = "Credit Header"
+                        value = purse.lastCreditTransactionHeader
                     }
-                    item { title = "Autoload Amount"; value = purse.autoLoadAmount }
-                    item { title = "CAN"; value = purse.can }
-                    item { title = "CSN"; value = purse.csn }
+                    item {
+                        title = "Debit Options"
+                        value = purse.lastTransactionDebitOptionsByte
+                    }
+                }
+                item {
+                    title = "Other Purse Information"
+                    item {
+                        title = "Logfile Record Count"
+                        value = purse.logfileRecordCount
+                    }
+                    item {
+                        title = "Issuer Data Length"
+                        value = purse.issuerDataLength
+                    }
+                    item {
+                        title = "Issuer-specific Data"
+                        value = purse.issuerSpecificData
+                    }
                 }
             }
         }
-        for (purse in purses) {
-            item {
-                title = "Last Transaction Information"
-                item { title = "TRP"; value = purse.lastTransactionTRP }
-                item { title = "Credit TRP"; value = purse.lastCreditTransactionTRP }
-                item { title = "Credit Header"; value = purse.lastCreditTransactionHeader }
-                item { title = "Debit Options"; value = purse.lastTransactionDebitOptionsByte }
-            }
-            item {
-                title = "Other Purse Information"
-                item { title = "Logfile Record Count"; value = purse.logfileRecordCount }
-                item { title = "Issuer Data Length"; value = purse.issuerDataLength }
-                item { title = "Issuer-specific Data"; value = purse.issuerSpecificData }
-            }
-        }
-    }
 
     companion object {
         fun create(

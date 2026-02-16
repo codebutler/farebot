@@ -78,20 +78,24 @@ data class VicinityCard(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
-        if (sysInfo != null) {
-            item { title = "System Info"; value = sysInfo }
-        }
-        item {
-            title = "Pages"
-            for (page in pages) {
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            if (sysInfo != null) {
                 item {
-                    title = "Page ${page.index}"
-                    value = if (page.isUnauthorized) "Unauthorized" else page.data
+                    title = "System Info"
+                    value = sysInfo
+                }
+            }
+            item {
+                title = "Pages"
+                for (page in pages) {
+                    item {
+                        title = "Page ${page.index}"
+                        value = if (page.isUnauthorized) "Unauthorized" else page.data
+                    }
                 }
             }
         }
-    }
 
     companion object {
         fun create(
