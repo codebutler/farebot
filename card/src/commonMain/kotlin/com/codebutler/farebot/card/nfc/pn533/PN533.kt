@@ -33,7 +33,7 @@ package com.codebutler.farebot.card.nfc.pn533
 class PN533(
     private val transport: PN533Transport,
 ) {
-    fun getFirmwareVersion(): FirmwareVersion {
+    suspend fun getFirmwareVersion(): FirmwareVersion {
         val resp = transport.sendCommand(CMD_GET_FIRMWARE_VERSION)
         // Response: [IC] [Ver] [Rev] [Support]
         if (resp.size < 4) throw PN533Exception("GetFirmwareVersion: short response")
@@ -45,7 +45,7 @@ class PN533(
         )
     }
 
-    fun samConfiguration(
+    suspend fun samConfiguration(
         mode: Byte = SAM_MODE_NORMAL,
         timeout: Byte = 0x00,
     ) {
@@ -55,16 +55,16 @@ class PN533(
         )
     }
 
-    fun setParameters(flags: Int) {
+    suspend fun setParameters(flags: Int) {
         transport.sendCommand(CMD_SET_PARAMETERS, byteArrayOf(flags.toByte()))
     }
 
-    fun resetMode() {
+    suspend fun resetMode() {
         transport.sendCommand(CMD_RESET_MODE, byteArrayOf(0x01))
         transport.sendAck()
     }
 
-    fun writeRegister(
+    suspend fun writeRegister(
         address: Int,
         value: Int,
     ) {
@@ -78,7 +78,7 @@ class PN533(
         )
     }
 
-    fun rfConfiguration(
+    suspend fun rfConfiguration(
         item: Byte,
         data: ByteArray,
     ) {
@@ -88,7 +88,7 @@ class PN533(
         )
     }
 
-    fun setMaxRetries(
+    suspend fun setMaxRetries(
         atrRetries: Byte = 0xFF.toByte(),
         pslRetries: Byte = 0x01,
         passiveActivation: Byte = 0x02,
@@ -99,15 +99,15 @@ class PN533(
         )
     }
 
-    fun rfFieldOff() {
+    suspend fun rfFieldOff() {
         rfConfiguration(RF_CONFIG_RF_FIELD, byteArrayOf(0x00))
     }
 
-    fun rfFieldOn() {
+    suspend fun rfFieldOn() {
         rfConfiguration(RF_CONFIG_RF_FIELD, byteArrayOf(0x01))
     }
 
-    fun inListPassiveTarget(
+    suspend fun inListPassiveTarget(
         maxTargets: Byte = 0x01,
         baudRate: Byte,
         initiatorData: ByteArray = byteArrayOf(),
@@ -139,7 +139,7 @@ class PN533(
         }
     }
 
-    fun inDataExchange(
+    suspend fun inDataExchange(
         tg: Int,
         data: ByteArray,
     ): ByteArray {
@@ -157,7 +157,7 @@ class PN533(
         return resp.copyOfRange(1, resp.size)
     }
 
-    fun inCommunicateThru(data: ByteArray): ByteArray {
+    suspend fun inCommunicateThru(data: ByteArray): ByteArray {
         val resp = transport.sendCommand(CMD_IN_COMMUNICATE_THRU, data)
         // Response: [Status] [Data...]
         if (resp.isEmpty()) throw PN533Exception("InCommunicateThru: empty response")
@@ -168,11 +168,11 @@ class PN533(
         return resp.copyOfRange(1, resp.size)
     }
 
-    fun inRelease(tg: Int) {
+    suspend fun inRelease(tg: Int) {
         transport.sendCommand(CMD_IN_RELEASE, byteArrayOf(tg.toByte()))
     }
 
-    fun sendAck() {
+    suspend fun sendAck() {
         transport.sendAck()
     }
 

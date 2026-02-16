@@ -41,17 +41,17 @@ class AndroidClassicTechnology(
     override val sectorCount: Int
         get() = mifareClassic.sectorCount
 
-    override fun authenticateSectorWithKeyA(
+    override suspend fun authenticateSectorWithKeyA(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean = mifareClassic.authenticateSectorWithKeyA(sectorIndex, key)
 
-    override fun authenticateSectorWithKeyB(
+    override suspend fun authenticateSectorWithKeyB(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean = mifareClassic.authenticateSectorWithKeyB(sectorIndex, key)
 
-    override fun readBlock(blockIndex: Int): ByteArray = mifareClassic.readBlock(blockIndex)
+    override suspend fun readBlock(blockIndex: Int): ByteArray = mifareClassic.readBlock(blockIndex)
 
     override fun sectorToBlock(sectorIndex: Int): Int = mifareClassic.sectorToBlock(sectorIndex)
 

@@ -31,7 +31,7 @@ import kotlin.time.Clock
 
 object DesfireCardReader {
     @Throws(Exception::class)
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         tech: CardTransceiver,
     ): RawDesfireCard {
@@ -58,7 +58,7 @@ object DesfireCardReader {
     }
 
     @Throws(Exception::class)
-    private fun readApplications(
+    private suspend fun readApplications(
         desfireProtocol: DesfireProtocol,
         appIds: IntArray,
     ): List<RawDesfireApplication> {
@@ -85,7 +85,7 @@ object DesfireCardReader {
     }
 
     @Throws(Exception::class)
-    private fun readFiles(
+    private suspend fun readFiles(
         desfireProtocol: DesfireProtocol,
         authLog: MutableList<DesfireAuthLog>,
     ): Pair<List<RawDesfireFile>, Boolean> {
@@ -121,7 +121,7 @@ object DesfireCardReader {
     }
 
     @Throws(Exception::class)
-    private fun readFile(
+    private suspend fun readFile(
         desfireProtocol: DesfireProtocol,
         fileId: Int,
         fileSettings: RawDesfireFileSettings,
@@ -136,7 +136,7 @@ object DesfireCardReader {
         }
 
     @Throws(Exception::class)
-    private fun tryReadFileWithoutSettings(
+    private suspend fun tryReadFileWithoutSettings(
         desfireProtocol: DesfireProtocol,
         fileId: Int,
     ): RawDesfireFile {
@@ -176,7 +176,7 @@ object DesfireCardReader {
     }
 
     @Throws(Exception::class)
-    private fun readFileData(
+    private suspend fun readFileData(
         desfireProtocol: DesfireProtocol,
         fileId: Int,
         settings: RawDesfireFileSettings,

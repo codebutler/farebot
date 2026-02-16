@@ -38,7 +38,7 @@ class FelicaTagReader(
     override fun getTech(tag: Tag): NfcFTechnology = AndroidNfcFTechnology(NfcF.get(tag))
 
     @Throws(Exception::class)
-    override fun readTag(
+    override suspend fun readTag(
         tagId: ByteArray,
         tag: Tag,
         tech: NfcFTechnology,

@@ -46,23 +46,13 @@ import kotlin.js.ExperimentalWasmJsInterop
 class WebUsbPN533Transport : PN533Transport {
     private var deviceOpened = false
 
-    override fun sendCommand(
+    override suspend fun sendCommand(
         code: Byte,
         data: ByteArray,
         timeoutMs: Int,
-    ): ByteArray {
-        error(
-            "WebUsbPN533Transport.sendCommand() cannot be called synchronously. " +
-                "Use sendCommandAsync() from a coroutine instead.",
-        )
-    }
+    ): ByteArray = sendCommandAsync(code, data, timeoutMs)
 
-    override fun sendAck() {
-        error(
-            "WebUsbPN533Transport.sendAck() cannot be called synchronously. " +
-                "Use sendAckAsync() from a coroutine instead.",
-        )
-    }
+    override suspend fun sendAck() = sendAckAsync()
 
     override fun flush() {
         // No-op: flush is handled during openAsync()

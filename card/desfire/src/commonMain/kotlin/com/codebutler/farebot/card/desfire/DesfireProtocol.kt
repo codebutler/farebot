@@ -42,7 +42,7 @@ internal class DesfireProtocol(
     private val mTransceiver: CardTransceiver,
 ) {
     @Throws(Exception::class)
-    fun getManufacturingData(): RawDesfireManufacturingData {
+    suspend fun getManufacturingData(): RawDesfireManufacturingData {
         val respBuffer = sendRequest(GET_MANUFACTURING_DATA)
 
         if (respBuffer.size != 28) {
@@ -53,7 +53,7 @@ internal class DesfireProtocol(
     }
 
     @Throws(Exception::class)
-    fun getAppList(): IntArray {
+    suspend fun getAppList(): IntArray {
         val appDirBuf = sendRequest(GET_APPLICATION_DIRECTORY)
 
         val appIds = IntArray(appDirBuf.size / 3)
@@ -71,7 +71,7 @@ internal class DesfireProtocol(
     }
 
     @Throws(Exception::class)
-    fun selectApp(appId: Int) {
+    suspend fun selectApp(appId: Int) {
         val appIdBuff = ByteArray(3)
         appIdBuff[0] = ((appId and 0xFF0000) shr 16).toByte()
         appIdBuff[1] = ((appId and 0xFF00) shr 8).toByte()
@@ -81,7 +81,7 @@ internal class DesfireProtocol(
     }
 
     @Throws(Exception::class)
-    fun getFileList(): IntArray {
+    suspend fun getFileList(): IntArray {
         val buf = sendRequest(GET_FILES)
         val fileIds = IntArray(buf.size)
         for (x in buf.indices) {
@@ -91,13 +91,13 @@ internal class DesfireProtocol(
     }
 
     @Throws(Exception::class)
-    fun getFileSettings(fileNo: Int): RawDesfireFileSettings {
+    suspend fun getFileSettings(fileNo: Int): RawDesfireFileSettings {
         val data = sendRequest(GET_FILE_SETTINGS, byteArrayOf(fileNo.toByte()))
         return RawDesfireFileSettings.create(data)
     }
 
     @Throws(Exception::class)
-    fun readFile(fileNo: Int): ByteArray =
+    suspend fun readFile(fileNo: Int): ByteArray =
         sendRequest(
             READ_DATA,
             byteArrayOf(
@@ -112,7 +112,7 @@ internal class DesfireProtocol(
         )
 
     @Throws(Exception::class)
-    fun readRecord(fileNum: Int): ByteArray =
+    suspend fun readRecord(fileNum: Int): ByteArray =
         sendRequest(
             READ_RECORD,
             byteArrayOf(
@@ -127,7 +127,7 @@ internal class DesfireProtocol(
         )
 
     @Throws(Exception::class)
-    fun getValue(fileNum: Int): ByteArray =
+    suspend fun getValue(fileNum: Int): ByteArray =
         sendRequest(
             GET_VALUE,
             byteArrayOf(
@@ -136,7 +136,7 @@ internal class DesfireProtocol(
         )
 
     @Throws(Exception::class)
-    fun sendUnlock(keyNum: Int): ByteArray =
+    suspend fun sendUnlock(keyNum: Int): ByteArray =
         sendRequest(
             UNLOCK,
             byteArrayOf(
@@ -146,7 +146,7 @@ internal class DesfireProtocol(
         )
 
     @Throws(Exception::class)
-    fun sendAdditionalFrame(bytes: ByteArray): ByteArray =
+    suspend fun sendAdditionalFrame(bytes: ByteArray): ByteArray =
         sendRequest(
             ADDITIONAL_FRAME,
             bytes,
@@ -154,16 +154,16 @@ internal class DesfireProtocol(
         )
 
     @Throws(Exception::class)
-    private fun sendRequest(command: Byte): ByteArray = sendRequest(command, null, getAdditionalFrame = true)
+    private suspend fun sendRequest(command: Byte): ByteArray = sendRequest(command, null, getAdditionalFrame = true)
 
     @Throws(Exception::class)
-    private fun sendRequest(
+    private suspend fun sendRequest(
         command: Byte,
         parameters: ByteArray?,
     ): ByteArray = sendRequest(command, parameters, getAdditionalFrame = true)
 
     @Throws(Exception::class)
-    private fun sendRequest(
+    private suspend fun sendRequest(
         command: Byte,
         parameters: ByteArray?,
         getAdditionalFrame: Boolean,

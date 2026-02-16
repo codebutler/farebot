@@ -52,6 +52,23 @@ subprojects {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
         }
+
+        // Library modules only need wasmJs compilation (klib) for app:web to consume.
+        // Disable wasmJs executable linking and test tasks — the IR linker is extremely
+        // slow and these modules get sufficient test coverage from jvmTest.
+        if (project.path != ":app:web") {
+            afterEvaluate {
+                tasks.configureEach {
+                    val isWasmJs = name.contains("WasmJs", ignoreCase = true)
+                    val isTestOrExe =
+                        name.contains("Test", ignoreCase = true) ||
+                            name.contains("Executable", ignoreCase = true)
+                    if (isWasmJs && isTestOrExe) {
+                        enabled = false
+                    }
+                }
+            }
+        }
     }
 
     plugins.withId("org.jetbrains.compose") {

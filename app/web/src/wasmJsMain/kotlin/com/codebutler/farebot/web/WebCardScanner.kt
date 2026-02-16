@@ -2,12 +2,20 @@ package com.codebutler.farebot.web
 
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.cepas.CEPASCardReader
+import com.codebutler.farebot.card.classic.ClassicCardReader
+import com.codebutler.farebot.card.felica.FeliCaReader
+import com.codebutler.farebot.card.felica.PN533FeliCaTagAdapter
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
-import com.codebutler.farebot.card.nfc.pn533.PN533CommandException
+import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
+import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
 import com.codebutler.farebot.card.nfc.pn533.WebUsbPN533Transport
+import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +28,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -34,11 +41,9 @@ import kotlinx.coroutines.launch
  * - SCM SCL3711 (VID 04E6:5591)
  * - Sony RC-S380 (VID 054C:02E1)
  *
- * Note: Full card DATA reading is not yet supported over WebUSB because
- * the card reader pipeline uses synchronous CardTransceiver.transceive()
- * which cannot be bridged to WebUSB's async API in Kotlin/WasmJs.
- * Card detection and identification works — for full data, export from
- * the desktop/Android app and import as JSON.
+ * Uses the same card reader pipeline as desktop/Android/iOS. All NFC I/O
+ * interfaces are suspend-compatible, allowing WebUSB's async API to be
+ * used seamlessly through Kotlin coroutines.
  */
 class WebCardScanner : CardScanner {
     override val requiresActiveScan: Boolean = true
@@ -84,34 +89,6 @@ class WebCardScanner : CardScanner {
                         return@launch
                     }
 
-                    // Initialize PN533
-                    webUsbTransport.sendAckAsync()
-                    val fwResp = webUsbTransport.sendCommandAsync(PN533.CMD_GET_FIRMWARE_VERSION)
-                    if (fwResp.size >= 4) {
-                        val ic = (fwResp[0].toInt() and 0xFF).toString(16).uppercase().padStart(2, '0')
-                        val major = fwResp[1].toInt() and 0xFF
-                        val minor = fwResp[2].toInt() and 0xFF
-                        println("[WebUSB] PN53x firmware: IC=0x$ic v$major.$minor")
-                    }
-
-                    // SAM configuration: normal mode
-                    webUsbTransport.sendCommandAsync(
-                        PN533.CMD_SAM_CONFIGURATION,
-                        byteArrayOf(PN533.SAM_MODE_NORMAL, 0x00, 0x01),
-                    )
-
-                    // Set max retries
-                    webUsbTransport.sendCommandAsync(
-                        PN533.CMD_RF_CONFIGURATION,
-                        byteArrayOf(
-                            PN533.RF_CONFIG_MAX_RETRIES,
-                            0xFF.toByte(),
-                            0x01,
-                            0x02,
-                        ),
-                    )
-
-                    // Poll loop
                     pollLoop(webUsbTransport)
                 } catch (e: CancellationException) {
                     throw e
@@ -134,17 +111,25 @@ class WebCardScanner : CardScanner {
     }
 
     private suspend fun pollLoop(transport: WebUsbPN533Transport) {
+        val pn533 = PN533(transport)
+
+        // Initialize PN533
+        pn533.sendAck()
+        val fw = pn533.getFirmwareVersion()
+        println("[WebUSB] PN53x firmware: $fw")
+        pn533.samConfiguration()
+        pn533.setMaxRetries(passiveActivation = 0x02)
+
         while (true) {
             // Try ISO 14443-A (covers Classic, Ultralight, DESFire)
-            var target = inListPassiveTarget(transport, PN533.BAUD_RATE_106_ISO14443A)
+            var target = pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
 
             // Try FeliCa (212 kbps) if no Type A found
             if (target == null) {
                 target =
-                    inListPassiveTarget(
-                        transport,
-                        PN533.BAUD_RATE_212_FELICA,
-                        SENSF_REQ,
+                    pn533.inListPassiveTarget(
+                        baudRate = PN533.BAUD_RATE_212_FELICA,
+                        initiatorData = SENSF_REQ,
                     )
             }
 
@@ -166,100 +151,102 @@ class WebCardScanner : CardScanner {
 
             _scannedTags.tryEmit(ScannedTag(id = tagId, techList = listOf(cardTypeName)))
 
-            // Full card reading requires async CardTransceiver (not yet available)
-            _scanErrors.tryEmit(
-                UnsupportedOperationException(
-                    "Detected $cardTypeName card (UID: ${tagId.hex()}). " +
-                        "Full card reading over WebUSB is in development. " +
-                        "For now, use the desktop app to scan cards, then import the JSON file here.",
-                ),
-            )
+            try {
+                val rawCard = readTarget(pn533, target)
+                _scannedCards.tryEmit(rawCard)
+                println("[WebUSB] Card read successfully")
+            } catch (e: Exception) {
+                println("[WebUSB] Read error: ${e.message}")
+                _scanErrors.tryEmit(e)
+            }
 
             // Release target
             try {
-                transport.sendCommandAsync(PN533.CMD_IN_RELEASE, byteArrayOf(target.tg.toByte()))
+                pn533.inRelease(target.tg)
             } catch (_: PN533Exception) {
             }
 
             // Wait for card removal
-            waitForRemoval(transport)
+            println("[WebUSB] Waiting for card removal...")
+            waitForRemoval(pn533)
         }
     }
 
-    private suspend fun inListPassiveTarget(
-        transport: WebUsbPN533Transport,
-        baudRate: Byte,
-        initiatorData: ByteArray = byteArrayOf(),
-    ): PN533.TargetInfo? {
-        val resp =
-            try {
-                transport.sendCommandAsync(
-                    PN533.CMD_IN_LIST_PASSIVE_TARGET,
-                    byteArrayOf(0x01, baudRate) + initiatorData,
-                    timeoutMs = PN533.POLL_TIMEOUT_MS,
-                )
-            } catch (e: PN533CommandException) {
-                return null
-            } catch (e: PN533Exception) {
-                if (e.message?.contains("timed out") == true) return null
-                throw e
+    private suspend fun readTarget(
+        pn533: PN533,
+        target: PN533.TargetInfo,
+    ): RawCard<*> =
+        when (target) {
+            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target)
+            is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target)
+        }
+
+    private suspend fun readTypeACard(
+        pn533: PN533,
+        target: PN533.TargetInfo.TypeA,
+    ): RawCard<*> {
+        val info = PN533CardInfo.fromTypeA(target)
+        val tagId = target.uid
+        println(
+            "[WebUSB] Type A card: type=${info.cardType}, SAK=0x${(target.sak.toInt() and 0xFF).toString(
+                16,
+            ).padStart(2, '0')}, UID=${tagId.hex()}",
+        )
+
+        return when (info.cardType) {
+            CardType.MifareDesfire, CardType.ISO7816 -> {
+                val transceiver = PN533CardTransceiver(pn533, target.tg)
+                ISO7816Dispatcher.readCard(tagId, transceiver)
             }
 
-        if (resp.isEmpty()) return null
-        val nbTg = resp[0].toInt() and 0xFF
-        if (nbTg == 0) return null
+            CardType.MifareClassic -> {
+                val tech = PN533ClassicTechnology(pn533, target.tg, tagId, info)
+                ClassicCardReader.readCard(tagId, tech, null)
+            }
 
-        val tg = resp[1].toInt() and 0xFF
-        return when (baudRate) {
-            PN533.BAUD_RATE_106_ISO14443A -> parseTypeATarget(resp, 2, tg)
-            PN533.BAUD_RATE_212_FELICA, PN533.BAUD_RATE_424_FELICA -> parseFeliCaTarget(resp, 2, tg)
-            else -> null
+            CardType.MifareUltralight -> {
+                val tech = PN533UltralightTechnology(pn533, target.tg, info)
+                UltralightCardReader.readCard(tagId, tech)
+            }
+
+            CardType.CEPAS -> {
+                val transceiver = PN533CardTransceiver(pn533, target.tg)
+                CEPASCardReader.readCard(tagId, transceiver)
+            }
+
+            else -> {
+                val transceiver = PN533CardTransceiver(pn533, target.tg)
+                ISO7816Dispatcher.readCard(tagId, transceiver)
+            }
         }
     }
 
-    private fun parseTypeATarget(
-        resp: ByteArray,
-        offset: Int,
-        tg: Int,
-    ): PN533.TargetInfo.TypeA {
-        var pos = offset
-        val atqa = resp.copyOfRange(pos, pos + 2)
-        pos += 2
-        val sak = resp[pos]
-        pos += 1
-        val nfcIdLen = resp[pos].toInt() and 0xFF
-        pos += 1
-        val uid = resp.copyOfRange(pos, pos + nfcIdLen)
-        return PN533.TargetInfo.TypeA(tg = tg, atqa = atqa, sak = sak, uid = uid)
+    private suspend fun readFeliCaCard(
+        pn533: PN533,
+        target: PN533.TargetInfo.FeliCa,
+    ): RawCard<*> {
+        val tagId = target.idm
+        println("[WebUSB] FeliCa card: IDm=${tagId.hex()}")
+        val adapter = PN533FeliCaTagAdapter(pn533, tagId)
+        return FeliCaReader.readTag(tagId, adapter)
     }
 
-    private fun parseFeliCaTarget(
-        resp: ByteArray,
-        offset: Int,
-        tg: Int,
-    ): PN533.TargetInfo.FeliCa {
-        var pos = offset
-        pos += 1 // polResLen
-        pos += 1 // response code
-        val idm = resp.copyOfRange(pos, pos + 8)
-        pos += 8
-        val pmm = resp.copyOfRange(pos, pos + 8)
-        return PN533.TargetInfo.FeliCa(tg = tg, idm = idm, pmm = pmm)
-    }
-
-    private suspend fun waitForRemoval(transport: WebUsbPN533Transport) {
+    private suspend fun waitForRemoval(pn533: PN533) {
         while (true) {
             delay(REMOVAL_POLL_INTERVAL_MS)
             val target =
                 try {
-                    inListPassiveTarget(transport, PN533.BAUD_RATE_106_ISO14443A)
-                        ?: inListPassiveTarget(transport, PN533.BAUD_RATE_212_FELICA, SENSF_REQ)
+                    pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
+                        ?: pn533.inListPassiveTarget(
+                            baudRate = PN533.BAUD_RATE_212_FELICA,
+                            initiatorData = SENSF_REQ,
+                        )
                 } catch (_: PN533Exception) {
                     null
                 }
             if (target == null) break
             try {
-                transport.sendCommandAsync(PN533.CMD_IN_RELEASE, byteArrayOf(target.tg.toByte()))
+                pn533.inRelease(target.tg)
             } catch (_: PN533Exception) {
             }
         }

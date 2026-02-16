@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.runBlocking
 import platform.CoreNFC.NFCFeliCaTagProtocol
 import platform.CoreNFC.NFCISO15693TagProtocol
 import platform.CoreNFC.NFCMiFareDESFire
@@ -197,14 +198,16 @@ class IosNfcScanner : CardScanner {
         }
 
         private fun readTag(tag: Any): RawCard<*> =
-            when (tag) {
-                is NFCFeliCaTagProtocol -> readFelicaTag(tag)
-                is NFCMiFareTagProtocol -> readMiFareTag(tag)
-                is NFCISO15693TagProtocol -> readVicinityTag(tag)
-                else -> throw Exception("Unsupported NFC tag type")
+            runBlocking {
+                when (tag) {
+                    is NFCFeliCaTagProtocol -> readFelicaTag(tag)
+                    is NFCMiFareTagProtocol -> readMiFareTag(tag)
+                    is NFCISO15693TagProtocol -> readVicinityTag(tag)
+                    else -> throw Exception("Unsupported NFC tag type")
+                }
             }
 
-        private fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
+        private suspend fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()
             /*
              * onlyFirst = true is an iOS-specific hack to work around
@@ -221,7 +224,7 @@ class IosNfcScanner : CardScanner {
             return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag), onlyFirst = true)
         }
 
-        private fun readMiFareTag(tag: NFCMiFareTagProtocol): RawCard<*> {
+        private suspend fun readMiFareTag(tag: NFCMiFareTagProtocol): RawCard<*> {
             val tagId = tag.identifier.toByteArray()
             return when (tag.mifareFamily) {
                 NFCMiFareDESFire -> {
@@ -272,7 +275,7 @@ class IosNfcScanner : CardScanner {
             }
         }
 
-        private fun readVicinityTag(tag: NFCISO15693TagProtocol): RawCard<*> {
+        private suspend fun readVicinityTag(tag: NFCISO15693TagProtocol): RawCard<*> {
             val tagId = tag.identifier.toByteArray().reversedArray()
             val tech = IosVicinityTechnology(tag)
             tech.connect()

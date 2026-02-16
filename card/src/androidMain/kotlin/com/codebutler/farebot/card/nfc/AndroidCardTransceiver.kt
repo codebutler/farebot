@@ -38,7 +38,7 @@ class AndroidCardTransceiver(
     override val isConnected: Boolean
         get() = isoDep.isConnected
 
-    override fun transceive(data: ByteArray): ByteArray = isoDep.transceive(data)
+    override suspend fun transceive(data: ByteArray): ByteArray = isoDep.transceive(data)
 
     override val maxTransceiveLength: Int
         get() = isoDep.maxTransceiveLength

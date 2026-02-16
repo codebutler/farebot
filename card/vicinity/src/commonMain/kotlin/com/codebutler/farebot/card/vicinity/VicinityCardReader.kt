@@ -45,7 +45,7 @@ object VicinityCardReader {
      * @param tech The NFC-V technology interface for communication
      * @return A [RawVicinityCard] containing the read data
      */
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         tech: VicinityTechnology,
     ): RawVicinityCard {

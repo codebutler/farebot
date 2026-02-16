@@ -28,7 +28,7 @@ import kotlin.time.Clock
 
 object UltralightCardReader {
     @Throws(Exception::class)
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         tech: UltralightTechnology,
     ): RawUltralightCard {
@@ -99,7 +99,7 @@ object UltralightCardReader {
      *
      * Falls back to UNKNOWN if detection fails.
      */
-    private fun detectCardType(tech: UltralightTechnology): UltralightCard.UltralightType =
+    private suspend fun detectCardType(tech: UltralightTechnology): UltralightCard.UltralightType =
         try {
             val protocol = UltralightProtocol(tech)
             val rawType = protocol.getCardType()

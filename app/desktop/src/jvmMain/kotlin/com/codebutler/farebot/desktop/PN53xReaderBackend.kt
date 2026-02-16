@@ -40,6 +40,8 @@ import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 /**
  * Abstract base for PN53x-family USB reader backends.
@@ -50,7 +52,7 @@ import com.codebutler.farebot.shared.nfc.ScannedTag
 abstract class PN53xReaderBackend(
     private val preOpenedTransport: Usb4JavaPN533Transport? = null,
 ) : NfcReaderBackend {
-    protected abstract fun initDevice(pn533: PN533)
+    protected abstract suspend fun initDevice(pn533: PN533)
 
     protected open fun createTransceiver(
         pn533: PN533,
@@ -70,14 +72,16 @@ abstract class PN53xReaderBackend(
         transport.flush()
         val pn533 = PN533(transport)
         try {
-            initDevice(pn533)
-            pollLoop(pn533, onCardDetected, onCardRead, onError)
+            runBlocking {
+                initDevice(pn533)
+                pollLoop(pn533, onCardDetected, onCardRead, onError)
+            }
         } finally {
             pn533.close()
         }
     }
 
-    private fun pollLoop(
+    private suspend fun pollLoop(
         pn533: PN533,
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
@@ -100,7 +104,7 @@ abstract class PN53xReaderBackend(
             }
 
             if (target == null) {
-                Thread.sleep(POLL_INTERVAL_MS)
+                delay(POLL_INTERVAL_MS)
                 continue
             }
 
@@ -137,7 +141,7 @@ abstract class PN53xReaderBackend(
         }
     }
 
-    private fun readTarget(
+    private suspend fun readTarget(
         pn533: PN533,
         target: PN533.TargetInfo,
     ): RawCard<*> =
@@ -146,7 +150,7 @@ abstract class PN53xReaderBackend(
             is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target)
         }
 
-    private fun readTypeACard(
+    private suspend fun readTypeACard(
         pn533: PN533,
         target: PN533.TargetInfo.TypeA,
     ): RawCard<*> {
@@ -182,7 +186,7 @@ abstract class PN53xReaderBackend(
         }
     }
 
-    private fun readFeliCaCard(
+    private suspend fun readFeliCaCard(
         pn533: PN533,
         target: PN533.TargetInfo.FeliCa,
     ): RawCard<*> {
@@ -192,9 +196,9 @@ abstract class PN53xReaderBackend(
         return FeliCaReader.readTag(tagId, adapter)
     }
 
-    private fun waitForRemoval(pn533: PN533) {
+    private suspend fun waitForRemoval(pn533: PN533) {
         while (true) {
-            Thread.sleep(REMOVAL_POLL_INTERVAL_MS)
+            delay(REMOVAL_POLL_INTERVAL_MS)
             val target =
                 try {
                     pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)

@@ -61,7 +61,7 @@ class IosCardTransceiver(
     override val isConnected: Boolean
         get() = _isConnected
 
-    override fun transceive(data: ByteArray): ByteArray {
+    override suspend fun transceive(data: ByteArray): ByteArray {
         val semaphore = dispatch_semaphore_create(0)
         var result: NSData? = null
         var nfcError: NSError? = null

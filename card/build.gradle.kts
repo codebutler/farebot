@@ -27,6 +27,10 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
         }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+        }
         jvmMain.dependencies {
             compileOnly(libs.usb4java)
             compileOnly(libs.usb4java.native)

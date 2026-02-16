@@ -48,7 +48,7 @@ class PN533CardTransceiver(
 
     override val isConnected: Boolean get() = connected
 
-    override fun transceive(data: ByteArray): ByteArray = pn533.inDataExchange(tg, data)
+    override suspend fun transceive(data: ByteArray): ByteArray = pn533.inDataExchange(tg, data)
 
     override val maxTransceiveLength: Int get() = 261
 }

@@ -37,7 +37,7 @@ class DesfireTagReader(
     override fun getTech(tag: Tag): CardTransceiver = AndroidCardTransceiver(IsoDep.get(tag))
 
     @Throws(Exception::class)
-    override fun readTag(
+    override suspend fun readTag(
         tagId: ByteArray,
         tag: Tag,
         tech: CardTransceiver,

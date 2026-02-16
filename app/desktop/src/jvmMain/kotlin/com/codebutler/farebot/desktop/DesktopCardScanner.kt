@@ -116,7 +116,7 @@ class DesktopCardScanner : CardScanner {
         PN533Device.shutdown()
     }
 
-    private fun discoverBackends(): List<NfcReaderBackend> {
+    private suspend fun discoverBackends(): List<NfcReaderBackend> {
         val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend())
         val transports = PN533Device.openAll()
         if (transports.isEmpty()) {

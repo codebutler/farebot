@@ -20,6 +20,7 @@
 package com.codebutler.farebot.card.iso7816
 
 import com.codebutler.farebot.card.nfc.CardTransceiver
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -63,7 +64,7 @@ class ISO7816CardReaderTest {
             script.add(Exchange(description, matcher, response))
         }
 
-        override fun transceive(data: ByteArray): ByteArray {
+        override suspend fun transceive(data: ByteArray): ByteArray {
             sentCommands.add(data.copyOf())
             for (i in script.indices) {
                 if (script[i].matcher(data)) {
@@ -123,172 +124,175 @@ class ISO7816CardReaderTest {
             data[1] == 0xB0.toByte()
 
     @Test
-    fun testReadCardWithFileSelectorCallsUnselectFile() {
-        val transceiver = ScriptedTransceiver()
+    fun testReadCardWithFileSelectorCallsUnselectFile() =
+        runTest {
+            val transceiver = ScriptedTransceiver()
 
-        // Set up responses for a card read with a file selector
-        // 1. SELECT BY NAME (application selection)
-        transceiver.expect("select by name", ::isSelectByName, "fci".encodeToByteArray() + OK)
+            // Set up responses for a card read with a file selector
+            // 1. SELECT BY NAME (application selection)
+            transceiver.expect("select by name", ::isSelectByName, "fci".encodeToByteArray() + OK)
 
-        // 2. SFI reads will all fail (no SFI files)
-        transceiver.expect("read record (sfi)", ::isReadRecord, ERROR_RECORD_NOT_FOUND)
-        transceiver.expect("read binary (sfi)", ::isReadBinary, ERROR_FILE_NOT_FOUND)
+            // 2. SFI reads will all fail (no SFI files)
+            transceiver.expect("read record (sfi)", ::isReadRecord, ERROR_RECORD_NOT_FOUND)
+            transceiver.expect("read binary (sfi)", ::isReadBinary, ERROR_FILE_NOT_FOUND)
 
-        // 3. Unselect file (before file selector read) -- should succeed
-        transceiver.expect("unselect file", ::isUnselectFile, OK)
+            // 3. Unselect file (before file selector read) -- should succeed
+            transceiver.expect("unselect file", ::isUnselectFile, OK)
 
-        // 4. SELECT BY ID for the file selector
-        transceiver.expect(
-            "select by id 0x2001",
-            { d -> isSelectById(d, 0x2001) },
-            "file_fci".encodeToByteArray() + OK,
-        )
-
-        // 5. Read records from selected file
-        transceiver.expect("read record (file)", ::isReadRecord, "record_data".encodeToByteArray() + OK)
-
-        val config =
-            ISO7816CardReader.AppConfig(
-                appNames = listOf(SAMPLE_AID),
-                type = "test",
-                sfiRange = IntRange.EMPTY, // Skip SFI scanning for simplicity
-                fileSelectors =
-                    listOf(
-                        ISO7816CardReader.FileSelector(fileId = 0x2001),
-                    ),
+            // 4. SELECT BY ID for the file selector
+            transceiver.expect(
+                "select by id 0x2001",
+                { d -> isSelectById(d, 0x2001) },
+                "file_fci".encodeToByteArray() + OK,
             )
 
-        val result =
-            ISO7816CardReader.readCard(
-                tagId = byteArrayOf(0x01, 0x02, 0x03, 0x04),
-                transceiver = transceiver,
-                appConfigs = listOf(config),
+            // 5. Read records from selected file
+            transceiver.expect("read record (file)", ::isReadRecord, "record_data".encodeToByteArray() + OK)
+
+            val config =
+                ISO7816CardReader.AppConfig(
+                    appNames = listOf(SAMPLE_AID),
+                    type = "test",
+                    sfiRange = IntRange.EMPTY, // Skip SFI scanning for simplicity
+                    fileSelectors =
+                        listOf(
+                            ISO7816CardReader.FileSelector(fileId = 0x2001),
+                        ),
+                )
+
+            val result =
+                ISO7816CardReader.readCard(
+                    tagId = byteArrayOf(0x01, 0x02, 0x03, 0x04),
+                    transceiver = transceiver,
+                    appConfigs = listOf(config),
+                )
+
+            assertNotNull(result, "Card read should succeed")
+
+            // Verify that an unselectFile command was sent
+            val unselectCommands = transceiver.sentCommands.filter(::isUnselectFile)
+            assertTrue(unselectCommands.isNotEmpty(), "unselectFile should have been called at least once")
+
+            // Verify the ordering: unselectFile must come before selectById(0x2001)
+            val unselectIndex = transceiver.sentCommands.indexOfFirst(::isUnselectFile)
+            val selectByIdIndex = transceiver.sentCommands.indexOfFirst { isSelectById(it, 0x2001) }
+            assertTrue(
+                unselectIndex < selectByIdIndex,
+                "unselectFile (index=$unselectIndex) should be called before selectById (index=$selectByIdIndex)",
             )
-
-        assertNotNull(result, "Card read should succeed")
-
-        // Verify that an unselectFile command was sent
-        val unselectCommands = transceiver.sentCommands.filter(::isUnselectFile)
-        assertTrue(unselectCommands.isNotEmpty(), "unselectFile should have been called at least once")
-
-        // Verify the ordering: unselectFile must come before selectById(0x2001)
-        val unselectIndex = transceiver.sentCommands.indexOfFirst(::isUnselectFile)
-        val selectByIdIndex = transceiver.sentCommands.indexOfFirst { isSelectById(it, 0x2001) }
-        assertTrue(
-            unselectIndex < selectByIdIndex,
-            "unselectFile (index=$unselectIndex) should be called before selectById (index=$selectByIdIndex)",
-        )
-    }
+        }
 
     @Test
-    fun testReadCardFileSelectorContinuesWhenUnselectFails() {
-        val transceiver = ScriptedTransceiver()
+    fun testReadCardFileSelectorContinuesWhenUnselectFails() =
+        runTest {
+            val transceiver = ScriptedTransceiver()
 
-        // Application selection succeeds
-        transceiver.expect("select by name", ::isSelectByName, "fci".encodeToByteArray() + OK)
+            // Application selection succeeds
+            transceiver.expect("select by name", ::isSelectByName, "fci".encodeToByteArray() + OK)
 
-        // Unselect file will FAIL (instruction not supported) -- should be caught
-        transceiver.expect("unselect file (fail)", ::isUnselectFile, ERROR_INS_NOT_SUPPORTED)
+            // Unselect file will FAIL (instruction not supported) -- should be caught
+            transceiver.expect("unselect file (fail)", ::isUnselectFile, ERROR_INS_NOT_SUPPORTED)
 
-        // Select by ID should still proceed after unselect failure
-        transceiver.expect(
-            "select by id 0x2001",
-            { d -> isSelectById(d, 0x2001) },
-            "file_fci".encodeToByteArray() + OK,
-        )
-
-        // Read records from the file -- first record succeeds, then EOF
-        var recordCallCount = 0
-        val origReadRecord = transceiver.script.find { it.description == "read record (file)" }
-        transceiver.expect("read record (file)", ::isReadRecord, ERROR_RECORD_NOT_FOUND)
-
-        // Read binary from the file
-        transceiver.expect("read binary (file)", ::isReadBinary, "binary_data".encodeToByteArray() + OK)
-
-        val config =
-            ISO7816CardReader.AppConfig(
-                appNames = listOf(SAMPLE_AID),
-                type = "test",
-                sfiRange = IntRange.EMPTY,
-                fileSelectors =
-                    listOf(
-                        ISO7816CardReader.FileSelector(fileId = 0x2001),
-                    ),
+            // Select by ID should still proceed after unselect failure
+            transceiver.expect(
+                "select by id 0x2001",
+                { d -> isSelectById(d, 0x2001) },
+                "file_fci".encodeToByteArray() + OK,
             )
 
-        val result =
-            ISO7816CardReader.readCard(
-                tagId = byteArrayOf(0x01, 0x02, 0x03, 0x04),
-                transceiver = transceiver,
-                appConfigs = listOf(config),
-            )
+            // Read records from the file -- first record succeeds, then EOF
+            var recordCallCount = 0
+            val origReadRecord = transceiver.script.find { it.description == "read record (file)" }
+            transceiver.expect("read record (file)", ::isReadRecord, ERROR_RECORD_NOT_FOUND)
 
-        assertNotNull(result, "Card read should succeed even when unselectFile fails")
+            // Read binary from the file
+            transceiver.expect("read binary (file)", ::isReadBinary, "binary_data".encodeToByteArray() + OK)
 
-        // Verify the card has one application with data
-        assertEquals(1, result.applications.size)
-        val app = result.applications[0]
-        assertEquals("test", app.type)
-    }
+            val config =
+                ISO7816CardReader.AppConfig(
+                    appNames = listOf(SAMPLE_AID),
+                    type = "test",
+                    sfiRange = IntRange.EMPTY,
+                    fileSelectors =
+                        listOf(
+                            ISO7816CardReader.FileSelector(fileId = 0x2001),
+                        ),
+                )
+
+            val result =
+                ISO7816CardReader.readCard(
+                    tagId = byteArrayOf(0x01, 0x02, 0x03, 0x04),
+                    transceiver = transceiver,
+                    appConfigs = listOf(config),
+                )
+
+            assertNotNull(result, "Card read should succeed even when unselectFile fails")
+
+            // Verify the card has one application with data
+            assertEquals(1, result.applications.size)
+            val app = result.applications[0]
+            assertEquals("test", app.type)
+        }
 
     @Test
-    fun testReadCardWithParentDfFileSelectorCallsUnselectFile() {
-        val transceiver = ScriptedTransceiver()
+    fun testReadCardWithParentDfFileSelectorCallsUnselectFile() =
+        runTest {
+            val transceiver = ScriptedTransceiver()
 
-        // Application selection succeeds
-        transceiver.expect("select by name", ::isSelectByName, "fci".encodeToByteArray() + OK)
+            // Application selection succeeds
+            transceiver.expect("select by name", ::isSelectByName, "fci".encodeToByteArray() + OK)
 
-        // When parentDf is set, the reader re-selects the app, selects parentDf, then unselects
-        // Re-select app by name (for parentDf state reset)
-        // Already matched above
+            // When parentDf is set, the reader re-selects the app, selects parentDf, then unselects
+            // Re-select app by name (for parentDf state reset)
+            // Already matched above
 
-        // Select parent DF by ID
-        transceiver.expect(
-            "select by id 0x3F00 (parent DF)",
-            { d -> isSelectById(d, 0x3F00) },
-            OK,
-        )
-
-        // Unselect file
-        transceiver.expect("unselect file", ::isUnselectFile, OK)
-
-        // Select file by ID
-        transceiver.expect(
-            "select by id 0x0001 (file)",
-            { d -> isSelectById(d, 0x0001) },
-            "file_fci".encodeToByteArray() + OK,
-        )
-
-        // Read records (none found)
-        transceiver.expect("read record", ::isReadRecord, ERROR_RECORD_NOT_FOUND)
-
-        // Read binary
-        transceiver.expect("read binary", ::isReadBinary, ERROR_FILE_NOT_FOUND)
-
-        val config =
-            ISO7816CardReader.AppConfig(
-                appNames = listOf(SAMPLE_AID),
-                type = "test",
-                sfiRange = IntRange.EMPTY,
-                fileSelectors =
-                    listOf(
-                        ISO7816CardReader.FileSelector(parentDf = 0x3F00, fileId = 0x0001),
-                    ),
+            // Select parent DF by ID
+            transceiver.expect(
+                "select by id 0x3F00 (parent DF)",
+                { d -> isSelectById(d, 0x3F00) },
+                OK,
             )
 
-        val result =
-            ISO7816CardReader.readCard(
-                tagId = byteArrayOf(0x01, 0x02, 0x03, 0x04),
-                transceiver = transceiver,
-                appConfigs = listOf(config),
+            // Unselect file
+            transceiver.expect("unselect file", ::isUnselectFile, OK)
+
+            // Select file by ID
+            transceiver.expect(
+                "select by id 0x0001 (file)",
+                { d -> isSelectById(d, 0x0001) },
+                "file_fci".encodeToByteArray() + OK,
             )
 
-        // This particular case will return null because no files have data,
-        // but the important thing is that unselectFile was called
-        val unselectCommands = transceiver.sentCommands.filter(::isUnselectFile)
-        assertTrue(
-            unselectCommands.isNotEmpty(),
-            "unselectFile should be called even when parentDf is set",
-        )
-    }
+            // Read records (none found)
+            transceiver.expect("read record", ::isReadRecord, ERROR_RECORD_NOT_FOUND)
+
+            // Read binary
+            transceiver.expect("read binary", ::isReadBinary, ERROR_FILE_NOT_FOUND)
+
+            val config =
+                ISO7816CardReader.AppConfig(
+                    appNames = listOf(SAMPLE_AID),
+                    type = "test",
+                    sfiRange = IntRange.EMPTY,
+                    fileSelectors =
+                        listOf(
+                            ISO7816CardReader.FileSelector(parentDf = 0x3F00, fileId = 0x0001),
+                        ),
+                )
+
+            val result =
+                ISO7816CardReader.readCard(
+                    tagId = byteArrayOf(0x01, 0x02, 0x03, 0x04),
+                    transceiver = transceiver,
+                    appConfigs = listOf(config),
+                )
+
+            // This particular case will return null because no files have data,
+            // but the important thing is that unselectFile was called
+            val unselectCommands = transceiver.sentCommands.filter(::isUnselectFile)
+            assertTrue(
+                unselectCommands.isNotEmpty(),
+                "unselectFile should be called even when parentDf is set",
+            )
+        }
 }

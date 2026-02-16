@@ -43,7 +43,7 @@ class VicinityTagReader(
     override fun getTech(tag: Tag): VicinityTechnology = AndroidVicinityTechnology(NfcV.get(tag))
 
     @Throws(Exception::class)
-    override fun readTag(
+    override suspend fun readTag(
         tagId: ByteArray,
         tag: Tag,
         tech: VicinityTechnology,

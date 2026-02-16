@@ -36,7 +36,7 @@ abstract class TagReader<
     private val mCardKeys: K?,
 ) {
     @Throws(Exception::class)
-    fun readTag(): C {
+    suspend fun readTag(): C {
         val tech = getTech(mTag)
         try {
             tech.connect()
@@ -53,7 +53,7 @@ abstract class TagReader<
     }
 
     @Throws(Exception::class)
-    protected abstract fun readTag(
+    protected abstract suspend fun readTag(
         tagId: ByteArray,
         tag: Tag,
         tech: T,

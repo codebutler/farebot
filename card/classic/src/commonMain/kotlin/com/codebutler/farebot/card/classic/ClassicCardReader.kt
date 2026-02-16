@@ -44,7 +44,7 @@ object ClassicCardReader {
         )
 
     @Throws(Exception::class)
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,

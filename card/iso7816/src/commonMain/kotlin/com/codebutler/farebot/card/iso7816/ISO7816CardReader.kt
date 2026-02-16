@@ -44,8 +44,8 @@ object ISO7816CardReader {
     data class AppConfig(
         val appNames: List<ByteArray>,
         val type: String,
-        val readBalances: ((ISO7816Protocol) -> Map<Int, ByteArray>)? = null,
-        val readExtraData: ((ISO7816Protocol) -> Map<String, ByteArray>)? = null,
+        val readBalances: (suspend (ISO7816Protocol) -> Map<Int, ByteArray>)? = null,
+        val readExtraData: (suspend (ISO7816Protocol) -> Map<String, ByteArray>)? = null,
         val sfiRange: IntRange = 0..31,
         val fileSelectors: List<FileSelector> = emptyList(),
     )
@@ -63,7 +63,7 @@ object ISO7816CardReader {
      * @param appConfigs List of application configurations to try.
      * @return A [RawISO7816Card] if any application was successfully selected, null otherwise.
      */
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         transceiver: CardTransceiver,
         appConfigs: List<AppConfig>,
@@ -83,7 +83,7 @@ object ISO7816CardReader {
         return RawISO7816Card.create(tagId, Clock.System.now(), applications)
     }
 
-    private fun tryReadApplication(
+    private suspend fun tryReadApplication(
         protocol: ISO7816Protocol,
         config: AppConfig,
     ): ISO7816Application? {
@@ -156,7 +156,7 @@ object ISO7816CardReader {
         )
     }
 
-    private fun readSfiFile(
+    private suspend fun readSfiFile(
         protocol: ISO7816Protocol,
         sfi: Int,
     ): ISO7816File? {
@@ -191,7 +191,7 @@ object ISO7816CardReader {
         }
     }
 
-    private fun readFileSelector(
+    private suspend fun readFileSelector(
         protocol: ISO7816Protocol,
         selector: FileSelector,
         appName: ByteArray,
@@ -246,7 +246,7 @@ object ISO7816CardReader {
      * Read China card balances using the proprietary GET BALANCE command.
      * CLA=0x80, INS=0x5c, P1=balance_index, P2=0x02, Le=4
      */
-    fun readChinaBalances(protocol: ISO7816Protocol): Map<Int, ByteArray> {
+    suspend fun readChinaBalances(protocol: ISO7816Protocol): Map<Int, ByteArray> {
         val balances = mutableMapOf<Int, ByteArray>()
         for (i in 0..3) {
             try {
@@ -270,7 +270,7 @@ object ISO7816CardReader {
      * Read KSX6924 balance using the proprietary GET BALANCE command.
      * CLA=0x90, INS=0x4c, P1=0, P2=0, Le=4
      */
-    fun readKSX6924Balance(protocol: ISO7816Protocol): ByteArray? =
+    suspend fun readKSX6924Balance(protocol: ISO7816Protocol): ByteArray? =
         try {
             protocol.sendRequest(
                 ISO7816Protocol.CLASS_90,
@@ -287,7 +287,7 @@ object ISO7816CardReader {
      * Read KSX6924 extra records using the proprietary GET RECORD command.
      * CLA=0x90, INS=0x78, P1=index, P2=0, Le=0x10
      */
-    fun readKSX6924ExtraRecords(protocol: ISO7816Protocol): List<ByteArray> {
+    suspend fun readKSX6924ExtraRecords(protocol: ISO7816Protocol): List<ByteArray> {
         val records = mutableListOf<ByteArray>()
         try {
             for (i in 0..0xf) {

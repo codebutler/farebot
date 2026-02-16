@@ -31,7 +31,7 @@ import kotlin.time.Clock
 
 object CEPASCardReader {
     @Throws(Exception::class)
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         tech: CardTransceiver,
     ): RawCEPASCard {

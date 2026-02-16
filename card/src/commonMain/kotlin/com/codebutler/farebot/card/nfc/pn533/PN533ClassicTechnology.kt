@@ -54,17 +54,17 @@ class PN533ClassicTechnology(
 
     override val sectorCount: Int get() = info.classicSectorCount
 
-    override fun authenticateSectorWithKeyA(
+    override suspend fun authenticateSectorWithKeyA(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean = authenticate(sectorIndex, key, MIFARE_CMD_AUTH_A)
 
-    override fun authenticateSectorWithKeyB(
+    override suspend fun authenticateSectorWithKeyB(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean = authenticate(sectorIndex, key, MIFARE_CMD_AUTH_B)
 
-    override fun readBlock(blockIndex: Int): ByteArray =
+    override suspend fun readBlock(blockIndex: Int): ByteArray =
         pn533.inDataExchange(
             tg,
             byteArrayOf(MIFARE_CMD_READ, blockIndex.toByte()),
@@ -79,7 +79,7 @@ class PN533ClassicTechnology(
 
     override fun getBlockCountInSector(sectorIndex: Int): Int = if (sectorIndex < 32) 4 else 16
 
-    private fun authenticate(
+    private suspend fun authenticate(
         sectorIndex: Int,
         key: ByteArray,
         authCommand: Byte,

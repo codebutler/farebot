@@ -35,6 +35,7 @@ import com.codebutler.farebot.card.nfc.PCSCUltralightTechnology
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import kotlinx.coroutines.runBlocking
 import javax.smartcardio.CardException
 import javax.smartcardio.CommandAPDU
 import javax.smartcardio.TerminalFactory
@@ -93,7 +94,7 @@ class PcscReaderBackend : NfcReaderBackend {
                     println("[PC/SC] Tag ID: ${tagId.hex()}")
 
                     onCardDetected(ScannedTag(id = tagId, techList = listOf(info.cardType.name)))
-                    val rawCard = readCard(info, channel, tagId)
+                    val rawCard = runBlocking { readCard(info, channel, tagId) }
                     onCardRead(rawCard)
                     println("[PC/SC] Card read successfully")
                 } finally {
@@ -112,7 +113,7 @@ class PcscReaderBackend : NfcReaderBackend {
         }
     }
 
-    private fun readCard(
+    private suspend fun readCard(
         info: PCSCCardInfo,
         channel: javax.smartcardio.CardChannel,
         tagId: ByteArray,

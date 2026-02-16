@@ -84,6 +84,11 @@ ALLOWED_DOMAINS=(
     "cache-redirector.jetbrains.com"
     "maven.pkg.jetbrains.space"
     "packages.jetbrains.team"
+    # Node.js (Kotlin/Wasm test runner)
+    "nodejs.org"
+    # GitHub Actions (log access, artifact storage)
+    "productionresultssa7.blob.core.windows.net"
+    "blob.core.windows.net"
 )
 
 for domain in "${ALLOWED_DOMAINS[@]}"; do

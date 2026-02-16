@@ -44,5 +44,5 @@ class AndroidVicinityTechnology(
     override val uid: ByteArray
         get() = nfcV.tag.id
 
-    override fun transceive(data: ByteArray): ByteArray = nfcV.transceive(data)
+    override suspend fun transceive(data: ByteArray): ByteArray = nfcV.transceive(data)
 }

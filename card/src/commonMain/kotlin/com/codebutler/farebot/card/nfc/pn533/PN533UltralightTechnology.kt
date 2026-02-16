@@ -49,13 +49,13 @@ class PN533UltralightTechnology(
 
     override val type: Int get() = info.ultralightType
 
-    override fun readPages(pageOffset: Int): ByteArray =
+    override suspend fun readPages(pageOffset: Int): ByteArray =
         pn533.inDataExchange(
             tg,
             byteArrayOf(MIFARE_CMD_READ, pageOffset.toByte()),
         )
 
-    override fun transceive(data: ByteArray): ByteArray = pn533.inDataExchange(tg, data)
+    override suspend fun transceive(data: ByteArray): ByteArray = pn533.inDataExchange(tg, data)
 
     companion object {
         const val MIFARE_CMD_READ: Byte = 0x30

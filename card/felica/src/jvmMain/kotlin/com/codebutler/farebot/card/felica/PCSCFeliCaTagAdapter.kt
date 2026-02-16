@@ -49,7 +49,7 @@ class PCSCFeliCaTagAdapter(
         return idm
     }
 
-    override fun getSystemCodes(): List<Int> {
+    override suspend fun getSystemCodes(): List<Int> {
         val idm = currentIdm ?: throw Exception("Must call getIDm() first")
         val cmd = buildFelicaCommand(FeliCaConstants.COMMAND_REQUEST_SYSTEMCODE, idm)
         val response = transceiveFelica(cmd) ?: return emptyList()
@@ -66,14 +66,14 @@ class PCSCFeliCaTagAdapter(
         return codes
     }
 
-    override fun selectSystem(systemCode: Int): ByteArray? {
+    override suspend fun selectSystem(systemCode: Int): ByteArray? {
         val response = polling(systemCode) ?: return null
         if (response.size < 18) return null
         currentIdm = response.copyOfRange(2, 10)
         return response.copyOfRange(10, 18)
     }
 
-    override fun getServiceCodes(): List<Int> {
+    override suspend fun getServiceCodes(): List<Int> {
         val idm = currentIdm ?: throw Exception("Must call getIDm() first")
         val serviceCodes = mutableListOf<Int>()
         var index = 1
@@ -106,7 +106,7 @@ class PCSCFeliCaTagAdapter(
         return serviceCodes
     }
 
-    override fun readBlock(
+    override suspend fun readBlock(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray? {

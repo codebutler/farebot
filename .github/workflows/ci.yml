@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    name: Build & Test (JVM + Android + Web)
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,20 +26,80 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Lint
+      - name: ktlint + checkstyle
         run: ./gradlew ktlintCheck checkstyle
 
-      - name: Run tests
-        run: xvfb-run ./gradlew allTests
+  test:
+    name: Test (JVM)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Build Android APK
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run JVM tests
+        run: xvfb-run ./gradlew jvmTest
+
+  android:
+    name: Build (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
         run: ./gradlew :app:android:assembleDebug
+
+  desktop:
+    name: Build (Desktop)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
 
       - name: Build Desktop
         run: ./gradlew :app:desktop:assemble
 
+  web:
+    name: Build (Web)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
+
       - name: Build Web
-        run: ./gradlew :app:web:wasmJsBrowserDistribution
+        run: ./gradlew :app:web:wasmJsBrowserDevelopmentExecutableDistribution
 
   ios:
     name: Build & Test (iOS)

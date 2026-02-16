@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.ultralight
 
 import com.codebutler.farebot.card.nfc.UltralightTechnology
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -50,7 +51,7 @@ class UltralightCardReaderTest {
     ) : UltralightTechnology {
         val readPageOffsets = mutableListOf<Int>()
 
-        override fun readPages(pageOffset: Int): ByteArray {
+        override suspend fun readPages(pageOffset: Int): ByteArray {
             readPageOffsets.add(pageOffset)
             check(pageOffset < totalPages) {
                 "readPages called with offset $pageOffset, but card only has $totalPages pages"
@@ -65,7 +66,7 @@ class UltralightCardReaderTest {
             return buffer
         }
 
-        override fun transceive(data: ByteArray): ByteArray {
+        override suspend fun transceive(data: ByteArray): ByteArray {
             val cmd = data[0].toInt() and 0xFF
             when (cmd) {
                 0x1a -> {
@@ -87,95 +88,101 @@ class UltralightCardReaderTest {
     }
 
     @Test
-    fun testUltralightReadsCorrectNumberOfPages() {
-        val tech =
-            FakeUltralightTechnology(
-                type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
-            )
+    fun testUltralightReadsCorrectNumberOfPages() =
+        runTest {
+            val tech =
+                FakeUltralightTechnology(
+                    type = UltralightTechnology.TYPE_ULTRALIGHT,
+                    totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
+                )
 
-        val result = UltralightCardReader.readCard(testTagId, tech)
+            val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
-        assertEquals(UltralightCard.UltralightType.MF0ICU1.pageCount - 1, result.pages.size)
-    }
-
-    @Test
-    fun testUltralightCReadsCorrectNumberOfPages() {
-        val tech =
-            FakeUltralightTechnology(
-                type = UltralightTechnology.TYPE_ULTRALIGHT_C,
-                totalPages = UltralightCard.UltralightType.MF0ICU2.pageCount,
-            )
-
-        val result = UltralightCardReader.readCard(testTagId, tech)
-
-        // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
-        assertEquals(UltralightCard.UltralightType.MF0ICU2.pageCount - 1, result.pages.size)
-    }
-
-    @Test
-    fun testPageIndicesAreSequential() {
-        val tech =
-            FakeUltralightTechnology(
-                type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
-            )
-
-        val result = UltralightCardReader.readCard(testTagId, tech)
-
-        for (i in result.pages.indices) {
-            assertEquals(i, result.pages[i].index)
+            // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
+            assertEquals(UltralightCard.UltralightType.MF0ICU1.pageCount - 1, result.pages.size)
         }
-    }
 
     @Test
-    fun testPageDataExtractedCorrectly() {
-        val tech =
-            FakeUltralightTechnology(
-                type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
-            )
+    fun testUltralightCReadsCorrectNumberOfPages() =
+        runTest {
+            val tech =
+                FakeUltralightTechnology(
+                    type = UltralightTechnology.TYPE_ULTRALIGHT_C,
+                    totalPages = UltralightCard.UltralightType.MF0ICU2.pageCount,
+                )
 
-        val result = UltralightCardReader.readCard(testTagId, tech)
+            val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // Each page's first byte should be its page number (set by FakeUltralightTechnology)
-        for (page in result.pages) {
-            assertEquals(page.index.toByte(), page.data[0])
-            assertEquals(UltralightTechnology.PAGE_SIZE, page.data.size)
+            // Reader uses size = pageCount - 1, so reads pages 0..(pageCount-2)
+            assertEquals(UltralightCard.UltralightType.MF0ICU2.pageCount - 1, result.pages.size)
         }
-    }
 
     @Test
-    fun testReadPagesCalledAtCorrectOffsets() {
-        val tech =
-            FakeUltralightTechnology(
-                type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
-            )
+    fun testPageIndicesAreSequential() =
+        runTest {
+            val tech =
+                FakeUltralightTechnology(
+                    type = UltralightTechnology.TYPE_ULTRALIGHT,
+                    totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
+                )
 
-        UltralightCardReader.readCard(testTagId, tech)
+            val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // readPages should be called every 4 pages (MF0ICU1 = 16 pages, size = 15, pages 0..15)
-        val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
-        val expectedOffsets = (0 until detectedPageCount step 4).toList()
-        assertEquals(expectedOffsets, tech.readPageOffsets)
-    }
+            for (i in result.pages.indices) {
+                assertEquals(i, result.pages[i].index)
+            }
+        }
 
     @Test
-    fun testDoesNotReadBeyondCardSize() {
-        val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
-        val tech =
-            FakeUltralightTechnology(
-                type = UltralightTechnology.TYPE_ULTRALIGHT,
-                totalPages = detectedPageCount,
-            )
+    fun testPageDataExtractedCorrectly() =
+        runTest {
+            val tech =
+                FakeUltralightTechnology(
+                    type = UltralightTechnology.TYPE_ULTRALIGHT,
+                    totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
+                )
 
-        val result = UltralightCardReader.readCard(testTagId, tech)
+            val result = UltralightCardReader.readCard(testTagId, tech)
 
-        // Verify no page with index >= detectedPageCount exists
-        assertTrue(result.pages.all { it.index < detectedPageCount })
-        // Verify readPages was never called with an offset >= detectedPageCount
-        assertTrue(tech.readPageOffsets.all { it < detectedPageCount })
-    }
+            // Each page's first byte should be its page number (set by FakeUltralightTechnology)
+            for (page in result.pages) {
+                assertEquals(page.index.toByte(), page.data[0])
+                assertEquals(UltralightTechnology.PAGE_SIZE, page.data.size)
+            }
+        }
+
+    @Test
+    fun testReadPagesCalledAtCorrectOffsets() =
+        runTest {
+            val tech =
+                FakeUltralightTechnology(
+                    type = UltralightTechnology.TYPE_ULTRALIGHT,
+                    totalPages = UltralightCard.UltralightType.MF0ICU1.pageCount,
+                )
+
+            UltralightCardReader.readCard(testTagId, tech)
+
+            // readPages should be called every 4 pages (MF0ICU1 = 16 pages, size = 15, pages 0..15)
+            val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
+            val expectedOffsets = (0 until detectedPageCount step 4).toList()
+            assertEquals(expectedOffsets, tech.readPageOffsets)
+        }
+
+    @Test
+    fun testDoesNotReadBeyondCardSize() =
+        runTest {
+            val detectedPageCount = UltralightCard.UltralightType.MF0ICU1.pageCount
+            val tech =
+                FakeUltralightTechnology(
+                    type = UltralightTechnology.TYPE_ULTRALIGHT,
+                    totalPages = detectedPageCount,
+                )
+
+            val result = UltralightCardReader.readCard(testTagId, tech)
+
+            // Verify no page with index >= detectedPageCount exists
+            assertTrue(result.pages.all { it.index < detectedPageCount })
+            // Verify readPages was never called with an offset >= detectedPageCount
+            assertTrue(tech.readPageOffsets.all { it < detectedPageCount })
+        }
 }

@@ -49,7 +49,7 @@ class PCSCUltralightTechnology(
 
     override val type: Int get() = info.ultralightType
 
-    override fun readPages(pageOffset: Int): ByteArray {
+    override suspend fun readPages(pageOffset: Int): ByteArray {
         // READ BINARY: FF B0 00 {page} 10 (read 16 bytes = 4 pages)
         val command = CommandAPDU(0xFF, 0xB0, 0x00, pageOffset, 16)
         val response = channel.transmit(command)
@@ -59,7 +59,7 @@ class PCSCUltralightTechnology(
         return response.data
     }
 
-    override fun transceive(data: ByteArray): ByteArray {
+    override suspend fun transceive(data: ByteArray): ByteArray {
         // For raw transceive, we need to send the data as-is through PC/SC
         // This is used for GET_VERSION (0x60) and AUTH_1 (0x1A) commands
         val command = CommandAPDU(0xFF, 0x00, 0x00, 0x00, data)
