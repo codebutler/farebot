@@ -31,7 +31,6 @@ jobs:
 
   test:
     name: Test (JVM)
-    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +49,6 @@ jobs:
 
   android:
     name: Build (Android)
-    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +67,6 @@ jobs:
 
   desktop:
     name: Build (Desktop)
-    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -88,7 +85,6 @@ jobs:
 
   web:
     name: Build (Web)
-    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -107,7 +103,6 @@ jobs:
 
   ios:
     name: Build & Test (iOS)
-    needs: lint
     runs-on: nscloud-macos-sequoia-arm64-6x14
     steps:
       - uses: actions/checkout@v4
