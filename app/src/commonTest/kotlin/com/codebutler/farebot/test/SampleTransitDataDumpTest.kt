@@ -167,7 +167,7 @@ class SampleTransitDataDumpTest {
             if (balances != null && balances.isNotEmpty()) {
                 appendLine("    balances:")
                 for (bal in balances) {
-                    appendLine("      - name: ${yamlValue(bal.name)}")
+                    appendLine("      - name: ${yamlValue(bal.name?.resolveAsync())}")
                     appendLine("        amount: \"${bal.balance.formatCurrencyString(isBalance = true)}\"")
                 }
             } else {
