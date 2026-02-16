@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    name: Build & Test (JVM + Android + Web)
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,23 +26,88 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Lint
+      - name: ktlint + checkstyle
         run: ./gradlew ktlintCheck checkstyle
 
-      - name: Run tests
+  test:
+    name: Test (JVM)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run JVM tests
         run: xvfb-run ./gradlew jvmTest
 
-      - name: Build Android APK
+  android:
+    name: Build (Android)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
         run: ./gradlew :app:android:assembleDebug
+
+  desktop:
+    name: Build (Desktop)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
 
       - name: Build Desktop
         run: ./gradlew :app:desktop:assemble
+
+  web:
+    name: Build (Web)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
 
       - name: Build Web
         run: ./gradlew :app:web:wasmJsBrowserDistribution
 
   ios:
     name: Build & Test (iOS)
+    needs: lint
     runs-on: nscloud-macos-sequoia-arm64-6x14
     steps:
       - uses: actions/checkout@v4
