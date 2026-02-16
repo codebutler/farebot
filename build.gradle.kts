@@ -59,10 +59,11 @@ subprojects {
         if (project.path != ":app:web") {
             afterEvaluate {
                 tasks.configureEach {
-                    if (name.contains("WasmJs", ignoreCase = true) &&
-                        (name.contains("Test", ignoreCase = true) ||
-                            name.contains("Executable", ignoreCase = true))
-                    ) {
+                    val isWasmJs = name.contains("WasmJs", ignoreCase = true)
+                    val isTestOrExe =
+                        name.contains("Test", ignoreCase = true) ||
+                            name.contains("Executable", ignoreCase = true)
+                    if (isWasmJs && isTestOrExe) {
                         enabled = false
                     }
                 }

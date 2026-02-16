@@ -86,6 +86,9 @@ ALLOWED_DOMAINS=(
     "packages.jetbrains.team"
     # Node.js (Kotlin/Wasm test runner)
     "nodejs.org"
+    # GitHub Actions (log access, artifact storage)
+    "productionresultssa7.blob.core.windows.net"
+    "blob.core.windows.net"
 )
 
 for domain in "${ALLOWED_DOMAINS[@]}"; do
