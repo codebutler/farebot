@@ -84,206 +84,214 @@ class ClassicCardReaderTest {
     }
 
     @Test
-    fun testNormalReadWithDefaultKey() = runTest {
-        val blockData = ByteArray(16) { 0xAB.toByte() }
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 1,
-                readBlockResult = { blockData },
-            )
+    fun testNormalReadWithDefaultKey() =
+        runTest {
+            val blockData = ByteArray(16) { 0xAB.toByte() }
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 1,
+                    readBlockResult = { blockData },
+                )
 
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
 
-        assertEquals(1, sectors.size)
-        assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
-        assertEquals(4, sectors[0].blocks!!.size)
-        assertTrue(sectors[0].blocks!![0].data.contentEquals(blockData))
-    }
-
-    @Test
-    fun testUnauthorizedSectorWhenAuthFails() = runTest {
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 1,
-                authKeyAResult = { _, _ -> false },
-                authKeyBResult = { _, _ -> false },
-            )
-
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
-
-        assertEquals(1, sectors.size)
-        assertEquals(RawClassicSector.TYPE_UNAUTHORIZED, sectors[0].type)
-    }
+            assertEquals(1, sectors.size)
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            assertEquals(4, sectors[0].blocks!!.size)
+            assertTrue(sectors[0].blocks!![0].data.contentEquals(blockData))
+        }
 
     @Test
-    fun testRetryOnSingleByteRead() = runTest {
-        var readCount = 0
-        val normalData = ByteArray(16) { 0xCC.toByte() }
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 1,
-                blocksPerSector = 1,
-                readBlockResult = {
-                    readCount++
-                    if (readCount == 1) {
-                        // First read returns single byte (the 0x04 error condition)
-                        byteArrayOf(0x04)
-                    } else {
-                        normalData
-                    }
-                },
-            )
+    fun testUnauthorizedSectorWhenAuthFails() =
+        runTest {
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 1,
+                    authKeyAResult = { _, _ -> false },
+                    authKeyBResult = { _, _ -> false },
+                )
 
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
 
-        assertEquals(1, sectors.size)
-        assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
-        // The block should contain the retried (normal) data
-        assertTrue(sectors[0].blocks!![0].data.contentEquals(normalData))
-        // readBlock called twice: initial + 1 retry
-        assertEquals(2, tech.readBlockCalls.size)
-        // Should have reauthenticated before retry
-        assertTrue(tech.authKeyACalls.size > 1)
-    }
+            assertEquals(1, sectors.size)
+            assertEquals(RawClassicSector.TYPE_UNAUTHORIZED, sectors[0].type)
+        }
 
     @Test
-    fun testRetryExhaustedKeepsSingleByteData() = runTest {
-        val singleByte = byteArrayOf(0x04)
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 1,
-                blocksPerSector = 1,
-                readBlockResult = { singleByte },
-            )
+    fun testRetryOnSingleByteRead() =
+        runTest {
+            var readCount = 0
+            val normalData = ByteArray(16) { 0xCC.toByte() }
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 1,
+                    blocksPerSector = 1,
+                    readBlockResult = {
+                        readCount++
+                        if (readCount == 1) {
+                            // First read returns single byte (the 0x04 error condition)
+                            byteArrayOf(0x04)
+                        } else {
+                            normalData
+                        }
+                    },
+                )
 
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
 
-        assertEquals(1, sectors.size)
-        assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
-        // After 3 retries all returning single byte, the block still gets saved
-        assertEquals(1, sectors[0].blocks!![0].data.size)
-        // Initial read + 3 retries = 4 total reads
-        assertEquals(4, tech.readBlockCalls.size)
-    }
-
-    @Test
-    fun testCardLostExceptionReturnsPartialData() = runTest {
-        var sectorReadCount = 0
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 4,
-                blocksPerSector = 1,
-                readBlockResult = { blockIndex ->
-                    sectorReadCount++
-                    if (sectorReadCount > 2) {
-                        throw CardLostException("removed")
-                    }
-                    ByteArray(16) { blockIndex.toByte() }
-                },
-            )
-
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
-
-        // Should have partial data: 2 successful sectors + 1 invalid (where loss occurred)
-        // Remaining sectors are not attempted
-        assertTrue(sectors.size < 4)
-        // The last sector should be marked invalid due to CardLostException
-        val lastSector = sectors.last()
-        assertEquals(RawClassicSector.TYPE_INVALID, lastSector.type)
-        assertTrue(lastSector.errorMessage!!.contains("Tag was lost"))
-    }
+            assertEquals(1, sectors.size)
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            // The block should contain the retried (normal) data
+            assertTrue(sectors[0].blocks!![0].data.contentEquals(normalData))
+            // readBlock called twice: initial + 1 retry
+            assertEquals(2, tech.readBlockCalls.size)
+            // Should have reauthenticated before retry
+            assertTrue(tech.authKeyACalls.size > 1)
+        }
 
     @Test
-    fun testKeyBFallbackAndRetryUsesKeyB() = runTest {
-        val keyA = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
-        val keyB = byteArrayOf(0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F)
-        val cardKeys = ClassicCardKeys.fromProxmark3(keyA + keyB)
+    fun testRetryExhaustedKeepsSingleByteData() =
+        runTest {
+            val singleByte = byteArrayOf(0x04)
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 1,
+                    blocksPerSector = 1,
+                    readBlockResult = { singleByte },
+                )
 
-        var readCount = 0
-        val normalData = ByteArray(16) { 0xDD.toByte() }
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
 
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 1,
-                blocksPerSector = 1,
-                // All Key A attempts fail, Key B succeeds
-                authKeyAResult = { _, _ -> false },
-                authKeyBResult = { _, key -> key.contentEquals(keyB) },
-                readBlockResult = {
-                    readCount++
-                    if (readCount == 1) {
-                        // Trigger retry
-                        byteArrayOf(0x04)
-                    } else {
-                        normalData
-                    }
-                },
-            )
-
-        val result = ClassicCardReader.readCard(testTagId, tech, cardKeys)
-        val sectors = result.sectors()
-
-        assertEquals(1, sectors.size)
-        assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
-        assertTrue(sectors[0].blocks!![0].data.contentEquals(normalData))
-
-        // Retry reauthentication should use Key B, not Key A
-        // The last auth call on Key B should be the retry reauthentication
-        assertTrue(tech.authKeyBCalls.size >= 2, "Expected at least 2 Key B auth calls (initial + retry)")
-    }
+            assertEquals(1, sectors.size)
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            // After 3 retries all returning single byte, the block still gets saved
+            assertEquals(1, sectors[0].blocks!![0].data.size)
+            // Initial read + 3 retries = 4 total reads
+            assertEquals(4, tech.readBlockCalls.size)
+        }
 
     @Test
-    fun testMultipleSectorsWithMixedAuth() = runTest {
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 3,
-                blocksPerSector = 1,
-                authKeyAResult = { sectorIndex, _ ->
-                    // Only sector 0 authenticates with default key
-                    sectorIndex == 0
-                },
-                readBlockResult = { ByteArray(16) },
-            )
+    fun testCardLostExceptionReturnsPartialData() =
+        runTest {
+            var sectorReadCount = 0
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 4,
+                    blocksPerSector = 1,
+                    readBlockResult = { blockIndex ->
+                        sectorReadCount++
+                        if (sectorReadCount > 2) {
+                            throw CardLostException("removed")
+                        }
+                        ByteArray(16) { blockIndex.toByte() }
+                    },
+                )
 
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
 
-        assertEquals(3, sectors.size)
-        // Sector 0: authenticated with default key → data
-        assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
-        // Sectors 1, 2: auth failed → unauthorized
-        assertEquals(RawClassicSector.TYPE_UNAUTHORIZED, sectors[1].type)
-        assertEquals(RawClassicSector.TYPE_UNAUTHORIZED, sectors[2].type)
-    }
+            // Should have partial data: 2 successful sectors + 1 invalid (where loss occurred)
+            // Remaining sectors are not attempted
+            assertTrue(sectors.size < 4)
+            // The last sector should be marked invalid due to CardLostException
+            val lastSector = sectors.last()
+            assertEquals(RawClassicSector.TYPE_INVALID, lastSector.type)
+            assertTrue(lastSector.errorMessage!!.contains("Tag was lost"))
+        }
 
     @Test
-    fun testGenericExceptionCreatesInvalidSector() = runTest {
-        val tech =
-            MockClassicTechnology(
-                sectorCount = 2,
-                blocksPerSector = 1,
-                readBlockResult = { blockIndex ->
-                    if (blockIndex == 0) {
-                        ByteArray(16)
-                    } else {
-                        throw RuntimeException("I/O error")
-                    }
-                },
-            )
+    fun testKeyBFallbackAndRetryUsesKeyB() =
+        runTest {
+            val keyA = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
+            val keyB = byteArrayOf(0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F)
+            val cardKeys = ClassicCardKeys.fromProxmark3(keyA + keyB)
 
-        val result = ClassicCardReader.readCard(testTagId, tech, null)
-        val sectors = result.sectors()
+            var readCount = 0
+            val normalData = ByteArray(16) { 0xDD.toByte() }
 
-        assertEquals(2, sectors.size)
-        // Sector 0 reads fine
-        assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
-        // Sector 1 hits exception → invalid (not a CardLostException, so reading continues)
-        assertEquals(RawClassicSector.TYPE_INVALID, sectors[1].type)
-        assertTrue(sectors[1].errorMessage!!.contains("I/O error"))
-    }
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 1,
+                    blocksPerSector = 1,
+                    // All Key A attempts fail, Key B succeeds
+                    authKeyAResult = { _, _ -> false },
+                    authKeyBResult = { _, key -> key.contentEquals(keyB) },
+                    readBlockResult = {
+                        readCount++
+                        if (readCount == 1) {
+                            // Trigger retry
+                            byteArrayOf(0x04)
+                        } else {
+                            normalData
+                        }
+                    },
+                )
+
+            val result = ClassicCardReader.readCard(testTagId, tech, cardKeys)
+            val sectors = result.sectors()
+
+            assertEquals(1, sectors.size)
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            assertTrue(sectors[0].blocks!![0].data.contentEquals(normalData))
+
+            // Retry reauthentication should use Key B, not Key A
+            // The last auth call on Key B should be the retry reauthentication
+            assertTrue(tech.authKeyBCalls.size >= 2, "Expected at least 2 Key B auth calls (initial + retry)")
+        }
+
+    @Test
+    fun testMultipleSectorsWithMixedAuth() =
+        runTest {
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 3,
+                    blocksPerSector = 1,
+                    authKeyAResult = { sectorIndex, _ ->
+                        // Only sector 0 authenticates with default key
+                        sectorIndex == 0
+                    },
+                    readBlockResult = { ByteArray(16) },
+                )
+
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
+
+            assertEquals(3, sectors.size)
+            // Sector 0: authenticated with default key → data
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            // Sectors 1, 2: auth failed → unauthorized
+            assertEquals(RawClassicSector.TYPE_UNAUTHORIZED, sectors[1].type)
+            assertEquals(RawClassicSector.TYPE_UNAUTHORIZED, sectors[2].type)
+        }
+
+    @Test
+    fun testGenericExceptionCreatesInvalidSector() =
+        runTest {
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 2,
+                    blocksPerSector = 1,
+                    readBlockResult = { blockIndex ->
+                        if (blockIndex == 0) {
+                            ByteArray(16)
+                        } else {
+                            throw RuntimeException("I/O error")
+                        }
+                    },
+                )
+
+            val result = ClassicCardReader.readCard(testTagId, tech, null)
+            val sectors = result.sectors()
+
+            assertEquals(2, sectors.size)
+            // Sector 0 reads fine
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            // Sector 1 hits exception → invalid (not a CardLostException, so reading continues)
+            assertEquals(RawClassicSector.TYPE_INVALID, sectors[1].type)
+            assertTrue(sectors[1].errorMessage!!.contains("I/O error"))
+        }
 }

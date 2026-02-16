@@ -34,12 +34,12 @@ import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.card.vicinity.VicinityCardReader
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.runBlocking
 import platform.CoreNFC.NFCFeliCaTagProtocol
 import platform.CoreNFC.NFCISO15693TagProtocol
 import platform.CoreNFC.NFCMiFareDESFire
@@ -197,14 +197,15 @@ class IosNfcScanner : CardScanner {
         override fun tagReaderSessionDidBecomeActive(session: NFCTagReaderSession) {
         }
 
-        private fun readTag(tag: Any): RawCard<*> = runBlocking {
-            when (tag) {
-                is NFCFeliCaTagProtocol -> readFelicaTag(tag)
-                is NFCMiFareTagProtocol -> readMiFareTag(tag)
-                is NFCISO15693TagProtocol -> readVicinityTag(tag)
-                else -> throw Exception("Unsupported NFC tag type")
+        private fun readTag(tag: Any): RawCard<*> =
+            runBlocking {
+                when (tag) {
+                    is NFCFeliCaTagProtocol -> readFelicaTag(tag)
+                    is NFCMiFareTagProtocol -> readMiFareTag(tag)
+                    is NFCISO15693TagProtocol -> readVicinityTag(tag)
+                    else -> throw Exception("Unsupported NFC tag type")
+                }
             }
-        }
 
         private suspend fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()

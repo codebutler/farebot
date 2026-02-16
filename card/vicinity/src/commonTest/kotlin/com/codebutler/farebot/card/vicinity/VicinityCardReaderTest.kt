@@ -36,90 +36,98 @@ class VicinityCardReaderTest {
     private val testTagId = byteArrayOf(0x0A, 0x0B, 0x0C, 0x0D)
 
     @Test
-    fun testReadCard_multiplePages() = runTest {
-        val pageData =
-            mapOf(
-                0 to byteArrayOf(0x11, 0x22, 0x33, 0x44),
-                1 to byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte()),
-                2 to byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte()),
+    fun testReadCard_multiplePages() =
+        runTest {
+            val pageData =
+                mapOf(
+                    0 to byteArrayOf(0x11, 0x22, 0x33, 0x44),
+                    1 to byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte()),
+                    2 to byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte()),
+                )
+            val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null)
+
+            val card = VicinityCardReader.readCard(testTagId, tech)
+
+            assertEquals(3, card.pages.size)
+            assertEquals(0, card.pages[0].index)
+            assertEquals(1, card.pages[1].index)
+            assertEquals(2, card.pages[2].index)
+            assertTrue(card.pages[0].data.contentEquals(byteArrayOf(0x11, 0x22, 0x33, 0x44)))
+            assertTrue(card.pages[1].data.contentEquals(byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte())))
+            assertTrue(
+                card.pages[2].data.contentEquals(
+                    byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte()),
+                ),
             )
-        val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null)
-
-        val card = VicinityCardReader.readCard(testTagId, tech)
-
-        assertEquals(3, card.pages.size)
-        assertEquals(0, card.pages[0].index)
-        assertEquals(1, card.pages[1].index)
-        assertEquals(2, card.pages[2].index)
-        assertTrue(card.pages[0].data.contentEquals(byteArrayOf(0x11, 0x22, 0x33, 0x44)))
-        assertTrue(card.pages[1].data.contentEquals(byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte())))
-        assertTrue(
-            card.pages[2].data.contentEquals(byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte())),
-        )
-        assertFalse(card.isPartialRead)
-        assertTrue(card.tagId().contentEquals(testTagId))
-    }
+            assertFalse(card.isPartialRead)
+            assertTrue(card.tagId().contentEquals(testTagId))
+        }
 
     @Test
-    fun testReadCard_withSysInfo() = runTest {
-        val sysInfoBytes = byteArrayOf(0x0F, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
-        val pageData = mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44))
-        val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = sysInfoBytes)
+    fun testReadCard_withSysInfo() =
+        runTest {
+            val sysInfoBytes = byteArrayOf(0x0F, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+            val pageData = mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44))
+            val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = sysInfoBytes)
 
-        val card = VicinityCardReader.readCard(testTagId, tech)
+            val card = VicinityCardReader.readCard(testTagId, tech)
 
-        val sysInfo = assertNotNull(card.sysInfo)
-        // sysInfo should have the status byte (0x00) stripped — the fake returns [0x00] + sysInfoBytes
-        // so card.sysInfo should be sysInfoBytes
-        assertTrue(sysInfo.contentEquals(sysInfoBytes))
-        assertEquals(1, card.pages.size)
-    }
-
-    @Test
-    fun testReadCard_sysInfoFails() = runTest {
-        val pageData = mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44))
-        val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null, sysInfoThrows = true)
-
-        val card = VicinityCardReader.readCard(testTagId, tech)
-
-        assertNull(card.sysInfo)
-        assertEquals(1, card.pages.size)
-    }
+            val sysInfo = assertNotNull(card.sysInfo)
+            // sysInfo should have the status byte (0x00) stripped — the fake returns [0x00] + sysInfoBytes
+            // so card.sysInfo should be sysInfoBytes
+            assertTrue(sysInfo.contentEquals(sysInfoBytes))
+            assertEquals(1, card.pages.size)
+        }
 
     @Test
-    fun testReadCard_partialRead() = runTest {
-        // Pages 0 and 1 succeed, page 2 throws (simulating tag lost)
-        val pageData =
-            mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44), 1 to byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte()))
-        val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null, throwOnMissingPage = true)
+    fun testReadCard_sysInfoFails() =
+        runTest {
+            val pageData = mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44))
+            val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null, sysInfoThrows = true)
 
-        val card = VicinityCardReader.readCard(testTagId, tech)
+            val card = VicinityCardReader.readCard(testTagId, tech)
 
-        assertEquals(2, card.pages.size)
-        assertTrue(card.isPartialRead)
-    }
-
-    @Test
-    fun testReadCard_emptyCard() = runTest {
-        // No readable pages — first read returns error status
-        val tech = FakeVicinityTechnology(testUid, emptyMap(), sysInfoResponse = null)
-
-        val card = VicinityCardReader.readCard(testTagId, tech)
-
-        assertEquals(0, card.pages.size)
-        assertFalse(card.isPartialRead)
-    }
+            assertNull(card.sysInfo)
+            assertEquals(1, card.pages.size)
+        }
 
     @Test
-    fun testReadCard_errorResponseStopsReading() = runTest {
-        // Page 0 returns error status (non-zero first byte)
-        val tech = FakeVicinityTechnology(testUid, emptyMap(), sysInfoResponse = null, errorOnPage = 0)
+    fun testReadCard_partialRead() =
+        runTest {
+            // Pages 0 and 1 succeed, page 2 throws (simulating tag lost)
+            val pageData =
+                mapOf(0 to byteArrayOf(0x11, 0x22, 0x33, 0x44), 1 to byteArrayOf(0x55, 0x66, 0x77, 0x88.toByte()))
+            val tech = FakeVicinityTechnology(testUid, pageData, sysInfoResponse = null, throwOnMissingPage = true)
 
-        val card = VicinityCardReader.readCard(testTagId, tech)
+            val card = VicinityCardReader.readCard(testTagId, tech)
 
-        assertEquals(0, card.pages.size)
-        assertFalse(card.isPartialRead)
-    }
+            assertEquals(2, card.pages.size)
+            assertTrue(card.isPartialRead)
+        }
+
+    @Test
+    fun testReadCard_emptyCard() =
+        runTest {
+            // No readable pages — first read returns error status
+            val tech = FakeVicinityTechnology(testUid, emptyMap(), sysInfoResponse = null)
+
+            val card = VicinityCardReader.readCard(testTagId, tech)
+
+            assertEquals(0, card.pages.size)
+            assertFalse(card.isPartialRead)
+        }
+
+    @Test
+    fun testReadCard_errorResponseStopsReading() =
+        runTest {
+            // Page 0 returns error status (non-zero first byte)
+            val tech = FakeVicinityTechnology(testUid, emptyMap(), sysInfoResponse = null, errorOnPage = 0)
+
+            val card = VicinityCardReader.readCard(testTagId, tech)
+
+            assertEquals(0, card.pages.size)
+            assertFalse(card.isPartialRead)
+        }
 
     /**
      * Fake [VicinityTechnology] for testing the card reader algorithm.

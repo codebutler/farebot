@@ -187,7 +187,11 @@ class WebCardScanner : CardScanner {
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
-        println("[WebUSB] Type A card: type=${info.cardType}, SAK=0x${(target.sak.toInt() and 0xFF).toString(16).padStart(2, '0')}, UID=${tagId.hex()}")
+        println(
+            "[WebUSB] Type A card: type=${info.cardType}, SAK=0x${(target.sak.toInt() and 0xFF).toString(
+                16,
+            ).padStart(2, '0')}, UID=${tagId.hex()}",
+        )
 
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
