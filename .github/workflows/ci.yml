@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew ktlintCheck checkstyle
 
       - name: Run tests
-        run: xvfb-run ./gradlew allTests
+        run: xvfb-run ./gradlew jvmTest
 
       - name: Build Android APK
         run: ./gradlew :app:android:assembleDebug

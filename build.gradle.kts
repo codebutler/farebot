@@ -53,13 +53,16 @@ subprojects {
             }
         }
 
-        // Disable wasmJs test compilation/linking for all modules except app:web.
-        // The Kotlin/Wasm IR linker is extremely slow for test executables and these
-        // library modules get sufficient test coverage from jvmTest.
+        // Library modules only need wasmJs compilation (klib) for app:web to consume.
+        // Disable wasmJs executable linking and test tasks — the IR linker is extremely
+        // slow and these modules get sufficient test coverage from jvmTest.
         if (project.path != ":app:web") {
             afterEvaluate {
                 tasks.configureEach {
-                    if (name.contains("WasmJs", ignoreCase = true) && name.contains("Test", ignoreCase = true)) {
+                    if (name.contains("WasmJs", ignoreCase = true) &&
+                        (name.contains("Test", ignoreCase = true) ||
+                            name.contains("Executable", ignoreCase = true))
+                    ) {
                         enabled = false
                     }
                 }
