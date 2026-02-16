@@ -34,7 +34,6 @@ import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitInfo
 import farebot.app.generated.resources.Res
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -74,9 +73,9 @@ private val testResourceMapping =
  * Loads a test resource as bytes using Compose Resources.
  * The path is relative to the test resources root (e.g., "easycard/deadbeef.mfc").
  */
-fun loadTestResource(path: String): ByteArray? {
+suspend fun loadTestResource(path: String): ByteArray? {
     val resPath = testResourceMapping[path] ?: return null
-    return runBlocking { Res.readBytes(resPath) }
+    return Res.readBytes(resPath)
 }
 
 /**
@@ -102,7 +101,7 @@ object TestAssetLoader {
      * @return The deserialized RawCard
      * @throws AssertionError if the file is not found
      */
-    fun loadJsonCard(resourcePath: String): RawCard<*> {
+    suspend fun loadJsonCard(resourcePath: String): RawCard<*> {
         val bytes = loadTestResource(resourcePath)
         assertNotNull(bytes, "Test resource not found: $resourcePath")
         val jsonString = bytes.decodeToString()
@@ -118,7 +117,7 @@ object TestAssetLoader {
      * @return The deserialized RawCard
      * @throws AssertionError if the file is not found or import fails
      */
-    fun loadMetrodroidJsonCard(resourcePath: String): RawCard<*> {
+    suspend fun loadMetrodroidJsonCard(resourcePath: String): RawCard<*> {
         val bytes = loadTestResource(resourcePath)
         assertNotNull(bytes, "Test resource not found: $resourcePath")
         val jsonString = bytes.decodeToString()
@@ -140,7 +139,7 @@ object TestAssetLoader {
      * @return The RawClassicCard representation
      * @throws AssertionError if the file is not found
      */
-    fun loadMfcCard(
+    suspend fun loadMfcCard(
         resourcePath: String,
         scannedAt: Instant = TEST_TIMESTAMP,
     ): RawClassicCard {
@@ -239,7 +238,7 @@ abstract class CardDumpTest {
     /**
      * Loads an .mfc file and parses it using the given transit factory.
      */
-    inline fun <reified T : TransitInfo> loadAndParseMfc(
+    suspend inline fun <reified T : TransitInfo> loadAndParseMfc(
         path: String,
         factory: TransitFactory<ClassicCard, T>,
         scannedAt: Instant = TEST_TIMESTAMP,
@@ -256,7 +255,7 @@ abstract class CardDumpTest {
     /**
      * Loads an .mfc file and returns the parsed ClassicCard.
      */
-    fun loadMfcCard(
+    suspend fun loadMfcCard(
         path: String,
         scannedAt: Instant = TEST_TIMESTAMP,
     ): ClassicCard = TestAssetLoader.loadMfcCard(path, scannedAt).parse()
@@ -264,7 +263,7 @@ abstract class CardDumpTest {
     /**
      * Loads a JSON card dump and parses it using the given transit factory.
      */
-    inline fun <reified C : Card, reified T : TransitInfo> loadAndParseJson(
+    suspend inline fun <reified C : Card, reified T : TransitInfo> loadAndParseJson(
         path: String,
         factory: TransitFactory<C, T>,
     ): T {
@@ -282,7 +281,7 @@ abstract class CardDumpTest {
     /**
      * Loads a Metrodroid JSON card dump and parses it using the given transit factory.
      */
-    inline fun <reified C : Card, reified T : TransitInfo> loadAndParseMetrodroidJson(
+    suspend inline fun <reified C : Card, reified T : TransitInfo> loadAndParseMetrodroidJson(
         path: String,
         factory: TransitFactory<C, T>,
     ): Pair<C, T> {

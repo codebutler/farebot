@@ -30,7 +30,7 @@ import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.orca.OrcaTransitFactory
 import com.codebutler.farebot.transit.orca.OrcaTransitInfo
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -84,7 +84,7 @@ class OrcaTransitTest {
 
     @Test
     fun testDemoCard() =
-        runBlocking {
+        runTest {
             val card = constructOrcaCard()
 
             // Test TransitIdentity

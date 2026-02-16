@@ -33,7 +33,7 @@ import com.codebutler.farebot.transit.orca.OrcaTransitFactory
 import com.codebutler.farebot.transit.orca.OrcaTransitInfo
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
 import com.codebutler.farebot.transit.suica.SuicaTransitInfo
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -48,7 +48,7 @@ import kotlin.time.Instant
  * asserting on exact trip data, balances, fares, timestamps, stations, and modes.
  */
 class FlipperIntegrationTest {
-    private fun loadFlipperDump(name: String): String {
+    private suspend fun loadFlipperDump(name: String): String {
         val bytes = loadTestResource("flipper/$name")
         assertNotNull(bytes, "Test resource not found: flipper/$name")
         return bytes.decodeToString()
@@ -58,7 +58,7 @@ class FlipperIntegrationTest {
 
     @Test
     fun testOrcaFromFlipper() =
-        runBlocking {
+        runTest {
             val data = loadFlipperDump("ORCA.nfc")
             val rawCard = FlipperNfcParser.parse(data)
             assertNotNull(rawCard, "Failed to parse ORCA Flipper dump")
@@ -95,7 +95,7 @@ class FlipperIntegrationTest {
 
     @Test
     fun testClipperFromFlipper() =
-        runBlocking {
+        runTest {
             val data = loadFlipperDump("Clipper.nfc")
             val rawCard = FlipperNfcParser.parse(data)
             assertNotNull(rawCard, "Failed to parse Clipper Flipper dump")
@@ -272,7 +272,7 @@ class FlipperIntegrationTest {
 
     @Test
     fun testSuicaFromFlipper() =
-        runBlocking {
+        runTest {
             val data = loadFlipperDump("Suica.nfc")
             val rawCard = FlipperNfcParser.parse(data)
             assertNotNull(rawCard, "Failed to parse Suica Flipper dump")
@@ -511,7 +511,7 @@ class FlipperIntegrationTest {
 
     @Test
     fun testPasmoFromFlipper() =
-        runBlocking {
+        runTest {
             val data = loadFlipperDump("PASMO.nfc")
             val rawCard = FlipperNfcParser.parse(data)
             assertNotNull(rawCard, "Failed to parse PASMO Flipper dump")
@@ -658,7 +658,7 @@ class FlipperIntegrationTest {
 
     @Test
     fun testIcocaFromFlipper() =
-        runBlocking {
+        runTest {
             val data = loadFlipperDump("ICOCA.nfc")
             val rawCard = FlipperNfcParser.parse(data)
             assertNotNull(rawCard, "Failed to parse ICOCA Flipper dump")

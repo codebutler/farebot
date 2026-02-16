@@ -28,7 +28,7 @@ package com.codebutler.farebot.test
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.Test
@@ -68,7 +68,7 @@ class EasyCardTransitTest : CardDumpTest() {
 
     @Test
     fun testDeadbeefEnglish() =
-        runBlocking {
+        runTest {
             val card = loadMfcCard("easycard/deadbeef.mfc")
 
             // Verify card is detected as EasyCard
@@ -138,7 +138,7 @@ class EasyCardTransitTest : CardDumpTest() {
      */
     @Test
     fun testDeadbeefChineseTraditional() =
-        runBlocking {
+        runTest {
             val card = loadMfcCard("easycard/deadbeef.mfc")
 
             assertTrue(factory.check(card), "Card should be detected as EasyCard")
@@ -159,17 +159,18 @@ class EasyCardTransitTest : CardDumpTest() {
         }
 
     @Test
-    fun testAssetLoaderBasicFunctionality() {
-        // Test that loading an MFC file works
-        val rawCard = TestAssetLoader.loadMfcCard("easycard/deadbeef.mfc")
-        assertNotNull(rawCard, "Should load MFC card")
+    fun testAssetLoaderBasicFunctionality() =
+        runTest {
+            // Test that loading an MFC file works
+            val rawCard = TestAssetLoader.loadMfcCard("easycard/deadbeef.mfc")
+            assertNotNull(rawCard, "Should load MFC card")
 
-        // Check UID extraction
-        val tagId = rawCard.tagId()
-        assertEquals(4, tagId.size, "Standard UID should be 4 bytes")
+            // Check UID extraction
+            val tagId = rawCard.tagId()
+            assertEquals(4, tagId.size, "Standard UID should be 4 bytes")
 
-        // Check sector parsing
-        val parsed = rawCard.parse()
-        assertEquals(16, parsed.sectors.size, "Should have 16 sectors (1K card)")
-    }
+            // Check sector parsing
+            val parsed = rawCard.parse()
+            assertEquals(16, parsed.sectors.size, "Should have 16 sectors (1K card)")
+        }
 }

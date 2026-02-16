@@ -31,7 +31,7 @@ import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.transit.createTransitFactoryRegistry
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.Trip
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
@@ -83,7 +83,7 @@ class SampleTransitDataDumpTest {
 
     @Test
     fun dumpAllSampleTransitData() =
-        runBlocking {
+        runTest {
             val output =
                 buildString {
                     appendLine("# FareBot Sample Transit Data Dump")
@@ -167,7 +167,7 @@ class SampleTransitDataDumpTest {
             if (balances != null && balances.isNotEmpty()) {
                 appendLine("    balances:")
                 for (bal in balances) {
-                    appendLine("      - name: ${yamlValue(bal.name)}")
+                    appendLine("      - name: ${yamlValue(bal.name?.resolveAsync())}")
                     appendLine("        amount: \"${bal.balance.formatCurrencyString(isBalance = true)}\"")
                 }
             } else {

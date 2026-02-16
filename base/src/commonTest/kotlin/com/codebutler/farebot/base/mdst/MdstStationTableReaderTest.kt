@@ -23,7 +23,7 @@
 package com.codebutler.farebot.base.mdst
 
 import farebot.base.generated.resources.Res
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -82,51 +82,54 @@ class MdstStationTableReaderTest {
      */
     @OptIn(ExperimentalSerializationApi::class)
     @Test
-    fun testMdstProtobufParsing() {
-        val bytes = runBlocking { Res.readBytes("files/seq_go.mdst") }
+    fun testMdstProtobufParsing() =
+        runTest {
+            val bytes = Res.readBytes("files/seq_go.mdst")
 
-        val reader = MdstStationTableReader.fromByteArray(bytes)
-        assertNotNull(reader.notice, "License notice should exist")
+            val reader = MdstStationTableReader.fromByteArray(bytes)
+            assertNotNull(reader.notice, "License notice should exist")
 
-        val station = reader.getStationById(9)
-        assertNotNull(station, "Station 9 should be found")
-        assertEquals(9, station.id)
-        assertEquals("Domestic Airport", station.name.english)
-    }
+            val station = reader.getStationById(9)
+            assertNotNull(station, "Station 9 should be found")
+            assertEquals(9, station.id)
+            assertEquals("Domestic Airport", station.name.english)
+        }
 
     /**
      * Tests Suica rail station lookup - the real user-reported bug.
      * Shinjuku station: area=0, line=37, station=10 -> stationId = (0 shl 16) or (37 shl 8) or 10 = 9482
      */
     @Test
-    fun testSuicaRailStationLookup() {
-        val bytes = runBlocking { Res.readBytes("files/suica_rail.mdst") }
+    fun testSuicaRailStationLookup() =
+        runTest {
+            val bytes = Res.readBytes("files/suica_rail.mdst")
 
-        val reader = MdstStationTableReader.fromByteArray(bytes)
+            val reader = MdstStationTableReader.fromByteArray(bytes)
 
-        // Shinjuku: area=0, line=37 (0x25), station=10 (0x0a)
-        // stationId = (0 shl 16) or (37 shl 8) or 10 = 9482
-        val shinjukuId = (0 shl 16) or (37 shl 8) or 10
-        val shinjuku = reader.getStationById(shinjukuId)
-        assertNotNull(shinjuku, "Shinjuku should be found (id=$shinjukuId)")
-        println("Shinjuku: english=${shinjuku.name.english}, local=${shinjuku.name.local}")
-        assertTrue(
-            shinjuku.name.english.contains("Shinjuku") || shinjuku.name.local.contains("新宿"),
-            "Station should be Shinjuku, got: ${shinjuku.name}",
-        )
-    }
+            // Shinjuku: area=0, line=37 (0x25), station=10 (0x0a)
+            // stationId = (0 shl 16) or (37 shl 8) or 10 = 9482
+            val shinjukuId = (0 shl 16) or (37 shl 8) or 10
+            val shinjuku = reader.getStationById(shinjukuId)
+            assertNotNull(shinjuku, "Shinjuku should be found (id=$shinjukuId)")
+            println("Shinjuku: english=${shinjuku.name.english}, local=${shinjuku.name.local}")
+            assertTrue(
+                shinjuku.name.english.contains("Shinjuku") || shinjuku.name.local.contains("新宿"),
+                "Station should be Shinjuku, got: ${shinjuku.name}",
+            )
+        }
 
     /**
      * Tests Suica bus station lookup.
      */
     @Test
-    fun testSuicaBusStationLookup() {
-        val bytes = runBlocking { Res.readBytes("files/suica_bus.mdst") }
+    fun testSuicaBusStationLookup() =
+        runTest {
+            val bytes = Res.readBytes("files/suica_bus.mdst")
 
-        // Just verify it parses without error and can look up stations
-        val reader = MdstStationTableReader.fromByteArray(bytes)
-        assertNotNull(reader)
-    }
+            // Just verify it parses without error and can look up stations
+            val reader = MdstStationTableReader.fromByteArray(bytes)
+            assertNotNull(reader)
+        }
 
     /**
      * Tests behavior when database is not found.

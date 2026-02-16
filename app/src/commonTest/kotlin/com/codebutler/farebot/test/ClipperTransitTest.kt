@@ -35,7 +35,7 @@ import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
 import com.codebutler.farebot.transit.clipper.ClipperTransitInfo
 import com.codebutler.farebot.transit.clipper.ClipperTrip
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -227,7 +227,7 @@ class ClipperTransitTest {
 
     @Test
     fun testDemoCard() =
-        runBlocking {
+        runTest {
             assertEquals(32 * 2, REFILL.length)
 
             // This is mocked-up data, probably has a wrong checksum.

@@ -52,7 +52,7 @@ class ISO7816CardReaderTest {
             val response: ByteArray,
         )
 
-        private val script = mutableListOf<Exchange>()
+        val script = mutableListOf<Exchange>()
         val sentCommands = mutableListOf<ByteArray>()
 
         fun expect(
