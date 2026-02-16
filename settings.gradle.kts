@@ -16,6 +16,38 @@ dependencyResolutionManagement {
         mavenLocal()
         google()
         mavenCentral()
+        // Required for Kotlin/WASM — the Kotlin Gradle plugin resolves Node.js and Yarn
+        // as dependencies, but they're hosted on their own CDNs, not Maven Central.
+        exclusiveContent {
+            forRepository {
+                ivy("https://nodejs.org/dist/") {
+                    patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+                    metadataSources { artifact() }
+                    content { includeModule("org.nodejs", "node") }
+                }
+            }
+            filter { includeGroup("org.nodejs") }
+        }
+        exclusiveContent {
+            forRepository {
+                ivy("https://github.com/yarnpkg/yarn/releases/download/") {
+                    patternLayout { artifact("v[revision]/[artifact](-v[revision]).[ext]") }
+                    metadataSources { artifact() }
+                    content { includeModule("com.yarnpkg", "yarn") }
+                }
+            }
+            filter { includeGroup("com.yarnpkg") }
+        }
+        exclusiveContent {
+            forRepository {
+                ivy("https://github.com/WebAssembly/binaryen/releases/download/") {
+                    patternLayout { artifact("version_[revision]/[artifact]-version_[revision]-[classifier].[ext]") }
+                    metadataSources { artifact() }
+                    content { includeModule("com.github.webassembly", "binaryen") }
+                }
+            }
+            filter { includeGroup("com.github.webassembly") }
+        }
     }
 }
 

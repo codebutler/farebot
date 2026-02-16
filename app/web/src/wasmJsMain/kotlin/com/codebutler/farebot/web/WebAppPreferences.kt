@@ -5,10 +5,12 @@ package com.codebutler.farebot.web
 import com.codebutler.farebot.shared.platform.AppPreferences
 import kotlin.js.ExperimentalWasmJsInterop
 
-private fun jsLocalStorageGetItem(key: JsString): JsString? =
-    js("localStorage.getItem(key)")
+private fun jsLocalStorageGetItem(key: JsString): JsString? = js("localStorage.getItem(key)")
 
-private fun jsLocalStorageSetItem(key: JsString, value: JsString) {
+private fun jsLocalStorageSetItem(
+    key: JsString,
+    value: JsString,
+) {
     js("localStorage.setItem(key, value)")
 }
 

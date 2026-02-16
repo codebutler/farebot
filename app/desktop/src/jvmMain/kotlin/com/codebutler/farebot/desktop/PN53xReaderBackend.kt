@@ -35,8 +35,8 @@ import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
-import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
 import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
+import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag

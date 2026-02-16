@@ -21,7 +21,10 @@ private fun jsConsoleLog(message: JsString) {
     js("console.log(message)")
 }
 
-private fun jsSaveFile(content: JsString, fileName: JsString) {
+private fun jsSaveFile(
+    content: JsString,
+    fileName: JsString,
+) {
     js(
         """
         (function() {

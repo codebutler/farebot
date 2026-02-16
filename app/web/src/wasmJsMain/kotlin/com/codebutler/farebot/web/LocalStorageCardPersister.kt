@@ -5,11 +5,11 @@ package com.codebutler.farebot.web
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
 private data class SerializableSavedCard(
@@ -38,10 +38,12 @@ private fun SerializableSavedCard.toSavedCard() =
         scannedAt = Instant.fromEpochMilliseconds(scannedAtEpochMillis),
     )
 
-private fun lsGetItem(key: JsString): JsString? =
-    js("localStorage.getItem(key)")
+private fun lsGetItem(key: JsString): JsString? = js("localStorage.getItem(key)")
 
-private fun lsSetItem(key: JsString, value: JsString) {
+private fun lsSetItem(
+    key: JsString,
+    value: JsString,
+) {
     js("localStorage.setItem(key, value)")
 }
 

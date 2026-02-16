@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   bash python3 locales make \
   iptables ipset iproute2 dnsutils aggregate jq nano vim tmux \
   build-essential libncurses-dev libz-dev libc6-dev \
+  bc coreutils findutils diffutils patch gawk sed grep file tree \
+  xz-utils bzip2 gzip tar zip rsync socat netcat-openbsd openssh-client \
+  htop lsof strace \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \
   && ln -sf /bin/bash /bin/sh \
   && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && locale-gen

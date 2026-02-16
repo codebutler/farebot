@@ -1,8 +1,7 @@
 package com.codebutler.farebot.shared.platform
 
 @OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
-private fun getNavigatorLanguage(): JsString =
-    js("(navigator.language || '')")
+private fun getNavigatorLanguage(): JsString = js("(navigator.language || '')")
 
 @OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
 actual fun getDeviceRegion(): String? {

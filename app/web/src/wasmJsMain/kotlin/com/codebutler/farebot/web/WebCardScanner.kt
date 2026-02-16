@@ -34,7 +34,9 @@ class WebCardScanner : CardScanner {
 
     override fun startActiveScan() {
         _scanErrors.tryEmit(
-            UnsupportedOperationException("NFC scanning is not available in the web browser. Import card data from a JSON file instead."),
+            UnsupportedOperationException(
+                "NFC scanning is not available in the web browser. Import card data from a JSON file instead.",
+            ),
         )
     }
 

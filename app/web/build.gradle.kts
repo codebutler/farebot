@@ -27,6 +27,8 @@ kotlin {
             implementation(compose.material3)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+            // kotlinx-datetime uses js-joda on JS/WASM targets, which needs the timezone DB
+            implementation(npm("@js-joda/timezone", "2.22.0"))
         }
     }
 }

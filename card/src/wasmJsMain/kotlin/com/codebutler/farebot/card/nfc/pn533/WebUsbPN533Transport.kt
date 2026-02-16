@@ -30,7 +30,11 @@ package com.codebutler.farebot.card.nfc.pn533
  * implemented in a future phase.
  */
 class WebUsbPN533Transport : PN533Transport {
-    override fun sendCommand(code: Byte, data: ByteArray, timeoutMs: Int): ByteArray {
+    override fun sendCommand(
+        code: Byte,
+        data: ByteArray,
+        timeoutMs: Int,
+    ): ByteArray {
         error("WebUSB PN533 transport not yet implemented")
     }
 
