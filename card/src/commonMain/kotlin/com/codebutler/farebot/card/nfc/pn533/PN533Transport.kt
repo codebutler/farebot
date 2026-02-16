@@ -27,13 +27,13 @@ package com.codebutler.farebot.card.nfc.pn533
  * Handles USB frame serialization and bulk I/O.
  */
 interface PN533Transport {
-    fun sendCommand(
+    suspend fun sendCommand(
         code: Byte,
         data: ByteArray = byteArrayOf(),
         timeoutMs: Int = 5000,
     ): ByteArray
 
-    fun sendAck()
+    suspend fun sendAck()
 
     fun flush()
 

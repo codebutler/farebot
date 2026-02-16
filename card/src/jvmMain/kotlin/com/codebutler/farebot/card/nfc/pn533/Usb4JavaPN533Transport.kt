@@ -54,7 +54,7 @@ class Usb4JavaPN533Transport(
         }
     }
 
-    override fun sendCommand(
+    override suspend fun sendCommand(
         code: Byte,
         data: ByteArray,
         timeoutMs: Int,
@@ -73,7 +73,7 @@ class Usb4JavaPN533Transport(
         return readResponse(timeoutMs)
     }
 
-    override fun sendAck() {
+    override suspend fun sendAck() {
         bulkWrite(ACK_FRAME)
     }
 
