@@ -41,7 +41,7 @@ import kotlin.time.Clock
  * read, but is needed to work around a bug in iOS.
  */
 object FeliCaReader {
-    fun readTag(
+    suspend fun readTag(
         tagId: ByteArray,
         adapter: FeliCaTagAdapter,
         onlyFirst: Boolean = false,

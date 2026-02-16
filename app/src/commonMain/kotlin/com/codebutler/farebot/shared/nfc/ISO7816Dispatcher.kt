@@ -36,7 +36,7 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
  * then falls back to the DESFire protocol if no known application is found.
  */
 object ISO7816Dispatcher {
-    fun readCard(
+    suspend fun readCard(
         tagId: ByteArray,
         transceiver: CardTransceiver,
     ): RawCard<*> {
@@ -47,7 +47,7 @@ object ISO7816Dispatcher {
         return DesfireCardReader.readCard(tagId, transceiver)
     }
 
-    private fun tryISO7816(
+    private suspend fun tryISO7816(
         tagId: ByteArray,
         transceiver: CardTransceiver,
     ): RawCard<*>? {
