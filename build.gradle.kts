@@ -52,6 +52,19 @@ subprojects {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
         }
+
+        // Disable wasmJs test compilation/linking for all modules except app:web.
+        // The Kotlin/Wasm IR linker is extremely slow for test executables and these
+        // library modules get sufficient test coverage from jvmTest.
+        if (project.path != ":app:web") {
+            afterEvaluate {
+                tasks.configureEach {
+                    if (name.contains("WasmJs", ignoreCase = true) && name.contains("Test", ignoreCase = true)) {
+                        enabled = false
+                    }
+                }
+            }
+        }
     }
 
     plugins.withId("org.jetbrains.compose") {
