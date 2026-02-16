@@ -33,14 +33,14 @@ import kotlin.time.Instant
  * Represents trip events on Go Card.
  */
 class SeqGoTrip(
-    private val journeyId: Int,
-    private val modeValue: Mode,
-    private val startTime: Instant?,
-    private val endTime: Instant?,
-    private val startStationId: Int,
-    private val endStationId: Int,
-    private val startStationValue: Station?,
-    private val endStationValue: Station?,
+    private val journeyId: Int = 0,
+    private val modeValue: Mode = Mode.OTHER,
+    private val startTime: Instant? = null,
+    private val endTime: Instant? = null,
+    private val startStationId: Int = 0,
+    private val endStationId: Int = 0,
+    private val startStationValue: Station? = null,
+    private val endStationValue: Station? = null,
 ) : Trip() {
     override val startTimestamp: Instant? get() = startTime
 
@@ -75,46 +75,4 @@ class SeqGoTrip(
 
     fun getEndStationId(): Int = endStationId
 
-    class Builder {
-        private var journeyId: Int = 0
-        private var mode: Mode = Mode.OTHER
-        private var startTime: Instant? = null
-        private var endTime: Instant? = null
-        private var startStationId: Int = 0
-        private var endStationId: Int = 0
-        private var startStation: Station? = null
-        private var endStation: Station? = null
-
-        fun journeyId(journeyId: Int) = apply { this.journeyId = journeyId }
-
-        fun mode(mode: Mode) = apply { this.mode = mode }
-
-        fun startTime(startTime: Instant?) = apply { this.startTime = startTime }
-
-        fun endTime(endTime: Instant?) = apply { this.endTime = endTime }
-
-        fun startStationId(startStationId: Int) = apply { this.startStationId = startStationId }
-
-        fun endStationId(endStationId: Int) = apply { this.endStationId = endStationId }
-
-        fun startStation(station: Station?) = apply { this.startStation = station }
-
-        fun endStation(station: Station?) = apply { this.endStation = station }
-
-        fun build(): SeqGoTrip =
-            SeqGoTrip(
-                journeyId = journeyId,
-                modeValue = mode,
-                startTime = startTime,
-                endTime = endTime,
-                startStationId = startStationId,
-                endStationId = endStationId,
-                startStationValue = startStation,
-                endStationValue = endStation,
-            )
-    }
-
-    companion object {
-        fun builder(): Builder = Builder()
-    }
 }
