@@ -25,6 +25,7 @@
 package com.codebutler.farebot.transit.hsl
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -51,12 +52,12 @@ class HSLTransitInfo(
         get() = TransitBalance(balance = TransitCurrency.EUR(mBalance))
 
     override suspend fun getAdvancedUi(): FareBotUiTree? {
-        val b = FareBotUiTree.builder()
-        applicationVersion?.let { b.item().title(Res.string.hsl_application_version).value(it) }
-        applicationKeyVersion?.let { b.item().title(Res.string.hsl_application_key_version).value(it) }
-        platformType?.let { b.item().title(Res.string.hsl_platform_type).value(it) }
-        securityLevel?.let { b.item().title(Res.string.hsl_security_level).value(it) }
-        val tree = b.build()
+        val tree = uiTree {
+            applicationVersion?.let { item { title = Res.string.hsl_application_version; value = it } }
+            applicationKeyVersion?.let { item { title = Res.string.hsl_application_key_version; value = it } }
+            platformType?.let { item { title = Res.string.hsl_platform_type; value = it } }
+            securityLevel?.let { item { title = Res.string.hsl_security_level; value = it } }
+        }
         return if (tree.items.isEmpty()) null else tree
     }
 }

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.umarsh
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.FormattedString
@@ -82,11 +83,11 @@ class UmarshTransitInfo(
     override suspend fun getAdvancedUi(): FareBotUiTree? {
         val rubSectors = sectors.filter { it.denomination == UmarshDenomination.RUB }
         if (rubSectors.isEmpty()) return null
-        val b = FareBotUiTree.builder()
-        for (sec in rubSectors) {
-            b.item().title(Res.string.umarsh_machine_id).value(sec.machineId.toString())
+        return uiTree {
+            for (sec in rubSectors) {
+                item { title = Res.string.umarsh_machine_id; value = sec.machineId.toString() }
+            }
         }
-        return b.build()
     }
 
     override val trips: List<Trip>?

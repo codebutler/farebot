@@ -11,6 +11,7 @@
 package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.FormattedString
@@ -43,10 +44,8 @@ class HoloTransitInfo(
                 ),
             )
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val b = FareBotUiTree.builder()
-        b.item().title(Res.string.manufacture_id).value(mManufacturingId)
-        return b.build()
+    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
+        item { title = Res.string.manufacture_id; value = mManufacturingId }
     }
 
     override val reason get() = Reason.NOT_STORED

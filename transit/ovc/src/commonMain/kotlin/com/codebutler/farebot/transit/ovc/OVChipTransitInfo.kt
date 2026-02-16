@@ -25,6 +25,7 @@
 package com.codebutler.farebot.transit.ovc
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
@@ -148,13 +149,13 @@ class OVChipTransitInfo(
             return li
         }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val b = FareBotUiTree.builder()
-        b.item().title("Credit Slot ID").value(creditSlotId.toString())
-        b.item().title("Last Credit ID").value(creditId.toString())
-        val slotsItem = b.item().title("Recent Slots")
-        index.addAdvancedItems(slotsItem)
-        return b.build()
+    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
+        item { title = "Credit Slot ID"; value = creditSlotId.toString() }
+        item { title = "Last Credit ID"; value = creditId.toString() }
+        item {
+            title = "Recent Slots"
+            addChildren(index.advancedItems())
+        }
     }
 
     companion object {

@@ -11,6 +11,7 @@
 package com.codebutler.farebot.transit.serialonly
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import farebot.transit.serialonly.generated.resources.Res
 import farebot.transit.serialonly.generated.resources.card_name_strelka
@@ -19,10 +20,8 @@ import farebot.transit.serialonly.generated.resources.strelka_long_serial
 class StrelkaTransitInfo(
     private val mSerial: String,
 ) : SerialOnlyTransitInfo() {
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val b = FareBotUiTree.builder()
-        b.item().title(Res.string.strelka_long_serial).value(mSerial)
-        return b.build()
+    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
+        item { title = Res.string.strelka_long_serial; value = mSerial }
     }
 
     override val reason get() = Reason.MORE_RESEARCH_NEEDED
