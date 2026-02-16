@@ -58,7 +58,7 @@ internal class UltralightProtocol(
      * @return MIFARE Ultralight card type.
      * @throws Exception On card communication error (eg: reconnects)
      */
-    fun getCardType(): UltralightTypeRaw {
+    suspend fun getCardType(): UltralightTypeRaw {
         // Try EV1's GET_VERSION command
         // This isn't supported by non-UL EV1s, and will cause those cards to disconnect.
         try {
@@ -97,7 +97,7 @@ internal class UltralightProtocol(
      * @throws Exception on card communication failure, or if the card does not support the
      * command.
      */
-    private fun getVersion(): ByteArray = sendRequest(GET_VERSION)
+    private suspend fun getVersion(): ByteArray = sendRequest(GET_VERSION)
 
     /**
      * Gets a nonce for 3DES authentication from the card. This only works on MIFARE Ultralight C
@@ -106,7 +106,7 @@ internal class UltralightProtocol(
      * @throws Exception on card communication failure, or if the card does not support the
      * command.
      */
-    private fun auth1(): ByteArray = sendRequest(AUTH_1, 0x00.toByte())
+    private suspend fun auth1(): ByteArray = sendRequest(AUTH_1, 0x00.toByte())
 
     /**
      * Instructs the card to terminate its session. This is supported by all Ultralight cards.
@@ -114,7 +114,7 @@ internal class UltralightProtocol(
      * This will silently swallow all communication failures, as Android returning an error is
      * to be expected.
      */
-    private fun halt() {
+    private suspend fun halt() {
         try {
             sendRequest(HALT, 0x00.toByte())
         } catch (e: Exception) {
@@ -124,7 +124,7 @@ internal class UltralightProtocol(
         }
     }
 
-    private fun sendRequest(vararg data: Byte): ByteArray {
+    private suspend fun sendRequest(vararg data: Byte): ByteArray {
         println("UltralightProtocol: sent card: ${data.hex()}")
 
         return mTagTech.transceive(data)

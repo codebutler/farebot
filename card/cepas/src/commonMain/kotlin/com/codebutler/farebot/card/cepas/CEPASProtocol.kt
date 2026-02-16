@@ -30,7 +30,7 @@ import com.codebutler.farebot.card.iso7816.ISO7816Protocol
 internal class CEPASProtocol(
     private val protocol: ISO7816Protocol,
 ) {
-    fun getPurse(purseId: Int): ByteArray? =
+    suspend fun getPurse(purseId: Int): ByteArray? =
         try {
             val result =
                 protocol.sendRequest(
@@ -45,7 +45,7 @@ internal class CEPASProtocol(
             null
         }
 
-    fun getHistory(purseId: Int): ByteArray? {
+    suspend fun getHistory(purseId: Int): ByteArray? {
         var historyBuff: ByteArray
         try {
             historyBuff =

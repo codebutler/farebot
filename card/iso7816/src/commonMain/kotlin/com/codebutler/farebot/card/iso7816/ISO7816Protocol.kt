@@ -79,7 +79,7 @@ class ISO7816Protocol(
         return output
     }
 
-    private fun sendRequestReal(
+    private suspend fun sendRequestReal(
         cla: Byte,
         ins: Byte,
         p1: Byte,
@@ -108,7 +108,7 @@ class ISO7816Protocol(
      * @param parameters Additional data to be sent in a command.
      * @return Response data (without status bytes).
      */
-    fun sendRequest(
+    suspend fun sendRequest(
         cla: Byte,
         ins: Byte,
         p1: Byte,
@@ -153,7 +153,7 @@ class ISO7816Protocol(
         return recvBuffer.copyOfRange(0, recvBuffer.size - 2)
     }
 
-    fun selectByName(
+    suspend fun selectByName(
         name: ByteArray,
         nextOccurrence: Boolean = false,
     ): ByteArray =
@@ -166,7 +166,7 @@ class ISO7816Protocol(
             name,
         )
 
-    fun selectByNameOrNull(name: ByteArray): ByteArray? =
+    suspend fun selectByNameOrNull(name: ByteArray): ByteArray? =
         try {
             selectByName(name, false)
         } catch (e: ISO7816Exception) {
@@ -175,11 +175,11 @@ class ISO7816Protocol(
             null
         }
 
-    fun unselectFile() {
+    suspend fun unselectFile() {
         sendRequest(CLASS_ISO7816, INSTRUCTION_ISO7816_SELECT, 0.toByte(), 0.toByte(), 0.toByte())
     }
 
-    fun selectById(fileId: Int): ByteArray {
+    suspend fun selectById(fileId: Int): ByteArray {
         val file = byteArrayOf((fileId shr 8).toByte(), fileId.toByte())
         return sendRequest(
             CLASS_ISO7816,
@@ -191,7 +191,7 @@ class ISO7816Protocol(
         )
     }
 
-    fun readRecord(
+    suspend fun readRecord(
         recordNumber: Byte,
         length: Byte,
     ): ByteArray? =
@@ -209,7 +209,7 @@ class ISO7816Protocol(
             null
         }
 
-    fun readRecord(
+    suspend fun readRecord(
         sfi: Int,
         recordNumber: Byte,
         length: Byte,
@@ -228,7 +228,7 @@ class ISO7816Protocol(
             null
         }
 
-    fun readBinary(): ByteArray? =
+    suspend fun readBinary(): ByteArray? =
         try {
             sendRequest(
                 CLASS_ISO7816,
@@ -243,7 +243,7 @@ class ISO7816Protocol(
             null
         }
 
-    fun readBinary(sfi: Int): ByteArray? =
+    suspend fun readBinary(sfi: Int): ByteArray? =
         try {
             sendRequest(
                 CLASS_ISO7816,
