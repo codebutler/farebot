@@ -24,6 +24,7 @@
 package com.codebutler.farebot.card.iso7816
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -51,45 +52,52 @@ data class ISO7816Card(
     fun getApplicationByName(appName: ByteArray): ISO7816Application? =
         applications.firstOrNull { it.appName?.toHexString() == appName.toHexString() }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder()
+    override suspend fun getAdvancedUi(): FareBotUiTree = uiTree {
+        item {
+            title = "Applications"
+            for (app in applications) {
+                item {
+                    val appNameStr = app.appName?.let { formatAID(it) } ?: "Unknown"
+                    title = "Application: $appNameStr (${app.type})"
 
-        val appsUiBuilder = cardUiBuilder.item().title("Applications")
-        for (app in applications) {
-            val appUiBuilder = appsUiBuilder.item()
-            val appNameStr = app.appName?.let { formatAID(it) } ?: "Unknown"
-            appUiBuilder.title("Application: $appNameStr (${app.type})")
+                    // Show files
+                    if (app.files.isNotEmpty()) {
+                        item {
+                            title = "Files"
+                            for ((selector, file) in app.files) {
+                                item {
+                                    title = "File: $selector"
+                                    if (file.binaryData != null) {
+                                        item { title = "Binary Data"; value = file.binaryData }
+                                    }
+                                    for ((index, record) in file.records.entries.sortedBy { it.key }) {
+                                        item { title = "Record $index"; value = record }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-            // Show files
-            if (app.files.isNotEmpty()) {
-                val filesUiBuilder = appUiBuilder.item().title("Files")
-                for ((selector, file) in app.files) {
-                    val fileUiBuilder = filesUiBuilder.item().title("File: $selector")
-                    if (file.binaryData != null) {
-                        fileUiBuilder.item().title("Binary Data").value(file.binaryData)
-                    }
-                    for ((index, record) in file.records.entries.sortedBy { it.key }) {
-                        fileUiBuilder.item().title("Record $index").value(record)
-                    }
-                }
-            }
-
-            // Show SFI files
-            if (app.sfiFiles.isNotEmpty()) {
-                val sfiUiBuilder = appUiBuilder.item().title("SFI Files")
-                for ((sfi, file) in app.sfiFiles.entries.sortedBy { it.key }) {
-                    val fileUiBuilder = sfiUiBuilder.item().title("SFI 0x${sfi.toString(16)}")
-                    if (file.binaryData != null) {
-                        fileUiBuilder.item().title("Binary Data").value(file.binaryData)
-                    }
-                    for ((index, record) in file.records.entries.sortedBy { it.key }) {
-                        fileUiBuilder.item().title("Record $index").value(record)
+                    // Show SFI files
+                    if (app.sfiFiles.isNotEmpty()) {
+                        item {
+                            title = "SFI Files"
+                            for ((sfi, file) in app.sfiFiles.entries.sortedBy { it.key }) {
+                                item {
+                                    title = "SFI 0x${sfi.toString(16)}"
+                                    if (file.binaryData != null) {
+                                        item { title = "Binary Data"; value = file.binaryData }
+                                    }
+                                    for ((index, record) in file.records.entries.sortedBy { it.key }) {
+                                        item { title = "Record $index"; value = record }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-
-        return cardUiBuilder.build()
     }
 
     companion object {
