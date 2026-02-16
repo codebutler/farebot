@@ -22,44 +22,59 @@
 
 package com.codebutler.farebot.base.ui
 
+import com.codebutler.farebot.base.util.FormattedString
 import org.jetbrains.compose.resources.StringResource
 
 @DslMarker
 private annotation class UiTreeBuilderMarker
 
-suspend fun uiTree(init: TreeScope.() -> Unit): FareBotUiTree {
-    val uiBuilder = FareBotUiTree.builder()
-    TreeScope(uiBuilder).init()
-    return uiBuilder.build()
+fun uiTree(init: TreeScope.() -> Unit): FareBotUiTree {
+    val scope = TreeScope()
+    scope.init()
+    return FareBotUiTree(scope.items.toList())
 }
 
 @UiTreeBuilderMarker
-class TreeScope(
-    private val uiBuilder: FareBotUiTree.Builder,
-) {
+class TreeScope {
+    internal val items = mutableListOf<FareBotUiTree.Item>()
+
     fun item(init: ItemScope.() -> Unit) {
-        ItemScope(uiBuilder.item()).init()
+        val scope = ItemScope()
+        scope.init()
+        items.add(scope.build())
     }
 }
 
 @UiTreeBuilderMarker
-class ItemScope(
-    private val item: FareBotUiTree.Item.Builder,
-) {
-    var title: Any? = null
+class ItemScope {
+    private var _title: FormattedString = FormattedString("")
+    var title: Any?
+        get() = _title
         set(value) {
-            when (value) {
-                is StringResource -> item.title(value)
-                else -> item.title(value.toString())
+            _title = when (value) {
+                is FormattedString -> value
+                is StringResource -> FormattedString(value)
+                else -> FormattedString(value.toString())
             }
         }
 
     var value: Any? = null
-        set(value) {
-            item.value(value)
-        }
+
+    private val children = mutableListOf<FareBotUiTree.Item>()
 
     fun item(init: ItemScope.() -> Unit) {
-        ItemScope(item.item()).init()
+        val scope = ItemScope()
+        scope.init()
+        children.add(scope.build())
     }
+
+    fun addChildren(items: List<FareBotUiTree.Item>) {
+        children.addAll(items)
+    }
+
+    internal fun build(): FareBotUiTree.Item = FareBotUiTree.Item(
+        title = _title,
+        value = value,
+        children = children.toList(),
+    )
 }
