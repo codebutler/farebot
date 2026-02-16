@@ -63,7 +63,7 @@ class IosUltralightTechnology(
                 else -> UltralightTechnology.TYPE_ULTRALIGHT
             }
 
-    override fun readPages(pageOffset: Int): ByteArray {
+    override suspend fun readPages(pageOffset: Int): ByteArray {
         // MIFARE Ultralight READ command: 0x30 followed by the page number.
         // Returns 16 bytes (4 consecutive pages of 4 bytes each).
         val readCommand = byteArrayOf(0x30, pageOffset.toByte())
@@ -88,7 +88,7 @@ class IosUltralightTechnology(
             ?: throw Exception("Ultralight read returned null at page $pageOffset")
     }
 
-    override fun transceive(data: ByteArray): ByteArray {
+    override suspend fun transceive(data: ByteArray): ByteArray {
         val semaphore = dispatch_semaphore_create(0)
         var result: NSData? = null
         var nfcError: NSError? = null

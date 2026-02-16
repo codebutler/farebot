@@ -51,7 +51,7 @@ class AndroidFeliCaTagAdapter(
         return idm
     }
 
-    override fun getSystemCodes(): List<Int> {
+    override suspend fun getSystemCodes(): List<Int> {
         val idm = currentIdm ?: throw Exception("Must call getIDm() first")
         // Build REQUEST_SYSTEMCODE command: length, command, IDm
         val cmd = buildCommand(FeliCaConstants.COMMAND_REQUEST_SYSTEMCODE, idm)
@@ -70,7 +70,7 @@ class AndroidFeliCaTagAdapter(
         return codes
     }
 
-    override fun selectSystem(systemCode: Int): ByteArray? {
+    override suspend fun selectSystem(systemCode: Int): ByteArray? {
         val response = polling(systemCode) ?: return null
         if (response.size < 18) return null
         // Update current IDm from polling response
@@ -79,7 +79,7 @@ class AndroidFeliCaTagAdapter(
         return response.copyOfRange(10, 18)
     }
 
-    override fun getServiceCodes(): List<Int> {
+    override suspend fun getServiceCodes(): List<Int> {
         val idm = currentIdm ?: throw Exception("Must call getIDm() first")
         val serviceCodes = mutableListOf<Int>()
         var index = 1 // 0 is root area, start from 1
@@ -111,7 +111,7 @@ class AndroidFeliCaTagAdapter(
         return serviceCodes
     }
 
-    override fun readBlock(
+    override suspend fun readBlock(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray? {

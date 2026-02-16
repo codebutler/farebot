@@ -46,7 +46,7 @@ class IosFeliCaTagAdapter(
 ) : FeliCaTagAdapter {
     override fun getIDm(): ByteArray = tag.currentIDm.toByteArray()
 
-    override fun getSystemCodes(): List<Int> {
+    override suspend fun getSystemCodes(): List<Int> {
         val semaphore = dispatch_semaphore_create(0)
         var codes: List<*>? = null
         var nfcError: NSError? = null
@@ -72,7 +72,7 @@ class IosFeliCaTagAdapter(
         } ?: emptyList()
     }
 
-    override fun selectSystem(systemCode: Int): ByteArray? {
+    override suspend fun selectSystem(systemCode: Int): ByteArray? {
         val semaphore = dispatch_semaphore_create(0)
         var pmmData: NSData? = null
         var nfcError: NSError? = null
@@ -99,7 +99,7 @@ class IosFeliCaTagAdapter(
         return pmmData?.toByteArray()
     }
 
-    override fun getServiceCodes(): List<Int> {
+    override suspend fun getServiceCodes(): List<Int> {
         val candidates = mutableListOf<Int>()
         for (n in 0 until MAX_SERVICE_NUMBER) {
             for (attr in PROBE_ATTRIBUTES) {
@@ -122,7 +122,7 @@ class IosFeliCaTagAdapter(
         return discovered
     }
 
-    override fun readBlock(
+    override suspend fun readBlock(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray? {

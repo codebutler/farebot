@@ -39,7 +39,7 @@ class PN533FeliCaTagAdapter(
 
     override fun getIDm(): ByteArray = currentIdm
 
-    override fun getSystemCodes(): List<Int> {
+    override suspend fun getSystemCodes(): List<Int> {
         val cmd = buildFelicaCommand(FeliCaConstants.COMMAND_REQUEST_SYSTEMCODE, currentIdm)
         val response = transceiveFelica(cmd) ?: return emptyList()
         if (response.size < 11) return emptyList()
@@ -55,14 +55,14 @@ class PN533FeliCaTagAdapter(
         return codes
     }
 
-    override fun selectSystem(systemCode: Int): ByteArray? {
+    override suspend fun selectSystem(systemCode: Int): ByteArray? {
         val response = polling(systemCode) ?: return null
         if (response.size < 18) return null
         currentIdm = response.copyOfRange(2, 10)
         return response.copyOfRange(10, 18)
     }
 
-    override fun getServiceCodes(): List<Int> {
+    override suspend fun getServiceCodes(): List<Int> {
         val serviceCodes = mutableListOf<Int>()
         var index = 1
 
@@ -94,7 +94,7 @@ class PN533FeliCaTagAdapter(
         return serviceCodes
     }
 
-    override fun readBlock(
+    override suspend fun readBlock(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray? {
@@ -121,7 +121,7 @@ class PN533FeliCaTagAdapter(
         return response.copyOfRange(13, 13 + 16)
     }
 
-    private fun polling(systemCode: Int): ByteArray? {
+    private suspend fun polling(systemCode: Int): ByteArray? {
         val cmd =
             buildFelicaCommand(
                 FeliCaConstants.COMMAND_POLLING,
@@ -143,7 +143,7 @@ class PN533FeliCaTagAdapter(
         return byteArrayOf(length.toByte(), commandCode) + idm + data
     }
 
-    private fun transceiveFelica(felicaFrame: ByteArray): ByteArray? =
+    private suspend fun transceiveFelica(felicaFrame: ByteArray): ByteArray? =
         try {
             pn533.inCommunicateThru(felicaFrame)
         } catch (_: Exception) {

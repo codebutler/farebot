@@ -49,7 +49,7 @@ class PCSCCardTransceiver(
 
     override val isConnected: Boolean get() = connected
 
-    override fun transceive(data: ByteArray): ByteArray {
+    override suspend fun transceive(data: ByteArray): ByteArray {
         val command = CommandAPDU(data)
         val response: ResponseAPDU = channel.transmit(command)
         // Return full response including SW1 SW2 for protocols that expect it

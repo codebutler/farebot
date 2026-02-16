@@ -66,7 +66,7 @@ class IosVicinityTechnology(
      * - 102: End of memory (no more blocks to read)
      * - 100: Tag lost
      */
-    override fun transceive(data: ByteArray): ByteArray {
+    override suspend fun transceive(data: ByteArray): ByteArray {
         // Parse the command to extract block number
         // Expected format: [flags, cmd, ...uid..., blockNumber]
         // For ISO 15693: flags=0x22, cmd=0x20 (read single block), uid=8 bytes, blockNum=1 byte

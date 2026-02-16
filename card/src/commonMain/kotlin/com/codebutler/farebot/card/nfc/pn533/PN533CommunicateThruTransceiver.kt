@@ -51,7 +51,7 @@ class PN533CommunicateThruTransceiver(
 
     override val isConnected: Boolean get() = connected
 
-    override fun transceive(data: ByteArray): ByteArray {
+    override suspend fun transceive(data: ByteArray): ByteArray {
         val pcb = (0x02 or blockNumber).toByte()
         val frame = byteArrayOf(pcb) + data
         var response = pn533.inCommunicateThru(frame)

@@ -52,17 +52,17 @@ class PCSCClassicTechnology(
 
     override val sectorCount: Int get() = info.classicSectorCount
 
-    override fun authenticateSectorWithKeyA(
+    override suspend fun authenticateSectorWithKeyA(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean = authenticate(sectorIndex, key, KEY_TYPE_A)
 
-    override fun authenticateSectorWithKeyB(
+    override suspend fun authenticateSectorWithKeyB(
         sectorIndex: Int,
         key: ByteArray,
     ): Boolean = authenticate(sectorIndex, key, KEY_TYPE_B)
 
-    override fun readBlock(blockIndex: Int): ByteArray {
+    override suspend fun readBlock(blockIndex: Int): ByteArray {
         // READ BINARY: FF B0 00 {block} 10
         val command = CommandAPDU(0xFF, 0xB0, 0x00, blockIndex, 16)
         val response = channel.transmit(command)
