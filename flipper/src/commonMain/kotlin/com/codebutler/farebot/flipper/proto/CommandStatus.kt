@@ -1,5 +1,5 @@
 /*
- * FlipperMain.kt
+ * CommandStatus.kt
  *
  * This file is part of FareBot.
  * Learn more at: https://codebutler.github.io/farebot/

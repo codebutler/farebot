@@ -25,16 +25,16 @@ package com.codebutler.farebot.flipper
 class MockTransport : FlipperTransport {
     val writtenData = mutableListOf<ByteArray>()
     private val responseBuffer = mutableListOf<Byte>()
-    private var _connected = false
+    private var connected = false
 
-    override val isConnected: Boolean get() = _connected
+    override val isConnected: Boolean get() = connected
 
     override suspend fun connect() {
-        _connected = true
+        connected = true
     }
 
     override suspend fun close() {
-        _connected = false
+        connected = false
     }
 
     override suspend fun write(data: ByteArray) {
