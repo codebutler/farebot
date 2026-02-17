@@ -11,8 +11,6 @@ interface PlatformActions {
 
     fun copyToClipboard(text: String)
 
-    fun getClipboardText(): String?
-
     fun shareText(text: String)
 
     fun showToast(message: String)

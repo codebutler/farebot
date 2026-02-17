@@ -10,6 +10,11 @@ import kotlin.js.ExperimentalWasmJsInterop
  * Load a compose resource file synchronously via XMLHttpRequest.
  * Returns base64-encoded content, or null on failure.
  *
+ * Uses overrideMimeType('text/plain; charset=x-user-defined') because browsers
+ * throw InvalidAccessError when setting responseType on synchronous XHR.
+ * The x-user-defined charset maps each byte to a Unicode code point, which
+ * we convert back to bytes via charCodeAt(i) & 0xFF.
+ *
  * Compose Resources for wasmJs serves files at:
  *   composeResources/{package}/files/{filename}
  */
@@ -20,15 +25,18 @@ private fun jsLoadResourceBase64(url: JsString): JsString? =
         try {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, false);
-            xhr.responseType = 'arraybuffer';
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
             xhr.send();
             if (xhr.status !== 200 && xhr.status !== 0) return null;
-            var bytes = new Uint8Array(xhr.response);
-            if (bytes.length === 0) return null;
+            var text = xhr.responseText;
+            if (text.length === 0) return null;
             var binary = '';
-            bytes.forEach(function(b) { binary += String.fromCharCode(b); });
+            for (var i = 0; i < text.length; i++) {
+                binary += String.fromCharCode(text.charCodeAt(i) & 0xFF);
+            }
             return btoa(binary);
         } catch(e) {
+            console.error('Failed to load resource: ' + url, e);
             return null;
         }
     })()

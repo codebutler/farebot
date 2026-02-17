@@ -125,11 +125,6 @@ class WebPlatformActions : PlatformActions {
         jsCopyToClipboard(text.toJsString())
     }
 
-    override fun getClipboardText(): String? {
-        // Clipboard read requires async permission; return null for now
-        return null
-    }
-
     override fun shareText(text: String) {
         copyToClipboard(text)
         showToast("Copied to clipboard")

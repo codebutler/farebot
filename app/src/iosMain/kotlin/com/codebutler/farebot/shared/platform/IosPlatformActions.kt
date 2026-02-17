@@ -60,8 +60,6 @@ class IosPlatformActions : PlatformActions {
         UIPasteboard.generalPasteboard.string = text
     }
 
-    override fun getClipboardText(): String? = UIPasteboard.generalPasteboard.string
-
     override fun shareText(text: String) {
         val viewController =
             getTopViewController() ?: run {
