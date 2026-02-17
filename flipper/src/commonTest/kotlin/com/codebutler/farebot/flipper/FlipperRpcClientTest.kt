@@ -28,7 +28,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FlipperRpcClientTest {
-
     @Test
     fun testFrameMessage() {
         // Verify that a message of N bytes is prefixed with varint(N)
@@ -49,133 +48,147 @@ class FlipperRpcClientTest {
     }
 
     @Test
-    fun testConnectSendsStartRpcSession() = runTest {
-        val transport = MockTransport()
-        val client = FlipperRpcClient(transport)
+    fun testConnectSendsStartRpcSession() =
+        runTest {
+            val transport = MockTransport()
+            val client = FlipperRpcClient(transport)
 
-        // Enqueue a valid ping response (Main envelope with command_id=1, status=OK, ping_response)
-        // Main fields: command_id=1 (field 1, varint), command_status=0 (field 2, varint),
-        //              has_next=false (field 3, varint=0), system_ping_response (field 5, LEN)
-        val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
+            // Enqueue a valid ping response (Main envelope with command_id=1, status=OK, ping_response)
+            // Main fields: command_id=1 (field 1, varint), command_status=0 (field 2, varint),
+            //              has_next=false (field 3, varint=0), system_ping_response (field 5, LEN)
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
-        client.connect()
+            client.connect()
 
-        assertTrue(transport.isConnected)
-        assertTrue(transport.writtenData.isNotEmpty())
-        val firstWrite = transport.writtenData[0].decodeToString()
-        assertTrue(firstWrite.contains("start_rpc_session"), "First write should be start_rpc_session")
-    }
+            assertTrue(transport.isConnected)
+            assertTrue(transport.writtenData.isNotEmpty())
+            val firstWrite = transport.writtenData[0].decodeToString()
+            assertTrue(firstWrite.contains("start_rpc_session"), "First write should be start_rpc_session")
+        }
 
     @Test
     fun testBuildMainEnvelope() {
         // Build envelope with command_id=1, empty ping request (field 4)
-        val envelope = FlipperRpcClient.buildMainEnvelope(
-            commandId = 1,
-            contentFieldNumber = 4,
-            contentBytes = byteArrayOf(),
-        )
+        val envelope =
+            FlipperRpcClient.buildMainEnvelope(
+                commandId = 1,
+                contentFieldNumber = 4,
+                contentBytes = byteArrayOf(),
+            )
         // Should start with field 1 (command_id) tag = 0x08, then varint 1
         assertEquals(0x08.toByte(), envelope[0])
         assertEquals(0x01.toByte(), envelope[1])
     }
 
     @Test
-    fun testListDirectory() = runTest {
-        val transport = MockTransport()
-        val client = FlipperRpcClient(transport)
+    fun testListDirectory() =
+        runTest {
+            val transport = MockTransport()
+            val client = FlipperRpcClient(transport)
 
-        // Enqueue ping response for connect
-        val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
+            // Enqueue ping response for connect
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
-        client.connect()
+            client.connect()
 
-        // Build a StorageListResponse with two files
-        val listResponseContent = buildStorageListResponseBytes(
-            listOf(
-                TestFileEntry("card.nfc", isDir = false, size = 1024u),
-                TestFileEntry("keys", isDir = true, size = 0u),
-            ),
-        )
-        val listResponse = buildMainEnvelope(
-            commandId = 2,
-            contentFieldNumber = 20, // storage_list_response
-            contentBytes = listResponseContent,
-        )
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(listResponse))
+            // Build a StorageListResponse with two files
+            val listResponseContent =
+                buildStorageListResponseBytes(
+                    listOf(
+                        TestFileEntry("card.nfc", isDir = false, size = 1024u),
+                        TestFileEntry("keys", isDir = true, size = 0u),
+                    ),
+                )
+            val listResponse =
+                buildMainEnvelope(
+                    commandId = 2,
+                    contentFieldNumber = 20, // storage_list_response
+                    contentBytes = listResponseContent,
+                )
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(listResponse))
 
-        val files = client.listDirectory("/ext/nfc")
-        assertEquals(2, files.size)
-        assertEquals("card.nfc", files[0].name)
-        assertEquals(false, files[0].isDirectory)
-        assertEquals("keys", files[1].name)
-        assertEquals(true, files[1].isDirectory)
-    }
-
-    @Test
-    fun testReadFile() = runTest {
-        val transport = MockTransport()
-        val client = FlipperRpcClient(transport)
-
-        // Enqueue ping response for connect
-        val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
-
-        client.connect()
-
-        // Build a StorageReadResponse with file data
-        val fileData = "Filetype: Flipper NFC device\n".encodeToByteArray()
-        val readResponseContent = buildStorageReadResponseBytes(fileData)
-        val readResponse = buildMainEnvelope(
-            commandId = 2,
-            contentFieldNumber = 22, // storage_read_response
-            contentBytes = readResponseContent,
-        )
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse))
-
-        val data = client.readFile("/ext/nfc/card.nfc")
-        assertEquals("Filetype: Flipper NFC device\n", data.decodeToString())
-    }
+            val files = client.listDirectory("/ext/nfc")
+            assertEquals(2, files.size)
+            assertEquals("card.nfc", files[0].name)
+            assertEquals(false, files[0].isDirectory)
+            assertEquals("keys", files[1].name)
+            assertEquals(true, files[1].isDirectory)
+        }
 
     @Test
-    fun testMultiPartReadFile() = runTest {
-        val transport = MockTransport()
-        val client = FlipperRpcClient(transport)
+    fun testReadFile() =
+        runTest {
+            val transport = MockTransport()
+            val client = FlipperRpcClient(transport)
 
-        // Enqueue ping response for connect
-        val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
+            // Enqueue ping response for connect
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
-        client.connect()
+            client.connect()
 
-        // Part 1: has_next = true
-        val chunk1 = "Hello, ".encodeToByteArray()
-        val readResponse1 = buildMainEnvelope(
-            commandId = 2,
-            contentFieldNumber = 22,
-            contentBytes = buildStorageReadResponseBytes(chunk1),
-            hasNext = true,
-        )
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse1))
+            // Build a StorageReadResponse with file data
+            val fileData = "Filetype: Flipper NFC device\n".encodeToByteArray()
+            val readResponseContent = buildStorageReadResponseBytes(fileData)
+            val readResponse =
+                buildMainEnvelope(
+                    commandId = 2,
+                    contentFieldNumber = 22, // storage_read_response
+                    contentBytes = readResponseContent,
+                )
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse))
 
-        // Part 2: has_next = false (final)
-        val chunk2 = "World!".encodeToByteArray()
-        val readResponse2 = buildMainEnvelope(
-            commandId = 2,
-            contentFieldNumber = 22,
-            contentBytes = buildStorageReadResponseBytes(chunk2),
-            hasNext = false,
-        )
-        transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse2))
+            val data = client.readFile("/ext/nfc/card.nfc")
+            assertEquals("Filetype: Flipper NFC device\n", data.decodeToString())
+        }
 
-        val data = client.readFile("/ext/nfc/card.nfc")
-        assertEquals("Hello, World!", data.decodeToString())
-    }
+    @Test
+    fun testMultiPartReadFile() =
+        runTest {
+            val transport = MockTransport()
+            val client = FlipperRpcClient(transport)
+
+            // Enqueue ping response for connect
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
+
+            client.connect()
+
+            // Part 1: has_next = true
+            val chunk1 = "Hello, ".encodeToByteArray()
+            val readResponse1 =
+                buildMainEnvelope(
+                    commandId = 2,
+                    contentFieldNumber = 22,
+                    contentBytes = buildStorageReadResponseBytes(chunk1),
+                    hasNext = true,
+                )
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse1))
+
+            // Part 2: has_next = false (final)
+            val chunk2 = "World!".encodeToByteArray()
+            val readResponse2 =
+                buildMainEnvelope(
+                    commandId = 2,
+                    contentFieldNumber = 22,
+                    contentBytes = buildStorageReadResponseBytes(chunk2),
+                    hasNext = false,
+                )
+            transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse2))
+
+            val data = client.readFile("/ext/nfc/card.nfc")
+            assertEquals("Hello, World!", data.decodeToString())
+        }
 
     // --- Test helpers to build raw protobuf bytes ---
 
-    data class TestFileEntry(val name: String, val isDir: Boolean, val size: UInt)
+    data class TestFileEntry(
+        val name: String,
+        val isDir: Boolean,
+        val size: UInt,
+    )
 
     companion object {
         /** Build a raw protobuf Main envelope. */

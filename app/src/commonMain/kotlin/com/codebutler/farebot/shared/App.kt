@@ -31,8 +31,8 @@ import com.codebutler.farebot.shared.ui.screen.AdvancedTab
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
 import com.codebutler.farebot.shared.ui.screen.CardScreen
-import com.codebutler.farebot.shared.ui.screen.FlipperScreen
 import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
+import com.codebutler.farebot.shared.ui.screen.FlipperScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen

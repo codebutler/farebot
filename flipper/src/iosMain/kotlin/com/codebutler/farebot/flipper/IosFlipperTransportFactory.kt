@@ -6,6 +6,5 @@ class IosFlipperTransportFactory : FlipperTransportFactory {
 
     override suspend fun createUsbTransport(): FlipperTransport? = null
 
-    override suspend fun createBleTransport(): FlipperTransport =
-        IosBleSerialTransport()
+    override suspend fun createBleTransport(): FlipperTransport = IosBleSerialTransport()
 }

@@ -1,5 +1,9 @@
 package com.codebutler.farebot.flipper
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeout
@@ -15,20 +19,16 @@ import platform.CoreBluetooth.CBUUID
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
+import platform.Foundation.create
 import platform.darwin.NSObject
 import platform.posix.memcpy
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
-import kotlinx.cinterop.allocArrayOf
-import kotlinx.cinterop.memScoped
-import platform.Foundation.create
+import kotlin.experimental.ExperimentalObjCRefinement
 
 /**
  * FlipperTransport implementation using iOS Core Bluetooth.
  * Connects to Flipper Zero's BLE Serial service.
  */
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, ExperimentalObjCRefinement::class)
 class IosBleSerialTransport(
     private val peripheral: CBPeripheral? = null,
 ) : FlipperTransport {
@@ -78,12 +78,17 @@ class IosBleSerialTransport(
         }
 
         // Enable notifications on TX characteristic
-        val tx = txCharacteristic
-            ?: throw FlipperException("TX characteristic not found")
+        val tx =
+            txCharacteristic
+                ?: throw FlipperException("TX characteristic not found")
         target.setNotifyValue(true, forCharacteristic = tx)
     }
 
-    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         val data = receiveChannel.receive()
         val bytesToCopy = minOf(data.size, length)
         data.copyInto(buffer, offset, 0, bytesToCopy)
@@ -130,112 +135,136 @@ class IosBleSerialTransport(
         }
     }
 
-    private val centralDelegate = object : NSObject(), CBCentralManagerDelegateProtocol {
-        override fun centralManagerDidUpdateState(central: CBCentralManager) {
-            if (central.state == CBCentralManagerStatePoweredOn) {
-                if (scanDeferred != null && scanDeferred?.isCompleted == false) {
-                    central.scanForPeripheralsWithServices(
-                        serviceUUIDs = listOf(SERIAL_SERVICE_UUID),
-                        options = null,
+    private val centralDelegate =
+        object : NSObject(), CBCentralManagerDelegateProtocol {
+            override fun centralManagerDidUpdateState(central: CBCentralManager) {
+                if (central.state == CBCentralManagerStatePoweredOn) {
+                    if (scanDeferred != null && scanDeferred?.isCompleted == false) {
+                        central.scanForPeripheralsWithServices(
+                            serviceUUIDs = listOf(SERIAL_SERVICE_UUID),
+                            options = null,
+                        )
+                    }
+                }
+            }
+
+            override fun centralManager(
+                central: CBCentralManager,
+                didDiscoverPeripheral: CBPeripheral,
+                advertisementData: Map<Any?, *>,
+                RSSI: NSNumber,
+            ) {
+                scanDeferred?.complete(didDiscoverPeripheral)
+            }
+
+            override fun centralManager(
+                central: CBCentralManager,
+                didConnectPeripheral: CBPeripheral,
+            ) {
+                connectionDeferred?.complete(Unit)
+            }
+
+            @ObjCSignatureOverride
+            override fun centralManager(
+                central: CBCentralManager,
+                didFailToConnectPeripheral: CBPeripheral,
+                error: NSError?,
+            ) {
+                connectionDeferred?.completeExceptionally(
+                    FlipperException("BLE connection failed: ${error?.localizedDescription}"),
+                )
+            }
+
+            @ObjCSignatureOverride
+            override fun centralManager(
+                central: CBCentralManager,
+                didDisconnectPeripheral: CBPeripheral,
+                error: NSError?,
+            ) {
+                connectedPeripheral = null
+            }
+        }
+
+    private val peripheralDelegate =
+        object : NSObject(), CBPeripheralDelegateProtocol {
+            override fun peripheral(
+                peripheral: CBPeripheral,
+                didDiscoverServices: NSError?,
+            ) {
+                if (didDiscoverServices != null) {
+                    servicesDeferred?.completeExceptionally(
+                        FlipperException("Service discovery failed: ${didDiscoverServices.localizedDescription}"),
+                    )
+                    return
+                }
+
+                val service =
+                    peripheral.services?.firstOrNull {
+                        (it as? CBService)?.UUID == SERIAL_SERVICE_UUID
+                    } as? CBService
+                if (service != null) {
+                    peripheral.discoverCharacteristics(
+                        listOf(SERIAL_RX_UUID, SERIAL_TX_UUID),
+                        forService = service,
+                    )
+                } else {
+                    servicesDeferred?.completeExceptionally(
+                        FlipperException("Serial service not found"),
                     )
                 }
             }
-        }
 
-        override fun centralManager(
-            central: CBCentralManager,
-            didDiscoverPeripheral: CBPeripheral,
-            advertisementData: Map<Any?, *>,
-            RSSI: NSNumber,
-        ) {
-            scanDeferred?.complete(didDiscoverPeripheral)
-        }
-
-        override fun centralManager(central: CBCentralManager, didConnectPeripheral: CBPeripheral) {
-            connectionDeferred?.complete(Unit)
-        }
-
-        override fun centralManager(
-            central: CBCentralManager,
-            didFailToConnectPeripheral: CBPeripheral,
-            error: NSError?,
-        ) {
-            connectionDeferred?.completeExceptionally(
-                FlipperException("BLE connection failed: ${error?.localizedDescription}"),
-            )
-        }
-
-        override fun centralManager(
-            central: CBCentralManager,
-            didDisconnectPeripheral: CBPeripheral,
-            error: NSError?,
-        ) {
-            connectedPeripheral = null
-        }
-    }
-
-    private val peripheralDelegate = object : NSObject(), CBPeripheralDelegateProtocol {
-        override fun peripheral(peripheral: CBPeripheral, didDiscoverServices: NSError?) {
-            if (didDiscoverServices != null) {
-                servicesDeferred?.completeExceptionally(
-                    FlipperException("Service discovery failed: ${didDiscoverServices.localizedDescription}"),
-                )
-                return
-            }
-
-            val service = peripheral.services?.firstOrNull { (it as? CBService)?.UUID == SERIAL_SERVICE_UUID } as? CBService
-            if (service != null) {
-                peripheral.discoverCharacteristics(
-                    listOf(SERIAL_RX_UUID, SERIAL_TX_UUID),
-                    forService = service,
-                )
-            } else {
-                servicesDeferred?.completeExceptionally(
-                    FlipperException("Serial service not found"),
-                )
-            }
-        }
-
-        override fun peripheral(peripheral: CBPeripheral, didDiscoverCharacteristicsForService: CBService, error: NSError?) {
-            if (error != null) {
-                servicesDeferred?.completeExceptionally(
-                    FlipperException("Characteristic discovery failed: ${error.localizedDescription}"),
-                )
-                return
-            }
-
-            val characteristics = didDiscoverCharacteristicsForService.characteristics ?: emptyList<CBCharacteristic>()
-            for (char in characteristics) {
-                val characteristic = char as? CBCharacteristic ?: continue
-                when (characteristic.UUID) {
-                    SERIAL_RX_UUID -> rxCharacteristic = characteristic
-                    SERIAL_TX_UUID -> txCharacteristic = characteristic
+            @ObjCSignatureOverride
+            override fun peripheral(
+                peripheral: CBPeripheral,
+                didDiscoverCharacteristicsForService: CBService,
+                error: NSError?,
+            ) {
+                if (error != null) {
+                    servicesDeferred?.completeExceptionally(
+                        FlipperException("Characteristic discovery failed: ${error.localizedDescription}"),
+                    )
+                    return
                 }
+
+                val characteristics = didDiscoverCharacteristicsForService.characteristics ?: return
+                for (char in characteristics) {
+                    val characteristic = char as? CBCharacteristic ?: continue
+                    when (characteristic.UUID) {
+                        SERIAL_RX_UUID -> rxCharacteristic = characteristic
+                        SERIAL_TX_UUID -> txCharacteristic = characteristic
+                    }
+                }
+
+                servicesDeferred?.complete(Unit)
             }
 
-            servicesDeferred?.complete(Unit)
-        }
-
-        override fun peripheral(peripheral: CBPeripheral, didUpdateValueForCharacteristic: CBCharacteristic, error: NSError?) {
-            if (error != null) return
-            if (didUpdateValueForCharacteristic.UUID == SERIAL_TX_UUID) {
-                val nsData = didUpdateValueForCharacteristic.value ?: return
-                val bytes = nsData.toByteArray()
-                if (bytes.isNotEmpty()) {
-                    receiveChannel.trySend(bytes)
+            @ObjCSignatureOverride
+            override fun peripheral(
+                peripheral: CBPeripheral,
+                didUpdateValueForCharacteristic: CBCharacteristic,
+                error: NSError?,
+            ) {
+                if (error != null) return
+                if (didUpdateValueForCharacteristic.UUID == SERIAL_TX_UUID) {
+                    val nsData = didUpdateValueForCharacteristic.value ?: return
+                    val bytes = nsData.toByteArray()
+                    if (bytes.isNotEmpty()) {
+                        receiveChannel.trySend(bytes)
+                    }
                 }
             }
         }
-    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun ByteArray.toNSData(): NSData = memScoped {
-    if (isEmpty()) return NSData()
-    usePinned { pinned ->
-        NSData.create(bytes = pinned.addressOf(0), length = size.toULong())
+private fun ByteArray.toNSData(): NSData =
+    memScoped {
+        if (isEmpty()) return NSData()
+        usePinned { pinned ->
+            NSData.create(bytes = pinned.addressOf(0), length = size.toULong())
+        }
     }
-}
 
 @OptIn(ExperimentalForeignApi::class)
 private fun NSData.toByteArray(): ByteArray {

@@ -51,7 +51,11 @@ class WebSerialTransport : FlipperTransport {
         opened = true
     }
 
-    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         jsWebSerialStartRead(length)
 
         var elapsed = 0L
@@ -117,11 +121,9 @@ private fun jsWebSerialRequestPort() {
     )
 }
 
-private fun jsWebSerialIsReady(): Boolean =
-    js("window._fbSerial && window._fbSerial.ready === true")
+private fun jsWebSerialIsReady(): Boolean = js("window._fbSerial && window._fbSerial.ready === true")
 
-private fun jsWebSerialHasPort(): Boolean =
-    js("window._fbSerial && window._fbSerial.port !== null")
+private fun jsWebSerialHasPort(): Boolean = js("window._fbSerial && window._fbSerial.port !== null")
 
 private fun jsWebSerialOpen() {
     js(
@@ -138,8 +140,7 @@ private fun jsWebSerialOpen() {
     )
 }
 
-private fun jsWebSerialIsOpen(): Boolean =
-    js("window._fbSerial && window._fbSerial.open === true")
+private fun jsWebSerialIsOpen(): Boolean = js("window._fbSerial && window._fbSerial.open === true")
 
 private fun jsWebSerialStartRead(length: Int) {
     js(
@@ -164,11 +165,9 @@ private fun jsWebSerialStartRead(length: Int) {
     )
 }
 
-private fun jsWebSerialIsReadReady(): Boolean =
-    js("window._fbSerialIn && window._fbSerialIn.ready === true")
+private fun jsWebSerialIsReadReady(): Boolean = js("window._fbSerialIn && window._fbSerialIn.ready === true")
 
-private fun jsWebSerialGetReadData(): JsString? =
-    js("(window._fbSerialIn && window._fbSerialIn.data) || null")
+private fun jsWebSerialGetReadData(): JsString? = js("(window._fbSerialIn && window._fbSerialIn.data) || null")
 
 private fun jsWebSerialStartWrite(dataStr: JsString) {
     js(
@@ -192,11 +191,9 @@ private fun jsWebSerialStartWrite(dataStr: JsString) {
     )
 }
 
-private fun jsWebSerialIsWriteReady(): Boolean =
-    js("window._fbSerialOut && window._fbSerialOut.ready === true")
+private fun jsWebSerialIsWriteReady(): Boolean = js("window._fbSerialOut && window._fbSerialOut.ready === true")
 
-private fun jsWebSerialGetWriteError(): JsString? =
-    js("(window._fbSerialOut && window._fbSerialOut.error) || null")
+private fun jsWebSerialGetWriteError(): JsString? = js("(window._fbSerialOut && window._fbSerialOut.error) || null")
 
 private fun jsWebSerialClose() {
     js(

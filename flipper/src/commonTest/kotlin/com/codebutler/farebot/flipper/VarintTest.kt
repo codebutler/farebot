@@ -27,7 +27,6 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class VarintTest {
-
     @Test
     fun testEncodeSmallValue() {
         assertContentEquals(byteArrayOf(0x01), Varint.encode(1))

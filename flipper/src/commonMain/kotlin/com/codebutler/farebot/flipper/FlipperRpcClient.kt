@@ -80,9 +80,11 @@ class FlipperRpcClient(
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun listDirectory(path: String): List<FlipperFileEntry> {
         val commandId = nextCommandId++
-        val requestBytes = ProtoBuf.encodeToByteArray(
-            com.codebutler.farebot.flipper.proto.StorageListRequest(path = path),
-        )
+        val requestBytes =
+            ProtoBuf.encodeToByteArray(
+                com.codebutler.farebot.flipper.proto
+                    .StorageListRequest(path = path),
+            )
         sendRequest(commandId, FIELD_STORAGE_LIST_REQUEST, requestBytes)
 
         val allFiles = mutableListOf<FlipperFileEntry>()
@@ -106,9 +108,11 @@ class FlipperRpcClient(
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun readFile(path: String): ByteArray {
         val commandId = nextCommandId++
-        val requestBytes = ProtoBuf.encodeToByteArray(
-            com.codebutler.farebot.flipper.proto.StorageReadRequest(path = path),
-        )
+        val requestBytes =
+            ProtoBuf.encodeToByteArray(
+                com.codebutler.farebot.flipper.proto
+                    .StorageReadRequest(path = path),
+            )
         sendRequest(commandId, FIELD_STORAGE_READ_REQUEST, requestBytes)
 
         val chunks = mutableListOf<ByteArray>()
@@ -141,9 +145,11 @@ class FlipperRpcClient(
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun statFile(path: String): StorageFile {
         val commandId = nextCommandId++
-        val requestBytes = ProtoBuf.encodeToByteArray(
-            com.codebutler.farebot.flipper.proto.StorageStatRequest(path = path),
-        )
+        val requestBytes =
+            ProtoBuf.encodeToByteArray(
+                com.codebutler.farebot.flipper.proto
+                    .StorageStatRequest(path = path),
+            )
         sendRequest(commandId, FIELD_STORAGE_STAT_REQUEST, requestBytes)
 
         val response = readMainResponse(commandId)
@@ -160,9 +166,11 @@ class FlipperRpcClient(
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getStorageInfo(path: String): StorageInfoResponse {
         val commandId = nextCommandId++
-        val requestBytes = ProtoBuf.encodeToByteArray(
-            com.codebutler.farebot.flipper.proto.StorageInfoRequest(path = path),
-        )
+        val requestBytes =
+            ProtoBuf.encodeToByteArray(
+                com.codebutler.farebot.flipper.proto
+                    .StorageInfoRequest(path = path),
+            )
         sendRequest(commandId, FIELD_STORAGE_INFO_REQUEST, requestBytes)
 
         val response = readMainResponse(commandId)
@@ -178,9 +186,11 @@ class FlipperRpcClient(
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getDeviceInfo(): Map<String, String> {
         val commandId = nextCommandId++
-        val requestBytes = ProtoBuf.encodeToByteArray(
-            com.codebutler.farebot.flipper.proto.SystemDeviceInfoRequest(),
-        )
+        val requestBytes =
+            ProtoBuf.encodeToByteArray(
+                com.codebutler.farebot.flipper.proto
+                    .SystemDeviceInfoRequest(),
+            )
         sendRequest(commandId, FIELD_SYSTEM_DEVICE_INFO_REQUEST, requestBytes)
 
         val info = mutableMapOf<String, String>()
@@ -204,15 +214,19 @@ class FlipperRpcClient(
 
     // --- Internal protocol implementation ---
 
-    private suspend fun sendRequest(commandId: Int, contentFieldNumber: Int, contentBytes: ByteArray) {
+    private suspend fun sendRequest(
+        commandId: Int,
+        contentFieldNumber: Int,
+        contentBytes: ByteArray,
+    ) {
         val envelope = buildMainEnvelope(commandId, contentFieldNumber, contentBytes)
         val framed = frameMessage(envelope)
         transport.write(framed)
     }
 
     /** Read a complete Main response from the transport, with timeout. */
-    private suspend fun readMainResponse(expectedCommandId: Int): ParsedMainResponse {
-        return withTimeout(timeoutMs) {
+    private suspend fun readMainResponse(expectedCommandId: Int): ParsedMainResponse =
+        withTimeout(timeoutMs) {
             // Read varint length prefix byte-by-byte
             val length = readVarintFromTransport()
 
@@ -222,7 +236,6 @@ class FlipperRpcClient(
             // Parse the Main envelope
             parseMainEnvelope(messageBytes)
         }
-    }
 
     /** Read a varint from the transport one byte at a time. */
     private suspend fun readVarintFromTransport(): Int {

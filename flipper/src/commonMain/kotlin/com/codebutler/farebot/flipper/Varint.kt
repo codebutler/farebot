@@ -23,7 +23,6 @@
 package com.codebutler.farebot.flipper
 
 object Varint {
-
     fun encode(value: Int): ByteArray {
         val result = mutableListOf<Byte>()
         var v = value
@@ -36,7 +35,10 @@ object Varint {
     }
 
     /** Returns (decoded value, number of bytes consumed). */
-    fun decode(data: ByteArray, offset: Int): Pair<Int, Int> {
+    fun decode(
+        data: ByteArray,
+        offset: Int,
+    ): Pair<Int, Int> {
         var result = 0
         var shift = 0
         var pos = offset

@@ -31,7 +31,6 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalSerializationApi::class)
 class FlipperProtoTest {
-
     @Test
     fun testStorageListRequestRoundTrip() {
         val request = StorageListRequest(path = "/ext/nfc")
@@ -42,11 +41,12 @@ class FlipperProtoTest {
 
     @Test
     fun testStorageFileRoundTrip() {
-        val file = StorageFile(
-            type = StorageFileType.FILE,
-            name = "card.nfc",
-            size = 1234u,
-        )
+        val file =
+            StorageFile(
+                type = StorageFileType.FILE,
+                name = "card.nfc",
+                size = 1234u,
+            )
         val bytes = ProtoBuf.encodeToByteArray(file)
         val decoded = ProtoBuf.decodeFromByteArray<StorageFile>(bytes)
         assertEquals("card.nfc", decoded.name)
@@ -56,12 +56,14 @@ class FlipperProtoTest {
 
     @Test
     fun testStorageListResponseRoundTrip() {
-        val response = StorageListResponse(
-            files = listOf(
-                StorageFile(type = StorageFileType.FILE, name = "card.nfc", size = 100u),
-                StorageFile(type = StorageFileType.DIR, name = "assets", size = 0u),
-            ),
-        )
+        val response =
+            StorageListResponse(
+                files =
+                    listOf(
+                        StorageFile(type = StorageFileType.FILE, name = "card.nfc", size = 100u),
+                        StorageFile(type = StorageFileType.DIR, name = "assets", size = 0u),
+                    ),
+            )
         val bytes = ProtoBuf.encodeToByteArray(response)
         val decoded = ProtoBuf.decodeFromByteArray<StorageListResponse>(bytes)
         assertEquals(2, decoded.files.size)

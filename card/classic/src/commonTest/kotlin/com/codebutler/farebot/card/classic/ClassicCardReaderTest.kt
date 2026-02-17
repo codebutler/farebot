@@ -271,7 +271,8 @@ class ClassicCardReaderTest {
     @Test
     fun testGlobalKeysUsedWhenCardKeysFail() =
         runTest {
-            val globalKey = byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte(), 0xEE.toByte(), 0xFF.toByte())
+            val globalKey =
+                byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte(), 0xEE.toByte(), 0xFF.toByte())
             val blockData = ByteArray(16) { 0x42 }
 
             val tech =

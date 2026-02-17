@@ -2,6 +2,8 @@ package com.codebutler.farebot.shared.di
 
 import com.codebutler.farebot.base.util.BundledDatabaseDriverFactory
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.IosFlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.DbCardKeysPersister
@@ -16,8 +18,6 @@ import com.codebutler.farebot.shared.platform.IosAppPreferences
 import com.codebutler.farebot.shared.platform.IosPlatformActions
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
 import com.codebutler.farebot.shared.platform.PlatformActions
-import com.codebutler.farebot.flipper.FlipperTransportFactory
-import com.codebutler.farebot.flipper.IosFlipperTransportFactory
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer

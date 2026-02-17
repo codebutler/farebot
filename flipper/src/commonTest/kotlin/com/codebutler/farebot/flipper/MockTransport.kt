@@ -41,7 +41,11 @@ class MockTransport : FlipperTransport {
         writtenData.add(data.copyOf())
     }
 
-    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         if (responseBuffer.isEmpty()) return 0
         val toCopy = minOf(length, responseBuffer.size)
         for (i in 0 until toCopy) {

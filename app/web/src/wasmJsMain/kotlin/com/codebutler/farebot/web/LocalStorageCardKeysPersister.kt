@@ -95,7 +95,10 @@ class LocalStorageCardKeysPersister(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun insertGlobalKeys(keys: List<ByteArray>, source: String) {
+    override fun insertGlobalKeys(
+        keys: List<ByteArray>,
+        source: String,
+    ) {
         val existing = getGlobalKeys().map { it.toHexString() }.toMutableSet()
         keys.forEach { existing.add(it.toHexString()) }
         val serialized = json.encodeToString<List<String>>(existing.toList())

@@ -30,11 +30,11 @@ package com.codebutler.farebot.flipper
  * Each key is 6 bytes (12 hex characters).
  */
 object FlipperKeyDictParser {
-
     private val HEX_KEY_REGEX = Regex("^[0-9A-Fa-f]{12}$")
 
     fun parse(data: String): List<ByteArray> =
-        data.lineSequence()
+        data
+            .lineSequence()
             .map { it.trim() }
             .filter { it.isNotEmpty() && !it.startsWith('#') }
             .filter { HEX_KEY_REGEX.matches(it) }

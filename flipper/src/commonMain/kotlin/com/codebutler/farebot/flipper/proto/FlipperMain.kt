@@ -26,7 +26,9 @@ package com.codebutler.farebot.flipper.proto
  * Flipper RPC command status codes.
  * Matches CommandStatus enum in flipper.proto.
  */
-enum class CommandStatus(val value: Int) {
+enum class CommandStatus(
+    val value: Int,
+) {
     OK(0),
     ERROR(1),
     ERROR_STORAGE_NOT_READY(2),
@@ -50,7 +52,6 @@ enum class CommandStatus(val value: Int) {
     ;
 
     companion object {
-        fun fromValue(value: Int): CommandStatus =
-            entries.firstOrNull { it.value == value } ?: ERROR
+        fun fromValue(value: Int): CommandStatus = entries.firstOrNull { it.value == value } ?: ERROR
     }
 }

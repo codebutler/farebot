@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.di
 
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.shared.core.NavDataHolder
@@ -11,7 +12,6 @@ import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.viewmodel.AddKeyViewModel
 import com.codebutler.farebot.shared.viewmodel.CardViewModel
-import com.codebutler.farebot.flipper.FlipperTransportFactory
 import com.codebutler.farebot.shared.viewmodel.FlipperViewModel
 import com.codebutler.farebot.shared.viewmodel.HistoryViewModel
 import com.codebutler.farebot.shared.viewmodel.HomeViewModel

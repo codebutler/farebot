@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.serialize.CardSerializer
-import com.codebutler.farebot.flipper.FlipperRpcClient
 import com.codebutler.farebot.flipper.FlipperKeyDictParser
+import com.codebutler.farebot.flipper.FlipperRpcClient
 import com.codebutler.farebot.flipper.FlipperTransport
 import com.codebutler.farebot.flipper.FlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
@@ -43,9 +43,10 @@ class FlipperViewModel(
             if (transport != null) {
                 connect(transport)
             } else {
-                _uiState.value = _uiState.value.copy(
-                    error = "USB transport not available on this platform",
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        error = "USB transport not available on this platform",
+                    )
             }
         }
     }
@@ -56,9 +57,10 @@ class FlipperViewModel(
             if (transport != null) {
                 connect(transport)
             } else {
-                _uiState.value = _uiState.value.copy(
-                    error = "Bluetooth transport not available on this platform",
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        error = "Bluetooth transport not available on this platform",
+                    )
             }
         }
     }
@@ -68,10 +70,11 @@ class FlipperViewModel(
         val client = FlipperRpcClient(transport)
         this.rpcClient = client
 
-        _uiState.value = _uiState.value.copy(
-            connectionState = FlipperConnectionState.Connecting,
-            error = null,
-        )
+        _uiState.value =
+            _uiState.value.copy(
+                connectionState = FlipperConnectionState.Connecting,
+                error = null,
+            )
 
         viewModelScope.launch {
             try {
@@ -85,17 +88,19 @@ class FlipperViewModel(
                     println("[FlipperViewModel] Failed to get device info: ${e.message}")
                 }
 
-                _uiState.value = _uiState.value.copy(
-                    connectionState = FlipperConnectionState.Connected,
-                    deviceInfo = deviceInfo,
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = FlipperConnectionState.Connected,
+                        deviceInfo = deviceInfo,
+                    )
 
                 navigateToDirectory("/ext/nfc")
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    connectionState = FlipperConnectionState.Disconnected,
-                    error = "Connection failed: ${e.message}",
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = FlipperConnectionState.Disconnected,
+                        error = "Connection failed: ${e.message}",
+                    )
             }
         }
     }
@@ -120,26 +125,30 @@ class FlipperViewModel(
         viewModelScope.launch {
             try {
                 val entries = client.listDirectory(path)
-                val files = entries.map { entry ->
-                    FlipperFileItem(
-                        name = entry.name,
-                        isDirectory = entry.isDirectory,
-                        size = entry.size,
-                        path = "$path/${entry.name}",
-                    )
-                }.sortedWith(compareByDescending<FlipperFileItem> { it.isDirectory }.thenBy { it.name })
+                val files =
+                    entries
+                        .map { entry ->
+                            FlipperFileItem(
+                                name = entry.name,
+                                isDirectory = entry.isDirectory,
+                                size = entry.size,
+                                path = "$path/${entry.name}",
+                            )
+                        }.sortedWith(compareByDescending<FlipperFileItem> { it.isDirectory }.thenBy { it.name })
 
-                _uiState.value = _uiState.value.copy(
-                    currentPath = path,
-                    files = files,
-                    isLoading = false,
-                    selectedFiles = emptySet(),
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        currentPath = path,
+                        files = files,
+                        isLoading = false,
+                        selectedFiles = emptySet(),
+                    )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = "Failed to list directory: ${e.message}",
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        isLoading = false,
+                        error = "Failed to list directory: ${e.message}",
+                    )
             }
         }
     }
@@ -154,11 +163,12 @@ class FlipperViewModel(
 
     fun toggleFileSelection(path: String) {
         val current = _uiState.value.selectedFiles
-        val newSelected = if (current.contains(path)) {
-            current - path
-        } else {
-            current + path
-        }
+        val newSelected =
+            if (current.contains(path)) {
+                current - path
+            } else {
+                current + path
+            }
         _uiState.value = _uiState.value.copy(selectedFiles = newSelected)
     }
 
@@ -170,13 +180,15 @@ class FlipperViewModel(
         viewModelScope.launch {
             for ((index, path) in selectedPaths.withIndex()) {
                 val fileName = path.substringAfterLast('/')
-                _uiState.value = _uiState.value.copy(
-                    importProgress = ImportProgress(
-                        currentFile = fileName,
-                        currentIndex = index + 1,
-                        totalFiles = selectedPaths.size,
-                    ),
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        importProgress =
+                            ImportProgress(
+                                currentFile = fileName,
+                                currentIndex = index + 1,
+                                totalFiles = selectedPaths.size,
+                            ),
+                    )
 
                 try {
                     val fileData = client.readFile(path)
@@ -194,12 +206,13 @@ class FlipperViewModel(
                             )
                         }
                         if (result.classicKeys != null) {
-                            val keys = result.classicKeys.keys.flatMap { sectorKey ->
-                                listOfNotNull(
-                                    sectorKey.keyA.takeIf { it.any { b -> b != 0.toByte() } },
-                                    sectorKey.keyB.takeIf { it.any { b -> b != 0.toByte() } },
-                                )
-                            }
+                            val keys =
+                                result.classicKeys.keys.flatMap { sectorKey ->
+                                    listOfNotNull(
+                                        sectorKey.keyA.takeIf { it.any { b -> b != 0.toByte() } },
+                                        sectorKey.keyB.takeIf { it.any { b -> b != 0.toByte() } },
+                                    )
+                                }
                             if (keys.isNotEmpty()) {
                                 cardKeysPersister.insertGlobalKeys(keys, "flipper_nfc_dump")
                             }
@@ -210,10 +223,11 @@ class FlipperViewModel(
                 }
             }
 
-            _uiState.value = _uiState.value.copy(
-                importProgress = null,
-                selectedFiles = emptySet(),
-            )
+            _uiState.value =
+                _uiState.value.copy(
+                    importProgress = null,
+                    selectedFiles = emptySet(),
+                )
         }
     }
 
@@ -221,13 +235,15 @@ class FlipperViewModel(
         val client = rpcClient ?: return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                importProgress = ImportProgress(
-                    currentFile = "mf_classic_dict_user.nfc",
-                    currentIndex = 1,
-                    totalFiles = 1,
-                ),
-            )
+            _uiState.value =
+                _uiState.value.copy(
+                    importProgress =
+                        ImportProgress(
+                            currentFile = "mf_classic_dict_user.nfc",
+                            currentIndex = 1,
+                            totalFiles = 1,
+                        ),
+                )
 
             try {
                 val dictPath = "/ext/nfc/assets/mf_classic_dict_user.nfc"
@@ -239,9 +255,10 @@ class FlipperViewModel(
                     cardKeysPersister.insertGlobalKeys(keys, "flipper_user_dict")
                 }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    error = "Failed to import key dictionary: ${e.message}",
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        error = "Failed to import key dictionary: ${e.message}",
+                    )
             }
 
             _uiState.value = _uiState.value.copy(importProgress = null)

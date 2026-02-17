@@ -27,31 +27,39 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class FlipperKeyDictParserTest {
-
     @Test
     fun testParseValidDictionary() {
-        val input = """
+        val input =
+            """
             # Flipper NFC user dictionary
             FFFFFFFFFFFF
             A0A1A2A3A4A5
             D3F7D3F7D3F7
 
             000000000000
-        """.trimIndent()
+            """.trimIndent()
 
         val keys = FlipperKeyDictParser.parse(input)
         assertEquals(4, keys.size)
         assertContentEquals(
             byteArrayOf(
-                0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(),
-                0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(),
+                0xFF.toByte(),
+                0xFF.toByte(),
+                0xFF.toByte(),
+                0xFF.toByte(),
+                0xFF.toByte(),
+                0xFF.toByte(),
             ),
             keys[0],
         )
         assertContentEquals(
             byteArrayOf(
-                0xA0.toByte(), 0xA1.toByte(), 0xA2.toByte(),
-                0xA3.toByte(), 0xA4.toByte(), 0xA5.toByte(),
+                0xA0.toByte(),
+                0xA1.toByte(),
+                0xA2.toByte(),
+                0xA3.toByte(),
+                0xA4.toByte(),
+                0xA5.toByte(),
             ),
             keys[1],
         )
@@ -59,13 +67,14 @@ class FlipperKeyDictParserTest {
 
     @Test
     fun testSkipsCommentsAndBlanks() {
-        val input = """
+        val input =
+            """
             # Comment
 
             # Another comment
             FFFFFFFFFFFF
 
-        """.trimIndent()
+            """.trimIndent()
 
         val keys = FlipperKeyDictParser.parse(input)
         assertEquals(1, keys.size)
@@ -73,12 +82,13 @@ class FlipperKeyDictParserTest {
 
     @Test
     fun testSkipsInvalidKeys() {
-        val input = """
+        val input =
+            """
             FFFFFFFFFFFF
             TOOSHORT
             FFFFFFFFFFFF00
             A0A1A2A3A4A5
-        """.trimIndent()
+            """.trimIndent()
 
         val keys = FlipperKeyDictParser.parse(input)
         assertEquals(2, keys.size) // Only valid 12-char hex strings

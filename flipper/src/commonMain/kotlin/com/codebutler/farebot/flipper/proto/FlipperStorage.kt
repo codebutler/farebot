@@ -32,7 +32,9 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 
 @Serializable(with = StorageFileTypeSerializer::class)
-enum class StorageFileType(val value: Int) {
+enum class StorageFileType(
+    val value: Int,
+) {
     FILE(0),
     DIR(1),
 }
@@ -40,7 +42,10 @@ enum class StorageFileType(val value: Int) {
 internal object StorageFileTypeSerializer : KSerializer<StorageFileType> {
     override val descriptor = PrimitiveSerialDescriptor("StorageFileType", PrimitiveKind.INT)
 
-    override fun serialize(encoder: Encoder, value: StorageFileType) {
+    override fun serialize(
+        encoder: Encoder,
+        value: StorageFileType,
+    ) {
         encoder.encodeInt(value.value)
     }
 
@@ -62,8 +67,11 @@ data class StorageFile(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is StorageFile) return false
-        return type == other.type && name == other.name && size == other.size &&
-            data.contentEquals(other.data) && md5sum == other.md5sum
+        return type == other.type &&
+            name == other.name &&
+            size == other.size &&
+            data.contentEquals(other.data) &&
+            md5sum == other.md5sum
     }
 
     override fun hashCode(): Int {

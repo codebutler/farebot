@@ -42,15 +42,17 @@ class AndroidUsbSerialTransport(
 
     override suspend fun connect() {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
-        val device = findFlipperDevice(usbManager)
-            ?: throw FlipperException("Flipper Zero not found. Is it connected via USB?")
+        val device =
+            findFlipperDevice(usbManager)
+                ?: throw FlipperException("Flipper Zero not found. Is it connected via USB?")
 
         if (!usbManager.hasPermission(device)) {
             requestPermission(usbManager, device)
         }
 
-        val conn = usbManager.openDevice(device)
-            ?: throw FlipperException("Failed to open USB device")
+        val conn =
+            usbManager.openDevice(device)
+                ?: throw FlipperException("Failed to open USB device")
 
         // Find the CDC Data interface (class 0x0A)
         var dataIface: UsbInterface? = null
@@ -98,7 +100,11 @@ class AndroidUsbSerialTransport(
         outEndpoint = bulkOut
     }
 
-    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         val conn = connection ?: throw FlipperException("Not connected")
         val ep = inEndpoint ?: throw FlipperException("No IN endpoint")
 
@@ -140,10 +146,16 @@ class AndroidUsbSerialTransport(
         }
 
     @Suppress("UnspecifiedRegisterReceiverFlag")
-    private suspend fun requestPermission(usbManager: UsbManager, device: UsbDevice) =
-        suspendCancellableCoroutine { cont ->
-            val receiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
+    private suspend fun requestPermission(
+        usbManager: UsbManager,
+        device: UsbDevice,
+    ) = suspendCancellableCoroutine { cont ->
+        val receiver =
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context,
+                    intent: Intent,
+                ) {
                     context.unregisterReceiver(this)
                     val granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
                     if (granted) {
@@ -154,26 +166,27 @@ class AndroidUsbSerialTransport(
                 }
             }
 
-            val filter = IntentFilter(ACTION_USB_PERMISSION)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
-            } else {
-                context.registerReceiver(receiver, filter)
-            }
+        val filter = IntentFilter(ACTION_USB_PERMISSION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            context.registerReceiver(receiver, filter)
+        }
 
-            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val flags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PendingIntent.FLAG_MUTABLE
             } else {
                 0
             }
-            val permissionIntent = PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
-            usbManager.requestPermission(device, permissionIntent)
+        val permissionIntent = PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+        usbManager.requestPermission(device, permissionIntent)
 
-            cont.invokeOnCancellation {
-                try {
-                    context.unregisterReceiver(receiver)
-                } catch (_: Exception) {
-                }
+        cont.invokeOnCancellation {
+            try {
+                context.unregisterReceiver(receiver)
+            } catch (_: Exception) {
             }
         }
+    }
 }

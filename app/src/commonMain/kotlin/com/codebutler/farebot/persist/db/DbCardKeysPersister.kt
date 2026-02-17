@@ -45,7 +45,10 @@ class DbCardKeysPersister(
             .executeAsList()
             .map { hexToBytes(it.key_data) }
 
-    override fun insertGlobalKeys(keys: List<ByteArray>, source: String) {
+    override fun insertGlobalKeys(
+        keys: List<ByteArray>,
+        source: String,
+    ) {
         val now = Clock.System.now().toEpochMilliseconds()
         keys.forEach { key ->
             db.savedKeyQueries.insertGlobalKey(

@@ -22,12 +22,13 @@ class JvmUsbSerialTransport(
         get() = serialPort?.isOpen == true
 
     override suspend fun connect() {
-        val port = if (portDescriptor != null) {
-            SerialPort.getCommPort(portDescriptor)
-        } else {
-            findFlipperPort()
-                ?: throw FlipperException("Flipper Zero not found. Is it connected via USB?")
-        }
+        val port =
+            if (portDescriptor != null) {
+                SerialPort.getCommPort(portDescriptor)
+            } else {
+                findFlipperPort()
+                    ?: throw FlipperException("Flipper Zero not found. Is it connected via USB?")
+            }
 
         port.baudRate = BAUD_RATE
         port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, READ_TIMEOUT_MS, 0)
@@ -39,7 +40,11 @@ class JvmUsbSerialTransport(
         serialPort = port
     }
 
-    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         val port = serialPort ?: throw FlipperException("Not connected")
         val tempBuffer = ByteArray(length)
         val bytesRead = port.readBytes(tempBuffer, length)

@@ -1,6 +1,8 @@
 package com.codebutler.farebot.web
 
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.WebFlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.shared.core.NavDataHolder
@@ -10,8 +12,6 @@ import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
-import com.codebutler.farebot.flipper.FlipperTransportFactory
-import com.codebutler.farebot.flipper.WebFlipperTransportFactory
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer

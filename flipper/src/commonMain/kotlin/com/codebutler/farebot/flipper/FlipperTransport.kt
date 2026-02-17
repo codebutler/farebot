@@ -24,8 +24,16 @@ package com.codebutler.farebot.flipper
 
 interface FlipperTransport {
     suspend fun connect()
-    suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int
+
+    suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int
+
     suspend fun write(data: ByteArray)
+
     suspend fun close()
+
     val isConnected: Boolean
 }

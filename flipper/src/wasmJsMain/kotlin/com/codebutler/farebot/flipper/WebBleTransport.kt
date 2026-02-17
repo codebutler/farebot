@@ -55,7 +55,11 @@ class WebBleTransport : FlipperTransport {
         connected = true
     }
 
-    override suspend fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    override suspend fun read(
+        buffer: ByteArray,
+        offset: Int,
+        length: Int,
+    ): Int {
         var elapsed = 0L
         while (jsWebBleAvailable() == 0) {
             delay(POLL_INTERVAL_MS)
@@ -66,8 +70,9 @@ class WebBleTransport : FlipperTransport {
         }
 
         jsWebBleStartRead(length)
-        val csv = jsWebBleGetReadResult()?.toString()
-            ?: throw FlipperException("BLE read returned no data")
+        val csv =
+            jsWebBleGetReadResult()?.toString()
+                ?: throw FlipperException("BLE read returned no data")
         if (csv.isEmpty()) throw FlipperException("BLE read returned empty data")
 
         val bytes = csv.split(",").map { it.toInt().toByte() }.toByteArray()
@@ -121,11 +126,9 @@ private fun jsWebBleRequestDevice() {
     )
 }
 
-private fun jsWebBleIsReady(): Boolean =
-    js("window._fbBle && window._fbBle.ready === true")
+private fun jsWebBleIsReady(): Boolean = js("window._fbBle && window._fbBle.ready === true")
 
-private fun jsWebBleHasDevice(): Boolean =
-    js("window._fbBle && window._fbBle.device !== null")
+private fun jsWebBleHasDevice(): Boolean = js("window._fbBle && window._fbBle.device !== null")
 
 private fun jsWebBleConnect() {
     js(
@@ -162,14 +165,11 @@ private fun jsWebBleConnect() {
     )
 }
 
-private fun jsWebBleIsConnected(): Boolean =
-    js("window._fbBle && window._fbBle.connected === true")
+private fun jsWebBleIsConnected(): Boolean = js("window._fbBle && window._fbBle.connected === true")
 
-private fun jsWebBleGetConnectError(): JsString? =
-    js("(window._fbBle && window._fbBle.connectError) || null")
+private fun jsWebBleGetConnectError(): JsString? = js("(window._fbBle && window._fbBle.connectError) || null")
 
-private fun jsWebBleAvailable(): Int =
-    js("(window._fbBle && window._fbBle.buffer) ? window._fbBle.buffer.length : 0")
+private fun jsWebBleAvailable(): Int = js("(window._fbBle && window._fbBle.buffer) ? window._fbBle.buffer.length : 0")
 
 private fun jsWebBleStartRead(length: Int) {
     js(
@@ -185,8 +185,7 @@ private fun jsWebBleStartRead(length: Int) {
     )
 }
 
-private fun jsWebBleGetReadResult(): JsString? =
-    js("window._fbBleReadResult || null")
+private fun jsWebBleGetReadResult(): JsString? = js("window._fbBleReadResult || null")
 
 private fun jsWebBleStartWrite(dataStr: JsString) {
     js(
@@ -208,11 +207,9 @@ private fun jsWebBleStartWrite(dataStr: JsString) {
     )
 }
 
-private fun jsWebBleIsWriteReady(): Boolean =
-    js("window._fbBle && window._fbBle.writeReady === true")
+private fun jsWebBleIsWriteReady(): Boolean = js("window._fbBle && window._fbBle.writeReady === true")
 
-private fun jsWebBleGetWriteError(): JsString? =
-    js("(window._fbBle && window._fbBle.writeError) || null")
+private fun jsWebBleGetWriteError(): JsString? = js("(window._fbBle && window._fbBle.writeError) || null")
 
 private fun jsWebBleDisconnect() {
     js(

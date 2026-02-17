@@ -2,6 +2,8 @@ package com.codebutler.farebot.desktop
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.JvmFlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.DbCardKeysPersister
@@ -15,8 +17,6 @@ import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.JvmAppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
-import com.codebutler.farebot.flipper.FlipperTransportFactory
-import com.codebutler.farebot.flipper.JvmFlipperTransportFactory
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
