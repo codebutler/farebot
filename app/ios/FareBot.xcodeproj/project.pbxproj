@@ -7,45 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7BFF0BD60CC51FB78D8A764D /* FareBotKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E296318A4ABC8EE549B0C47E /* FareBotKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8E11E423477F24B274729679 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534508E7AAA01FF336ECDC0C /* iOSApp.swift */; };
 		D52C887B87D2D7CD2DF7A030 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 445C357A8AB1DD9317170556 /* Assets.xcassets */; };
-		EA3AC0F2B800448FB22567C4 /* FareBotKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E296318A4ABC8EE549B0C47E /* FareBotKit.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		C396E052E1BD6239F169D5D4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				7BFF0BD60CC51FB78D8A764D /* FareBotKit.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		154ABFFD520502DDADF58B61 /* FareBot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FareBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		445C357A8AB1DD9317170556 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		534508E7AAA01FF336ECDC0C /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		A893E13DD60D0B10ECB49A59 /* FareBot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FareBot.entitlements; sourceTree = "<group>"; };
-		E296318A4ABC8EE549B0C47E /* FareBotKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FareBotKit.framework; path = "../farebot-app/build/bin/iosSimulatorArm64/debugFramework/FareBotKit.framework"; sourceTree = "<group>"; };
 		E65B641D90F72BA2E1DEAFF7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		E1F31206D4AE717D1E2DE8D8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA3AC0F2B800448FB22567C4 /* FareBotKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		2098F79B3F3B6A526575D03F /* Products */ = {
@@ -67,19 +39,10 @@
 			path = FareBot;
 			sourceTree = "<group>";
 		};
-		9B0F3B4C26A1726B3C4A2BE9 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				E296318A4ABC8EE549B0C47E /* FareBotKit.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		E8645766090C58DFD719F43E = {
 			isa = PBXGroup;
 			children = (
 				35C5B4B3C4B8B2643DF5E68A /* FareBot */,
-				9B0F3B4C26A1726B3C4A2BE9 /* Frameworks */,
 				2098F79B3F3B6A526575D03F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,8 +57,6 @@
 				B2007E057701C93D2F6474DC /* Build KMP Framework */,
 				42DDFD780701DBC1BD02AB98 /* Sources */,
 				5DA19835EA0C3024B2D5A4B9 /* Resources */,
-				E1F31206D4AE717D1E2DE8D8 /* Frameworks */,
-				C396E052E1BD6239F169D5D4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -176,7 +137,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :farebot-app:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "cd \"$SRCROOT/../..\"\n./gradlew :app:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -324,11 +285,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZJ9GEQ36AH;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../farebot-app/build/XCFrameworks/release",
-					"$(SRCROOT)/../farebot-app/build/bin/iosSimulatorArm64/debugFramework",
-					"$(SRCROOT)/../farebot-app/build/bin/iosArm64/debugFramework",
-					"$(SRCROOT)/../farebot-app/build/bin/iosX64/debugFramework",
-					"\"../farebot-app/build/bin/iosSimulatorArm64/debugFramework\"",
+					"$(SRCROOT)/../../app/build/XCFrameworks/release",
+					"$(SRCROOT)/../../app/build/bin/iosSimulatorArm64/debugFramework",
+					"$(SRCROOT)/../../app/build/bin/iosArm64/debugFramework",
+					"$(SRCROOT)/../../app/build/bin/iosX64/debugFramework",
 				);
 				INFOPLIST_FILE = FareBot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -357,11 +317,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZJ9GEQ36AH;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../farebot-app/build/XCFrameworks/release",
-					"$(SRCROOT)/../farebot-app/build/bin/iosSimulatorArm64/debugFramework",
-					"$(SRCROOT)/../farebot-app/build/bin/iosArm64/debugFramework",
-					"$(SRCROOT)/../farebot-app/build/bin/iosX64/debugFramework",
-					"\"../farebot-app/build/bin/iosSimulatorArm64/debugFramework\"",
+					"$(SRCROOT)/../../app/build/XCFrameworks/release",
+					"$(SRCROOT)/../../app/build/bin/iosSimulatorArm64/debugFramework",
+					"$(SRCROOT)/../../app/build/bin/iosArm64/debugFramework",
+					"$(SRCROOT)/../../app/build/bin/iosX64/debugFramework",
 				);
 				INFOPLIST_FILE = FareBot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

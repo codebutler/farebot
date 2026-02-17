@@ -43,19 +43,22 @@ object PN533Device {
 
     private var context: Context? = null
 
+    private fun ensureContext(): Context? {
+        context?.let { return it }
+        val ctx = Context()
+        if (LibUsb.init(ctx) != LibUsb.SUCCESS) return null
+        context = ctx
+        return ctx
+    }
+
     fun open(): Usb4JavaPN533Transport? = openAll().firstOrNull()
 
     fun openAll(): List<Usb4JavaPN533Transport> {
-        val ctx = Context()
-        val result = LibUsb.init(ctx)
-        if (result != LibUsb.SUCCESS) {
-            return emptyList()
-        }
+        val ctx = ensureContext() ?: return emptyList()
 
         val deviceList = DeviceList()
         val count = LibUsb.getDeviceList(ctx, deviceList)
         if (count < 0) {
-            LibUsb.exit(ctx)
             return emptyList()
         }
 
@@ -90,11 +93,6 @@ object PN533Device {
             LibUsb.freeDeviceList(deviceList, true)
         }
 
-        if (transports.isEmpty()) {
-            LibUsb.exit(ctx)
-        } else {
-            context = ctx
-        }
         return transports
     }
 

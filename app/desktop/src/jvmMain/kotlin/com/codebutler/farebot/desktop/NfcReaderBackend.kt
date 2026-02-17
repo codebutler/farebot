@@ -36,7 +36,7 @@ import com.codebutler.farebot.shared.nfc.ScannedTag
 interface NfcReaderBackend {
     val name: String
 
-    fun scanLoop(
+    suspend fun scanLoop(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,

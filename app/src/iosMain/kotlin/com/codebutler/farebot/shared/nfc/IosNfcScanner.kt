@@ -24,6 +24,7 @@ package com.codebutler.farebot.shared.nfc
 
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
+import com.codebutler.farebot.card.desfire.DesfireCardReader
 import com.codebutler.farebot.card.felica.FeliCaReader
 import com.codebutler.farebot.card.felica.IosFeliCaTagAdapter
 import com.codebutler.farebot.card.nfc.IosCardTransceiver
@@ -33,19 +34,23 @@ import com.codebutler.farebot.card.nfc.toByteArray
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.card.vicinity.VicinityCardReader
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import platform.CoreNFC.NFCFeliCaTagProtocol
 import platform.CoreNFC.NFCISO15693TagProtocol
 import platform.CoreNFC.NFCMiFareDESFire
 import platform.CoreNFC.NFCMiFareTagProtocol
 import platform.CoreNFC.NFCMiFareUltralight
 import platform.CoreNFC.NFCPollingISO14443
+import platform.CoreNFC.NFCPollingISO15693
 import platform.CoreNFC.NFCPollingISO18092
 import platform.CoreNFC.NFCTagReaderSession
 import platform.CoreNFC.NFCTagReaderSessionDelegateProtocol
@@ -116,7 +121,7 @@ class IosNfcScanner : CardScanner {
         dispatch_async(dispatch_get_main_queue()) {
             val newSession =
                 NFCTagReaderSession(
-                    pollingOption = NFCPollingISO14443 or NFCPollingISO18092,
+                    pollingOption = NFCPollingISO14443 or NFCPollingISO15693 or NFCPollingISO18092,
                     delegate = scanDelegate,
                     queue = nfcQueue,
                 )
@@ -170,14 +175,40 @@ class IosNfcScanner : CardScanner {
                 }
 
                 session.alertMessage = "Reading card… Keep holding."
-                try {
-                    val rawCard = readTag(tag)
-                    session.alertMessage = "Done!"
-                    session.invalidateSession()
-                    onCardScanned(rawCard)
-                } catch (e: Exception) {
+
+                // Bridge suspend card readers using coroutine + GCD semaphore.
+                // We use CoroutineScope(Dispatchers.IO) instead of runBlocking to avoid
+                // interfering with GCD's management of the workerQueue thread.
+                val readSemaphore = dispatch_semaphore_create(0)
+                var rawCard: RawCard<*>? = null
+                var readException: Exception? = null
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        rawCard = readTag(tag)
+                    } catch (e: Exception) {
+                        readException = e
+                    } finally {
+                        dispatch_semaphore_signal(readSemaphore)
+                    }
+                }
+
+                dispatch_semaphore_wait(readSemaphore, DISPATCH_TIME_FOREVER)
+
+                readException?.let { e ->
                     session.invalidateSessionWithErrorMessage("Read failed: ${e.message}")
                     onError("Read failed: ${e.message ?: "Unknown error"}")
+                    return@dispatch_async
+                }
+
+                val card = rawCard
+                if (card != null) {
+                    session.alertMessage = "Done!"
+                    session.invalidateSession()
+                    onCardScanned(card)
+                } else {
+                    session.invalidateSessionWithErrorMessage("Read failed: no card data")
+                    onError("Read failed: no card data")
                 }
             }
         }
@@ -197,14 +228,12 @@ class IosNfcScanner : CardScanner {
         override fun tagReaderSessionDidBecomeActive(session: NFCTagReaderSession) {
         }
 
-        private fun readTag(tag: Any): RawCard<*> =
-            runBlocking {
-                when (tag) {
-                    is NFCFeliCaTagProtocol -> readFelicaTag(tag)
-                    is NFCMiFareTagProtocol -> readMiFareTag(tag)
-                    is NFCISO15693TagProtocol -> readVicinityTag(tag)
-                    else -> throw Exception("Unsupported NFC tag type")
-                }
+        private suspend fun readTag(tag: Any): RawCard<*> =
+            when (tag) {
+                is NFCFeliCaTagProtocol -> readFelicaTag(tag)
+                is NFCMiFareTagProtocol -> readMiFareTag(tag)
+                is NFCISO15693TagProtocol -> readVicinityTag(tag)
+                else -> throw Exception("Unsupported NFC tag type")
             }
 
         private suspend fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
@@ -228,10 +257,14 @@ class IosNfcScanner : CardScanner {
             val tagId = tag.identifier.toByteArray()
             return when (tag.mifareFamily) {
                 NFCMiFareDESFire -> {
+                    // Use DESFire native protocol directly. iOS requires AIDs to be
+                    // registered in Info.plist for ISO 7816 SELECT commands — an
+                    // unregistered AID causes Core NFC to kill the entire session.
+                    // DESFire native protocol avoids this by not sending SELECT commands.
                     val transceiver = IosCardTransceiver(tag)
                     transceiver.connect()
                     try {
-                        ISO7816Dispatcher.readCard(tagId, transceiver)
+                        DesfireCardReader.readCard(tagId, transceiver)
                     } finally {
                         if (transceiver.isConnected) {
                             try {

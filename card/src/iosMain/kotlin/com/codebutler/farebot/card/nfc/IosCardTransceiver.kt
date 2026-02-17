@@ -23,13 +23,12 @@
 package com.codebutler.farebot.card.nfc
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreNFC.NFCMiFareTagProtocol
 import platform.Foundation.NSData
 import platform.Foundation.NSError
-import platform.darwin.DISPATCH_TIME_FOREVER
-import platform.darwin.dispatch_semaphore_create
-import platform.darwin.dispatch_semaphore_signal
-import platform.darwin.dispatch_semaphore_wait
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * iOS implementation of [CardTransceiver] wrapping Core NFC's [NFCMiFareTag].
@@ -39,8 +38,7 @@ import platform.darwin.dispatch_semaphore_wait
  * [DesfireProtocol] and [CEPASProtocol] use through [transceive].
  *
  * Core NFC APIs are asynchronous (completion handler based). This wrapper bridges
- * them to the synchronous [CardTransceiver] interface using dispatch semaphores,
- * which is safe because tag reading runs on a background thread.
+ * them to the suspend [CardTransceiver] interface using [suspendCancellableCoroutine].
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosCardTransceiver(
@@ -61,26 +59,18 @@ class IosCardTransceiver(
     override val isConnected: Boolean
         get() = _isConnected
 
-    override suspend fun transceive(data: ByteArray): ByteArray {
-        val semaphore = dispatch_semaphore_create(0)
-        var result: NSData? = null
-        var nfcError: NSError? = null
-
-        tag.sendMiFareCommand(data.toNSData()) { response: NSData?, error: NSError? ->
-            result = response
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
+    override suspend fun transceive(data: ByteArray): ByteArray =
+        suspendCancellableCoroutine { cont ->
+            tag.sendMiFareCommand(data.toNSData()) { response: NSData?, error: NSError? ->
+                if (error != null) {
+                    cont.resumeWithException(Exception("NFC transceive failed: ${error.localizedDescription}"))
+                } else if (response != null) {
+                    cont.resume(response.toByteArray())
+                } else {
+                    cont.resumeWithException(Exception("NFC transceive returned null response"))
+                }
+            }
         }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        nfcError?.let {
-            throw Exception("NFC transceive failed: ${it.localizedDescription}")
-        }
-
-        return result?.toByteArray()
-            ?: throw Exception("NFC transceive returned null response")
-    }
 
     override val maxTransceiveLength: Int
         get() = 253 // ISO 7816 APDU maximum command length

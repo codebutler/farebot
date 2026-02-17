@@ -23,18 +23,17 @@
 package com.codebutler.farebot.card.nfc
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreNFC.NFCISO15693TagProtocol
 import platform.Foundation.NSData
 import platform.Foundation.NSError
-import platform.darwin.DISPATCH_TIME_FOREVER
-import platform.darwin.dispatch_semaphore_create
-import platform.darwin.dispatch_semaphore_signal
-import platform.darwin.dispatch_semaphore_wait
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * iOS implementation of [VicinityTechnology] using Core NFC's [NFCISO15693TagProtocol].
  *
- * Uses semaphore-based bridging for the async Core NFC API.
+ * Uses [suspendCancellableCoroutine] to bridge the async Core NFC API.
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosVicinityTechnology(
@@ -76,30 +75,29 @@ class IosVicinityTechnology(
 
         val blockNumber = data[10].toUByte()
 
-        val semaphore = dispatch_semaphore_create(0)
-        var blockData: NSData? = null
-        var nfcError: NSError? = null
-
-        tag.readSingleBlockWithRequestFlags(
-            0x22u,
-            blockNumber = blockNumber,
-        ) { data: NSData?, error: NSError? ->
-            blockData = data
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
-        }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        nfcError?.let { error ->
-            when (error.code) {
-                102L -> throw EndOfMemoryException()
-                100L -> throw TagLostException()
-                else -> throw Exception("NFC-V read error: ${error.localizedDescription}")
+        val bytes =
+            suspendCancellableCoroutine<ByteArray> { cont ->
+                tag.readSingleBlockWithRequestFlags(
+                    0x22u,
+                    blockNumber = blockNumber,
+                ) { blockData: NSData?, error: NSError? ->
+                    if (error != null) {
+                        when (error.code) {
+                            102L -> cont.resumeWithException(EndOfMemoryException())
+                            100L -> cont.resumeWithException(TagLostException())
+                            else ->
+                                cont.resumeWithException(
+                                    Exception("NFC-V read error: ${error.localizedDescription}"),
+                                )
+                        }
+                    } else if (blockData != null) {
+                        cont.resume(blockData.toByteArray())
+                    } else {
+                        cont.resumeWithException(Exception("No data returned"))
+                    }
+                }
             }
-        }
 
-        val bytes = blockData?.toByteArray() ?: throw Exception("No data returned")
         // Prepend success status byte (0x00) to match Android NfcV.transceive behavior
         return byteArrayOf(0x00) + bytes
     }

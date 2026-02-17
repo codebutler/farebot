@@ -118,7 +118,11 @@ class WebCardScanner : CardScanner {
         val fw = pn533.getFirmwareVersion()
         println("[WebUSB] PN53x firmware: $fw")
         pn533.samConfiguration()
-        pn533.setMaxRetries(passiveActivation = 0x02)
+        // Use finite ATR retries on WebUSB. WebUSB's transferIn cannot be
+        // cancelled, so InListPassiveTarget must self-resolve within its own
+        // timeout rather than relying on client-side abort. With atrRetries=2,
+        // the PN533 polls ~2 times (~300ms) then returns NbTg=0.
+        pn533.setMaxRetries(atrRetries = 0x02, passiveActivation = 0x02)
 
         while (true) {
             // Try ISO 14443-A (covers Classic, Ultralight, DESFire)
