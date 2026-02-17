@@ -1,8 +1,8 @@
 package com.codebutler.farebot.flipper
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
@@ -19,16 +19,15 @@ import platform.CoreBluetooth.CBUUID
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
-import platform.Foundation.create
+import platform.Foundation.dataWithBytes
 import platform.darwin.NSObject
 import platform.posix.memcpy
-import kotlin.experimental.ExperimentalObjCRefinement
 
 /**
  * FlipperTransport implementation using iOS Core Bluetooth.
  * Connects to Flipper Zero's BLE Serial service.
  */
-@OptIn(ExperimentalForeignApi::class, ExperimentalObjCRefinement::class)
+@OptIn(ExperimentalForeignApi::class)
 class IosBleSerialTransport(
     private val peripheral: CBPeripheral? = null,
 ) : FlipperTransport {
@@ -258,13 +257,12 @@ class IosBleSerialTransport(
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun ByteArray.toNSData(): NSData =
-    memScoped {
-        if (isEmpty()) return NSData()
-        usePinned { pinned ->
-            NSData.create(bytes = pinned.addressOf(0), length = size.toULong())
-        }
+private fun ByteArray.toNSData(): NSData {
+    if (isEmpty()) return NSData()
+    return usePinned { pinned ->
+        NSData.dataWithBytes(pinned.addressOf(0), size.toULong())
     }
+}
 
 @OptIn(ExperimentalForeignApi::class)
 private fun NSData.toByteArray(): ByteArray {
