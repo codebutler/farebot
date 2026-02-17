@@ -163,7 +163,9 @@ abstract class PN53xReaderBackend(
 
             CardType.MifareClassic -> {
                 val tech = PN533ClassicTechnology(pn533, target.tg, tagId, info)
-                ClassicCardReader.readCard(tagId, tech, null)
+                ClassicCardReader.readCard(tagId, tech, null) { progress ->
+                    println("[$name] $progress")
+                }
             }
 
             CardType.MifareUltralight -> {
