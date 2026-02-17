@@ -46,9 +46,7 @@ class FakePCSCChannel : CardChannel() {
     override fun transmit(
         command: ByteBuffer,
         response: ByteBuffer,
-    ): Int {
-        throw UnsupportedOperationException()
-    }
+    ): Int = throw UnsupportedOperationException()
 
     override fun close() {}
 }

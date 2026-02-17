@@ -30,19 +30,21 @@ class PCSCVicinityTechnologyTest {
     @Test
     fun testUidReturnsProvidedUid() {
         val expectedUid = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
-        val tech = PCSCVicinityTechnology(
-            channel = FakePCSCChannel(),
-            uid = expectedUid,
-        )
+        val tech =
+            PCSCVicinityTechnology(
+                channel = FakePCSCChannel(),
+                uid = expectedUid,
+            )
         assertTrue(tech.uid.contentEquals(expectedUid))
     }
 
     @Test
     fun testConnectAndClose() {
-        val tech = PCSCVicinityTechnology(
-            channel = FakePCSCChannel(),
-            uid = byteArrayOf(),
-        )
+        val tech =
+            PCSCVicinityTechnology(
+                channel = FakePCSCChannel(),
+                uid = byteArrayOf(),
+            )
         tech.connect()
         assertTrue(tech.isConnected)
         tech.close()

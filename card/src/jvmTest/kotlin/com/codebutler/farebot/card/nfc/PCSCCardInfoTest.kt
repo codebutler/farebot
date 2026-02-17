@@ -30,15 +30,29 @@ class PCSCCardInfoTest {
     @Test
     fun testFromATR_vicinityICODESLI() {
         // ATR with PC/SC RID (A0 00 00 03 06) followed by SS=0x07 (ICODE SLI) and NN=0x00 0x01
-        val atr = byteArrayOf(
-            0x3B.toByte(), 0x8F.toByte(), 0x80.toByte(), 0x01,
-            0x80.toByte(), 0x4F, 0x0C,
-            0xA0.toByte(), 0x00, 0x00, 0x03, 0x06,
-            0x07, // SS = ICODE SLI (ISO 15693)
-            0x00, 0x01, // NN = card name
-            0x00, 0x00, 0x00, 0x00,
-            0x00, // TCK
-        )
+        val atr =
+            byteArrayOf(
+                0x3B.toByte(),
+                0x8F.toByte(),
+                0x80.toByte(),
+                0x01,
+                0x80.toByte(),
+                0x4F,
+                0x0C,
+                0xA0.toByte(),
+                0x00,
+                0x00,
+                0x03,
+                0x06,
+                0x07, // SS = ICODE SLI (ISO 15693)
+                0x00,
+                0x01, // NN = card name
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00, // TCK
+            )
         val info = PCSCCardInfo.fromATR(atr)
         assertEquals(CardType.Vicinity, info.cardType)
     }
@@ -46,15 +60,29 @@ class PCSCCardInfoTest {
     @Test
     fun testFromATR_vicinityTagIt() {
         // ATR with SS=0x0C (Tag-it HFI)
-        val atr = byteArrayOf(
-            0x3B.toByte(), 0x8F.toByte(), 0x80.toByte(), 0x01,
-            0x80.toByte(), 0x4F, 0x0C,
-            0xA0.toByte(), 0x00, 0x00, 0x03, 0x06,
-            0x0C, // SS = Tag-it HFI Plus (ISO 15693)
-            0x00, 0x01,
-            0x00, 0x00, 0x00, 0x00,
-            0x00,
-        )
+        val atr =
+            byteArrayOf(
+                0x3B.toByte(),
+                0x8F.toByte(),
+                0x80.toByte(),
+                0x01,
+                0x80.toByte(),
+                0x4F,
+                0x0C,
+                0xA0.toByte(),
+                0x00,
+                0x00,
+                0x03,
+                0x06,
+                0x0C, // SS = Tag-it HFI Plus (ISO 15693)
+                0x00,
+                0x01,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+            )
         val info = PCSCCardInfo.fromATR(atr)
         assertEquals(CardType.Vicinity, info.cardType)
     }
@@ -62,15 +90,29 @@ class PCSCCardInfoTest {
     @Test
     fun testFromATR_existingClassic1k() {
         // Verify existing behavior isn't broken: SS=0x01 → MifareClassic
-        val atr = byteArrayOf(
-            0x3B.toByte(), 0x8F.toByte(), 0x80.toByte(), 0x01,
-            0x80.toByte(), 0x4F, 0x0C,
-            0xA0.toByte(), 0x00, 0x00, 0x03, 0x06,
-            0x01, // SS = MIFARE Classic 1K
-            0x00, 0x01,
-            0x00, 0x00, 0x00, 0x00,
-            0x00,
-        )
+        val atr =
+            byteArrayOf(
+                0x3B.toByte(),
+                0x8F.toByte(),
+                0x80.toByte(),
+                0x01,
+                0x80.toByte(),
+                0x4F,
+                0x0C,
+                0xA0.toByte(),
+                0x00,
+                0x00,
+                0x03,
+                0x06,
+                0x01, // SS = MIFARE Classic 1K
+                0x00,
+                0x01,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+            )
         val info = PCSCCardInfo.fromATR(atr)
         assertEquals(CardType.MifareClassic, info.cardType)
     }
