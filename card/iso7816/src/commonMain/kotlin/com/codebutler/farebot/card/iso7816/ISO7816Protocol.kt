@@ -172,6 +172,7 @@ class ISO7816Protocol(
         } catch (e: ISO7816Exception) {
             null
         } catch (e: Exception) {
+            println("[ISO7816Protocol] Unexpected error in selectByName: $e")
             null
         }
 

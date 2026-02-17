@@ -172,6 +172,7 @@ class PCSCFeliCaTagAdapter(
                 null
             }
         } catch (e: Exception) {
+            println("[PCSCFeliCa] Transceive failed: $e")
             null
         }
 }

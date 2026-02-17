@@ -86,7 +86,8 @@ class LocalStorageCardPersister(
         val raw = lsGetItem(STORAGE_KEY.toJsString())?.toString() ?: return emptyList()
         return try {
             json.decodeFromString<List<SerializableSavedCard>>(raw).map { it.toSavedCard() }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            println("[LocalStorage] Failed to load saved cards: $e")
             emptyList()
         }
     }

@@ -398,6 +398,7 @@ object MetrodroidJsonParser {
         return try {
             ByteUtils.hexStringToByteArray(hex)
         } catch (e: Exception) {
+            println("[MetrodroidJsonParser] Failed to parse hex string: $e")
             ByteArray(0)
         }
     }

@@ -42,6 +42,7 @@ internal class CEPASProtocol(
                 )
             if (result.isEmpty()) null else result
         } catch (ex: ISO7816Exception) {
+            println("[CEPAS] Failed to read purse $purseId: $ex")
             null
         }
 
@@ -58,6 +59,7 @@ internal class CEPASProtocol(
                     byteArrayOf(0.toByte()),
                 )
         } catch (ex: ISO7816Exception) {
+            println("[CEPAS] Failed to read purse history: $ex")
             return null
         }
 
@@ -73,7 +75,7 @@ internal class CEPASProtocol(
                 )
             historyBuff = historyBuff + historyBuff2
         } catch (ex: ISO7816Exception) {
-            // Error reading 2nd purse history
+            println("[CEPAS] Failed to read 2nd purse history: $ex")
         }
 
         return historyBuff

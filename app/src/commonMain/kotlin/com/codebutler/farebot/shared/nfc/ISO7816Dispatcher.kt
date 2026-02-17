@@ -57,6 +57,7 @@ object ISO7816Dispatcher {
         return try {
             ISO7816CardReader.readCard(tagId, transceiver, appConfigs)
         } catch (e: Exception) {
+            println("[ISO7816Dispatcher] ISO7816 read attempt failed: $e")
             null
         }
     }

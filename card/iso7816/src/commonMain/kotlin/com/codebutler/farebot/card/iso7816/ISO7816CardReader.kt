@@ -173,6 +173,7 @@ object ISO7816CardReader {
             } catch (e: ISO7816Exception) {
                 break
             } catch (e: Exception) {
+                println("[ISO7816] Record read failed at SFI $sfi, record $recordNum: $e")
                 break
             }
         }
@@ -181,7 +182,7 @@ object ISO7816CardReader {
         try {
             binaryData = protocol.readBinary(sfi)
         } catch (e: Exception) {
-            // Ignore - binary read may not be supported for this SFI
+            println("[ISO7816] Binary read failed for SFI $sfi: $e")
         }
 
         return if (records.isNotEmpty() || binaryData != null) {
@@ -222,6 +223,7 @@ object ISO7816CardReader {
                 } catch (e: ISOEOFException) {
                     break
                 } catch (e: Exception) {
+                    println("[ISO7816] File record read failed: $e")
                     break
                 }
             }
@@ -231,6 +233,7 @@ object ISO7816CardReader {
                 try {
                     protocol.readBinary()
                 } catch (e: Exception) {
+                    println("[ISO7816] File binary read failed: $e")
                     null
                 }
 
@@ -238,6 +241,7 @@ object ISO7816CardReader {
 
             return ISO7816File(binaryData = binaryData, records = records, fci = fci)
         } catch (e: Exception) {
+            println("[ISO7816] File read failed for app: $e")
             return null
         }
     }
@@ -260,7 +264,7 @@ object ISO7816CardReader {
                     )
                 balances[i] = balance
             } catch (e: Exception) {
-                // Some balances may not be available
+                println("[ISO7816] Balance read failed: $e")
             }
         }
         return balances
@@ -280,6 +284,7 @@ object ISO7816CardReader {
                 4, // BALANCE_RESP_LEN
             )
         } catch (e: Exception) {
+            println("[ISO7816] KSX6924 purse info failed: $e")
             null
         }
 
@@ -302,7 +307,7 @@ object ISO7816CardReader {
                 records.add(record)
             }
         } catch (e: Exception) {
-            // Stop at first failure
+            println("[ISO7816] KSX6924 transaction record read failed: $e")
         }
         return records
     }
