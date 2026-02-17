@@ -24,12 +24,15 @@
 package com.codebutler.farebot.card.classic
 
 import com.codebutler.farebot.card.CardLostException
+import com.codebutler.farebot.card.classic.crypto1.NestedAttack
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey
+import com.codebutler.farebot.card.classic.pn533.PN533RawClassic
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.nfc.ClassicTechnology
+import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import kotlin.time.Clock
 
 object ClassicCardReader {
@@ -51,6 +54,7 @@ object ClassicCardReader {
         globalKeys: List<ByteArray>? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
+        val recoveredKeys = mutableMapOf<Int, Pair<ByteArray, Boolean>>()
 
         for (sectorIndex in 0 until tech.sectorCount) {
             try {
@@ -155,7 +159,49 @@ object ClassicCardReader {
                     }
                 }
 
+                // Try key recovery via nested attack (PN533 only)
+                if (!authSuccess && tech is PN533ClassicTechnology) {
+                    val knownEntry = recoveredKeys.entries.firstOrNull()
+                    if (knownEntry != null) {
+                        val (knownSector, knownKeyInfo) = knownEntry
+                        val (knownKeyBytes, knownIsKeyA) = knownKeyInfo
+                        val knownKey = keyBytesToLong(knownKeyBytes)
+                        val knownKeyType: Byte = if (knownIsKeyA) 0x60 else 0x61
+                        val knownBlock = tech.sectorToBlock(knownSector)
+                        val targetBlock = tech.sectorToBlock(sectorIndex)
+
+                        val rawClassic = PN533RawClassic(tech.rawPn533, tech.rawUid)
+                        val attack = NestedAttack(rawClassic, tech.uidAsUInt)
+
+                        val recoveredKey = attack.recoverKey(
+                            knownKeyType = knownKeyType,
+                            knownSectorBlock = knownBlock,
+                            knownKey = knownKey,
+                            targetKeyType = 0x60,
+                            targetBlock = targetBlock,
+                        )
+
+                        if (recoveredKey != null) {
+                            val keyBytes = longToKeyBytes(recoveredKey)
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
+                            if (authSuccess) {
+                                successfulKey = keyBytes
+                                isKeyA = true
+                            } else {
+                                // Try as Key B
+                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
+                                if (authSuccess) {
+                                    successfulKey = keyBytes
+                                    isKeyA = false
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (authSuccess && successfulKey != null) {
+                    recoveredKeys[sectorIndex] = Pair(successfulKey, isKeyA)
+
                     val blocks = ArrayList<RawClassicBlock>()
                     // FIXME: First read trailer block to get type of other blocks.
                     val firstBlockIndex = tech.sectorToBlock(sectorIndex)
@@ -197,4 +243,15 @@ object ClassicCardReader {
 
         return RawClassicCard.create(tagId, Clock.System.now(), sectors)
     }
+
+    private fun keyBytesToLong(key: ByteArray): Long {
+        var result = 0L
+        for (i in 0 until minOf(6, key.size)) {
+            result = (result shl 8) or (key[i].toLong() and 0xFF)
+        }
+        return result
+    }
+
+    private fun longToKeyBytes(key: Long): ByteArray =
+        ByteArray(6) { i -> ((key ushr ((5 - i) * 8)) and 0xFF).toByte() }
 }

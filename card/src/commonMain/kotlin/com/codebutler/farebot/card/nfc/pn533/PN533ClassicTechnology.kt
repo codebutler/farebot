@@ -42,6 +42,22 @@ class PN533ClassicTechnology(
 ) : ClassicTechnology {
     private var connected = true
 
+    /** The underlying PN533 instance. Exposed for raw MIFARE operations (key recovery). */
+    val rawPn533: PN533 get() = pn533
+
+    /** The card UID bytes. */
+    val rawUid: ByteArray get() = uid
+
+    /** UID as UInt (first 4 bytes, big-endian). */
+    val uidAsUInt: UInt
+        get() {
+            val b = if (uid.size >= 4) uid.copyOfRange(0, 4) else uid
+            return ((b[0].toUInt() and 0xFFu) shl 24) or
+                ((b[1].toUInt() and 0xFFu) shl 16) or
+                ((b[2].toUInt() and 0xFFu) shl 8) or
+                (b[3].toUInt() and 0xFFu)
+        }
+
     override fun connect() {
         connected = true
     }
