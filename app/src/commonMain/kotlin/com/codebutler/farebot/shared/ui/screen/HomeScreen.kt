@@ -140,7 +140,7 @@ fun HomeScreen(
     onStatusChipTap: (String) -> Unit = {},
     onNavigateToKeys: (() -> Unit)?,
     onOpenAbout: () -> Unit,
-    onOpenNfcSettings: () -> Unit,
+    onOpenNfcSettings: (() -> Unit)? = null,
     onAddAllSamples: (() -> Unit)? = null,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
     onToggleShowAllScans: () -> Unit = {},
@@ -576,7 +576,7 @@ fun HomeScreen(
                 ExtendedFloatingActionButton(
                     onClick = {
                         if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
-                            onOpenNfcSettings()
+                            onOpenNfcSettings?.invoke()
                         } else {
                             onScanCard()
                         }
@@ -616,7 +616,7 @@ fun HomeScreen(
                     ),
         ) {
             // NFC disabled banner (scan tab only)
-            if (selectedTab == 0 && homeUiState.nfcStatus == NfcStatus.DISABLED) {
+            if (selectedTab == 0 && homeUiState.nfcStatus == NfcStatus.DISABLED && onOpenNfcSettings != null) {
                 Surface(
                     color = MaterialTheme.colorScheme.errorContainer,
                     modifier = Modifier.fillMaxWidth(),

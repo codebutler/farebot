@@ -51,7 +51,7 @@ class IosPlatformActions : PlatformActions {
         UIApplication.sharedApplication.openURL(nsUrl, emptyMap<Any?, Any>(), null)
     }
 
-    override fun openNfcSettings() {
+    override val openNfcSettings: (() -> Unit) = {
         val settingsUrl = NSURL(string = "App-prefs:root")
         UIApplication.sharedApplication.openURL(settingsUrl, emptyMap<Any?, Any>(), null)
     }

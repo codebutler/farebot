@@ -17,9 +17,7 @@ class DesktopPlatformActions : PlatformActions {
         }
     }
 
-    override fun openNfcSettings() {
-        // No NFC settings on desktop
-    }
+    // openNfcSettings not overridden — no NFC settings on desktop
 
     override fun copyToClipboard(text: String) {
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
