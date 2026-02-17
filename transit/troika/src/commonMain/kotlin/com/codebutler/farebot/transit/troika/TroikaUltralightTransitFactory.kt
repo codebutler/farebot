@@ -615,15 +615,14 @@ private class TroikaTrip(
             if (validator == null || validator == 0) return null
             val result = MdstStationLookup.getStation(TROIKA_STR, validator)
             if (result != null) {
-                return Station
-                    .Builder()
-                    .stationName(result.stationName)
-                    .shortStationName(result.shortStationName)
-                    .companyName(result.companyName)
-                    .lineNames(result.lineNames)
-                    .latitude(if (result.hasLocation) result.latitude.toString() else null)
-                    .longitude(if (result.hasLocation) result.longitude.toString() else null)
-                    .build()
+                return Station(
+                    stationName = result.stationName,
+                    shortStationName = result.shortStationName,
+                    companyName = result.companyName,
+                    lineNames = result.lineNames,
+                    latitude = if (result.hasLocation) result.latitude else null,
+                    longitude = if (result.hasLocation) result.longitude else null,
+                )
             }
             return Station.unknown(validator.toString())
         }

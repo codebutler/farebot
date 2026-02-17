@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.smartrider
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.Subscription
 import com.codebutler.farebot.transit.TransitBalance
@@ -101,22 +102,23 @@ class SmartRiderTransitInfo(
 
     override val subscriptions: List<Subscription>? = null
 
-    override suspend fun getAdvancedUi(): FareBotUiTree? {
-        val uiBuilder = FareBotUiTree.builder()
-        uiBuilder
-            .item()
-            .title(Res.string.smartrider_ticket_type)
-            .value(mTokenType.toString())
-        if (mSmartRiderType == SmartRiderType.SMARTRIDER) {
-            uiBuilder
-                .item()
-                .title(Res.string.smartrider_autoload_threshold)
-                .value(TransitCurrency.AUD(mAutoloadThreshold).formatCurrencyString(true))
-            uiBuilder
-                .item()
-                .title(Res.string.smartrider_autoload_value)
-                .value(TransitCurrency.AUD(mAutoloadValue).formatCurrencyString(true))
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = Res.string.smartrider_ticket_type
+                value = mTokenType.toString()
+            }
+            if (mSmartRiderType == SmartRiderType.SMARTRIDER) {
+                item {
+                    title = Res.string.smartrider_autoload_threshold
+                    value =
+                        TransitCurrency.AUD(mAutoloadThreshold).formatCurrencyString(true)
+                }
+                item {
+                    title = Res.string.smartrider_autoload_value
+                    value =
+                        TransitCurrency.AUD(mAutoloadValue).formatCurrencyString(true)
+                }
+            }
         }
-        return uiBuilder.build()
-    }
 }

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.vicinity
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -77,28 +78,24 @@ data class VicinityCard(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val builder = FareBotUiTree.builder()
-        if (sysInfo != null) {
-            builder
-                .item()
-                .title("System Info")
-                .value(sysInfo)
-        }
-        val pagesBuilder = builder.item().title("Pages")
-        for (page in pages) {
-            val pageBuilder =
-                pagesBuilder
-                    .item()
-                    .title("Page ${page.index}")
-            if (page.isUnauthorized) {
-                pageBuilder.value("Unauthorized")
-            } else {
-                pageBuilder.value(page.data)
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            if (sysInfo != null) {
+                item {
+                    title = "System Info"
+                    value = sysInfo
+                }
+            }
+            item {
+                title = "Pages"
+                for (page in pages) {
+                    item {
+                        title = "Page ${page.index}"
+                        value = if (page.isUnauthorized) "Unauthorized" else page.data
+                    }
+                }
             }
         }
-        return builder.build()
-    }
 
     companion object {
         fun create(

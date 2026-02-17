@@ -27,6 +27,7 @@ import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
 import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Refill
+import com.codebutler.farebot.transit.Station
 import com.codebutler.farebot.transit.TransitFactory
 import com.codebutler.farebot.transit.TransitIdentity
 import com.codebutler.farebot.transit.TransitRegion
@@ -36,6 +37,7 @@ import com.codebutler.farebot.transit.seqgo.record.SeqGoRecord
 import com.codebutler.farebot.transit.seqgo.record.SeqGoTapRecord
 import com.codebutler.farebot.transit.seqgo.record.SeqGoTopupRecord
 import farebot.transit.seqgo.generated.resources.*
+import kotlin.time.Instant
 
 class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
     override val allCards: List<CardInfo>
@@ -111,26 +113,33 @@ class SeqGoTransitFactory : TransitFactory<ClassicCard, SeqGoTransitInfo> {
             var i = 0
             while (sortedTaps.size > i) {
                 val tapOn = sortedTaps[i]
-                val tripBuilder = SeqGoTrip.builder()
-
-                tripBuilder.journeyId(tapOn.journey)
-                tripBuilder.startTime(tapOn.timestamp)
-                tripBuilder.startStationId(tapOn.station)
-                tripBuilder.startStation(SeqGoUtil.getStation(tapOn.station))
-                tripBuilder.mode(tapOn.mode)
+                var endTime: Instant? = null
+                var endStationId = 0
+                var endStation: Station? = null
 
                 if (sortedTaps.size > i + 1 &&
                     sortedTaps[i + 1].journey == tapOn.journey &&
                     sortedTaps[i + 1].mode == tapOn.mode
                 ) {
                     val tapOff = sortedTaps[i + 1]
-                    tripBuilder.endTime(tapOff.timestamp)
-                    tripBuilder.endStationId(tapOff.station)
-                    tripBuilder.endStation(SeqGoUtil.getStation(tapOff.station))
+                    endTime = tapOff.timestamp
+                    endStationId = tapOff.station
+                    endStation = SeqGoUtil.getStation(tapOff.station)
                     i++
                 }
 
-                trips.add(tripBuilder.build())
+                trips.add(
+                    SeqGoTrip(
+                        journeyId = tapOn.journey,
+                        modeValue = tapOn.mode,
+                        startTime = tapOn.timestamp,
+                        endTime = endTime,
+                        startStationId = tapOn.station,
+                        endStationId = endStationId,
+                        startStationValue = SeqGoUtil.getStation(tapOn.station),
+                        endStationValue = endStation,
+                    ),
+                )
                 i++
             }
 

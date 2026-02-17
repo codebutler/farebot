@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.octopus
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.transit.TransitBalance
 import com.codebutler.farebot.transit.TransitCurrency
@@ -87,20 +88,16 @@ class OctopusTransitInfo(
             }
 
     override suspend fun getAdvancedUi(): FareBotUiTree? {
-        // Dual-mode card, show the CNY balance here.
         val szt = shenzhenBalance
-        if (hasOctopus && szt != null) {
-            val uiBuilder = FareBotUiTree.builder()
-            val apbUiBuilder =
-                uiBuilder
-                    .item()
-                    .title(Res.string.octopus_alternate_purse_balances)
-            apbUiBuilder.item(
-                Res.string.octopus_szt,
-                TransitCurrency.CNY(szt).formatCurrencyString(isBalance = true),
-            )
-            return uiBuilder.build()
+        if (!hasOctopus || szt == null) return null
+        return uiTree {
+            item {
+                title = Res.string.octopus_alternate_purse_balances
+                item {
+                    title = Res.string.octopus_szt
+                    value = TransitCurrency.CNY(szt).formatCurrencyString(isBalance = true)
+                }
+            }
         }
-        return null
     }
 }

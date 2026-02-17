@@ -130,7 +130,7 @@ private fun TreeItemView(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = item.title.orEmpty(),
+                    text = item.title.resolve(),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 if (item.value != null) {

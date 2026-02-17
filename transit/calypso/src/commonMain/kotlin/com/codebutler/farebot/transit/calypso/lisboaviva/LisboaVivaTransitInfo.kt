@@ -23,6 +23,7 @@ package com.codebutler.farebot.transit.calypso.lisboaviva
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.byteArrayToLong
@@ -60,9 +61,12 @@ class LisboaVivaTransitInfo internal constructor(
 
     override suspend fun getAdvancedUi(): FareBotUiTree? {
         if (tagId == null) return null
-        val b = FareBotUiTree.builder()
-        b.item().title(Res.string.calypso_engraved_serial).value(tagId.toString())
-        return b.build()
+        return uiTree {
+            item {
+                title = Res.string.calypso_engraved_serial
+                value = tagId.toString()
+            }
+        }
     }
 
     companion object {

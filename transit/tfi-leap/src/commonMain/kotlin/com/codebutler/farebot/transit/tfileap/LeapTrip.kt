@@ -96,15 +96,14 @@ class LeapTrip internal constructor(
 
     private fun lookupStation(stationId: Int): Station? {
         val result = MdstStationLookup.getStation(LEAP_STR, stationId) ?: return null
-        return Station
-            .Builder()
-            .stationName(result.stationName)
-            .shortStationName(result.shortStationName)
-            .companyName(result.companyName)
-            .lineNames(result.lineNames)
-            .latitude(if (result.hasLocation) result.latitude.toString() else null)
-            .longitude(if (result.hasLocation) result.longitude.toString() else null)
-            .build()
+        return Station(
+            stationName = result.stationName,
+            shortStationName = result.shortStationName,
+            companyName = result.companyName,
+            lineNames = result.lineNames,
+            latitude = if (result.hasLocation) result.latitude else null,
+            longitude = if (result.hasLocation) result.longitude else null,
+        )
     }
 
     companion object {

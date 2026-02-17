@@ -222,19 +222,17 @@ class ClipperTransitFactory : TransitFactory<DesfireCard, ClipperTransitInfo> {
             return null
         }
 
-        return ClipperTrip
-            .builder()
-            .timestamp(timestamp)
-            .exitTimestamp(exitTimestamp)
-            .fare(fare)
-            .agency(agency)
-            .from(from)
-            .to(to)
-            .route(route)
-            .vehicleNum(vehicleNum)
-            .transportCode(transportCode)
-            .balance(0) // Filled in later
-            .build()
+        return ClipperTrip(
+            timestamp = timestamp,
+            exitTimestampValue = exitTimestamp,
+            fareValue = fare,
+            agency = agency,
+            from = from,
+            to = to,
+            route = route,
+            vehicleNum = vehicleNum,
+            transportCode = transportCode,
+        )
     }
 
     private fun parseRefills(card: DesfireCard): List<ClipperRefill> {

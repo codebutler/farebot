@@ -27,6 +27,7 @@
 package com.codebutler.farebot.card.felica
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
 import kotlinx.serialization.Contextual
@@ -50,35 +51,38 @@ data class FelicaCard(
 
     fun getSystem(systemCode: Int): FelicaSystem? = systemsByCode[systemCode]
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder()
-        cardUiBuilder.item().title("IDm").value(idm)
-        cardUiBuilder.item().title("PMm").value(pmm)
-        val systemsUiBuilder = cardUiBuilder.item().title("Systems")
-        for (system in systems) {
-            val systemUiBuilder =
-                systemsUiBuilder
-                    .item()
-                    .title("System: ${system.code.toString(16)}")
-            for (service in system.services) {
-                val serviceUiBuilder =
-                    systemUiBuilder
-                        .item()
-                        .title(
-                            "Service: 0x${service.serviceCode.toString(
-                                16,
-                            )} (${FelicaUtils.getFriendlyServiceName(system.code, service.serviceCode)})",
-                        )
-                for (block in service.blocks) {
-                    serviceUiBuilder
-                        .item()
-                        .title("Block ${block.address.toString().padStart(2, '0')}")
-                        .value(block.data)
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "IDm"
+                value = idm
+            }
+            item {
+                title = "PMm"
+                value = pmm
+            }
+            item {
+                title = "Systems"
+                for (system in systems) {
+                    item {
+                        title = "System: ${system.code.toString(16)}"
+                        for (service in system.services) {
+                            item {
+                                title = "Service: 0x${service.serviceCode.toString(
+                                    16,
+                                )} (${FelicaUtils.getFriendlyServiceName(system.code, service.serviceCode)})"
+                                for (block in service.blocks) {
+                                    item {
+                                        title = "Block ${block.address.toString().padStart(2, '0')}"
+                                        value = block.data
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        return cardUiBuilder.build()
-    }
 
     companion object {
         fun create(

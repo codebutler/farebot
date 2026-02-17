@@ -26,6 +26,7 @@
 package com.codebutler.farebot.card.ultralight
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
@@ -68,20 +69,18 @@ data class UltralightCard(
         return result
     }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val builder = FareBotUiTree.builder()
-        val pagesBuilder =
-            builder
-                .item()
-                .title(Res.string.ultralight_pages)
-        for (page in pages) {
-            pagesBuilder
-                .item()
-                .title(FormattedString(Res.string.ultralight_page_title_format, page.index.toString()))
-                .value(page.data)
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = Res.string.ultralight_pages
+                for (page in pages) {
+                    item {
+                        title = FormattedString(Res.string.ultralight_page_title_format, page.index.toString())
+                        value = page.data
+                    }
+                }
+            }
         }
-        return builder.build()
-    }
 
     /**
      * Known Ultralight card type variants, detected via GET_VERSION command.

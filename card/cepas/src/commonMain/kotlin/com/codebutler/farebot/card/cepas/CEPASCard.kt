@@ -24,6 +24,7 @@
 package com.codebutler.farebot.card.cepas
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.CurrencyFormatter
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.formatDate
@@ -46,47 +47,93 @@ data class CEPASCard(
 
     fun getHistory(purse: Int): CEPASHistory? = histories[purse]
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder()
-
-        val pursesUiBuilder = cardUiBuilder.item().title("Purses")
-        for (purse in purses) {
-            val purseUiBuilder =
-                pursesUiBuilder
-                    .item()
-                    .title("Purse ID ${purse.id}")
-            purseUiBuilder.item().title("CEPAS Version").value(purse.cepasVersion)
-            purseUiBuilder.item().title("Purse Status").value(purse.purseStatus)
-            purseUiBuilder
-                .item()
-                .title("Purse Balance")
-                .value(CurrencyFormatter.formatValue(purse.purseBalance / 100.0, "SGD"))
-            purseUiBuilder
-                .item()
-                .title("Purse Creation Date")
-                .value(formatDate(Instant.fromEpochMilliseconds(purse.purseCreationDate * 1000L), DateFormatStyle.LONG))
-            purseUiBuilder
-                .item()
-                .title("Purse Expiry Date")
-                .value(formatDate(Instant.fromEpochMilliseconds(purse.purseExpiryDate * 1000L), DateFormatStyle.LONG))
-            purseUiBuilder.item().title("Autoload Amount").value(purse.autoLoadAmount)
-            purseUiBuilder.item().title("CAN").value(purse.can)
-            purseUiBuilder.item().title("CSN").value(purse.csn)
-
-            val transactionUiBuilder = cardUiBuilder.item().title("Last Transaction Information")
-            transactionUiBuilder.item().title("TRP").value(purse.lastTransactionTRP)
-            transactionUiBuilder.item().title("Credit TRP").value(purse.lastCreditTransactionTRP)
-            transactionUiBuilder.item().title("Credit Header").value(purse.lastCreditTransactionHeader)
-            transactionUiBuilder.item().title("Debit Options").value(purse.lastTransactionDebitOptionsByte)
-
-            val otherUiBuilder = cardUiBuilder.item().title("Other Purse Information")
-            otherUiBuilder.item().title("Logfile Record Count").value(purse.logfileRecordCount)
-            otherUiBuilder.item().title("Issuer Data Length").value(purse.issuerDataLength)
-            otherUiBuilder.item().title("Issuer-specific Data").value(purse.issuerSpecificData)
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            item {
+                title = "Purses"
+                for (purse in purses) {
+                    item {
+                        title = "Purse ID ${purse.id}"
+                        item {
+                            title = "CEPAS Version"
+                            value = purse.cepasVersion
+                        }
+                        item {
+                            title = "Purse Status"
+                            value = purse.purseStatus
+                        }
+                        item {
+                            title = "Purse Balance"
+                            value = CurrencyFormatter.formatValue(purse.purseBalance / 100.0, "SGD")
+                        }
+                        item {
+                            title = "Purse Creation Date"
+                            value =
+                                formatDate(
+                                    Instant.fromEpochMilliseconds(purse.purseCreationDate * 1000L),
+                                    DateFormatStyle.LONG,
+                                )
+                        }
+                        item {
+                            title = "Purse Expiry Date"
+                            value =
+                                formatDate(
+                                    Instant.fromEpochMilliseconds(purse.purseExpiryDate * 1000L),
+                                    DateFormatStyle.LONG,
+                                )
+                        }
+                        item {
+                            title = "Autoload Amount"
+                            value = purse.autoLoadAmount
+                        }
+                        item {
+                            title = "CAN"
+                            value = purse.can
+                        }
+                        item {
+                            title = "CSN"
+                            value = purse.csn
+                        }
+                    }
+                }
+            }
+            for (purse in purses) {
+                item {
+                    title = "Last Transaction Information"
+                    item {
+                        title = "TRP"
+                        value = purse.lastTransactionTRP
+                    }
+                    item {
+                        title = "Credit TRP"
+                        value = purse.lastCreditTransactionTRP
+                    }
+                    item {
+                        title = "Credit Header"
+                        value = purse.lastCreditTransactionHeader
+                    }
+                    item {
+                        title = "Debit Options"
+                        value = purse.lastTransactionDebitOptionsByte
+                    }
+                }
+                item {
+                    title = "Other Purse Information"
+                    item {
+                        title = "Logfile Record Count"
+                        value = purse.logfileRecordCount
+                    }
+                    item {
+                        title = "Issuer Data Length"
+                        value = purse.issuerDataLength
+                    }
+                    item {
+                        title = "Issuer-specific Data"
+                        value = purse.issuerSpecificData
+                    }
+                }
+            }
         }
-
-        return cardUiBuilder.build()
-    }
 
     companion object {
         fun create(

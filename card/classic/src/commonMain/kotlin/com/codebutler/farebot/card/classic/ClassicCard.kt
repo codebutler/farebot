@@ -27,6 +27,7 @@
 package com.codebutler.farebot.card.classic
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.Card
 import com.codebutler.farebot.card.CardType
@@ -56,49 +57,49 @@ class ClassicCard(
             return ClassicManufacturingInfo.parse(block0.data, tagId)
         }
 
-    override suspend fun getAdvancedUi(): FareBotUiTree {
-        val cardUiBuilder = FareBotUiTree.builder()
-        for (sector in sectors) {
-            val sectorIndexString = sector.index.toString(16)
-            val sectorUiBuilder = cardUiBuilder.item()
-            when (sector) {
-                is UnauthorizedClassicSector -> {
-                    sectorUiBuilder.title(
-                        FormattedString(
-                            Res.string.classic_unauthorized_sector_title_format,
-                            sectorIndexString,
-                        ),
-                    )
-                }
-                is InvalidClassicSector -> {
-                    sectorUiBuilder.title(
-                        FormattedString(
-                            Res.string.classic_invalid_sector_title_format,
-                            sectorIndexString,
-                            sector.error,
-                        ),
-                    )
-                }
-                else -> {
-                    val dataClassicSector = sector as DataClassicSector
-                    sectorUiBuilder.title(
-                        FormattedString(Res.string.classic_sector_title_format, sectorIndexString),
-                    )
-                    for (block in dataClassicSector.blocks) {
-                        sectorUiBuilder
-                            .item()
-                            .title(
+    override suspend fun getAdvancedUi(): FareBotUiTree =
+        uiTree {
+            for (sector in sectors) {
+                val sectorIndexString = sector.index.toString(16)
+                when (sector) {
+                    is UnauthorizedClassicSector -> {
+                        item {
+                            title =
                                 FormattedString(
-                                    Res.string.classic_block_title_format,
-                                    block.index.toString(),
-                                ),
-                            ).value(block.data)
+                                    Res.string.classic_unauthorized_sector_title_format,
+                                    sectorIndexString,
+                                )
+                        }
+                    }
+                    is InvalidClassicSector -> {
+                        item {
+                            title =
+                                FormattedString(
+                                    Res.string.classic_invalid_sector_title_format,
+                                    sectorIndexString,
+                                    sector.error,
+                                )
+                        }
+                    }
+                    else -> {
+                        val dataClassicSector = sector as DataClassicSector
+                        item {
+                            title = FormattedString(Res.string.classic_sector_title_format, sectorIndexString)
+                            for (block in dataClassicSector.blocks) {
+                                item {
+                                    title =
+                                        FormattedString(
+                                            Res.string.classic_block_title_format,
+                                            block.index.toString(),
+                                        )
+                                    value = block.data
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-        return cardUiBuilder.build()
-    }
 
     companion object {
         fun create(

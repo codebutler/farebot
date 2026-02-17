@@ -23,6 +23,7 @@
 package com.codebutler.farebot.transit.charlie
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
+import com.codebutler.farebot.base.ui.uiTree
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.transit.Subscription
@@ -88,9 +89,12 @@ class CharlieCardTransitInfo internal constructor(
 
     override suspend fun getAdvancedUi(): FareBotUiTree? {
         if (secondSerial == 0L || secondSerial == 0xffffffffL) return null
-        val b = FareBotUiTree.builder()
-        b.item().title(Res.string.charlie_2nd_card_number).value("A" + NumberUtils.zeroPad(secondSerial, 10))
-        return b.build()
+        return uiTree {
+            item {
+                title = Res.string.charlie_2nd_card_number
+                value = "A" + NumberUtils.zeroPad(secondSerial, 10)
+            }
+        }
     }
 
     companion object {
