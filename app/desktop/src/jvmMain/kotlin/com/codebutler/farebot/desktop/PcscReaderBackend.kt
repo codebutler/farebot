@@ -32,7 +32,9 @@ import com.codebutler.farebot.card.nfc.PCSCCardInfo
 import com.codebutler.farebot.card.nfc.PCSCCardTransceiver
 import com.codebutler.farebot.card.nfc.PCSCClassicTechnology
 import com.codebutler.farebot.card.nfc.PCSCUltralightTechnology
+import com.codebutler.farebot.card.nfc.PCSCVicinityTechnology
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
+import com.codebutler.farebot.card.vicinity.VicinityCardReader
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.runBlocking
@@ -142,6 +144,11 @@ class PcscReaderBackend : NfcReaderBackend {
             CardType.CEPAS -> {
                 val transceiver = PCSCCardTransceiver(channel)
                 CEPASCardReader.readCard(tagId, transceiver)
+            }
+
+            CardType.Vicinity -> {
+                val tech = PCSCVicinityTechnology(channel, tagId)
+                VicinityCardReader.readCard(tagId, tech)
             }
 
             else -> {

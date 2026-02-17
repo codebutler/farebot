@@ -48,6 +48,10 @@ data class PCSCCardInfo(
         private const val SS_FELICA_424K: Byte = 0x12.toByte()
         private const val SS_JCOP_DESFIRE: Byte = 0x04 // DESFire via JCOP emulation
 
+        // ISO 15693 / NFC-V card types
+        private const val SS_ICODE_SLI: Byte = 0x07
+        private const val SS_TAG_IT_HFI: Byte = 0x0C
+
         // Card Name bytes (NN NN) from ATR for finer identification
         private const val NN_DESFIRE_EV1: Short = 0x0306
         private const val NN_DESFIRE_EV2: Short = 0x0308
@@ -137,6 +141,10 @@ data class PCSCCardInfo(
 
                 SS_FELICA_212K, SS_FELICA_424K -> {
                     PCSCCardInfo(CardType.FeliCa)
+                }
+
+                SS_ICODE_SLI, SS_TAG_IT_HFI -> {
+                    PCSCCardInfo(CardType.Vicinity)
                 }
 
                 else -> {
