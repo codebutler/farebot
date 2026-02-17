@@ -51,12 +51,7 @@ class En1545FixedString(
         var lastNonSpace = 0
         val ret = StringBuilder()
         while (i + 4 < start + length && i + 4 < bin.size * 8) {
-            val bl: Int
-            try {
-                bl = bitParser(bin, i, 5)
-            } catch (_: Exception) {
-                return null
-            }
+            val bl = bitParser(bin, i, 5)
 
             if (bl == 0 || bl == 31) {
                 if (j != 0) {
@@ -70,10 +65,10 @@ class En1545FixedString(
             }
             i += 5
         }
-        return try {
-            ret.substring(0, lastNonSpace + 1)
-        } catch (_: Exception) {
+        return if (ret.isEmpty()) {
             ret.toString()
+        } else {
+            ret.substring(0, lastNonSpace + 1)
         }
     }
 }

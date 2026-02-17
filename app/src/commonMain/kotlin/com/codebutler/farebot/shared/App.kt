@@ -227,27 +227,24 @@ fun FareBotApp(
                                     var count = 0
                                     for (cardInfo in supportedCards) {
                                         val fileName = cardInfo.sampleDumpFile ?: continue
-                                        try {
-                                            val bytes = Res.readBytes("files/samples/$fileName")
-                                            val result =
-                                                if (fileName.endsWith(".mfc")) {
-                                                    cardImporter.importMfcDump(bytes)
-                                                } else {
-                                                    cardImporter.importCards(bytes.decodeToString())
-                                                }
-                                            if (result is ImportResult.Success) {
-                                                for (rawCard in result.cards) {
-                                                    cardPersister.insertCard(
-                                                        SavedCard(
-                                                            type = rawCard.cardType(),
-                                                            serial = rawCard.tagId().hex(),
-                                                            data = cardSerializer.serialize(rawCard),
-                                                        ),
-                                                    )
-                                                    count++
-                                                }
+                                        val bytes = Res.readBytes("files/samples/$fileName")
+                                        val result =
+                                            if (fileName.endsWith(".mfc")) {
+                                                cardImporter.importMfcDump(bytes)
+                                            } else {
+                                                cardImporter.importCards(bytes.decodeToString())
                                             }
-                                        } catch (_: Exception) {
+                                        if (result is ImportResult.Success) {
+                                            for (rawCard in result.cards) {
+                                                cardPersister.insertCard(
+                                                    SavedCard(
+                                                        type = rawCard.cardType(),
+                                                        serial = rawCard.tagId().hex(),
+                                                        data = cardSerializer.serialize(rawCard),
+                                                    ),
+                                                )
+                                                count++
+                                            }
                                         }
                                     }
                                     historyViewModel.loadCards()

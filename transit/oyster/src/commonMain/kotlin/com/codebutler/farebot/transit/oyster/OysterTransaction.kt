@@ -54,14 +54,12 @@ class OysterTransaction(
                 for (block in 0..2) {
                     // invalid
                     if (block == 0 && sector == 9) continue
-                    try {
-                        result.add(
-                            OysterTransaction(
-                                OysterUtils.parseTimestamp(sec.getBlock(block).data, 6),
-                            ),
-                        )
-                    } catch (_: Exception) {
-                    }
+                    if (block >= sec.blocks.size) continue
+                    result.add(
+                        OysterTransaction(
+                            OysterUtils.parseTimestamp(sec.getBlock(block).data, 6),
+                        ),
+                    )
                 }
             }
             return result

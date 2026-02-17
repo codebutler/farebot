@@ -135,13 +135,11 @@ class SmartRiderTagRecord(
     companion object {
         private fun routeName(input: ByteArray): String {
             val cleaned = input.filter { it != 0.toByte() }.toByteArray()
-            try {
-                if (cleaned.isASCII()) {
-                    return cleaned.readASCII()
-                }
-            } catch (_: Exception) {
+            return if (cleaned.isASCII()) {
+                cleaned.readASCII()
+            } else {
+                cleaned.hex()
             }
-            return cleaned.hex()
         }
 
         /**

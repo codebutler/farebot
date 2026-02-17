@@ -44,17 +44,15 @@ class OysterRefill(
             val result = mutableListOf<OysterRefill>()
             val sector5 = card.getSector(5) as? DataClassicSector ?: return result
             for (block in 0..2) {
-                try {
-                    val data = sector5.getBlock(block).data
-                    result.add(
-                        OysterRefill(
-                            startTimestamp = OysterUtils.parseTimestamp(data),
-                            // estimate: max top-up requires 14 bits
-                            amount = data.getBitsFromBufferLeBits(74, 14),
-                        ),
-                    )
-                } catch (_: Exception) {
-                }
+                if (block >= sector5.blocks.size) continue
+                val data = sector5.getBlock(block).data
+                result.add(
+                    OysterRefill(
+                        startTimestamp = OysterUtils.parseTimestamp(data),
+                        // estimate: max top-up requires 14 bits
+                        amount = data.getBitsFromBufferLeBits(74, 14),
+                    ),
+                )
             }
             return result
         }
