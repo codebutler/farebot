@@ -71,49 +71,50 @@ class DesktopCardScanner : CardScanner {
 
         scanJob =
             scope.launch {
-                val backends = discoverBackends()
-                val backendJobs =
-                    backends.map { backend ->
-                        launch {
-                            println("[DesktopCardScanner] Starting ${backend.name} backend")
-                            try {
-                                backend.scanLoop(
-                                    onCardDetected = { tag ->
-                                        _scannedTags.tryEmit(tag)
-                                    },
-                                    onCardRead = { rawCard ->
-                                        _scannedCards.tryEmit(rawCard)
-                                    },
-                                    onError = { error ->
-                                        _scanErrors.tryEmit(error)
-                                    },
-                                )
-                            } catch (e: Exception) {
-                                if (isActive) {
-                                    println("[DesktopCardScanner] ${backend.name} backend failed: ${e.message}")
+                try {
+                    val backends = discoverBackends()
+                    val backendJobs =
+                        backends.map { backend ->
+                            launch {
+                                println("[DesktopCardScanner] Starting ${backend.name} backend")
+                                try {
+                                    backend.scanLoop(
+                                        onCardDetected = { tag ->
+                                            _scannedTags.tryEmit(tag)
+                                        },
+                                        onCardRead = { rawCard ->
+                                            _scannedCards.tryEmit(rawCard)
+                                        },
+                                        onError = { error ->
+                                            _scanErrors.tryEmit(error)
+                                        },
+                                    )
+                                } catch (e: Exception) {
+                                    if (isActive) {
+                                        println("[DesktopCardScanner] ${backend.name} backend failed: ${e.message}")
+                                    }
+                                } catch (e: Error) {
+                                    // Catch LinkageError / UnsatisfiedLinkError from native libs
+                                    println("[DesktopCardScanner] ${backend.name} backend unavailable: ${e.message}")
                                 }
-                            } catch (e: Error) {
-                                // Catch LinkageError / UnsatisfiedLinkError from native libs
-                                println("[DesktopCardScanner] ${backend.name} backend unavailable: ${e.message}")
                             }
                         }
+
+                    backendJobs.forEach { it.join() }
+
+                    // All backends exited — emit error only if none ran successfully
+                    if (isActive) {
+                        _scanErrors.tryEmit(Exception("All NFC reader backends failed. Is a USB NFC reader connected?"))
                     }
-
-                backendJobs.forEach { it.join() }
-
-                // All backends exited — emit error only if none ran successfully
-                if (isActive) {
-                    _scanErrors.tryEmit(Exception("All NFC reader backends failed. Is a USB NFC reader connected?"))
+                } finally {
+                    _isScanning.value = false
                 }
-                _isScanning.value = false
             }
     }
 
     override fun stopActiveScan() {
         scanJob?.cancel()
         scanJob = null
-        _isScanning.value = false
-        PN533Device.shutdown()
     }
 
     private suspend fun discoverBackends(): List<NfcReaderBackend> {

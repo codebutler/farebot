@@ -208,6 +208,7 @@ internal class DesfireProtocol(
                 }
                 PERMISSION_DENIED -> throw DesfireAccessControlException("Permission denied")
                 AUTHENTICATION_ERROR -> throw DesfireAccessControlException("Authentication error")
+                COMMAND_ABORTED -> throw DesfireAccessControlException("Command aborted")
                 AID_NOT_FOUND -> throw DesfireNotFoundException("AID not found")
                 FILE_NOT_FOUND -> throw DesfireNotFoundException("File not found")
                 else -> throw Exception("Unknown status code: " + (status.toInt() and 0xFF).toString(16))
@@ -259,6 +260,7 @@ internal class DesfireProtocol(
         private val AID_NOT_FOUND: Byte = 0xA0.toByte()
         private val AUTHENTICATION_ERROR: Byte = 0xAE.toByte()
         private val ADDITIONAL_FRAME: Byte = 0xAF.toByte()
+        private val COMMAND_ABORTED: Byte = 0xCA.toByte()
         private val FILE_NOT_FOUND: Byte = 0xF0.toByte()
     }
 }

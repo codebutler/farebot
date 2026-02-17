@@ -41,7 +41,6 @@ import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 /**
  * Abstract base for PN53x-family USB reader backends.
@@ -59,7 +58,7 @@ abstract class PN53xReaderBackend(
         tg: Int,
     ): CardTransceiver = PN533CardTransceiver(pn533, tg)
 
-    override fun scanLoop(
+    override suspend fun scanLoop(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
@@ -72,10 +71,8 @@ abstract class PN53xReaderBackend(
         transport.flush()
         val pn533 = PN533(transport)
         try {
-            runBlocking {
-                initDevice(pn533)
-                pollLoop(pn533, onCardDetected, onCardRead, onError)
-            }
+            initDevice(pn533)
+            pollLoop(pn533, onCardDetected, onCardRead, onError)
         } finally {
             pn533.close()
         }

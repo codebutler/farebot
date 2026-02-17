@@ -25,20 +25,19 @@ package com.codebutler.farebot.card.felica
 import com.codebutler.farebot.card.nfc.toByteArray
 import com.codebutler.farebot.card.nfc.toNSData
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreNFC.NFCFeliCaPollingRequestCodeNoRequest
 import platform.CoreNFC.NFCFeliCaPollingTimeSlotMax1
 import platform.CoreNFC.NFCFeliCaTagProtocol
 import platform.Foundation.NSData
 import platform.Foundation.NSError
-import platform.darwin.DISPATCH_TIME_FOREVER
-import platform.darwin.dispatch_semaphore_create
-import platform.darwin.dispatch_semaphore_signal
-import platform.darwin.dispatch_semaphore_wait
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * iOS implementation of [FeliCaTagAdapter] using Core NFC's [NFCFeliCaTagProtocol].
  *
- * Uses semaphore-based bridging for the async Core NFC API.
+ * Uses [suspendCancellableCoroutine] to bridge the async Core NFC API.
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosFeliCaTagAdapter(
@@ -47,19 +46,22 @@ class IosFeliCaTagAdapter(
     override fun getIDm(): ByteArray = tag.currentIDm.toByteArray()
 
     override suspend fun getSystemCodes(): List<Int> {
-        val semaphore = dispatch_semaphore_create(0)
-        var codes: List<*>? = null
-        var nfcError: NSError? = null
-
-        tag.requestSystemCodeWithCompletionHandler { systemCodes: List<*>?, error: NSError? ->
-            codes = systemCodes
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
-        }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        if (nfcError != null) return emptyList()
+        val codes =
+            try {
+                suspendCancellableCoroutine<List<*>?> { cont ->
+                    tag.requestSystemCodeWithCompletionHandler { systemCodes: List<*>?, error: NSError? ->
+                        if (error != null) {
+                            cont.resumeWithException(
+                                Exception("requestSystemCode failed: ${error.localizedDescription}"),
+                            )
+                        } else {
+                            cont.resume(systemCodes)
+                        }
+                    }
+                }
+            } catch (_: Exception) {
+                return emptyList()
+            }
 
         return codes?.mapNotNull { item ->
             val data = item as? NSData ?: return@mapNotNull null
@@ -73,30 +75,29 @@ class IosFeliCaTagAdapter(
     }
 
     override suspend fun selectSystem(systemCode: Int): ByteArray? {
-        val semaphore = dispatch_semaphore_create(0)
-        var pmmData: NSData? = null
-        var nfcError: NSError? = null
-
         val systemCodeBytes =
             byteArrayOf(
                 (systemCode shr 8).toByte(),
                 (systemCode and 0xff).toByte(),
             )
 
-        tag.pollingWithSystemCode(
-            systemCodeBytes.toNSData(),
-            requestCode = NFCFeliCaPollingRequestCodeNoRequest,
-            timeSlot = NFCFeliCaPollingTimeSlotMax1,
-        ) { pmm: NSData?, _: NSData?, error: NSError? ->
-            pmmData = pmm
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
+        return try {
+            suspendCancellableCoroutine<ByteArray?> { cont ->
+                tag.pollingWithSystemCode(
+                    systemCodeBytes.toNSData(),
+                    requestCode = NFCFeliCaPollingRequestCodeNoRequest,
+                    timeSlot = NFCFeliCaPollingTimeSlotMax1,
+                ) { pmm: NSData?, _: NSData?, error: NSError? ->
+                    if (error != null) {
+                        cont.resume(null)
+                    } else {
+                        cont.resume(pmm?.toByteArray())
+                    }
+                }
+            }
+        } catch (_: Exception) {
+            null
         }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        if (nfcError != null) return null
-        return pmmData?.toByteArray()
     }
 
     override suspend fun getServiceCodes(): List<Int> {
@@ -126,10 +127,6 @@ class IosFeliCaTagAdapter(
         serviceCode: Int,
         blockAddr: Byte,
     ): ByteArray? {
-        val semaphore = dispatch_semaphore_create(0)
-        var blockDataList: List<*>? = null
-        var nfcError: NSError? = null
-
         // Service code list: 2 bytes, little-endian
         val serviceCodeData =
             byteArrayOf(
@@ -140,29 +137,27 @@ class IosFeliCaTagAdapter(
         // Block list element: 2-byte format (0x80 | service_list_order, block_number)
         val blockListData = byteArrayOf(0x80.toByte(), blockAddr).toNSData()
 
-        tag.readWithoutEncryptionWithServiceCodeList(
-            listOf(serviceCodeData),
-            blockList = listOf(blockListData),
-        ) { _: Long, _: Long, dataList: List<*>?, error: NSError? ->
-            blockDataList = dataList
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
+        return try {
+            suspendCancellableCoroutine<ByteArray?> { cont ->
+                tag.readWithoutEncryptionWithServiceCodeList(
+                    listOf(serviceCodeData),
+                    blockList = listOf(blockListData),
+                ) { _: Long, _: Long, dataList: List<*>?, error: NSError? ->
+                    if (error != null) {
+                        cont.resume(null)
+                    } else {
+                        val data = dataList?.firstOrNull() as? NSData
+                        val bytes = data?.toByteArray()
+                        cont.resume(if (bytes != null && bytes.isNotEmpty()) bytes else null)
+                    }
+                }
+            }
+        } catch (_: Exception) {
+            null
         }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        if (nfcError != null) return null
-
-        val data = blockDataList?.firstOrNull() as? NSData ?: return null
-        val bytes = data.toByteArray()
-        return if (bytes.isNotEmpty()) bytes else null
     }
 
-    private fun requestServiceVersions(serviceCodes: List<Int>): List<Int>? {
-        val semaphore = dispatch_semaphore_create(0)
-        var versionList: List<*>? = null
-        var nfcError: NSError? = null
-
+    private suspend fun requestServiceVersions(serviceCodes: List<Int>): List<Int>? {
         val nodeCodeList =
             serviceCodes.map { code ->
                 byteArrayOf(
@@ -171,24 +166,28 @@ class IosFeliCaTagAdapter(
                 ).toNSData()
             }
 
-        tag.requestServiceWithNodeCodeList(nodeCodeList) { versions: List<*>?, error: NSError? ->
-            versionList = versions
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
-        }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        if (nfcError != null) return null
-
-        return versionList?.map { item ->
-            val data = item as? NSData ?: return@map 0xFFFF
-            val bytes = data.toByteArray()
-            if (bytes.size >= 2) {
-                (bytes[0].toInt() and 0xff) or ((bytes[1].toInt() and 0xff) shl 8)
-            } else {
-                0xFFFF
+        return try {
+            suspendCancellableCoroutine<List<Int>?> { cont ->
+                tag.requestServiceWithNodeCodeList(nodeCodeList) { versions: List<*>?, error: NSError? ->
+                    if (error != null) {
+                        cont.resume(null)
+                    } else {
+                        cont.resume(
+                            versions?.map { item ->
+                                val data = item as? NSData ?: return@map 0xFFFF
+                                val bytes = data.toByteArray()
+                                if (bytes.size >= 2) {
+                                    (bytes[0].toInt() and 0xff) or ((bytes[1].toInt() and 0xff) shl 8)
+                                } else {
+                                    0xFFFF
+                                }
+                            },
+                        )
+                    }
+                }
             }
+        } catch (_: Exception) {
+            null
         }
     }
 

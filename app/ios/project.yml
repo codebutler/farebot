@@ -38,9 +38,6 @@ targets:
       SystemCapabilities:
         com.apple.NearFieldCommunicationTagReading:
           enabled: 1
-    dependencies:
-      - framework: "../../app/build/bin/iosSimulatorArm64/debugFramework/FareBotKit.framework"
-        embed: true
     preBuildScripts:
       - name: "Build KMP Framework"
         script: |

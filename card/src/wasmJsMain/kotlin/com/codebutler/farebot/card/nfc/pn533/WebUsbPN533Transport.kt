@@ -80,11 +80,10 @@ class WebUsbPN533Transport : PN533Transport {
             return false
         }
         deviceOpened = true
-        // Drain stale data
-        repeat(MAX_FLUSH_READS) {
-            val drained = bulkRead(FLUSH_TIMEOUT_MS)
-            drained ?: return@repeat
-        }
+        // No flush here — WebUSB transferIn cannot be cancelled, so rapid
+        // reads with short timeouts leave dangling promises that consume
+        // subsequent device responses. The poll loop sends an ACK first
+        // to clear any stale PN533 command state.
         return true
     }
 
@@ -153,8 +152,6 @@ class WebUsbPN533Transport : PN533Transport {
 
     companion object {
         const val TIMEOUT_MS = 5000
-        const val FLUSH_TIMEOUT_MS = 100
-        const val MAX_FLUSH_READS = 10
         const val POLL_INTERVAL_MS = 5L
 
         const val TFI_HOST_TO_PN533: Byte = 0xD4.toByte()
@@ -315,7 +312,7 @@ private fun jsWebUsbStartTransferIn(timeoutMs: Int) {
             var timer = setTimeout(function() {
                 if (!window._fbUsbIn.ready) window._fbUsbIn.ready = true;
             }, timeoutMs);
-            window._fbUsb.device.transferIn(4, 64).then(function(result) {
+            window._fbUsb.device.transferIn(4, 265).then(function(result) {
                 clearTimeout(timer);
                 if (result.data && result.data.byteLength > 0) {
                     var arr = new Uint8Array(result.data.buffer);

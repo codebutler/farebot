@@ -23,14 +23,13 @@
 package com.codebutler.farebot.card.nfc
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreNFC.NFCMiFareTagProtocol
 import platform.CoreNFC.NFCMiFareUltralight
 import platform.Foundation.NSData
 import platform.Foundation.NSError
-import platform.darwin.DISPATCH_TIME_FOREVER
-import platform.darwin.dispatch_semaphore_create
-import platform.darwin.dispatch_semaphore_signal
-import platform.darwin.dispatch_semaphore_wait
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * iOS implementation of [UltralightTechnology] wrapping Core NFC's [NFCMiFareTag].
@@ -68,44 +67,33 @@ class IosUltralightTechnology(
         // Returns 16 bytes (4 consecutive pages of 4 bytes each).
         val readCommand = byteArrayOf(0x30, pageOffset.toByte())
 
-        val semaphore = dispatch_semaphore_create(0)
-        var result: NSData? = null
-        var nfcError: NSError? = null
-
-        tag.sendMiFareCommand(readCommand.toNSData()) { response: NSData?, error: NSError? ->
-            result = response
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
+        return suspendCancellableCoroutine { cont ->
+            tag.sendMiFareCommand(readCommand.toNSData()) { response: NSData?, error: NSError? ->
+                if (error != null) {
+                    cont.resumeWithException(
+                        Exception("Ultralight read failed at page $pageOffset: ${error.localizedDescription}"),
+                    )
+                } else if (response != null) {
+                    cont.resume(response.toByteArray())
+                } else {
+                    cont.resumeWithException(
+                        Exception("Ultralight read returned null at page $pageOffset"),
+                    )
+                }
+            }
         }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        nfcError?.let {
-            throw Exception("Ultralight read failed at page $pageOffset: ${it.localizedDescription}")
-        }
-
-        return result?.toByteArray()
-            ?: throw Exception("Ultralight read returned null at page $pageOffset")
     }
 
-    override suspend fun transceive(data: ByteArray): ByteArray {
-        val semaphore = dispatch_semaphore_create(0)
-        var result: NSData? = null
-        var nfcError: NSError? = null
-
-        tag.sendMiFareCommand(data.toNSData()) { response: NSData?, error: NSError? ->
-            result = response
-            nfcError = error
-            dispatch_semaphore_signal(semaphore)
+    override suspend fun transceive(data: ByteArray): ByteArray =
+        suspendCancellableCoroutine { cont ->
+            tag.sendMiFareCommand(data.toNSData()) { response: NSData?, error: NSError? ->
+                if (error != null) {
+                    cont.resumeWithException(Exception("Ultralight transceive failed: ${error.localizedDescription}"))
+                } else if (response != null) {
+                    cont.resume(response.toByteArray())
+                } else {
+                    cont.resumeWithException(Exception("Ultralight transceive returned null"))
+                }
+            }
         }
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-
-        nfcError?.let {
-            throw Exception("Ultralight transceive failed: ${it.localizedDescription}")
-        }
-
-        return result?.toByteArray()
-            ?: throw Exception("Ultralight transceive returned null")
-    }
 }
