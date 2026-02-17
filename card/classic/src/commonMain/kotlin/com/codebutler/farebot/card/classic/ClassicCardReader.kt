@@ -52,14 +52,14 @@ object ClassicCardReader {
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,
         globalKeys: List<ByteArray>? = null,
-        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
+        onProgress: ((String) -> Unit)? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
         val sectorCount = tech.sectorCount
         val recoveredKeys = mutableMapOf<Int, Pair<ByteArray, Boolean>>()
 
         for (sectorIndex in 0 until sectorCount) {
-            onProgress?.invoke(sectorIndex, sectorCount)
+            onProgress?.invoke("Reading sector $sectorIndex of $sectorCount")
             try {
                 var authSuccess = false
                 var successfulKey: ByteArray? = null
@@ -176,12 +176,15 @@ object ClassicCardReader {
                         val rawClassic = PN533RawClassic(tech.rawPn533, tech.rawUid)
                         val attack = NestedAttack(rawClassic, tech.uidAsUInt)
 
+                        onProgress?.invoke("Sector $sectorIndex: attempting key recovery...")
+
                         val recoveredKey = attack.recoverKey(
                             knownKeyType = knownKeyType,
                             knownSectorBlock = knownBlock,
                             knownKey = knownKey,
                             targetKeyType = 0x60,
                             targetBlock = targetBlock,
+                            onProgress = onProgress,
                         )
 
                         if (recoveredKey != null) {
@@ -197,6 +200,9 @@ object ClassicCardReader {
                                     successfulKey = keyBytes
                                     isKeyA = false
                                 }
+                            }
+                            if (authSuccess) {
+                                onProgress?.invoke("Sector $sectorIndex: key recovered!")
                             }
                         }
                     }
