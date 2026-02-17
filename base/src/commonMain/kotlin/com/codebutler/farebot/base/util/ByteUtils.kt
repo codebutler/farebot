@@ -13,13 +13,8 @@ object ByteUtils {
 
     fun getHexString(
         b: ByteArray,
-        defaultResult: String,
-    ): String =
-        try {
-            getHexString(b)
-        } catch (ex: Exception) {
-            defaultResult
-        }
+        @Suppress("UNUSED_PARAMETER") defaultResult: String,
+    ): String = getHexString(b)
 
     fun hexStringToByteArray(s: String): ByteArray {
         if (s.length % 2 != 0) {

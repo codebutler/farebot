@@ -33,8 +33,8 @@ class En1545FixedHex(
         holder: En1545Parsed,
         bitParser: En1545Bits,
     ): Int {
-        var res = ""
-        try {
+        if (off + len <= b.size * 8) {
+            var res = ""
             var i = len
             while (i > 0) {
                 if (i >= 8) {
@@ -53,7 +53,6 @@ class En1545FixedHex(
                 break
             }
             holder.insertString(name, path, res)
-        } catch (_: Exception) {
         }
         return off + len
     }

@@ -49,12 +49,8 @@ class En1545Bitmap private constructor(
         bitParser: En1545Bits,
     ): Int {
         var off = off
-        val bitmask: Int
-        try {
-            bitmask = bitParser(b, off, fields.size)
-        } catch (_: Exception) {
-            return off + fields.size
-        }
+        if (off + fields.size > b.size * 8) return off + fields.size
+        val bitmask = bitParser(b, off, fields.size)
 
         off += fields.size
         if (infix != null) {

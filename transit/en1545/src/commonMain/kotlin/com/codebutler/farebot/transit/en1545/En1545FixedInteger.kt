@@ -43,9 +43,8 @@ class En1545FixedInteger(
         holder: En1545Parsed,
         bitParser: En1545Bits,
     ): Int {
-        try {
+        if (off + len <= b.size * 8) {
             holder.insertInt(name, path, bitParser(b, off, len))
-        } catch (_: Exception) {
         }
         return off + len
     }

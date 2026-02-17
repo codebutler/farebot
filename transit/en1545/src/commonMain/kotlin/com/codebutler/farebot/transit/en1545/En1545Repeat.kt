@@ -41,12 +41,8 @@ class En1545Repeat(
         bitParser: En1545Bits,
     ): Int {
         var off = off
-        val ctr: Int
-        try {
-            ctr = bitParser(b, off, ctrLen)
-        } catch (_: Exception) {
-            return off + ctrLen
-        }
+        if (off + ctrLen > b.size * 8) return off + ctrLen
+        val ctr = bitParser(b, off, ctrLen)
 
         off += ctrLen
         for (i in 0 until ctr) {

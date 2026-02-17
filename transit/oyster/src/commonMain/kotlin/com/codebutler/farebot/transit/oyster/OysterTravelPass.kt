@@ -47,33 +47,27 @@ class OysterTravelPass(
         internal fun parseAll(card: ClassicCard): List<OysterTravelPass> {
             val result = mutableListOf<OysterTravelPass>()
             for (block in 0..2) {
-                try {
-                    val sec7 =
-                        (card.getSector(7) as? DataClassicSector)
-                            ?.getBlock(block)
-                            ?.data ?: continue
+                val sector7 = card.getSector(7) as? DataClassicSector ?: continue
+                val sector8 = card.getSector(8) as? DataClassicSector ?: continue
+                if (block >= sector7.blocks.size || block >= sector8.blocks.size) continue
 
-                    // Don't know what a blank card looks like, so try to skip if it doesn't look
-                    // like there is any expiry date on a pass.
-                    if (sec7.sliceOffLen(9, 4).isAllZero()) {
-                        // invalid date?
-                        continue
-                    }
+                val sec7 = sector7.getBlock(block).data
+                val sec8 = sector8.getBlock(block).data
 
-                    val sec8 =
-                        (card.getSector(8) as? DataClassicSector)
-                            ?.getBlock(block)
-                            ?.data ?: continue
-
-                    result.add(
-                        OysterTravelPass(
-                            validFrom = OysterUtils.parseTimestamp(sec8, 78),
-                            validTo = OysterUtils.parseTimestamp(sec7, 33),
-                            cost = TransitCurrency.GBP(sec8.byteArrayToIntReversed(0, 2)),
-                        ),
-                    )
-                } catch (_: Exception) {
+                // Don't know what a blank card looks like, so try to skip if it doesn't look
+                // like there is any expiry date on a pass.
+                if (sec7.sliceOffLen(9, 4).isAllZero()) {
+                    // invalid date?
+                    continue
                 }
+
+                result.add(
+                    OysterTravelPass(
+                        validFrom = OysterUtils.parseTimestamp(sec8, 78),
+                        validTo = OysterUtils.parseTimestamp(sec7, 33),
+                        cost = TransitCurrency.GBP(sec8.byteArrayToIntReversed(0, 2)),
+                    ),
+                )
             }
             return result
         }
