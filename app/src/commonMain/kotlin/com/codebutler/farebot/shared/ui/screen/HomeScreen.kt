@@ -92,6 +92,7 @@ import farebot.app.generated.resources.app_name
 import farebot.app.generated.resources.cancel
 import farebot.app.generated.resources.delete
 import farebot.app.generated.resources.delete_selected_cards
+import farebot.app.generated.resources.flipper_zero
 import farebot.app.generated.resources.ic_cards_stack
 import farebot.app.generated.resources.ic_launcher
 import farebot.app.generated.resources.import_file
@@ -142,6 +143,7 @@ fun HomeScreen(
     onKeysRequiredTap: () -> Unit,
     onStatusChipTap: (String) -> Unit = {},
     onNavigateToKeys: (() -> Unit)?,
+    onNavigateToFlipper: (() -> Unit)? = null,
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: (() -> Unit)? = null,
     onAddAllSamples: (() -> Unit)? = null,
@@ -368,6 +370,15 @@ fun HomeScreen(
                                     },
                                 )
                             }
+                            if (onNavigateToFlipper != null) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.flipper_zero)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onNavigateToFlipper()
+                                    },
+                                )
+                            }
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.about)) },
                                 onClick = {
@@ -546,6 +557,15 @@ fun HomeScreen(
                                     onClick = {
                                         menuExpanded = false
                                         onNavigateToKeys()
+                                    },
+                                )
+                            }
+                            if (onNavigateToFlipper != null) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.flipper_zero)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onNavigateToFlipper()
                                     },
                                 )
                             }

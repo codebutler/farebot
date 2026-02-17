@@ -19,6 +19,8 @@ import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
+import com.codebutler.farebot.flipper.AndroidFlipperTransportFactory
+import com.codebutler.farebot.flipper.FlipperTransportFactory
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -113,6 +115,11 @@ abstract class AndroidAppGraph : AppGraph {
         cardSerializer: CardSerializer,
         json: Json,
     ): CardImporter = CardImporter(cardSerializer, json)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideFlipperTransportFactory(context: Context): FlipperTransportFactory =
+        AndroidFlipperTransportFactory(context)
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner

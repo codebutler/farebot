@@ -15,6 +15,8 @@ import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.JvmAppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.JvmFlipperTransportFactory
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -86,6 +88,10 @@ abstract class DesktopAppGraph : AppGraph {
         cardSerializer: CardSerializer,
         json: Json,
     ): CardImporter = CardImporter(cardSerializer, json)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideFlipperTransportFactory(): FlipperTransportFactory = JvmFlipperTransportFactory()
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner

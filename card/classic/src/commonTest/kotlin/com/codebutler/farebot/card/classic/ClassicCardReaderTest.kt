@@ -269,6 +269,33 @@ class ClassicCardReaderTest {
         }
 
     @Test
+    fun testGlobalKeysUsedWhenCardKeysFail() =
+        runTest {
+            val globalKey = byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte(), 0xEE.toByte(), 0xFF.toByte())
+            val blockData = ByteArray(16) { 0x42 }
+
+            val tech =
+                MockClassicTechnology(
+                    sectorCount = 1,
+                    blocksPerSector = 1,
+                    authKeyAResult = { _, key ->
+                        // Only the global key works
+                        key.contentEquals(globalKey)
+                    },
+                    readBlockResult = { blockData },
+                )
+
+            val result = ClassicCardReader.readCard(testTagId, tech, null, globalKeys = listOf(globalKey))
+            val sectors = result.sectors()
+
+            assertEquals(1, sectors.size)
+            assertEquals(RawClassicSector.TYPE_DATA, sectors[0].type)
+            assertTrue(sectors[0].blocks!![0].data.contentEquals(blockData))
+            // Default keys should have been tried and failed, then global key succeeded
+            assertTrue(tech.authKeyACalls.any { it.second.contentEquals(globalKey) })
+        }
+
+    @Test
     fun testGenericExceptionCreatesInvalidSector() =
         runTest {
             val tech =

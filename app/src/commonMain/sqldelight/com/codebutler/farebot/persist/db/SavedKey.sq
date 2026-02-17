@@ -17,3 +17,22 @@ INSERT INTO keys (card_id, card_type, key_data, created_at) VALUES (?, ?, ?, ?);
 
 deleteById:
 DELETE FROM keys WHERE id = ?;
+
+CREATE TABLE IF NOT EXISTS global_keys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    key_data TEXT NOT NULL,
+    source TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+
+insertGlobalKey:
+INSERT INTO global_keys (key_data, source, created_at) VALUES (?, ?, ?);
+
+selectAllGlobalKeys:
+SELECT * FROM global_keys;
+
+deleteGlobalKey:
+DELETE FROM global_keys WHERE id = ?;
+
+deleteAllGlobalKeys:
+DELETE FROM global_keys;

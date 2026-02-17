@@ -31,6 +31,7 @@ import com.codebutler.farebot.shared.ui.screen.AdvancedTab
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
 import com.codebutler.farebot.shared.ui.screen.CardScreen
+import com.codebutler.farebot.shared.ui.screen.FlipperScreen
 import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
@@ -218,6 +219,7 @@ fun FareBotApp(
                         } else {
                             null
                         },
+                    onNavigateToFlipper = { navController.navigate(Screen.Flipper.route) },
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = platformActions.openNfcSettings,
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
@@ -277,6 +279,24 @@ fun FareBotApp(
                             }
                         }
                     },
+                )
+            }
+
+            composable(Screen.Flipper.route) {
+                val viewModel = graphViewModel { flipperViewModel }
+                val flipperUiState by viewModel.uiState.collectAsState()
+
+                FlipperScreen(
+                    uiState = flipperUiState,
+                    onConnectUsb = { viewModel.connectUsb() },
+                    onConnectBle = { viewModel.connectBle() },
+                    onDisconnect = { viewModel.disconnect() },
+                    onNavigateToDirectory = { path -> viewModel.navigateToDirectory(path) },
+                    onNavigateUp = { viewModel.navigateUp() },
+                    onToggleSelection = { path -> viewModel.toggleFileSelection(path) },
+                    onImportSelected = { viewModel.importSelectedFiles() },
+                    onImportKeys = { viewModel.importKeyDictionary() },
+                    onBack = { navController.popBackStack() },
                 )
             }
 

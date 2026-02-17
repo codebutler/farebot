@@ -103,4 +103,20 @@
     <!-- Date labels -->
     <string name="date_today">Today</string>
     <string name="date_yesterday">Yesterday</string>
+
+    <!-- Flipper Zero -->
+    <string name="flipper_zero">Flipper Zero</string>
+    <string name="flipper_connecting">Connecting\u2026</string>
+    <string name="flipper_connecting_message">Connecting to Flipper Zero\u2026</string>
+    <string name="flipper_disconnect">Disconnect</string>
+    <string name="flipper_connect_prompt">Connect your Flipper Zero to browse and import NFC card dumps.</string>
+    <string name="flipper_connect_usb">Connect via USB</string>
+    <string name="flipper_connect_ble">Connect via Bluetooth</string>
+    <string name="flipper_no_files">No NFC files found</string>
+    <string name="flipper_up">Up</string>
+    <string name="flipper_import_selected">Import Selected (%1$d)</string>
+    <string name="flipper_import_keys">Import Keys</string>
+    <string name="flipper_importing">Importing %1$s</string>
+    <string name="flipper_import_progress">%1$d of %2$d</string>
+    <string name="flipper_bytes">%1$d bytes</string>
 </resources>

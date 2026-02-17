@@ -29,6 +29,7 @@ import com.codebutler.farebot.card.felica.raw.RawFelicaCard
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.shared.serialize.FlipperNfcParser
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
@@ -79,9 +80,9 @@ class FlipperNfcParserTest {
                 }
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawClassicCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawClassicCard>(parseResult.rawCard)
 
         // Verify UID
         assertEquals(0xBA.toByte(), result.tagId()[0])
@@ -123,9 +124,9 @@ class FlipperNfcParserTest {
                 }
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawClassicCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawClassicCard>(parseResult.rawCard)
 
         val sectors = result.sectors()
         assertEquals(40, sectors.size)
@@ -162,9 +163,9 @@ class FlipperNfcParserTest {
                 }
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawClassicCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawClassicCard>(parseResult.rawCard)
 
         val sectors = result.sectors()
         assertEquals(16, sectors.size)
@@ -201,9 +202,9 @@ class FlipperNfcParserTest {
                 }
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawClassicCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawClassicCard>(parseResult.rawCard)
 
         val sectors = result.sectors()
         // Sector 0 has readable blocks, so it should be data
@@ -216,6 +217,76 @@ class FlipperNfcParserTest {
         assertEquals(0x00.toByte(), block0.data[2]) // was ??
         assertEquals(0x04.toByte(), block0.data[3])
         assertEquals(0x00.toByte(), block0.data[4]) // was ??
+    }
+
+    @Test
+    fun testParseClassicExtractsKeys() {
+        val dump =
+            buildString {
+                appendLine("Filetype: Flipper NFC device")
+                appendLine("Version: 4")
+                appendLine("Device type: Mifare Classic")
+                appendLine("UID: 01 02 03 04")
+                appendLine("ATQA: 00 02")
+                appendLine("SAK: 08")
+                appendLine("Mifare Classic type: 1K")
+                appendLine("Data format version: 2")
+                // Sector 0: known keys
+                appendLine("Block 0: 01 02 03 04 B9 18 02 00 46 44 53 37 30 56 30 31")
+                appendLine("Block 1: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
+                appendLine("Block 2: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
+                // Sector trailer: Key A = A0A1A2A3A4A5, Access = FF078069, Key B = FFFFFFFFFFFF
+                appendLine("Block 3: A0 A1 A2 A3 A4 A5 FF 07 80 69 FF FF FF FF FF FF")
+                // Sector 1: different keys
+                appendLine("Block 4: 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00")
+                appendLine("Block 5: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
+                appendLine("Block 6: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
+                // Sector trailer: Key A = D3F7D3F7D3F7, Access = FF078069, Key B = 000000000000
+                appendLine("Block 7: D3 F7 D3 F7 D3 F7 FF 07 80 69 00 00 00 00 00 00")
+                // Sectors 2-15: unread
+                for (block in 8 until 64) {
+                    appendLine("Block $block: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??")
+                }
+            }
+
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        assertIs<RawClassicCard>(parseResult.rawCard)
+
+        // Verify keys were extracted
+        val keys = parseResult.classicKeys
+        assertNotNull(keys)
+        assertEquals(16, keys.keys.size)
+
+        // Sector 0: Key A = A0A1A2A3A4A5, Key B = FFFFFFFFFFFF
+        val sector0Key = keys.keyForSector(0)
+        assertNotNull(sector0Key)
+        assertContentEquals(
+            byteArrayOf(0xA0.toByte(), 0xA1.toByte(), 0xA2.toByte(), 0xA3.toByte(), 0xA4.toByte(), 0xA5.toByte()),
+            sector0Key.keyA,
+        )
+        assertContentEquals(
+            byteArrayOf(0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte()),
+            sector0Key.keyB,
+        )
+
+        // Sector 1: Key A = D3F7D3F7D3F7, Key B = 000000000000
+        val sector1Key = keys.keyForSector(1)
+        assertNotNull(sector1Key)
+        assertContentEquals(
+            byteArrayOf(0xD3.toByte(), 0xF7.toByte(), 0xD3.toByte(), 0xF7.toByte(), 0xD3.toByte(), 0xF7.toByte()),
+            sector1Key.keyA,
+        )
+        assertContentEquals(
+            byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+            sector1Key.keyB,
+        )
+
+        // Sector 2 (unauthorized): should have placeholder zero keys
+        val sector2Key = keys.keyForSector(2)
+        assertNotNull(sector2Key)
+        assertContentEquals(ByteArray(6), sector2Key.keyA)
+        assertContentEquals(ByteArray(6), sector2Key.keyB)
     }
 
     @Test
@@ -250,9 +321,9 @@ class FlipperNfcParserTest {
                 }
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawUltralightCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawUltralightCard>(parseResult.rawCard)
 
         // Verify UID
         assertEquals(0x04.toByte(), result.tagId()[0])
@@ -265,6 +336,9 @@ class FlipperNfcParserTest {
 
         // Verify type (NTAG213 = 2)
         assertEquals(2, result.ultralightType)
+
+        // Ultralight should have no classic keys
+        assertNull(parseResult.classicKeys)
     }
 
     @Test
@@ -310,9 +384,9 @@ class FlipperNfcParserTest {
                 appendLine("Application abcdef File 2 Cur: 10")
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawDesfireCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawDesfireCard>(parseResult.rawCard)
 
         // Verify UID
         assertEquals(0x04.toByte(), result.tagId()[0])
@@ -342,6 +416,9 @@ class FlipperNfcParserTest {
         val file2 = app.files[1]
         assertEquals(2, file2.fileId)
         assertNotNull(file2.error)
+
+        // DESFire should have no classic keys
+        assertNull(parseResult.classicKeys)
     }
 
     @Test
@@ -377,9 +454,9 @@ class FlipperNfcParserTest {
                 )
             }
 
-        val result = FlipperNfcParser.parse(dump)
-        assertNotNull(result)
-        assertIs<RawFelicaCard>(result)
+        val parseResult = FlipperNfcParser.parse(dump)
+        assertNotNull(parseResult)
+        val result = assertIs<RawFelicaCard>(parseResult.rawCard)
 
         // Verify UID
         assertEquals(0x01.toByte(), result.tagId()[0])

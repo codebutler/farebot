@@ -52,6 +52,7 @@ class LocalStorageCardKeysPersister(
 ) : CardKeysPersister {
     private companion object {
         const val STORAGE_KEY = "farebot_keys"
+        const val GLOBAL_KEYS_STORAGE_KEY = "farebot_global_keys"
     }
 
     override fun getSavedKeys(): List<SavedKey> = loadKeys()
@@ -80,6 +81,29 @@ class LocalStorageCardKeysPersister(
         val keys = loadKeys().toMutableList()
         keys.removeAll { it.id == savedKey.id }
         saveKeys(keys)
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun getGlobalKeys(): List<ByteArray> {
+        val raw = lsGetItem(GLOBAL_KEYS_STORAGE_KEY.toJsString())?.toString() ?: return emptyList()
+        return try {
+            json.decodeFromString<List<String>>(raw).map { it.hexToByteArray() }
+        } catch (e: Exception) {
+            println("[LocalStorage] Failed to load global keys: $e")
+            emptyList()
+        }
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun insertGlobalKeys(keys: List<ByteArray>, source: String) {
+        val existing = getGlobalKeys().map { it.toHexString() }.toMutableSet()
+        keys.forEach { existing.add(it.toHexString()) }
+        val serialized = json.encodeToString<List<String>>(existing.toList())
+        lsSetItem(GLOBAL_KEYS_STORAGE_KEY.toJsString(), serialized.toJsString())
+    }
+
+    override fun deleteAllGlobalKeys() {
+        lsSetItem(GLOBAL_KEYS_STORAGE_KEY.toJsString(), "[]".toJsString())
     }
 
     private fun loadKeys(): List<SavedKey> {

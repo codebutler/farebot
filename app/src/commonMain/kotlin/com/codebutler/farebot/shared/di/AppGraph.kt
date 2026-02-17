@@ -11,6 +11,8 @@ import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.viewmodel.AddKeyViewModel
 import com.codebutler.farebot.shared.viewmodel.CardViewModel
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.shared.viewmodel.FlipperViewModel
 import com.codebutler.farebot.shared.viewmodel.HistoryViewModel
 import com.codebutler.farebot.shared.viewmodel.HomeViewModel
 import com.codebutler.farebot.shared.viewmodel.KeysViewModel
@@ -27,10 +29,12 @@ interface AppGraph {
     val cardKeysPersister: CardKeysPersister
     val transitFactoryRegistry: TransitFactoryRegistry
     val cardScanner: CardScanner
+    val flipperTransportFactory: FlipperTransportFactory
 
     val homeViewModel: HomeViewModel
     val cardViewModel: CardViewModel
     val historyViewModel: HistoryViewModel
     val keysViewModel: KeysViewModel
     val addKeyViewModel: AddKeyViewModel
+    val flipperViewModel: FlipperViewModel
 }
