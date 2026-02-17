@@ -88,6 +88,7 @@ class MdstStationTableReader private constructor(
             val (bytes, _) = readDelimitedBytes(data, absoluteOffset)
             ProtoBuf.decodeFromByteArray<MdstStation>(bytes)
         } catch (e: Exception) {
+            println("[MdST] Failed to decode station $id: $e")
             null
         }
     }
@@ -129,6 +130,7 @@ class MdstStationTableReader private constructor(
                 readers[dbName] = reader
                 reader
             } catch (e: Exception) {
+                println("[MdST] Failed to parse $dbName: $e")
                 null
             }
         }

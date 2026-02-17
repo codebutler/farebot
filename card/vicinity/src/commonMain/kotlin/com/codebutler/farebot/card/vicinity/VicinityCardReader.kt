@@ -61,7 +61,8 @@ object VicinityCardReader {
                 } else {
                     null
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                println("[VicinityCardReader] Failed to read system info: $e")
                 null
             }
 

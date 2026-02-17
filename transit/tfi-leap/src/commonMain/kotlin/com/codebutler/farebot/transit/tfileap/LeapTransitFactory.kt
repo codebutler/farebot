@@ -48,6 +48,7 @@ class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
             val file6 = (app.getFile(6) as StandardDesfireFile).data
             TransitIdentity(FormattedString(Res.string.transit_leap_card_name), LeapTransitInfo.getSerial(file2, file6))
         } catch (e: Exception) {
+            println("[Leap] Failed to parse identity: $e")
             TransitIdentity(FormattedString(Res.string.transit_leap_card_name), null)
         }
 

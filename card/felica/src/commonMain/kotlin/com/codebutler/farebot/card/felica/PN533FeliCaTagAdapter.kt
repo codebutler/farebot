@@ -146,7 +146,8 @@ class PN533FeliCaTagAdapter(
     private suspend fun transceiveFelica(felicaFrame: ByteArray): ByteArray? =
         try {
             pn533.inCommunicateThru(felicaFrame)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            println("[PN533FeliCa] Transceive failed: $e")
             null
         }
 }

@@ -156,6 +156,8 @@ class HistoryViewModel(
                         groupedItems = groupedItems,
                     )
             } catch (e: Throwable) {
+                println("[HistoryViewModel] Failed to load cards: $e")
+                e.printStackTrace()
                 _uiState.value =
                     _uiState.value.copy(isLoading = false, allItems = emptyList(), groupedItems = emptyList())
             }

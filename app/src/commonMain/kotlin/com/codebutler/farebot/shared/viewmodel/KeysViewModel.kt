@@ -37,6 +37,8 @@ class KeysViewModel(
                     }
                 _uiState.value = KeysUiState(keys = keys, isLoading = false)
             } catch (e: Throwable) {
+                println("[KeysViewModel] Failed to load keys: $e")
+                e.printStackTrace()
                 _uiState.value = KeysUiState(isLoading = false)
             }
         }

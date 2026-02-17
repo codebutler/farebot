@@ -91,7 +91,8 @@ open class ErgTransitInfo(
             if (sector0 !is DataClassicSector) return null
             return try {
                 ErgMetadataRecord.recordFromBytes(sector0.getBlock(2).data)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                println("[ERG] Failed to parse metadata record: $e")
                 null
             }
         }

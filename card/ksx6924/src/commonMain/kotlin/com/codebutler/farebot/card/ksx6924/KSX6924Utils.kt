@@ -70,6 +70,7 @@ object KSX6924Utils {
                 second = second,
             ).toInstant(tz)
         } catch (e: Exception) {
+            println("[KSX6924] Failed to parse hex datetime: $e")
             null
         }
     }
@@ -94,6 +95,7 @@ object KSX6924Utils {
         return try {
             LocalDate(year = year, month = month, day = day)
         } catch (e: Exception) {
+            println("[KSX6924] Failed to parse hex date: $e")
             null
         }
     }

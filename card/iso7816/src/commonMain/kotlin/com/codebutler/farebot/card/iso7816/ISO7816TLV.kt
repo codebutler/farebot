@@ -306,6 +306,7 @@ object ISO7816TLV {
                             infoBerTLV(header + data, multihead),
                         )
                     } catch (e: Exception) {
+                        println("[ISO7816TLV] Failed to build TLV items: $e")
                         ListItem(id.toHexDump(), data.toHexDump())
                     }
                 } else {
@@ -319,6 +320,7 @@ object ISO7816TLV {
             try {
                 ListItemRecursive(FormattedString("TLV"), null, infoBerTLV(buf))
             } catch (e: Exception) {
+                println("[ISO7816TLV] Failed to decode TLV node: $e")
                 null
             },
         )

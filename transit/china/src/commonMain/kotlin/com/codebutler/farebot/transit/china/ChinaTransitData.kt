@@ -114,6 +114,7 @@ object ChinaTransitData {
                 second = 0,
             ).toInstant(TZ)
         } catch (e: Exception) {
+            println("[ChinaTransit] Failed to parse hex date from $value: $e")
             null
         }
     }
