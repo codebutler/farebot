@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,6 +48,7 @@ import farebot.app.generated.resources.delete_selected_keys
 import farebot.app.generated.resources.keys
 import farebot.app.generated.resources.n_selected
 import farebot.app.generated.resources.no_keys
+import farebot.app.generated.resources.select_all
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -58,6 +60,7 @@ fun KeysScreen(
     onDeleteKey: (String) -> Unit,
     onToggleSelection: (String) -> Unit = {},
     onClearSelection: () -> Unit = {},
+    onSelectAll: () -> Unit = {},
     onDeleteSelected: () -> Unit = {},
 ) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
@@ -94,6 +97,9 @@ fun KeysScreen(
                         }
                     },
                     actions = {
+                        IconButton(onClick = onSelectAll) {
+                            Icon(Icons.Default.SelectAll, contentDescription = stringResource(Res.string.select_all))
+                        }
                         IconButton(onClick = { showDeleteConfirmation = true }) {
                             Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
                         }

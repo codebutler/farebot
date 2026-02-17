@@ -471,7 +471,7 @@ private fun CardImageTile(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun CardDetailSheet(
+internal fun CardDetailSheet(
     card: CardInfo,
     cardName: String,
     cardLocation: String,
@@ -479,6 +479,7 @@ private fun CardDetailSheet(
     isKeysRequired: Boolean,
     onStatusChipTap: (String) -> Unit = {},
     onSampleCardTap: (() -> Unit)? = null,
+    showImage: Boolean = true,
 ) {
     Column(
         modifier =
@@ -487,39 +488,40 @@ private fun CardDetailSheet(
                 .padding(horizontal = 16.dp),
     ) {
         // Card image
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1.586f)
-                    .clip(RoundedCornerShape(12.dp)),
-        ) {
-            val imageRes = card.imageRes
-            if (imageRes != null) {
-                Image(
-                    painter = painterResource(imageRes),
-                    contentDescription = cardName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                )
-            } else {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = cardName,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        if (showImage) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1.586f)
+                        .clip(RoundedCornerShape(12.dp)),
+            ) {
+                val imageRes = card.imageRes
+                if (imageRes != null) {
+                    Image(
+                        painter = painterResource(imageRes),
+                        contentDescription = cardName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
                     )
+                } else {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = cardName,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
+            Spacer(Modifier.height(12.dp))
         }
-
-        Spacer(Modifier.height(12.dp))
 
         // Card name
         Text(
@@ -669,7 +671,7 @@ private fun CardDetailSheet(
 }
 
 @Composable
-private fun NonInteractiveChip(content: @Composable () -> Unit) {
+internal fun NonInteractiveChip(content: @Composable () -> Unit) {
     Box(
         modifier =
             Modifier.pointerInput(Unit) {

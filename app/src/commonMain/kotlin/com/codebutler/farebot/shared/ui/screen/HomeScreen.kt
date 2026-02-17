@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -105,6 +106,7 @@ import farebot.app.generated.resources.ok
 import farebot.app.generated.resources.reading_card
 import farebot.app.generated.resources.scan
 import farebot.app.generated.resources.search_supported_cards
+import farebot.app.generated.resources.select_all
 import farebot.app.generated.resources.show
 import farebot.app.generated.resources.show_all_scans
 import farebot.app.generated.resources.show_experimental_cards
@@ -130,6 +132,7 @@ fun HomeScreen(
     onImportFile: () -> Unit,
     onToggleSelection: (String) -> Unit,
     onClearSelection: () -> Unit,
+    onSelectAll: () -> Unit,
     onDeleteSelected: () -> Unit,
     supportedCards: List<CardInfo>,
     supportedCardTypes: Set<CardType>,
@@ -255,6 +258,9 @@ fun HomeScreen(
                         }
                     },
                     actions = {
+                        IconButton(onClick = onSelectAll) {
+                            Icon(Icons.Default.SelectAll, contentDescription = stringResource(Res.string.select_all))
+                        }
                         IconButton(onClick = { showDeleteConfirmation = true }) {
                             Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
                         }
