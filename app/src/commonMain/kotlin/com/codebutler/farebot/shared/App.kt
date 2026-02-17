@@ -218,7 +218,7 @@ fun FareBotApp(
                             null
                         },
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
-                    onOpenNfcSettings = { platformActions.openNfcSettings() },
+                    onOpenNfcSettings = platformActions.openNfcSettings,
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
                     onAddAllSamples =
                         if (isDebug) {

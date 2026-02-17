@@ -7,7 +7,7 @@ package com.codebutler.farebot.shared.platform
 interface PlatformActions {
     fun openUrl(url: String)
 
-    fun openNfcSettings()
+    val openNfcSettings: (() -> Unit)? get() = null
 
     fun copyToClipboard(text: String)
 

@@ -73,7 +73,7 @@ class AndroidPlatformActions(
         context.startActivity(intent)
     }
 
-    override fun openNfcSettings() {
+    override val openNfcSettings: (() -> Unit) = {
         val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)

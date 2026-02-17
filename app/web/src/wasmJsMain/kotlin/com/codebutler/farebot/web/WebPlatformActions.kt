@@ -117,9 +117,7 @@ class WebPlatformActions : PlatformActions {
         jsOpenUrl(url.toJsString())
     }
 
-    override fun openNfcSettings() {
-        // No NFC settings on web
-    }
+    // openNfcSettings not overridden — no NFC settings on web
 
     override fun copyToClipboard(text: String) {
         jsCopyToClipboard(text.toJsString())
