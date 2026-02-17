@@ -39,8 +39,13 @@ kotlin {
 }
 
 // javax.smartcardio is in the java.smartcardio JDK module (not auto-resolved).
-// Add it to the Kotlin JVM compilation classpath.
+// Add it to the Kotlin JVM compilation classpath (main and test).
 tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>("compileKotlinJvm") {
+    compilerOptions {
+        freeCompilerArgs.add("-Xadd-modules=java.smartcardio")
+    }
+}
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>("compileTestKotlinJvm") {
     compilerOptions {
         freeCompilerArgs.add("-Xadd-modules=java.smartcardio")
     }
