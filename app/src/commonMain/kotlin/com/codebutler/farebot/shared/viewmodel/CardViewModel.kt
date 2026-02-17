@@ -76,6 +76,8 @@ class CardViewModel(
         viewModelScope.launch {
             try {
                 val card = rawCard.parse()
+                val brandColor = transitFactoryRegistry.findBrandColor(card)
+                val cardInfo = transitFactoryRegistry.findCardInfo(card)
                 val transitInfo = transitFactoryRegistry.parseTransitInfo(card)
 
                 // Build scan history entries
@@ -121,6 +123,8 @@ class CardViewModel(
                             scanCount = currentScanIds.size.coerceAtLeast(1),
                             currentScanLabel = currentScanLabel,
                             scanHistory = scanHistory,
+                            brandColor = brandColor,
+                            cardInfo = cardInfo,
                         )
                 } else {
                     val tagIdHex =
@@ -145,6 +149,8 @@ class CardViewModel(
                             scanCount = currentScanIds.size.coerceAtLeast(1),
                             currentScanLabel = currentScanLabel,
                             scanHistory = scanHistory,
+                            brandColor = brandColor,
+                            cardInfo = cardInfo,
                         )
                 }
             } catch (ex: Exception) {

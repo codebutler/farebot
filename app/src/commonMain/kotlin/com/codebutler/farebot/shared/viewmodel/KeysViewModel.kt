@@ -59,6 +59,16 @@ class KeysViewModel(
             )
     }
 
+    fun selectAll() {
+        val current = _uiState.value
+        val allIds = current.keys.map { it.id }.toSet()
+        _uiState.value =
+            current.copy(
+                selectedIds = allIds,
+                isSelectionMode = allIds.isNotEmpty(),
+            )
+    }
+
     fun clearSelection() {
         _uiState.value =
             _uiState.value.copy(

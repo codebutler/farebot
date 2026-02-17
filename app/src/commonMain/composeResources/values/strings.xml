@@ -13,6 +13,7 @@
     <string name="view_sample">Sample card</string>
     <string name="card_type">Card Type</string>
     <string name="copy">Copy</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="delete">Delete</string>
     <string name="delete_selected_cards">Delete %1$d selected cards?</string>
     <string name="delete_selected_keys">Delete %1$d selected keys?</string>
@@ -33,6 +34,7 @@
     <string name="locked_card">Locked Card</string>
     <string name="menu">Menu</string>
     <string name="n_selected">%1$d selected</string>
+    <string name="select_all">Select all</string>
     <string name="nfc">NFC</string>
     <string name="nfc_disabled">NFC is disabled</string>
     <string name="nfc_listening_title">Ready to scan</string>

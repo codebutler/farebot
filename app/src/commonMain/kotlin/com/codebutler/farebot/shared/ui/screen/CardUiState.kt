@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.ui.screen
 
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.FormattedString
+import com.codebutler.farebot.transit.CardInfo
 import com.codebutler.farebot.transit.Trip
 
 data class CardUiState(
@@ -20,6 +21,8 @@ data class CardUiState(
     val currentScanLabel: String? = null,
     val scanHistory: List<ScanHistoryEntry> = emptyList(),
     val showScanHistory: Boolean = false,
+    val brandColor: Int? = null,
+    val cardInfo: CardInfo? = null,
 )
 
 data class ScanHistoryEntry(

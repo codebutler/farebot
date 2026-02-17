@@ -187,6 +187,7 @@ fun FareBotApp(
                     },
                     onToggleSelection = { itemId -> historyViewModel.toggleSelection(itemId) },
                     onClearSelection = { historyViewModel.clearSelection() },
+                    onSelectAll = { historyViewModel.selectAll() },
                     onDeleteSelected = { historyViewModel.deleteSelected() },
                     supportedCards = supportedCards,
                     supportedCardTypes = supportedCardTypes,
@@ -294,6 +295,7 @@ fun FareBotApp(
                     onDeleteKey = { keyId -> viewModel.deleteKey(keyId) },
                     onToggleSelection = { keyId -> viewModel.toggleSelection(keyId) },
                     onClearSelection = { viewModel.clearSelection() },
+                    onSelectAll = { viewModel.selectAll() },
                     onDeleteSelected = { viewModel.deleteSelected() },
                 )
             }

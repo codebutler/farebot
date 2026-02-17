@@ -1,15 +1,23 @@
 package com.codebutler.farebot.shared.ui.screen
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,10 +27,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,25 +40,40 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.transit.Trip
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.advanced
 import farebot.app.generated.resources.back
-import farebot.app.generated.resources.balance
+import farebot.app.generated.resources.copied_to_clipboard
 import farebot.app.generated.resources.delete
 import farebot.app.generated.resources.ic_transaction_banned_32dp
 import farebot.app.generated.resources.ic_transaction_bus_32dp
@@ -78,7 +101,7 @@ import farebot.app.generated.resources.trip_mode_toll_road
 import farebot.app.generated.resources.trip_mode_train
 import farebot.app.generated.resources.trip_mode_tram
 import farebot.app.generated.resources.trip_mode_trolleybus
-import farebot.app.generated.resources.unknown_card
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -96,234 +119,58 @@ fun CardScreen(
     onShowScanHistory: () -> Unit = {},
     onNavigateToScan: (String) -> Unit = {},
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = uiState.cardName ?: stringResource(Res.string.unknown_card),
-                        )
-                        if (uiState.serialNumber != null) {
-                            Text(
-                                text = uiState.serialNumber,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodySmall,
-                                fontFamily = FontFamily.Monospace,
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
-                    }
-                },
-                actions = {
-                    if (uiState.currentScanLabel != null) {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .padding(end = 4.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.secondaryContainer,
-                                        shape = RoundedCornerShape(12.dp),
-                                    ).clickable(onClick = onShowScanHistory)
-                                    .padding(horizontal = 10.dp, vertical = 4.dp),
-                        ) {
-                            Text(
-                                text = uiState.currentScanLabel,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            )
-                        }
-                    }
-                    if (!uiState.isSample || uiState.hasAdvancedData) {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
-                        }
-                        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                            if (!uiState.isSample) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.share)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onExportShare()
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.save)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onExportSave()
-                                    },
+    when {
+        uiState.isLoading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+        uiState.error != null -> {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {},
+                        navigationIcon = {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(Res.string.back),
                                 )
                             }
-                            if (uiState.hasAdvancedData) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.advanced)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onNavigateToAdvanced()
-                                    },
-                                )
-                            }
-                            if (onDelete != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.delete)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onDelete()
-                                    },
-                                )
-                            }
-                        }
-                    }
+                        },
+                    )
                 },
-            )
-        },
-    ) { padding ->
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-        ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-                uiState.error != null -> {
+            ) { padding ->
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(padding),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Text(
                         text = uiState.error,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier =
-                            Modifier
-                                .align(Alignment.Center)
-                                .padding(16.dp),
+                        modifier = Modifier.padding(16.dp),
                     )
-                }
-                else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        // Warning banner
-                        if (uiState.warning != null) {
-                            item {
-                                WarningBanner(uiState.warning)
-                            }
-                        }
-
-                        // Empty state message (e.g., serial-only cards)
-                        if (uiState.emptyStateMessage != null &&
-                            uiState.balances.isEmpty() &&
-                            uiState.transactions.isEmpty()
-                        ) {
-                            item {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .fillParentMaxHeight(0.6f)
-                                            .fillMaxWidth(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Text(
-                                        text = uiState.emptyStateMessage,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(horizontal = 32.dp),
-                                    )
-                                }
-                            }
-                        }
-
-                        // Balances
-                        if (uiState.balances.isNotEmpty()) {
-                            item {
-                                ElevatedCard(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp),
-                                    ) {
-                                        Text(
-                                            text = stringResource(Res.string.balance),
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                        for (balanceItem in uiState.balances) {
-                                            if (balanceItem.name != null) {
-                                                Text(
-                                                    text = balanceItem.name,
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            }
-                                            Text(
-                                                text = balanceItem.balance,
-                                                style = MaterialTheme.typography.headlineMedium,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Info items
-                        if (uiState.infoItems.isNotEmpty()) {
-                            item {
-                                SectionHeaderRow(TransactionItem.SectionHeader("Info"))
-                            }
-                            items(uiState.infoItems) { infoItem ->
-                                InfoItemRow(infoItem)
-                            }
-                            item {
-                                HorizontalDivider()
-                            }
-                        }
-
-                        uiState.transactions.forEach { item ->
-                            when (item) {
-                                is TransactionItem.DateHeader -> {
-                                    stickyHeader(key = item.date) {
-                                        DateHeaderRow(item)
-                                    }
-                                }
-                                is TransactionItem.SectionHeader -> {
-                                    stickyHeader(key = item.title) {
-                                        SectionHeaderRow(item)
-                                    }
-                                }
-                                is TransactionItem.TripItem -> {
-                                    item {
-                                        TripRow(item, onNavigateToTripMap)
-                                        HorizontalDivider()
-                                    }
-                                }
-                                is TransactionItem.RefillItem -> {
-                                    item {
-                                        RefillRow(item)
-                                        HorizontalDivider()
-                                    }
-                                }
-                                is TransactionItem.SubscriptionItem -> {
-                                    item {
-                                        SubscriptionRow(item)
-                                        HorizontalDivider()
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
+        else -> {
+            CardContentScreen(
+                uiState = uiState,
+                onBack = onBack,
+                onNavigateToAdvanced = onNavigateToAdvanced,
+                onNavigateToTripMap = onNavigateToTripMap,
+                onExportShare = onExportShare,
+                onExportSave = onExportSave,
+                onDelete = onDelete,
+                onShowScanHistory = onShowScanHistory,
+            )
+        }
     }
 
-    // Scan history bottom sheet
+    // Scan history bottom sheet (overlays everything)
     if (uiState.showScanHistory && uiState.scanHistory.isNotEmpty()) {
         ModalBottomSheet(
             onDismissRequest = onShowScanHistory,
@@ -374,6 +221,411 @@ fun CardScreen(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun CardContentScreen(
+    uiState: CardUiState,
+    onBack: () -> Unit,
+    onNavigateToAdvanced: () -> Unit,
+    onNavigateToTripMap: (String) -> Unit,
+    onExportShare: () -> Unit,
+    onExportSave: () -> Unit,
+    onDelete: (() -> Unit)?,
+    onShowScanHistory: () -> Unit,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    val brandBgColor =
+        remember(uiState.brandColor) {
+            uiState.brandColor?.let { colorInt ->
+                Color(
+                    red = (colorInt shr 16 and 0xFF) / 255f,
+                    green = (colorInt shr 8 and 0xFF) / 255f,
+                    blue = (colorInt and 0xFF) / 255f,
+                )
+            }
+        }
+    val fallbackColor = MaterialTheme.colorScheme.primaryContainer
+    val backgroundColor = brandBgColor ?: fallbackColor
+    val textColor = remember(backgroundColor) { contrastingTextColor(backgroundColor) }
+
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val hasSheetContent =
+            uiState.warning != null || uiState.infoItems.isNotEmpty() || uiState.transactions.isNotEmpty()
+        val sheetPeekHeight = if (hasSheetContent) maxHeight * 0.30f else 0.dp
+        var wasExpanded by rememberSaveable { mutableStateOf(false) }
+        val scaffoldState =
+            rememberBottomSheetScaffoldState(
+                bottomSheetState =
+                    rememberStandardBottomSheetState(
+                        initialValue = if (wasExpanded) SheetValue.Expanded else SheetValue.PartiallyExpanded,
+                    ),
+            )
+        LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
+            wasExpanded = scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
+        }
+        val clipboardManager = LocalClipboardManager.current
+        val scope = rememberCoroutineScope()
+        val copiedMessage = stringResource(Res.string.copied_to_clipboard)
+        val copyToClipboard: (String) -> Unit = { text ->
+            clipboardManager.setText(AnnotatedString(text))
+            scope.launch { scaffoldState.snackbarHostState.showSnackbar(copiedMessage) }
+        }
+        val targetExpanded = scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded
+        val cornerRadius by animateDpAsState(
+            targetValue = if (targetExpanded) 0.dp else 24.dp,
+            animationSpec = tween(durationMillis = 300),
+        )
+        val contentScale by animateFloatAsState(
+            targetValue = if (targetExpanded) 1f else (maxWidth.value - 24f) / maxWidth.value,
+            animationSpec = tween(durationMillis = 300),
+        )
+
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetPeekHeight = sheetPeekHeight,
+            sheetShape = RectangleShape,
+            sheetContainerColor = Color.Transparent,
+            sheetDragHandle = null,
+            sheetShadowElevation = 8.dp,
+            sheetTonalElevation = 0.dp,
+            containerColor = backgroundColor,
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                            navigationIconContentColor = textColor,
+                            actionIconContentColor = textColor,
+                        ),
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(Res.string.back),
+                            )
+                        }
+                    },
+                    actions = {
+                        if (uiState.currentScanLabel != null) {
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .padding(end = 4.dp)
+                                        .background(
+                                            color = textColor.copy(alpha = 0.15f),
+                                            shape = RoundedCornerShape(12.dp),
+                                        ).clickable(onClick = onShowScanHistory)
+                                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                            ) {
+                                Text(
+                                    text = uiState.currentScanLabel,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = textColor,
+                                )
+                            }
+                        }
+                        if (!uiState.isSample || uiState.hasAdvancedData) {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(
+                                    Icons.Default.MoreVert,
+                                    contentDescription = stringResource(Res.string.menu),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false },
+                            ) {
+                                if (!uiState.isSample) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.share)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onExportShare()
+                                        },
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.save)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onExportSave()
+                                        },
+                                    )
+                                }
+                                if (uiState.hasAdvancedData) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.advanced)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onNavigateToAdvanced()
+                                        },
+                                    )
+                                }
+                                if (onDelete != null) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.delete)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onDelete()
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                    },
+                )
+            },
+            sheetContent = {
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .graphicsLayer {
+                                scaleX = contentScale
+                                transformOrigin = TransformOrigin(0.5f, 0f)
+                            }.clip(RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius))
+                            .background(MaterialTheme.colorScheme.surface),
+                ) {
+                    // Drag handle
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(width = 32.dp, height = 4.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                        RoundedCornerShape(2.dp),
+                                    ),
+                        )
+                    }
+                    LazyColumn(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                    ) {
+                        // Warning banner
+                        if (uiState.warning != null) {
+                            item {
+                                WarningBanner(uiState.warning)
+                            }
+                        }
+
+                        // Info items
+                        if (uiState.infoItems.isNotEmpty()) {
+                            item {
+                                SectionHeaderRow(TransactionItem.SectionHeader("Info"))
+                            }
+                            items(uiState.infoItems) { infoItem ->
+                                InfoItemRow(
+                                    item = infoItem,
+                                    onLongClick = {
+                                        val text = listOfNotNull(infoItem.title, infoItem.value).joinToString(": ")
+                                        copyToClipboard(text)
+                                    },
+                                )
+                            }
+                            item {
+                                HorizontalDivider()
+                            }
+                        }
+
+                        // Transactions (with sticky headers)
+                        uiState.transactions.forEach { txnItem ->
+                            when (txnItem) {
+                                is TransactionItem.DateHeader -> {
+                                    stickyHeader(key = txnItem.date) {
+                                        DateHeaderRow(txnItem)
+                                    }
+                                }
+                                is TransactionItem.SectionHeader -> {
+                                    stickyHeader(key = txnItem.title) {
+                                        SectionHeaderRow(txnItem)
+                                    }
+                                }
+                                is TransactionItem.TripItem -> {
+                                    item {
+                                        TripRow(
+                                            trip = txnItem,
+                                            onNavigateToTripMap = onNavigateToTripMap,
+                                            onLongClick = {
+                                                val text =
+                                                    listOfNotNull(
+                                                        txnItem.agency,
+                                                        txnItem.route,
+                                                        txnItem.stations,
+                                                        txnItem.fare,
+                                                        txnItem.time,
+                                                    ).joinToString(" · ")
+                                                copyToClipboard(text)
+                                            },
+                                        )
+                                        HorizontalDivider()
+                                    }
+                                }
+                                is TransactionItem.RefillItem -> {
+                                    item {
+                                        RefillRow(
+                                            refill = txnItem,
+                                            onLongClick = {
+                                                val text =
+                                                    listOfNotNull(
+                                                        txnItem.agency,
+                                                        txnItem.amount,
+                                                        txnItem.time,
+                                                    ).joinToString(" · ")
+                                                copyToClipboard(text)
+                                            },
+                                        )
+                                        HorizontalDivider()
+                                    }
+                                }
+                                is TransactionItem.SubscriptionItem -> {
+                                    item {
+                                        SubscriptionRow(
+                                            sub = txnItem,
+                                            onLongClick = {
+                                                val text =
+                                                    listOfNotNull(
+                                                        txnItem.name,
+                                                        txnItem.agency,
+                                                        txnItem.validRange,
+                                                        txnItem.remainingTrips,
+                                                        txnItem.state,
+                                                    ).joinToString(" · ")
+                                                copyToClipboard(text)
+                                            },
+                                        )
+                                        HorizontalDivider()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+        ) { padding ->
+            // Hero area: card image, serial, balance — centered above the sheet
+            var showCardDetailSheet by remember { mutableStateOf(false) }
+
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                // Card image (tappable to show card detail sheet)
+                val cardImageRes = uiState.cardInfo?.imageRes
+                if (cardImageRes != null) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        shadowElevation = 8.dp,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1.586f)
+                                .clickable { showCardDetailSheet = true },
+                    ) {
+                        Image(
+                            painter = painterResource(cardImageRes),
+                            contentDescription = uiState.cardName,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                if (uiState.serialNumber != null) {
+                    Text(
+                        text = uiState.serialNumber,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = textColor.copy(alpha = 0.7f),
+                        fontFamily = FontFamily.Monospace,
+                        modifier =
+                            Modifier.combinedClickable(
+                                onLongClick = { copyToClipboard(uiState.serialNumber) },
+                                onClick = {},
+                            ),
+                    )
+                }
+                if (uiState.balances.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    for (balanceItem in uiState.balances) {
+                        Column(
+                            modifier =
+                                Modifier.combinedClickable(
+                                    onLongClick = { copyToClipboard(balanceItem.balance) },
+                                    onClick = {},
+                                ),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            if (balanceItem.name != null) {
+                                Text(
+                                    text = balanceItem.name,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = textColor.copy(alpha = 0.7f),
+                                )
+                            }
+                            Text(
+                                text = balanceItem.balance,
+                                style = MaterialTheme.typography.displayMedium,
+                                color = textColor,
+                            )
+                        }
+                    }
+                }
+                if (uiState.emptyStateMessage != null &&
+                    uiState.balances.isEmpty() &&
+                    uiState.transactions.isEmpty()
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = uiState.emptyStateMessage,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textColor.copy(alpha = 0.7f),
+                    )
+                }
+            }
+
+            // Card detail bottom sheet (same as Explore tab)
+            val cardInfo = uiState.cardInfo
+            if (showCardDetailSheet && cardInfo != null) {
+                val cardName = stringResource(cardInfo.nameRes)
+                val cardLocation = stringResource(cardInfo.locationRes)
+                ModalBottomSheet(
+                    onDismissRequest = { showCardDetailSheet = false },
+                    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                ) {
+                    CardDetailSheet(
+                        card = cardInfo,
+                        cardName = cardName,
+                        cardLocation = cardLocation,
+                        isSupported = true,
+                        isKeysRequired = cardInfo.keysRequired,
+                        showImage = false,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun contrastingTextColor(color: Color): Color {
+    val luminance = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue
+    return if (luminance > 0.5) Color.Black else Color.White
 }
 
 @Composable
@@ -434,7 +686,10 @@ private fun SectionHeaderRow(header: TransactionItem.SectionHeader) {
 }
 
 @Composable
-private fun InfoItemRow(item: InfoItem) {
+private fun InfoItemRow(
+    item: InfoItem,
+    onLongClick: () -> Unit = {},
+) {
     if (item.isHeader) {
         ListItem(
             headlineContent = {
@@ -447,8 +702,13 @@ private fun InfoItemRow(item: InfoItem) {
         )
     } else {
         ListItem(
-            headlineContent = { Text(text = item.title ?: "") },
-            supportingContent =
+            headlineContent = {
+                Text(
+                    text = item.title ?: "",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            trailingContent =
                 if (item.value != null) {
                     {
                         Text(
@@ -460,6 +720,11 @@ private fun InfoItemRow(item: InfoItem) {
                 } else {
                     null
                 },
+            modifier =
+                Modifier.combinedClickable(
+                    onLongClick = onLongClick,
+                    onClick = {},
+                ),
         )
     }
 }
@@ -468,6 +733,7 @@ private fun InfoItemRow(item: InfoItem) {
 private fun TripRow(
     trip: TransactionItem.TripItem,
     onNavigateToTripMap: (String) -> Unit,
+    onLongClick: () -> Unit = {},
 ) {
     val agencyRoute = listOfNotNull(trip.agency, trip.route).joinToString(" ").ifEmpty { null }
     // If no agency/route, promote stations to headline so title isn't blank.
@@ -528,18 +794,22 @@ private fun TripRow(
                 null
             },
         modifier =
-            Modifier.let { mod ->
-                if (trip.hasLocation && trip.tripKey != null) {
-                    mod.clickable { onNavigateToTripMap(trip.tripKey) }
-                } else {
-                    mod
-                }
-            },
+            Modifier.combinedClickable(
+                onLongClick = onLongClick,
+                onClick = {
+                    if (trip.hasLocation && trip.tripKey != null) {
+                        onNavigateToTripMap(trip.tripKey)
+                    }
+                },
+            ),
     )
 }
 
 @Composable
-private fun RefillRow(refill: TransactionItem.RefillItem) {
+private fun RefillRow(
+    refill: TransactionItem.RefillItem,
+    onLongClick: () -> Unit = {},
+) {
     ListItem(
         headlineContent = { Text(text = stringResource(Res.string.refill)) },
         supportingContent =
@@ -567,11 +837,19 @@ private fun RefillRow(refill: TransactionItem.RefillItem) {
                 }
             }
         },
+        modifier =
+            Modifier.combinedClickable(
+                onLongClick = onLongClick,
+                onClick = {},
+            ),
     )
 }
 
 @Composable
-private fun SubscriptionRow(sub: TransactionItem.SubscriptionItem) {
+private fun SubscriptionRow(
+    sub: TransactionItem.SubscriptionItem,
+    onLongClick: () -> Unit = {},
+) {
     val supportingParts =
         buildList {
             if (sub.agency != null) add(sub.agency)
@@ -592,6 +870,11 @@ private fun SubscriptionRow(sub: TransactionItem.SubscriptionItem) {
             } else {
                 null
             },
+        modifier =
+            Modifier.combinedClickable(
+                onLongClick = onLongClick,
+                onClick = {},
+            ),
     )
 }
 
