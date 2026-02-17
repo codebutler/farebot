@@ -115,7 +115,7 @@ class DesfireProtocolTest {
                 assertFailsWith<Exception> {
                     protocol.getFileList()
                 }
-            assertTrue(ex.message!!.contains("Invalid response"))
+            assertEquals(ex.message?.contains("Invalid response"), true)
         }
 
     // -- Status code: OPERATION_OK --
@@ -185,7 +185,7 @@ class DesfireProtocolTest {
                 assertFailsWith<DesfireAccessControlException> {
                     protocol.getFileList()
                 }
-            assertTrue(ex.message!!.contains("Permission denied"))
+            assertTrue(ex.message.contains("Permission denied"))
         }
 
     // -- Status code: AUTHENTICATION_ERROR (0xAE) --
@@ -210,7 +210,7 @@ class DesfireProtocolTest {
                 assertFailsWith<DesfireAccessControlException> {
                     protocol.getFileList()
                 }
-            assertTrue(ex.message!!.contains("Authentication error"))
+            assertTrue(ex.message.contains("Authentication error"))
         }
 
     // -- Status code: AID_NOT_FOUND (0xA0) --
@@ -235,7 +235,7 @@ class DesfireProtocolTest {
                 assertFailsWith<DesfireNotFoundException> {
                     protocol.selectApp(0x000001)
                 }
-            assertTrue(ex.message!!.contains("AID not found"))
+            assertTrue(ex.message.contains("AID not found"))
         }
 
     // -- Status code: FILE_NOT_FOUND (0xF0) --
@@ -260,7 +260,7 @@ class DesfireProtocolTest {
                 assertFailsWith<DesfireNotFoundException> {
                     protocol.readFile(1)
                 }
-            assertTrue(ex.message!!.contains("File not found"))
+            assertTrue(ex.message.contains("File not found"))
         }
 
     // -- Status code: unknown --
@@ -275,8 +275,8 @@ class DesfireProtocolTest {
                 assertFailsWith<Exception> {
                     protocol.getFileList()
                 }
-            assertTrue(ex.message!!.contains("Unknown status code"))
-            assertTrue(ex.message!!.contains("bb"))
+            assertEquals(ex.message?.contains("Unknown status code"), true)
+            assertEquals(ex.message?.contains("bb"), true)
         }
 
     @Test

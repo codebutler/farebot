@@ -130,7 +130,7 @@ object DesfireCardReader {
             val fileData = readFileData(desfireProtocol, fileId, fileSettings)
             RawDesfireFile.create(fileId, fileSettings, fileData)
         } catch (ex: UnauthorizedException) {
-            RawDesfireFile.createUnauthorized(fileId, fileSettings, ex.message ?: "Access denied")
+            RawDesfireFile.createUnauthorized(fileId, fileSettings, ex.message)
         } catch (ex: Exception) {
             RawDesfireFile.createInvalid(fileId, fileSettings, ex.toString())
         }
@@ -169,7 +169,7 @@ object DesfireCardReader {
 
         // All commands failed
         return if (lastException is UnauthorizedException) {
-            RawDesfireFile.createUnauthorized(fileId, null, lastException.message ?: "Access denied")
+            RawDesfireFile.createUnauthorized(fileId, null, lastException.message)
         } else {
             RawDesfireFile.createInvalid(fileId, null, lastException.toString())
         }

@@ -28,11 +28,8 @@ import com.codebutler.farebot.shared.serialize.FlipperNfcParser
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
-import com.codebutler.farebot.transit.clipper.ClipperTransitInfo
 import com.codebutler.farebot.transit.orca.OrcaTransitFactory
-import com.codebutler.farebot.transit.orca.OrcaTransitInfo
 import com.codebutler.farebot.transit.suica.SuicaTransitFactory
-import com.codebutler.farebot.transit.suica.SuicaTransitInfo
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -74,8 +71,6 @@ class FlipperIntegrationTest {
             assertEquals("10043012", identity.serialNumber)
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse ORCA transit info")
-            assertTrue(info is OrcaTransitInfo)
 
             // Balance: $26.25 USD
             val balances = info.balances
@@ -111,8 +106,6 @@ class FlipperIntegrationTest {
             assertEquals("1205019883", identity.serialNumber)
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse Clipper transit info")
-            assertTrue(info is ClipperTransitInfo)
 
             // Balance: $2.25 USD
             val balances = info.balances
@@ -288,8 +281,6 @@ class FlipperIntegrationTest {
             assertNull(identity.serialNumber)
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse Suica transit info")
-            assertTrue(info is SuicaTransitInfo)
 
             // Balance: 870 JPY
             val balances = info.balances
@@ -527,9 +518,6 @@ class FlipperIntegrationTest {
             assertNull(identity.serialNumber)
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse PASMO transit info")
-            assertTrue(info is SuicaTransitInfo)
-
             // Balance: 500 JPY
             val balances = info.balances
             assertNotNull(balances)
@@ -674,8 +662,6 @@ class FlipperIntegrationTest {
             assertNull(identity.serialNumber)
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse ICOCA transit info")
-            assertTrue(info is SuicaTransitInfo)
 
             // Balance: 827 JPY
             val balances = info.balances

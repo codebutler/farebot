@@ -83,8 +83,6 @@ class CompassTransitTest {
 
             // Test transit info parsing
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Transit info should not be null")
-            assertTrue(info is CompassUltralightTransitInfo, "Info should be CompassUltralightTransitInfo")
             assertEquals(cardData[0], info.serialNumber, "Serial number should match")
 
             // Test identity parsing

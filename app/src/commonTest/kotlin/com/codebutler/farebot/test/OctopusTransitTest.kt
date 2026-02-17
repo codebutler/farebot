@@ -91,7 +91,6 @@ class OctopusTransitTest {
 
         // Test TransitData
         val info = factory.parseInfo(card)
-        assertTrue(info is OctopusTransitInfo, "TransitData must be instance of OctopusTransitInfo")
 
         assertNotNull(info.balances)
         assertTrue(info.balances!!.isNotEmpty())

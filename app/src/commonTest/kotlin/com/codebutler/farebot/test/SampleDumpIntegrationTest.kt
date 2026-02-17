@@ -37,7 +37,6 @@ import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitFactory
 import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitInfo
 import com.codebutler.farebot.transit.calypso.mobib.MobibTransitInfo
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
-import com.codebutler.farebot.transit.easycard.EasyCardTransitInfo
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
 import com.codebutler.farebot.transit.ezlink.EZLinkTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
@@ -58,7 +57,6 @@ import com.codebutler.farebot.transit.seqgo.SeqGoTransitFactory
 import com.codebutler.farebot.transit.seqgo.SeqGoTransitInfo
 import com.codebutler.farebot.transit.serialonly.HoloTransitFactory
 import com.codebutler.farebot.transit.serialonly.HoloTransitInfo
-import com.codebutler.farebot.transit.serialonly.SerialOnlyTransitInfo
 import com.codebutler.farebot.transit.serialonly.TrimetHopTransitFactory
 import com.codebutler.farebot.transit.serialonly.TrimetHopTransitInfo
 import com.codebutler.farebot.transit.tmoney.TMoneyTransitFactory
@@ -320,7 +318,6 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             assertNotNull(identity.serialNumber)
 
             // Serial-only card: no balance, no trips, but has emptyStateMessage
-            assertTrue(info is SerialOnlyTransitInfo)
             assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
             assertNull(info.trips, "Serial-only card should have null trips")
             assertTrue(info.balances.isNullOrEmpty(), "Serial-only card should have no balances")
@@ -377,7 +374,7 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             val result = importer.importMfcDump(bytes)
             assertTrue(result is ImportResult.Success, "Failed to import MFC dump: $result")
 
-            val rawCard = (result as ImportResult.Success).cards.first()
+            val rawCard = result.cards.first()
             val card = rawCard.parse() as ClassicCard
 
             val factory = EasyCardTransitFactory()
@@ -387,8 +384,6 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             assertNotNull(identity.name)
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse EasyCard transit info")
-            assertTrue(info is EasyCardTransitInfo)
 
             // Balance: 245 TWD
             val balances = info.balances
@@ -518,7 +513,6 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             assertEquals("308425123456780", identity.serialNumber)
 
             // Serial-only card: has emptyStateMessage, no trips
-            assertTrue(info is SerialOnlyTransitInfo)
             assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
             assertNull(info.trips, "Serial-only card should have null trips")
         }
@@ -567,11 +561,9 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             assertEquals("Hop Fastpass", identity.name.resolveAsync())
             assertEquals("01-001-12345678-RA", identity.serialNumber)
 
-            assertTrue(info is TrimetHopTransitInfo)
             assertEquals("01-001-12345678-RA", info.serialNumber)
 
             // Serial-only card: has emptyStateMessage, no trips
-            assertTrue(info is SerialOnlyTransitInfo)
             assertNotNull(info.emptyStateMessage, "Serial-only card should have an emptyStateMessage")
             assertNull(info.trips, "Serial-only card should have null trips")
         }

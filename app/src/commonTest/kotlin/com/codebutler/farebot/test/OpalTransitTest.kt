@@ -151,7 +151,6 @@ class OpalTransitTest {
 
             // Test TransitInfo
             val info = factory.parseInfo(card)
-            assertTrue(info is OpalTransitInfo, "TransitData must be instance of OpalTransitInfo")
 
             assertEquals("3085 2200 1234 5670", info.serialNumber)
             assertEquals(TransitCurrency.AUD(336), info.balances?.first()?.balance)
@@ -191,7 +190,7 @@ class OpalTransitTest {
         // 2018-03-31 09:00 AEDT (UTC+11)
         // = 2018-03-30 22:00 UTC
         var card = createOpalCard(hexToBytes("85D25E07230520A70044DA380419FFFF"))
-        var info = factory.parseInfo(card) as OpalTransitInfo
+        var info = factory.parseInfo(card)
         var expectedTime = Instant.parse("2018-03-30T22:00:00Z")
         assertEquals(
             expectedTime,
@@ -204,7 +203,7 @@ class OpalTransitTest {
         // 2018-04-01 09:00 AEST (UTC+10)
         // = 2018-03-31 23:00 UTC
         card = createOpalCard(hexToBytes("85D25E07430520A70048DA380419FFFF"))
-        info = factory.parseInfo(card) as OpalTransitInfo
+        info = factory.parseInfo(card)
         expectedTime = Instant.parse("2018-03-31T23:00:00Z")
         assertEquals(
             expectedTime,

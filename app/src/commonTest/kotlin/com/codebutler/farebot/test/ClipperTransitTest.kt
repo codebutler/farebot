@@ -33,7 +33,6 @@ import com.codebutler.farebot.test.CardTestHelper.standardFile
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.Trip
 import com.codebutler.farebot.transit.clipper.ClipperTransitFactory
-import com.codebutler.farebot.transit.clipper.ClipperTransitInfo
 import com.codebutler.farebot.transit.clipper.ClipperTrip
 import kotlinx.coroutines.test.runTest
 import kotlin.math.abs
@@ -195,7 +194,7 @@ class ClipperTransitTest {
                 agency = 0x04,
                 fareValue = 350,
             )
-        val fareStr = trip.fare?.formatCurrencyString() ?: ""
+        val fareStr = trip.fare.formatCurrencyString()
         // Should format as USD
         assertTrue(
             fareStr.contains("3.50") || fareStr.contains("3,50"),
@@ -229,7 +228,6 @@ class ClipperTransitTest {
             assertEquals("572691763", identity.serialNumber)
 
             val info = factory.parseInfo(card)
-            assertTrue(info is ClipperTransitInfo, "TransitData must be instance of ClipperTransitInfo")
 
             assertEquals("572691763", info.serialNumber)
             assertEquals("Clipper", info.cardName.resolveAsync())

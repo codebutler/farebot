@@ -26,12 +26,10 @@ import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
-import com.codebutler.farebot.card.ultralight.UltralightCard
 import com.codebutler.farebot.card.ultralight.UltralightPage
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import com.codebutler.farebot.transit.TransitCurrency
 import com.codebutler.farebot.transit.troika.TroikaTransitFactory
-import com.codebutler.farebot.transit.troika.TroikaTransitInfo
 import com.codebutler.farebot.transit.ventra.VentraUltralightTransitInfo
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -93,7 +91,6 @@ class MetrodroidDumpIntegrationTest {
                 )
 
             val card = rawCard.parse()
-            assertTrue(card is UltralightCard, "Expected UltralightCard")
 
             val factory = VentraUltralightTransitInfo.FACTORY
             assertTrue(factory.check(card), "Ventra factory should recognize this card")
@@ -103,8 +100,6 @@ class MetrodroidDumpIntegrationTest {
             assertNotNull(identity.serialNumber, "Should have a serial number")
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse Ventra transit info")
-            assertTrue(info is VentraUltralightTransitInfo)
 
             // Balance: $8.44 USD (844 cents)
             val balances = info.balances
@@ -141,8 +136,6 @@ class MetrodroidDumpIntegrationTest {
             assertNotNull(identity.serialNumber, "Should have serial number")
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse Troika transit info")
-            assertTrue(info is TroikaTransitInfo)
 
             // Balance: 0.00 RUB (0 kopeks)
             val balances = info.balances
@@ -174,8 +167,6 @@ class MetrodroidDumpIntegrationTest {
             assertNotNull(identity.serialNumber, "Should have serial number")
 
             val info = factory.parseInfo(card)
-            assertNotNull(info, "Failed to parse Troika transit info")
-            assertTrue(info is TroikaTransitInfo)
 
             // Balance: 50.00 RUB (5000 kopeks)
             val balances = info.balances
