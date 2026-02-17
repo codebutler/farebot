@@ -3,7 +3,6 @@ package com.codebutler.farebot.desktop
 import com.codebutler.farebot.shared.platform.PlatformActions
 import java.awt.Desktop
 import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.net.URI
@@ -25,15 +24,6 @@ class DesktopPlatformActions : PlatformActions {
     override fun copyToClipboard(text: String) {
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
         clipboard.setContents(StringSelection(text), null)
-    }
-
-    override fun getClipboardText(): String? {
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        return try {
-            clipboard.getData(DataFlavor.stringFlavor) as? String
-        } catch (_: Exception) {
-            null
-        }
     }
 
     override fun shareText(text: String) {

@@ -23,13 +23,7 @@
 package com.codebutler.farebot.shared.serialize
 
 import com.codebutler.farebot.base.util.ByteUtils
-import com.codebutler.farebot.card.Card
-import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
-import com.codebutler.farebot.card.cepas.CEPASCard
-import com.codebutler.farebot.card.cepas.CEPASHistory
-import com.codebutler.farebot.card.cepas.CEPASPurse
-import com.codebutler.farebot.card.cepas.CEPASTransaction
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
@@ -79,8 +73,6 @@ object MetrodroidJsonParser {
                 parseClassic(obj["mifareClassic"]!!.jsonObject, tagId, scannedAt)
             obj.containsKey("iso7816") ->
                 parseISO7816(obj["iso7816"]!!.jsonObject, tagId, scannedAt)
-            obj.containsKey("cepasCompat") ->
-                parseCEPAS(obj["cepasCompat"]!!.jsonObject, tagId, scannedAt)
             obj.containsKey("felica") ->
                 parseFelica(obj["felica"]!!.jsonObject, tagId, scannedAt)
             else -> null
@@ -399,148 +391,6 @@ object MetrodroidJsonParser {
         return FelicaService.create(serviceCode, blocks)
     }
 
-    // --- CEPAS (compat format) ---
-
-    private fun parseCEPAS(
-        cepas: JsonObject,
-        tagId: ByteArray,
-        scannedAt: Instant,
-    ): RawCard<CEPASCard> {
-        val pursesArray = cepas["purses"]?.jsonArray ?: JsonArray(emptyList())
-        val historiesArray = cepas["histories"]?.jsonArray ?: JsonArray(emptyList())
-
-        val purses = parseCEPASPurses(pursesArray)
-        val histories = parseCEPASHistories(historiesArray)
-        val card = CEPASCard.create(tagId, scannedAt, purses, histories)
-
-        return PreParsedRawCard(CardType.CEPAS, tagId, scannedAt, card)
-    }
-
-    private fun parseCEPASPurses(pursesArray: JsonArray): List<CEPASPurse> {
-        val parsedById = mutableMapOf<Int, CEPASPurse>()
-
-        pursesArray.forEachIndexed { index, purseElement ->
-            val purseObj = purseElement.jsonObject
-            val id = purseObj["id"]?.jsonPrimitive?.intOrNull ?: index
-            val purseBalance = purseObj["purseBalance"]?.jsonPrimitive?.intOrNull
-            val canStr = purseObj["can"]?.jsonPrimitive?.content
-
-            val purse =
-                if (purseBalance != null) {
-                    // Purse with data — CAN is a hex string representing raw bytes
-                    val can = if (canStr != null) hexToBytes(canStr) else ByteArray(8)
-
-                    CEPASPurse(
-                        id = id,
-                        cepasVersion = 0,
-                        purseStatus = 0,
-                        purseBalance = purseBalance,
-                        autoLoadAmount = 0,
-                        can = can,
-                        csn = ByteArray(8),
-                        purseExpiryDate = 0,
-                        purseCreationDate = 0,
-                        lastCreditTransactionTRP = 0,
-                        lastCreditTransactionHeader = ByteArray(8),
-                        logfileRecordCount = 0,
-                        issuerDataLength = 0,
-                        lastTransactionTRP = 0,
-                        lastTransactionRecord = null,
-                        issuerSpecificData = ByteArray(0),
-                        lastTransactionDebitOptionsByte = 0,
-                        isValid = true,
-                        errorMessage = null,
-                    )
-                } else {
-                    // Empty purse
-                    CEPASPurse(
-                        id = id,
-                        cepasVersion = 0,
-                        purseStatus = 0,
-                        purseBalance = 0,
-                        autoLoadAmount = 0,
-                        can = null,
-                        csn = null,
-                        purseExpiryDate = 0,
-                        purseCreationDate = 0,
-                        lastCreditTransactionTRP = 0,
-                        lastCreditTransactionHeader = null,
-                        logfileRecordCount = 0,
-                        issuerDataLength = 0,
-                        lastTransactionTRP = 0,
-                        lastTransactionRecord = null,
-                        issuerSpecificData = null,
-                        lastTransactionDebitOptionsByte = 0,
-                        isValid = false,
-                        errorMessage = "No purse data",
-                    )
-                }
-            parsedById[id] = purse
-        }
-
-        // Return purses ordered by ID (0..15) so getPurse(n) returns purse with ID n
-        return (0..15).map { id ->
-            parsedById[id] ?: CEPASPurse(
-                id = id,
-                cepasVersion = 0,
-                purseStatus = 0,
-                purseBalance = 0,
-                autoLoadAmount = 0,
-                can = null,
-                csn = null,
-                purseExpiryDate = 0,
-                purseCreationDate = 0,
-                lastCreditTransactionTRP = 0,
-                lastCreditTransactionHeader = null,
-                logfileRecordCount = 0,
-                issuerDataLength = 0,
-                lastTransactionTRP = 0,
-                lastTransactionRecord = null,
-                issuerSpecificData = null,
-                lastTransactionDebitOptionsByte = 0,
-                isValid = false,
-                errorMessage = "No purse data",
-            )
-        }
-    }
-
-    private fun parseCEPASHistories(historiesArray: JsonArray): List<CEPASHistory> {
-        val parsedById = mutableMapOf<Int, CEPASHistory>()
-
-        historiesArray.forEachIndexed { index, histElement ->
-            val histObj = histElement.jsonObject
-            val id = histObj["id"]?.jsonPrimitive?.intOrNull ?: index
-            val transactionsArray = histObj["transactions"]?.jsonArray
-
-            val history =
-                if (transactionsArray != null && transactionsArray.isNotEmpty()) {
-                    val transactions =
-                        transactionsArray.map { txElement ->
-                            parseCEPASTransaction(txElement.jsonObject)
-                        }
-                    CEPASHistory.create(id, transactions)
-                } else {
-                    CEPASHistory.create(id, emptyList<CEPASTransaction>())
-                }
-            parsedById[id] = history
-        }
-
-        // Return histories ordered by ID (0..15) so getHistory(n) returns history with ID n
-        return (0..15).map { id ->
-            parsedById[id] ?: CEPASHistory.create(id, emptyList<CEPASTransaction>())
-        }
-    }
-
-    private fun parseCEPASTransaction(txObj: JsonObject): CEPASTransaction {
-        val type = txObj["type"]?.jsonPrimitive?.intOrNull ?: 0
-        val amount = txObj["amount"]?.jsonPrimitive?.intOrNull ?: 0
-        // date2 is milliseconds since Unix epoch
-        val date2 = txObj["date2"]?.jsonPrimitive?.longOrNull ?: 0L
-        val timestamp = (date2 / 1000).toInt()
-        val userData = txObj["user-data"]?.jsonPrimitive?.content ?: ""
-        return CEPASTransaction(type, amount, timestamp, userData)
-    }
-
     // --- Helpers ---
 
     private fun hexToBytes(hex: String): ByteArray {
@@ -550,27 +400,5 @@ object MetrodroidJsonParser {
         } catch (e: Exception) {
             ByteArray(0)
         }
-    }
-
-    /**
-     * A RawCard wrapper that holds a pre-parsed Card object.
-     * Used for card types (like CEPAS compat) where the Metrodroid format
-     * provides decoded fields rather than raw binary data.
-     */
-    private class PreParsedRawCard<T : Card>(
-        private val _cardType: CardType,
-        private val _tagId: ByteArray,
-        private val _scannedAt: Instant,
-        private val parsed: T,
-    ) : RawCard<T> {
-        override fun cardType() = _cardType
-
-        override fun tagId() = _tagId
-
-        override fun scannedAt() = _scannedAt
-
-        override fun isUnauthorized() = false
-
-        override fun parse() = parsed
     }
 }

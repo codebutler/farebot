@@ -184,7 +184,7 @@ Some MIFARE Classic cards require encryption keys to read. You can obtain keys u
 * **Android:** NFC-enabled device running Android 6.0 (API 23) or later
 * **iOS:** iPhone 7 or later with iOS support for CoreNFC
 * **macOS** (experimental): Mac with a PC/SC-compatible NFC smart card reader (e.g., ACR122U), a PN533-based USB NFC controller (e.g., SCL3711), or a Sony RC-S956 (PaSoRi) USB NFC reader
-* **Web** (experimental): Any modern browser with WebAssembly support. Card data can be imported from JSON files exported by other platforms. NFC reading via WebUSB is planned but not yet implemented.
+* **Web** (experimental): Any modern browser with WebAssembly support. Card data can be imported from JSON files exported by other platforms. Live NFC card reading is supported in Chrome/Edge/Opera via WebUSB with a PN533-based USB NFC reader (e.g., SCL3711).
 
 ## Building
 

@@ -84,14 +84,6 @@ class AndroidPlatformActions(
         clipboard.setPrimaryClip(ClipData.newPlainText("FareBot", text))
     }
 
-    override fun getClipboardText(): String? {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        return clipboard.primaryClip
-            ?.getItemAt(0)
-            ?.text
-            ?.toString()
-    }
-
     override fun shareText(text: String) {
         val intent =
             Intent(Intent.ACTION_SEND).apply {

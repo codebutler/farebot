@@ -22,7 +22,6 @@
 
 package com.codebutler.farebot.test
 
-import com.codebutler.farebot.card.cepas.CEPASCard
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.desfire.DesfireCard
 import com.codebutler.farebot.card.felica.FelicaCard
@@ -37,8 +36,6 @@ import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitFactory
 import com.codebutler.farebot.transit.bilheteunico.BilheteUnicoSPTransitInfo
 import com.codebutler.farebot.transit.calypso.mobib.MobibTransitInfo
 import com.codebutler.farebot.transit.easycard.EasyCardTransitFactory
-import com.codebutler.farebot.transit.ezlink.EZLinkTransitFactory
-import com.codebutler.farebot.transit.ezlink.EZLinkTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLTransitFactory
 import com.codebutler.farebot.transit.hsl.HSLTransitInfo
 import com.codebutler.farebot.transit.hsl.HSLUltralightTransitFactory
@@ -244,58 +241,6 @@ class SampleDumpIntegrationTest : CardDumpTest() {
             val trips = info.trips
             assertNotNull(trips)
             assertTrue(trips.isNotEmpty(), "Should have trips")
-        }
-
-    // --- EZ-Link/NETS (CEPAS) ---
-    // Source: Metrodroid test asset legacy.json
-    // Card: EZ-Link/NETS, Singapore
-    // Balance: $8.97 SGD (897 cents), 4 trips, serial: 1123456789123456
-
-    @Test
-    fun testEZLinkDump() =
-        runTest {
-            val factory = EZLinkTransitFactory()
-            val (card, info) =
-                loadAndParseMetrodroidJson<CEPASCard, EZLinkTransitInfo>(
-                    "cepas/EZLink.json",
-                    factory,
-                )
-
-            val identity = factory.parseIdentity(card)
-            // CAN "112..." maps to generic CEPAS issuer (not specifically EZ-Link "100...")
-            assertNotNull(identity.name)
-            assertNotNull(identity.serialNumber)
-
-            // Balance: $8.97 SGD (897 cents)
-            val balances = info.balances
-            assertNotNull(balances)
-            assertEquals(1, balances.size)
-            assertEquals(TransitCurrency.SGD(897), balances[0].balance)
-
-            // 4 trips: BUS, BUS_REFUND, MRT, CREATION
-            val trips = info.trips
-            assertNotNull(trips)
-            assertEquals(4, trips.size)
-
-            // Verify expected modes are present
-            val modes = trips.map { it.mode }
-            assertEquals(2, modes.count { it == Trip.Mode.BUS }, "Should have 2 BUS trips (bus + refund)")
-            assertEquals(1, modes.count { it == Trip.Mode.METRO }, "Should have 1 MRT trip")
-            assertEquals(1, modes.count { it == Trip.Mode.OTHER }, "Should have 1 OTHER trip (creation)")
-
-            // MRT trip should have stations
-            val mrtTrip = trips.first { it.mode == Trip.Mode.METRO }
-            assertNotNull(mrtTrip.startStation, "MRT trip should have a start station")
-            assertNotNull(mrtTrip.endStation, "MRT trip should have an end station")
-
-            // Bus trips should not have stations (BUS_REFUND userData handled via toStationOrNull)
-            trips.filter { it.mode == Trip.Mode.BUS }.forEach { busTrip ->
-                assertNull(busTrip.startStation, "Bus trip should not have a station")
-            }
-
-            // CREATION trip should not have a station (blank userData nullified by toStationOrNull)
-            val creationTrip = trips.first { it.mode == Trip.Mode.OTHER }
-            assertNull(creationTrip.startStation, "CREATION trip should not have a station for blank userData")
         }
 
     // --- Holo (DESFire, serial-only) ---
