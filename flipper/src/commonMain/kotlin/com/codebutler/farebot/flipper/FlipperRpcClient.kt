@@ -54,26 +54,17 @@ class FlipperRpcClient(
 ) {
     private var nextCommandId = 1
 
-    private fun log(msg: String) {
-        FlipperDebugLog.log("RPC: $msg")
-    }
-
     /** Connect to the Flipper and verify with a ping. */
     suspend fun connect() {
         transport.connect()
-        log("transport connected, sending ping...")
         ping()
-        log("ping response received, RPC session ready!")
     }
 
     /** Send a ping and wait for the pong response. */
     suspend fun ping() {
         val commandId = nextCommandId++
-        log("ping: sending request (commandId=$commandId)")
         sendRequest(commandId, FIELD_SYSTEM_PING_REQUEST, byteArrayOf())
-        log("ping: waiting for response...")
         val response = readMainResponse(commandId)
-        log("ping: got response status=${response.commandStatus}")
         checkStatus(response)
     }
 
@@ -243,21 +234,9 @@ class FlipperRpcClient(
     /** Read a complete Main response from the transport, with timeout. */
     private suspend fun readMainResponse(expectedCommandId: Int): ParsedMainResponse =
         withTimeout(timeoutMs) {
-            log("readMainResponse: reading varint length prefix...")
-            // Read varint length prefix byte-by-byte
             val length = readVarintFromTransport()
-            log("readMainResponse: length=$length, reading message bytes...")
-
-            // Read the full message
             val messageBytes = readExactly(length)
-            log("readMainResponse: got ${messageBytes.size} bytes, parsing...")
-
-            // Parse the Main envelope
-            val parsed = parseMainEnvelope(messageBytes)
-            log(
-                "readMainResponse: commandId=${parsed.commandId}, status=${parsed.commandStatus}, hasNext=${parsed.hasNext}, contentField=${parsed.contentFieldNumber}",
-            )
-            parsed
+            parseMainEnvelope(messageBytes)
         }
 
     /** Read a varint from the transport one byte at a time. */
@@ -266,7 +245,6 @@ class FlipperRpcClient(
         var shift = 0
         val buf = ByteArray(1)
         var zeroReadCount = 0
-        var bytesRead = 0
         while (true) {
             val read = transport.read(buf, 0, 1)
             if (read == 0) {
@@ -278,14 +256,6 @@ class FlipperRpcClient(
             }
             zeroReadCount = 0
             val b = buf[0].toInt() and 0xFF
-            if (bytesRead < 20) {
-                log(
-                    "readVarint: byte[$bytesRead]=0x${b.toString(
-                        16,
-                    ).padStart(2, '0')} (char='${if (b in 32..126) b.toChar() else '?'}')",
-                )
-            }
-            bytesRead++
             result = result or ((b and 0x7F) shl shift)
             if (b and 0x80 == 0) break
             shift += 7

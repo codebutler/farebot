@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
@@ -109,7 +107,6 @@ fun FlipperScreen(
                 FlipperConnectionState.Disconnected -> {
                     DisconnectedContent(
                         error = uiState.error,
-                        debugLog = uiState.debugLog,
                         onConnectUsb = onConnectUsb,
                         onConnectBle = onConnectBle,
                     )
@@ -123,10 +120,6 @@ fun FlipperScreen(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(stringResource(Res.string.flipper_connecting_message))
-                        if (uiState.debugLog.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            DebugLogView(uiState.debugLog)
-                        }
                     }
                 }
 
@@ -152,7 +145,6 @@ fun FlipperScreen(
 @Composable
 private fun DisconnectedContent(
     error: String?,
-    debugLog: List<String>,
     onConnectUsb: () -> Unit,
     onConnectBle: () -> Unit,
 ) {
@@ -196,11 +188,6 @@ private fun DisconnectedContent(
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
-        }
-
-        if (debugLog.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
-            DebugLogView(debugLog)
         }
     }
 }
@@ -354,30 +341,6 @@ private fun FileListItem(
             Checkbox(
                 checked = isSelected,
                 onCheckedChange = { onToggleSelection() },
-            )
-        }
-    }
-}
-
-@Composable
-private fun DebugLogView(lines: List<String>) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-    ) {
-        Text(
-            text = "Debug Log (${lines.size} lines):",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        for (line in lines) {
-            Text(
-                text = line,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(vertical = 1.dp),
             )
         }
     }

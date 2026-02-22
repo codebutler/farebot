@@ -9,7 +9,6 @@ data class FlipperUiState(
     val selectedFiles: Set<String> = emptySet(),
     val error: String? = null,
     val importProgress: ImportProgress? = null,
-    val debugLog: List<String> = emptyList(),
 )
 
 enum class FlipperConnectionState {
