@@ -94,7 +94,6 @@ import com.codebutler.farebot.shared.viewmodel.ScanError
 import com.codebutler.farebot.transit.CardInfo
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.about
-import farebot.app.generated.resources.add_all_samples
 import farebot.app.generated.resources.add_key
 import farebot.app.generated.resources.app_name
 import farebot.app.generated.resources.cancel
@@ -115,6 +114,7 @@ import farebot.app.generated.resources.nfc_listening_title
 import farebot.app.generated.resources.nfc_settings
 import farebot.app.generated.resources.ok
 import farebot.app.generated.resources.reading_card
+import farebot.app.generated.resources.sample_cards
 import farebot.app.generated.resources.scan
 import farebot.app.generated.resources.search_supported_cards
 import farebot.app.generated.resources.select_all
@@ -363,16 +363,6 @@ fun HomeScreen(
                                     showImportSheet = true
                                 },
                             )
-                            if (onAddAllSamples != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.add_all_samples)) },
-                                    trailingIcon = { Icon(Icons.Default.Code, contentDescription = null) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onAddAllSamples()
-                                    },
-                                )
-                            }
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.keys)) },
@@ -849,6 +839,18 @@ fun HomeScreen(
                             Modifier.clickable {
                                 showImportSheet = false
                                 onConnectFlipperUsb()
+                            },
+                    )
+                }
+                if (onAddAllSamples != null) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(Res.string.sample_cards)) },
+                        leadingContent = { Icon(Icons.Default.Code, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier =
+                            Modifier.clickable {
+                                showImportSheet = false
+                                onAddAllSamples()
                             },
                     )
                 }

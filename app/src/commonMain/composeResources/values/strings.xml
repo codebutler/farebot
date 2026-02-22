@@ -128,4 +128,5 @@
     <string name="import_source_file">File Browser</string>
     <string name="import_source_flipper_ble">Flipper Zero (Bluetooth)</string>
     <string name="import_source_flipper_usb">Flipper Zero (USB)</string>
+    <string name="sample_cards">Sample Cards</string>
 </resources>
