@@ -237,40 +237,35 @@ fun FareBotApp(
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = platformActions.openNfcSettings,
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
-                    onAddAllSamples =
-                        if (isDebug) {
-                            {
-                                scope.launch {
-                                    var count = 0
-                                    for (cardInfo in supportedCards) {
-                                        val fileName = cardInfo.sampleDumpFile ?: continue
-                                        val bytes = Res.readBytes("files/samples/$fileName")
-                                        val result =
-                                            if (fileName.endsWith(".mfc")) {
-                                                cardImporter.importMfcDump(bytes)
-                                            } else {
-                                                cardImporter.importCards(bytes.decodeToString())
-                                            }
-                                        if (result is ImportResult.Success) {
-                                            for (rawCard in result.cards) {
-                                                cardPersister.insertCard(
-                                                    SavedCard(
-                                                        type = rawCard.cardType(),
-                                                        serial = rawCard.tagId().hex(),
-                                                        data = cardSerializer.serialize(rawCard),
-                                                    ),
-                                                )
-                                                count++
-                                            }
-                                        }
+                    onAddAllSamples = {
+                        scope.launch {
+                            var count = 0
+                            for (cardInfo in supportedCards) {
+                                val fileName = cardInfo.sampleDumpFile ?: continue
+                                val bytes = Res.readBytes("files/samples/$fileName")
+                                val result =
+                                    if (fileName.endsWith(".mfc")) {
+                                        cardImporter.importMfcDump(bytes)
+                                    } else {
+                                        cardImporter.importCards(bytes.decodeToString())
                                     }
-                                    historyViewModel.loadCards()
-                                    platformActions.showToast(getString(Res.string.imported_cards, count))
+                                if (result is ImportResult.Success) {
+                                    for (rawCard in result.cards) {
+                                        cardPersister.insertCard(
+                                            SavedCard(
+                                                type = rawCard.cardType(),
+                                                serial = rawCard.tagId().hex(),
+                                                data = cardSerializer.serialize(rawCard),
+                                            ),
+                                        )
+                                        count++
+                                    }
                                 }
                             }
-                        } else {
-                            null
-                        },
+                            historyViewModel.loadCards()
+                            platformActions.showToast(getString(Res.string.imported_cards, count))
+                        }
+                    },
                     onSampleCardTap = { cardInfo ->
                         val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
                         scope.launch {
