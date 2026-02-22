@@ -545,13 +545,6 @@ fun HomeScreen(
                             )
                             HorizontalDivider()
                             DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_source)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    showImportSheet = true
-                                },
-                            )
-                            DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.about)) },
                                 onClick = {
                                     menuExpanded = false
