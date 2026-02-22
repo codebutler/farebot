@@ -26,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
@@ -328,7 +327,7 @@ private fun CardContentScreen(
                         if (!uiState.isSample) {
                             IconButton(onClick = onShare) {
                                 Icon(
-                                    Icons.Default.Share,
+                                    platformShareIcon,
                                     contentDescription = stringResource(Res.string.share),
                                 )
                             }
