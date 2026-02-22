@@ -30,6 +30,11 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 fun ByteArray.hex(): String = ByteUtils.getHexString(this)
 
+fun Int.hexByte(): String {
+    val v = this and 0xFF
+    return "${ByteUtils.HEX_CHARS[v ushr 4]}${ByteUtils.HEX_CHARS[v and 0x0F]}"
+}
+
 fun ByteArray.getHexString(
     offset: Int,
     length: Int,

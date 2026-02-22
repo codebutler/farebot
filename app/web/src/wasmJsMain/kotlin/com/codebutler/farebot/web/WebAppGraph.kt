@@ -1,5 +1,6 @@
 package com.codebutler.farebot.web
 
+import com.codebutler.farebot.app.keymanager.KeyManagerPluginImpl
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.flipper.FlipperTransportFactory
 import com.codebutler.farebot.flipper.WebFlipperTransportFactory
@@ -12,6 +13,8 @@ import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
+import com.codebutler.farebot.shared.plugin.toKeyManagerPlugin
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -55,7 +58,7 @@ abstract class WebAppGraph : AppGraph {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideCardScanner(): CardScanner = WebCardScanner()
+    fun provideCardScanner(keyManagerPlugin: KeyManagerPlugin?): CardScanner = WebCardScanner(keyManagerPlugin)
 
     @Provides
     @SingleIn(AppScope::class)
@@ -78,4 +81,11 @@ abstract class WebAppGraph : AppGraph {
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideKeyManagerPlugin(
+        cardKeysPersister: CardKeysPersister,
+        json: Json,
+    ): KeyManagerPlugin? = KeyManagerPluginImpl(cardKeysPersister, json).toKeyManagerPlugin()
 }

@@ -29,6 +29,7 @@ import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -51,7 +52,9 @@ import kotlinx.coroutines.launch
  */
 private val log = Logger.withTag("DesktopCardScanner")
 
-class DesktopCardScanner : CardScanner {
+class DesktopCardScanner(
+    private val keyManagerPlugin: KeyManagerPlugin? = null,
+) : CardScanner {
     override val requiresActiveScan: Boolean = true
 
     private val _scannedTags = MutableSharedFlow<ScannedTag>(extraBufferCapacity = 1)
@@ -79,7 +82,18 @@ class DesktopCardScanner : CardScanner {
         scanJob =
             scope.launch {
                 try {
-                    val backends = discoverBackends()
+                    val backends =
+                        try {
+                            discoverBackends()
+                        } catch (e: Throwable) {
+                            // UnsatisfiedLinkError (missing libusb) or other fatal errors
+                            // during backend discovery — report to UI instead of silently failing
+                            log.e(e) { "Backend discovery failed" }
+                            _scanErrors.tryEmit(
+                                Exception("NFC reader initialization failed: ${e.message}", e),
+                            )
+                            return@launch
+                        }
                     val backendJobs =
                         backends.map { backend ->
                             launch {
@@ -108,6 +122,9 @@ class DesktopCardScanner : CardScanner {
                                 } catch (e: Error) {
                                     // Catch LinkageError / UnsatisfiedLinkError from native libs
                                     log.w(e) { "${backend.name} backend unavailable" }
+                                    _scanErrors.tryEmit(
+                                        Exception("${backend.name} reader unavailable: ${e.message}", e),
+                                    )
                                 }
                             }
                         }
@@ -130,16 +147,18 @@ class DesktopCardScanner : CardScanner {
     }
 
     private suspend fun discoverBackends(): List<NfcReaderBackend> {
-        val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend())
+        val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend(keyManagerPlugin))
         val transports =
             try {
                 PN533Device.openAll()
-            } catch (e: UnsatisfiedLinkError) {
-                log.w(e) { "libusb not available" }
+            } catch (e: Throwable) {
+                // UnsatisfiedLinkError when libusb is not installed, or other native lib failures.
+                // Fall back to PC/SC-only mode rather than failing entirely.
+                log.w(e) { "USB device enumeration failed (libusb not available?)" }
                 emptyList()
             }
         if (transports.isEmpty()) {
-            backends.add(PN533ReaderBackend())
+            backends.add(PN533ReaderBackend(keyManagerPlugin))
         } else {
             transports.forEachIndexed { index, transport ->
                 transport.flush()
@@ -149,9 +168,9 @@ class DesktopCardScanner : CardScanner {
                 val label = "PN53x #${index + 1}"
                 log.i { "$label firmware: $fw" }
                 if (fw.version >= 2) {
-                    backends.add(PN533ReaderBackend(transport))
+                    backends.add(PN533ReaderBackend(keyManagerPlugin, transport))
                 } else {
-                    backends.add(RCS956ReaderBackend(transport, label))
+                    backends.add(RCS956ReaderBackend(keyManagerPlugin, transport, label))
                 }
             }
         }

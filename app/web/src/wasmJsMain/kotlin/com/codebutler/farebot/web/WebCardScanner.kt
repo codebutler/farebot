@@ -1,6 +1,7 @@
 package com.codebutler.farebot.web
 
 import co.touchlab.kermit.Logger
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -12,13 +13,16 @@ import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
 import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
 import com.codebutler.farebot.card.nfc.pn533.WebUsbPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -49,7 +53,9 @@ import kotlinx.coroutines.launch
  */
 private val log = Logger.withTag("WebCardScanner")
 
-class WebCardScanner : CardScanner {
+class WebCardScanner(
+    private val keyManagerPlugin: KeyManagerPlugin? = null,
+) : CardScanner {
     override val requiresActiveScan: Boolean = true
 
     private val _scannedTags = MutableSharedFlow<ScannedTag>(extraBufferCapacity = 1)
@@ -168,6 +174,8 @@ class WebCardScanner : CardScanner {
                 _readingProgress.value = null
                 _scannedCards.tryEmit(rawCard)
                 log.i { "Card read successfully" }
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (e: Exception) {
                 _readingProgress.value = null
                 log.e(e) { "Read error" }
@@ -177,6 +185,8 @@ class WebCardScanner : CardScanner {
             // Release target
             try {
                 pn533.inRelease(target.tg)
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (e: PN533Exception) {
                 log.d(e) { "inRelease failed (expected)" }
             }
@@ -220,7 +230,18 @@ class WebCardScanner : CardScanner {
 
             CardType.MifareClassic -> {
                 val tech = PN533ClassicTechnology(pn533, target.tg, tagId, info)
-                ClassicCardReader.readCard(tagId, tech, null, onProgress = onProgress)
+                val tagIdHex = tagId.hex()
+                val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
+                val globalKeys = keyManagerPlugin?.getGlobalKeys()
+                val recovery = keyManagerPlugin?.classicKeyRecovery
+                val rawCard =
+                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, recovery) { progress ->
+                        log.i { "[WebUSB] $progress" }
+                    }
+                if (rawCard.hasUnauthorizedSectors()) {
+                    throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
+                }
+                rawCard
             }
 
             CardType.MifareUltralight -> {
@@ -260,6 +281,8 @@ class WebCardScanner : CardScanner {
                             baudRate = PN533.BAUD_RATE_212_FELICA,
                             initiatorData = SENSF_REQ,
                         )
+                } catch (e: PN533TransportException) {
+                    throw e
                 } catch (e: PN533Exception) {
                     log.d(e) { "Poll during removal check failed" }
                     null
@@ -267,6 +290,8 @@ class WebCardScanner : CardScanner {
             if (target == null) break
             try {
                 pn533.inRelease(target.tg)
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (e: PN533Exception) {
                 log.d(e) { "inRelease during removal wait failed" }
             }
@@ -278,16 +303,5 @@ class WebCardScanner : CardScanner {
         private const val REMOVAL_POLL_INTERVAL_MS = 300L
 
         private val SENSF_REQ = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte(), 0x01, 0x00)
-
-        private fun ByteArray.hex(): String {
-            val chars = "0123456789ABCDEF".toCharArray()
-            return buildString(size * 2) {
-                for (b in this@hex) {
-                    val i = b.toInt() and 0xFF
-                    append(chars[i shr 4])
-                    append(chars[i and 0x0F])
-                }
-            }
-        }
     }
 }

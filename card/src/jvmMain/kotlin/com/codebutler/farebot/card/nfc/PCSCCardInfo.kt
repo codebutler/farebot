@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.card.nfc
 
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 
 /**
@@ -203,7 +204,7 @@ data class PCSCCardInfo(
             // DESFire commonly: 3B 81 80 01 80 80 (or similar)
             // MIFARE Classic: 3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 00 01 00 00 00 00 6A
             // Try to detect based on known ATR patterns
-            val hex = atr.joinToString("") { "%02X".format(it) }
+            val hex = atr.hex()
             return when {
                 hex.contains("0001") -> PCSCCardInfo(CardType.MifareClassic, classicSectorCount = 16)
                 hex.contains("0002") -> PCSCCardInfo(CardType.MifareClassic, classicSectorCount = 40)

@@ -24,13 +24,15 @@ package com.codebutler.farebot.desktop
 
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 
 /**
  * NXP PN533 reader backend (e.g., SCM SCL3711).
  */
 class PN533ReaderBackend(
+    keyManagerPlugin: KeyManagerPlugin? = null,
     transport: Usb4JavaPN533Transport? = null,
-) : PN53xReaderBackend(transport) {
+) : PN53xReaderBackend(transport, keyManagerPlugin) {
     override val name: String = "PN533"
 
     override suspend fun initDevice(pn533: PN533) {

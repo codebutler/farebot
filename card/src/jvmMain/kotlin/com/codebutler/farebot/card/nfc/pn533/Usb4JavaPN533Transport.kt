@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.nfc.pn533
 
 import co.touchlab.kermit.Logger
+import com.codebutler.farebot.base.util.hex
 import org.usb4java.DeviceHandle
 import org.usb4java.LibUsb
 import java.nio.ByteBuffer
@@ -126,7 +127,7 @@ class Usb4JavaPN533Transport(
         val transferred = IntBuffer.allocate(1)
         val result = LibUsb.bulkTransfer(handle, ENDPOINT_IN, buf, transferred, TIMEOUT_MS.toLong())
         if (result != LibUsb.SUCCESS && result != LibUsb.ERROR_TIMEOUT) {
-            throw PN533Exception("USB read ACK failed: ${LibUsb.errorName(result)}")
+            throw PN533TransportException("USB read ACK failed: ${LibUsb.errorName(result)}")
         }
         val count = transferred.get(0)
         val bytes = ByteArray(count)
@@ -150,7 +151,7 @@ class Usb4JavaPN533Transport(
         val transferred = IntBuffer.allocate(1)
         val result = LibUsb.bulkTransfer(handle, ENDPOINT_IN, buf, transferred, timeoutMs.toLong())
         if (result != LibUsb.SUCCESS) {
-            throw PN533Exception("USB read response failed: ${LibUsb.errorName(result)}")
+            throw PN533TransportException("USB read response failed: ${LibUsb.errorName(result)}")
         }
         val count = transferred.get(0)
         val bytes = ByteArray(count)
@@ -208,7 +209,7 @@ class Usb4JavaPN533Transport(
         val transferred = IntBuffer.allocate(1)
         val result = LibUsb.bulkTransfer(handle, ENDPOINT_OUT, buf, transferred, TIMEOUT_MS.toLong())
         if (result != LibUsb.SUCCESS) {
-            throw PN533Exception("USB write failed: ${LibUsb.errorName(result)}")
+            throw PN533TransportException("USB write failed: ${LibUsb.errorName(result)}")
         }
     }
 
@@ -233,6 +234,5 @@ class Usb4JavaPN533Transport(
                 0x00,
             )
 
-        private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }
 }

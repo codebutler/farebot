@@ -35,11 +35,36 @@ class TransitFactoryRegistry {
     val allCards: List<CardInfo>
         get() = registry.values.flatten().flatMap { it.allCards }
 
-    fun parseTransitIdentity(card: Card): TransitIdentity? = findFactory(card)?.parseIdentity(card)
+    fun parseTransitIdentity(card: Card): TransitIdentity? {
+        val factory = findFactory(card) ?: return null
+        return try {
+            factory.parseIdentity(card)
+        } catch (e: Exception) {
+            println("[TransitFactoryRegistry] parseIdentity failed for ${factory::class.simpleName}: ${e.message}")
+            null
+        }
+    }
 
-    fun parseTransitInfo(card: Card): TransitInfo? = findFactory(card)?.parseInfo(card)
+    fun parseTransitInfo(card: Card): TransitInfo? {
+        val factory = findFactory(card) ?: return null
+        return try {
+            factory.parseInfo(card)
+        } catch (e: Exception) {
+            println("[TransitFactoryRegistry] parseInfo failed for ${factory::class.simpleName}: ${e.message}")
+            e.printStackTrace()
+            null
+        }
+    }
 
-    fun findCardInfo(card: Card): CardInfo? = findFactory(card)?.findCardInfo(card)
+    fun findCardInfo(card: Card): CardInfo? {
+        val factory = findFactory(card) ?: return null
+        return try {
+            factory.findCardInfo(card)
+        } catch (e: Exception) {
+            println("[TransitFactoryRegistry] findCardInfo failed for ${factory::class.simpleName}: ${e.message}")
+            null
+        }
+    }
 
     fun findBrandColor(card: Card): Int? = findCardInfo(card)?.brandColor
 
@@ -53,5 +78,12 @@ class TransitFactoryRegistry {
     }
 
     private fun findFactory(card: Card): TransitFactory<Card, out TransitInfo>? =
-        registry[card.cardType]?.find { it.check(card) }
+        registry[card.cardType]?.find { factory ->
+            try {
+                factory.check(card)
+            } catch (e: Exception) {
+                println("[TransitFactoryRegistry] check failed for ${factory::class.simpleName}: ${e.message}")
+                false
+            }
+        }
 }

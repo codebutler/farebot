@@ -22,6 +22,8 @@
 
 package com.codebutler.farebot.card.nfc.pn533
 
+import com.codebutler.farebot.base.util.hexByte
+
 /**
  * Platform-specific transport layer for PN533 NFC reader communication.
  * Handles USB frame serialization and bulk I/O.
@@ -44,13 +46,10 @@ open class PN533Exception(
     message: String,
 ) : Exception(message)
 
+class PN533TransportException(
+    message: String,
+) : PN533Exception(message)
+
 class PN533CommandException(
     val errorCode: Int,
-) : PN533Exception("PN53x command error: 0x${hexByte(errorCode)}")
-
-private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
-
-private fun hexByte(value: Int): String {
-    val v = value and 0xFF
-    return "${HEX_CHARS[v ushr 4]}${HEX_CHARS[v and 0x0F]}"
-}
+) : PN533Exception("PN53x command error: 0x${errorCode.hexByte()}")

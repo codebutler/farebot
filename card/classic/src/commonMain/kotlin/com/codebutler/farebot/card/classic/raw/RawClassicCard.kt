@@ -57,6 +57,9 @@ data class RawClassicCard(
         return ClassicCard.create(tagId, scannedAt, parsedSectors, isPartialRead)
     }
 
+    /** True if any sector failed authentication (card partially or fully locked). */
+    fun hasUnauthorizedSectors(): Boolean = sectors.any { it.type == RawClassicSector.TYPE_UNAUTHORIZED }
+
     fun sectors(): List<RawClassicSector> = sectors
 
     companion object {

@@ -26,6 +26,7 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533CommunicateThruTransceiver
 import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 
 /**
  * Sony RC-S956 reader backend (RC-S370/P, RC-S380).
@@ -37,9 +38,10 @@ import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
  * Reference: https://github.com/nfcpy/nfcpy/blob/master/src/nfc/clf/rcs956.py
  */
 class RCS956ReaderBackend(
+    keyManagerPlugin: KeyManagerPlugin? = null,
     transport: Usb4JavaPN533Transport,
     private val deviceLabel: String = "RC-S956",
-) : PN53xReaderBackend(transport) {
+) : PN53xReaderBackend(transport, keyManagerPlugin) {
     override val name: String = deviceLabel
 
     override fun createTransceiver(

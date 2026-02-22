@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_key">Add Key</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="card_id">Card ID</string>
+    <string name="card_type">Card Type</string>
+    <string name="delete">Delete</string>
+    <string name="delete_selected_keys">Delete %1$d selected keys?</string>
+    <string name="enter_manually">Enter manually</string>
+    <string name="hold_nfc_card">Hold your NFC card against the device to detect its ID and type.</string>
+    <string name="import_file_button">Import File</string>
+    <string name="key_data">Key Data</string>
+    <string name="keys">Keys</string>
+    <string name="keys_loaded">Keys are built in.</string>
+    <string name="keys_required">Encryption keys are required to read this card.</string>
+    <string name="locked_card">Locked Card</string>
+    <string name="n_selected">%1$d selected</string>
+    <string name="nfc">NFC</string>
+    <string name="no_keys">No keys added yet.</string>
+    <string name="select_all">Select all</string>
+    <string name="tap_your_card">Tap your card</string>
+</resources>

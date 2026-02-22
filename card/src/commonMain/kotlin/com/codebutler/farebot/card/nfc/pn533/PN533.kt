@@ -22,6 +22,8 @@
 
 package com.codebutler.farebot.card.nfc.pn533
 
+import com.codebutler.farebot.base.util.hexByte
+
 /**
  * High-level PN533 NFC controller protocol.
  *
@@ -267,12 +269,5 @@ class PN533(
 
         // Timeout for InListPassiveTarget polling (ms)
         const val POLL_TIMEOUT_MS = 2000
-
-        private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
-
-        internal fun Int.hexByte(): String {
-            val v = this and 0xFF
-            return "${HEX_CHARS[v ushr 4]}${HEX_CHARS[v and 0x0F]}"
-        }
     }
 }

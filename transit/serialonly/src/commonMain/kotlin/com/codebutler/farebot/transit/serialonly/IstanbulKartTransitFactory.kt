@@ -61,7 +61,7 @@ class IstanbulKartTransitFactory : TransitFactory<DesfireCard, IstanbulKartTrans
 
     override fun parseInfo(card: DesfireCard): IstanbulKartTransitInfo {
         val serial = parseSerial(card) ?: ""
-        val serial2 = card.tagId.hex().uppercase()
+        val serial2 = card.tagId.hex()
         return IstanbulKartTransitInfo(mSerial = serial, mSerial2 = serial2)
     }
 }
