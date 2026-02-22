@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.RadioButtonChecked
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Usb
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -45,6 +47,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +57,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,6 +98,8 @@ import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.di.LocalAppGraph
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NfcStatus
+import com.codebutler.farebot.shared.ui.layout.LocalWindowWidthSizeClass
+import com.codebutler.farebot.shared.ui.layout.WindowWidthSizeClass
 import com.codebutler.farebot.shared.viewmodel.ScanError
 import com.codebutler.farebot.transit.CardInfo
 import farebot.app.generated.resources.Res
@@ -180,6 +190,8 @@ fun HomeScreen(
     }
     var exploreSearchQuery by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val windowWidthSizeClass = LocalWindowWidthSizeClass.current
+    val isCompact = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
     val hasUnsupportedCards =
         remember(supportedCards, supportedCardTypes) {
@@ -259,183 +271,238 @@ fun HomeScreen(
         )
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            if (selectedTab == 0 && historyUiState.isSelectionMode) {
-                // Scan tab — selection mode
-                TopAppBar(
-                    title = { Text(stringResource(Res.string.n_selected, historyUiState.selectedIds.size)) },
-                    navigationIcon = {
-                        IconButton(onClick = onClearSelection) {
-                            Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.cancel))
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = onSelectAll) {
-                            Icon(Icons.Default.SelectAll, contentDescription = stringResource(Res.string.select_all))
-                        }
-                        IconButton(onClick = { showDeleteConfirmation = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
-                        }
-                    },
-                    colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
-                )
-            } else if (selectedTab == 0) {
-                // Scan tab — normal mode
-                TopAppBar(
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(Res.drawable.ic_launcher),
-                                contentDescription = null,
-                                modifier =
-                                    Modifier
-                                        .size(32.dp)
-                                        .clip(RoundedCornerShape(6.dp)),
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(Res.string.app_name))
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
-                        }
-                        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                            Text(
-                                stringResource(Res.string.show),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.show_latest_scans)) },
-                                trailingIcon = {
-                                    Icon(
-                                        if (!historyUiState.showAllScans) {
-                                            Icons.Default.RadioButtonChecked
-                                        } else {
-                                            Icons.Default.RadioButtonUnchecked
-                                        },
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    if (historyUiState.showAllScans) {
-                                        onToggleShowAllScans()
-                                    }
-                                    menuExpanded =
-                                        false
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.show_all_scans)) },
-                                trailingIcon = {
-                                    Icon(
-                                        if (historyUiState.showAllScans) {
-                                            Icons.Default.RadioButtonChecked
-                                        } else {
-                                            Icons.Default.RadioButtonUnchecked
-                                        },
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    if (!historyUiState.showAllScans) {
-                                        onToggleShowAllScans()
-                                    }
-                                    menuExpanded =
-                                        false
-                                },
-                            )
-                            HorizontalDivider()
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_source)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    showImportSheet = true
-                                },
-                            )
-                            if (onNavigateToKeys != null) {
+    AdaptiveNavigation(
+        windowWidthSizeClass = windowWidthSizeClass,
+        selectedTab = selectedTab,
+        onTabSelected = { selectedTab = it },
+        showFab = selectedTab == 0 && homeUiState.requiresActiveScan && homeUiState.nfcStatus != NfcStatus.UNAVAILABLE,
+        onFabClick = {
+            if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
+                onOpenNfcSettings?.invoke()
+            } else {
+                onScanCard()
+            }
+        },
+        fabIsLoading = homeUiState.isLoading,
+        onNavigateToKeys = onNavigateToKeys,
+        onOpenAbout = onOpenAbout,
+        onShowImportSheet = { showImportSheet = true },
+    ) {
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            topBar = {
+                if (selectedTab == 0 && historyUiState.isSelectionMode) {
+                    // Scan tab — selection mode
+                    TopAppBar(
+                        title = { Text(stringResource(Res.string.n_selected, historyUiState.selectedIds.size)) },
+                        navigationIcon = {
+                            IconButton(onClick = onClearSelection) {
+                                Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.cancel))
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = onSelectAll) {
+                                Icon(
+                                    Icons.Default.SelectAll,
+                                    contentDescription = stringResource(Res.string.select_all),
+                                )
+                            }
+                            IconButton(onClick = { showDeleteConfirmation = true }) {
+                                Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
+                            }
+                        },
+                        colors =
+                            TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
+                    )
+                } else if (selectedTab == 0) {
+                    // Scan tab — normal mode
+                    TopAppBar(
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(Res.drawable.ic_launcher),
+                                    contentDescription = null,
+                                    modifier =
+                                        Modifier
+                                            .size(32.dp)
+                                            .clip(RoundedCornerShape(6.dp)),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(Res.string.app_name))
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
+                            }
+                            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                                Text(
+                                    stringResource(Res.string.show),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                )
                                 DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.keys)) },
+                                    text = { Text(stringResource(Res.string.show_latest_scans)) },
+                                    trailingIcon = {
+                                        Icon(
+                                            if (!historyUiState.showAllScans) {
+                                                Icons.Default.RadioButtonChecked
+                                            } else {
+                                                Icons.Default.RadioButtonUnchecked
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    onClick = {
+                                        if (historyUiState.showAllScans) {
+                                            onToggleShowAllScans()
+                                        }
+                                        menuExpanded =
+                                            false
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.show_all_scans)) },
+                                    trailingIcon = {
+                                        Icon(
+                                            if (historyUiState.showAllScans) {
+                                                Icons.Default.RadioButtonChecked
+                                            } else {
+                                                Icons.Default.RadioButtonUnchecked
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    onClick = {
+                                        if (!historyUiState.showAllScans) {
+                                            onToggleShowAllScans()
+                                        }
+                                        menuExpanded =
+                                            false
+                                    },
+                                )
+                                HorizontalDivider()
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.import_source)) },
                                     onClick = {
                                         menuExpanded = false
-                                        onNavigateToKeys()
+                                        showImportSheet = true
+                                    },
+                                )
+                                if (onNavigateToKeys != null) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.keys)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onNavigateToKeys()
+                                        },
+                                    )
+                                }
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.about)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onOpenAbout()
                                     },
                                 )
                             }
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.about)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onOpenAbout()
-                                },
+                        },
+                    )
+                } else {
+                    // Explore tab — search bar in place of title
+                    TopAppBar(
+                        title = {
+                            TextField(
+                                value = exploreSearchQuery,
+                                onValueChange = { exploreSearchQuery = it },
+                                placeholder = { Text(stringResource(Res.string.search_supported_cards)) },
+                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                                singleLine = true,
+                                colors =
+                                    TextFieldDefaults.colors(
+                                        focusedContainerColor = Color.Transparent,
+                                        unfocusedContainerColor = Color.Transparent,
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                    ),
+                                modifier = Modifier.fillMaxWidth(),
                             )
-                        }
-                    },
-                )
-            } else {
-                // Explore tab — search bar in place of title
-                TopAppBar(
-                    title = {
-                        TextField(
-                            value = exploreSearchQuery,
-                            onValueChange = { exploreSearchQuery = it },
-                            placeholder = { Text(stringResource(Res.string.search_supported_cards)) },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                            singleLine = true,
-                            colors =
-                                TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                ),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    },
-                    colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                        ),
-                    actions = {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
-                        }
-                        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                            Text(
-                                stringResource(Res.string.show),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            )
-                            if (hasUnsupportedCards) {
+                        },
+                        colors =
+                            TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                            ),
+                        actions = {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
+                            }
+                            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                                Text(
+                                    stringResource(Res.string.show),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                )
+                                if (hasUnsupportedCards) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            ) {
+                                                Text(stringResource(Res.string.show_unsupported_cards))
+                                                Badge(
+                                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                ) {
+                                                    Text("$unsupportedCount")
+                                                }
+                                            }
+                                        },
+                                        trailingIcon = {
+                                            Icon(
+                                                if (showUnsupported) {
+                                                    Icons.Default.CheckBox
+                                                } else {
+                                                    Icons.Default.CheckBoxOutlineBlank
+                                                },
+                                                contentDescription = null,
+                                            )
+                                        },
+                                        onClick = {
+                                            showUnsupported = !showUnsupported
+                                            appPreferences.putBoolean(
+                                                AppPreferences.KEY_SHOW_UNSUPPORTED,
+                                                showUnsupported,
+                                            )
+                                            menuExpanded = false
+                                        },
+                                    )
+                                }
                                 DropdownMenuItem(
                                     text = {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
-                                            Text(stringResource(Res.string.show_unsupported_cards))
+                                            Text(stringResource(Res.string.show_serial_only_cards))
                                             Badge(
                                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                             ) {
-                                                Text("$unsupportedCount")
+                                                Text("$serialOnlyCount")
                                             }
                                         }
                                     },
                                     trailingIcon = {
                                         Icon(
-                                            if (showUnsupported) {
+                                            if (showSerialOnly) {
                                                 Icons.Default.CheckBox
                                             } else {
                                                 Icons.Default.CheckBoxOutlineBlank
@@ -444,345 +511,329 @@ fun HomeScreen(
                                         )
                                     },
                                     onClick = {
-                                        showUnsupported = !showUnsupported
-                                        appPreferences.putBoolean(AppPreferences.KEY_SHOW_UNSUPPORTED, showUnsupported)
+                                        showSerialOnly = !showSerialOnly
+                                        appPreferences.putBoolean(AppPreferences.KEY_SHOW_SERIAL_ONLY, showSerialOnly)
                                         menuExpanded = false
                                     },
                                 )
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        ) {
+                                            Text(stringResource(Res.string.show_keys_required_cards))
+                                            Badge(
+                                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            ) {
+                                                Text("$keysRequiredCount")
+                                            }
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        Icon(
+                                            if (showKeysRequired) {
+                                                Icons.Default.CheckBox
+                                            } else {
+                                                Icons.Default.CheckBoxOutlineBlank
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    onClick = {
+                                        showKeysRequired = !showKeysRequired
+                                        appPreferences.putBoolean(
+                                            AppPreferences.KEY_SHOW_KEYS_REQUIRED,
+                                            showKeysRequired,
+                                        )
+                                        menuExpanded = false
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        ) {
+                                            Text(stringResource(Res.string.show_experimental_cards))
+                                            Badge(
+                                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            ) {
+                                                Text("$experimentalCount")
+                                            }
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        Icon(
+                                            if (showExperimental) {
+                                                Icons.Default.CheckBox
+                                            } else {
+                                                Icons.Default.CheckBoxOutlineBlank
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    onClick = {
+                                        showExperimental = !showExperimental
+                                        appPreferences.putBoolean(
+                                            AppPreferences.KEY_SHOW_EXPERIMENTAL,
+                                            showExperimental,
+                                        )
+                                        menuExpanded = false
+                                    },
+                                )
+                                HorizontalDivider()
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.about)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onOpenAbout()
+                                    },
+                                )
                             }
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        Text(stringResource(Res.string.show_serial_only_cards))
-                                        Badge(
-                                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        ) {
-                                            Text("$serialOnlyCount")
-                                        }
-                                    }
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        if (showSerialOnly) {
-                                            Icons.Default.CheckBox
-                                        } else {
-                                            Icons.Default.CheckBoxOutlineBlank
-                                        },
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    showSerialOnly = !showSerialOnly
-                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_SERIAL_ONLY, showSerialOnly)
-                                    menuExpanded = false
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        Text(stringResource(Res.string.show_keys_required_cards))
-                                        Badge(
-                                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        ) {
-                                            Text("$keysRequiredCount")
-                                        }
-                                    }
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        if (showKeysRequired) {
-                                            Icons.Default.CheckBox
-                                        } else {
-                                            Icons.Default.CheckBoxOutlineBlank
-                                        },
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    showKeysRequired = !showKeysRequired
-                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_KEYS_REQUIRED, showKeysRequired)
-                                    menuExpanded = false
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        Text(stringResource(Res.string.show_experimental_cards))
-                                        Badge(
-                                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        ) {
-                                            Text("$experimentalCount")
-                                        }
-                                    }
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        if (showExperimental) {
-                                            Icons.Default.CheckBox
-                                        } else {
-                                            Icons.Default.CheckBoxOutlineBlank
-                                        },
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    showExperimental = !showExperimental
-                                    appPreferences.putBoolean(AppPreferences.KEY_SHOW_EXPERIMENTAL, showExperimental)
-                                    menuExpanded = false
-                                },
-                            )
-                            HorizontalDivider()
-                            DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.about)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onOpenAbout()
-                                },
-                            )
-                        }
-                    },
-                )
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    icon = { Icon(painterResource(Res.drawable.ic_cards_stack), contentDescription = null) },
-                    label = { Text(stringResource(Res.string.tab_scan)) },
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.Explore, contentDescription = null) },
-                    label = { Text(stringResource(Res.string.tab_explore)) },
-                )
-            }
-        },
-        floatingActionButton = {
-            if (selectedTab == 0 && homeUiState.requiresActiveScan && homeUiState.nfcStatus != NfcStatus.UNAVAILABLE) {
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
-                            onOpenNfcSettings?.invoke()
-                        } else {
-                            onScanCard()
-                        }
-                    },
-                    icon = {
-                        if (homeUiState.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.padding(4.dp),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                strokeWidth = 2.dp,
-                            )
-                        } else {
-                            Icon(Icons.Default.Nfc, contentDescription = null)
-                        }
-                    },
-                    text = {
-                        Text(
-                            stringResource(
-                                if (homeUiState.isReadingCard) Res.string.reading_card else Res.string.scan,
-                            ),
-                        )
-                    },
-                )
-            }
-        },
-    ) { padding ->
-        // On the Explore tab, skip top padding so the map extends behind the translucent top bar
-        // (only when the platform actually renders a map)
-        val isExploreTabWithMap = selectedTab == 1 && platformHasCardsMap
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = if (isExploreTabWithMap) 0.dp else padding.calculateTopPadding(),
-                        bottom = padding.calculateBottomPadding(),
-                    ),
-        ) {
-            // NFC disabled banner (scan tab only)
-            if (selectedTab == 0 && homeUiState.nfcStatus == NfcStatus.DISABLED && onOpenNfcSettings != null) {
-                Surface(
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.nfc_disabled),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.weight(1f),
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = onOpenNfcSettings) {
-                            Text(stringResource(Res.string.nfc_settings))
-                        }
-                    }
-                }
-            }
-
-            // NFC listening banner (Android passive scanning, scan tab only)
-            if (selectedTab == 0 && !homeUiState.requiresActiveScan && homeUiState.nfcStatus == NfcStatus.AVAILABLE) {
-                val shimmerTransition = rememberInfiniteTransition()
-                val shimmerProgress by shimmerTransition.animateFloat(
-                    initialValue = 0f,
-                    targetValue = 1f,
-                    animationSpec =
-                        infiniteRepeatable(
-                            animation = tween(2500, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse,
-                        ),
-                )
-                val shimmerOffset = -0.5f + shimmerProgress * 1f
-                val containerColor = MaterialTheme.colorScheme.secondaryContainer
-                val shimmerColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.35f)
-                val shimmerBrush =
-                    Brush.linearGradient(
-                        colors = listOf(containerColor, shimmerColor, containerColor),
-                        start = Offset(shimmerOffset * 1000f, 0f),
-                        end = Offset((shimmerOffset + 1f) * 1000f, 0f),
+                        },
                     )
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .background(shimmerBrush)
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            Icons.Default.Nfc,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                }
+            },
+            bottomBar = {
+                if (isCompact) {
+                    NavigationBar {
+                        NavigationBarItem(
+                            selected = selectedTab == 0,
+                            onClick = { selectedTab = 0 },
+                            icon = { Icon(painterResource(Res.drawable.ic_cards_stack), contentDescription = null) },
+                            label = { Text(stringResource(Res.string.tab_scan)) },
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text =
-                                buildAnnotatedString {
-                                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                        append(stringResource(Res.string.nfc_listening_title))
-                                    }
-                                    append("  ")
-                                    append(stringResource(Res.string.nfc_listening_subtitle))
-                                },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        NavigationBarItem(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            icon = { Icon(Icons.Default.Explore, contentDescription = null) },
+                            label = { Text(stringResource(Res.string.tab_explore)) },
                         )
                     }
                 }
-            }
-
-            // Tab content — dismiss keyboard on any touch
-            Box(
+            },
+            floatingActionButton = {
+                if (windowWidthSizeClass != WindowWidthSizeClass.Medium &&
+                    selectedTab == 0 &&
+                    homeUiState.requiresActiveScan &&
+                    homeUiState.nfcStatus != NfcStatus.UNAVAILABLE
+                ) {
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            if (homeUiState.nfcStatus == NfcStatus.DISABLED) {
+                                onOpenNfcSettings?.invoke()
+                            } else {
+                                onScanCard()
+                            }
+                        },
+                        icon = {
+                            if (homeUiState.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.padding(4.dp),
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    strokeWidth = 2.dp,
+                                )
+                            } else {
+                                Icon(Icons.Default.Nfc, contentDescription = null)
+                            }
+                        },
+                        text = {
+                            Text(
+                                stringResource(
+                                    if (homeUiState.isReadingCard) Res.string.reading_card else Res.string.scan,
+                                ),
+                            )
+                        },
+                    )
+                }
+            },
+        ) { padding ->
+            // On the Explore tab, skip top padding so the map extends behind the translucent top bar
+            // (only when the platform actually renders a map)
+            val isExploreTabWithMap = selectedTab == 1 && platformHasCardsMap
+            Column(
                 modifier =
-                    Modifier.fillMaxSize().pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent(PointerEventPass.Initial)
-                                focusManager.clearFocus()
+                    Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = if (isExploreTabWithMap) 0.dp else padding.calculateTopPadding(),
+                            bottom = padding.calculateBottomPadding(),
+                        ),
+            ) {
+                // NFC disabled banner (scan tab only)
+                if (selectedTab == 0 && homeUiState.nfcStatus == NfcStatus.DISABLED && onOpenNfcSettings != null) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(Res.string.nfc_disabled),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = onOpenNfcSettings) {
+                                Text(stringResource(Res.string.nfc_settings))
                             }
                         }
-                    },
-            ) {
-                // Both tabs always stay composed so the map doesn't re-initialize on tab switch.
-                // Active tab is drawn on top via zIndex; inactive tab is hidden via alpha.
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .zIndex(if (selectedTab == 0) 1f else 0f)
-                            .alpha(if (selectedTab == 0) 1f else 0f)
-                            .then(
-                                if (selectedTab !=
-                                    0
-                                ) {
-                                    Modifier.pointerInput(Unit) {
-                                        awaitPointerEventScope {
-                                            while (true) {
-                                                awaitPointerEvent(
-                                                    PointerEventPass.Initial,
-                                                ).changes.forEach { it.consume() }
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                ) {
-                    HistoryContent(
-                        uiState = historyUiState,
-                        supportedCardTypes = supportedCardTypes,
-                        loadedKeyBundles = loadedKeyBundles,
-                        onNavigateToCard = onNavigateToCard,
-                        onToggleSelection = onToggleSelection,
-                    )
+                    }
                 }
+
+                // NFC listening banner (Android passive scanning, scan tab only)
+                if (selectedTab == 0 &&
+                    !homeUiState.requiresActiveScan &&
+                    homeUiState.nfcStatus == NfcStatus.AVAILABLE
+                ) {
+                    val shimmerTransition = rememberInfiniteTransition()
+                    val shimmerProgress by shimmerTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 1f,
+                        animationSpec =
+                            infiniteRepeatable(
+                                animation = tween(2500, easing = LinearEasing),
+                                repeatMode = RepeatMode.Reverse,
+                            ),
+                    )
+                    val shimmerOffset = -0.5f + shimmerProgress * 1f
+                    val containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    val shimmerColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.35f)
+                    val shimmerBrush =
+                        Brush.linearGradient(
+                            colors = listOf(containerColor, shimmerColor, containerColor),
+                            start = Offset(shimmerOffset * 1000f, 0f),
+                            end = Offset((shimmerOffset + 1f) * 1000f, 0f),
+                        )
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(shimmerBrush)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                Icons.Default.Nfc,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text =
+                                    buildAnnotatedString {
+                                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                            append(stringResource(Res.string.nfc_listening_title))
+                                        }
+                                        append("  ")
+                                        append(stringResource(Res.string.nfc_listening_subtitle))
+                                    },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
+                        }
+                    }
+                }
+
+                // Tab content — dismiss keyboard on any touch
                 Box(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .zIndex(if (selectedTab == 1) 1f else 0f)
-                            .alpha(if (selectedTab == 1) 1f else 0f)
-                            .then(
-                                if (selectedTab !=
-                                    1
-                                ) {
-                                    Modifier.pointerInput(Unit) {
-                                        awaitPointerEventScope {
-                                            while (true) {
-                                                awaitPointerEvent(
-                                                    PointerEventPass.Initial,
-                                                ).changes.forEach { it.consume() }
+                        Modifier.fillMaxSize().pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent(PointerEventPass.Initial)
+                                    focusManager.clearFocus()
+                                }
+                            }
+                        },
+                ) {
+                    // Both tabs always stay composed so the map doesn't re-initialize on tab switch.
+                    // Active tab is drawn on top via zIndex; inactive tab is hidden via alpha.
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .zIndex(if (selectedTab == 0) 1f else 0f)
+                                .alpha(if (selectedTab == 0) 1f else 0f)
+                                .then(
+                                    if (selectedTab !=
+                                        0
+                                    ) {
+                                        Modifier.pointerInput(Unit) {
+                                            awaitPointerEventScope {
+                                                while (true) {
+                                                    awaitPointerEvent(
+                                                        PointerEventPass.Initial,
+                                                    ).changes.forEach { it.consume() }
+                                                }
                                             }
                                         }
-                                    }
-                                } else {
-                                    Modifier
-                                },
-                            ),
-                ) {
-                    ExploreContent(
-                        supportedCards = supportedCards,
-                        supportedCardTypes = supportedCardTypes,
-                        deviceRegion = deviceRegion,
-                        loadedKeyBundles = loadedKeyBundles,
-                        showUnsupported = showUnsupported,
-                        showSerialOnly = showSerialOnly,
-                        showKeysRequired = showKeysRequired,
-                        showExperimental = showExperimental,
-                        onKeysRequiredTap = onKeysRequiredTap,
-                        onStatusChipTap = onStatusChipTap,
-                        mapMarkers = mapMarkers,
-                        onSampleCardTap = onSampleCardTap,
-                        searchQuery = exploreSearchQuery,
-                        topBarHeight = padding.calculateTopPadding(),
-                    )
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
+                    ) {
+                        HistoryContent(
+                            uiState = historyUiState,
+                            supportedCardTypes = supportedCardTypes,
+                            loadedKeyBundles = loadedKeyBundles,
+                            onNavigateToCard = onNavigateToCard,
+                            onToggleSelection = onToggleSelection,
+                        )
+                    }
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .zIndex(if (selectedTab == 1) 1f else 0f)
+                                .alpha(if (selectedTab == 1) 1f else 0f)
+                                .then(
+                                    if (selectedTab !=
+                                        1
+                                    ) {
+                                        Modifier.pointerInput(Unit) {
+                                            awaitPointerEventScope {
+                                                while (true) {
+                                                    awaitPointerEvent(
+                                                        PointerEventPass.Initial,
+                                                    ).changes.forEach { it.consume() }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
+                    ) {
+                        ExploreContent(
+                            supportedCards = supportedCards,
+                            supportedCardTypes = supportedCardTypes,
+                            deviceRegion = deviceRegion,
+                            loadedKeyBundles = loadedKeyBundles,
+                            showUnsupported = showUnsupported,
+                            showSerialOnly = showSerialOnly,
+                            showKeysRequired = showKeysRequired,
+                            showExperimental = showExperimental,
+                            onKeysRequiredTap = onKeysRequiredTap,
+                            onStatusChipTap = onStatusChipTap,
+                            mapMarkers = mapMarkers,
+                            onSampleCardTap = onSampleCardTap,
+                            searchQuery = exploreSearchQuery,
+                            topBarHeight = padding.calculateTopPadding(),
+                        )
+                    }
                 }
             }
         }
@@ -845,6 +896,130 @@ fun HomeScreen(
                             },
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AdaptiveNavigation(
+    windowWidthSizeClass: WindowWidthSizeClass,
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    showFab: Boolean,
+    onFabClick: () -> Unit,
+    fabIsLoading: Boolean,
+    onNavigateToKeys: (() -> Unit)?,
+    onOpenAbout: () -> Unit,
+    onShowImportSheet: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    when (windowWidthSizeClass) {
+        WindowWidthSizeClass.Compact -> content()
+        WindowWidthSizeClass.Medium -> {
+            Row(Modifier.fillMaxSize()) {
+                NavigationRail(
+                    header =
+                        if (showFab) {
+                            {
+                                FloatingActionButton(onClick = onFabClick) {
+                                    if (fabIsLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(24.dp),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            strokeWidth = 2.dp,
+                                        )
+                                    } else {
+                                        Icon(Icons.Default.Nfc, contentDescription = null)
+                                    }
+                                }
+                            }
+                        } else {
+                            null
+                        },
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    NavigationRailItem(
+                        selected = selectedTab == 0,
+                        onClick = { onTabSelected(0) },
+                        icon = { Icon(painterResource(Res.drawable.ic_cards_stack), contentDescription = null) },
+                        label = { Text(stringResource(Res.string.tab_scan)) },
+                    )
+                    NavigationRailItem(
+                        selected = selectedTab == 1,
+                        onClick = { onTabSelected(1) },
+                        icon = { Icon(Icons.Default.Explore, contentDescription = null) },
+                        label = { Text(stringResource(Res.string.tab_explore)) },
+                    )
+                    Spacer(Modifier.weight(1f))
+                }
+                Box(Modifier.weight(1f)) { content() }
+            }
+        }
+        WindowWidthSizeClass.Expanded -> {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(Modifier.width(280.dp)) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.ic_launcher),
+                                contentDescription = null,
+                                modifier =
+                                    Modifier
+                                        .size(40.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                stringResource(Res.string.app_name),
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                        }
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(Res.string.tab_scan)) },
+                            icon = { Icon(painterResource(Res.drawable.ic_cards_stack), contentDescription = null) },
+                            selected = selectedTab == 0,
+                            onClick = { onTabSelected(0) },
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                        )
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(Res.string.tab_explore)) },
+                            icon = { Icon(Icons.Default.Explore, contentDescription = null) },
+                            selected = selectedTab == 1,
+                            onClick = { onTabSelected(1) },
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp))
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(Res.string.import_source)) },
+                            icon = { Icon(Icons.Default.FolderOpen, contentDescription = null) },
+                            selected = false,
+                            onClick = onShowImportSheet,
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                        )
+                        if (onNavigateToKeys != null) {
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(Res.string.keys)) },
+                                icon = { Icon(Icons.Default.VpnKey, contentDescription = null) },
+                                selected = false,
+                                onClick = onNavigateToKeys,
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                            )
+                        }
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(Res.string.about)) },
+                            icon = { Icon(Icons.Default.Info, contentDescription = null) },
+                            selected = false,
+                            onClick = onOpenAbout,
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                        )
+                    }
+                },
+            ) {
+                content()
             }
         }
     }

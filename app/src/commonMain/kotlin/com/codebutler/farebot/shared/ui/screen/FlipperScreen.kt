@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.back
 import farebot.app.generated.resources.cancel
@@ -186,39 +187,41 @@ fun FlipperScreen(
             }
         },
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-            when (uiState.connectionState) {
-                FlipperConnectionState.Disconnected -> {
-                    DisconnectedContent(
-                        error = uiState.error,
-                        onRetry = onRetry,
-                    )
-                }
+        ContentWidthConstraint {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                when (uiState.connectionState) {
+                    FlipperConnectionState.Disconnected -> {
+                        DisconnectedContent(
+                            error = uiState.error,
+                            onRetry = onRetry,
+                        )
+                    }
 
-                FlipperConnectionState.Connecting -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(stringResource(Res.string.flipper_connecting_message))
+                    FlipperConnectionState.Connecting -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(stringResource(Res.string.flipper_connecting_message))
+                        }
+                    }
+
+                    FlipperConnectionState.Connected -> {
+                        ConnectedContent(
+                            uiState = uiState,
+                            onNavigateToDirectory = onNavigateToDirectory,
+                            onNavigateUp = onNavigateUp,
+                            onToggleSelection = onToggleSelection,
+                        )
                     }
                 }
 
-                FlipperConnectionState.Connected -> {
-                    ConnectedContent(
-                        uiState = uiState,
-                        onNavigateToDirectory = onNavigateToDirectory,
-                        onNavigateUp = onNavigateUp,
-                        onToggleSelection = onToggleSelection,
-                    )
+                if (uiState.importProgress != null) {
+                    ImportProgressOverlay(uiState.importProgress)
                 }
-            }
-
-            if (uiState.importProgress != null) {
-                ImportProgressOverlay(uiState.importProgress)
             }
         }
     }

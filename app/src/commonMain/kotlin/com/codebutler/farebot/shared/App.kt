@@ -2,7 +2,9 @@ package com.codebutler.farebot.shared
 
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,6 +27,8 @@ import com.codebutler.farebot.shared.di.graphViewModel
 import com.codebutler.farebot.shared.platform.PlatformActions
 import com.codebutler.farebot.shared.platform.getDeviceRegion
 import com.codebutler.farebot.shared.serialize.ImportResult
+import com.codebutler.farebot.shared.ui.layout.LocalWindowWidthSizeClass
+import com.codebutler.farebot.shared.ui.layout.windowWidthSizeClass
 import com.codebutler.farebot.shared.ui.navigation.Screen
 import com.codebutler.farebot.shared.ui.screen.AddKeyScreen
 import com.codebutler.farebot.shared.ui.screen.AdvancedTab
@@ -56,500 +60,508 @@ fun FareBotApp(
     isDebug: Boolean = false,
 ) {
     FareBotTheme {
-        val navController = rememberNavController()
-        val graph = LocalAppGraph.current
-        val navDataHolder = graph.navDataHolder
-        val transitFactoryRegistry = graph.transitFactoryRegistry
-        val supportedCards = remember { transitFactoryRegistry.allCards }
-        val cardImporter = graph.cardImporter
-        val cardPersister = graph.cardPersister
-        val cardSerializer = graph.cardSerializer
-        val scope = rememberCoroutineScope()
-
-        LaunchedEffect(Unit) {
-            cardImporter.pendingImport.collect { content ->
-                when (val result = cardImporter.importCards(content)) {
-                    is ImportResult.Success -> {
-                        for (rawCard in result.cards) {
-                            cardPersister.insertCard(
-                                SavedCard(
-                                    type = rawCard.cardType(),
-                                    serial = rawCard.tagId().hex(),
-                                    data = cardSerializer.serialize(rawCard),
-                                ),
-                            )
-                        }
-                        if (result.cards.size == 1) {
-                            val rawCard = result.cards.first()
-                            val navKey = navDataHolder.put(rawCard)
-                            navController.navigate(Screen.Card.createRoute(navKey))
-                        }
-                        if (result.cards.size > 1) {
-                            platformActions.showToast(getString(Res.string.imported_cards, result.cards.size))
-                        }
-                    }
-                    is ImportResult.Error -> {
-                        platformActions.showToast(getString(Res.string.import_failed, result.message))
-                    }
-                }
-            }
-        }
-
-        val historyViewModel = graphViewModel { historyViewModel }
-        val flipperViewModel = graphViewModel { flipperViewModel }
-        val flipperTransportFactory = graph.flipperTransportFactory
-
-        NavHost(navController = navController, startDestination = Screen.Home.route) {
-            composable(Screen.Home.route) {
-                val homeViewModel = graphViewModel { homeViewModel }
-                val homeUiState by homeViewModel.uiState.collectAsState()
-                val errorMessage by homeViewModel.errorMessage.collectAsState()
-
-                val historyUiState by historyViewModel.uiState.collectAsState()
+        BoxWithConstraints {
+            val widthSizeClass = windowWidthSizeClass(maxWidth)
+            CompositionLocalProvider(LocalWindowWidthSizeClass provides widthSizeClass) {
+                val navController = rememberNavController()
+                val graph = LocalAppGraph.current
+                val navDataHolder = graph.navDataHolder
+                val transitFactoryRegistry = graph.transitFactoryRegistry
+                val supportedCards = remember { transitFactoryRegistry.allCards }
+                val cardImporter = graph.cardImporter
+                val cardPersister = graph.cardPersister
+                val cardSerializer = graph.cardSerializer
+                val scope = rememberCoroutineScope()
 
                 LaunchedEffect(Unit) {
-                    homeViewModel.startObserving()
-                }
-
-                LaunchedEffect(Unit) {
-                    historyViewModel.loadCards()
-                }
-
-                LaunchedEffect(Unit) {
-                    homeViewModel.navigateToCard.collect { cardKey ->
-                        navController.navigate(Screen.Card.createRoute(cardKey))
-                    }
-                }
-
-                LaunchedEffect(Unit) {
-                    historyViewModel.navigateToCard.collect { cardKey ->
-                        navController.navigate(Screen.Card.createRoute(cardKey))
-                    }
-                }
-
-                HomeScreen(
-                    homeUiState = homeUiState,
-                    errorMessage = errorMessage,
-                    onDismissError = { homeViewModel.dismissError() },
-                    onNavigateToAddKeyForCard = { tagId, cardType ->
-                        navController.navigate(Screen.AddKey.createRoute(tagId, cardType))
-                    },
-                    onScanCard = { homeViewModel.startActiveScan() },
-                    historyUiState = historyUiState,
-                    onNavigateToCard = { itemId ->
-                        val cardKey = historyViewModel.getCardNavKey(itemId)
-                        if (cardKey != null) {
-                            val scanIds = historyViewModel.getCardScanIds(itemId)
-                            val scanIdsKey = if (scanIds.size > 1) navDataHolder.put(scanIds) else null
-                            navController.navigate(Screen.Card.createRoute(cardKey, scanIdsKey, itemId))
-                        }
-                    },
-                    onImportFile = {
-                        platformActions.pickFileForImport { text ->
-                            if (text != null) {
-                                val result = historyViewModel.importCardsDetailed(text)
-                                when (result) {
-                                    is ImportResult.Success -> {
-                                        for (rawCard in result.cards) {
-                                            cardPersister.insertCard(
-                                                SavedCard(
-                                                    type = rawCard.cardType(),
-                                                    serial = rawCard.tagId().hex(),
-                                                    data = cardSerializer.serialize(rawCard),
-                                                ),
-                                            )
-                                        }
-                                        if (result.cards.size == 1) {
-                                            val rawCard = result.cards.first()
-                                            val navKey = navDataHolder.put(rawCard)
-                                            navController.navigate(Screen.Card.createRoute(navKey))
-                                        }
-                                        scope.launch {
-                                            platformActions.showToast(
-                                                FormattedString(
-                                                    Res.string.imported_cards,
-                                                    result.cards.size,
-                                                ).resolveAsync(),
-                                            )
-                                        }
-                                        historyViewModel.loadCards()
-                                    }
-                                    is ImportResult.Error -> {
-                                        scope.launch {
-                                            platformActions.showToast(
-                                                FormattedString(
-                                                    Res.string.import_failed,
-                                                    result.message,
-                                                ).resolveAsync(),
-                                            )
-                                        }
-                                    }
+                    cardImporter.pendingImport.collect { content ->
+                        when (val result = cardImporter.importCards(content)) {
+                            is ImportResult.Success -> {
+                                for (rawCard in result.cards) {
+                                    cardPersister.insertCard(
+                                        SavedCard(
+                                            type = rawCard.cardType(),
+                                            serial = rawCard.tagId().hex(),
+                                            data = cardSerializer.serialize(rawCard),
+                                        ),
+                                    )
                                 }
-                            }
-                        }
-                    },
-                    onToggleSelection = { itemId -> historyViewModel.toggleSelection(itemId) },
-                    onClearSelection = { historyViewModel.clearSelection() },
-                    onSelectAll = { historyViewModel.selectAll() },
-                    onDeleteSelected = { historyViewModel.deleteSelected() },
-                    supportedCards = supportedCards,
-                    supportedCardTypes = supportedCardTypes,
-                    deviceRegion = getDeviceRegion(),
-                    loadedKeyBundles = loadedKeyBundles,
-                    mapMarkers =
-                        supportedCards
-                            .filter { it.latitude != null && it.longitude != null }
-                            .map { card ->
-                                CardsMapMarker(
-                                    name = stringResource(card.nameRes),
-                                    location = stringResource(card.locationRes),
-                                    latitude = card.latitude!!.toDouble(),
-                                    longitude = card.longitude!!.toDouble(),
-                                )
-                            },
-                    onKeysRequiredTap = {
-                        scope.launch {
-                            platformActions.showToast(FormattedString(Res.string.keys_required).resolveAsync())
-                        }
-                    },
-                    onStatusChipTap = { message ->
-                        platformActions.showToast(message)
-                    },
-                    onNavigateToKeys = { navController.navigate(Screen.Keys.route) },
-                    onConnectFlipperBle =
-                        if (flipperTransportFactory.isBleSupported) {
-                            {
-                                flipperViewModel.connectBle()
-                                navController.navigate(Screen.Flipper.route)
-                            }
-                        } else {
-                            null
-                        },
-                    onConnectFlipperUsb =
-                        if (flipperTransportFactory.isUsbSupported) {
-                            {
-                                flipperViewModel.connectUsb()
-                                navController.navigate(Screen.Flipper.route)
-                            }
-                        } else {
-                            null
-                        },
-                    onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
-                    onOpenNfcSettings = platformActions.openNfcSettings,
-                    onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
-                    onAddAllSamples = {
-                        scope.launch {
-                            var count = 0
-                            for (cardInfo in supportedCards) {
-                                val fileName = cardInfo.sampleDumpFile ?: continue
-                                val bytes = Res.readBytes("files/samples/$fileName")
-                                val result =
-                                    if (fileName.endsWith(".mfc")) {
-                                        cardImporter.importMfcDump(bytes)
-                                    } else {
-                                        cardImporter.importCards(bytes.decodeToString())
-                                    }
-                                if (result is ImportResult.Success) {
-                                    for (rawCard in result.cards) {
-                                        cardPersister.insertCard(
-                                            SavedCard(
-                                                type = rawCard.cardType(),
-                                                serial = rawCard.tagId().hex(),
-                                                data = cardSerializer.serialize(rawCard),
-                                            ),
-                                        )
-                                        count++
-                                    }
-                                }
-                            }
-                            historyViewModel.loadCards()
-                            platformActions.showToast(getString(Res.string.imported_cards, count))
-                        }
-                    },
-                    onSampleCardTap = { cardInfo ->
-                        val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
-                        scope.launch {
-                            try {
-                                val bytes = Res.readBytes("files/samples/$fileName")
-                                val result =
-                                    if (fileName.endsWith(".mfc")) {
-                                        cardImporter.importMfcDump(bytes)
-                                    } else {
-                                        cardImporter.importCards(bytes.decodeToString())
-                                    }
-                                if (result is ImportResult.Success && result.cards.isNotEmpty()) {
+                                if (result.cards.size == 1) {
                                     val rawCard = result.cards.first()
                                     val navKey = navDataHolder.put(rawCard)
-                                    val cardName = getString(cardInfo.nameRes)
-                                    navController.navigate(Screen.SampleCard.createRoute(navKey, cardName))
+                                    navController.navigate(Screen.Card.createRoute(navKey))
                                 }
-                            } catch (e: Exception) {
-                                platformActions.showToast("Failed to load sample: ${e.message}")
+                                if (result.cards.size > 1) {
+                                    platformActions.showToast(getString(Res.string.imported_cards, result.cards.size))
+                                }
+                            }
+                            is ImportResult.Error -> {
+                                platformActions.showToast(getString(Res.string.import_failed, result.message))
                             }
                         }
-                    },
-                )
-            }
-
-            composable(Screen.Flipper.route) {
-                val flipperUiState by flipperViewModel.uiState.collectAsState()
-
-                FlipperScreen(
-                    uiState = flipperUiState,
-                    onRetry = { flipperViewModel.retry() },
-                    onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
-                    onNavigateUp = { flipperViewModel.navigateUp() },
-                    onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
-                    onClearSelection = { flipperViewModel.clearSelection() },
-                    onImportSelected = { flipperViewModel.importSelectedFiles() },
-                    onImportKeys = { flipperViewModel.importKeyDictionary() },
-                    onClearImportMessage = { flipperViewModel.clearImportMessage() },
-                    onBack = {
-                        flipperViewModel.disconnect()
-                        navController.popBackStack()
-                    },
-                )
-            }
-
-            composable(Screen.Keys.route) {
-                val viewModel = graphViewModel { keysViewModel }
-                val uiState by viewModel.uiState.collectAsState()
-
-                LaunchedEffect(Unit) {
-                    viewModel.loadKeys()
+                    }
                 }
 
-                KeysScreen(
-                    uiState = uiState,
-                    onBack = { navController.popBackStack() },
-                    onNavigateToAddKey = { navController.navigate(Screen.AddKey.createRoute()) },
-                    onDeleteKey = { keyId -> viewModel.deleteKey(keyId) },
-                    onToggleSelection = { keyId -> viewModel.toggleSelection(keyId) },
-                    onClearSelection = { viewModel.clearSelection() },
-                    onSelectAll = { viewModel.selectAll() },
-                    onDeleteSelected = { viewModel.deleteSelected() },
-                )
-            }
+                val historyViewModel = graphViewModel { historyViewModel }
+                val flipperViewModel = graphViewModel { flipperViewModel }
+                val flipperTransportFactory = graph.flipperTransportFactory
 
-            composable(
-                route = Screen.AddKey.route,
-                arguments =
-                    listOf(
-                        navArgument("tagId") {
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        },
-                        navArgument("cardType") {
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        },
-                    ),
-            ) { backStackEntry ->
-                val viewModel = graphViewModel { addKeyViewModel }
-                val uiState by viewModel.uiState.collectAsState()
+                NavHost(navController = navController, startDestination = Screen.Home.route) {
+                    composable(Screen.Home.route) {
+                        val homeViewModel = graphViewModel { homeViewModel }
+                        val homeUiState by homeViewModel.uiState.collectAsState()
+                        val errorMessage by homeViewModel.errorMessage.collectAsState()
 
-                val prefillTagId = backStackEntry.arguments?.read { getStringOrNull("tagId") }
-                val prefillCardTypeName = backStackEntry.arguments?.read { getStringOrNull("cardType") }
+                        val historyUiState by historyViewModel.uiState.collectAsState()
 
-                LaunchedEffect(prefillTagId, prefillCardTypeName) {
-                    if (prefillTagId != null && prefillCardTypeName != null) {
-                        val cardType = CardType.entries.firstOrNull { it.name == prefillCardTypeName }
-                        if (cardType != null) {
-                            viewModel.prefillCardData(prefillTagId, cardType)
+                        LaunchedEffect(Unit) {
+                            homeViewModel.startObserving()
                         }
-                    }
-                }
 
-                LaunchedEffect(Unit) {
-                    viewModel.startObservingTags()
-                }
+                        LaunchedEffect(Unit) {
+                            historyViewModel.loadCards()
+                        }
 
-                LaunchedEffect(Unit) {
-                    viewModel.keySaved.collect {
-                        navController.popBackStack()
-                    }
-                }
-
-                AddKeyScreen(
-                    uiState = uiState,
-                    onBack = { navController.popBackStack() },
-                    onSaveKey = { cardId, cardType, keyData ->
-                        viewModel.saveKey(cardId, cardType, keyData)
-                    },
-                    onEnterManually = { viewModel.enterManualMode() },
-                    onImportFile = {
-                        platformActions.pickFileForBytes { bytes ->
-                            if (bytes != null) {
-                                viewModel.importKeyFile(bytes)
+                        LaunchedEffect(Unit) {
+                            homeViewModel.navigateToCard.collect { cardKey ->
+                                navController.navigate(Screen.Card.createRoute(cardKey))
                             }
                         }
-                    },
-                )
-            }
 
-            composable(
-                route = Screen.Card.route,
-                arguments =
-                    listOf(
-                        navArgument("cardKey") { type = NavType.StringType },
-                        navArgument("scanIdsKey") {
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        },
-                        navArgument("currentScanId") {
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        },
-                    ),
-                enterTransition = {
-                    if (initialState.destination.route == Screen.Card.route) fadeIn() else null
-                },
-                exitTransition = {
-                    if (targetState.destination.route == Screen.Card.route) fadeOut() else null
-                },
-            ) { backStackEntry ->
-                val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
-                val scanIdsKey = backStackEntry.arguments?.read { getStringOrNull("scanIdsKey") }
-                val currentScanId = backStackEntry.arguments?.read { getStringOrNull("currentScanId") }
-
-                @Suppress("UNCHECKED_CAST")
-                val scanIds = scanIdsKey?.let { navDataHolder.get<List<String>>(it) } ?: emptyList()
-                val viewModel = graphViewModel { cardViewModel }
-                val uiState by viewModel.uiState.collectAsState()
-
-                LaunchedEffect(cardKey) {
-                    viewModel.loadCard(cardKey, scanIds, currentScanId)
-                }
-
-                CardScreen(
-                    uiState = uiState,
-                    onBack = { navController.popBackStack() },
-                    onNavigateToAdvanced = {
-                        val advKey = viewModel.getAdvancedCardKey()
-                        if (advKey != null) {
-                            navController.navigate(Screen.CardAdvanced.createRoute(advKey))
-                        }
-                    },
-                    onNavigateToTripMap = { tripKey ->
-                        navController.navigate(Screen.TripMap.createRoute(tripKey))
-                    },
-                    onShare = {
-                        val json = viewModel.exportCard()
-                        if (json != null) {
-                            val name = uiState.cardName?.lowercase()?.replace(' ', '-') ?: "card"
-                            val serial = uiState.serialNumber ?: ""
-                            val fileName = "farebot-$name-$serial.json"
-                            platformActions.shareFile(json, fileName, "application/json")
-                        }
-                    },
-                    onDelete = {
-                        viewModel.deleteCard()
-                        historyViewModel.loadCards()
-                        navController.popBackStack()
-                    },
-                    onShowScanHistory = {
-                        viewModel.toggleScanHistory()
-                    },
-                    onNavigateToScan = { savedCardId ->
-                        val navKey = viewModel.navigateToScan(savedCardId)
-                        if (navKey != null) {
-                            val route = Screen.Card.createRoute(navKey, scanIdsKey, savedCardId)
-                            navController.navigate(route) {
-                                popUpTo(Screen.Card.route) { inclusive = true }
+                        LaunchedEffect(Unit) {
+                            historyViewModel.navigateToCard.collect { cardKey ->
+                                navController.navigate(Screen.Card.createRoute(cardKey))
                             }
                         }
-                    },
-                )
-            }
 
-            composable(
-                route = Screen.SampleCard.route,
-                arguments =
-                    listOf(
-                        navArgument("cardKey") { type = NavType.StringType },
-                        navArgument("cardName") { type = NavType.StringType },
-                    ),
-            ) { backStackEntry ->
-                val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
-                val cardName = backStackEntry.arguments?.read { getStringOrNull("cardName") } ?: return@composable
-                val viewModel = graphViewModel { cardViewModel }
-                val uiState by viewModel.uiState.collectAsState()
-
-                LaunchedEffect(cardKey) {
-                    viewModel.loadSampleCard(cardKey, "Sample: $cardName")
-                }
-
-                CardScreen(
-                    uiState = uiState,
-                    onBack = { navController.popBackStack() },
-                    onNavigateToAdvanced = {
-                        val advKey = viewModel.getAdvancedCardKey()
-                        if (advKey != null) {
-                            navController.navigate(Screen.CardAdvanced.createRoute(advKey))
-                        }
-                    },
-                    onNavigateToTripMap = { tripKey ->
-                        navController.navigate(Screen.TripMap.createRoute(tripKey))
-                    },
-                )
-            }
-
-            composable(
-                route = Screen.CardAdvanced.route,
-                arguments = listOf(navArgument("cardKey") { type = NavType.StringType }),
-            ) { backStackEntry ->
-                val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
-
-                @Suppress("UNCHECKED_CAST")
-                val data = remember { navDataHolder.get<Pair<Card, TransitInfo?>>(cardKey) }
-                val card = data?.first
-                val transitInfo = data?.second
-
-                val tabs by produceState(emptyList<AdvancedTab>()) {
-                    val tabList = mutableListOf<AdvancedTab>()
-                    if (transitInfo != null) {
-                        val transitInfoUi = transitInfo.getAdvancedUi()
-                        if (transitInfoUi != null) {
-                            tabList.add(AdvancedTab(transitInfo.cardName, transitInfoUi))
-                        }
-                    }
-                    if (card != null) {
-                        tabList.add(AdvancedTab(FormattedString(card.cardType.toString()), card.getAdvancedUi()))
-                    }
-                    value = tabList
-                }
-
-                CardAdvancedScreen(
-                    uiState = CardAdvancedUiState(tabs = tabs),
-                    onBack = { navController.popBackStack() },
-                )
-            }
-
-            composable(
-                route = Screen.TripMap.route,
-                arguments = listOf(navArgument("tripKey") { type = NavType.StringType }),
-            ) { backStackEntry ->
-                val tripKey = backStackEntry.arguments?.read { getStringOrNull("tripKey") } ?: return@composable
-
-                val trip = remember { navDataHolder.get<Trip>(tripKey) }
-                val uiState =
-                    remember {
-                        TripMapUiState(
-                            startStation = trip?.startStation,
-                            endStation = trip?.endStation,
-                            routeName = trip?.routeName,
-                            agencyName = trip?.agencyName,
+                        HomeScreen(
+                            homeUiState = homeUiState,
+                            errorMessage = errorMessage,
+                            onDismissError = { homeViewModel.dismissError() },
+                            onNavigateToAddKeyForCard = { tagId, cardType ->
+                                navController.navigate(Screen.AddKey.createRoute(tagId, cardType))
+                            },
+                            onScanCard = { homeViewModel.startActiveScan() },
+                            historyUiState = historyUiState,
+                            onNavigateToCard = { itemId ->
+                                val cardKey = historyViewModel.getCardNavKey(itemId)
+                                if (cardKey != null) {
+                                    val scanIds = historyViewModel.getCardScanIds(itemId)
+                                    val scanIdsKey = if (scanIds.size > 1) navDataHolder.put(scanIds) else null
+                                    navController.navigate(Screen.Card.createRoute(cardKey, scanIdsKey, itemId))
+                                }
+                            },
+                            onImportFile = {
+                                platformActions.pickFileForImport { text ->
+                                    if (text != null) {
+                                        val result = historyViewModel.importCardsDetailed(text)
+                                        when (result) {
+                                            is ImportResult.Success -> {
+                                                for (rawCard in result.cards) {
+                                                    cardPersister.insertCard(
+                                                        SavedCard(
+                                                            type = rawCard.cardType(),
+                                                            serial = rawCard.tagId().hex(),
+                                                            data = cardSerializer.serialize(rawCard),
+                                                        ),
+                                                    )
+                                                }
+                                                if (result.cards.size == 1) {
+                                                    val rawCard = result.cards.first()
+                                                    val navKey = navDataHolder.put(rawCard)
+                                                    navController.navigate(Screen.Card.createRoute(navKey))
+                                                }
+                                                scope.launch {
+                                                    platformActions.showToast(
+                                                        FormattedString(
+                                                            Res.string.imported_cards,
+                                                            result.cards.size,
+                                                        ).resolveAsync(),
+                                                    )
+                                                }
+                                                historyViewModel.loadCards()
+                                            }
+                                            is ImportResult.Error -> {
+                                                scope.launch {
+                                                    platformActions.showToast(
+                                                        FormattedString(
+                                                            Res.string.import_failed,
+                                                            result.message,
+                                                        ).resolveAsync(),
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            onToggleSelection = { itemId -> historyViewModel.toggleSelection(itemId) },
+                            onClearSelection = { historyViewModel.clearSelection() },
+                            onSelectAll = { historyViewModel.selectAll() },
+                            onDeleteSelected = { historyViewModel.deleteSelected() },
+                            supportedCards = supportedCards,
+                            supportedCardTypes = supportedCardTypes,
+                            deviceRegion = getDeviceRegion(),
+                            loadedKeyBundles = loadedKeyBundles,
+                            mapMarkers =
+                                supportedCards
+                                    .filter { it.latitude != null && it.longitude != null }
+                                    .map { card ->
+                                        CardsMapMarker(
+                                            name = stringResource(card.nameRes),
+                                            location = stringResource(card.locationRes),
+                                            latitude = card.latitude!!.toDouble(),
+                                            longitude = card.longitude!!.toDouble(),
+                                        )
+                                    },
+                            onKeysRequiredTap = {
+                                scope.launch {
+                                    platformActions.showToast(FormattedString(Res.string.keys_required).resolveAsync())
+                                }
+                            },
+                            onStatusChipTap = { message ->
+                                platformActions.showToast(message)
+                            },
+                            onNavigateToKeys = { navController.navigate(Screen.Keys.route) },
+                            onConnectFlipperBle =
+                                if (flipperTransportFactory.isBleSupported) {
+                                    {
+                                        flipperViewModel.connectBle()
+                                        navController.navigate(Screen.Flipper.route)
+                                    }
+                                } else {
+                                    null
+                                },
+                            onConnectFlipperUsb =
+                                if (flipperTransportFactory.isUsbSupported) {
+                                    {
+                                        flipperViewModel.connectUsb()
+                                        navController.navigate(Screen.Flipper.route)
+                                    }
+                                } else {
+                                    null
+                                },
+                            onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
+                            onOpenNfcSettings = platformActions.openNfcSettings,
+                            onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
+                            onAddAllSamples = {
+                                scope.launch {
+                                    var count = 0
+                                    for (cardInfo in supportedCards) {
+                                        val fileName = cardInfo.sampleDumpFile ?: continue
+                                        val bytes = Res.readBytes("files/samples/$fileName")
+                                        val result =
+                                            if (fileName.endsWith(".mfc")) {
+                                                cardImporter.importMfcDump(bytes)
+                                            } else {
+                                                cardImporter.importCards(bytes.decodeToString())
+                                            }
+                                        if (result is ImportResult.Success) {
+                                            for (rawCard in result.cards) {
+                                                cardPersister.insertCard(
+                                                    SavedCard(
+                                                        type = rawCard.cardType(),
+                                                        serial = rawCard.tagId().hex(),
+                                                        data = cardSerializer.serialize(rawCard),
+                                                    ),
+                                                )
+                                                count++
+                                            }
+                                        }
+                                    }
+                                    historyViewModel.loadCards()
+                                    platformActions.showToast(getString(Res.string.imported_cards, count))
+                                }
+                            },
+                            onSampleCardTap = { cardInfo ->
+                                val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
+                                scope.launch {
+                                    try {
+                                        val bytes = Res.readBytes("files/samples/$fileName")
+                                        val result =
+                                            if (fileName.endsWith(".mfc")) {
+                                                cardImporter.importMfcDump(bytes)
+                                            } else {
+                                                cardImporter.importCards(bytes.decodeToString())
+                                            }
+                                        if (result is ImportResult.Success && result.cards.isNotEmpty()) {
+                                            val rawCard = result.cards.first()
+                                            val navKey = navDataHolder.put(rawCard)
+                                            val cardName = getString(cardInfo.nameRes)
+                                            navController.navigate(Screen.SampleCard.createRoute(navKey, cardName))
+                                        }
+                                    } catch (e: Exception) {
+                                        platformActions.showToast("Failed to load sample: ${e.message}")
+                                    }
+                                }
+                            },
                         )
                     }
 
-                TripMapScreen(
-                    uiState = uiState,
-                    onBack = { navController.popBackStack() },
-                )
+                    composable(Screen.Flipper.route) {
+                        val flipperUiState by flipperViewModel.uiState.collectAsState()
+
+                        FlipperScreen(
+                            uiState = flipperUiState,
+                            onRetry = { flipperViewModel.retry() },
+                            onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
+                            onNavigateUp = { flipperViewModel.navigateUp() },
+                            onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
+                            onClearSelection = { flipperViewModel.clearSelection() },
+                            onImportSelected = { flipperViewModel.importSelectedFiles() },
+                            onImportKeys = { flipperViewModel.importKeyDictionary() },
+                            onClearImportMessage = { flipperViewModel.clearImportMessage() },
+                            onBack = {
+                                flipperViewModel.disconnect()
+                                navController.popBackStack()
+                            },
+                        )
+                    }
+
+                    composable(Screen.Keys.route) {
+                        val viewModel = graphViewModel { keysViewModel }
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(Unit) {
+                            viewModel.loadKeys()
+                        }
+
+                        KeysScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onNavigateToAddKey = { navController.navigate(Screen.AddKey.createRoute()) },
+                            onDeleteKey = { keyId -> viewModel.deleteKey(keyId) },
+                            onToggleSelection = { keyId -> viewModel.toggleSelection(keyId) },
+                            onClearSelection = { viewModel.clearSelection() },
+                            onSelectAll = { viewModel.selectAll() },
+                            onDeleteSelected = { viewModel.deleteSelected() },
+                        )
+                    }
+
+                    composable(
+                        route = Screen.AddKey.route,
+                        arguments =
+                            listOf(
+                                navArgument("tagId") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                                navArgument("cardType") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                            ),
+                    ) { backStackEntry ->
+                        val viewModel = graphViewModel { addKeyViewModel }
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        val prefillTagId = backStackEntry.arguments?.read { getStringOrNull("tagId") }
+                        val prefillCardTypeName = backStackEntry.arguments?.read { getStringOrNull("cardType") }
+
+                        LaunchedEffect(prefillTagId, prefillCardTypeName) {
+                            if (prefillTagId != null && prefillCardTypeName != null) {
+                                val cardType = CardType.entries.firstOrNull { it.name == prefillCardTypeName }
+                                if (cardType != null) {
+                                    viewModel.prefillCardData(prefillTagId, cardType)
+                                }
+                            }
+                        }
+
+                        LaunchedEffect(Unit) {
+                            viewModel.startObservingTags()
+                        }
+
+                        LaunchedEffect(Unit) {
+                            viewModel.keySaved.collect {
+                                navController.popBackStack()
+                            }
+                        }
+
+                        AddKeyScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onSaveKey = { cardId, cardType, keyData ->
+                                viewModel.saveKey(cardId, cardType, keyData)
+                            },
+                            onEnterManually = { viewModel.enterManualMode() },
+                            onImportFile = {
+                                platformActions.pickFileForBytes { bytes ->
+                                    if (bytes != null) {
+                                        viewModel.importKeyFile(bytes)
+                                    }
+                                }
+                            },
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Card.route,
+                        arguments =
+                            listOf(
+                                navArgument("cardKey") { type = NavType.StringType },
+                                navArgument("scanIdsKey") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                                navArgument("currentScanId") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                            ),
+                        enterTransition = {
+                            if (initialState.destination.route == Screen.Card.route) fadeIn() else null
+                        },
+                        exitTransition = {
+                            if (targetState.destination.route == Screen.Card.route) fadeOut() else null
+                        },
+                    ) { backStackEntry ->
+                        val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
+                        val scanIdsKey = backStackEntry.arguments?.read { getStringOrNull("scanIdsKey") }
+                        val currentScanId = backStackEntry.arguments?.read { getStringOrNull("currentScanId") }
+
+                        @Suppress("UNCHECKED_CAST")
+                        val scanIds = scanIdsKey?.let { navDataHolder.get<List<String>>(it) } ?: emptyList()
+                        val viewModel = graphViewModel { cardViewModel }
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(cardKey) {
+                            viewModel.loadCard(cardKey, scanIds, currentScanId)
+                        }
+
+                        CardScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onNavigateToAdvanced = {
+                                val advKey = viewModel.getAdvancedCardKey()
+                                if (advKey != null) {
+                                    navController.navigate(Screen.CardAdvanced.createRoute(advKey))
+                                }
+                            },
+                            onNavigateToTripMap = { tripKey ->
+                                navController.navigate(Screen.TripMap.createRoute(tripKey))
+                            },
+                            onShare = {
+                                val json = viewModel.exportCard()
+                                if (json != null) {
+                                    val name = uiState.cardName?.lowercase()?.replace(' ', '-') ?: "card"
+                                    val serial = uiState.serialNumber ?: ""
+                                    val fileName = "farebot-$name-$serial.json"
+                                    platformActions.shareFile(json, fileName, "application/json")
+                                }
+                            },
+                            onDelete = {
+                                viewModel.deleteCard()
+                                historyViewModel.loadCards()
+                                navController.popBackStack()
+                            },
+                            onShowScanHistory = {
+                                viewModel.toggleScanHistory()
+                            },
+                            onNavigateToScan = { savedCardId ->
+                                val navKey = viewModel.navigateToScan(savedCardId)
+                                if (navKey != null) {
+                                    val route = Screen.Card.createRoute(navKey, scanIdsKey, savedCardId)
+                                    navController.navigate(route) {
+                                        popUpTo(Screen.Card.route) { inclusive = true }
+                                    }
+                                }
+                            },
+                        )
+                    }
+
+                    composable(
+                        route = Screen.SampleCard.route,
+                        arguments =
+                            listOf(
+                                navArgument("cardKey") { type = NavType.StringType },
+                                navArgument("cardName") { type = NavType.StringType },
+                            ),
+                    ) { backStackEntry ->
+                        val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
+                        val cardName =
+                            backStackEntry.arguments?.read { getStringOrNull("cardName") } ?: return@composable
+                        val viewModel = graphViewModel { cardViewModel }
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(cardKey) {
+                            viewModel.loadSampleCard(cardKey, "Sample: $cardName")
+                        }
+
+                        CardScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onNavigateToAdvanced = {
+                                val advKey = viewModel.getAdvancedCardKey()
+                                if (advKey != null) {
+                                    navController.navigate(Screen.CardAdvanced.createRoute(advKey))
+                                }
+                            },
+                            onNavigateToTripMap = { tripKey ->
+                                navController.navigate(Screen.TripMap.createRoute(tripKey))
+                            },
+                        )
+                    }
+
+                    composable(
+                        route = Screen.CardAdvanced.route,
+                        arguments = listOf(navArgument("cardKey") { type = NavType.StringType }),
+                    ) { backStackEntry ->
+                        val cardKey = backStackEntry.arguments?.read { getStringOrNull("cardKey") } ?: return@composable
+
+                        @Suppress("UNCHECKED_CAST")
+                        val data = remember { navDataHolder.get<Pair<Card, TransitInfo?>>(cardKey) }
+                        val card = data?.first
+                        val transitInfo = data?.second
+
+                        val tabs by produceState(emptyList<AdvancedTab>()) {
+                            val tabList = mutableListOf<AdvancedTab>()
+                            if (transitInfo != null) {
+                                val transitInfoUi = transitInfo.getAdvancedUi()
+                                if (transitInfoUi != null) {
+                                    tabList.add(AdvancedTab(transitInfo.cardName, transitInfoUi))
+                                }
+                            }
+                            if (card != null) {
+                                tabList.add(
+                                    AdvancedTab(FormattedString(card.cardType.toString()), card.getAdvancedUi()),
+                                )
+                            }
+                            value = tabList
+                        }
+
+                        CardAdvancedScreen(
+                            uiState = CardAdvancedUiState(tabs = tabs),
+                            onBack = { navController.popBackStack() },
+                        )
+                    }
+
+                    composable(
+                        route = Screen.TripMap.route,
+                        arguments = listOf(navArgument("tripKey") { type = NavType.StringType }),
+                    ) { backStackEntry ->
+                        val tripKey = backStackEntry.arguments?.read { getStringOrNull("tripKey") } ?: return@composable
+
+                        val trip = remember { navDataHolder.get<Trip>(tripKey) }
+                        val uiState =
+                            remember {
+                                TripMapUiState(
+                                    startStation = trip?.startStation,
+                                    endStation = trip?.endStation,
+                                    routeName = trip?.routeName,
+                                    agencyName = trip?.agencyName,
+                                )
+                            }
+
+                        TripMapScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                        )
+                    }
+                }
             }
         }
     }

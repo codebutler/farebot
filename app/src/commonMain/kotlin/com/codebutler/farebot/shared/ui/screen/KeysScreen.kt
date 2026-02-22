@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.add_key
 import farebot.app.generated.resources.back
@@ -132,76 +133,78 @@ fun KeysScreen(
             }
         },
     ) { padding ->
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-        ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-                uiState.keys.isEmpty() -> {
-                    Text(
-                        text = stringResource(Res.string.no_keys),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier =
-                            Modifier
-                                .align(Alignment.Center)
-                                .padding(16.dp),
-                    )
-                }
-                else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(uiState.keys) { keyItem ->
-                            val isSelected = uiState.selectedIds.contains(keyItem.id)
-                            Row(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .combinedClickable(
-                                            onClick = {
-                                                if (uiState.isSelectionMode) {
+        ContentWidthConstraint {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+            ) {
+                when {
+                    uiState.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    uiState.keys.isEmpty() -> {
+                        Text(
+                            text = stringResource(Res.string.no_keys),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier =
+                                Modifier
+                                    .align(Alignment.Center)
+                                    .padding(16.dp),
+                        )
+                    }
+                    else -> {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(uiState.keys) { keyItem ->
+                                val isSelected = uiState.selectedIds.contains(keyItem.id)
+                                Row(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .combinedClickable(
+                                                onClick = {
+                                                    if (uiState.isSelectionMode) {
+                                                        onToggleSelection(keyItem.id)
+                                                    }
+                                                },
+                                                onLongClick = {
                                                     onToggleSelection(keyItem.id)
-                                                }
-                                            },
-                                            onLongClick = {
-                                                onToggleSelection(keyItem.id)
-                                            },
-                                        ).padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                if (uiState.isSelectionMode) {
-                                    Checkbox(
-                                        checked = isSelected,
-                                        onCheckedChange = { onToggleSelection(keyItem.id) },
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = keyItem.cardId,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                    )
-                                    Text(
-                                        text = keyItem.cardType,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                                if (!uiState.isSelectionMode) {
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    IconButton(onClick = { onDeleteKey(keyItem.id) }) {
-                                        Icon(
-                                            Icons.Default.Delete,
-                                            contentDescription = stringResource(Res.string.delete),
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                },
+                                            ).padding(horizontal = 16.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    if (uiState.isSelectionMode) {
+                                        Checkbox(
+                                            checked = isSelected,
+                                            onCheckedChange = { onToggleSelection(keyItem.id) },
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = keyItem.cardId,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                        )
+                                        Text(
+                                            text = keyItem.cardType,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
+                                    if (!uiState.isSelectionMode) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        IconButton(onClick = { onDeleteKey(keyItem.id) }) {
+                                            Icon(
+                                                Icons.Default.Delete,
+                                                contentDescription = stringResource(Res.string.delete),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
                                 }
+                                HorizontalDivider()
                             }
-                            HorizontalDivider()
                         }
                     }
                 }

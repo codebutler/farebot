@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.add_key
 import farebot.app.generated.resources.back
@@ -100,130 +101,136 @@ fun AddKeyScreen(
             )
         },
     ) { padding ->
-        Crossfade(targetState = uiState.detectedTagId != null) { showForm ->
-            if (!showForm && uiState.hasNfc) {
-                // NFC splash - waiting for tag
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(padding)
-                            .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Icon(
-                        Icons.Default.Nfc,
-                        contentDescription = stringResource(Res.string.nfc),
-                        modifier = Modifier.size(96.dp),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(Res.string.tap_your_card),
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(Res.string.hold_nfc_card),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    TextButton(onClick = onEnterManually) {
-                        Text(stringResource(Res.string.enter_manually))
+        ContentWidthConstraint {
+            Crossfade(targetState = uiState.detectedTagId != null) { showForm ->
+                if (!showForm && uiState.hasNfc) {
+                    // NFC splash - waiting for tag
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(padding)
+                                .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.Nfc,
+                            contentDescription = stringResource(Res.string.nfc),
+                            modifier = Modifier.size(96.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(Res.string.tap_your_card),
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(Res.string.hold_nfc_card),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        TextButton(onClick = onEnterManually) {
+                            Text(stringResource(Res.string.enter_manually))
+                        }
                     }
-                }
-            } else {
-                // Key entry form
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(padding)
-                            .padding(16.dp),
-                ) {
-                    OutlinedTextField(
-                        value = cardId,
-                        onValueChange = { if (!isAutoDetected) cardId = it },
-                        label = { Text(stringResource(Res.string.card_id)) },
-                        singleLine = true,
-                        readOnly = isAutoDetected,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ExposedDropdownMenuBox(
-                        expanded = cardTypeExpanded,
-                        onExpandedChange = { if (!isAutoDetected) cardTypeExpanded = it },
+                } else {
+                    // Key entry form
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(padding)
+                                .padding(16.dp),
                     ) {
                         OutlinedTextField(
-                            value = selectedCardType.toString(),
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(Res.string.card_type)) },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cardTypeExpanded) },
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                            value = cardId,
+                            onValueChange = { if (!isAutoDetected) cardId = it },
+                            label = { Text(stringResource(Res.string.card_id)) },
+                            singleLine = true,
+                            readOnly = isAutoDetected,
+                            modifier = Modifier.fillMaxWidth(),
                         )
-                        if (!isAutoDetected) {
-                            ExposedDropdownMenu(
-                                expanded = cardTypeExpanded,
-                                onDismissRequest = { cardTypeExpanded = false },
-                            ) {
-                                cardTypes.forEach { type ->
-                                    DropdownMenuItem(
-                                        text = { Text(type.toString()) },
-                                        onClick = {
-                                            selectedCardType = type
-                                            cardTypeExpanded = false
-                                        },
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        ExposedDropdownMenuBox(
+                            expanded = cardTypeExpanded,
+                            onExpandedChange = { if (!isAutoDetected) cardTypeExpanded = it },
+                        ) {
+                            OutlinedTextField(
+                                value = selectedCardType.toString(),
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(Res.string.card_type)) },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                        expanded = cardTypeExpanded,
                                     )
+                                },
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                            )
+                            if (!isAutoDetected) {
+                                ExposedDropdownMenu(
+                                    expanded = cardTypeExpanded,
+                                    onDismissRequest = { cardTypeExpanded = false },
+                                ) {
+                                    cardTypes.forEach { type ->
+                                        DropdownMenuItem(
+                                            text = { Text(type.toString()) },
+                                            onClick = {
+                                                selectedCardType = type
+                                                cardTypeExpanded = false
+                                            },
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    OutlinedTextField(
-                        value = keyData,
-                        onValueChange = { keyData = it },
-                        label = { Text(stringResource(Res.string.key_data)) },
-                        minLines = 3,
-                        maxLines = 6,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-
-                    if (uiState.error != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = uiState.error,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
+                        OutlinedTextField(
+                            value = keyData,
+                            onValueChange = { keyData = it },
+                            label = { Text(stringResource(Res.string.key_data)) },
+                            minLines = 3,
+                            maxLines = 6,
+                            modifier = Modifier.fillMaxWidth(),
                         )
-                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        if (uiState.error != null) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = uiState.error,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
 
-                    Button(
-                        onClick = onImportFile,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(stringResource(Res.string.import_file_button))
-                    }
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = onImportFile,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(stringResource(Res.string.import_file_button))
+                        }
 
-                    Button(
-                        onClick = { onSaveKey(cardId, selectedCardType, keyData) },
-                        enabled = cardId.isNotBlank() && keyData.isNotBlank() && !uiState.isSaving,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(stringResource(Res.string.add_key))
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = { onSaveKey(cardId, selectedCardType, keyData) },
+                            enabled = cardId.isNotBlank() && keyData.isNotBlank() && !uiState.isSaving,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(stringResource(Res.string.add_key))
+                        }
                     }
                 }
             }

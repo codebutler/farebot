@@ -17,7 +17,7 @@ fun main() =
         Window(
             onCloseRequest = ::exitApplication,
             title = "FareBot",
-            state = rememberWindowState(width = 420.dp, height = 800.dp),
+            state = rememberWindowState(width = 1024.dp, height = 768.dp),
         ) {
             CompositionLocalProvider(LocalAppGraph provides graph) {
                 FareBotApp(
