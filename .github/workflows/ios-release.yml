@@ -159,17 +159,20 @@ jobs:
           # Build the API key JSON that fastlane expects
           API_KEY_JSON="$RUNNER_TEMP/api_key.json"
           P8_CONTENTS=$(cat ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8)
-          cat > "$API_KEY_JSON" <<EOF
-          {
-            "key_id": "$APP_STORE_CONNECT_API_KEY_ID",
-            "issuer_id": "$APP_STORE_CONNECT_ISSUER_ID",
-            "key": $(echo "$P8_CONTENTS" | jq -Rs .),
-            "in_house": false
-          }
-          EOF
+          jq -n \
+            --arg key_id "$APP_STORE_CONNECT_API_KEY_ID" \
+            --arg issuer_id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --arg key "$P8_CONTENTS" \
+            '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' \
+            > "$API_KEY_JSON"
+
+          # Find the IPA (xcodebuild may name it differently)
+          IPA_PATH=$(find "$RUNNER_TEMP/export" -name '*.ipa' -print -quit)
+          echo "IPA: $IPA_PATH"
+          [ -f "$IPA_PATH" ] || { echo "No IPA found in $RUNNER_TEMP/export"; ls -la "$RUNNER_TEMP/export"; exit 1; }
 
           fastlane pilot upload \
-            --ipa "$RUNNER_TEMP/export/FareBot.ipa" \
+            --ipa "$IPA_PATH" \
             --api_key_path "$API_KEY_JSON" \
             --distribute_external false \
             --skip_waiting_for_build_processing false \
