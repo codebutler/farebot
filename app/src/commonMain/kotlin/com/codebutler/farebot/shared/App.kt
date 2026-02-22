@@ -96,6 +96,8 @@ fun FareBotApp(
         }
 
         val historyViewModel = graphViewModel { historyViewModel }
+        val flipperViewModel = graphViewModel { flipperViewModel }
+        val flipperTransportFactory = graph.flipperTransportFactory
 
         NavHost(navController = navController, startDestination = Screen.Home.route) {
             composable(Screen.Home.route) {
@@ -219,7 +221,24 @@ fun FareBotApp(
                         } else {
                             null
                         },
-                    onNavigateToFlipper = { navController.navigate(Screen.Flipper.route) },
+                    onConnectFlipperBle =
+                        if (flipperTransportFactory.isBleSupported) {
+                            {
+                                flipperViewModel.connectBle()
+                                navController.navigate(Screen.Flipper.route)
+                            }
+                        } else {
+                            null
+                        },
+                    onConnectFlipperUsb =
+                        if (flipperTransportFactory.isUsbSupported) {
+                            {
+                                flipperViewModel.connectUsb()
+                                navController.navigate(Screen.Flipper.route)
+                            }
+                        } else {
+                            null
+                        },
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = platformActions.openNfcSettings,
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
@@ -283,19 +302,19 @@ fun FareBotApp(
             }
 
             composable(Screen.Flipper.route) {
-                val viewModel = graphViewModel { flipperViewModel }
-                val flipperUiState by viewModel.uiState.collectAsState()
+                val flipperUiState by flipperViewModel.uiState.collectAsState()
 
                 FlipperScreen(
                     uiState = flipperUiState,
-                    onConnectUsb = { viewModel.connectUsb() },
-                    onConnectBle = { viewModel.connectBle() },
-                    onDisconnect = { viewModel.disconnect() },
-                    onNavigateToDirectory = { path -> viewModel.navigateToDirectory(path) },
-                    onNavigateUp = { viewModel.navigateUp() },
-                    onToggleSelection = { path -> viewModel.toggleFileSelection(path) },
-                    onImportSelected = { viewModel.importSelectedFiles() },
-                    onImportKeys = { viewModel.importKeyDictionary() },
+                    onConnectUsb = { flipperViewModel.connectUsb() },
+                    onConnectBle = { flipperViewModel.connectBle() },
+                    onDisconnect = { flipperViewModel.disconnect() },
+                    onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
+                    onNavigateUp = { flipperViewModel.navigateUp() },
+                    onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
+                    onImportSelected = { flipperViewModel.importSelectedFiles() },
+                    onImportKeys = { flipperViewModel.importKeyDictionary() },
+                    onClearImportMessage = { flipperViewModel.clearImportMessage() },
                     onBack = { navController.popBackStack() },
                 )
             }

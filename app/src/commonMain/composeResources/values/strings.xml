@@ -119,4 +119,12 @@
     <string name="flipper_importing">Importing %1$s</string>
     <string name="flipper_import_progress">%1$d of %2$d</string>
     <string name="flipper_bytes">%1$d bytes</string>
+    <string name="flipper_import_complete">Imported %1$d file(s) successfully</string>
+    <string name="flipper_keys_import_complete">Imported %1$d keys successfully</string>
+
+    <!-- Import bottom sheet -->
+    <string name="import_source">Import</string>
+    <string name="import_source_file">File Browser</string>
+    <string name="import_source_flipper_ble">Flipper Zero (Bluetooth)</string>
+    <string name="import_source_flipper_usb">Flipper Zero (USB)</string>
 </resources>

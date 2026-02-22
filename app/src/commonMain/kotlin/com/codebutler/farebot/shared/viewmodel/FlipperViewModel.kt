@@ -37,6 +37,10 @@ class FlipperViewModel(
     private var rpcClient: FlipperRpcClient? = null
     private var transport: FlipperTransport? = null
 
+    fun clearImportMessage() {
+        _uiState.value = _uiState.value.copy(importCompleteMessage = null)
+    }
+
     fun connectUsb() {
         viewModelScope.launch {
             val transport = transportFactory.createUsbTransport()
@@ -177,6 +181,7 @@ class FlipperViewModel(
         if (selectedPaths.isEmpty()) return
 
         viewModelScope.launch {
+            var importedCount = 0
             for ((index, path) in selectedPaths.withIndex()) {
                 val fileName = path.substringAfterLast('/')
                 _uiState.value =
@@ -195,6 +200,7 @@ class FlipperViewModel(
                     val result = cardImporter.importCards(content)
 
                     if (result is ImportResult.Success) {
+                        importedCount++
                         for (rawCard in result.cards) {
                             cardPersister.insertCard(
                                 SavedCard(
@@ -226,6 +232,7 @@ class FlipperViewModel(
                 _uiState.value.copy(
                     importProgress = null,
                     selectedFiles = emptySet(),
+                    importCompleteMessage = "Imported $importedCount file(s) successfully",
                 )
         }
     }
@@ -253,14 +260,19 @@ class FlipperViewModel(
                 if (keys.isNotEmpty()) {
                     cardKeysPersister.insertGlobalKeys(keys, "flipper_user_dict")
                 }
+
+                _uiState.value =
+                    _uiState.value.copy(
+                        importProgress = null,
+                        importCompleteMessage = "Imported ${keys.size} keys successfully",
+                    )
             } catch (e: Exception) {
                 _uiState.value =
                     _uiState.value.copy(
+                        importProgress = null,
                         error = "Failed to import key dictionary: ${e.message}",
                     )
             }
-
-            _uiState.value = _uiState.value.copy(importProgress = null)
         }
     }
 }
