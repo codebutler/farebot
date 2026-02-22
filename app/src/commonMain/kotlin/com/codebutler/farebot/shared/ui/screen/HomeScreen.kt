@@ -47,7 +47,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,8 +57,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -321,19 +318,22 @@ fun HomeScreen(
                     )
                 } else if (selectedTab == 0) {
                     // Scan tab — normal mode
+                    // In Expanded mode, the sidebar already shows the icon+title, so use a plain title
                     TopAppBar(
                         title = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(Res.drawable.ic_launcher),
-                                    contentDescription = null,
-                                    modifier =
-                                        Modifier
-                                            .size(32.dp)
-                                            .clip(RoundedCornerShape(6.dp)),
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(Res.string.app_name))
+                            if (windowWidthSizeClass != WindowWidthSizeClass.Expanded) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(Res.drawable.ic_launcher),
+                                        contentDescription = null,
+                                        modifier =
+                                            Modifier
+                                                .size(32.dp)
+                                                .clip(RoundedCornerShape(6.dp)),
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(stringResource(Res.string.app_name))
+                                }
                             }
                         },
                         actions = {
@@ -387,30 +387,32 @@ fun HomeScreen(
                                             false
                                     },
                                 )
-                                HorizontalDivider()
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.import_source)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        showImportSheet = true
-                                    },
-                                )
-                                if (onNavigateToKeys != null) {
+                                if (windowWidthSizeClass != WindowWidthSizeClass.Expanded) {
+                                    HorizontalDivider()
                                     DropdownMenuItem(
-                                        text = { Text(stringResource(Res.string.keys)) },
+                                        text = { Text(stringResource(Res.string.import_source)) },
                                         onClick = {
                                             menuExpanded = false
-                                            onNavigateToKeys()
+                                            showImportSheet = true
+                                        },
+                                    )
+                                    if (onNavigateToKeys != null) {
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(Res.string.keys)) },
+                                            onClick = {
+                                                menuExpanded = false
+                                                onNavigateToKeys()
+                                            },
+                                        )
+                                    }
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.about)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onOpenAbout()
                                         },
                                     )
                                 }
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.about)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onOpenAbout()
-                                    },
-                                )
                             }
                         },
                     )
@@ -584,14 +586,16 @@ fun HomeScreen(
                                         menuExpanded = false
                                     },
                                 )
-                                HorizontalDivider()
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.about)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onOpenAbout()
-                                    },
-                                )
+                                if (windowWidthSizeClass != WindowWidthSizeClass.Expanded) {
+                                    HorizontalDivider()
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.about)) },
+                                        onClick = {
+                                            menuExpanded = false
+                                            onOpenAbout()
+                                        },
+                                    )
+                                }
                             }
                         },
                     )
@@ -616,8 +620,7 @@ fun HomeScreen(
                 }
             },
             floatingActionButton = {
-                if (windowWidthSizeClass != WindowWidthSizeClass.Medium &&
-                    selectedTab == 0 &&
+                if (selectedTab == 0 &&
                     homeUiState.requiresActiveScan &&
                     homeUiState.nfcStatus != NfcStatus.UNAVAILABLE
                 ) {
@@ -915,47 +918,7 @@ private fun AdaptiveNavigation(
     content: @Composable () -> Unit,
 ) {
     when (windowWidthSizeClass) {
-        WindowWidthSizeClass.Compact -> content()
-        WindowWidthSizeClass.Medium -> {
-            Row(Modifier.fillMaxSize()) {
-                NavigationRail(
-                    header =
-                        if (showFab) {
-                            {
-                                FloatingActionButton(onClick = onFabClick) {
-                                    if (fabIsLoading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(24.dp),
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                            strokeWidth = 2.dp,
-                                        )
-                                    } else {
-                                        Icon(Icons.Default.Nfc, contentDescription = null)
-                                    }
-                                }
-                            }
-                        } else {
-                            null
-                        },
-                ) {
-                    Spacer(Modifier.weight(1f))
-                    NavigationRailItem(
-                        selected = selectedTab == 0,
-                        onClick = { onTabSelected(0) },
-                        icon = { Icon(painterResource(Res.drawable.ic_cards_stack), contentDescription = null) },
-                        label = { Text(stringResource(Res.string.tab_scan)) },
-                    )
-                    NavigationRailItem(
-                        selected = selectedTab == 1,
-                        onClick = { onTabSelected(1) },
-                        icon = { Icon(Icons.Default.Explore, contentDescription = null) },
-                        label = { Text(stringResource(Res.string.tab_explore)) },
-                    )
-                    Spacer(Modifier.weight(1f))
-                }
-                Box(Modifier.weight(1f)) { content() }
-            }
-        }
+        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> content()
         WindowWidthSizeClass.Expanded -> {
             PermanentNavigationDrawer(
                 drawerContent = {
