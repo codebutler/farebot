@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Folder
@@ -38,7 +39,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.back
 import farebot.app.generated.resources.cancel
-import farebot.app.generated.resources.flipper_bytes
 import farebot.app.generated.resources.flipper_connecting_message
 import farebot.app.generated.resources.flipper_import_complete
 import farebot.app.generated.resources.flipper_import_keys
@@ -93,7 +92,11 @@ fun FlipperScreen(
             is ImportComplete.Files ->
                 pluralStringResource(Res.plurals.flipper_import_complete, importComplete.count, importComplete.count)
             is ImportComplete.Keys ->
-                pluralStringResource(Res.plurals.flipper_keys_import_complete, importComplete.count, importComplete.count)
+                pluralStringResource(
+                    Res.plurals.flipper_keys_import_complete,
+                    importComplete.count,
+                    importComplete.count,
+                )
             null -> null
         }
 
@@ -256,22 +259,26 @@ private fun ConnectedContent(
     Column(modifier = Modifier.fillMaxSize()) {
         // Breadcrumb path bar
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (uiState.currentPath != "/ext/nfc") {
-                TextButton(onClick = onNavigateUp) {
-                    Text(stringResource(Res.string.flipper_up))
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
             Text(
                 text = uiState.currentPath,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
+            if (uiState.currentPath != "/ext/nfc") {
+                IconButton(onClick = onNavigateUp) {
+                    Icon(
+                        Icons.Default.ArrowUpward,
+                        contentDescription = stringResource(Res.string.flipper_up),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
 
         HorizontalDivider()
@@ -335,8 +342,9 @@ private fun FileListItem(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .height(56.dp)
                 .clickable(onClick = onTap)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -362,7 +370,7 @@ private fun FileListItem(
             )
             if (!file.isDirectory && file.size > 0) {
                 Text(
-                    text = stringResource(Res.string.flipper_bytes, file.size),
+                    text = formatFileSize(file.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -377,6 +385,19 @@ private fun FileListItem(
         }
     }
 }
+
+private fun formatFileSize(bytes: Long): String =
+    when {
+        bytes < 1024 -> "$bytes B"
+        bytes < 1024 * 1024 -> {
+            val kb = bytes * 10 / 1024
+            "${kb / 10}.${kb % 10} KB"
+        }
+        else -> {
+            val mb = bytes * 10 / (1024 * 1024)
+            "${mb / 10}.${mb % 10} MB"
+        }
+    }
 
 @Composable
 private fun ImportProgressOverlay(progress: ImportProgress) {

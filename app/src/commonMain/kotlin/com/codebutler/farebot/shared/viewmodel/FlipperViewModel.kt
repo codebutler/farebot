@@ -14,10 +14,10 @@ import com.codebutler.farebot.persist.db.model.SavedCard
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.ui.screen.FlipperConnectionMode
-import com.codebutler.farebot.shared.ui.screen.ImportComplete
 import com.codebutler.farebot.shared.ui.screen.FlipperConnectionState
 import com.codebutler.farebot.shared.ui.screen.FlipperFileItem
 import com.codebutler.farebot.shared.ui.screen.FlipperUiState
+import com.codebutler.farebot.shared.ui.screen.ImportComplete
 import com.codebutler.farebot.shared.ui.screen.ImportProgress
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

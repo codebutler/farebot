@@ -38,6 +38,11 @@ data class ImportProgress(
 )
 
 sealed class ImportComplete {
-    data class Files(val count: Int) : ImportComplete()
-    data class Keys(val count: Int) : ImportComplete()
+    data class Files(
+        val count: Int,
+    ) : ImportComplete()
+
+    data class Keys(
+        val count: Int,
+    ) : ImportComplete()
 }
