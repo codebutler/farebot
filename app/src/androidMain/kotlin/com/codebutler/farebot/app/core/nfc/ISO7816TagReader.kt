@@ -48,5 +48,6 @@ class ISO7816TagReader(
         tag: Tag,
         tech: CardTransceiver,
         cardKeys: CardKeys?,
-    ): RawCard<*> = ISO7816Dispatcher.readCard(tagId, tech)
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+    ): RawCard<*> = ISO7816Dispatcher.readCard(tagId, tech, onProgress)
 }

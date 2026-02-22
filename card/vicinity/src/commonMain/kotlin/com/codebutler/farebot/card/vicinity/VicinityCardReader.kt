@@ -48,6 +48,7 @@ object VicinityCardReader {
     suspend fun readCard(
         tagId: ByteArray,
         tech: VicinityTechnology,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawVicinityCard {
         val uid = tech.uid
 

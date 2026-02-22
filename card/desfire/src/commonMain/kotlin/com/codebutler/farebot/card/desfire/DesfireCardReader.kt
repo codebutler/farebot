@@ -34,6 +34,7 @@ object DesfireCardReader {
     suspend fun readCard(
         tagId: ByteArray,
         tech: CardTransceiver,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawDesfireCard {
         val desfireProtocol = DesfireProtocol(tech)
 
@@ -53,7 +54,7 @@ object DesfireCardReader {
                 intArrayOf()
             }
 
-        val apps = readApplications(desfireProtocol, appIds)
+        val apps = readApplications(desfireProtocol, appIds, onProgress)
         return RawDesfireCard.create(tagId, Clock.System.now(), apps, manufData, appListLocked)
     }
 
@@ -61,6 +62,7 @@ object DesfireCardReader {
     private suspend fun readApplications(
         desfireProtocol: DesfireProtocol,
         appIds: IntArray,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): List<RawDesfireApplication> {
         val apps = ArrayList<RawDesfireApplication>()
 
@@ -70,7 +72,8 @@ object DesfireCardReader {
         // - Use unlocker.getOrder() to reorder file IDs
         // - Call unlocker.unlock() before reading each file
 
-        for (appId in appIds) {
+        for ((appIndex, appId) in appIds.withIndex()) {
+            onProgress?.invoke(appIndex, appIds.size)
             try {
                 desfireProtocol.selectApp(appId)
             } catch (e: NotFoundException) {

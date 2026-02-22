@@ -43,8 +43,9 @@ class FelicaTagReader(
         tag: Tag,
         tech: NfcFTechnology,
         cardKeys: CardKeys?,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawFelicaCard {
         val adapter = AndroidFeliCaTagAdapter(tag)
-        return FeliCaReader.readTag(tagId, adapter)
+        return FeliCaReader.readTag(tagId, adapter, onProgress = onProgress)
     }
 }

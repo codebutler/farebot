@@ -67,11 +67,13 @@ object ISO7816CardReader {
         tagId: ByteArray,
         transceiver: CardTransceiver,
         appConfigs: List<AppConfig>,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawISO7816Card? {
         val protocol = ISO7816Protocol(transceiver)
         val applications = mutableListOf<ISO7816Application>()
 
-        for (config in appConfigs) {
+        for ((configIndex, config) in appConfigs.withIndex()) {
+            onProgress?.invoke(configIndex, appConfigs.size)
             val app = tryReadApplication(protocol, config) ?: continue
             applications.add(app)
         }

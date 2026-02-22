@@ -36,11 +36,11 @@ abstract class TagReader<
     private val mCardKeys: K?,
 ) {
     @Throws(Exception::class)
-    suspend fun readTag(): C {
+    suspend fun readTag(onProgress: (suspend (current: Int, total: Int) -> Unit)? = null): C {
         val tech = getTech(mTag)
         try {
             tech.connect()
-            return readTag(mTagId, mTag, tech, mCardKeys)
+            return readTag(mTagId, mTag, tech, mCardKeys, onProgress)
         } finally {
             if (tech.isConnected) {
                 try {
@@ -58,6 +58,7 @@ abstract class TagReader<
         tag: Tag,
         tech: T,
         cardKeys: K?,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): C
 
     protected abstract fun getTech(tag: Tag): T

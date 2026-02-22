@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,7 +43,6 @@ import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +50,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +58,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -107,6 +109,7 @@ import farebot.app.generated.resources.app_name
 import farebot.app.generated.resources.cancel
 import farebot.app.generated.resources.delete
 import farebot.app.generated.resources.delete_selected_cards
+import farebot.app.generated.resources.hold_card_near_reader
 import farebot.app.generated.resources.ic_cards_stack
 import farebot.app.generated.resources.ic_launcher
 import farebot.app.generated.resources.import_source
@@ -148,6 +151,7 @@ fun HomeScreen(
     onDismissError: () -> Unit,
     onNavigateToAddKeyForCard: (tagId: String, cardType: CardType) -> Unit,
     onScanCard: () -> Unit,
+    onCancelScan: () -> Unit,
     historyUiState: HistoryUiState,
     onNavigateToCard: (String) -> Unit,
     onImportFile: () -> Unit,
@@ -658,22 +662,10 @@ fun HomeScreen(
                             }
                         },
                         icon = {
-                            if (homeUiState.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.padding(4.dp),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    strokeWidth = 2.dp,
-                                )
-                            } else {
-                                Icon(Icons.Default.Nfc, contentDescription = null)
-                            }
+                            Icon(Icons.Default.Nfc, contentDescription = null)
                         },
                         text = {
-                            Text(
-                                stringResource(
-                                    if (homeUiState.isReadingCard) Res.string.reading_card else Res.string.scan,
-                                ),
-                            )
+                            Text(stringResource(Res.string.scan))
                         },
                     )
                 }
@@ -861,6 +853,64 @@ fun HomeScreen(
                             searchQuery = exploreSearchQuery,
                             topBarHeight = padding.calculateTopPadding(),
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    // Reading progress bottom sheet — shown while scanning/reading a card
+    if (homeUiState.isLoading || homeUiState.isReadingCard) {
+        ModalBottomSheet(
+            onDismissRequest = onCancelScan,
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Icon(
+                    Icons.Default.Nfc,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+
+                Text(
+                    text =
+                        if (homeUiState.isReadingCard) {
+                            stringResource(Res.string.reading_card)
+                        } else {
+                            stringResource(Res.string.hold_card_near_reader)
+                        },
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                val progress = homeUiState.readingProgress
+                if (progress != null) {
+                    LinearProgressIndicator(
+                        progress = { progress.current.toFloat() / progress.total.toFloat() },
+                        modifier = Modifier.fillMaxWidth().height(4.dp),
+                    )
+                    Text(
+                        text = "${progress.current} / ${progress.total}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().height(4.dp),
+                    )
+                }
+
+                if (homeUiState.requiresActiveScan) {
+                    OutlinedButton(onClick = onCancelScan) {
+                        Text(stringResource(Res.string.cancel))
                     }
                 }
             }

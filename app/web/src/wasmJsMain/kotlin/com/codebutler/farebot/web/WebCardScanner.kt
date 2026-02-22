@@ -16,6 +16,7 @@ import com.codebutler.farebot.card.nfc.pn533.WebUsbPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
+import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -59,6 +60,9 @@ class WebCardScanner : CardScanner {
 
     private val _isScanning = MutableStateFlow(false)
     override val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
+
+    private val _readingProgress = MutableStateFlow<ReadingProgress?>(null)
+    override val readingProgress: StateFlow<ReadingProgress?> = _readingProgress.asStateFlow()
 
     private var scanJob: Job? = null
     private var transport: WebUsbPN533Transport? = null
@@ -108,6 +112,7 @@ class WebCardScanner : CardScanner {
         transport?.close()
         transport = null
         _isScanning.value = false
+        _readingProgress.value = null
     }
 
     private suspend fun pollLoop(transport: WebUsbPN533Transport) {
@@ -157,9 +162,11 @@ class WebCardScanner : CardScanner {
 
             try {
                 val rawCard = readTarget(pn533, target)
+                _readingProgress.value = null
                 _scannedCards.tryEmit(rawCard)
                 println("[WebUSB] Card read successfully")
             } catch (e: Exception) {
+                _readingProgress.value = null
                 println("[WebUSB] Read error: ${e.message}")
                 _scanErrors.tryEmit(e)
             }
@@ -185,6 +192,10 @@ class WebCardScanner : CardScanner {
             is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target)
         }
 
+    private val onProgress: suspend (Int, Int) -> Unit = { current, total ->
+        _readingProgress.value = ReadingProgress(current, total)
+    }
+
     private suspend fun readTypeACard(
         pn533: PN533,
         target: PN533.TargetInfo.TypeA,
@@ -200,27 +211,27 @@ class WebCardScanner : CardScanner {
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
                 val transceiver = PN533CardTransceiver(pn533, target.tg)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
+                ISO7816Dispatcher.readCard(tagId, transceiver, onProgress)
             }
 
             CardType.MifareClassic -> {
                 val tech = PN533ClassicTechnology(pn533, target.tg, tagId, info)
-                ClassicCardReader.readCard(tagId, tech, null)
+                ClassicCardReader.readCard(tagId, tech, null, onProgress = onProgress)
             }
 
             CardType.MifareUltralight -> {
                 val tech = PN533UltralightTechnology(pn533, target.tg, info)
-                UltralightCardReader.readCard(tagId, tech)
+                UltralightCardReader.readCard(tagId, tech, onProgress)
             }
 
             CardType.CEPAS -> {
                 val transceiver = PN533CardTransceiver(pn533, target.tg)
-                CEPASCardReader.readCard(tagId, transceiver)
+                CEPASCardReader.readCard(tagId, transceiver, onProgress)
             }
 
             else -> {
                 val transceiver = PN533CardTransceiver(pn533, target.tg)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
+                ISO7816Dispatcher.readCard(tagId, transceiver, onProgress)
             }
         }
     }
@@ -232,7 +243,7 @@ class WebCardScanner : CardScanner {
         val tagId = target.idm
         println("[WebUSB] FeliCa card: IDm=${tagId.hex()}")
         val adapter = PN533FeliCaTagAdapter(pn533, tagId)
-        return FeliCaReader.readTag(tagId, adapter)
+        return FeliCaReader.readTag(tagId, adapter, onProgress = onProgress)
     }
 
     private suspend fun waitForRemoval(pn533: PN533) {

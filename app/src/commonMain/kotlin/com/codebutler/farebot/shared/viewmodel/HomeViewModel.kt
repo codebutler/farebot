@@ -83,15 +83,21 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
+            cardScanner.readingProgress.collect { progress ->
+                _uiState.value = _uiState.value.copy(readingProgress = progress)
+            }
+        }
+
+        viewModelScope.launch {
             cardScanner.scannedCards.collect { rawCard ->
-                _uiState.value = _uiState.value.copy(isReadingCard = false)
+                _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
                 processScannedCard(rawCard)
             }
         }
 
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
-                _uiState.value = _uiState.value.copy(isReadingCard = false)
+                _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
                 val scanError = categorizeError(error)
                 analytics.logEvent(
                     "scan_card_error",
@@ -107,6 +113,10 @@ class HomeViewModel(
 
     fun startActiveScan() {
         cardScanner?.startActiveScan()
+    }
+
+    fun stopActiveScan() {
+        cardScanner?.stopActiveScan()
     }
 
     fun dismissError() {

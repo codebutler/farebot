@@ -31,6 +31,7 @@ object UltralightCardReader {
     suspend fun readCard(
         tagId: ByteArray,
         tech: UltralightTechnology,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawUltralightCard {
         // Detect card type using protocol commands (GET_VERSION, AUTH_1)
         val detectedType = detectCardType(tech)
@@ -56,6 +57,7 @@ object UltralightCardReader {
         val pages = mutableListOf<UltralightPage>()
         var unauthorized = false
         while (pageNumber < size) {
+            onProgress?.invoke(pageNumber, size)
             if (pageNumber % 4 == 0) {
                 try {
                     pageBuffer = tech.readPages(pageNumber)

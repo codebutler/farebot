@@ -49,10 +49,13 @@ object ClassicCardReader {
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,
         globalKeys: List<ByteArray>? = null,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
+        val sectorCount = tech.sectorCount
 
-        for (sectorIndex in 0 until tech.sectorCount) {
+        for (sectorIndex in 0 until sectorCount) {
+            onProgress?.invoke(sectorIndex, sectorCount)
             try {
                 var authSuccess = false
                 var successfulKey: ByteArray? = null
