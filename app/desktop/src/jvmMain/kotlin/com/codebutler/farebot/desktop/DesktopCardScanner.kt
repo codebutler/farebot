@@ -128,7 +128,13 @@ class DesktopCardScanner : CardScanner {
 
     private suspend fun discoverBackends(): List<NfcReaderBackend> {
         val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend())
-        val transports = PN533Device.openAll()
+        val transports =
+            try {
+                PN533Device.openAll()
+            } catch (e: UnsatisfiedLinkError) {
+                println("[DesktopCardScanner] libusb not available: ${e.message}")
+                emptyList()
+            }
         if (transports.isEmpty()) {
             backends.add(PN533ReaderBackend())
         } else {
