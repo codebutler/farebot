@@ -511,7 +511,7 @@ private fun CardContentScreen(
                     Modifier
                         .fillMaxSize()
                         .padding(padding)
-                        .padding(horizontal = 32.dp),
+                        .padding(horizontal = maxOf(32.dp, (maxWidth - 536.dp) / 2)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {

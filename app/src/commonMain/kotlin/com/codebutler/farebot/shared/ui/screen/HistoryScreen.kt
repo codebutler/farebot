@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.card.CardType
+import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.img_home_splash
 import farebot.app.generated.resources.unknown_card
@@ -67,59 +69,67 @@ fun HistoryContent(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             uiState.items.isEmpty() -> {
-                Image(
-                    painter = painterResource(Res.drawable.img_home_splash),
-                    contentDescription = null,
-                    modifier =
-                        Modifier
-                            .align(Alignment.Center)
-                            .widthIn(max = 320.dp)
-                            .padding(80.dp),
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.img_home_splash),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillWidth,
+                        modifier =
+                            Modifier
+                                .widthIn(max = 600.dp)
+                                .fillMaxWidth()
+                                .padding(80.dp),
+                    )
+                }
             }
             else -> {
                 val grouped = uiState.items.groupBy { it.scannedDate ?: "" }
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding =
-                        PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            // Extra bottom padding so the FAB doesn't cover the last card
-                            bottom = 88.dp,
-                        ),
-                ) {
-                    grouped.forEach { (date, items) ->
-                        if (date.isNotEmpty()) {
-                            stickyHeader(key = "header-$date") {
-                                Text(
-                                    text = date,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .background(MaterialTheme.colorScheme.surface)
-                                            .padding(vertical = 8.dp),
+                ContentWidthConstraint(maxWidth = 600.dp) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding =
+                            PaddingValues(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 8.dp,
+                                // Extra bottom padding so the FAB doesn't cover the last card
+                                bottom = 88.dp,
+                            ),
+                    ) {
+                        grouped.forEach { (date, items) ->
+                            if (date.isNotEmpty()) {
+                                stickyHeader(key = "header-$date") {
+                                    Text(
+                                        text = date,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .background(MaterialTheme.colorScheme.surface)
+                                                .padding(vertical = 8.dp),
+                                    )
+                                }
+                            }
+                            itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+                                val isLastInGroup = index == items.lastIndex
+                                val isSelected = uiState.selectedIds.contains(item.id)
+                                WalletCard(
+                                    item = item,
+                                    isSelected = isSelected,
+                                    isSelectionMode = uiState.isSelectionMode,
+                                    isLastInGroup = isLastInGroup,
+                                    onNavigateToCard = onNavigateToCard,
+                                    onToggleSelection = onToggleSelection,
                                 )
                             }
-                        }
-                        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-                            val isLastInGroup = index == items.lastIndex
-                            val isSelected = uiState.selectedIds.contains(item.id)
-                            WalletCard(
-                                item = item,
-                                isSelected = isSelected,
-                                isSelectionMode = uiState.isSelectionMode,
-                                isLastInGroup = isLastInGroup,
-                                onNavigateToCard = onNavigateToCard,
-                                onToggleSelection = onToggleSelection,
-                            )
-                        }
-                        // Spacing between date groups
-                        item(key = "spacer-$date") {
-                            Spacer(modifier = Modifier.height(8.dp))
+                            // Spacing between date groups
+                            item(key = "spacer-$date") {
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                     }
                 }

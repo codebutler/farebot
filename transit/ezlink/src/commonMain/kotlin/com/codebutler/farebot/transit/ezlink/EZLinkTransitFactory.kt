@@ -89,7 +89,6 @@ class EZLinkTransitFactory : TransitFactory<CEPASCard, EZLinkTransitInfo> {
                     longitude = 103.8198f,
                     brandColor = 0x0199D9,
                     credits = listOf("Sean Cross", "Victor Heng", "Toby Bonang"),
-                    sampleDumpFile = "EZLink.json",
                     extraNoteRes = Res.string.ezlink_card_note,
                 ),
                 CardInfo(

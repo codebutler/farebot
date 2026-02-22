@@ -69,6 +69,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -134,6 +135,8 @@ import farebot.app.generated.resources.show_serial_only_cards
 import farebot.app.generated.resources.show_unsupported_cards
 import farebot.app.generated.resources.tab_explore
 import farebot.app.generated.resources.tab_scan
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -167,6 +170,8 @@ fun HomeScreen(
     onAddAllSamples: (() -> Unit)? = null,
     onSampleCardTap: ((CardInfo) -> Unit)? = null,
     onToggleShowAllScans: () -> Unit = {},
+    menuEvents: Flow<String> = emptyFlow(),
+    onSelectedTabChanged: (Int) -> Unit = {},
 ) {
     val appPreferences = LocalAppGraph.current.appPreferences
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -189,6 +194,26 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
     val windowWidthSizeClass = LocalWindowWidthSizeClass.current
     val isCompact = windowWidthSizeClass == WindowWidthSizeClass.Compact
+
+    // Sync tab state with menu bar
+    LaunchedEffect(selectedTab) {
+        onSelectedTabChanged(selectedTab)
+    }
+
+    // Handle menu events (e.g. import, tab switching)
+    LaunchedEffect(Unit) {
+        menuEvents.collect { event ->
+            when (event) {
+                "import" -> showImportSheet = true
+                "tab:cards" -> {
+                    selectedTab = 0
+                }
+                "tab:explore" -> {
+                    selectedTab = 1
+                }
+            }
+        }
+    }
 
     val hasUnsupportedCards =
         remember(supportedCards, supportedCardTypes) {

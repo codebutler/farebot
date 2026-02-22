@@ -33,7 +33,7 @@ ios-install: ios ## Build and install on connected iOS device
 ## Desktop
 
 desktop: ## Run macOS desktop app (experimental)
-	./gradlew :app:desktop:run
+	./gradlew :app:desktop:runDistributable
 
 ## Web
 

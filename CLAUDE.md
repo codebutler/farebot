@@ -144,6 +144,10 @@ When continuing from a previous session, check for implementation plans and sess
 4. Register factory in `TransitFactoryRegistryBuilder.kt` (shared, used by all platforms)
 5. Add string resources in `composeResources/values/strings.xml`
 
+## Commits & PRs
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for both commit messages and PR titles. Format: `type: description` (e.g., `fix: clean up responsive layout`, `feat: add ORCA transit support`, `refactor: extract shared card parsing`).
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`). Runs tests and builds on push/PR.

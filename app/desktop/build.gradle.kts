@@ -42,6 +42,7 @@ compose.desktop {
             "-Dsun.security.smartcardio.t1GetResponse=false",
         )
         nativeDistributions {
+            modules("java.sql", "java.smartcardio")
             targetFormats(
                 org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg,
             )

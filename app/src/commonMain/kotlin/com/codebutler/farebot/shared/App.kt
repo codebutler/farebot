@@ -58,6 +58,8 @@ fun FareBotApp(
     supportedCardTypes: Set<CardType> = CardType.entries.toSet() - setOf(CardType.MifareClassic, CardType.Vicinity),
     loadedKeyBundles: Set<String> = emptySet(),
     isDebug: Boolean = false,
+    menuEvents: kotlinx.coroutines.flow.Flow<String> = kotlinx.coroutines.flow.emptyFlow(),
+    onSelectedTabChanged: (Int) -> Unit = {},
 ) {
     FareBotTheme {
         BoxWithConstraints {
@@ -98,6 +100,14 @@ fun FareBotApp(
                             is ImportResult.Error -> {
                                 platformActions.showToast(getString(Res.string.import_failed, result.message))
                             }
+                        }
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    menuEvents.collect { event ->
+                        when (event) {
+                            "keys" -> navController.navigate(Screen.Keys.route)
                         }
                     }
                 }
@@ -295,6 +305,8 @@ fun FareBotApp(
                                     }
                                 }
                             },
+                            menuEvents = menuEvents,
+                            onSelectedTabChanged = onSelectedTabChanged,
                         )
                     }
 
