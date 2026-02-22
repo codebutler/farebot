@@ -1,4 +1,4 @@
-package com.codebutler.farebot.shared.ui.screen
+package com.codebutler.farebot.app.keymanager.ui
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
@@ -35,18 +35,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
-import farebot.app.generated.resources.Res
-import farebot.app.generated.resources.add_key
-import farebot.app.generated.resources.back
-import farebot.app.generated.resources.card_id
-import farebot.app.generated.resources.card_type
-import farebot.app.generated.resources.enter_manually
-import farebot.app.generated.resources.hold_nfc_card
-import farebot.app.generated.resources.import_file_button
-import farebot.app.generated.resources.key_data
-import farebot.app.generated.resources.nfc
-import farebot.app.generated.resources.tap_your_card
+import farebot.app_keymanager.generated.resources.Res
+import farebot.app_keymanager.generated.resources.add_key
+import farebot.app_keymanager.generated.resources.back
+import farebot.app_keymanager.generated.resources.card_id
+import farebot.app_keymanager.generated.resources.card_type
+import farebot.app_keymanager.generated.resources.enter_manually
+import farebot.app_keymanager.generated.resources.hold_nfc_card
+import farebot.app_keymanager.generated.resources.import_file_button
+import farebot.app_keymanager.generated.resources.key_data
+import farebot.app_keymanager.generated.resources.nfc
+import farebot.app_keymanager.generated.resources.tap_your_card
 import org.jetbrains.compose.resources.stringResource
 
 data class AddKeyUiState(

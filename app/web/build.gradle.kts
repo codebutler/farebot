@@ -25,6 +25,8 @@ kotlin {
     sourceSets {
         wasmJsMain.dependencies {
             implementation(project(":app"))
+            implementation(project(":keymanager"))
+            implementation(project(":app-keymanager"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

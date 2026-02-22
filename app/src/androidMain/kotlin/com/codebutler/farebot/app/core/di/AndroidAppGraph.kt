@@ -6,6 +6,7 @@ import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.app.core.platform.AndroidAppPreferences
 import com.codebutler.farebot.app.feature.home.AndroidCardScanner
+import com.codebutler.farebot.app.keymanager.KeyManagerPluginImpl
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.flipper.AndroidFlipperTransportFactory
 import com.codebutler.farebot.flipper.FlipperTransportFactory
@@ -21,6 +22,7 @@ import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -123,6 +125,13 @@ abstract class AndroidAppGraph : AppGraph {
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideKeyManagerPlugin(
+        cardKeysPersister: CardKeysPersister,
+        json: Json,
+    ): KeyManagerPlugin? = KeyManagerPluginImpl(cardKeysPersister, json).toKeyManagerPlugin()
 }
 
 fun createAndroidGraph(context: Context): AndroidAppGraph {

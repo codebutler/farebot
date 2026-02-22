@@ -1,4 +1,4 @@
-package com.codebutler.farebot.shared.ui.screen
+package com.codebutler.farebot.app.keymanager.ui
 
 data class KeysUiState(
     val isLoading: Boolean = true,

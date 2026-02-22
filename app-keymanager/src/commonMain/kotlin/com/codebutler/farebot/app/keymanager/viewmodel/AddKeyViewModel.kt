@@ -1,15 +1,14 @@
-package com.codebutler.farebot.shared.viewmodel
+package com.codebutler.farebot.app.keymanager.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.app.keymanager.ui.AddKeyUiState
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.db.model.SavedKey
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.ScannedTag
-import com.codebutler.farebot.shared.ui.screen.AddKeyUiState
-import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,12 +17,16 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-@Inject
 class AddKeyViewModel(
     private val keysPersister: CardKeysPersister,
     private val cardScanner: CardScanner? = null,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AddKeyUiState(hasNfc = cardScanner != null))
+    private val _uiState =
+        MutableStateFlow(
+            AddKeyUiState(
+                hasNfc = cardScanner != null && !cardScanner.requiresActiveScan,
+            ),
+        )
     val uiState: StateFlow<AddKeyUiState> = _uiState.asStateFlow()
 
     private val _keySaved = MutableSharedFlow<Unit>()
@@ -62,20 +65,7 @@ class AddKeyViewModel(
     }
 
     fun importKeyFile(bytes: ByteArray) {
-        // Try to interpret as hex-encoded key data
-        val hexString =
-            try {
-                ByteUtils.getHexString(bytes)
-            } catch (_: Exception) {
-                // If binary, use raw hex
-                bytes.joinToString("") {
-                    it
-                        .toInt()
-                        .and(0xFF)
-                        .toString(16)
-                        .padStart(2, '0')
-                }
-            }
+        val hexString = bytes.hex()
         _uiState.value = _uiState.value.copy(importedKeyData = hexString)
     }
 

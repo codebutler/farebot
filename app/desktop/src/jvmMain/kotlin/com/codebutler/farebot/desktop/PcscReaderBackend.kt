@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.desktop
 
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -35,8 +36,10 @@ import com.codebutler.farebot.card.nfc.PCSCUltralightTechnology
 import com.codebutler.farebot.card.nfc.PCSCVicinityTechnology
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.card.vicinity.VicinityCardReader
+import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import javax.smartcardio.CardException
 import javax.smartcardio.CommandAPDU
 import javax.smartcardio.TerminalFactory
@@ -47,7 +50,9 @@ import javax.smartcardio.TerminalFactory
  * This is the original desktop NFC reader implementation, extracted from
  * [DesktopCardScanner] to allow multiple reader backends to run simultaneously.
  */
-class PcscReaderBackend : NfcReaderBackend {
+class PcscReaderBackend(
+    private val keyManagerPlugin: KeyManagerPlugin? = null,
+) : NfcReaderBackend {
     override val name: String = "PC/SC"
 
     override suspend fun scanLoop(
@@ -129,7 +134,15 @@ class PcscReaderBackend : NfcReaderBackend {
 
             CardType.MifareClassic -> {
                 val tech = PCSCClassicTechnology(channel, info)
-                ClassicCardReader.readCard(tagId, tech, null, onProgress = onProgress)
+                val tagIdHex = tagId.hex()
+                val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
+                val globalKeys = keyManagerPlugin?.getGlobalKeys()
+                // PC/SC doesn't support raw communication needed for nested attack key recovery
+                val rawCard = ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, onProgress = onProgress)
+                if (rawCard.hasUnauthorizedSectors()) {
+                    throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
+                }
+                rawCard
             }
 
             CardType.MifareUltralight -> {
@@ -158,7 +171,5 @@ class PcscReaderBackend : NfcReaderBackend {
             }
         }
 
-    companion object {
-        private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
-    }
+    companion object
 }

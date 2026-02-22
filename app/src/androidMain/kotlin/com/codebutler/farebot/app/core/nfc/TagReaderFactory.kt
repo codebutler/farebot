@@ -23,7 +23,7 @@
 package com.codebutler.farebot.app.core.nfc
 
 import android.nfc.Tag
-import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.TagReader
 import com.codebutler.farebot.card.cepas.CEPASTagReader
 import com.codebutler.farebot.card.classic.ClassicTagReader
@@ -51,6 +51,6 @@ class TagReaderFactory {
                 )
             "android.nfc.tech.MifareUltralight" in tag.techList -> UltralightTagReader(tagId, tag)
             "android.nfc.tech.NfcV" in tag.techList -> VicinityTagReader(tagId, tag)
-            else -> throw UnsupportedTagException(tag.techList, ByteUtils.getHexString(tag.id))
+            else -> throw UnsupportedTagException(tag.techList, tag.id.hex())
         }
 }

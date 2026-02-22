@@ -49,7 +49,9 @@ class OVChipTransitFactory : TransitFactory<ClassicCard, OVChipTransitInfo> {
         get() = listOf(CARD_INFO)
 
     override fun check(card: ClassicCard): Boolean {
-        if (card.sectors.size != 40) return false
+        // OVChip is always on 4K cards (40 sectors), but accept partial reads too
+        if (card.sectors.size != 40 && !card.isPartialRead) return false
+        if (card.sectors.isEmpty()) return false
         val sector0 = card.getSector(0) as? DataClassicSector ?: return false
         val blockData = sector0.readBlocks(1, 1)
         return blockData.size >= 11 && blockData.copyOfRange(0, 11).contentEquals(OVC_HEADER)

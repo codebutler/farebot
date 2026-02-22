@@ -30,6 +30,8 @@ import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.nfc.ClassicTechnology
+import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
+import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import kotlin.time.Clock
 
 object ClassicCardReader {
@@ -49,9 +51,11 @@ object ClassicCardReader {
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,
         globalKeys: List<ByteArray>? = null,
+        keyRecovery: ClassicKeyRecovery? = null,
         onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
+        val recoveredKeys = mutableMapOf<Int, Pair<ByteArray, Boolean>>()
         val sectorCount = tech.sectorCount
 
         for (sectorIndex in 0 until sectorCount) {
@@ -158,7 +162,36 @@ object ClassicCardReader {
                     }
                 }
 
+                // Try key recovery via pluggable implementation (PN533 only)
+                if (!authSuccess &&
+                    keyRecovery != null &&
+                    tech is PN533ClassicTechnology &&
+                    recoveredKeys.isNotEmpty()
+                ) {
+                    println("[ClassicCardReader] Sector $sectorIndex: attempting key recovery...")
+                    val recovered =
+                        keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys) { msg ->
+                            println("[ClassicCardReader] $msg")
+                        }
+                    if (recovered != null) {
+                        val (keyBytes, recoveredIsKeyA) = recovered
+                        authSuccess =
+                            if (recoveredIsKeyA) {
+                                tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
+                            } else {
+                                tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
+                            }
+                        if (authSuccess) {
+                            successfulKey = keyBytes
+                            isKeyA = recoveredIsKeyA
+                            println("[ClassicCardReader] Sector $sectorIndex: key recovered!")
+                        }
+                    }
+                }
+
                 if (authSuccess && successfulKey != null) {
+                    recoveredKeys[sectorIndex] = Pair(successfulKey, isKeyA)
+
                     val blocks = ArrayList<RawClassicBlock>()
                     // FIXME: First read trailer block to get type of other blocks.
                     val firstBlockIndex = tech.sectorToBlock(sectorIndex)
@@ -189,6 +222,8 @@ object ClassicCardReader {
                 } else {
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
                 }
+            } catch (ex: PN533TransportException) {
+                throw ex
             } catch (ex: CardLostException) {
                 // Card was lost during reading - return immediately with partial data
                 sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.message ?: "Card lost"))

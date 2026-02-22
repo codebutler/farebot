@@ -1,5 +1,6 @@
 package com.codebutler.farebot.web
 
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -11,13 +12,16 @@ import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
 import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
 import com.codebutler.farebot.card.nfc.pn533.WebUsbPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -46,7 +50,9 @@ import kotlinx.coroutines.launch
  * interfaces are suspend-compatible, allowing WebUSB's async API to be
  * used seamlessly through Kotlin coroutines.
  */
-class WebCardScanner : CardScanner {
+class WebCardScanner(
+    private val keyManagerPlugin: KeyManagerPlugin? = null,
+) : CardScanner {
     override val requiresActiveScan: Boolean = true
 
     private val _scannedTags = MutableSharedFlow<ScannedTag>(extraBufferCapacity = 1)
@@ -165,6 +171,8 @@ class WebCardScanner : CardScanner {
                 _readingProgress.value = null
                 _scannedCards.tryEmit(rawCard)
                 println("[WebUSB] Card read successfully")
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (e: Exception) {
                 _readingProgress.value = null
                 println("[WebUSB] Read error: ${e.message}")
@@ -174,6 +182,8 @@ class WebCardScanner : CardScanner {
             // Release target
             try {
                 pn533.inRelease(target.tg)
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (_: PN533Exception) {
             }
 
@@ -216,7 +226,17 @@ class WebCardScanner : CardScanner {
 
             CardType.MifareClassic -> {
                 val tech = PN533ClassicTechnology(pn533, target.tg, tagId, info)
-                ClassicCardReader.readCard(tagId, tech, null, onProgress = onProgress)
+                val tagIdHex = tagId.hex()
+                val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
+                val globalKeys = keyManagerPlugin?.getGlobalKeys()
+                // Don't attempt key recovery during initial scan — that happens
+                // on the dedicated key recovery screen after user interaction.
+                val rawCard =
+                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, onProgress = onProgress)
+                if (rawCard.hasUnauthorizedSectors()) {
+                    throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
+                }
+                rawCard
             }
 
             CardType.MifareUltralight -> {
@@ -256,12 +276,16 @@ class WebCardScanner : CardScanner {
                             baudRate = PN533.BAUD_RATE_212_FELICA,
                             initiatorData = SENSF_REQ,
                         )
+                } catch (e: PN533TransportException) {
+                    throw e
                 } catch (_: PN533Exception) {
                     null
                 }
             if (target == null) break
             try {
                 pn533.inRelease(target.tg)
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (_: PN533Exception) {
             }
         }
@@ -272,16 +296,5 @@ class WebCardScanner : CardScanner {
         private const val REMOVAL_POLL_INTERVAL_MS = 300L
 
         private val SENSF_REQ = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte(), 0x01, 0x00)
-
-        private fun ByteArray.hex(): String {
-            val chars = "0123456789ABCDEF".toCharArray()
-            return buildString(size * 2) {
-                for (b in this@hex) {
-                    val i = b.toInt() and 0xFF
-                    append(chars[i shr 4])
-                    append(chars[i and 0x0F])
-                }
-            }
-        }
     }
 }

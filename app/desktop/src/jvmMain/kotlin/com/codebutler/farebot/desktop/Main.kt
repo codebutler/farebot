@@ -25,7 +25,36 @@ import javax.imageio.ImageIO
 
 private const val ICON_PATH = "composeResources/farebot.app.generated.resources/drawable/ic_launcher.png"
 
+/**
+ * Preload the bundled libusb before usb4java initializes.
+ *
+ * usb4java's libusb4java.dylib links against /opt/local/lib/libusb-1.0.0.dylib.
+ * We bundle a copy with its install name patched to match that path. By loading it
+ * into the process first, dyld finds the already-loaded image (matched by install
+ * name) when processing libusb4java's dependency — no external libusb required.
+ */
+private fun preloadBundledLibusb() {
+    try {
+        val stream =
+            Thread
+                .currentThread()
+                .contextClassLoader
+                .getResourceAsStream("native/libusb-1.0.0.dylib") ?: return
+        val tmpFile = java.io.File.createTempFile("libusb-1.0", ".dylib")
+        tmpFile.deleteOnExit()
+        stream.use { input ->
+            java.io.FileOutputStream(tmpFile).use { output ->
+                input.copyTo(output)
+            }
+        }
+        System.load(tmpFile.absolutePath)
+    } catch (e: Throwable) {
+        System.err.println("[FareBot] Could not preload bundled libusb: ${e.message}")
+    }
+}
+
 fun main() {
+    preloadBundledLibusb()
     System.setProperty("apple.awt.application.appearance", "system")
 
     val desktop = Desktop.getDesktop()

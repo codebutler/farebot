@@ -1,4 +1,4 @@
-package com.codebutler.farebot.shared.ui.screen
+package com.codebutler.farebot.app.keymanager.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -39,17 +39,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
-import farebot.app.generated.resources.Res
-import farebot.app.generated.resources.add_key
-import farebot.app.generated.resources.back
-import farebot.app.generated.resources.cancel
-import farebot.app.generated.resources.delete
-import farebot.app.generated.resources.delete_selected_keys
-import farebot.app.generated.resources.keys
-import farebot.app.generated.resources.n_selected
-import farebot.app.generated.resources.no_keys
-import farebot.app.generated.resources.select_all
+import farebot.app_keymanager.generated.resources.Res
+import farebot.app_keymanager.generated.resources.add_key
+import farebot.app_keymanager.generated.resources.back
+import farebot.app_keymanager.generated.resources.cancel
+import farebot.app_keymanager.generated.resources.delete
+import farebot.app_keymanager.generated.resources.delete_selected_keys
+import farebot.app_keymanager.generated.resources.keys
+import farebot.app_keymanager.generated.resources.n_selected
+import farebot.app_keymanager.generated.resources.no_keys
+import farebot.app_keymanager.generated.resources.select_all
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

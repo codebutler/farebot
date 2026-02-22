@@ -23,6 +23,7 @@
 package com.codebutler.farebot.card.nfc.pn533
 
 import com.codebutler.farebot.card.nfc.ClassicTechnology
+import kotlinx.coroutines.delay
 
 /**
  * PN533 implementation of [ClassicTechnology] for MIFARE Classic cards.
@@ -41,6 +42,22 @@ class PN533ClassicTechnology(
     private val info: PN533CardInfo,
 ) : ClassicTechnology {
     private var connected = true
+
+    /** The underlying PN533 instance. Exposed for raw MIFARE operations (key recovery). */
+    val rawPn533: PN533 get() = pn533
+
+    /** The card UID bytes. */
+    val rawUid: ByteArray get() = uid
+
+    /** UID as UInt (first 4 bytes, big-endian). */
+    val uidAsUInt: UInt
+        get() {
+            val b = if (uid.size >= 4) uid.copyOfRange(0, 4) else uid
+            return ((b[0].toUInt() and 0xFFu) shl 24) or
+                ((b[1].toUInt() and 0xFFu) shl 16) or
+                ((b[2].toUInt() and 0xFFu) shl 8) or
+                (b[3].toUInt() and 0xFFu)
+        }
 
     override fun connect() {
         connected = true
@@ -92,13 +109,32 @@ class PN533ClassicTechnology(
             val data = byteArrayOf(authCommand, block.toByte()) + key + uidBytes
             pn533.inDataExchange(tg, data)
             true
-        } catch (_: PN533Exception) {
+        } catch (e: PN533Exception) {
+            if (e is PN533TransportException) throw e
+            // After failed MIFARE auth, the card enters HALT state and won't
+            // respond to subsequent commands, causing slow PN533 timeouts.
+            // Cycle the RF field to reset the card, then re-select it.
+            reselectCard()
             false
         }
+
+    private suspend fun reselectCard() {
+        try {
+            pn533.rfFieldOff()
+            delay(RF_RESET_DELAY_MS)
+            pn533.rfFieldOn()
+            delay(RF_RESET_DELAY_MS)
+            pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
+        } catch (e: PN533Exception) {
+            if (e is PN533TransportException) throw e
+            // Card may have been removed — caller will handle this
+        }
+    }
 
     companion object {
         const val MIFARE_CMD_AUTH_A: Byte = 0x60
         const val MIFARE_CMD_AUTH_B: Byte = 0x61
         const val MIFARE_CMD_READ: Byte = 0x30
+        private const val RF_RESET_DELAY_MS = 50L
     }
 }

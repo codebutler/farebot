@@ -1,6 +1,7 @@
 package com.codebutler.farebot.desktop
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import com.codebutler.farebot.app.keymanager.KeyManagerPluginImpl
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.flipper.FlipperTransportFactory
 import com.codebutler.farebot.flipper.JvmFlipperTransportFactory
@@ -17,6 +18,8 @@ import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.AppPreferences
 import com.codebutler.farebot.shared.platform.JvmAppPreferences
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
+import com.codebutler.farebot.shared.plugin.toKeyManagerPlugin
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -72,7 +75,7 @@ abstract class DesktopAppGraph : AppGraph {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideCardScanner(): CardScanner = DesktopCardScanner()
+    fun provideCardScanner(keyManagerPlugin: KeyManagerPlugin?): CardScanner = DesktopCardScanner(keyManagerPlugin)
 
     @Provides
     @SingleIn(AppScope::class)
@@ -95,4 +98,11 @@ abstract class DesktopAppGraph : AppGraph {
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideKeyManagerPlugin(
+        cardKeysPersister: CardKeysPersister,
+        json: Json,
+    ): KeyManagerPlugin? = KeyManagerPluginImpl(cardKeysPersister, json).toKeyManagerPlugin()
 }
