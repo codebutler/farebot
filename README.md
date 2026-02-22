@@ -20,7 +20,7 @@ FareBot runs on:
 <!-- TODO: Add links when published -->
 - **Android:** Coming soon on Google Play
 - **iOS:** Coming soon on the App Store
-- **Web:** Coming soon
+- **Web:** [farebot-web.vercel.app](https://farebot-web.vercel.app/)
 - **Build from source:** See [Building](#building)
 
 ## Written By
