@@ -12,7 +12,7 @@ concurrency:
 jobs:
   release:
     name: Build & Upload to TestFlight
-    runs-on: nscloud-macos-sequoia-stable-arm64-6x14
+    runs-on: nscloud-macos-tahoe-arm64-6x14
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
