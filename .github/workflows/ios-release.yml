@@ -109,6 +109,9 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID"
 
       - name: Export IPA
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
           cat > "$EXPORT_PLIST" <<-PLIST
@@ -137,14 +140,13 @@ jobs:
           </plist>
           PLIST
 
-          echo "--- ExportOptions.plist ---"
-          cat "$EXPORT_PLIST"
-          echo "---"
-
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist "$EXPORT_PLIST"
+            -exportOptionsPlist "$EXPORT_PLIST" \
+            -authenticationKeyPath ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8 \
+            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
 
       - name: Install fastlane
         run: brew install fastlane
