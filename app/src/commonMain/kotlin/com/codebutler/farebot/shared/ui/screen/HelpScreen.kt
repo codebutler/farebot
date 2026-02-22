@@ -280,14 +280,14 @@ fun ExploreContent(
                                 .padding(horizontal = 12.dp, vertical = 8.dp),
                     )
                 }
-                items(cards, key = { it.nameRes.key }) { card ->
+                items(cards, key = { it.uniqueKey }) { card ->
                     CardImageTile(
                         card = card,
                         cardName = cardNames[card.nameRes.key] ?: "",
                         isSupported = card.cardType in supportedCardTypes,
                         isKeysRequired = card.keysRequired && card.keyBundle !in loadedKeyBundles,
                         onTap = {
-                            selectedCardKey = card.nameRes.key
+                            selectedCardKey = card.uniqueKey
                         },
                     )
                 }
@@ -337,7 +337,7 @@ fun ExploreContent(
     // Bottom sheet for selected card details
     val selectedCard =
         selectedCardKey?.let { key ->
-            supportedCards.find { it.nameRes.key == key }
+            supportedCards.find { it.uniqueKey == key }
         }
     if (selectedCard != null) {
         ModalBottomSheet(

@@ -41,4 +41,6 @@ data class CardInfo(
     /** Brand color as 0xRRGGBB (no alpha). Null if unknown — UI will use a theme-appropriate fallback. */
     val brandColor: Int?,
     val credits: List<String> = emptyList(),
-)
+) {
+    val uniqueKey: String get() = "${nameRes.key}:${cardType.name}"
+}
