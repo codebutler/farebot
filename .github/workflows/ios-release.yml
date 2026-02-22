@@ -105,10 +105,7 @@ jobs:
             DEVELOPMENT_TEAM=ZJ9GEQ36AH \
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID"
 
-      - name: Export & upload to App Store Connect
-        env:
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      - name: Export IPA
         run: |
           EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
           cat > "$EXPORT_PLIST" <<-PLIST
@@ -132,7 +129,7 @@ jobs:
             <key>uploadSymbols</key>
             <true/>
             <key>destination</key>
-            <string>upload</string>
+            <string>export</string>
           </dict>
           </plist>
           PLIST
@@ -140,15 +137,12 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist "$EXPORT_PLIST" \
-            -authenticationKeyPath ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8 \
-            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
-            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
+            -exportOptionsPlist "$EXPORT_PLIST"
 
       - name: Install fastlane
         run: brew install fastlane
 
-      - name: Distribute to TestFlight testers
+      - name: Upload & distribute to TestFlight
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -162,13 +156,16 @@ jobs:
             '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' \
             > "$API_KEY_JSON"
 
-          fastlane pilot distribute \
+          IPA_PATH=$(find "$RUNNER_TEMP/export" -name '*.ipa' -print -quit)
+          echo "IPA: $IPA_PATH"
+          [ -f "$IPA_PATH" ] || { echo "No IPA found"; ls -la "$RUNNER_TEMP/export"; exit 1; }
+
+          fastlane pilot upload \
+            --ipa "$IPA_PATH" \
             --api_key_path "$API_KEY_JSON" \
             --app_platform ios \
-            --app_identifier com.codebutler.farebot \
             --distribute_external true \
             --notify_external_testers true \
-            --build_number "$CURRENT_PROJECT_VERSION" \
             --skip_waiting_for_build_processing false \
             --changelog "Build $MARKETING_VERSION ($CURRENT_PROJECT_VERSION)"
 
