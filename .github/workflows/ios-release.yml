@@ -19,6 +19,14 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Select latest Xcode
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$LATEST" ]; then
+            sudo xcode-select -s "$LATEST"
+          fi
+          xcodebuild -version
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
