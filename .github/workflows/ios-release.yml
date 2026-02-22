@@ -165,6 +165,7 @@ jobs:
             --api_key_path "$API_KEY_JSON" \
             --app_platform ios \
             --distribute_external true \
+            --groups "External Testers" \
             --notify_external_testers true \
             --skip_waiting_for_build_processing false \
             --changelog "Build $MARKETING_VERSION ($CURRENT_PROJECT_VERSION)"
