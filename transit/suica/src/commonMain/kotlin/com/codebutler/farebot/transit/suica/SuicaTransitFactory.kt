@@ -54,6 +54,16 @@ class SuicaTransitFactory : TransitFactory<FelicaCard, SuicaTransitInfo> {
 
     override fun check(card: FelicaCard): Boolean = card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA) != null
 
+    override fun findCardInfo(card: FelicaCard): CardInfo? {
+        val system = card.getSystem(FeliCaConstants.SYSTEMCODE_SUICA) ?: return allCards.firstOrNull()
+        val serviceCodes =
+            system.allServiceCodes.ifEmpty {
+                system.services.map { it.serviceCode }.toSet()
+            }
+        val nameRes = SuicaUtil.getCardNameResource(serviceCodes) ?: return allCards.firstOrNull()
+        return allCards.find { it.nameRes == nameRes } ?: allCards.firstOrNull()
+    }
+
     override fun parseIdentity(card: FelicaCard): TransitIdentity {
         val cardName = detectCardName(card)
         return TransitIdentity.create(cardName, null)
