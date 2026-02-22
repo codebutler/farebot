@@ -131,6 +131,7 @@ kotlin {
             api(project(":transit:warsaw"))
             api(project(":transit:zolotayakorona"))
             api(project(":transit:serialonly"))
+            api(project(":flipper"))
             api(project(":transit:krocap"))
             api(project(":transit:snapper"))
             api(project(":transit:ndef"))

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.shared.serialize
 
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
@@ -48,6 +49,7 @@ sealed class ImportResult {
         val cards: List<RawCard<*>>,
         val format: ImportFormat,
         val metadata: ImportMetadata? = null,
+        val classicKeys: ClassicCardKeys? = null,
     ) : ImportResult()
 
     /**
@@ -301,12 +303,16 @@ class CardImporter(
     }
 
     private fun importFromFlipper(data: String): ImportResult {
-        val rawCard =
+        val result =
             FlipperNfcParser.parse(data)
                 ?: return ImportResult.Error(
                     "Failed to parse Flipper NFC dump. Unsupported card type or malformed file.",
                 )
-        return ImportResult.Success(listOf(rawCard), ImportFormat.FLIPPER_NFC)
+        return ImportResult.Success(
+            listOf(result.rawCard),
+            ImportFormat.FLIPPER_NFC,
+            classicKeys = result.classicKeys,
+        )
     }
 
     companion object {

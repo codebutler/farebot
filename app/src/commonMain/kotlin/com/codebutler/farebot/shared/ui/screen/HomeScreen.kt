@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,18 +22,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -44,7 +48,10 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -55,6 +62,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -86,7 +94,6 @@ import com.codebutler.farebot.shared.viewmodel.ScanError
 import com.codebutler.farebot.transit.CardInfo
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.about
-import farebot.app.generated.resources.add_all_samples
 import farebot.app.generated.resources.add_key
 import farebot.app.generated.resources.app_name
 import farebot.app.generated.resources.cancel
@@ -94,7 +101,10 @@ import farebot.app.generated.resources.delete
 import farebot.app.generated.resources.delete_selected_cards
 import farebot.app.generated.resources.ic_cards_stack
 import farebot.app.generated.resources.ic_launcher
-import farebot.app.generated.resources.import_file
+import farebot.app.generated.resources.import_source
+import farebot.app.generated.resources.import_source_file
+import farebot.app.generated.resources.import_source_flipper_ble
+import farebot.app.generated.resources.import_source_flipper_usb
 import farebot.app.generated.resources.keys
 import farebot.app.generated.resources.menu
 import farebot.app.generated.resources.n_selected
@@ -104,6 +114,7 @@ import farebot.app.generated.resources.nfc_listening_title
 import farebot.app.generated.resources.nfc_settings
 import farebot.app.generated.resources.ok
 import farebot.app.generated.resources.reading_card
+import farebot.app.generated.resources.sample_cards
 import farebot.app.generated.resources.scan
 import farebot.app.generated.resources.search_supported_cards
 import farebot.app.generated.resources.select_all
@@ -142,6 +153,8 @@ fun HomeScreen(
     onKeysRequiredTap: () -> Unit,
     onStatusChipTap: (String) -> Unit = {},
     onNavigateToKeys: (() -> Unit)?,
+    onConnectFlipperBle: (() -> Unit)? = null,
+    onConnectFlipperUsb: (() -> Unit)? = null,
     onOpenAbout: () -> Unit,
     onOpenNfcSettings: (() -> Unit)? = null,
     onAddAllSamples: (() -> Unit)? = null,
@@ -151,6 +164,7 @@ fun HomeScreen(
     val appPreferences = LocalAppGraph.current.appPreferences
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var menuExpanded by remember { mutableStateOf(false) }
+    var showImportSheet by remember { mutableStateOf(false) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showUnsupported by rememberSaveable {
         mutableStateOf(appPreferences.getBoolean(AppPreferences.KEY_SHOW_UNSUPPORTED, false))
@@ -343,22 +357,12 @@ fun HomeScreen(
                             )
                             HorizontalDivider()
                             DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_file)) },
+                                text = { Text(stringResource(Res.string.import_source)) },
                                 onClick = {
                                     menuExpanded = false
-                                    onImportFile()
+                                    showImportSheet = true
                                 },
                             )
-                            if (onAddAllSamples != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.add_all_samples)) },
-                                    trailingIcon = { Icon(Icons.Default.Code, contentDescription = null) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onAddAllSamples()
-                                    },
-                                )
-                            }
                             if (onNavigateToKeys != null) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(Res.string.keys)) },
@@ -540,15 +544,6 @@ fun HomeScreen(
                                 },
                             )
                             HorizontalDivider()
-                            if (onNavigateToKeys != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.keys)) },
-                                    onClick = {
-                                        menuExpanded = false
-                                        onNavigateToKeys()
-                                    },
-                                )
-                            }
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.about)) },
                                 onClick = {
@@ -742,6 +737,8 @@ fun HomeScreen(
                 ) {
                     HistoryContent(
                         uiState = historyUiState,
+                        supportedCardTypes = supportedCardTypes,
+                        loadedKeyBundles = loadedKeyBundles,
                         onNavigateToCard = onNavigateToCard,
                         onToggleSelection = onToggleSelection,
                     )
@@ -785,6 +782,67 @@ fun HomeScreen(
                         onSampleCardTap = onSampleCardTap,
                         searchQuery = exploreSearchQuery,
                         topBarHeight = padding.calculateTopPadding(),
+                    )
+                }
+            }
+        }
+    }
+
+    if (showImportSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showImportSheet = false },
+            sheetState = rememberModalBottomSheetState(),
+        ) {
+            Column(modifier = Modifier.padding(bottom = 24.dp)) {
+                Text(
+                    stringResource(Res.string.import_source),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+                ListItem(
+                    headlineContent = { Text(stringResource(Res.string.import_source_file)) },
+                    leadingContent = { Icon(Icons.Default.FolderOpen, contentDescription = null) },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    modifier =
+                        Modifier.clickable {
+                            showImportSheet = false
+                            onImportFile()
+                        },
+                )
+                if (onConnectFlipperBle != null) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(Res.string.import_source_flipper_ble)) },
+                        leadingContent = { Icon(Icons.Default.Bluetooth, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier =
+                            Modifier.clickable {
+                                showImportSheet = false
+                                onConnectFlipperBle()
+                            },
+                    )
+                }
+                if (onConnectFlipperUsb != null) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(Res.string.import_source_flipper_usb)) },
+                        leadingContent = { Icon(Icons.Default.Usb, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier =
+                            Modifier.clickable {
+                                showImportSheet = false
+                                onConnectFlipperUsb()
+                            },
+                    )
+                }
+                if (onAddAllSamples != null) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(Res.string.sample_cards)) },
+                        leadingContent = { Icon(Icons.Default.Code, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier =
+                            Modifier.clickable {
+                                showImportSheet = false
+                                onAddAllSamples()
+                            },
                     )
                 }
             }

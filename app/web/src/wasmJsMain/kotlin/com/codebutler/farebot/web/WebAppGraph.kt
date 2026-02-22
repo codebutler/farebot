@@ -1,6 +1,8 @@
 package com.codebutler.farebot.web
 
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.WebFlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.shared.core.NavDataHolder
@@ -69,6 +71,10 @@ abstract class WebAppGraph : AppGraph {
         cardSerializer: CardSerializer,
         json: Json,
     ): CardImporter = CardImporter(cardSerializer, json)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideFlipperTransportFactory(): FlipperTransportFactory = WebFlipperTransportFactory()
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner

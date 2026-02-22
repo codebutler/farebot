@@ -22,7 +22,10 @@
 
 package com.codebutler.farebot.shared.serialize
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.card.classic.key.ClassicCardKeys
+import com.codebutler.farebot.card.classic.key.ClassicSectorKey
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
@@ -41,10 +44,15 @@ import com.codebutler.farebot.card.ultralight.UltralightPage
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import kotlin.time.Clock
 
+data class FlipperParseResult(
+    val rawCard: RawCard<*>,
+    val classicKeys: ClassicCardKeys? = null,
+)
+
 object FlipperNfcParser {
     fun isFlipperFormat(data: String): Boolean = data.trimStart().startsWith("Filetype: Flipper NFC device")
 
-    fun parse(data: String): RawCard<*>? {
+    fun parse(data: String): FlipperParseResult? {
         val lines = data.lines()
         val headers = parseHeaders(lines)
 
@@ -52,9 +60,9 @@ object FlipperNfcParser {
 
         return when (deviceType) {
             "Mifare Classic" -> parseClassic(headers, lines)
-            "NTAG/Ultralight" -> parseUltralight(headers, lines)
-            "Mifare DESFire" -> parseDesfire(headers, lines)
-            "FeliCa" -> parseFelica(headers, lines)
+            "NTAG/Ultralight" -> parseUltralight(headers, lines)?.let { FlipperParseResult(it) }
+            "Mifare DESFire" -> parseDesfire(headers, lines)?.let { FlipperParseResult(it) }
+            "FeliCa" -> parseFelica(headers, lines)?.let { FlipperParseResult(it) }
             else -> null
         }
     }
@@ -396,7 +404,7 @@ object FlipperNfcParser {
     private fun parseClassic(
         headers: Map<String, String>,
         lines: List<String>,
-    ): RawClassicCard? {
+    ): FlipperParseResult? {
         val tagId = parseTagId(headers) ?: return null
         val classicType = headers["Mifare Classic type"]
         val totalSectors =
@@ -416,12 +424,14 @@ object FlipperNfcParser {
             blockDataMap[blockIndex] = blockHex
         }
 
-        // Group blocks into sectors
+        // Group blocks into sectors and extract keys from sector trailers
         val sectors = mutableListOf<RawClassicSector>()
+        val sectorKeys = mutableListOf<ClassicSectorKey?>()
         var currentBlock = 0
         for (sectorIndex in 0 until totalSectors) {
             val blocksPerSector = if (sectorIndex < 32) 4 else 16
             val sectorBlockIndices = (currentBlock until currentBlock + blocksPerSector)
+            val trailerBlockIndex = currentBlock + blocksPerSector - 1
 
             // Check if ALL blocks in this sector are unread
             val allUnread =
@@ -432,6 +442,7 @@ object FlipperNfcParser {
 
             if (allUnread) {
                 sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
+                sectorKeys.add(null)
             } else {
                 val blocks =
                     sectorBlockIndices.map { blockIdx ->
@@ -440,12 +451,39 @@ object FlipperNfcParser {
                         RawClassicBlock.create(blockIdx, data)
                     }
                 sectors.add(RawClassicSector.createData(sectorIndex, blocks))
+
+                // Extract keys from sector trailer (last block of sector)
+                // Trailer format: [Key A: 6 bytes] [Access Bits: 4 bytes] [Key B: 6 bytes]
+                val trailerHex = blockDataMap[trailerBlockIndex]
+                if (trailerHex != null && !isAllUnread(trailerHex)) {
+                    val trailerData = parseHexBytes(trailerHex)
+                    if (trailerData.size >= 16) {
+                        val keyA = trailerData.copyOfRange(0, 6)
+                        val keyB = trailerData.copyOfRange(10, 16)
+                        sectorKeys.add(ClassicSectorKey.create(keyA, keyB))
+                    } else {
+                        sectorKeys.add(null)
+                    }
+                } else {
+                    sectorKeys.add(null)
+                }
             }
 
             currentBlock += blocksPerSector
         }
 
-        return RawClassicCard.create(tagId, Clock.System.now(), sectors)
+        val rawCard = RawClassicCard.create(tagId, Clock.System.now(), sectors)
+
+        // Build ClassicCardKeys if any keys were extracted
+        val classicKeys =
+            if (sectorKeys.any { it != null }) {
+                val filledKeys = sectorKeys.map { it ?: ClassicSectorKey.create(ByteArray(6), ByteArray(6)) }
+                ClassicCardKeys(CardType.MifareClassic, filledKeys)
+            } else {
+                null
+            }
+
+        return FlipperParseResult(rawCard, classicKeys)
     }
 
     // --- Ultralight parsing ---

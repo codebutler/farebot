@@ -57,10 +57,10 @@ class FlipperIntegrationTest {
     fun testOrcaFromFlipper() =
         runTest {
             val data = loadFlipperDump("ORCA.nfc")
-            val rawCard = FlipperNfcParser.parse(data)
-            assertNotNull(rawCard, "Failed to parse ORCA Flipper dump")
+            val parseResult = FlipperNfcParser.parse(data)
+            assertNotNull(parseResult, "Failed to parse ORCA Flipper dump")
 
-            val card = rawCard.parse()
+            val card = parseResult.rawCard.parse()
             assertTrue(card is DesfireCard, "Expected DesfireCard, got ${card::class.simpleName}")
 
             val factory = OrcaTransitFactory()
@@ -92,10 +92,10 @@ class FlipperIntegrationTest {
     fun testClipperFromFlipper() =
         runTest {
             val data = loadFlipperDump("Clipper.nfc")
-            val rawCard = FlipperNfcParser.parse(data)
-            assertNotNull(rawCard, "Failed to parse Clipper Flipper dump")
+            val parseResult = FlipperNfcParser.parse(data)
+            assertNotNull(parseResult, "Failed to parse Clipper Flipper dump")
 
-            val card = rawCard.parse()
+            val card = parseResult.rawCard.parse()
             assertTrue(card is DesfireCard, "Expected DesfireCard, got ${card::class.simpleName}")
 
             val factory = ClipperTransitFactory()
@@ -267,10 +267,10 @@ class FlipperIntegrationTest {
     fun testSuicaFromFlipper() =
         runTest {
             val data = loadFlipperDump("Suica.nfc")
-            val rawCard = FlipperNfcParser.parse(data)
-            assertNotNull(rawCard, "Failed to parse Suica Flipper dump")
+            val parseResult = FlipperNfcParser.parse(data)
+            assertNotNull(parseResult, "Failed to parse Suica Flipper dump")
 
-            val card = rawCard.parse()
+            val card = parseResult.rawCard.parse()
             assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
 
             val factory = SuicaTransitFactory()
@@ -504,10 +504,10 @@ class FlipperIntegrationTest {
     fun testPasmoFromFlipper() =
         runTest {
             val data = loadFlipperDump("PASMO.nfc")
-            val rawCard = FlipperNfcParser.parse(data)
-            assertNotNull(rawCard, "Failed to parse PASMO Flipper dump")
+            val parseResult = FlipperNfcParser.parse(data)
+            assertNotNull(parseResult, "Failed to parse PASMO Flipper dump")
 
-            val card = rawCard.parse()
+            val card = parseResult.rawCard.parse()
             assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
 
             val factory = SuicaTransitFactory()
@@ -648,10 +648,10 @@ class FlipperIntegrationTest {
     fun testIcocaFromFlipper() =
         runTest {
             val data = loadFlipperDump("ICOCA.nfc")
-            val rawCard = FlipperNfcParser.parse(data)
-            assertNotNull(rawCard, "Failed to parse ICOCA Flipper dump")
+            val parseResult = FlipperNfcParser.parse(data)
+            assertNotNull(parseResult, "Failed to parse ICOCA Flipper dump")
 
-            val card = rawCard.parse()
+            val card = parseResult.rawCard.parse()
             assertTrue(card is FelicaCard, "Expected FelicaCard, got ${card::class.simpleName}")
 
             val factory = SuicaTransitFactory()

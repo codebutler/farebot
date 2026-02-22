@@ -10,4 +10,13 @@ interface CardKeysPersister {
     fun insert(savedKey: SavedKey): Long
 
     fun delete(savedKey: SavedKey)
+
+    fun getGlobalKeys(): List<ByteArray>
+
+    fun insertGlobalKeys(
+        keys: List<ByteArray>,
+        source: String,
+    )
+
+    fun deleteAllGlobalKeys()
 }

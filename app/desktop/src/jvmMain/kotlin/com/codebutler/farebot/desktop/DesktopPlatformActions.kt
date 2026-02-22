@@ -24,9 +24,20 @@ class DesktopPlatformActions : PlatformActions {
         clipboard.setContents(StringSelection(text), null)
     }
 
-    override fun shareText(text: String) {
-        copyToClipboard(text)
-        showToast("Copied to clipboard")
+    override fun shareFile(
+        content: String,
+        fileName: String,
+        mimeType: String,
+    ) {
+        val chooser =
+            JFileChooser().apply {
+                selectedFile = File(fileName)
+                dialogTitle = "Export Card"
+            }
+        val result = chooser.showSaveDialog(null)
+        if (result == JFileChooser.APPROVE_OPTION) {
+            chooser.selectedFile.writeText(content)
+        }
     }
 
     override fun showToast(message: String) {
@@ -44,21 +55,6 @@ class DesktopPlatformActions : PlatformActions {
             onResult(chooser.selectedFile.readText())
         } else {
             onResult(null)
-        }
-    }
-
-    override fun saveFileForExport(
-        content: String,
-        defaultFileName: String,
-    ) {
-        val chooser =
-            JFileChooser().apply {
-                selectedFile = File(defaultFileName)
-                dialogTitle = "Export Card"
-            }
-        val result = chooser.showSaveDialog(null)
-        if (result == JFileChooser.APPROVE_OPTION) {
-            chooser.selectedFile.writeText(content)
         }
     }
 

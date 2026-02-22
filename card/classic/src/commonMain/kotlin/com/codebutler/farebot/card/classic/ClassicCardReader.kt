@@ -48,6 +48,7 @@ object ClassicCardReader {
         tagId: ByteArray,
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,
+        globalKeys: List<ByteArray>? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
 
@@ -132,6 +133,24 @@ object ClassicCardReader {
                                 // Jump out if we have the key
                                 break
                             }
+                        }
+                    }
+                }
+
+                // Try global dictionary keys
+                if (!authSuccess && !globalKeys.isNullOrEmpty()) {
+                    for (globalKey in globalKeys) {
+                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, globalKey)
+                        if (authSuccess) {
+                            successfulKey = globalKey
+                            isKeyA = true
+                            break
+                        }
+                        authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, globalKey)
+                        if (authSuccess) {
+                            successfulKey = globalKey
+                            isKeyA = false
+                            break
                         }
                     }
                 }

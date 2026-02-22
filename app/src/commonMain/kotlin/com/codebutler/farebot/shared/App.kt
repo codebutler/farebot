@@ -32,6 +32,7 @@ import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
 import com.codebutler.farebot.shared.ui.screen.CardScreen
 import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
+import com.codebutler.farebot.shared.ui.screen.FlipperScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
 import com.codebutler.farebot.shared.ui.screen.KeysScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
@@ -95,6 +96,8 @@ fun FareBotApp(
         }
 
         val historyViewModel = graphViewModel { historyViewModel }
+        val flipperViewModel = graphViewModel { flipperViewModel }
+        val flipperTransportFactory = graph.flipperTransportFactory
 
         NavHost(navController = navController, startDestination = Screen.Home.route) {
             composable(Screen.Home.route) {
@@ -212,49 +215,57 @@ fun FareBotApp(
                     onStatusChipTap = { message ->
                         platformActions.showToast(message)
                     },
-                    onNavigateToKeys =
-                        if (CardType.MifareClassic in supportedCardTypes) {
-                            { navController.navigate(Screen.Keys.route) }
+                    onNavigateToKeys = { navController.navigate(Screen.Keys.route) },
+                    onConnectFlipperBle =
+                        if (flipperTransportFactory.isBleSupported) {
+                            {
+                                flipperViewModel.connectBle()
+                                navController.navigate(Screen.Flipper.route)
+                            }
+                        } else {
+                            null
+                        },
+                    onConnectFlipperUsb =
+                        if (flipperTransportFactory.isUsbSupported) {
+                            {
+                                flipperViewModel.connectUsb()
+                                navController.navigate(Screen.Flipper.route)
+                            }
                         } else {
                             null
                         },
                     onOpenAbout = { platformActions.openUrl("https://codebutler.github.io/farebot") },
                     onOpenNfcSettings = platformActions.openNfcSettings,
                     onToggleShowAllScans = { historyViewModel.toggleShowAllScans() },
-                    onAddAllSamples =
-                        if (isDebug) {
-                            {
-                                scope.launch {
-                                    var count = 0
-                                    for (cardInfo in supportedCards) {
-                                        val fileName = cardInfo.sampleDumpFile ?: continue
-                                        val bytes = Res.readBytes("files/samples/$fileName")
-                                        val result =
-                                            if (fileName.endsWith(".mfc")) {
-                                                cardImporter.importMfcDump(bytes)
-                                            } else {
-                                                cardImporter.importCards(bytes.decodeToString())
-                                            }
-                                        if (result is ImportResult.Success) {
-                                            for (rawCard in result.cards) {
-                                                cardPersister.insertCard(
-                                                    SavedCard(
-                                                        type = rawCard.cardType(),
-                                                        serial = rawCard.tagId().hex(),
-                                                        data = cardSerializer.serialize(rawCard),
-                                                    ),
-                                                )
-                                                count++
-                                            }
-                                        }
+                    onAddAllSamples = {
+                        scope.launch {
+                            var count = 0
+                            for (cardInfo in supportedCards) {
+                                val fileName = cardInfo.sampleDumpFile ?: continue
+                                val bytes = Res.readBytes("files/samples/$fileName")
+                                val result =
+                                    if (fileName.endsWith(".mfc")) {
+                                        cardImporter.importMfcDump(bytes)
+                                    } else {
+                                        cardImporter.importCards(bytes.decodeToString())
                                     }
-                                    historyViewModel.loadCards()
-                                    platformActions.showToast(getString(Res.string.imported_cards, count))
+                                if (result is ImportResult.Success) {
+                                    for (rawCard in result.cards) {
+                                        cardPersister.insertCard(
+                                            SavedCard(
+                                                type = rawCard.cardType(),
+                                                serial = rawCard.tagId().hex(),
+                                                data = cardSerializer.serialize(rawCard),
+                                            ),
+                                        )
+                                        count++
+                                    }
                                 }
                             }
-                        } else {
-                            null
-                        },
+                            historyViewModel.loadCards()
+                            platformActions.showToast(getString(Res.string.imported_cards, count))
+                        }
+                    },
                     onSampleCardTap = { cardInfo ->
                         val fileName = cardInfo.sampleDumpFile ?: return@HomeScreen
                         scope.launch {
@@ -276,6 +287,26 @@ fun FareBotApp(
                                 platformActions.showToast("Failed to load sample: ${e.message}")
                             }
                         }
+                    },
+                )
+            }
+
+            composable(Screen.Flipper.route) {
+                val flipperUiState by flipperViewModel.uiState.collectAsState()
+
+                FlipperScreen(
+                    uiState = flipperUiState,
+                    onRetry = { flipperViewModel.retry() },
+                    onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
+                    onNavigateUp = { flipperViewModel.navigateUp() },
+                    onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
+                    onClearSelection = { flipperViewModel.clearSelection() },
+                    onImportSelected = { flipperViewModel.importSelectedFiles() },
+                    onImportKeys = { flipperViewModel.importKeyDictionary() },
+                    onClearImportMessage = { flipperViewModel.clearImportMessage() },
+                    onBack = {
+                        flipperViewModel.disconnect()
+                        navController.popBackStack()
                     },
                 )
             }
@@ -406,16 +437,13 @@ fun FareBotApp(
                     onNavigateToTripMap = { tripKey ->
                         navController.navigate(Screen.TripMap.createRoute(tripKey))
                     },
-                    onExportShare = {
+                    onShare = {
                         val json = viewModel.exportCard()
                         if (json != null) {
-                            platformActions.shareText(json)
-                        }
-                    },
-                    onExportSave = {
-                        val json = viewModel.exportCard()
-                        if (json != null) {
-                            platformActions.saveFileForExport(json, "farebot-card.json")
+                            val name = uiState.cardName?.lowercase()?.replace(' ', '-') ?: "card"
+                            val serial = uiState.serialNumber ?: ""
+                            val fileName = "farebot-$name-$serial.json"
+                            platformActions.shareFile(json, fileName, "application/json")
                         }
                     },
                     onDelete = {

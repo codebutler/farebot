@@ -2,6 +2,8 @@ package com.codebutler.farebot.desktop
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.JvmFlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.DbCardKeysPersister
@@ -86,6 +88,10 @@ abstract class DesktopAppGraph : AppGraph {
         cardSerializer: CardSerializer,
         json: Json,
     ): CardImporter = CardImporter(cardSerializer, json)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideFlipperTransportFactory(): FlipperTransportFactory = JvmFlipperTransportFactory()
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner

@@ -11,16 +11,15 @@ interface PlatformActions {
 
     fun copyToClipboard(text: String)
 
-    fun shareText(text: String)
+    fun shareFile(
+        content: String,
+        fileName: String,
+        mimeType: String,
+    )
 
     fun showToast(message: String)
 
     fun pickFileForImport(onResult: (String?) -> Unit)
-
-    fun saveFileForExport(
-        content: String,
-        defaultFileName: String,
-    )
 
     fun updateAppTimestamp() {}
 

@@ -87,7 +87,6 @@ import farebot.app.generated.resources.ic_transaction_unknown_32dp
 import farebot.app.generated.resources.ic_transaction_vend_32dp
 import farebot.app.generated.resources.menu
 import farebot.app.generated.resources.refill
-import farebot.app.generated.resources.save
 import farebot.app.generated.resources.scan_history
 import farebot.app.generated.resources.share
 import farebot.app.generated.resources.trip_mode_bus
@@ -113,8 +112,7 @@ fun CardScreen(
     onBack: () -> Unit,
     onNavigateToAdvanced: () -> Unit,
     onNavigateToTripMap: (String) -> Unit,
-    onExportShare: () -> Unit = {},
-    onExportSave: () -> Unit = {},
+    onShare: () -> Unit = {},
     onDelete: (() -> Unit)? = null,
     onShowScanHistory: () -> Unit = {},
     onNavigateToScan: (String) -> Unit = {},
@@ -162,8 +160,7 @@ fun CardScreen(
                 onBack = onBack,
                 onNavigateToAdvanced = onNavigateToAdvanced,
                 onNavigateToTripMap = onNavigateToTripMap,
-                onExportShare = onExportShare,
-                onExportSave = onExportSave,
+                onShare = onShare,
                 onDelete = onDelete,
                 onShowScanHistory = onShowScanHistory,
             )
@@ -230,8 +227,7 @@ private fun CardContentScreen(
     onBack: () -> Unit,
     onNavigateToAdvanced: () -> Unit,
     onNavigateToTripMap: (String) -> Unit,
-    onExportShare: () -> Unit,
-    onExportSave: () -> Unit,
+    onShare: () -> Unit,
     onDelete: (() -> Unit)?,
     onShowScanHistory: () -> Unit,
 ) {
@@ -328,7 +324,15 @@ private fun CardContentScreen(
                                 )
                             }
                         }
-                        if (!uiState.isSample || uiState.hasAdvancedData) {
+                        if (!uiState.isSample) {
+                            IconButton(onClick = onShare) {
+                                Icon(
+                                    platformShareIcon,
+                                    contentDescription = stringResource(Res.string.share),
+                                )
+                            }
+                        }
+                        if (uiState.hasAdvancedData || onDelete != null) {
                             IconButton(onClick = { menuExpanded = true }) {
                                 Icon(
                                     Icons.Default.MoreVert,
@@ -339,22 +343,6 @@ private fun CardContentScreen(
                                 expanded = menuExpanded,
                                 onDismissRequest = { menuExpanded = false },
                             ) {
-                                if (!uiState.isSample) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(Res.string.share)) },
-                                        onClick = {
-                                            menuExpanded = false
-                                            onExportShare()
-                                        },
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(Res.string.save)) },
-                                        onClick = {
-                                            menuExpanded = false
-                                            onExportSave()
-                                        },
-                                    )
-                                }
                                 if (uiState.hasAdvancedData) {
                                     DropdownMenuItem(
                                         text = { Text(stringResource(Res.string.advanced)) },

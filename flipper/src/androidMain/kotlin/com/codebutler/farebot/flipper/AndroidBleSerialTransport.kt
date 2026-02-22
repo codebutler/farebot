@@ -1,0 +1,214 @@
+@file:Suppress("MissingPermission")
+
+package com.codebutler.farebot.flipper
+
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
+import android.content.Context
+import android.os.ParcelUuid
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
+import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+
+/**
+ * FlipperTransport implementation using Android BLE.
+ * Connects to Flipper Zero's BLE Serial service.
+ */
+@SuppressLint("MissingPermission")
+class AndroidBleSerialTransport(
+    private val context: Context,
+    private val device: BluetoothDevice? = null,
+) : FlipperBleTransportBase() {
+    companion object {
+        val SERIAL_SERVICE_UUID: UUID = UUID.fromString(SERIAL_SERVICE_UUID_STRING)
+        val SERIAL_READ_UUID: UUID = UUID.fromString(SERIAL_READ_UUID_STRING)
+        val SERIAL_WRITE_UUID: UUID = UUID.fromString(SERIAL_WRITE_UUID_STRING)
+        private val CCCD_UUID: UUID = UUID.fromString(CCCD_UUID_STRING)
+    }
+
+    private var gatt: BluetoothGatt? = null
+    private var writeCharacteristic: BluetoothGattCharacteristic? = null
+    private var readCharacteristic: BluetoothGattCharacteristic? = null
+
+    override val isConnected: Boolean
+        get() = gatt != null
+
+    override suspend fun connect() {
+        val targetDevice = device ?: scanForFlipper()
+
+        val connectionDeferred = CompletableDeferred<Unit>()
+        val servicesDeferred = CompletableDeferred<Unit>()
+
+        val callback =
+            object : BluetoothGattCallback() {
+                override fun onConnectionStateChange(
+                    gatt: BluetoothGatt,
+                    status: Int,
+                    newState: Int,
+                ) {
+                    if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
+                        connectionDeferred.complete(Unit)
+                        gatt.discoverServices()
+                    } else if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        connectionDeferred.completeExceptionally(
+                            FlipperException("BLE connection established with error (status $status)"),
+                        )
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        val error = FlipperException("BLE disconnected (status $status)")
+                        if (!connectionDeferred.isCompleted) {
+                            connectionDeferred.completeExceptionally(error)
+                        }
+                        if (!servicesDeferred.isCompleted) {
+                            servicesDeferred.completeExceptionally(error)
+                        }
+                        receiveChannel.close(error)
+                    }
+                }
+
+                override fun onServicesDiscovered(
+                    gatt: BluetoothGatt,
+                    status: Int,
+                ) {
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        val service = gatt.getService(SERIAL_SERVICE_UUID)
+                        if (service != null) {
+                            writeCharacteristic = service.getCharacteristic(SERIAL_WRITE_UUID)
+                            readCharacteristic = service.getCharacteristic(SERIAL_READ_UUID)
+                            servicesDeferred.complete(Unit)
+                        } else {
+                            servicesDeferred.completeExceptionally(
+                                FlipperException("Serial service not found on device"),
+                            )
+                        }
+                    } else {
+                        servicesDeferred.completeExceptionally(
+                            FlipperException("Service discovery failed (status $status)"),
+                        )
+                    }
+                }
+
+                @Deprecated("Deprecated in API 33")
+                override fun onCharacteristicChanged(
+                    gatt: BluetoothGatt,
+                    characteristic: BluetoothGattCharacteristic,
+                ) {
+                    if (characteristic.uuid == SERIAL_READ_UUID) {
+                        val data = characteristic.value
+                        if (data != null && data.isNotEmpty()) {
+                            onDataReceived(data)
+                        }
+                    }
+                }
+            }
+
+        val bluetoothGatt = targetDevice.connectGatt(context, false, callback)
+        this.gatt = bluetoothGatt
+
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            connectionDeferred.await()
+        }
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            servicesDeferred.await()
+        }
+
+        // Request higher MTU for better throughput
+        bluetoothGatt.requestMtu(512)
+
+        // Enable notifications on the serial read characteristic (data from Flipper)
+        val read =
+            readCharacteristic
+                ?: throw FlipperException("Serial read characteristic not found")
+        bluetoothGatt.setCharacteristicNotification(read, true)
+        val descriptor =
+            read.getDescriptor(CCCD_UUID)
+                ?: throw FlipperException("Serial read notification descriptor not found")
+        descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        if (!bluetoothGatt.writeDescriptor(descriptor)) {
+            throw FlipperException("Failed to enable serial read notifications")
+        }
+    }
+
+    override suspend fun write(data: ByteArray) {
+        val g = gatt ?: throw FlipperException("Not connected")
+        val write = writeCharacteristic ?: throw FlipperException("Write characteristic not found")
+        write.value = data
+        if (!g.writeCharacteristic(write)) {
+            throw FlipperException("BLE write failed")
+        }
+    }
+
+    override suspend fun platformClose() {
+        gatt?.disconnect()
+        gatt?.close()
+        gatt = null
+        writeCharacteristic = null
+        readCharacteristic = null
+    }
+
+    private suspend fun scanForFlipper(): BluetoothDevice {
+        val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val adapter =
+            bluetoothManager.adapter
+                ?: throw FlipperException("Bluetooth not available")
+
+        if (!adapter.isEnabled) {
+            throw FlipperException("Bluetooth is disabled")
+        }
+
+        return withTimeout(SCAN_TIMEOUT_MS) {
+            suspendCancellableCoroutine { cont ->
+                val scanner =
+                    adapter.bluetoothLeScanner
+                        ?: throw FlipperException("BLE scanner not available")
+
+                val callback =
+                    object : ScanCallback() {
+                        override fun onScanResult(
+                            callbackType: Int,
+                            result: ScanResult,
+                        ) {
+                            scanner.stopScan(this)
+                            cont.resume(result.device)
+                        }
+
+                        override fun onScanFailed(errorCode: Int) {
+                            cont.resumeWithException(FlipperException("BLE scan failed (error $errorCode)"))
+                        }
+                    }
+
+                val filters =
+                    FLIPPER_ADV_SERVICE_UUIDS.map { uuid ->
+                        ScanFilter
+                            .Builder()
+                            .setServiceUuid(ParcelUuid.fromString(uuid))
+                            .build()
+                    }
+
+                val settings =
+                    ScanSettings
+                        .Builder()
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                        .build()
+
+                scanner.startScan(filters, settings, callback)
+
+                cont.invokeOnCancellation {
+                    scanner.stopScan(callback)
+                }
+            }
+        }
+    }
+}

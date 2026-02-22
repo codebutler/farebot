@@ -2,6 +2,8 @@ package com.codebutler.farebot.shared.di
 
 import com.codebutler.farebot.base.util.BundledDatabaseDriverFactory
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperTransportFactory
+import com.codebutler.farebot.flipper.IosFlipperTransportFactory
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.DbCardKeysPersister
@@ -88,6 +90,10 @@ abstract class IosAppGraph : AppGraph {
         cardSerializer: CardSerializer,
         json: Json,
     ): CardImporter = CardImporter(cardSerializer, json)
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideFlipperTransportFactory(): FlipperTransportFactory = IosFlipperTransportFactory()
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner

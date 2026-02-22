@@ -24,10 +24,13 @@ package com.codebutler.farebot.shared.platform
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSString
+import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSTimer
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.create
 import platform.Foundation.stringWithContentsOfURL
+import platform.Foundation.writeToFile
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
@@ -60,15 +63,21 @@ class IosPlatformActions : PlatformActions {
         UIPasteboard.generalPasteboard.string = text
     }
 
-    override fun shareText(text: String) {
-        val viewController =
-            getTopViewController() ?: run {
-                copyToClipboard(text)
-                return
-            }
+    @OptIn(ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
+    override fun shareFile(
+        content: String,
+        fileName: String,
+        mimeType: String,
+    ) {
+        val viewController = getTopViewController() ?: return
+        val tempDir = NSTemporaryDirectory()
+        val filePath = "$tempDir$fileName"
+        val nsString = NSString.create(string = content)
+        nsString.writeToFile(filePath, atomically = true, encoding = NSUTF8StringEncoding, error = null)
+        val fileUrl = NSURL.fileURLWithPath(filePath)
         val activityVC =
             UIActivityViewController(
-                activityItems = listOf(text),
+                activityItems = listOf(fileUrl),
                 applicationActivities = null,
             )
         viewController.presentViewController(activityVC, animated = true, completion = null)
@@ -114,19 +123,6 @@ class IosPlatformActions : PlatformActions {
 
             viewController.presentViewController(picker, animated = true, completion = null)
         }
-    }
-
-    override fun saveFileForExport(
-        content: String,
-        defaultFileName: String,
-    ) {
-        val viewController = getTopViewController() ?: return
-        val activityVC =
-            UIActivityViewController(
-                activityItems = listOf(content),
-                applicationActivities = null,
-            )
-        viewController.presentViewController(activityVC, animated = true, completion = null)
     }
 
     private fun getTopViewController(): UIViewController? {

@@ -52,4 +52,6 @@ sealed class Screen(
     data object TripMap : Screen("trip_map/{tripKey}") {
         fun createRoute(tripKey: String): String = "trip_map/$tripKey"
     }
+
+    data object Flipper : Screen("flipper")
 }
