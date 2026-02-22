@@ -111,14 +111,39 @@ jobs:
       - name: Export IPA
         run: |
           EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
-          sed "s/PROVISIONING_PROFILE_UUID_PLACEHOLDER/$PROVISIONING_PROFILE_UUID/" \
-            app/ios/ExportOptions.plist > "$EXPORT_PLIST"
+          cat > "$EXPORT_PLIST" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store-connect</string>
+              <key>teamID</key>
+              <string>ZJ9GEQ36AH</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>signingCertificate</key>
+              <string>Apple Distribution</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.codebutler.farebot</key>
+                  <string>$PROVISIONING_PROFILE_UUID</string>
+              </dict>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>destination</key>
+              <string>upload</string>
+          </dict>
+          </plist>
+          PLIST
+
+          cat "$EXPORT_PLIST"
 
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist "$EXPORT_PLIST" \
-            -allowProvisioningUpdates
+            -exportOptionsPlist "$EXPORT_PLIST"
 
       - name: Install fastlane
         run: brew install fastlane

@@ -7,15 +7,6 @@
     <string>app-store-connect</string>
     <key>teamID</key>
     <string>ZJ9GEQ36AH</string>
-    <key>signingStyle</key>
-    <string>manual</string>
-    <key>signingCertificate</key>
-    <string>Apple Distribution</string>
-    <key>provisioningProfiles</key>
-    <dict>
-        <key>com.codebutler.farebot</key>
-        <string>PROVISIONING_PROFILE_UUID_PLACEHOLDER</string>
-    </dict>
     <key>uploadSymbols</key>
     <true/>
     <key>destination</key>
