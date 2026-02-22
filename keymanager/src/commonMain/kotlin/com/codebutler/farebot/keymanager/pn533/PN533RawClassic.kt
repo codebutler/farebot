@@ -114,22 +114,32 @@ class PN533RawClassic(
     }
 
     /**
-     * Reset the card by cycling the RF field and re-selecting.
+     * Re-select the card without cycling the RF field.
      *
      * After an incomplete MIFARE Classic authentication (e.g., requestAuth()
-     * collects the nonce but doesn't complete the handshake), the card enters
-     * HALT state and won't respond to subsequent commands. Cycling the RF field
-     * resets the card, and InListPassiveTarget re-selects it.
+     * collects the nonce but doesn't complete the handshake), the card
+     * returns to IDLE state after its Frame Waiting Time expires (~5ms).
+     * We wait for that timeout, release the PN533's internal target tracking,
+     * then re-select with InListPassiveTarget (which sends REQA).
+     *
+     * Crucially, this keeps the RF field powered — the card's PRNG continues
+     * running from its original seed, which is required for PRNG distance
+     * calibration in the nested attack.
      *
      * @return true if the card was successfully re-selected
      */
     suspend fun reselectCard(): Boolean {
         restoreNormalMode()
+        // Wait for card's auth timeout (FWT ~5ms) so it returns to IDLE state
+        delay(CARD_AUTH_TIMEOUT_MS)
         return try {
-            pn533.rfFieldOff()
-            delay(RF_RESET_DELAY_MS)
-            pn533.rfFieldOn()
-            delay(RF_RESET_DELAY_MS)
+            // Release PN533's internal target tracking
+            try {
+                pn533.inRelease(0)
+            } catch (_: PN533Exception) {
+                // May fail if no target was listed — that's fine
+            }
+            // Re-select card (REQA → anti-collision → SELECT)
             pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A) != null
         } catch (_: PN533Exception) {
             false
@@ -306,8 +316,8 @@ class PN533RawClassic(
         /** CIU Status2 register — Bit 3 = Crypto1 active */
         const val REG_CIU_STATUS2 = 0x6338
 
-        /** Delay in ms for RF field cycling during card reset */
-        private const val RF_RESET_DELAY_MS = 50L
+        /** Wait time in ms for card's auth timeout (FWT) before re-selecting */
+        private const val CARD_AUTH_TIMEOUT_MS = 10L
 
         /**
          * Build a MIFARE Classic AUTH command with CRC.

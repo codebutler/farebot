@@ -233,11 +233,10 @@ class WebCardScanner(
                 val tagIdHex = tagId.hex()
                 val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
                 val globalKeys = keyManagerPlugin?.getGlobalKeys()
-                val recovery = keyManagerPlugin?.classicKeyRecovery
+                // Don't attempt key recovery during initial scan — that happens
+                // on the dedicated key recovery screen after user interaction.
                 val rawCard =
-                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, recovery) { progress ->
-                        log.i { "[WebUSB] $progress" }
-                    }
+                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, onProgress = onProgress)
                 if (rawCard.hasUnauthorizedSectors()) {
                     throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }
