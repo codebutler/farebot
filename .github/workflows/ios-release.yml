@@ -98,16 +98,14 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             DEVELOPMENT_TEAM=ZJ9GEQ36AH \
-            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
-            | xcpretty
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID"
 
       - name: Export IPA
         run: |
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist app/ios/ExportOptions.plist \
-            | xcpretty
+            -exportOptionsPlist app/ios/ExportOptions.plist
 
       - name: Install fastlane
         run: brew install fastlane
