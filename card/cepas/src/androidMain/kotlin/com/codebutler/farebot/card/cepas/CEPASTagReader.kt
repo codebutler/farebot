@@ -42,5 +42,6 @@ class CEPASTagReader(
         tag: Tag,
         tech: CardTransceiver,
         cardKeys: CardKeys?,
-    ): RawCEPASCard = CEPASCardReader.readCard(tagId, tech)
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+    ): RawCEPASCard = CEPASCardReader.readCard(tagId, tech, onProgress)
 }

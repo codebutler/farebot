@@ -185,7 +185,10 @@ class IosNfcScanner : CardScanner {
 
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        rawCard = readTag(tag)
+                        rawCard =
+                            readTag(tag) { current, total ->
+                                session.alertMessage = "Reading… $current / $total"
+                            }
                     } catch (e: Exception) {
                         readException = e
                     } finally {
@@ -228,15 +231,21 @@ class IosNfcScanner : CardScanner {
         override fun tagReaderSessionDidBecomeActive(session: NFCTagReaderSession) {
         }
 
-        private suspend fun readTag(tag: Any): RawCard<*> =
+        private suspend fun readTag(
+            tag: Any,
+            onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
+        ): RawCard<*> =
             when (tag) {
-                is NFCFeliCaTagProtocol -> readFelicaTag(tag)
-                is NFCMiFareTagProtocol -> readMiFareTag(tag)
+                is NFCFeliCaTagProtocol -> readFelicaTag(tag, onProgress)
+                is NFCMiFareTagProtocol -> readMiFareTag(tag, onProgress)
                 is NFCISO15693TagProtocol -> readVicinityTag(tag)
                 else -> throw Exception("Unsupported NFC tag type")
             }
 
-        private suspend fun readFelicaTag(tag: NFCFeliCaTagProtocol): RawCard<*> {
+        private suspend fun readFelicaTag(
+            tag: NFCFeliCaTagProtocol,
+            onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        ): RawCard<*> {
             val tagId = tag.currentIDm.toByteArray()
             /*
              * onlyFirst = true is an iOS-specific hack to work around
@@ -250,10 +259,13 @@ class IosNfcScanner : CardScanner {
              *
              * Once iOS fixes this, do an iOS version check instead.
              */
-            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag), onlyFirst = true)
+            return FeliCaReader.readTag(tagId, IosFeliCaTagAdapter(tag), onlyFirst = true, onProgress = onProgress)
         }
 
-        private suspend fun readMiFareTag(tag: NFCMiFareTagProtocol): RawCard<*> {
+        private suspend fun readMiFareTag(
+            tag: NFCMiFareTagProtocol,
+            onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        ): RawCard<*> {
             val tagId = tag.identifier.toByteArray()
             return when (tag.mifareFamily) {
                 NFCMiFareDESFire -> {
@@ -264,7 +276,7 @@ class IosNfcScanner : CardScanner {
                     val transceiver = IosCardTransceiver(tag)
                     transceiver.connect()
                     try {
-                        DesfireCardReader.readCard(tagId, transceiver)
+                        DesfireCardReader.readCard(tagId, transceiver, onProgress)
                     } finally {
                         if (transceiver.isConnected) {
                             try {
@@ -279,7 +291,7 @@ class IosNfcScanner : CardScanner {
                     val tech = IosUltralightTechnology(tag)
                     tech.connect()
                     try {
-                        UltralightCardReader.readCard(tagId, tech)
+                        UltralightCardReader.readCard(tagId, tech, onProgress)
                     } finally {
                         if (tech.isConnected) {
                             try {
@@ -295,7 +307,7 @@ class IosNfcScanner : CardScanner {
                     val transceiver = IosCardTransceiver(tag)
                     transceiver.connect()
                     try {
-                        CEPASCardReader.readCard(tagId, transceiver)
+                        CEPASCardReader.readCard(tagId, transceiver, onProgress)
                     } finally {
                         if (transceiver.isConnected) {
                             try {

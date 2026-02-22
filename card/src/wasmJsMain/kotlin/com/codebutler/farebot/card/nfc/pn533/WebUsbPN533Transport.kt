@@ -281,7 +281,7 @@ private fun jsWebUsbStartTransferOut(dataStr: JsString) {
         (function() {
             window._fbUsbOut = { ready: false, error: null };
             if (!window._fbUsb || !window._fbUsb.device) {
-                window._fbUsbOut.error = "USB device disconnected";
+                window._fbUsbOut.error = 'Device not connected';
                 window._fbUsbOut.ready = true;
                 return;
             }
@@ -309,7 +309,7 @@ private fun jsWebUsbStartTransferIn(timeoutMs: Int) {
         (function() {
             window._fbUsbIn = { data: null, ready: false, error: null };
             if (!window._fbUsb || !window._fbUsb.device) {
-                window._fbUsbIn.error = "USB device disconnected";
+                window._fbUsbIn.error = 'Device not connected';
                 window._fbUsbIn.ready = true;
                 return;
             }

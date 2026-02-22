@@ -83,16 +83,22 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
+            cardScanner.readingProgress.collect { progress ->
+                _uiState.value = _uiState.value.copy(readingProgress = progress)
+            }
+        }
+
+        viewModelScope.launch {
             cardScanner.scannedCards.collect { rawCard ->
-                _uiState.value = _uiState.value.copy(isReadingCard = false)
+                _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
                 processScannedCard(rawCard)
             }
         }
 
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
-                _uiState.value = _uiState.value.copy(isReadingCard = false)
-                println("[HomeViewModel] Scan error: ${error::class.simpleName}: ${error.message}")
+                _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
+                println("[FareBot] Scan error: ${error::class.simpleName}: ${error.message}")
                 error.printStackTrace()
                 val scanError = categorizeError(error)
                 analytics.logEvent(
@@ -109,6 +115,10 @@ class HomeViewModel(
 
     fun startActiveScan() {
         cardScanner?.startActiveScan()
+    }
+
+    fun stopActiveScan() {
+        cardScanner?.stopActiveScan()
     }
 
     fun dismissError() {
@@ -157,7 +167,7 @@ class HomeViewModel(
             val key = navDataHolder.put(rawCard)
             _navigateToCard.emit(key)
         } catch (e: Exception) {
-            println("[HomeViewModel] Card processing error: ${e::class.simpleName}: ${e.message}")
+            println("[FareBot] Process card error: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace()
             _errorMessage.value =
                 ScanError(

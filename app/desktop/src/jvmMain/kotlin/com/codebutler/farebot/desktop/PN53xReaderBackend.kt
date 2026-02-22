@@ -67,6 +67,7 @@ abstract class PN53xReaderBackend(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ) {
         val transport =
             preOpenedTransport
@@ -77,7 +78,7 @@ abstract class PN53xReaderBackend(
         val pn533 = PN533(transport)
         try {
             initDevice(pn533)
-            pollLoop(pn533, onCardDetected, onCardRead, onError)
+            pollLoop(pn533, onCardDetected, onCardRead, onError, onProgress)
         } finally {
             pn533.close()
         }
@@ -88,6 +89,7 @@ abstract class PN53xReaderBackend(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ) {
         while (true) {
             println("[$name] Polling for cards...")
@@ -123,7 +125,7 @@ abstract class PN53xReaderBackend(
             onCardDetected(ScannedTag(id = tagId, techList = listOf(cardTypeName)))
 
             try {
-                val rawCard = readTarget(pn533, target)
+                val rawCard = readTarget(pn533, target, onProgress)
                 onCardRead(rawCard)
                 println("[$name] Card read successfully")
             } catch (e: PN533TransportException) {
@@ -150,15 +152,17 @@ abstract class PN53xReaderBackend(
     private suspend fun readTarget(
         pn533: PN533,
         target: PN533.TargetInfo,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawCard<*> =
         when (target) {
-            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target)
-            is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target)
+            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target, onProgress)
+            is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target, onProgress)
         }
 
     private suspend fun readTypeACard(
         pn533: PN533,
         target: PN533.TargetInfo.TypeA,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
@@ -167,7 +171,7 @@ abstract class PN53xReaderBackend(
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
                 val transceiver = createTransceiver(pn533, target.tg)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
+                ISO7816Dispatcher.readCard(tagId, transceiver, onProgress)
             }
 
             CardType.MifareClassic -> {
@@ -177,9 +181,7 @@ abstract class PN53xReaderBackend(
                 val globalKeys = keyManagerPlugin?.getGlobalKeys()
                 val recovery = keyManagerPlugin?.classicKeyRecovery
                 val rawCard =
-                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, recovery) { progress ->
-                        println("[$name] $progress")
-                    }
+                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, recovery, onProgress)
                 if (rawCard.hasUnauthorizedSectors()) {
                     throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }
@@ -188,17 +190,17 @@ abstract class PN53xReaderBackend(
 
             CardType.MifareUltralight -> {
                 val tech = PN533UltralightTechnology(pn533, target.tg, info)
-                UltralightCardReader.readCard(tagId, tech)
+                UltralightCardReader.readCard(tagId, tech, onProgress)
             }
 
             CardType.CEPAS -> {
                 val transceiver = createTransceiver(pn533, target.tg)
-                CEPASCardReader.readCard(tagId, transceiver)
+                CEPASCardReader.readCard(tagId, transceiver, onProgress)
             }
 
             else -> {
                 val transceiver = createTransceiver(pn533, target.tg)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
+                ISO7816Dispatcher.readCard(tagId, transceiver, onProgress)
             }
         }
     }
@@ -206,11 +208,12 @@ abstract class PN53xReaderBackend(
     private suspend fun readFeliCaCard(
         pn533: PN533,
         target: PN533.TargetInfo.FeliCa,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawCard<*> {
         val tagId = target.idm
         println("[$name] FeliCa card: IDm=${tagId.hex()}")
         val adapter = PN533FeliCaTagAdapter(pn533, target.idm)
-        return FeliCaReader.readTag(tagId, adapter)
+        return FeliCaReader.readTag(tagId, adapter, onProgress = onProgress)
     }
 
     private suspend fun waitForRemoval(pn533: PN533) {

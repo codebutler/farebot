@@ -12,12 +12,17 @@ concurrency:
 jobs:
   release:
     name: Build & Upload to TestFlight
-    runs-on: nscloud-macos-sequoia-arm64-6x14
+    runs-on: nscloud-macos-tahoe-arm64-6x14
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Select Xcode 26.2
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.2.app
+          xcodebuild -version
 
       - uses: actions/setup-java@v4
         with:
@@ -98,41 +103,69 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             DEVELOPMENT_TEAM=ZJ9GEQ36AH \
-            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
-            | xcpretty
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID"
 
       - name: Export IPA
         run: |
+          EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
+          cat > "$EXPORT_PLIST" <<-PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>ZJ9GEQ36AH</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>signingCertificate</key>
+            <string>Apple Distribution</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.codebutler.farebot</key>
+              <string>$PROVISIONING_PROFILE_UUID</string>
+            </dict>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>destination</key>
+            <string>export</string>
+          </dict>
+          </plist>
+          PLIST
+
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist app/ios/ExportOptions.plist \
-            | xcpretty
+            -exportOptionsPlist "$EXPORT_PLIST"
 
       - name: Install fastlane
         run: brew install fastlane
 
-      - name: Upload to TestFlight & distribute to internal testers
+      - name: Upload & distribute to TestFlight
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
-          # Build the API key JSON that fastlane expects
           API_KEY_JSON="$RUNNER_TEMP/api_key.json"
           P8_CONTENTS=$(cat ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8)
-          cat > "$API_KEY_JSON" <<EOF
-          {
-            "key_id": "$APP_STORE_CONNECT_API_KEY_ID",
-            "issuer_id": "$APP_STORE_CONNECT_ISSUER_ID",
-            "key": $(echo "$P8_CONTENTS" | jq -Rs .),
-            "in_house": false
-          }
-          EOF
+          jq -n \
+            --arg key_id "$APP_STORE_CONNECT_API_KEY_ID" \
+            --arg issuer_id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --arg key "$P8_CONTENTS" \
+            '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' \
+            > "$API_KEY_JSON"
+
+          IPA_PATH=$(find "$RUNNER_TEMP/export" -name '*.ipa' -print -quit)
+          echo "IPA: $IPA_PATH"
+          [ -f "$IPA_PATH" ] || { echo "No IPA found"; ls -la "$RUNNER_TEMP/export"; exit 1; }
 
           fastlane pilot upload \
-            --ipa "$RUNNER_TEMP/export/FareBot.ipa" \
+            --ipa "$IPA_PATH" \
             --api_key_path "$API_KEY_JSON" \
-            --distribute_external false \
+            --app_platform ios \
+            --distribute_external true \
+            --notify_external_testers true \
             --skip_waiting_for_build_processing false \
             --changelog "Build $MARKETING_VERSION ($CURRENT_PROJECT_VERSION)"
 

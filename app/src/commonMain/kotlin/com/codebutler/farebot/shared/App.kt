@@ -150,6 +150,7 @@ fun FareBotApp(
                                 graph.keyManagerPlugin?.navigateToAddKey(navController, tagId, cardType)
                             },
                             onScanCard = { homeViewModel.startActiveScan() },
+                            onCancelScan = { homeViewModel.stopActiveScan() },
                             historyUiState = historyUiState,
                             onNavigateToCard = { itemId ->
                                 val cardKey = historyViewModel.getCardNavKey(itemId)

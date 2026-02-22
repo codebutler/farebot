@@ -44,5 +44,6 @@ class ClassicTagReader(
         tag: Tag,
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,
-    ): RawClassicCard = ClassicCardReader.readCard(tagId, tech, cardKeys)
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+    ): RawClassicCard = ClassicCardReader.readCard(tagId, tech, cardKeys, onProgress = onProgress)
 }

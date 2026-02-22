@@ -42,5 +42,6 @@ class UltralightTagReader(
         tag: Tag,
         tech: UltralightTechnology,
         cardKeys: CardKeys?,
-    ): RawUltralightCard = UltralightCardReader.readCard(tagId, tech)
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+    ): RawUltralightCard = UltralightCardReader.readCard(tagId, tech, onProgress)
 }

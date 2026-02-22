@@ -26,6 +26,7 @@ import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.CoroutineScope
@@ -65,6 +66,9 @@ class DesktopCardScanner(
     private val _isScanning = MutableStateFlow(false)
     override val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
 
+    private val _readingProgress = MutableStateFlow<ReadingProgress?>(null)
+    override val readingProgress: StateFlow<ReadingProgress?> = _readingProgress.asStateFlow()
+
     private var scanJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -97,10 +101,15 @@ class DesktopCardScanner(
                                             _scannedTags.tryEmit(tag)
                                         },
                                         onCardRead = { rawCard ->
+                                            _readingProgress.value = null
                                             _scannedCards.tryEmit(rawCard)
                                         },
                                         onError = { error ->
+                                            _readingProgress.value = null
                                             _scanErrors.tryEmit(error)
+                                        },
+                                        onProgress = { current, total ->
+                                            _readingProgress.value = ReadingProgress(current, total)
                                         },
                                     )
                                 } catch (e: Exception) {

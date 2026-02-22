@@ -59,6 +59,7 @@ class PcscReaderBackend(
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ) {
         val factory = TerminalFactory.getDefault()
         val terminals =
@@ -100,7 +101,7 @@ class PcscReaderBackend(
                     println("[PC/SC] Tag ID: ${tagId.hex()}")
 
                     onCardDetected(ScannedTag(id = tagId, techList = listOf(info.cardType.name)))
-                    val rawCard = readCard(info, channel, tagId)
+                    val rawCard = readCard(info, channel, tagId, onProgress)
                     onCardRead(rawCard)
                     println("[PC/SC] Card read successfully")
                 } finally {
@@ -123,11 +124,12 @@ class PcscReaderBackend(
         info: PCSCCardInfo,
         channel: javax.smartcardio.CardChannel,
         tagId: ByteArray,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawCard<*> =
         when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
                 val transceiver = PCSCCardTransceiver(channel)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
+                ISO7816Dispatcher.readCard(tagId, transceiver, onProgress)
             }
 
             CardType.MifareClassic -> {
@@ -136,7 +138,7 @@ class PcscReaderBackend(
                 val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
                 val globalKeys = keyManagerPlugin?.getGlobalKeys()
                 // PC/SC doesn't support raw communication needed for nested attack key recovery
-                val rawCard = ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys)
+                val rawCard = ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, onProgress = onProgress)
                 if (rawCard.hasUnauthorizedSectors()) {
                     throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }
@@ -145,17 +147,17 @@ class PcscReaderBackend(
 
             CardType.MifareUltralight -> {
                 val tech = PCSCUltralightTechnology(channel, info)
-                UltralightCardReader.readCard(tagId, tech)
+                UltralightCardReader.readCard(tagId, tech, onProgress)
             }
 
             CardType.FeliCa -> {
                 val adapter = PCSCFeliCaTagAdapter(channel)
-                FeliCaReader.readTag(tagId, adapter)
+                FeliCaReader.readTag(tagId, adapter, onProgress = onProgress)
             }
 
             CardType.CEPAS -> {
                 val transceiver = PCSCCardTransceiver(channel)
-                CEPASCardReader.readCard(tagId, transceiver)
+                CEPASCardReader.readCard(tagId, transceiver, onProgress)
             }
 
             CardType.Vicinity -> {
@@ -165,7 +167,7 @@ class PcscReaderBackend(
 
             else -> {
                 val transceiver = PCSCCardTransceiver(channel)
-                ISO7816Dispatcher.readCard(tagId, transceiver)
+                ISO7816Dispatcher.readCard(tagId, transceiver, onProgress)
             }
         }
 

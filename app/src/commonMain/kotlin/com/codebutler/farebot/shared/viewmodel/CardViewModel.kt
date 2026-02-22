@@ -154,7 +154,7 @@ class CardViewModel(
                         )
                 }
             } catch (ex: Exception) {
-                println("[CardViewModel] Card loading error: ${ex::class.simpleName}: ${ex.message}")
+                println("[FareBot] Card load error: ${ex::class.simpleName}: ${ex.message}")
                 ex.printStackTrace()
                 _uiState.value =
                     CardUiState(

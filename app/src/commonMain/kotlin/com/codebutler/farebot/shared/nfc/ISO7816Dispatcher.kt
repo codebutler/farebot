@@ -39,23 +39,25 @@ object ISO7816Dispatcher {
     suspend fun readCard(
         tagId: ByteArray,
         transceiver: CardTransceiver,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawCard<*> {
-        val iso7816Card = tryISO7816(tagId, transceiver)
+        val iso7816Card = tryISO7816(tagId, transceiver, onProgress)
         if (iso7816Card != null) {
             return iso7816Card
         }
-        return DesfireCardReader.readCard(tagId, transceiver)
+        return DesfireCardReader.readCard(tagId, transceiver, onProgress)
     }
 
     private suspend fun tryISO7816(
         tagId: ByteArray,
         transceiver: CardTransceiver,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawCard<*>? {
         val appConfigs = buildAppConfigs()
         if (appConfigs.isEmpty()) return null
 
         return try {
-            ISO7816CardReader.readCard(tagId, transceiver, appConfigs)
+            ISO7816CardReader.readCard(tagId, transceiver, appConfigs, onProgress)
         } catch (e: Exception) {
             println("[ISO7816Dispatcher] ISO7816 read attempt failed: $e")
             null

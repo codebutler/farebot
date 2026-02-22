@@ -24,8 +24,14 @@ package com.codebutler.farebot.shared.nfc
 
 import com.codebutler.farebot.card.RawCard
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+
+data class ReadingProgress(
+    val current: Int,
+    val total: Int,
+)
 
 data class ScannedTag(
     val id: ByteArray,
@@ -65,6 +71,10 @@ interface CardScanner {
 
     /** Whether scanning is currently in progress. */
     val isScanning: StateFlow<Boolean>
+
+    /** Reading progress — non-null when a card read is in progress with known total. */
+    val readingProgress: StateFlow<ReadingProgress?>
+        get() = MutableStateFlow(null)
 
     /**
      * Start an active scan session (e.g., iOS NFC dialog).
