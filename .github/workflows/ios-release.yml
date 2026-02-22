@@ -1,0 +1,145 @@
+name: iOS Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ios-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Build & Upload to TestFlight
+    runs-on: nscloud-macos-sequoia-arm64-6x14
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Import signing certificate
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
+
+          echo -n "$APPLE_CERTIFICATE_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security import "$CERTIFICATE_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_PATH"
+
+          security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
+
+      - name: Import provisioning profile
+        env:
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          echo -n "$APPLE_PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$PROFILE_PATH"
+
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< \
+            "$(security cms -D -i "$PROFILE_PATH")")
+          cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"$PROFILE_UUID".mobileprovision
+
+          echo "PROVISIONING_PROFILE_UUID=$PROFILE_UUID" >> "$GITHUB_ENV"
+
+      - name: Set up App Store Connect API key
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          mkdir -p ~/.private_keys
+          echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode \
+            -o ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8
+
+      - name: Extract version from tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          echo "MARKETING_VERSION=$TAG" >> "$GITHUB_ENV"
+          echo "CURRENT_PROJECT_VERSION=$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+          echo "Building version $TAG ($GITHUB_RUN_NUMBER)"
+
+      - name: Build archive
+        run: |
+          xcodebuild archive \
+            -project app/ios/FareBot.xcodeproj \
+            -scheme FareBot \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
+            MARKETING_VERSION="$MARKETING_VERSION" \
+            CURRENT_PROJECT_VERSION="$CURRENT_PROJECT_VERSION" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            DEVELOPMENT_TEAM=ZJ9GEQ36AH \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
+            | xcpretty
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist app/ios/ExportOptions.plist \
+            | xcpretty
+
+      - name: Install fastlane
+        run: brew install fastlane
+
+      - name: Upload to TestFlight & distribute to internal testers
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          # Build the API key JSON that fastlane expects
+          API_KEY_JSON="$RUNNER_TEMP/api_key.json"
+          P8_CONTENTS=$(cat ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8)
+          cat > "$API_KEY_JSON" <<EOF
+          {
+            "key_id": "$APP_STORE_CONNECT_API_KEY_ID",
+            "issuer_id": "$APP_STORE_CONNECT_ISSUER_ID",
+            "key": $(echo "$P8_CONTENTS" | jq -Rs .),
+            "in_house": false
+          }
+          EOF
+
+          fastlane pilot upload \
+            --ipa "$RUNNER_TEMP/export/FareBot.ipa" \
+            --api_key_path "$API_KEY_JSON" \
+            --distribute_external false \
+            --skip_waiting_for_build_processing false \
+            --changelog "Build $MARKETING_VERSION ($CURRENT_PROJECT_VERSION)"
+
+      - name: Cleanup keychain
+        if: always()
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+          if [ -f "$KEYCHAIN_PATH" ]; then
+            security delete-keychain "$KEYCHAIN_PATH"
+          fi
