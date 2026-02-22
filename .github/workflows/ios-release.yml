@@ -12,7 +12,7 @@ concurrency:
 jobs:
   release:
     name: Build & Upload to TestFlight
-    runs-on: nscloud-macos-sequoia-arm64-6x14
+    runs-on: nscloud-macos-sequoia-stable-arm64-6x14
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -167,6 +167,7 @@ jobs:
 
           fastlane pilot distribute \
             --api_key_path "$API_KEY_JSON" \
+            --app_platform ios \
             --app_identifier com.codebutler.farebot \
             --distribute_external true \
             --notify_external_testers true \
