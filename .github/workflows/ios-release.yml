@@ -148,6 +148,32 @@ jobs:
             -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
             -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
 
+      - name: Install fastlane
+        run: brew install fastlane
+
+      - name: Distribute to TestFlight testers
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          API_KEY_JSON="$RUNNER_TEMP/api_key.json"
+          P8_CONTENTS=$(cat ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8)
+          jq -n \
+            --arg key_id "$APP_STORE_CONNECT_API_KEY_ID" \
+            --arg issuer_id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --arg key "$P8_CONTENTS" \
+            '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' \
+            > "$API_KEY_JSON"
+
+          fastlane pilot distribute \
+            --api_key_path "$API_KEY_JSON" \
+            --app_identifier com.codebutler.farebot \
+            --distribute_external true \
+            --notify_external_testers true \
+            --build_number "$CURRENT_PROJECT_VERSION" \
+            --skip_waiting_for_build_processing false \
+            --changelog "Build $MARKETING_VERSION ($CURRENT_PROJECT_VERSION)"
+
       - name: Cleanup keychain
         if: always()
         run: |
