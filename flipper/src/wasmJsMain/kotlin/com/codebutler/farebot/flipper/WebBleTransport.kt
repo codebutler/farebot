@@ -114,11 +114,16 @@ private fun jsWebBleRequestDevice() {
     js(
         """
         (function() {
-            console.log('[FareBot BLE] requestDevice: starting with namePrefix filter "Flipper"');
+            console.log('[FareBot BLE] requestDevice: starting with service UUID filters');
             console.log('[FareBot BLE] navigator.bluetooth available:', !!navigator.bluetooth);
             window._fbBle = { device: null, server: null, rxChar: null, txChar: null, ready: false, connected: false, connectError: null, buffer: [], writeReady: false, writeError: null };
             navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'Flipper' }],
+                filters: [
+                    { services: [0x3080] },
+                    { services: [0x3081] },
+                    { services: [0x3082] },
+                    { services: [0x3083] }
+                ],
                 optionalServices: ['8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000']
             }).then(function(device) {
                 console.log('[FareBot BLE] requestDevice: got device:', device.name, 'id:', device.id);

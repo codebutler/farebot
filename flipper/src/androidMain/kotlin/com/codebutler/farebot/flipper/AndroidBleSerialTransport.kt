@@ -11,9 +11,11 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.os.ParcelUuid
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
@@ -178,16 +180,21 @@ class AndroidBleSerialTransport(
                             callbackType: Int,
                             result: ScanResult,
                         ) {
-                            val name = result.device.name ?: return
-                            if (name.startsWith(FLIPPER_DEVICE_PREFIX, ignoreCase = true)) {
-                                scanner.stopScan(this)
-                                cont.resume(result.device)
-                            }
+                            scanner.stopScan(this)
+                            cont.resume(result.device)
                         }
 
                         override fun onScanFailed(errorCode: Int) {
                             cont.resumeWithException(FlipperException("BLE scan failed (error $errorCode)"))
                         }
+                    }
+
+                val filters =
+                    FLIPPER_ADV_SERVICE_UUIDS.map { uuid ->
+                        ScanFilter
+                            .Builder()
+                            .setServiceUuid(ParcelUuid.fromString(uuid))
+                            .build()
                     }
 
                 val settings =
@@ -196,7 +203,7 @@ class AndroidBleSerialTransport(
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                         .build()
 
-                scanner.startScan(null, settings, callback)
+                scanner.startScan(filters, settings, callback)
 
                 cont.invokeOnCancellation {
                     scanner.stopScan(callback)

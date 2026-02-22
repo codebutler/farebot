@@ -44,10 +44,23 @@ abstract class FlipperBleTransportBase : FlipperTransport {
 
         const val CCCD_UUID_STRING = "00002902-0000-1000-8000-00805f9b34fb"
 
+        // Advertised service UUIDs (16-bit) used for BLE scanning/filtering.
+        // Each corresponds to a Flipper Zero hardware variant.
+        const val FLIPPER_ADV_SERVICE_F6 = "00003080-0000-1000-8000-00805f9b34fb"
+        const val FLIPPER_ADV_SERVICE_BLACK = "00003081-0000-1000-8000-00805f9b34fb"
+        const val FLIPPER_ADV_SERVICE_WHITE = "00003082-0000-1000-8000-00805f9b34fb"
+        const val FLIPPER_ADV_SERVICE_CLEAR = "00003083-0000-1000-8000-00805f9b34fb"
+
+        val FLIPPER_ADV_SERVICE_UUIDS =
+            listOf(
+                FLIPPER_ADV_SERVICE_F6,
+                FLIPPER_ADV_SERVICE_BLACK,
+                FLIPPER_ADV_SERVICE_WHITE,
+                FLIPPER_ADV_SERVICE_CLEAR,
+            )
+
         const val SCAN_TIMEOUT_MS = 15_000L
         const val CONNECT_TIMEOUT_MS = 10_000L
-
-        const val FLIPPER_DEVICE_PREFIX = "Flipper"
 
         /**
          * Parse a 4-byte big-endian flow control value from a BLE characteristic.

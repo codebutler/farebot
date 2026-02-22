@@ -6,7 +6,6 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeout
-import platform.CoreBluetooth.CBAdvertisementDataLocalNameKey
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
 import platform.CoreBluetooth.CBCentralManagerStatePoweredOff
@@ -40,6 +39,7 @@ class IosBleSerialTransport(
         val SERIAL_READ_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_READ_UUID_STRING)
         val SERIAL_WRITE_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_WRITE_UUID_STRING)
         val SERIAL_FLOW_CONTROL_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_FLOW_CONTROL_UUID_STRING)
+        val FLIPPER_ADV_CBUUIDS: List<CBUUID> = FLIPPER_ADV_SERVICE_UUIDS.map { CBUUID.UUIDWithString(it) }
     }
 
     private var centralManager: CBCentralManager? = null
@@ -129,7 +129,7 @@ class IosBleSerialTransport(
         try {
             return withTimeout(SCAN_TIMEOUT_MS) {
                 manager.scanForPeripheralsWithServices(
-                    serviceUUIDs = null,
+                    serviceUUIDs = FLIPPER_ADV_CBUUIDS,
                     options = null,
                 )
                 try {
@@ -150,7 +150,7 @@ class IosBleSerialTransport(
                     CBCentralManagerStatePoweredOn -> {
                         if (scanDeferred != null && scanDeferred?.isCompleted == false) {
                             central.scanForPeripheralsWithServices(
-                                serviceUUIDs = null,
+                                serviceUUIDs = FLIPPER_ADV_CBUUIDS,
                                 options = null,
                             )
                         }
@@ -181,14 +181,8 @@ class IosBleSerialTransport(
                 advertisementData: Map<Any?, *>,
                 RSSI: NSNumber,
             ) {
-                val advName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
-                val periphName = didDiscoverPeripheral.name
-                val name = advName ?: periphName
-
-                if (name != null && name.startsWith(FLIPPER_DEVICE_PREFIX, ignoreCase = true)) {
-                    central.stopScan()
-                    scanDeferred?.complete(didDiscoverPeripheral)
-                }
+                central.stopScan()
+                scanDeferred?.complete(didDiscoverPeripheral)
             }
 
             override fun centralManager(
