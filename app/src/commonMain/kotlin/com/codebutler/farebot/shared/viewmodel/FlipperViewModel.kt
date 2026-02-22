@@ -13,6 +13,7 @@ import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
+import com.codebutler.farebot.shared.ui.screen.FlipperConnectionMode
 import com.codebutler.farebot.shared.ui.screen.FlipperConnectionState
 import com.codebutler.farebot.shared.ui.screen.FlipperFileItem
 import com.codebutler.farebot.shared.ui.screen.FlipperUiState
@@ -42,6 +43,7 @@ class FlipperViewModel(
     }
 
     fun connectUsb() {
+        _uiState.value = _uiState.value.copy(connectionMode = FlipperConnectionMode.Usb)
         viewModelScope.launch {
             val transport = transportFactory.createUsbTransport()
             if (transport != null) {
@@ -56,6 +58,7 @@ class FlipperViewModel(
     }
 
     fun connectBle() {
+        _uiState.value = _uiState.value.copy(connectionMode = FlipperConnectionMode.Ble)
         viewModelScope.launch {
             val transport = transportFactory.createBleTransport()
             if (transport != null) {
@@ -66,6 +69,14 @@ class FlipperViewModel(
                         error = "Bluetooth transport not available on this platform",
                     )
             }
+        }
+    }
+
+    fun retry() {
+        when (_uiState.value.connectionMode) {
+            FlipperConnectionMode.Usb -> connectUsb()
+            FlipperConnectionMode.Ble -> connectBle()
+            null -> {}
         }
     }
 

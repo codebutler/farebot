@@ -11,7 +11,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import com.codebutler.farebot.shared.platform.PlatformActions
+import java.io.File
 
 class AndroidPlatformActions(
     private val context: Context,
@@ -84,11 +86,21 @@ class AndroidPlatformActions(
         clipboard.setPrimaryClip(ClipData.newPlainText("FareBot", text))
     }
 
-    override fun shareText(text: String) {
+    override fun shareFile(
+        content: String,
+        fileName: String,
+        mimeType: String,
+    ) {
+        val sharedDir = File(context.cacheDir, "shared")
+        sharedDir.mkdirs()
+        val file = File(sharedDir, fileName)
+        file.writeText(content)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         val intent =
             Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, text)
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         context.startActivity(
@@ -137,23 +149,5 @@ class AndroidPlatformActions(
                 type = "*/*"
             }
         launcher.launch(intent)
-    }
-
-    override fun saveFileForExport(
-        content: String,
-        defaultFileName: String,
-    ) {
-        val intent =
-            Intent(Intent.ACTION_SEND).apply {
-                type = "application/json"
-                putExtra(Intent.EXTRA_TEXT, content)
-                putExtra(Intent.EXTRA_SUBJECT, defaultFileName)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        context.startActivity(
-            Intent.createChooser(intent, "Save").apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            },
-        )
     }
 }

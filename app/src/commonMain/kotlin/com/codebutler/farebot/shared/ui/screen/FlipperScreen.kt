@@ -18,9 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
-import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,15 +47,13 @@ import androidx.compose.ui.unit.dp
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.back
 import farebot.app.generated.resources.flipper_bytes
-import farebot.app.generated.resources.flipper_connect_ble
-import farebot.app.generated.resources.flipper_connect_prompt
-import farebot.app.generated.resources.flipper_connect_usb
 import farebot.app.generated.resources.flipper_connecting_message
 import farebot.app.generated.resources.flipper_import_keys
 import farebot.app.generated.resources.flipper_import_progress
 import farebot.app.generated.resources.flipper_import_selected
 import farebot.app.generated.resources.flipper_importing
 import farebot.app.generated.resources.flipper_no_files
+import farebot.app.generated.resources.flipper_retry
 import farebot.app.generated.resources.flipper_up
 import farebot.app.generated.resources.flipper_zero
 import org.jetbrains.compose.resources.stringResource
@@ -66,8 +62,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun FlipperScreen(
     uiState: FlipperUiState,
-    onConnectUsb: () -> Unit,
-    onConnectBle: () -> Unit,
+    onRetry: () -> Unit,
     onNavigateToDirectory: (String) -> Unit,
     onNavigateUp: () -> Unit,
     onToggleSelection: (String) -> Unit,
@@ -116,8 +111,7 @@ fun FlipperScreen(
                 FlipperConnectionState.Disconnected -> {
                     DisconnectedContent(
                         error = uiState.error,
-                        onConnectUsb = onConnectUsb,
-                        onConnectBle = onConnectBle,
+                        onRetry = onRetry,
                     )
                 }
 
@@ -155,49 +149,24 @@ fun FlipperScreen(
 @Composable
 private fun DisconnectedContent(
     error: String?,
-    onConnectUsb: () -> Unit,
-    onConnectBle: () -> Unit,
+    onRetry: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Text(
-            text = stringResource(Res.string.flipper_connect_prompt),
-            style = MaterialTheme.typography.bodyLarge,
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = onConnectUsb,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(Icons.Default.Usb, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(Res.string.flipper_connect_usb))
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(
-            onClick = onConnectBle,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(Icons.Default.Bluetooth, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(Res.string.flipper_connect_ble))
-        }
-
         if (error != null) {
-            Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = error,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        Button(onClick = onRetry) {
+            Text(stringResource(Res.string.flipper_retry))
         }
     }
 }

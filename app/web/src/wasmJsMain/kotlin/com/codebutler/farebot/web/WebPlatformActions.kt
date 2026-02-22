@@ -123,9 +123,12 @@ class WebPlatformActions : PlatformActions {
         jsCopyToClipboard(text.toJsString())
     }
 
-    override fun shareText(text: String) {
-        copyToClipboard(text)
-        showToast("Copied to clipboard")
+    override fun shareFile(
+        content: String,
+        fileName: String,
+        mimeType: String,
+    ) {
+        jsSaveFile(content.toJsString(), fileName.toJsString())
     }
 
     override fun showToast(message: String) {
@@ -138,13 +141,6 @@ class WebPlatformActions : PlatformActions {
             val result = awaitFileResult()
             onResult(result)
         }
-    }
-
-    override fun saveFileForExport(
-        content: String,
-        defaultFileName: String,
-    ) {
-        jsSaveFile(content.toJsString(), defaultFileName.toJsString())
     }
 
     @OptIn(ExperimentalEncodingApi::class)

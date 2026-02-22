@@ -301,8 +301,7 @@ fun FareBotApp(
 
                 FlipperScreen(
                     uiState = flipperUiState,
-                    onConnectUsb = { flipperViewModel.connectUsb() },
-                    onConnectBle = { flipperViewModel.connectBle() },
+                    onRetry = { flipperViewModel.retry() },
                     onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
                     onNavigateUp = { flipperViewModel.navigateUp() },
                     onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
@@ -442,16 +441,10 @@ fun FareBotApp(
                     onNavigateToTripMap = { tripKey ->
                         navController.navigate(Screen.TripMap.createRoute(tripKey))
                     },
-                    onExportShare = {
+                    onShare = {
                         val json = viewModel.exportCard()
                         if (json != null) {
-                            platformActions.shareText(json)
-                        }
-                    },
-                    onExportSave = {
-                        val json = viewModel.exportCard()
-                        if (json != null) {
-                            platformActions.saveFileForExport(json, "farebot-card.json")
+                            platformActions.shareFile(json, "farebot-card.json", "application/json")
                         }
                     },
                     onDelete = {

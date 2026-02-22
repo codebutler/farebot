@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.ui.screen
 
 data class FlipperUiState(
     val connectionState: FlipperConnectionState = FlipperConnectionState.Disconnected,
+    val connectionMode: FlipperConnectionMode? = null,
     val deviceInfo: Map<String, String> = emptyMap(),
     val currentPath: String = "/ext/nfc",
     val files: List<FlipperFileItem> = emptyList(),
@@ -16,6 +17,11 @@ enum class FlipperConnectionState {
     Disconnected,
     Connecting,
     Connected,
+}
+
+enum class FlipperConnectionMode {
+    Usb,
+    Ble,
 }
 
 data class FlipperFileItem(
