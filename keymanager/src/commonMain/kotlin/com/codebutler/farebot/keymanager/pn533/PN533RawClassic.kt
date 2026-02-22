@@ -128,7 +128,7 @@ class PN533RawClassic(
         blockIndex: Int,
     ): UInt? {
         disableCrc()
-        disableParity()
+        enableParity() // Plaintext auth requires standard ISO 14443-3A parity
         clearCrypto1()
 
         val cmd = buildAuthCommand(keyType, blockIndex)
@@ -162,7 +162,7 @@ class PN533RawClassic(
         blockIndex: Int,
         key: Long,
     ): Crypto1State? {
-        // Step 1: Request auth and get card nonce
+        // Step 1: Request auth and get card nonce (plaintext, parity enabled)
         val nT = requestAuth(keyType, blockIndex) ?: return null
 
         // Step 2: Initialize cipher with key, UID XOR nT
@@ -174,7 +174,8 @@ class PN533RawClassic(
         val nR = 0x01020304u
         val (nREnc, aREnc) = Crypto1Auth.computeReaderResponse(state, nR, nT)
 
-        // Step 4: Send {nR}{aR} via InCommunicateThru
+        // Step 4: Send encrypted {nR}{aR} — disable parity (encrypted parity handled in software)
+        disableParity()
         val readerMsg = uintToBytes(nREnc) + uintToBytes(aREnc)
         val cardResponse =
             try {
