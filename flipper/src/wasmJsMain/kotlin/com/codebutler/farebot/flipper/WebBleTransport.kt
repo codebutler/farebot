@@ -116,7 +116,8 @@ private fun jsWebBleRequestDevice() {
         (function() {
             window._fbBle = { device: null, server: null, rxChar: null, txChar: null, ready: false, connected: false, connectError: null, buffer: [], writeReady: false, writeError: null };
             navigator.bluetooth.requestDevice({
-                filters: [{ services: ['8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000'] }]
+                filters: [{ namePrefix: 'Flipper' }],
+                optionalServices: ['8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000']
             }).then(function(device) {
                 window._fbBle.device = device;
                 window._fbBle.ready = true;
