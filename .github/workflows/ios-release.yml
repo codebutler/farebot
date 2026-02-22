@@ -110,10 +110,15 @@ jobs:
 
       - name: Export IPA
         run: |
+          EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
+          sed "s/PROVISIONING_PROFILE_UUID_PLACEHOLDER/$PROVISIONING_PROFILE_UUID/" \
+            app/ios/ExportOptions.plist > "$EXPORT_PLIST"
+
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/FareBot.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist app/ios/ExportOptions.plist
+            -exportOptionsPlist "$EXPORT_PLIST" \
+            -allowProvisioningUpdates
 
       - name: Install fastlane
         run: brew install fastlane
