@@ -36,4 +36,10 @@ interface FlipperTransport {
     suspend fun close()
 
     val isConnected: Boolean
+
+    /**
+     * Whether this transport requires sending "start_rpc_session" to switch from CLI to protobuf mode.
+     * USB serial transports need this; BLE transports do not.
+     */
+    val requiresRpcSessionInit: Boolean get() = false
 }

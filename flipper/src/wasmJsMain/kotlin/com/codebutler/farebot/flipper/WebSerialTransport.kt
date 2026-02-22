@@ -25,6 +25,8 @@ class WebSerialTransport : FlipperTransport {
     override val isConnected: Boolean
         get() = opened
 
+    override val requiresRpcSessionInit: Boolean get() = true
+
     /**
      * Request a serial port from the user and open it.
      * Must be called from a user gesture context (button click).

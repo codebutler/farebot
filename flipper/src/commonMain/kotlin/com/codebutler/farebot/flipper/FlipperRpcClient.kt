@@ -57,8 +57,26 @@ class FlipperRpcClient(
     /** Connect to the Flipper and verify with a ping. */
     suspend fun connect() {
         transport.connect()
+        if (transport.requiresRpcSessionInit) {
+            startRpcSession()
+        }
         ping()
     }
+
+    /**
+     * Send "start_rpc_session" CLI command to switch from CLI to protobuf RPC mode.
+     * Required for USB serial connections; BLE goes directly to protobuf mode.
+     */
+    private suspend fun startRpcSession() =
+        withTimeout(timeoutMs) {
+            transport.write("start_rpc_session\r".encodeToByteArray())
+            // Drain CLI response until newline (Flipper echoes command + sends response)
+            val buf = ByteArray(1)
+            while (true) {
+                val read = transport.read(buf, 0, 1)
+                if (read > 0 && buf[0] == '\n'.code.toByte()) break
+            }
+        }
 
     /** Send a ping and wait for the pong response. */
     suspend fun ping() {

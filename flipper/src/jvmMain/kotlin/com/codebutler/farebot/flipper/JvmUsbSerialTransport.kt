@@ -21,6 +21,8 @@ class JvmUsbSerialTransport(
     override val isConnected: Boolean
         get() = serialPort?.isOpen == true
 
+    override val requiresRpcSessionInit: Boolean get() = true
+
     override suspend fun connect() {
         val port =
             if (portDescriptor != null) {

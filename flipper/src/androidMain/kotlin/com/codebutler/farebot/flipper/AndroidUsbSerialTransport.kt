@@ -40,6 +40,8 @@ class AndroidUsbSerialTransport(
     override val isConnected: Boolean
         get() = connection != null
 
+    override val requiresRpcSessionInit: Boolean get() = true
+
     override suspend fun connect() {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
         val device =
