@@ -15,7 +15,6 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import java.util.UUID
@@ -30,25 +29,17 @@ import kotlin.coroutines.resumeWithException
 class AndroidBleSerialTransport(
     private val context: Context,
     private val device: BluetoothDevice? = null,
-) : FlipperTransport {
+) : FlipperBleTransportBase() {
     companion object {
-        val SERIAL_SERVICE_UUID: UUID = UUID.fromString("8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000")
-
-        // Phone reads FROM Flipper (subscribe to notifications)
-        val SERIAL_READ_UUID: UUID = UUID.fromString("19ed82ae-ed21-4c9d-4145-228e61fe0000")
-
-        // Phone writes TO Flipper
-        val SERIAL_WRITE_UUID: UUID = UUID.fromString("19ed82ae-ed21-4c9d-4145-228e62fe0000")
-        private val CCCD_UUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-        private const val SCAN_TIMEOUT_MS = 15_000L
-        private const val CONNECT_TIMEOUT_MS = 10_000L
+        val SERIAL_SERVICE_UUID: UUID = UUID.fromString(SERIAL_SERVICE_UUID_STRING)
+        val SERIAL_READ_UUID: UUID = UUID.fromString(SERIAL_READ_UUID_STRING)
+        val SERIAL_WRITE_UUID: UUID = UUID.fromString(SERIAL_WRITE_UUID_STRING)
+        private val CCCD_UUID: UUID = UUID.fromString(CCCD_UUID_STRING)
     }
 
     private var gatt: BluetoothGatt? = null
     private var writeCharacteristic: BluetoothGattCharacteristic? = null
     private var readCharacteristic: BluetoothGattCharacteristic? = null
-    private val receiveChannel = Channel<ByteArray>(Channel.UNLIMITED)
-    private var readBuffer = byteArrayOf()
 
     override val isConnected: Boolean
         get() = gatt != null
@@ -115,7 +106,7 @@ class AndroidBleSerialTransport(
                     if (characteristic.uuid == SERIAL_READ_UUID) {
                         val data = characteristic.value
                         if (data != null && data.isNotEmpty()) {
-                            receiveChannel.trySend(data)
+                            onDataReceived(data)
                         }
                     }
                 }
@@ -148,20 +139,6 @@ class AndroidBleSerialTransport(
         }
     }
 
-    override suspend fun read(
-        buffer: ByteArray,
-        offset: Int,
-        length: Int,
-    ): Int {
-        if (readBuffer.isEmpty()) {
-            readBuffer = receiveChannel.receive()
-        }
-        val bytesToCopy = minOf(readBuffer.size, length)
-        readBuffer.copyInto(buffer, offset, 0, bytesToCopy)
-        readBuffer = readBuffer.copyOfRange(bytesToCopy, readBuffer.size)
-        return bytesToCopy
-    }
-
     override suspend fun write(data: ByteArray) {
         val g = gatt ?: throw FlipperException("Not connected")
         val write = writeCharacteristic ?: throw FlipperException("Write characteristic not found")
@@ -171,14 +148,12 @@ class AndroidBleSerialTransport(
         }
     }
 
-    override suspend fun close() {
+    override suspend fun platformClose() {
         gatt?.disconnect()
         gatt?.close()
         gatt = null
         writeCharacteristic = null
         readCharacteristic = null
-        readBuffer = byteArrayOf()
-        receiveChannel.close()
     }
 
     private suspend fun scanForFlipper(): BluetoothDevice {
@@ -204,7 +179,7 @@ class AndroidBleSerialTransport(
                             result: ScanResult,
                         ) {
                             val name = result.device.name ?: return
-                            if (name.startsWith("Flipper", ignoreCase = true)) {
+                            if (name.startsWith(FLIPPER_DEVICE_PREFIX, ignoreCase = true)) {
                                 scanner.stopScan(this)
                                 cont.resume(result.device)
                             }

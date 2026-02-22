@@ -5,7 +5,6 @@ import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeout
 import platform.CoreBluetooth.CBAdvertisementDataLocalNameKey
 import platform.CoreBluetooth.CBCentralManager
@@ -35,20 +34,12 @@ import platform.posix.memcpy
 @OptIn(ExperimentalForeignApi::class)
 class IosBleSerialTransport(
     private val peripheral: CBPeripheral? = null,
-) : FlipperTransport {
+) : FlipperBleTransportBase() {
     companion object {
-        val SERIAL_SERVICE_UUID: CBUUID = CBUUID.UUIDWithString("8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000")
-
-        // Phone reads FROM Flipper (subscribe to notifications)
-        val SERIAL_READ_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e61fe0000")
-
-        // Phone writes TO Flipper
-        val SERIAL_WRITE_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e62fe0000")
-
-        // Flow control — Flipper reports available buffer space
-        val SERIAL_FLOW_CONTROL_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e63fe0000")
-        private const val SCAN_TIMEOUT_MS = 15_000L
-        private const val CONNECT_TIMEOUT_MS = 10_000L
+        val SERIAL_SERVICE_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_SERVICE_UUID_STRING)
+        val SERIAL_READ_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_READ_UUID_STRING)
+        val SERIAL_WRITE_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_WRITE_UUID_STRING)
+        val SERIAL_FLOW_CONTROL_UUID: CBUUID = CBUUID.UUIDWithString(SERIAL_FLOW_CONTROL_UUID_STRING)
     }
 
     private var centralManager: CBCentralManager? = null
@@ -56,8 +47,6 @@ class IosBleSerialTransport(
     private var writeCharacteristic: CBCharacteristic? = null
     private var readCharacteristic: CBCharacteristic? = null
     private var flowControlCharacteristic: CBCharacteristic? = null
-    private val receiveChannel = Channel<ByteArray>(Channel.UNLIMITED)
-    private var readBuffer = byteArrayOf()
 
     private var connectionDeferred: CompletableDeferred<Unit>? = null
     private var servicesDeferred: CompletableDeferred<Unit>? = null
@@ -141,21 +130,6 @@ class IosBleSerialTransport(
         log("connect() Done!")
     }
 
-    override suspend fun read(
-        buffer: ByteArray,
-        offset: Int,
-        length: Int,
-    ): Int {
-        // If the internal buffer is empty, wait for the next BLE notification
-        if (readBuffer.isEmpty()) {
-            readBuffer = receiveChannel.receive()
-        }
-        val bytesToCopy = minOf(readBuffer.size, length)
-        readBuffer.copyInto(buffer, offset, 0, bytesToCopy)
-        readBuffer = readBuffer.copyOfRange(bytesToCopy, readBuffer.size)
-        return bytesToCopy
-    }
-
     override suspend fun write(data: ByteArray) {
         val peripheral = connectedPeripheral ?: throw FlipperException("Not connected")
         val write = writeCharacteristic ?: throw FlipperException("Write characteristic not found")
@@ -167,7 +141,7 @@ class IosBleSerialTransport(
         peripheral.writeValue(nsData, forCharacteristic = write, type = CBCharacteristicWriteWithoutResponse)
     }
 
-    override suspend fun close() {
+    override suspend fun platformClose() {
         log("close() called")
         val peripheral = connectedPeripheral ?: return
         centralManager?.cancelPeripheralConnection(peripheral)
@@ -175,8 +149,6 @@ class IosBleSerialTransport(
         writeCharacteristic = null
         readCharacteristic = null
         flowControlCharacteristic = null
-        readBuffer = byteArrayOf()
-        receiveChannel.close()
     }
 
     private suspend fun scanForFlipper(): CBPeripheral {
@@ -308,7 +280,7 @@ class IosBleSerialTransport(
                     }
                 }
 
-                if (name != null && name.startsWith("Flipper", ignoreCase = true)) {
+                if (name != null && name.startsWith(FLIPPER_DEVICE_PREFIX, ignoreCase = true)) {
                     log("  FOUND FLIPPER! name=$name, stopping scan and completing deferred")
                     central.stopScan()
                     scanDeferred?.complete(didDiscoverPeripheral)
@@ -472,20 +444,20 @@ class IosBleSerialTransport(
                         val bytes = nsData.toByteArray()
                         log("  -> Serial read data: ${bytes.size} bytes")
                         if (bytes.isNotEmpty()) {
-                            receiveChannel.trySend(bytes)
+                            onDataReceived(bytes)
                         }
                     }
                     SERIAL_FLOW_CONTROL_UUID -> {
-                        if (nsData != null && nsData.length.toInt() >= 4) {
+                        if (nsData != null) {
                             val bytes = nsData.toByteArray()
-                            val freeSpace =
-                                ((bytes[0].toInt() and 0xFF) shl 24) or
-                                    ((bytes[1].toInt() and 0xFF) shl 16) or
-                                    ((bytes[2].toInt() and 0xFF) shl 8) or
-                                    (bytes[3].toInt() and 0xFF)
-                            log("  -> Flow control: freeSpace=$freeSpace bytes")
+                            val freeSpace = parseFlowControl(bytes)
+                            if (freeSpace != null) {
+                                log("  -> Flow control: freeSpace=$freeSpace bytes")
+                            } else {
+                                log("  -> Flow control: unexpected data length=${nsData.length}")
+                            }
                         } else {
-                            log("  -> Flow control: unexpected data length=${nsData?.length}")
+                            log("  -> Flow control: unexpected data length=null")
                         }
                     }
                 }
