@@ -66,17 +66,46 @@ class FlipperRpcClient(
     /**
      * Send "start_rpc_session" CLI command to switch from CLI to protobuf RPC mode.
      * Required for USB serial connections; BLE goes directly to protobuf mode.
+     *
+     * Protocol (from flipperzero-protobuf docs):
+     * 1. Send "\r" and read until ">: " prompt to clear any buffered CLI output
+     * 2. Send "start_rpc_session\r"
+     * 3. Read until "\n" to confirm protobuf mode is active
      */
     private suspend fun startRpcSession() =
         withTimeout(timeoutMs) {
+            // Send empty command to trigger a fresh prompt, then drain until we see ">: "
+            transport.write("\r".encodeToByteArray())
+            drainUntilPrompt()
+
+            // Now send the RPC session command
             transport.write("start_rpc_session\r".encodeToByteArray())
-            // Drain CLI response until newline (Flipper echoes command + sends response)
+
+            // Read until newline confirms protobuf mode
             val buf = ByteArray(1)
             while (true) {
                 val read = transport.read(buf, 0, 1)
                 if (read > 0 && buf[0] == '\n'.code.toByte()) break
             }
         }
+
+    /** Read bytes from the transport until we see the CLI prompt ">: ". */
+    private suspend fun drainUntilPrompt() {
+        val buf = ByteArray(1)
+        // Look for ">: " sequence (0x3E, 0x3A, 0x20)
+        var matchIndex = 0
+        val prompt = ">: "
+        while (matchIndex < prompt.length) {
+            val read = transport.read(buf, 0, 1)
+            if (read > 0) {
+                if (buf[0] == prompt[matchIndex].code.toByte()) {
+                    matchIndex++
+                } else {
+                    matchIndex = 0
+                }
+            }
+        }
+    }
 
     /** Send a ping and wait for the pong response. */
     suspend fun ping() {
