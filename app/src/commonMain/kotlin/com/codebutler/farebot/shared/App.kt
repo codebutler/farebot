@@ -300,6 +300,7 @@ fun FareBotApp(
                     onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
                     onNavigateUp = { flipperViewModel.navigateUp() },
                     onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
+                    onClearSelection = { flipperViewModel.clearSelection() },
                     onImportSelected = { flipperViewModel.importSelectedFiles() },
                     onImportKeys = { flipperViewModel.importKeyDictionary() },
                     onClearImportMessage = { flipperViewModel.clearImportMessage() },

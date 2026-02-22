@@ -42,6 +42,10 @@ class FlipperViewModel(
         _uiState.value = _uiState.value.copy(importCompleteMessage = null)
     }
 
+    fun clearSelection() {
+        _uiState.value = _uiState.value.copy(selectedFiles = emptySet())
+    }
+
     fun connectUsb() {
         _uiState.value = _uiState.value.copy(connectionMode = FlipperConnectionMode.Usb)
         viewModelScope.launch {

@@ -18,17 +18,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -39,13 +43,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.back
+import farebot.app.generated.resources.cancel
 import farebot.app.generated.resources.flipper_bytes
 import farebot.app.generated.resources.flipper_connecting_message
 import farebot.app.generated.resources.flipper_import_keys
@@ -56,6 +64,8 @@ import farebot.app.generated.resources.flipper_no_files
 import farebot.app.generated.resources.flipper_retry
 import farebot.app.generated.resources.flipper_up
 import farebot.app.generated.resources.flipper_zero
+import farebot.app.generated.resources.menu
+import farebot.app.generated.resources.n_selected
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +76,7 @@ fun FlipperScreen(
     onNavigateToDirectory: (String) -> Unit,
     onNavigateUp: () -> Unit,
     onToggleSelection: (String) -> Unit,
+    onClearSelection: () -> Unit,
     onImportSelected: () -> Unit,
     onImportKeys: () -> Unit,
     onClearImportMessage: () -> Unit,
@@ -79,31 +90,84 @@ fun FlipperScreen(
         onClearImportMessage()
     }
 
+    val isSelectionMode = uiState.selectedFiles.isNotEmpty()
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        when (uiState.connectionState) {
-                            FlipperConnectionState.Connected ->
-                                uiState.deviceInfo["hardware.name"] ?: stringResource(Res.string.flipper_zero)
-                            FlipperConnectionState.Connecting -> stringResource(Res.string.flipper_zero)
-                            FlipperConnectionState.Disconnected -> stringResource(Res.string.flipper_zero)
-                        },
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
-                    }
-                },
-                actions = {},
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
-            )
+            if (isSelectionMode) {
+                TopAppBar(
+                    title = {
+                        Text(stringResource(Res.string.n_selected, uiState.selectedFiles.size))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onClearSelection) {
+                            Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.cancel))
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = onImportSelected) {
+                            Icon(
+                                Icons.Default.Download,
+                                contentDescription =
+                                    stringResource(
+                                        Res.string.flipper_import_selected,
+                                        uiState.selectedFiles.size,
+                                    ),
+                            )
+                        }
+                    },
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                )
+            } else {
+                var menuExpanded by remember { mutableStateOf(false) }
+                TopAppBar(
+                    title = {
+                        Text(
+                            when (uiState.connectionState) {
+                                FlipperConnectionState.Connected ->
+                                    uiState.deviceInfo["hardware.name"] ?: stringResource(Res.string.flipper_zero)
+                                FlipperConnectionState.Connecting -> stringResource(Res.string.flipper_zero)
+                                FlipperConnectionState.Disconnected -> stringResource(Res.string.flipper_zero)
+                            },
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(Res.string.back),
+                            )
+                        }
+                    },
+                    actions = {
+                        if (uiState.connectionState == FlipperConnectionState.Connected) {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.menu))
+                            }
+                            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.flipper_import_keys)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onImportKeys()
+                                    },
+                                )
+                            }
+                        }
+                    },
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
+                )
+            }
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -133,8 +197,6 @@ fun FlipperScreen(
                         onNavigateToDirectory = onNavigateToDirectory,
                         onNavigateUp = onNavigateUp,
                         onToggleSelection = onToggleSelection,
-                        onImportSelected = onImportSelected,
-                        onImportKeys = onImportKeys,
                     )
                 }
             }
@@ -177,8 +239,6 @@ private fun ConnectedContent(
     onNavigateToDirectory: (String) -> Unit,
     onNavigateUp: () -> Unit,
     onToggleSelection: (String) -> Unit,
-    onImportSelected: () -> Unit,
-    onImportKeys: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Breadcrumb path bar
@@ -246,26 +306,6 @@ private fun ConnectedContent(
                     )
                     HorizontalDivider()
                 }
-            }
-        }
-
-        // Bottom action bar
-        HorizontalDivider()
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-        ) {
-            Button(
-                onClick = onImportSelected,
-                enabled = uiState.selectedFiles.isNotEmpty(),
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(stringResource(Res.string.flipper_import_selected, uiState.selectedFiles.size))
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            OutlinedButton(
-                onClick = onImportKeys,
-            ) {
-                Text(stringResource(Res.string.flipper_import_keys))
             }
         }
     }
