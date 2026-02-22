@@ -108,7 +108,7 @@ object HashUtils {
 
         val saltBytes = salt.encodeToByteArray()
         val toHash = saltBytes + key + saltBytes
-        val digest = md5(toHash).hex()
+        val digest = md5(toHash).hex().lowercase()
 
         return expectedHashes.indexOf(digest)
     }

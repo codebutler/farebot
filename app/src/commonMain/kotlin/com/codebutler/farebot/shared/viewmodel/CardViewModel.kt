@@ -130,6 +130,9 @@ class CardViewModel(
                             cardInfo = cardInfo,
                         )
                 } else {
+                    // parseTransitInfo failed (e.g. locked sectors) — try identity as fallback
+                    val identity = transitFactoryRegistry.parseTransitIdentity(card)
+
                     val tagIdHex =
                         card.tagId
                             .joinToString("") {
@@ -137,7 +140,7 @@ class CardViewModel(
                             }.uppercase()
                     val unknownInfo =
                         UnknownTransitInfo(
-                            cardTypeName = card.cardType.toString(),
+                            cardTypeName = identity?.name?.resolveAsync() ?: card.cardType.toString(),
                             tagIdHex = tagIdHex,
                         )
                     parsedCardKey = navDataHolder.put(Pair(card, unknownInfo))
@@ -145,7 +148,7 @@ class CardViewModel(
                         CardUiState(
                             isLoading = false,
                             cardName = sampleTitle ?: unknownInfo.cardName.resolveAsync(),
-                            serialNumber = unknownInfo.serialNumber,
+                            serialNumber = identity?.serialNumber ?: unknownInfo.serialNumber,
                             balances = createBalanceItems(unknownInfo),
                             hasAdvancedData = true,
                             isSample = isSample,
