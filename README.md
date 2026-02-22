@@ -1,19 +1,11 @@
 <p align="center">
-  <img src="docs/images/logo.png" width="128" alt="FareBot">
+  <img src="https://codebutler.github.io/farebot/img/farebot_icon_huge.png" width="128" alt="FareBot">
 </p>
 
 <h1 align="center">FareBot</h1>
 
 <p align="center">
   Read your remaining balance, recent trips, and other information from contactless public transit cards using your NFC-enabled device.
-</p>
-
-<p align="center">
-  <img src="docs/images/screenshot-android.png" width="270" alt="Android">
-  &nbsp;&nbsp;
-  <img src="docs/images/screenshot-ios.png" width="270" alt="iOS">
-  &nbsp;&nbsp;
-  <img src="docs/images/screenshot-web.png" width="270" alt="Web">
 </p>
 
 FareBot runs on:
