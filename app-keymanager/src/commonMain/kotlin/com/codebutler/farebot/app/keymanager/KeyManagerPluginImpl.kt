@@ -169,7 +169,13 @@ class KeyManagerPluginImpl(
         }
     }
 
-    fun getGlobalKeys(): List<ByteArray> = cardKeysPersister.getGlobalKeys()
+    fun getGlobalKeys(): List<ByteArray> =
+        try {
+            cardKeysPersister.getGlobalKeys()
+        } catch (e: Exception) {
+            println("[KeyManager] Failed to load global keys: ${e.message}")
+            emptyList()
+        }
 
     val lockedCardTitle: StringResource get() = Res.string.locked_card
     val keysRequiredMessage: StringResource get() = Res.string.keys_required
