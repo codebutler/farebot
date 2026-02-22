@@ -108,7 +108,7 @@ jobs:
             DEVELOPMENT_TEAM=ZJ9GEQ36AH \
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID"
 
-      - name: Export IPA
+      - name: Export & upload to App Store Connect
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -147,36 +147,6 @@ jobs:
             -authenticationKeyPath ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8 \
             -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
             -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
-
-      - name: Install fastlane
-        run: brew install fastlane
-
-      - name: Upload to TestFlight & distribute to internal testers
-        env:
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-        run: |
-          # Build the API key JSON that fastlane expects
-          API_KEY_JSON="$RUNNER_TEMP/api_key.json"
-          P8_CONTENTS=$(cat ~/.private_keys/AuthKey_"$APP_STORE_CONNECT_API_KEY_ID".p8)
-          jq -n \
-            --arg key_id "$APP_STORE_CONNECT_API_KEY_ID" \
-            --arg issuer_id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --arg key "$P8_CONTENTS" \
-            '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' \
-            > "$API_KEY_JSON"
-
-          # Find the IPA (xcodebuild may name it differently)
-          IPA_PATH=$(find "$RUNNER_TEMP/export" -name '*.ipa' -print -quit)
-          echo "IPA: $IPA_PATH"
-          [ -f "$IPA_PATH" ] || { echo "No IPA found in $RUNNER_TEMP/export"; ls -la "$RUNNER_TEMP/export"; exit 1; }
-
-          fastlane pilot upload \
-            --ipa "$IPA_PATH" \
-            --api_key_path "$API_KEY_JSON" \
-            --distribute_external false \
-            --skip_waiting_for_build_processing false \
-            --changelog "Build $MARKETING_VERSION ($CURRENT_PROJECT_VERSION)"
 
       - name: Cleanup keychain
         if: always()
