@@ -21,7 +21,7 @@ jobs:
 
       - name: Select latest Xcode
         run: |
-          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -iv beta | sort -V | tail -1)
           if [ -n "$LATEST" ]; then
             sudo xcode-select -s "$LATEST"
           fi
