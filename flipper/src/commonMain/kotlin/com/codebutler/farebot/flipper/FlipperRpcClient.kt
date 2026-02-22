@@ -68,20 +68,19 @@ class FlipperRpcClient(
      * Required for USB serial connections; BLE goes directly to protobuf mode.
      *
      * Protocol (from flipperzero-protobuf docs):
-     * 1. Send "\r" and read until ">: " prompt to clear any buffered CLI output
+     * 1. Wait for ">: " CLI prompt (Flipper sends banner automatically on USB connect)
      * 2. Send "start_rpc_session\r"
      * 3. Read until "\n" to confirm protobuf mode is active
      */
     private suspend fun startRpcSession() =
         withTimeout(timeoutMs) {
-            // Send empty command to trigger a fresh prompt, then drain until we see ">: "
-            transport.write("\r".encodeToByteArray())
+            // Wait for the CLI prompt (Flipper sends banner + ">: " automatically on USB connect)
             drainUntilPrompt()
 
-            // Now send the RPC session command
+            // Send the RPC session command
             transport.write("start_rpc_session\r".encodeToByteArray())
 
-            // Read until newline confirms protobuf mode
+            // Read until newline confirms protobuf mode is active
             val buf = ByteArray(1)
             while (true) {
                 val read = transport.read(buf, 0, 1)
@@ -92,7 +91,6 @@ class FlipperRpcClient(
     /** Read bytes from the transport until we see the CLI prompt ">: ". */
     private suspend fun drainUntilPrompt() {
         val buf = ByteArray(1)
-        // Look for ">: " sequence (0x3E, 0x3A, 0x20)
         var matchIndex = 0
         val prompt = ">: "
         while (matchIndex < prompt.length) {
