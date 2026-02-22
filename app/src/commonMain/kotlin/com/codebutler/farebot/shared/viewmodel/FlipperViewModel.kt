@@ -14,6 +14,7 @@ import com.codebutler.farebot.persist.db.model.SavedCard
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.ui.screen.FlipperConnectionMode
+import com.codebutler.farebot.shared.ui.screen.ImportComplete
 import com.codebutler.farebot.shared.ui.screen.FlipperConnectionState
 import com.codebutler.farebot.shared.ui.screen.FlipperFileItem
 import com.codebutler.farebot.shared.ui.screen.FlipperUiState
@@ -39,7 +40,7 @@ class FlipperViewModel(
     private var transport: FlipperTransport? = null
 
     fun clearImportMessage() {
-        _uiState.value = _uiState.value.copy(importCompleteMessage = null)
+        _uiState.value = _uiState.value.copy(importComplete = null)
     }
 
     fun clearSelection() {
@@ -247,7 +248,7 @@ class FlipperViewModel(
                 _uiState.value.copy(
                     importProgress = null,
                     selectedFiles = emptySet(),
-                    importCompleteMessage = "Imported $importedCount file(s) successfully",
+                    importComplete = ImportComplete.Files(importedCount),
                 )
         }
     }
@@ -279,7 +280,7 @@ class FlipperViewModel(
                 _uiState.value =
                     _uiState.value.copy(
                         importProgress = null,
-                        importCompleteMessage = "Imported ${keys.size} keys successfully",
+                        importComplete = ImportComplete.Keys(keys.size),
                     )
             } catch (e: Exception) {
                 _uiState.value =

@@ -56,16 +56,19 @@ import farebot.app.generated.resources.back
 import farebot.app.generated.resources.cancel
 import farebot.app.generated.resources.flipper_bytes
 import farebot.app.generated.resources.flipper_connecting_message
+import farebot.app.generated.resources.flipper_import_complete
 import farebot.app.generated.resources.flipper_import_keys
 import farebot.app.generated.resources.flipper_import_progress
 import farebot.app.generated.resources.flipper_import_selected
 import farebot.app.generated.resources.flipper_importing
+import farebot.app.generated.resources.flipper_keys_import_complete
 import farebot.app.generated.resources.flipper_no_files
 import farebot.app.generated.resources.flipper_retry
 import farebot.app.generated.resources.flipper_up
 import farebot.app.generated.resources.flipper_zero
 import farebot.app.generated.resources.menu
 import farebot.app.generated.resources.n_selected
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,8 +87,18 @@ fun FlipperScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiState.importCompleteMessage) {
-        val message = uiState.importCompleteMessage ?: return@LaunchedEffect
+    val importComplete = uiState.importComplete
+    val importMessage =
+        when (importComplete) {
+            is ImportComplete.Files ->
+                pluralStringResource(Res.plurals.flipper_import_complete, importComplete.count, importComplete.count)
+            is ImportComplete.Keys ->
+                pluralStringResource(Res.plurals.flipper_keys_import_complete, importComplete.count, importComplete.count)
+            null -> null
+        }
+
+    LaunchedEffect(importComplete) {
+        val message = importMessage ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(message)
         onClearImportMessage()
     }

@@ -10,7 +10,7 @@ data class FlipperUiState(
     val selectedFiles: Set<String> = emptySet(),
     val error: String? = null,
     val importProgress: ImportProgress? = null,
-    val importCompleteMessage: String? = null,
+    val importComplete: ImportComplete? = null,
 )
 
 enum class FlipperConnectionState {
@@ -36,3 +36,8 @@ data class ImportProgress(
     val currentIndex: Int,
     val totalFiles: Int,
 )
+
+sealed class ImportComplete {
+    data class Files(val count: Int) : ImportComplete()
+    data class Keys(val count: Int) : ImportComplete()
+}
