@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.base.ui.FareBotUiTree
 import com.codebutler.farebot.base.util.toHexDump
+import com.codebutler.farebot.shared.ui.layout.ContentWidthConstraint
 import farebot.app.generated.resources.Res
 import farebot.app.generated.resources.advanced
 import farebot.app.generated.resources.back
@@ -61,29 +62,31 @@ fun CardAdvancedScreen(
             )
         },
     ) { padding ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-        ) {
-            if (uiState.tabs.size > 1) {
-                PrimaryScrollableTabRow(selectedTabIndex = selectedTab) {
-                    uiState.tabs.forEachIndexed { index, tab ->
-                        Tab(
-                            selected = selectedTab == index,
-                            onClick = { selectedTab = index },
-                            text = { Text(tab.title.resolve()) },
-                        )
+        ContentWidthConstraint {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+            ) {
+                if (uiState.tabs.size > 1) {
+                    PrimaryScrollableTabRow(selectedTabIndex = selectedTab) {
+                        uiState.tabs.forEachIndexed { index, tab ->
+                            Tab(
+                                selected = selectedTab == index,
+                                onClick = { selectedTab = index },
+                                text = { Text(tab.title.resolve()) },
+                            )
+                        }
                     }
                 }
-            }
 
-            if (uiState.tabs.isNotEmpty()) {
-                val tree = uiState.tabs[selectedTab].tree
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(tree.items) { item ->
-                        TreeItemView(item = item, depth = 0)
+                if (uiState.tabs.isNotEmpty()) {
+                    val tree = uiState.tabs[selectedTab].tree
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(tree.items) { item ->
+                            TreeItemView(item = item, depth = 0)
+                        }
                     }
                 }
             }

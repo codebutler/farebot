@@ -41,3 +41,5 @@ worktrees/
 
 # Generated review pages
 scripts/card-image-review.html
+.vercel
+.env*.local
