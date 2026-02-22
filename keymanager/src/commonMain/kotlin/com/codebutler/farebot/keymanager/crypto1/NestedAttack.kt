@@ -116,8 +116,10 @@ class NestedAttack(
                     break
                 }
             }
-            // Reset the card state between attempts
-            rawClassic.restoreNormalMode()
+            // Reset the card by cycling RF field — after an incomplete auth
+            // (nonce collected but handshake not completed), the card enters
+            // HALT state and won't respond to further commands.
+            rawClassic.reselectCard()
         }
 
         if (nonces.isEmpty()) {
@@ -154,8 +156,9 @@ class NestedAttack(
         val collectedNonces = mutableListOf<NestedNonceData>()
         consecutiveFailures = 0
         for (i in 0 until COLLECTION_ROUNDS) {
-            // Authenticate with the known key
-            rawClassic.restoreNormalMode()
+            // Reset card — after previous round's incomplete nested auth,
+            // the card is in HALT state.
+            rawClassic.reselectCard()
             val authState =
                 rawClassic.authenticate(knownKeyType, knownSectorBlock, knownKey)
             if (authState == null) {
@@ -284,9 +287,9 @@ class NestedAttack(
         block: Int,
         key: Long,
     ): Boolean {
-        rawClassic.restoreNormalMode()
+        rawClassic.reselectCard()
         val result = rawClassic.authenticate(keyType, block, key)
-        rawClassic.restoreNormalMode()
+        rawClassic.reselectCard()
         return result != null
     }
 

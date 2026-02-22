@@ -27,6 +27,7 @@ import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
 import com.codebutler.farebot.keymanager.crypto1.Crypto1Auth
 import com.codebutler.farebot.keymanager.crypto1.Crypto1State
+import kotlinx.coroutines.delay
 
 /**
  * Raw MIFARE Classic interface using PN533 InCommunicateThru.
@@ -110,6 +111,29 @@ class PN533RawClassic(
         enableCrc()
         enableParity()
         clearCrypto1()
+    }
+
+    /**
+     * Reset the card by cycling the RF field and re-selecting.
+     *
+     * After an incomplete MIFARE Classic authentication (e.g., requestAuth()
+     * collects the nonce but doesn't complete the handshake), the card enters
+     * HALT state and won't respond to subsequent commands. Cycling the RF field
+     * resets the card, and InListPassiveTarget re-selects it.
+     *
+     * @return true if the card was successfully re-selected
+     */
+    suspend fun reselectCard(): Boolean {
+        restoreNormalMode()
+        return try {
+            pn533.rfFieldOff()
+            delay(RF_RESET_DELAY_MS)
+            pn533.rfFieldOn()
+            delay(RF_RESET_DELAY_MS)
+            pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A) != null
+        } catch (_: PN533Exception) {
+            false
+        }
     }
 
     /**
@@ -281,6 +305,9 @@ class PN533RawClassic(
 
         /** CIU Status2 register — Bit 3 = Crypto1 active */
         const val REG_CIU_STATUS2 = 0x6338
+
+        /** Delay in ms for RF field cycling during card reset */
+        private const val RF_RESET_DELAY_MS = 50L
 
         /**
          * Build a MIFARE Classic AUTH command with CRC.
