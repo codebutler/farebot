@@ -286,6 +286,11 @@ private fun jsWebUsbStartTransferOut(dataStr: JsString) {
         """
         (function() {
             window._fbUsbOut = { ready: false, error: null };
+            if (!window._fbUsb || !window._fbUsb.device) {
+                window._fbUsbOut.error = 'Device not connected';
+                window._fbUsbOut.ready = true;
+                return;
+            }
             var parts = dataStr.split(',');
             var bytes = new Uint8Array(parts.length);
             for (var i = 0; i < parts.length; i++) bytes[i] = parseInt(parts[i]);
@@ -309,6 +314,10 @@ private fun jsWebUsbStartTransferIn(timeoutMs: Int) {
         """
         (function() {
             window._fbUsbIn = { data: null, ready: false };
+            if (!window._fbUsb || !window._fbUsb.device) {
+                window._fbUsbIn.ready = true;
+                return;
+            }
             var timer = setTimeout(function() {
                 if (!window._fbUsbIn.ready) window._fbUsbIn.ready = true;
             }, timeoutMs);
