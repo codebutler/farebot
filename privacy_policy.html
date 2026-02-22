@@ -3,15 +3,62 @@
   <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width'>
-    <title>Privacy Policy</title>
-    <style> body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; } </style>
+    <title>FareBot - Privacy Policy</title>
+    <style>
+      body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
+      h1 { color: #111; }
+      h2 { color: #222; margin-top: 2em; }
+      a { color: #0066cc; }
+    </style>
   </head>
   <body>
-    <h2>Privacy Policies</h2> 
+    <h1>Privacy Policy</h1>
+    <p><strong>Last updated:</strong> February 22, 2026</p>
+    <p>FareBot is an open-source transit card reader. Your privacy is important to us. This policy explains what data FareBot handles and how.</p>
+
+    <h2>Data We Do Not Collect</h2>
+    <p>FareBot does <strong>not</strong> collect, transmit, or share any personal data. Specifically:</p>
     <ul>
-      <li><a href="https://www.google.com/policies/privacy/" target="_blank">Google Play Services</a></li>
-      <li><a href="https://fabric.io/privacy" target="_blank">Fabric / Crashlytics</a></li>
+      <li><strong>No analytics or tracking.</strong> We do not use any analytics services.</li>
+      <li><strong>No crash reporting.</strong> Crash data stays on your device.</li>
+      <li><strong>No accounts or sign-ups.</strong> The app does not require or support user accounts.</li>
+      <li><strong>No advertising.</strong> There are no ads in the app.</li>
+      <li><strong>No server communication.</strong> FareBot does not send data to any server we operate.</li>
     </ul>
+
+    <h2>Data Stored on Your Device</h2>
+    <p>When you scan a transit card, the following data is stored locally on your device:</p>
+    <ul>
+      <li>Raw card data (the binary content read from the card)</li>
+      <li>Card serial number</li>
+      <li>Card type</li>
+      <li>Scan timestamp</li>
+      <li>Encryption keys (if provided for locked cards)</li>
+    </ul>
+    <p>This data <strong>never leaves your device</strong> unless you explicitly export it using the share or export feature.</p>
+
+    <h2>Third-Party Services</h2>
+    <h3>Google Maps (Android only)</h3>
+    <p>The Android version uses Google Maps to display transit station locations. When you view a map, your device sends location coordinates to Google to load map tiles. This is governed by <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
+    <p>No other third-party services are used.</p>
+
+    <h2>Hardware Access</h2>
+    <ul>
+      <li><strong>NFC:</strong> Used to read transit cards. Card data is processed and stored locally.</li>
+      <li><strong>Bluetooth:</strong> Used on iOS to connect to Flipper Zero devices for importing NFC dumps. No data is transmitted over the internet.</li>
+      <li><strong>USB:</strong> The web version uses WebUSB to connect to USB NFC readers. All processing happens locally in your browser.</li>
+    </ul>
+
+    <h2>Data Export</h2>
+    <p>You can export your saved card data to files. Exported data is handled by your device's native sharing functionality. FareBot does not control where you send exported files.</p>
+
+    <h2>Open Source</h2>
+    <p>FareBot is open source. You can review the complete source code at <a href="https://github.com/codebutler/farebot">github.com/codebutler/farebot</a> to verify these claims.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, we will update the "Last updated" date above.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this policy, please open an issue on <a href="https://github.com/codebutler/farebot/issues">GitHub</a>.</p>
   </body>
 </html>
-  
