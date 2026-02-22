@@ -163,13 +163,26 @@ private fun jsWebSerialStartRead(length: Int) {
         """
         (function() {
             window._fbSerialIn = { data: null, ready: false };
+            if (!window._fbSerialBuf) window._fbSerialBuf = [];
+
+            // If we have buffered bytes from a previous read, return those first
+            if (window._fbSerialBuf.length > 0) {
+                var len = Math.min(window._fbSerialBuf.length, length);
+                var parts = window._fbSerialBuf.splice(0, len);
+                window._fbSerialIn.data = parts.join(',');
+                window._fbSerialIn.ready = true;
+                return;
+            }
+
             window._fbSerial.reader.read().then(function(result) {
                 if (result.value && result.value.length > 0) {
                     var arr = result.value;
-                    var parts = [];
                     var len = Math.min(arr.length, length);
+                    var parts = [];
                     for (var i = 0; i < len; i++) parts.push(arr[i]);
                     window._fbSerialIn.data = parts.join(',');
+                    // Buffer any excess bytes for the next read
+                    for (var i = len; i < arr.length; i++) window._fbSerialBuf.push(arr[i]);
                 }
                 window._fbSerialIn.ready = true;
             }).catch(function(err) {
@@ -229,6 +242,7 @@ private fun jsWebSerialClose() {
             window._fbSerial = null;
             window._fbSerialIn = null;
             window._fbSerialOut = null;
+            window._fbSerialBuf = null;
         })()
         """,
     )
