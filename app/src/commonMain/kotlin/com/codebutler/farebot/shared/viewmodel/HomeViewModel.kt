@@ -92,6 +92,8 @@ class HomeViewModel(
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
                 _uiState.value = _uiState.value.copy(isReadingCard = false)
+                println("[HomeViewModel] Scan error: ${error::class.simpleName}: ${error.message}")
+                error.printStackTrace()
                 val scanError = categorizeError(error)
                 analytics.logEvent(
                     "scan_card_error",
@@ -155,6 +157,8 @@ class HomeViewModel(
             val key = navDataHolder.put(rawCard)
             _navigateToCard.emit(key)
         } catch (e: Exception) {
+            println("[HomeViewModel] Card processing error: ${e::class.simpleName}: ${e.message}")
+            e.printStackTrace()
             _errorMessage.value =
                 ScanError(
                     title = getString(Res.string.error),

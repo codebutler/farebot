@@ -24,15 +24,14 @@
 package com.codebutler.farebot.card.classic
 
 import com.codebutler.farebot.card.CardLostException
-import com.codebutler.farebot.card.classic.crypto1.NestedAttack
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey
-import com.codebutler.farebot.card.classic.pn533.PN533RawClassic
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.nfc.ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
+import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import kotlin.time.Clock
 
 object ClassicCardReader {
@@ -52,6 +51,7 @@ object ClassicCardReader {
         tech: ClassicTechnology,
         cardKeys: ClassicCardKeys?,
         globalKeys: List<ByteArray>? = null,
+        keyRecovery: ClassicKeyRecovery? = null,
         onProgress: ((String) -> Unit)? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
@@ -59,6 +59,7 @@ object ClassicCardReader {
 
         for (sectorIndex in 0 until tech.sectorCount) {
             try {
+                onProgress?.invoke("Reading sector $sectorIndex/${tech.sectorCount}...")
                 var authSuccess = false
                 var successfulKey: ByteArray? = null
                 var isKeyA = true
@@ -160,48 +161,26 @@ object ClassicCardReader {
                     }
                 }
 
-                // Try key recovery via nested attack (PN533 only)
-                if (!authSuccess && tech is PN533ClassicTechnology) {
-                    val knownEntry = recoveredKeys.entries.firstOrNull()
-                    if (knownEntry != null) {
-                        val (knownSector, knownKeyInfo) = knownEntry
-                        val (knownKeyBytes, knownIsKeyA) = knownKeyInfo
-                        val knownKey = keyBytesToLong(knownKeyBytes)
-                        val knownKeyType: Byte = if (knownIsKeyA) 0x60 else 0x61
-                        val knownBlock = tech.sectorToBlock(knownSector)
-                        val targetBlock = tech.sectorToBlock(sectorIndex)
-
-                        val rawClassic = PN533RawClassic(tech.rawPn533, tech.rawUid)
-                        val attack = NestedAttack(rawClassic, tech.uidAsUInt)
-
-                        onProgress?.invoke("Sector $sectorIndex: attempting key recovery...")
-
-                        val recoveredKey = attack.recoverKey(
-                            knownKeyType = knownKeyType,
-                            knownSectorBlock = knownBlock,
-                            knownKey = knownKey,
-                            targetKeyType = 0x60,
-                            targetBlock = targetBlock,
-                            onProgress = onProgress,
-                        )
-
-                        if (recoveredKey != null) {
-                            val keyBytes = longToKeyBytes(recoveredKey)
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
-                            if (authSuccess) {
-                                successfulKey = keyBytes
-                                isKeyA = true
+                // Try key recovery via pluggable implementation (PN533 only)
+                if (!authSuccess &&
+                    keyRecovery != null &&
+                    tech is PN533ClassicTechnology &&
+                    recoveredKeys.isNotEmpty()
+                ) {
+                    onProgress?.invoke("Sector $sectorIndex: attempting key recovery...")
+                    val recovered = keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys, onProgress)
+                    if (recovered != null) {
+                        val (keyBytes, recoveredIsKeyA) = recovered
+                        authSuccess =
+                            if (recoveredIsKeyA) {
+                                tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
                             } else {
-                                // Try as Key B
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
-                                if (authSuccess) {
-                                    successfulKey = keyBytes
-                                    isKeyA = false
-                                }
+                                tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
                             }
-                            if (authSuccess) {
-                                onProgress?.invoke("Sector $sectorIndex: key recovered!")
-                            }
+                        if (authSuccess) {
+                            successfulKey = keyBytes
+                            isKeyA = recoveredIsKeyA
+                            onProgress?.invoke("Sector $sectorIndex: key recovered!")
                         }
                     }
                 }
@@ -239,6 +218,8 @@ object ClassicCardReader {
                 } else {
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
                 }
+            } catch (ex: PN533TransportException) {
+                throw ex
             } catch (ex: CardLostException) {
                 // Card was lost during reading - return immediately with partial data
                 sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.message ?: "Card lost"))
@@ -250,15 +231,4 @@ object ClassicCardReader {
 
         return RawClassicCard.create(tagId, Clock.System.now(), sectors)
     }
-
-    private fun keyBytesToLong(key: ByteArray): Long {
-        var result = 0L
-        for (i in 0 until minOf(6, key.size)) {
-            result = (result shl 8) or (key[i].toLong() and 0xFF)
-        }
-        return result
-    }
-
-    private fun longToKeyBytes(key: Long): ByteArray =
-        ByteArray(6) { i -> ((key ushr ((5 - i) * 8)) and 0xFF).toByte() }
 }

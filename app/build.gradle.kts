@@ -38,12 +38,20 @@ kotlin {
             implementation(libs.play.services.maps)
             implementation(libs.sqldelight.android.driver)
             implementation(libs.activity.compose)
+            api(project(":keymanager"))
+            api(project(":app-keymanager"))
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
         }
         jvmMain.dependencies {
             implementation(libs.sqldelight.sqlite.driver)
+            api(project(":keymanager"))
+            api(project(":app-keymanager"))
+        }
+        wasmJsMain.dependencies {
+            api(project(":keymanager"))
+            api(project(":app-keymanager"))
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

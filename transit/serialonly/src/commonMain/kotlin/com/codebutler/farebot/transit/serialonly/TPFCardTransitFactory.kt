@@ -22,7 +22,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
-import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.base.util.reverseBuffer
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.desfire.DesfireCard
@@ -60,7 +60,6 @@ class TPFCardTransitFactory : TransitFactory<DesfireCard, TPFCardTransitInfo> {
         // "CTK" in ASCII
         private const val APP_ID = 0x43544b
 
-        internal fun formatSerial(card: DesfireCard): String =
-            ByteUtils.getHexString(card.tagId.reverseBuffer()).uppercase()
+        internal fun formatSerial(card: DesfireCard): String = card.tagId.reverseBuffer().hex()
     }
 }

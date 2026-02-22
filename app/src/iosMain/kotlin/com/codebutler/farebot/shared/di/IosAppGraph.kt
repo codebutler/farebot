@@ -18,6 +18,7 @@ import com.codebutler.farebot.shared.platform.IosAppPreferences
 import com.codebutler.farebot.shared.platform.IosPlatformActions
 import com.codebutler.farebot.shared.platform.NoOpAnalytics
 import com.codebutler.farebot.shared.platform.PlatformActions
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import com.codebutler.farebot.shared.serialize.CardImporter
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.serialize.KotlinxCardSerializer
@@ -97,4 +98,7 @@ abstract class IosAppGraph : AppGraph {
 
     @Provides
     fun provideNullableCardScanner(scanner: CardScanner): CardScanner? = scanner
+
+    @Provides
+    fun provideNullableKeyManagerPlugin(): KeyManagerPlugin? = null
 }

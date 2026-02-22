@@ -161,7 +161,7 @@ object ByteUtils {
         }
     }
 
-    private val HEX_CHARS =
+    internal val HEX_CHARS =
         charArrayOf(
             '0',
             '1',
@@ -173,11 +173,11 @@ object ByteUtils {
             '7',
             '8',
             '9',
-            'a',
-            'b',
-            'c',
-            'd',
-            'e',
-            'f',
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+            'F',
         )
 }

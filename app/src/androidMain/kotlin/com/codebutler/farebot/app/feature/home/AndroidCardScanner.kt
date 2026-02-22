@@ -2,10 +2,11 @@ package com.codebutler.farebot.app.feature.home
 
 import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
-import com.codebutler.farebot.base.util.ByteUtils
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
+import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.key.CardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.nfc.CardScanner
@@ -64,9 +65,12 @@ class AndroidCardScanner(
 
                 _isScanning.value = true
                 try {
-                    val cardKeys = getCardKeys(ByteUtils.getHexString(tag.id))
+                    val cardKeys = getCardKeys(tag.id.hex())
                     val rawCard = tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
                     if (rawCard.isUnauthorized()) {
+                        throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
+                    }
+                    if (rawCard is RawClassicCard && rawCard.hasUnauthorizedSectors()) {
                         throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                     }
                     _scannedCards.emit(rawCard)

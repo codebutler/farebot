@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.desktop
 
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -35,11 +36,14 @@ import com.codebutler.farebot.card.nfc.pn533.PN533CardTransceiver
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
 import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
+import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
 import com.codebutler.farebot.shared.nfc.ScannedTag
+import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.delay
 
 /**
@@ -50,6 +54,7 @@ import kotlinx.coroutines.delay
  */
 abstract class PN53xReaderBackend(
     private val preOpenedTransport: Usb4JavaPN533Transport? = null,
+    private val keyManagerPlugin: KeyManagerPlugin? = null,
 ) : NfcReaderBackend {
     protected abstract suspend fun initDevice(pn533: PN533)
 
@@ -121,6 +126,8 @@ abstract class PN53xReaderBackend(
                 val rawCard = readTarget(pn533, target)
                 onCardRead(rawCard)
                 println("[$name] Card read successfully")
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (e: Exception) {
                 println("[$name] Read error: ${e.message}")
                 onError(e)
@@ -129,6 +136,8 @@ abstract class PN53xReaderBackend(
             // Release target
             try {
                 pn533.inRelease(target.tg)
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (_: PN533Exception) {
             }
 
@@ -163,9 +172,18 @@ abstract class PN53xReaderBackend(
 
             CardType.MifareClassic -> {
                 val tech = PN533ClassicTechnology(pn533, target.tg, tagId, info)
-                ClassicCardReader.readCard(tagId, tech, null) { progress ->
-                    println("[$name] $progress")
+                val tagIdHex = tagId.hex()
+                val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
+                val globalKeys = keyManagerPlugin?.getGlobalKeys()
+                val recovery = keyManagerPlugin?.classicKeyRecovery
+                val rawCard =
+                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, recovery) { progress ->
+                        println("[$name] $progress")
+                    }
+                if (rawCard.hasUnauthorizedSectors()) {
+                    throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }
+                rawCard
             }
 
             CardType.MifareUltralight -> {
@@ -205,6 +223,8 @@ abstract class PN53xReaderBackend(
                             baudRate = PN533.BAUD_RATE_212_FELICA,
                             initiatorData = SENSF_REQ,
                         )
+                } catch (e: PN533TransportException) {
+                    throw e
                 } catch (_: PN533Exception) {
                     null
                 }
@@ -214,6 +234,8 @@ abstract class PN53xReaderBackend(
             // Card still present, release and keep waiting
             try {
                 pn533.inRelease(target.tg)
+            } catch (e: PN533TransportException) {
+                throw e
             } catch (_: PN533Exception) {
             }
         }
@@ -227,7 +249,5 @@ abstract class PN53xReaderBackend(
         // system code=0xFFFF (wildcard), request code=0x01 (with PMm), time slot=0x00.
         // PN533 generates this internally, but RC-S956 requires it explicitly.
         private val SENSF_REQ = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte(), 0x01, 0x00)
-
-        private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }
 }

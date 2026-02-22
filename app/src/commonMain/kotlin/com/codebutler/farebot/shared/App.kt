@@ -30,7 +30,6 @@ import com.codebutler.farebot.shared.serialize.ImportResult
 import com.codebutler.farebot.shared.ui.layout.LocalWindowWidthSizeClass
 import com.codebutler.farebot.shared.ui.layout.windowWidthSizeClass
 import com.codebutler.farebot.shared.ui.navigation.Screen
-import com.codebutler.farebot.shared.ui.screen.AddKeyScreen
 import com.codebutler.farebot.shared.ui.screen.AdvancedTab
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedScreen
 import com.codebutler.farebot.shared.ui.screen.CardAdvancedUiState
@@ -38,7 +37,6 @@ import com.codebutler.farebot.shared.ui.screen.CardScreen
 import com.codebutler.farebot.shared.ui.screen.CardsMapMarker
 import com.codebutler.farebot.shared.ui.screen.FlipperScreen
 import com.codebutler.farebot.shared.ui.screen.HomeScreen
-import com.codebutler.farebot.shared.ui.screen.KeysScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapScreen
 import com.codebutler.farebot.shared.ui.screen.TripMapUiState
 import com.codebutler.farebot.shared.ui.theme.FareBotTheme
@@ -107,7 +105,7 @@ fun FareBotApp(
                 LaunchedEffect(Unit) {
                     menuEvents.collect { event ->
                         when (event) {
-                            "keys" -> navController.navigate(Screen.Keys.route)
+                            "keys" -> graph.keyManagerPlugin?.navigateToKeys(navController)
                         }
                     }
                 }
@@ -149,7 +147,7 @@ fun FareBotApp(
                             errorMessage = errorMessage,
                             onDismissError = { homeViewModel.dismissError() },
                             onNavigateToAddKeyForCard = { tagId, cardType ->
-                                navController.navigate(Screen.AddKey.createRoute(tagId, cardType))
+                                graph.keyManagerPlugin?.navigateToAddKey(navController, tagId, cardType)
                             },
                             onScanCard = { homeViewModel.startActiveScan() },
                             historyUiState = historyUiState,
@@ -232,7 +230,10 @@ fun FareBotApp(
                             onStatusChipTap = { message ->
                                 platformActions.showToast(message)
                             },
-                            onNavigateToKeys = { navController.navigate(Screen.Keys.route) },
+                            onNavigateToKeys =
+                                graph.keyManagerPlugin?.let { plugin ->
+                                    { plugin.navigateToKeys(navController) }
+                                },
                             onConnectFlipperBle =
                                 if (flipperTransportFactory.isBleSupported) {
                                     {
@@ -330,81 +331,12 @@ fun FareBotApp(
                         )
                     }
 
-                    composable(Screen.Keys.route) {
-                        val viewModel = graphViewModel { keysViewModel }
-                        val uiState by viewModel.uiState.collectAsState()
-
-                        LaunchedEffect(Unit) {
-                            viewModel.loadKeys()
-                        }
-
-                        KeysScreen(
-                            uiState = uiState,
-                            onBack = { navController.popBackStack() },
-                            onNavigateToAddKey = { navController.navigate(Screen.AddKey.createRoute()) },
-                            onDeleteKey = { keyId -> viewModel.deleteKey(keyId) },
-                            onToggleSelection = { keyId -> viewModel.toggleSelection(keyId) },
-                            onClearSelection = { viewModel.clearSelection() },
-                            onSelectAll = { viewModel.selectAll() },
-                            onDeleteSelected = { viewModel.deleteSelected() },
-                        )
-                    }
-
-                    composable(
-                        route = Screen.AddKey.route,
-                        arguments =
-                            listOf(
-                                navArgument("tagId") {
-                                    type = NavType.StringType
-                                    nullable = true
-                                    defaultValue = null
-                                },
-                                navArgument("cardType") {
-                                    type = NavType.StringType
-                                    nullable = true
-                                    defaultValue = null
-                                },
-                            ),
-                    ) { backStackEntry ->
-                        val viewModel = graphViewModel { addKeyViewModel }
-                        val uiState by viewModel.uiState.collectAsState()
-
-                        val prefillTagId = backStackEntry.arguments?.read { getStringOrNull("tagId") }
-                        val prefillCardTypeName = backStackEntry.arguments?.read { getStringOrNull("cardType") }
-
-                        LaunchedEffect(prefillTagId, prefillCardTypeName) {
-                            if (prefillTagId != null && prefillCardTypeName != null) {
-                                val cardType = CardType.entries.firstOrNull { it.name == prefillCardTypeName }
-                                if (cardType != null) {
-                                    viewModel.prefillCardData(prefillTagId, cardType)
-                                }
-                            }
-                        }
-
-                        LaunchedEffect(Unit) {
-                            viewModel.startObservingTags()
-                        }
-
-                        LaunchedEffect(Unit) {
-                            viewModel.keySaved.collect {
-                                navController.popBackStack()
-                            }
-                        }
-
-                        AddKeyScreen(
-                            uiState = uiState,
-                            onBack = { navController.popBackStack() },
-                            onSaveKey = { cardId, cardType, keyData ->
-                                viewModel.saveKey(cardId, cardType, keyData)
-                            },
-                            onEnterManually = { viewModel.enterManualMode() },
-                            onImportFile = {
-                                platformActions.pickFileForBytes { bytes ->
-                                    if (bytes != null) {
-                                        viewModel.importKeyFile(bytes)
-                                    }
-                                }
-                            },
+                    graph.keyManagerPlugin?.run {
+                        registerKeyRoutes(
+                            navController = navController,
+                            cardKeysPersister = graph.cardKeysPersister,
+                            cardScanner = graph.cardScanner,
+                            onPickFile = { callback -> platformActions.pickFileForBytes(callback) },
                         )
                     }
 

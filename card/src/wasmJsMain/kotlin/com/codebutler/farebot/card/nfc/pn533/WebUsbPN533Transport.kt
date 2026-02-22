@@ -24,6 +24,7 @@
 
 package com.codebutler.farebot.card.nfc.pn533
 
+import com.codebutler.farebot.base.util.hex
 import kotlinx.coroutines.delay
 import kotlin.js.ExperimentalWasmJsInterop
 
@@ -100,7 +101,7 @@ class WebUsbPN533Transport : PN533Transport {
         // Read ACK or response
         val ackOrResponse =
             bulkRead(TIMEOUT_MS)
-                ?: throw PN533Exception("USB read ACK timed out")
+                ?: throw PN533TransportException("USB read ACK timed out")
 
         if (ackOrResponse.size >= ACK_FRAME.size &&
             ackOrResponse.copyOfRange(0, ACK_FRAME.size).contentEquals(ACK_FRAME)
@@ -108,7 +109,7 @@ class WebUsbPN533Transport : PN533Transport {
             // ACK received, now read the actual response
             val response =
                 bulkRead(timeoutMs)
-                    ?: throw PN533Exception("USB read response timed out")
+                    ?: throw PN533TransportException("USB read response timed out")
             return parseFrame(response)
         }
 
@@ -136,7 +137,7 @@ class WebUsbPN533Transport : PN533Transport {
         }
         val error = jsWebUsbGetXferOutError()?.toString()
         if (error != null) {
-            throw PN533Exception("USB write failed: $error")
+            throw PN533TransportException("USB write failed: $error")
         }
     }
 
@@ -144,6 +145,10 @@ class WebUsbPN533Transport : PN533Transport {
         jsWebUsbStartTransferIn(timeoutMs)
         while (!jsWebUsbIsXferInReady()) {
             delay(POLL_INTERVAL_MS)
+        }
+        val error = jsWebUsbGetXferInError()?.toString()
+        if (error != null) {
+            throw PN533TransportException("USB read failed: $error")
         }
         val csv = jsWebUsbGetXferInData()?.toString() ?: return null
         if (csv.isEmpty()) return null
@@ -229,17 +234,6 @@ class WebUsbPN533Transport : PN533Transport {
 
             return payload.copyOfRange(2, payload.size)
         }
-
-        private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
-
-        private fun ByteArray.hex(): String =
-            buildString(size * 2) {
-                for (b in this@hex) {
-                    val i = b.toInt() and 0xFF
-                    append(HEX_CHARS[i shr 4])
-                    append(HEX_CHARS[i and 0x0F])
-                }
-            }
     }
 }
 
@@ -286,6 +280,11 @@ private fun jsWebUsbStartTransferOut(dataStr: JsString) {
         """
         (function() {
             window._fbUsbOut = { ready: false, error: null };
+            if (!window._fbUsb || !window._fbUsb.device) {
+                window._fbUsbOut.error = "USB device disconnected";
+                window._fbUsbOut.ready = true;
+                return;
+            }
             var parts = dataStr.split(',');
             var bytes = new Uint8Array(parts.length);
             for (var i = 0; i < parts.length; i++) bytes[i] = parseInt(parts[i]);
@@ -308,7 +307,12 @@ private fun jsWebUsbStartTransferIn(timeoutMs: Int) {
     js(
         """
         (function() {
-            window._fbUsbIn = { data: null, ready: false };
+            window._fbUsbIn = { data: null, ready: false, error: null };
+            if (!window._fbUsb || !window._fbUsb.device) {
+                window._fbUsbIn.error = "USB device disconnected";
+                window._fbUsbIn.ready = true;
+                return;
+            }
             var timer = setTimeout(function() {
                 if (!window._fbUsbIn.ready) window._fbUsbIn.ready = true;
             }, timeoutMs);
@@ -321,8 +325,9 @@ private fun jsWebUsbStartTransferIn(timeoutMs: Int) {
                     window._fbUsbIn.data = parts.join(',');
                 }
                 window._fbUsbIn.ready = true;
-            }).catch(function() {
+            }).catch(function(err) {
                 clearTimeout(timer);
+                window._fbUsbIn.error = err.message;
                 window._fbUsbIn.ready = true;
             });
         })()
@@ -331,6 +336,8 @@ private fun jsWebUsbStartTransferIn(timeoutMs: Int) {
 }
 
 private fun jsWebUsbIsXferInReady(): Boolean = js("window._fbUsbIn && window._fbUsbIn.ready === true")
+
+private fun jsWebUsbGetXferInError(): JsString? = js("(window._fbUsbIn && window._fbUsbIn.error) || null")
 
 private fun jsWebUsbGetXferInData(): JsString? = js("(window._fbUsbIn && window._fbUsbIn.data) || null")
 
