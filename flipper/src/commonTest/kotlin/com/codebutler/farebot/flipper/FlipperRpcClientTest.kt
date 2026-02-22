@@ -48,23 +48,21 @@ class FlipperRpcClientTest {
     }
 
     @Test
-    fun testConnectSendsStartRpcSession() =
+    fun testConnectSendsPing() =
         runTest {
             val transport = MockTransport()
             val client = FlipperRpcClient(transport)
 
             // Enqueue a valid ping response (Main envelope with command_id=1, status=OK, ping_response)
             // Main fields: command_id=1 (field 1, varint), command_status=0 (field 2, varint),
-            //              has_next=false (field 3, varint=0), system_ping_response (field 5, LEN)
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            //              has_next=false (field 3, varint=0), system_ping_response (field 6, LEN)
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
             client.connect()
 
             assertTrue(transport.isConnected)
-            assertTrue(transport.writtenData.isNotEmpty())
-            val firstWrite = transport.writtenData[0].decodeToString()
-            assertTrue(firstWrite.contains("start_rpc_session"), "First write should be start_rpc_session")
+            assertTrue(transport.writtenData.isNotEmpty(), "Connect should send a ping request")
         }
 
     @Test
@@ -88,7 +86,7 @@ class FlipperRpcClientTest {
             val client = FlipperRpcClient(transport)
 
             // Enqueue ping response for connect
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
             client.connect()
@@ -104,7 +102,7 @@ class FlipperRpcClientTest {
             val listResponse =
                 buildMainEnvelope(
                     commandId = 2,
-                    contentFieldNumber = 20, // storage_list_response
+                    contentFieldNumber = 8, // storage_list_response
                     contentBytes = listResponseContent,
                 )
             transport.enqueueResponse(FlipperRpcClient.frameMessage(listResponse))
@@ -124,7 +122,7 @@ class FlipperRpcClientTest {
             val client = FlipperRpcClient(transport)
 
             // Enqueue ping response for connect
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
             client.connect()
@@ -135,7 +133,7 @@ class FlipperRpcClientTest {
             val readResponse =
                 buildMainEnvelope(
                     commandId = 2,
-                    contentFieldNumber = 22, // storage_read_response
+                    contentFieldNumber = 10, // storage_read_response
                     contentBytes = readResponseContent,
                 )
             transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse))
@@ -151,7 +149,7 @@ class FlipperRpcClientTest {
             val client = FlipperRpcClient(transport)
 
             // Enqueue ping response for connect
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
 
             client.connect()
@@ -161,7 +159,7 @@ class FlipperRpcClientTest {
             val readResponse1 =
                 buildMainEnvelope(
                     commandId = 2,
-                    contentFieldNumber = 22,
+                    contentFieldNumber = 10,
                     contentBytes = buildStorageReadResponseBytes(chunk1),
                     hasNext = true,
                 )
@@ -172,7 +170,7 @@ class FlipperRpcClientTest {
             val readResponse2 =
                 buildMainEnvelope(
                     commandId = 2,
-                    contentFieldNumber = 22,
+                    contentFieldNumber = 10,
                     contentBytes = buildStorageReadResponseBytes(chunk2),
                     hasNext = false,
                 )

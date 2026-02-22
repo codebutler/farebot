@@ -74,7 +74,7 @@ class FlipperProtoTest {
     @Test
     fun testCommandStatusValues() {
         assertEquals(0, CommandStatus.OK.value)
-        assertEquals(2, CommandStatus.ERROR_STORAGE_NOT_READY.value)
+        assertEquals(5, CommandStatus.ERROR_STORAGE_NOT_READY.value)
     }
 
     @Test

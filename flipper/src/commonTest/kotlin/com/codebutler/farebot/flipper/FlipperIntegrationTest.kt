@@ -44,7 +44,7 @@ class FlipperIntegrationTest {
             val client = FlipperRpcClient(transport)
 
             // 1. Connect — enqueue ping response
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
             client.connect()
             assertTrue(transport.isConnected)
@@ -58,7 +58,7 @@ class FlipperIntegrationTest {
                         TestFileEntry("backup.nfc", isDir = false, size = 256u),
                     ),
                 )
-            val listResponse = buildMainEnvelope(commandId = 2, contentFieldNumber = 20, contentBytes = listContent)
+            val listResponse = buildMainEnvelope(commandId = 2, contentFieldNumber = 8, contentBytes = listContent)
             transport.enqueueResponse(FlipperRpcClient.frameMessage(listResponse))
 
             val entries = client.listDirectory("/ext/nfc")
@@ -80,7 +80,7 @@ class FlipperIntegrationTest {
                 """.trimIndent()
             val fileData = nfcContent.encodeToByteArray()
             val readContent = buildStorageReadResponseBytes(fileData)
-            val readResponse = buildMainEnvelope(commandId = 3, contentFieldNumber = 22, contentBytes = readContent)
+            val readResponse = buildMainEnvelope(commandId = 3, contentFieldNumber = 10, contentBytes = readContent)
             transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse))
 
             val data = client.readFile("/ext/nfc/card.nfc")
@@ -97,7 +97,7 @@ class FlipperIntegrationTest {
             val client = FlipperRpcClient(transport)
 
             // Connect
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
             client.connect()
 
@@ -112,7 +112,7 @@ class FlipperIntegrationTest {
                 """.trimIndent()
             val dictData = dictContent.encodeToByteArray()
             val readContent = buildStorageReadResponseBytes(dictData)
-            val readResponse = buildMainEnvelope(commandId = 2, contentFieldNumber = 22, contentBytes = readContent)
+            val readResponse = buildMainEnvelope(commandId = 2, contentFieldNumber = 10, contentBytes = readContent)
             transport.enqueueResponse(FlipperRpcClient.frameMessage(readResponse))
 
             val data = client.readFile("/ext/nfc/assets/mf_classic_dict_user.nfc")
@@ -139,7 +139,7 @@ class FlipperIntegrationTest {
             val client = FlipperRpcClient(transport)
 
             // Connect
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
             client.connect()
 
@@ -150,7 +150,7 @@ class FlipperIntegrationTest {
             val readResponse1 =
                 buildMainEnvelope(
                     commandId = 2,
-                    contentFieldNumber = 22,
+                    contentFieldNumber = 10,
                     contentBytes = buildStorageReadResponseBytes(chunk1),
                     hasNext = true,
                 )
@@ -159,7 +159,7 @@ class FlipperIntegrationTest {
             val readResponse2 =
                 buildMainEnvelope(
                     commandId = 2,
-                    contentFieldNumber = 22,
+                    contentFieldNumber = 10,
                     contentBytes = buildStorageReadResponseBytes(chunk2),
                     hasNext = false,
                 )
@@ -177,7 +177,7 @@ class FlipperIntegrationTest {
             val client = FlipperRpcClient(transport)
 
             // Connect
-            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 5, contentBytes = byteArrayOf())
+            val pingResponse = buildMainEnvelope(commandId = 1, contentFieldNumber = 6, contentBytes = byteArrayOf())
             transport.enqueueResponse(FlipperRpcClient.frameMessage(pingResponse))
             client.connect()
             assertTrue(transport.isConnected)
