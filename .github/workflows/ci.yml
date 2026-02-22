@@ -99,7 +99,36 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build Web
-        run: ./gradlew :app:web:wasmJsBrowserDevelopmentExecutableDistribution
+        run: ./gradlew :app:web:wasmJsBrowserDistribution
+
+      - name: Upload web artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: app/web/build/dist/wasmJs/productionExecutable/
+          retention-days: 1
+
+  deploy-web:
+    name: Deploy (Web)
+    needs: web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist/
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
+        run: vercel deploy --prod --token "$VERCEL_TOKEN" --yes dist/
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
   ios:
     name: Build & Test (iOS)
