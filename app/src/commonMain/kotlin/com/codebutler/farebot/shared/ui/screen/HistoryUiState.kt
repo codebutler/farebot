@@ -1,6 +1,7 @@
 package com.codebutler.farebot.shared.ui.screen
 
 import com.codebutler.farebot.card.CardType
+import org.jetbrains.compose.resources.DrawableResource
 
 data class HistoryUiState(
     val isLoading: Boolean = true,
@@ -24,6 +25,10 @@ data class HistoryItem(
     val parseError: String?,
     /** Brand color as 0xRRGGBB (no alpha). Null if unknown. */
     val brandColor: Int? = null,
+    /** Card image resource (e.g. transit card artwork). */
+    val imageRes: DrawableResource? = null,
+    /** Formatted balance string, e.g. "$12.50". */
+    val balance: String? = null,
     val cardType: CardType? = null,
     val keysRequired: Boolean = false,
     val keyBundle: String? = null,

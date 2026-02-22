@@ -362,7 +362,7 @@ internal object SuicaUtil {
     /**
      * Gets the StringResource for the card name, or null if unknown or ambiguous.
      */
-    private fun getCardNameResource(services: Set<Int>): org.jetbrains.compose.resources.StringResource? =
+    fun getCardNameResource(services: Set<Int>): org.jetbrains.compose.resources.StringResource? =
         ICCardType.entries
             .map {
                 Pair(it.localName, (it.uniqueServices intersect services).size)

@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.getString
 
 @Inject
@@ -81,6 +82,8 @@ class HistoryViewModel(
                         var serial = savedCard.serial
                         var parseError: String? = null
                         var brandColor: Int? = null
+                        var imageRes: DrawableResource? = null
+                        var balance: String? = null
                         var keysRequired = false
                         var keyBundle: String? = null
                         var preview = false
@@ -91,12 +94,22 @@ class HistoryViewModel(
                             val identity = transitFactoryRegistry.parseTransitIdentity(card)
                             cardName = identity?.name?.resolveAsync()
                             brandColor = cardInfo?.brandColor
+                            imageRes = cardInfo?.imageRes
                             keysRequired = cardInfo?.keysRequired ?: false
                             keyBundle = cardInfo?.keyBundle
                             preview = cardInfo?.preview ?: false
                             serialOnly = cardInfo?.serialOnly ?: false
                             if (identity?.serialNumber != null) {
                                 serial = identity.serialNumber!!
+                            }
+                            try {
+                                val transitInfo = transitFactoryRegistry.parseTransitInfo(card)
+                                val balanceStr = transitInfo?.formatBalanceString()
+                                if (!balanceStr.isNullOrEmpty()) {
+                                    balance = balanceStr
+                                }
+                            } catch (_: Exception) {
+                                // Balance parsing is best-effort
                             }
                         } catch (ex: Exception) {
                             parseError = ex.message
@@ -123,6 +136,8 @@ class HistoryViewModel(
                             scannedTime = scannedTime,
                             parseError = parseError,
                             brandColor = brandColor,
+                            imageRes = imageRes,
+                            balance = balance,
                             cardType = savedCard.type,
                             keysRequired = keysRequired,
                             keyBundle = keyBundle,

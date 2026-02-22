@@ -39,7 +39,7 @@ class TransitFactoryRegistry {
 
     fun parseTransitInfo(card: Card): TransitInfo? = findFactory(card)?.parseInfo(card)
 
-    fun findCardInfo(card: Card): CardInfo? = findFactory(card)?.allCards?.firstOrNull()
+    fun findCardInfo(card: Card): CardInfo? = findFactory(card)?.findCardInfo(card)
 
     fun findBrandColor(card: Card): Int? = findCardInfo(card)?.brandColor
 
