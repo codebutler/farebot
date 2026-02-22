@@ -1,0 +1,5 @@
+{
+  "buildCommand": "./gradlew :app:web:wasmJsBrowserDistribution",
+  "outputDirectory": "app/web/build/dist/wasmJs/productionExecutable",
+  "installCommand": "echo 'skip'"
+}
