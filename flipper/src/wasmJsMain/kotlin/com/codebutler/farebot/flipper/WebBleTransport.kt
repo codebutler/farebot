@@ -114,15 +114,18 @@ private fun jsWebBleRequestDevice() {
     js(
         """
         (function() {
+            console.log('[FareBot BLE] requestDevice: starting with namePrefix filter "Flipper"');
+            console.log('[FareBot BLE] navigator.bluetooth available:', !!navigator.bluetooth);
             window._fbBle = { device: null, server: null, rxChar: null, txChar: null, ready: false, connected: false, connectError: null, buffer: [], writeReady: false, writeError: null };
             navigator.bluetooth.requestDevice({
                 filters: [{ namePrefix: 'Flipper' }],
                 optionalServices: ['8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000']
             }).then(function(device) {
+                console.log('[FareBot BLE] requestDevice: got device:', device.name, 'id:', device.id);
                 window._fbBle.device = device;
                 window._fbBle.ready = true;
             }).catch(function(err) {
-                console.error('Web Bluetooth requestDevice failed:', err);
+                console.error('[FareBot BLE] requestDevice failed:', err.name, err.message);
                 window._fbBle.ready = true;
             });
         })()
@@ -139,19 +142,24 @@ private fun jsWebBleConnect() {
         """
         (function() {
             var ble = window._fbBle;
+            console.log('[FareBot BLE] connect: connecting to GATT server on device:', ble.device.name);
             ble.device.gatt.connect().then(function(server) {
+                console.log('[FareBot BLE] connect: GATT server connected, getting primary service...');
                 ble.server = server;
                 return server.getPrimaryService('8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000');
             }).then(function(service) {
+                console.log('[FareBot BLE] connect: got service, getting characteristics...');
                 return Promise.all([
                     service.getCharacteristic('19ed82ae-ed21-4c9d-4145-228e62fe0000'),
                     service.getCharacteristic('19ed82ae-ed21-4c9d-4145-228e61fe0000')
                 ]);
             }).then(function(chars) {
+                console.log('[FareBot BLE] connect: got characteristics, starting notifications...');
                 ble.rxChar = chars[0];
                 ble.txChar = chars[1];
                 return ble.txChar.startNotifications();
             }).then(function() {
+                console.log('[FareBot BLE] connect: notifications started, connection ready');
                 ble.txChar.addEventListener('characteristicvaluechanged', function(event) {
                     var value = event.target.value;
                     var arr = new Uint8Array(value.buffer);
@@ -161,6 +169,7 @@ private fun jsWebBleConnect() {
                 });
                 ble.connected = true;
             }).catch(function(err) {
+                console.error('[FareBot BLE] connect failed:', err.name, err.message);
                 ble.connectError = err.message || 'Unknown error';
                 ble.connected = true;
             });
