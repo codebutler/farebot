@@ -439,7 +439,10 @@ fun FareBotApp(
                     onShare = {
                         val json = viewModel.exportCard()
                         if (json != null) {
-                            platformActions.shareFile(json, "farebot-card.json", "application/json")
+                            val name = uiState.cardName?.lowercase()?.replace(' ', '-') ?: "card"
+                            val serial = uiState.serialNumber ?: ""
+                            val fileName = "farebot-$name-$serial.json"
+                            platformActions.shareFile(json, fileName, "application/json")
                         }
                     },
                     onDelete = {
