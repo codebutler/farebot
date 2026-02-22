@@ -10,6 +10,7 @@ import com.codebutler.farebot.key.CardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
+import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +52,9 @@ class AndroidCardScanner(
     private val _isScanning = MutableStateFlow(false)
     override val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
 
+    private val _readingProgress = MutableStateFlow<ReadingProgress?>(null)
+    override val readingProgress: StateFlow<ReadingProgress?> = _readingProgress.asStateFlow()
+
     private var isObserving = false
 
     fun startObservingTags() {
@@ -65,12 +69,17 @@ class AndroidCardScanner(
                 _isScanning.value = true
                 try {
                     val cardKeys = getCardKeys(ByteUtils.getHexString(tag.id))
-                    val rawCard = tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag()
+                    val rawCard =
+                        tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag { current, total ->
+                            _readingProgress.value = ReadingProgress(current, total)
+                        }
+                    _readingProgress.value = null
                     if (rawCard.isUnauthorized()) {
                         throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                     }
                     _scannedCards.emit(rawCard)
                 } catch (error: Throwable) {
+                    _readingProgress.value = null
                     _scanErrors.emit(error)
                 } finally {
                     _isScanning.value = false

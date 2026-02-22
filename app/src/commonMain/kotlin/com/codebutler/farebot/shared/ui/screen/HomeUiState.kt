@@ -1,5 +1,6 @@
 package com.codebutler.farebot.shared.ui.screen
 
+import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.platform.NfcStatus
 
 data class HomeUiState(
@@ -7,4 +8,5 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val isReadingCard: Boolean = false,
     val requiresActiveScan: Boolean = true,
+    val readingProgress: ReadingProgress? = null,
 )

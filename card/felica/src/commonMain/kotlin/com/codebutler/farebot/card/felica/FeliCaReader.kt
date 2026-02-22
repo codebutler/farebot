@@ -45,6 +45,7 @@ object FeliCaReader {
         tagId: ByteArray,
         adapter: FeliCaTagAdapter,
         onlyFirst: Boolean = false,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawFelicaCard {
         val idmBytes = adapter.getIDm()
         val idm = FeliCaIdm(idmBytes)
@@ -85,6 +86,7 @@ object FeliCaReader {
         val systems = mutableListOf<FelicaSystem>()
 
         for ((systemNumber, systemCode) in systemCodes.withIndex()) {
+            onProgress?.invoke(systemNumber, systemCodes.size)
             // We can get System Code 0 from magic fallbacks -- drop this.
             if (systemCode == 0) continue
 

@@ -80,6 +80,7 @@
     <string name="tab_explore">Explore</string>
     <string name="scan">Scan</string>
     <string name="reading_card">Reading\u2026</string>
+    <string name="hold_card_near_reader">Hold your card near the reader</string>
     <string name="search_supported_cards">Search</string>
     <string name="nfc_disabled_tap_to_enable">Enable NFC to scan cards</string>
 

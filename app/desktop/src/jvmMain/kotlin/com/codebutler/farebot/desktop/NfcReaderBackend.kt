@@ -40,5 +40,6 @@ interface NfcReaderBackend {
         onCardDetected: (ScannedTag) -> Unit,
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     )
 }

@@ -48,5 +48,6 @@ class VicinityTagReader(
         tag: Tag,
         tech: VicinityTechnology,
         cardKeys: CardKeys?,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawVicinityCard = VicinityCardReader.readCard(tagId, tech)
 }

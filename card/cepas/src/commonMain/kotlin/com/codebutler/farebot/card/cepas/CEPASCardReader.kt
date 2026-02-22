@@ -34,6 +34,7 @@ object CEPASCardReader {
     suspend fun readCard(
         tagId: ByteArray,
         tech: CardTransceiver,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
     ): RawCEPASCard {
         val purses = arrayOfNulls<RawCEPASPurse>(16)
         val histories = arrayOfNulls<RawCEPASHistory>(16)
@@ -41,6 +42,7 @@ object CEPASCardReader {
         val protocol = CEPASProtocol(ISO7816Protocol(tech))
 
         for (purseId in purses.indices) {
+            onProgress?.invoke(purseId, 32)
             val purseData = protocol.getPurse(purseId)
             purses[purseId] =
                 if (purseData != null) {
@@ -51,6 +53,7 @@ object CEPASCardReader {
         }
 
         for (historyId in histories.indices) {
+            onProgress?.invoke(16 + historyId, 32)
             val rawCEPASPurse = purses[historyId]!!
             if (rawCEPASPurse.isValid) {
                 val historyData = protocol.getHistory(historyId)

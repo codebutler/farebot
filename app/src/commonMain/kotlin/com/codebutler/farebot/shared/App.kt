@@ -152,6 +152,7 @@ fun FareBotApp(
                                 navController.navigate(Screen.AddKey.createRoute(tagId, cardType))
                             },
                             onScanCard = { homeViewModel.startActiveScan() },
+                            onCancelScan = { homeViewModel.stopActiveScan() },
                             historyUiState = historyUiState,
                             onNavigateToCard = { itemId ->
                                 val cardKey = historyViewModel.getCardNavKey(itemId)

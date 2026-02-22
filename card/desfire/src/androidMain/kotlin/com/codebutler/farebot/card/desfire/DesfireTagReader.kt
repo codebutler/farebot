@@ -42,5 +42,6 @@ class DesfireTagReader(
         tag: Tag,
         tech: CardTransceiver,
         cardKeys: CardKeys?,
-    ): RawDesfireCard = DesfireCardReader.readCard(tagId, tech)
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+    ): RawDesfireCard = DesfireCardReader.readCard(tagId, tech, onProgress)
 }
