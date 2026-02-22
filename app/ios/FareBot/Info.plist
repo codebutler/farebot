@@ -33,6 +33,8 @@
     </array>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>FareBot uses Bluetooth to connect to Flipper Zero for NFC dump import</string>
     <key>NFCReaderUsageDescription</key>
     <string>FareBot needs NFC access to read transit cards</string>
     <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>

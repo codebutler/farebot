@@ -3,6 +3,7 @@
 package com.codebutler.farebot.flipper
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import kotlin.js.ExperimentalWasmJsInterop
 
 /**
@@ -16,6 +17,7 @@ class WebSerialTransport : FlipperTransport {
     companion object {
         private const val POLL_INTERVAL_MS = 10L
         private const val READ_TIMEOUT_MS = 5000
+        private const val CONNECT_TIMEOUT_MS = 15_000L
     }
 
     private var opened = false
@@ -34,18 +36,26 @@ class WebSerialTransport : FlipperTransport {
 
         jsWebSerialRequestPort()
 
-        while (!jsWebSerialIsReady()) {
-            delay(POLL_INTERVAL_MS)
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            while (!jsWebSerialIsReady()) {
+                delay(POLL_INTERVAL_MS)
+            }
         }
 
         if (!jsWebSerialHasPort()) {
-            throw FlipperException("No serial port selected")
+            throw FlipperException("No serial port selected. Did you cancel the dialog?")
         }
 
         jsWebSerialOpen()
 
-        while (!jsWebSerialIsOpen()) {
-            delay(POLL_INTERVAL_MS)
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            while (!jsWebSerialIsOpen()) {
+                val error = jsWebSerialGetOpenError()?.toString()
+                if (error != null) {
+                    throw FlipperException("Failed to open serial port: $error")
+                }
+                delay(POLL_INTERVAL_MS)
+            }
         }
 
         opened = true
@@ -129,11 +139,13 @@ private fun jsWebSerialOpen() {
     js(
         """
         (function() {
+            window._fbSerial.openError = null;
             window._fbSerial.port.open({ baudRate: 230400 }).then(function() {
                 window._fbSerial.reader = window._fbSerial.port.readable.getReader();
                 window._fbSerial.open = true;
             }).catch(function(err) {
                 console.error('Web Serial open failed:', err);
+                window._fbSerial.openError = err.message || 'Unknown error';
             });
         })()
         """,
@@ -141,6 +153,8 @@ private fun jsWebSerialOpen() {
 }
 
 private fun jsWebSerialIsOpen(): Boolean = js("window._fbSerial && window._fbSerial.open === true")
+
+private fun jsWebSerialGetOpenError(): JsString? = js("(window._fbSerial && window._fbSerial.openError) || null")
 
 private fun jsWebSerialStartRead(length: Int) {
     js(

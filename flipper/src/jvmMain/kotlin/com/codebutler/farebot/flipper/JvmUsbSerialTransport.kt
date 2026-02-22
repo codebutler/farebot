@@ -61,6 +61,9 @@ class JvmUsbSerialTransport(
         if (written < 0) {
             throw FlipperException("Serial write failed")
         }
+        if (written < data.size) {
+            throw FlipperException("Serial write incomplete: wrote $written of ${data.size} bytes")
+        }
     }
 
     override suspend fun close() {

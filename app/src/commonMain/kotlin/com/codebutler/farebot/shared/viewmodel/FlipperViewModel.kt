@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.serialize.CardSerializer
+import com.codebutler.farebot.flipper.FlipperDebugLog
 import com.codebutler.farebot.flipper.FlipperKeyDictParser
 import com.codebutler.farebot.flipper.FlipperRpcClient
 import com.codebutler.farebot.flipper.FlipperTransport
@@ -37,6 +38,19 @@ class FlipperViewModel(
     private var rpcClient: FlipperRpcClient? = null
     private var transport: FlipperTransport? = null
 
+    init {
+        // Collect debug log lines from the shared FlipperDebugLog and push to UI state
+        viewModelScope.launch {
+            FlipperDebugLog.lines.collect { lines ->
+                _uiState.value = _uiState.value.copy(debugLog = lines)
+            }
+        }
+    }
+
+    private fun debugLog(msg: String) {
+        FlipperDebugLog.log(msg)
+    }
+
     fun connectUsb() {
         viewModelScope.launch {
             val transport = transportFactory.createUsbTransport()
@@ -52,11 +66,16 @@ class FlipperViewModel(
     }
 
     fun connectBle() {
+        FlipperDebugLog.clear()
+        debugLog("connectBle() called")
         viewModelScope.launch {
+            debugLog("creating BLE transport...")
             val transport = transportFactory.createBleTransport()
+            debugLog("transport=$transport (class=${transport?.let { it::class.simpleName }})")
             if (transport != null) {
                 connect(transport)
             } else {
+                debugLog("transport is null!")
                 _uiState.value =
                     _uiState.value.copy(
                         error = "Bluetooth transport not available on this platform",
@@ -66,6 +85,7 @@ class FlipperViewModel(
     }
 
     fun connect(transport: FlipperTransport) {
+        debugLog("connect() starting")
         this.transport = transport
         val client = FlipperRpcClient(transport)
         this.rpcClient = client
@@ -78,14 +98,16 @@ class FlipperViewModel(
 
         viewModelScope.launch {
             try {
+                debugLog("calling client.connect()...")
                 client.connect()
+                debugLog("connected!")
 
                 val deviceInfo = mutableMapOf<String, String>()
                 try {
                     val info = client.getDeviceInfo()
                     deviceInfo.putAll(info)
                 } catch (e: Exception) {
-                    println("[FlipperViewModel] Failed to get device info: ${e.message}")
+                    debugLog("getDeviceInfo failed: ${e.message}")
                 }
 
                 _uiState.value =
@@ -96,6 +118,7 @@ class FlipperViewModel(
 
                 navigateToDirectory("/ext/nfc")
             } catch (e: Exception) {
+                debugLog("FAILED: ${e::class.simpleName}: ${e.message}")
                 _uiState.value =
                     _uiState.value.copy(
                         connectionState = FlipperConnectionState.Disconnected,
@@ -185,7 +208,7 @@ class FlipperViewModel(
                         importProgress =
                             ImportProgress(
                                 currentFile = fileName,
-                                currentIndex = index + 1,
+                                currentIndex = index,
                                 totalFiles = selectedPaths.size,
                             ),
                     )

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
@@ -107,20 +109,23 @@ fun FlipperScreen(
                 FlipperConnectionState.Disconnected -> {
                     DisconnectedContent(
                         error = uiState.error,
+                        debugLog = uiState.debugLog,
                         onConnectUsb = onConnectUsb,
                         onConnectBle = onConnectBle,
                     )
                 }
 
                 FlipperConnectionState.Connecting -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator()
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(stringResource(Res.string.flipper_connecting_message))
+                        if (uiState.debugLog.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(stringResource(Res.string.flipper_connecting_message))
+                            DebugLogView(uiState.debugLog)
                         }
                     }
                 }
@@ -147,6 +152,7 @@ fun FlipperScreen(
 @Composable
 private fun DisconnectedContent(
     error: String?,
+    debugLog: List<String>,
     onConnectUsb: () -> Unit,
     onConnectBle: () -> Unit,
 ) {
@@ -190,6 +196,11 @@ private fun DisconnectedContent(
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
+        }
+
+        if (debugLog.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            DebugLogView(debugLog)
         }
     }
 }
@@ -349,6 +360,30 @@ private fun FileListItem(
 }
 
 @Composable
+private fun DebugLogView(lines: List<String>) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+    ) {
+        Text(
+            text = "Debug Log (${lines.size} lines):",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        for (line in lines) {
+            Text(
+                text = line,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 1.dp),
+            )
+        }
+    }
+}
+
+@Composable
 private fun ImportProgressOverlay(progress: ImportProgress) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -364,12 +399,16 @@ private fun ImportProgressOverlay(progress: ImportProgress) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = stringResource(Res.string.flipper_import_progress, progress.currentIndex, progress.totalFiles),
+                text =
+                    stringResource(
+                        Res.string.flipper_import_progress,
+                        progress.currentIndex + 1,
+                        progress.totalFiles,
+                    ),
                 style = MaterialTheme.typography.bodySmall,
             )
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
-                progress = { progress.currentIndex.toFloat() / progress.totalFiles },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

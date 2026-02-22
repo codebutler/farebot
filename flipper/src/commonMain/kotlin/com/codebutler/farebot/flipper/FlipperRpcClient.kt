@@ -43,7 +43,7 @@ import kotlinx.serialization.protobuf.ProtoBuf
  * `Main` envelopes manually using raw protobuf field encoding.
  *
  * Protocol flow:
- * 1. Send "start_rpc_session\r" as raw text
+ * 1. Connect transport and enable BLE notifications
  * 2. Send/receive varint-length-prefixed protobuf `Main` messages
  * 3. Correlate responses by command_id
  * 4. Handle multi-part responses (has_next = true)
@@ -54,20 +54,26 @@ class FlipperRpcClient(
 ) {
     private var nextCommandId = 1
 
-    /** Connect to the Flipper, start RPC session, and verify with a ping. */
+    private fun log(msg: String) {
+        FlipperDebugLog.log("RPC: $msg")
+    }
+
+    /** Connect to the Flipper and verify with a ping. */
     suspend fun connect() {
         transport.connect()
-        // Send raw session start command
-        transport.write("start_rpc_session\r".encodeToByteArray())
-        // Verify connectivity with a ping
+        log("transport connected, sending ping...")
         ping()
+        log("ping response received, RPC session ready!")
     }
 
     /** Send a ping and wait for the pong response. */
     suspend fun ping() {
         val commandId = nextCommandId++
+        log("ping: sending request (commandId=$commandId)")
         sendRequest(commandId, FIELD_SYSTEM_PING_REQUEST, byteArrayOf())
+        log("ping: waiting for response...")
         val response = readMainResponse(commandId)
+        log("ping: got response status=${response.commandStatus}")
         checkStatus(response)
     }
 
@@ -94,11 +100,15 @@ class FlipperRpcClient(
             checkStatus(response)
             hasNext = response.hasNext
 
-            if (response.contentFieldNumber == FIELD_STORAGE_LIST_RESPONSE && response.contentBytes.isNotEmpty()) {
-                val listResponse = ProtoBuf.decodeFromByteArray<StorageListResponse>(response.contentBytes)
-                for (file in listResponse.files) {
-                    allFiles.add(file.toEntry(path))
+            if (response.contentFieldNumber == FIELD_STORAGE_LIST_RESPONSE) {
+                if (response.contentBytes.isNotEmpty()) {
+                    val listResponse = ProtoBuf.decodeFromByteArray<StorageListResponse>(response.contentBytes)
+                    for (file in listResponse.files) {
+                        allFiles.add(file.toEntry(path))
+                    }
                 }
+            } else if (response.contentFieldNumber != 0) {
+                throw FlipperException("Unexpected response field ${response.contentFieldNumber} for listDirectory")
             }
         }
         return allFiles
@@ -122,11 +132,15 @@ class FlipperRpcClient(
             checkStatus(response)
             hasNext = response.hasNext
 
-            if (response.contentFieldNumber == FIELD_STORAGE_READ_RESPONSE && response.contentBytes.isNotEmpty()) {
-                val readResponse = ProtoBuf.decodeFromByteArray<StorageReadResponse>(response.contentBytes)
-                if (readResponse.file.data.isNotEmpty()) {
-                    chunks.add(readResponse.file.data)
+            if (response.contentFieldNumber == FIELD_STORAGE_READ_RESPONSE) {
+                if (response.contentBytes.isNotEmpty()) {
+                    val readResponse = ProtoBuf.decodeFromByteArray<StorageReadResponse>(response.contentBytes)
+                    if (readResponse.file.data.isNotEmpty()) {
+                        chunks.add(readResponse.file.data)
+                    }
                 }
+            } else if (response.contentFieldNumber != 0) {
+                throw FlipperException("Unexpected response field ${response.contentFieldNumber} for readFile")
             }
         }
 
@@ -200,13 +214,15 @@ class FlipperRpcClient(
             checkStatus(response)
             hasNext = response.hasNext
 
-            if (response.contentFieldNumber == FIELD_SYSTEM_DEVICE_INFO_RESPONSE &&
-                response.contentBytes.isNotEmpty()
-            ) {
-                val devInfo = ProtoBuf.decodeFromByteArray<SystemDeviceInfoResponse>(response.contentBytes)
-                if (devInfo.key.isNotEmpty()) {
-                    info[devInfo.key] = devInfo.value
+            if (response.contentFieldNumber == FIELD_SYSTEM_DEVICE_INFO_RESPONSE) {
+                if (response.contentBytes.isNotEmpty()) {
+                    val devInfo = ProtoBuf.decodeFromByteArray<SystemDeviceInfoResponse>(response.contentBytes)
+                    if (devInfo.key.isNotEmpty()) {
+                        info[devInfo.key] = devInfo.value
+                    }
                 }
+            } else if (response.contentFieldNumber != 0) {
+                throw FlipperException("Unexpected response field ${response.contentFieldNumber} for getDeviceInfo")
             }
         }
         return info
@@ -227,14 +243,21 @@ class FlipperRpcClient(
     /** Read a complete Main response from the transport, with timeout. */
     private suspend fun readMainResponse(expectedCommandId: Int): ParsedMainResponse =
         withTimeout(timeoutMs) {
+            log("readMainResponse: reading varint length prefix...")
             // Read varint length prefix byte-by-byte
             val length = readVarintFromTransport()
+            log("readMainResponse: length=$length, reading message bytes...")
 
             // Read the full message
             val messageBytes = readExactly(length)
+            log("readMainResponse: got ${messageBytes.size} bytes, parsing...")
 
             // Parse the Main envelope
-            parseMainEnvelope(messageBytes)
+            val parsed = parseMainEnvelope(messageBytes)
+            log(
+                "readMainResponse: commandId=${parsed.commandId}, status=${parsed.commandStatus}, hasNext=${parsed.hasNext}, contentField=${parsed.contentFieldNumber}",
+            )
+            parsed
         }
 
     /** Read a varint from the transport one byte at a time. */
@@ -242,10 +265,27 @@ class FlipperRpcClient(
         var result = 0
         var shift = 0
         val buf = ByteArray(1)
+        var zeroReadCount = 0
+        var bytesRead = 0
         while (true) {
             val read = transport.read(buf, 0, 1)
-            if (read == 0) continue // spin until data available
+            if (read == 0) {
+                zeroReadCount++
+                if (zeroReadCount > MAX_ZERO_READS) {
+                    throw FlipperException("Transport returned no data (disconnected?)")
+                }
+                continue
+            }
+            zeroReadCount = 0
             val b = buf[0].toInt() and 0xFF
+            if (bytesRead < 20) {
+                log(
+                    "readVarint: byte[$bytesRead]=0x${b.toString(
+                        16,
+                    ).padStart(2, '0')} (char='${if (b in 32..126) b.toChar() else '?'}')",
+                )
+            }
+            bytesRead++
             result = result or ((b and 0x7F) shl shift)
             if (b and 0x80 == 0) break
             shift += 7
@@ -258,10 +298,17 @@ class FlipperRpcClient(
     private suspend fun readExactly(length: Int): ByteArray {
         val result = ByteArray(length)
         var offset = 0
+        var zeroReadCount = 0
         while (offset < length) {
             val read = transport.read(result, offset, length - offset)
             if (read > 0) {
                 offset += read
+                zeroReadCount = 0
+            } else {
+                zeroReadCount++
+                if (zeroReadCount > MAX_ZERO_READS) {
+                    throw FlipperException("Transport returned no data (disconnected?)")
+                }
             }
         }
         return result
@@ -302,19 +349,21 @@ class FlipperRpcClient(
     }
 
     companion object {
+        private const val MAX_ZERO_READS = 1000
+
         // Main message content field numbers from flipper.proto
-        internal const val FIELD_SYSTEM_PING_REQUEST = 4
-        internal const val FIELD_SYSTEM_PING_RESPONSE = 5
-        internal const val FIELD_SYSTEM_DEVICE_INFO_REQUEST = 7
-        internal const val FIELD_SYSTEM_DEVICE_INFO_RESPONSE = 8
-        internal const val FIELD_STORAGE_LIST_REQUEST = 19
-        internal const val FIELD_STORAGE_LIST_RESPONSE = 20
-        internal const val FIELD_STORAGE_READ_REQUEST = 21
-        internal const val FIELD_STORAGE_READ_RESPONSE = 22
-        internal const val FIELD_STORAGE_STAT_REQUEST = 25
-        internal const val FIELD_STORAGE_STAT_RESPONSE = 26
+        internal const val FIELD_SYSTEM_PING_REQUEST = 5
+        internal const val FIELD_SYSTEM_PING_RESPONSE = 6
+        internal const val FIELD_STORAGE_LIST_REQUEST = 7
+        internal const val FIELD_STORAGE_LIST_RESPONSE = 8
+        internal const val FIELD_STORAGE_READ_REQUEST = 9
+        internal const val FIELD_STORAGE_READ_RESPONSE = 10
+        internal const val FIELD_STORAGE_STAT_REQUEST = 24
+        internal const val FIELD_STORAGE_STAT_RESPONSE = 25
         internal const val FIELD_STORAGE_INFO_REQUEST = 28
         internal const val FIELD_STORAGE_INFO_RESPONSE = 29
+        internal const val FIELD_SYSTEM_DEVICE_INFO_REQUEST = 32
+        internal const val FIELD_SYSTEM_DEVICE_INFO_RESPONSE = 33
 
         /** Prepend a varint length prefix to a message. */
         fun frameMessage(data: ByteArray): ByteArray {
@@ -410,8 +459,7 @@ class FlipperRpcClient(
                         pos += length
                     }
                     else -> {
-                        // Skip unknown wire types (shouldn't happen in practice)
-                        break
+                        throw FlipperException("Unknown protobuf wire type $wireType at field $fieldNumber")
                     }
                 }
             }

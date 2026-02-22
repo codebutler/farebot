@@ -7,11 +7,16 @@ import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeout
+import platform.CoreBluetooth.CBAdvertisementDataLocalNameKey
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
+import platform.CoreBluetooth.CBCentralManagerStatePoweredOff
 import platform.CoreBluetooth.CBCentralManagerStatePoweredOn
+import platform.CoreBluetooth.CBCentralManagerStateResetting
+import platform.CoreBluetooth.CBCentralManagerStateUnauthorized
+import platform.CoreBluetooth.CBCentralManagerStateUnsupported
 import platform.CoreBluetooth.CBCharacteristic
-import platform.CoreBluetooth.CBCharacteristicWriteWithResponse
+import platform.CoreBluetooth.CBCharacteristicWriteWithoutResponse
 import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBPeripheralDelegateProtocol
 import platform.CoreBluetooth.CBService
@@ -33,54 +38,107 @@ class IosBleSerialTransport(
 ) : FlipperTransport {
     companion object {
         val SERIAL_SERVICE_UUID: CBUUID = CBUUID.UUIDWithString("8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000")
-        val SERIAL_RX_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e62fe0000")
-        val SERIAL_TX_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e63fe0000")
+
+        // Phone reads FROM Flipper (subscribe to notifications)
+        val SERIAL_READ_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e61fe0000")
+
+        // Phone writes TO Flipper
+        val SERIAL_WRITE_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e62fe0000")
+
+        // Flow control — Flipper reports available buffer space
+        val SERIAL_FLOW_CONTROL_UUID: CBUUID = CBUUID.UUIDWithString("19ed82ae-ed21-4c9d-4145-228e63fe0000")
         private const val SCAN_TIMEOUT_MS = 15_000L
         private const val CONNECT_TIMEOUT_MS = 10_000L
     }
 
     private var centralManager: CBCentralManager? = null
     private var connectedPeripheral: CBPeripheral? = null
-    private var rxCharacteristic: CBCharacteristic? = null
-    private var txCharacteristic: CBCharacteristic? = null
+    private var writeCharacteristic: CBCharacteristic? = null
+    private var readCharacteristic: CBCharacteristic? = null
+    private var flowControlCharacteristic: CBCharacteristic? = null
     private val receiveChannel = Channel<ByteArray>(Channel.UNLIMITED)
+    private var readBuffer = byteArrayOf()
 
     private var connectionDeferred: CompletableDeferred<Unit>? = null
     private var servicesDeferred: CompletableDeferred<Unit>? = null
+    private var notifyDeferred: CompletableDeferred<Unit>? = null
     private var scanDeferred: CompletableDeferred<CBPeripheral>? = null
+
+    private fun log(msg: String) {
+        FlipperDebugLog.log(msg)
+    }
+
+    // Diagnostics — included in timeout error messages
+    private var lastBleState: Long = -1
+    private var scanStarted: Boolean = false
+    private val discoveredDevices = mutableListOf<String>()
 
     override val isConnected: Boolean
         get() = connectedPeripheral != null
 
     override suspend fun connect() {
+        log("connect() called, peripheral=${peripheral?.name}")
         val target = peripheral ?: scanForFlipper()
+        log("connect() got target peripheral: ${target.name}, identifier=${target.identifier}")
 
         connectionDeferred = CompletableDeferred()
         servicesDeferred = CompletableDeferred()
 
         val manager = centralManager ?: CBCentralManager(delegate = centralDelegate, queue = null)
         centralManager = manager
+        log("connect() centralManager state=${manager.state}")
 
         target.delegate = peripheralDelegate
         connectedPeripheral = target
 
+        log("connect() calling connectPeripheral...")
         manager.connectPeripheral(target, options = null)
 
+        log("connect() waiting for connection (timeout=${CONNECT_TIMEOUT_MS}ms)...")
         withTimeout(CONNECT_TIMEOUT_MS) {
             connectionDeferred!!.await()
         }
+        log("connect() connected! Discovering services...")
 
         target.discoverServices(listOf(SERIAL_SERVICE_UUID))
 
+        log("connect() waiting for service discovery (timeout=${CONNECT_TIMEOUT_MS}ms)...")
         withTimeout(CONNECT_TIMEOUT_MS) {
             servicesDeferred!!.await()
         }
+        log(
+            "connect() services discovered! write=$writeCharacteristic, read=$readCharacteristic, flowControl=$flowControlCharacteristic",
+        )
 
-        // Enable notifications on TX characteristic
-        val tx =
-            txCharacteristic
-                ?: throw FlipperException("TX characteristic not found")
-        target.setNotifyValue(true, forCharacteristic = tx)
+        // Enable notifications on serial read characteristic (data from Flipper)
+        val read =
+            readCharacteristic
+                ?: throw FlipperException("Serial read characteristic not found")
+        notifyDeferred = CompletableDeferred()
+        log("connect() enabling notifications on serial read...")
+        target.setNotifyValue(true, forCharacteristic = read)
+
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            notifyDeferred!!.await()
+        }
+        log("connect() notifications confirmed on serial read.")
+
+        // Enable notifications on flow control characteristic and read initial value
+        val fc = flowControlCharacteristic
+        if (fc != null) {
+            notifyDeferred = CompletableDeferred()
+            log("connect() enabling notifications on flow control...")
+            target.setNotifyValue(true, forCharacteristic = fc)
+            withTimeout(CONNECT_TIMEOUT_MS) {
+                notifyDeferred!!.await()
+            }
+            log("connect() flow control notifications enabled, reading initial value...")
+            target.readValueForCharacteristic(fc)
+        } else {
+            log("connect() WARNING: flow control characteristic not found")
+        }
+
+        log("connect() Done!")
     }
 
     override suspend fun read(
@@ -88,61 +146,136 @@ class IosBleSerialTransport(
         offset: Int,
         length: Int,
     ): Int {
-        val data = receiveChannel.receive()
-        val bytesToCopy = minOf(data.size, length)
-        data.copyInto(buffer, offset, 0, bytesToCopy)
+        // If the internal buffer is empty, wait for the next BLE notification
+        if (readBuffer.isEmpty()) {
+            readBuffer = receiveChannel.receive()
+        }
+        val bytesToCopy = minOf(readBuffer.size, length)
+        readBuffer.copyInto(buffer, offset, 0, bytesToCopy)
+        readBuffer = readBuffer.copyOfRange(bytesToCopy, readBuffer.size)
         return bytesToCopy
     }
 
     override suspend fun write(data: ByteArray) {
         val peripheral = connectedPeripheral ?: throw FlipperException("Not connected")
-        val rx = rxCharacteristic ?: throw FlipperException("RX characteristic not found")
+        val write = writeCharacteristic ?: throw FlipperException("Write characteristic not found")
+
+        val hex = data.joinToString("") { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }
+        log("write(): ${data.size} bytes, hex=$hex")
 
         val nsData = data.toNSData()
-        peripheral.writeValue(nsData, forCharacteristic = rx, type = CBCharacteristicWriteWithResponse)
+        peripheral.writeValue(nsData, forCharacteristic = write, type = CBCharacteristicWriteWithoutResponse)
     }
 
     override suspend fun close() {
+        log("close() called")
         val peripheral = connectedPeripheral ?: return
         centralManager?.cancelPeripheralConnection(peripheral)
         connectedPeripheral = null
-        rxCharacteristic = null
-        txCharacteristic = null
+        writeCharacteristic = null
+        readCharacteristic = null
+        flowControlCharacteristic = null
+        readBuffer = byteArrayOf()
         receiveChannel.close()
     }
 
     private suspend fun scanForFlipper(): CBPeripheral {
+        log("scanForFlipper() starting...")
         scanDeferred = CompletableDeferred()
+        lastBleState = -1
+        scanStarted = false
+        discoveredDevices.clear()
 
+        log("scanForFlipper() creating CBCentralManager...")
         val manager = CBCentralManager(delegate = centralDelegate, queue = null)
         centralManager = manager
+        log("scanForFlipper() CBCentralManager created, initial state=${manager.state}")
 
-        return withTimeout(SCAN_TIMEOUT_MS) {
-            // Wait for powered on state
-            if (manager.state != CBCentralManagerStatePoweredOn) {
-                // Central delegate will start scan when powered on
+        try {
+            return withTimeout(SCAN_TIMEOUT_MS) {
+                log(
+                    "scanForFlipper() inside withTimeout, manager.state=${manager.state}, poweredOn=${manager.state == CBCentralManagerStatePoweredOn}",
+                )
+                // Wait for powered on state
+                if (manager.state != CBCentralManagerStatePoweredOn) {
+                    log("scanForFlipper() NOT powered on yet, delegate will start scan")
+                    // Central delegate will start scan when powered on
+                } else {
+                    log("scanForFlipper() ALREADY powered on, starting scan immediately")
+                }
+                log("scanForFlipper() calling scanForPeripheralsWithServices(null)...")
+                manager.scanForPeripheralsWithServices(
+                    serviceUUIDs = null,
+                    options = null,
+                )
+                scanStarted = true
+                log("scanForFlipper() scan started, awaiting scanDeferred...")
+                try {
+                    scanDeferred!!.await()
+                } finally {
+                    log("scanForFlipper() stopping scan (finally block)")
+                    manager.stopScan()
+                }
             }
-            manager.scanForPeripheralsWithServices(
-                serviceUUIDs = listOf(SERIAL_SERVICE_UUID),
-                options = null,
+        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            val deviceList =
+                if (discoveredDevices.isEmpty()) {
+                    "none"
+                } else {
+                    discoveredDevices.joinToString("; ")
+                }
+            log("scanForFlipper() TIMED OUT! BLE state=$lastBleState, scanStarted=$scanStarted, devices=$deviceList")
+            throw FlipperException(
+                "Flipper Zero not found (scan timed out). " +
+                    "BLE state: $lastBleState, scan started: $scanStarted, " +
+                    "devices seen: $deviceList",
             )
-            try {
-                scanDeferred!!.await()
-            } finally {
-                manager.stopScan()
-            }
         }
     }
 
     private val centralDelegate =
         object : NSObject(), CBCentralManagerDelegateProtocol {
             override fun centralManagerDidUpdateState(central: CBCentralManager) {
-                if (central.state == CBCentralManagerStatePoweredOn) {
-                    if (scanDeferred != null && scanDeferred?.isCompleted == false) {
-                        central.scanForPeripheralsWithServices(
-                            serviceUUIDs = listOf(SERIAL_SERVICE_UUID),
-                            options = null,
+                lastBleState = central.state
+                log("centralManagerDidUpdateState: state=${central.state}")
+                when (central.state) {
+                    CBCentralManagerStatePoweredOn -> {
+                        log(
+                            "  -> PoweredOn! scanDeferred=${scanDeferred != null}, isCompleted=${scanDeferred?.isCompleted}",
                         )
+                        if (scanDeferred != null && scanDeferred?.isCompleted == false) {
+                            log("  -> Starting scan from delegate...")
+                            central.scanForPeripheralsWithServices(
+                                serviceUUIDs = null,
+                                options = null,
+                            )
+                            scanStarted = true
+                            log("  -> Scan started from delegate")
+                        }
+                    }
+                    CBCentralManagerStateUnauthorized -> {
+                        log("  -> Unauthorized!")
+                        scanDeferred?.completeExceptionally(
+                            FlipperException("Bluetooth permission denied. Enable Bluetooth access in Settings."),
+                        )
+                    }
+                    CBCentralManagerStateUnsupported -> {
+                        log("  -> Unsupported!")
+                        scanDeferred?.completeExceptionally(
+                            FlipperException("Bluetooth is not supported on this device."),
+                        )
+                    }
+                    CBCentralManagerStatePoweredOff -> {
+                        log("  -> PoweredOff!")
+                        scanDeferred?.completeExceptionally(
+                            FlipperException("Bluetooth is turned off. Enable it in Settings."),
+                        )
+                    }
+                    CBCentralManagerStateResetting -> {
+                        log("  -> Resetting, waiting...")
+                    }
+                    else -> {
+                        log("  -> Unknown state: ${central.state}")
                     }
                 }
             }
@@ -153,13 +286,40 @@ class IosBleSerialTransport(
                 advertisementData: Map<Any?, *>,
                 RSSI: NSNumber,
             ) {
-                scanDeferred?.complete(didDiscoverPeripheral)
+                val advName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
+                val periphName = didDiscoverPeripheral.name
+                val name = advName ?: periphName
+                val uuid = didDiscoverPeripheral.identifier.UUIDString()
+
+                log("didDiscoverPeripheral: advName=$advName, periphName=$periphName, uuid=$uuid, RSSI=$RSSI")
+
+                // Log all advertisement data keys for first few devices
+                if (discoveredDevices.size < 10) {
+                    val keys = advertisementData.keys.map { it.toString() }
+                    log("  advertisementData keys: $keys")
+                }
+
+                // Capture all named devices for diagnostics
+                if (name != null && discoveredDevices.size < 50) {
+                    val entry = "$name (adv=${advName != null}, periph=${periphName != null})"
+                    if (entry !in discoveredDevices) {
+                        discoveredDevices.add(entry)
+                        log("  NEW device: $entry (total: ${discoveredDevices.size})")
+                    }
+                }
+
+                if (name != null && name.startsWith("Flipper", ignoreCase = true)) {
+                    log("  FOUND FLIPPER! name=$name, stopping scan and completing deferred")
+                    central.stopScan()
+                    scanDeferred?.complete(didDiscoverPeripheral)
+                }
             }
 
             override fun centralManager(
                 central: CBCentralManager,
                 didConnectPeripheral: CBPeripheral,
             ) {
+                log("didConnectPeripheral: ${didConnectPeripheral.name}")
                 connectionDeferred?.complete(Unit)
             }
 
@@ -169,6 +329,7 @@ class IosBleSerialTransport(
                 didFailToConnectPeripheral: CBPeripheral,
                 error: NSError?,
             ) {
+                log("didFailToConnectPeripheral: ${didFailToConnectPeripheral.name}, error=$error")
                 connectionDeferred?.completeExceptionally(
                     FlipperException("BLE connection failed: ${error?.localizedDescription}"),
                 )
@@ -180,6 +341,7 @@ class IosBleSerialTransport(
                 didDisconnectPeripheral: CBPeripheral,
                 error: NSError?,
             ) {
+                log("didDisconnectPeripheral: ${didDisconnectPeripheral.name}, error=$error")
                 connectedPeripheral = null
             }
         }
@@ -190,11 +352,18 @@ class IosBleSerialTransport(
                 peripheral: CBPeripheral,
                 didDiscoverServices: NSError?,
             ) {
+                log("didDiscoverServices: error=$didDiscoverServices, services=${peripheral.services?.size}")
                 if (didDiscoverServices != null) {
+                    log("  Service discovery FAILED: ${didDiscoverServices.localizedDescription}")
                     servicesDeferred?.completeExceptionally(
                         FlipperException("Service discovery failed: ${didDiscoverServices.localizedDescription}"),
                     )
                     return
+                }
+
+                peripheral.services?.forEach { svc ->
+                    val service = svc as? CBService
+                    log("  Found service: ${service?.UUID}")
                 }
 
                 val service =
@@ -202,11 +371,13 @@ class IosBleSerialTransport(
                         (it as? CBService)?.UUID == SERIAL_SERVICE_UUID
                     } as? CBService
                 if (service != null) {
+                    log("  Serial service FOUND! Discovering ALL characteristics...")
                     peripheral.discoverCharacteristics(
-                        listOf(SERIAL_RX_UUID, SERIAL_TX_UUID),
+                        null, // discover ALL characteristics
                         forService = service,
                     )
                 } else {
+                    log("  Serial service NOT FOUND among ${peripheral.services?.size} services")
                     servicesDeferred?.completeExceptionally(
                         FlipperException("Serial service not found"),
                     )
@@ -219,6 +390,7 @@ class IosBleSerialTransport(
                 didDiscoverCharacteristicsForService: CBService,
                 error: NSError?,
             ) {
+                log("didDiscoverCharacteristics: service=${didDiscoverCharacteristicsForService.UUID}, error=$error")
                 if (error != null) {
                     servicesDeferred?.completeExceptionally(
                         FlipperException("Characteristic discovery failed: ${error.localizedDescription}"),
@@ -227,15 +399,55 @@ class IosBleSerialTransport(
                 }
 
                 val characteristics = didDiscoverCharacteristicsForService.characteristics ?: return
+                log("  Found ${characteristics.size} characteristics")
                 for (char in characteristics) {
                     val characteristic = char as? CBCharacteristic ?: continue
+                    log("  Characteristic: ${characteristic.UUID}")
                     when (characteristic.UUID) {
-                        SERIAL_RX_UUID -> rxCharacteristic = characteristic
-                        SERIAL_TX_UUID -> txCharacteristic = characteristic
+                        SERIAL_READ_UUID -> {
+                            readCharacteristic = characteristic
+                            log("    -> Serial read characteristic set")
+                        }
+                        SERIAL_WRITE_UUID -> {
+                            writeCharacteristic = characteristic
+                            log("    -> Serial write characteristic set")
+                        }
+                        SERIAL_FLOW_CONTROL_UUID -> {
+                            flowControlCharacteristic = characteristic
+                            log("    -> Flow control characteristic set")
+                        }
                     }
                 }
 
+                log("  Completing servicesDeferred")
                 servicesDeferred?.complete(Unit)
+            }
+
+            @ObjCSignatureOverride
+            override fun peripheral(
+                peripheral: CBPeripheral,
+                didUpdateNotificationStateForCharacteristic: CBCharacteristic,
+                error: NSError?,
+            ) {
+                log(
+                    "didUpdateNotificationState: char=${didUpdateNotificationStateForCharacteristic.UUID}, isNotifying=${didUpdateNotificationStateForCharacteristic.isNotifying()}, error=$error",
+                )
+                if (error != null) {
+                    notifyDeferred?.completeExceptionally(
+                        FlipperException("Failed to enable notifications: ${error.localizedDescription}"),
+                    )
+                } else {
+                    notifyDeferred?.complete(Unit)
+                }
+            }
+
+            @ObjCSignatureOverride
+            override fun peripheral(
+                peripheral: CBPeripheral,
+                didWriteValueForCharacteristic: CBCharacteristic,
+                error: NSError?,
+            ) {
+                log("didWriteValueForCharacteristic: char=${didWriteValueForCharacteristic.UUID}, error=$error")
             }
 
             @ObjCSignatureOverride
@@ -244,12 +456,37 @@ class IosBleSerialTransport(
                 didUpdateValueForCharacteristic: CBCharacteristic,
                 error: NSError?,
             ) {
-                if (error != null) return
-                if (didUpdateValueForCharacteristic.UUID == SERIAL_TX_UUID) {
-                    val nsData = didUpdateValueForCharacteristic.value ?: return
-                    val bytes = nsData.toByteArray()
-                    if (bytes.isNotEmpty()) {
-                        receiveChannel.trySend(bytes)
+                if (error != null) {
+                    log(
+                        "didUpdateValueForCharacteristic ERROR: char=${didUpdateValueForCharacteristic.UUID}, error=$error",
+                    )
+                    return
+                }
+                val nsData = didUpdateValueForCharacteristic.value
+                log(
+                    "didUpdateValueForCharacteristic: char=${didUpdateValueForCharacteristic.UUID}, dataLen=${nsData?.length}",
+                )
+                when (didUpdateValueForCharacteristic.UUID) {
+                    SERIAL_READ_UUID -> {
+                        if (nsData == null) return
+                        val bytes = nsData.toByteArray()
+                        log("  -> Serial read data: ${bytes.size} bytes")
+                        if (bytes.isNotEmpty()) {
+                            receiveChannel.trySend(bytes)
+                        }
+                    }
+                    SERIAL_FLOW_CONTROL_UUID -> {
+                        if (nsData != null && nsData.length.toInt() >= 4) {
+                            val bytes = nsData.toByteArray()
+                            val freeSpace =
+                                ((bytes[0].toInt() and 0xFF) shl 24) or
+                                    ((bytes[1].toInt() and 0xFF) shl 16) or
+                                    ((bytes[2].toInt() and 0xFF) shl 8) or
+                                    (bytes[3].toInt() and 0xFF)
+                            log("  -> Flow control: freeSpace=$freeSpace bytes")
+                        } else {
+                            log("  -> Flow control: unexpected data length=${nsData?.length}")
+                        }
                     }
                 }
             }

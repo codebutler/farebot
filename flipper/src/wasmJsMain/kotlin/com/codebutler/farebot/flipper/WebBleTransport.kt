@@ -3,6 +3,7 @@
 package com.codebutler.farebot.flipper
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import kotlin.js.ExperimentalWasmJsInterop
 
 /**
@@ -15,10 +16,15 @@ import kotlin.js.ExperimentalWasmJsInterop
 class WebBleTransport : FlipperTransport {
     companion object {
         private const val SERIAL_SERVICE_UUID = "8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000"
-        private const val SERIAL_RX_UUID = "19ed82ae-ed21-4c9d-4145-228e62fe0000"
-        private const val SERIAL_TX_UUID = "19ed82ae-ed21-4c9d-4145-228e63fe0000"
+
+        // Phone reads FROM Flipper (subscribe to notifications)
+        private const val SERIAL_READ_UUID = "19ed82ae-ed21-4c9d-4145-228e61fe0000"
+
+        // Phone writes TO Flipper
+        private const val SERIAL_WRITE_UUID = "19ed82ae-ed21-4c9d-4145-228e62fe0000"
         private const val POLL_INTERVAL_MS = 10L
         private const val READ_TIMEOUT_MS = 5000
+        private const val CONNECT_TIMEOUT_MS = 30_000L
     }
 
     private var connected = false
@@ -33,18 +39,22 @@ class WebBleTransport : FlipperTransport {
 
         jsWebBleRequestDevice()
 
-        while (!jsWebBleIsReady()) {
-            delay(POLL_INTERVAL_MS)
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            while (!jsWebBleIsReady()) {
+                delay(POLL_INTERVAL_MS)
+            }
         }
 
         if (!jsWebBleHasDevice()) {
-            throw FlipperException("No Flipper Zero device selected")
+            throw FlipperException("No Flipper Zero device selected. Did you cancel the dialog?")
         }
 
         jsWebBleConnect()
 
-        while (!jsWebBleIsConnected()) {
-            delay(POLL_INTERVAL_MS)
+        withTimeout(CONNECT_TIMEOUT_MS) {
+            while (!jsWebBleIsConnected()) {
+                delay(POLL_INTERVAL_MS)
+            }
         }
 
         val error = jsWebBleGetConnectError()?.toString()
@@ -141,7 +151,7 @@ private fun jsWebBleConnect() {
             }).then(function(service) {
                 return Promise.all([
                     service.getCharacteristic('19ed82ae-ed21-4c9d-4145-228e62fe0000'),
-                    service.getCharacteristic('19ed82ae-ed21-4c9d-4145-228e63fe0000')
+                    service.getCharacteristic('19ed82ae-ed21-4c9d-4145-228e61fe0000')
                 ]);
             }).then(function(chars) {
                 ble.rxChar = chars[0];
