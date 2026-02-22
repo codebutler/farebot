@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,7 +53,6 @@ import farebot.app.generated.resources.flipper_connect_ble
 import farebot.app.generated.resources.flipper_connect_prompt
 import farebot.app.generated.resources.flipper_connect_usb
 import farebot.app.generated.resources.flipper_connecting_message
-import farebot.app.generated.resources.flipper_disconnect
 import farebot.app.generated.resources.flipper_import_keys
 import farebot.app.generated.resources.flipper_import_progress
 import farebot.app.generated.resources.flipper_import_selected
@@ -68,7 +68,6 @@ fun FlipperScreen(
     uiState: FlipperUiState,
     onConnectUsb: () -> Unit,
     onConnectBle: () -> Unit,
-    onDisconnect: () -> Unit,
     onNavigateToDirectory: (String) -> Unit,
     onNavigateUp: () -> Unit,
     onToggleSelection: (String) -> Unit,
@@ -94,7 +93,7 @@ fun FlipperScreen(
                         when (uiState.connectionState) {
                             FlipperConnectionState.Connected ->
                                 uiState.deviceInfo["hardware.name"] ?: stringResource(Res.string.flipper_zero)
-                            FlipperConnectionState.Connecting -> stringResource(Res.string.flipper_connecting_message)
+                            FlipperConnectionState.Connecting -> stringResource(Res.string.flipper_zero)
                             FlipperConnectionState.Disconnected -> stringResource(Res.string.flipper_zero)
                         },
                     )
@@ -104,13 +103,7 @@ fun FlipperScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
-                actions = {
-                    if (uiState.connectionState == FlipperConnectionState.Connected) {
-                        TextButton(onClick = onDisconnect) {
-                            Text(stringResource(Res.string.flipper_disconnect))
-                        }
-                    }
-                },
+                actions = {},
                 colors =
                     TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -132,6 +125,7 @@ fun FlipperScreen(
                     Column(
                         modifier = Modifier.fillMaxSize().padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(8.dp))

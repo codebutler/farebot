@@ -49,6 +49,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
@@ -563,13 +564,6 @@ fun HomeScreen(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_source)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    showImportSheet = true
-                                },
-                            )
-                            DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.about)) },
                                 onClick = {
                                     menuExpanded = false
@@ -762,6 +756,8 @@ fun HomeScreen(
                 ) {
                     HistoryContent(
                         uiState = historyUiState,
+                        supportedCardTypes = supportedCardTypes,
+                        loadedKeyBundles = loadedKeyBundles,
                         onNavigateToCard = onNavigateToCard,
                         onToggleSelection = onToggleSelection,
                     )
@@ -825,6 +821,7 @@ fun HomeScreen(
                 ListItem(
                     headlineContent = { Text(stringResource(Res.string.import_source_file)) },
                     leadingContent = { Icon(Icons.Default.FolderOpen, contentDescription = null) },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     modifier =
                         Modifier.clickable {
                             showImportSheet = false
@@ -835,6 +832,7 @@ fun HomeScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(Res.string.import_source_flipper_ble)) },
                         leadingContent = { Icon(Icons.Default.Bluetooth, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier =
                             Modifier.clickable {
                                 showImportSheet = false
@@ -846,6 +844,7 @@ fun HomeScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(Res.string.import_source_flipper_usb)) },
                         leadingContent = { Icon(Icons.Default.Usb, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier =
                             Modifier.clickable {
                                 showImportSheet = false

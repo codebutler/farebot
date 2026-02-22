@@ -215,12 +215,7 @@ fun FareBotApp(
                     onStatusChipTap = { message ->
                         platformActions.showToast(message)
                     },
-                    onNavigateToKeys =
-                        if (CardType.MifareClassic in supportedCardTypes) {
-                            { navController.navigate(Screen.Keys.route) }
-                        } else {
-                            null
-                        },
+                    onNavigateToKeys = { navController.navigate(Screen.Keys.route) },
                     onConnectFlipperBle =
                         if (flipperTransportFactory.isBleSupported) {
                             {
@@ -308,14 +303,16 @@ fun FareBotApp(
                     uiState = flipperUiState,
                     onConnectUsb = { flipperViewModel.connectUsb() },
                     onConnectBle = { flipperViewModel.connectBle() },
-                    onDisconnect = { flipperViewModel.disconnect() },
                     onNavigateToDirectory = { path -> flipperViewModel.navigateToDirectory(path) },
                     onNavigateUp = { flipperViewModel.navigateUp() },
                     onToggleSelection = { path -> flipperViewModel.toggleFileSelection(path) },
                     onImportSelected = { flipperViewModel.importSelectedFiles() },
                     onImportKeys = { flipperViewModel.importKeyDictionary() },
                     onClearImportMessage = { flipperViewModel.clearImportMessage() },
-                    onBack = { navController.popBackStack() },
+                    onBack = {
+                        flipperViewModel.disconnect()
+                        navController.popBackStack()
+                    },
                 )
             }
 
