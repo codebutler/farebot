@@ -23,9 +23,12 @@
 
 package com.codebutler.farebot.card.vicinity
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.nfc.VicinityTechnology
 import com.codebutler.farebot.card.vicinity.raw.RawVicinityCard
 import kotlin.time.Clock
+
+private val log = Logger.withTag("VicinityCardReader")
 
 /**
  * Shared card-reading algorithm for NFC-V (ISO 15693) Vicinity cards.
@@ -63,7 +66,7 @@ object VicinityCardReader {
                     null
                 }
             } catch (e: Exception) {
-                println("[VicinityCardReader] Failed to read system info: $e")
+                log.w(e) { "Failed to read system info" }
                 null
             }
 

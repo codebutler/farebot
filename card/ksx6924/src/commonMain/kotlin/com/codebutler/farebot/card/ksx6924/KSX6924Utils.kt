@@ -22,6 +22,7 @@
  */
 package com.codebutler.farebot.card.ksx6924
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.NumberUtils
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -30,6 +31,7 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Instant
 
 object KSX6924Utils {
+    private val log = Logger.withTag("KSX6924Utils")
     const val INVALID_DATETIME = 0xffffffffffffffL
     private const val INVALID_DATE = 0xffffffffL
 
@@ -70,7 +72,7 @@ object KSX6924Utils {
                 second = second,
             ).toInstant(tz)
         } catch (e: Exception) {
-            println("[KSX6924] Failed to parse hex datetime: $e")
+            log.w(e) { "Failed to parse hex datetime" }
             null
         }
     }
@@ -95,7 +97,7 @@ object KSX6924Utils {
         return try {
             LocalDate(year = year, month = month, day = day)
         } catch (e: Exception) {
-            println("[KSX6924] Failed to parse hex date: $e")
+            log.w(e) { "Failed to parse hex date" }
             null
         }
     }

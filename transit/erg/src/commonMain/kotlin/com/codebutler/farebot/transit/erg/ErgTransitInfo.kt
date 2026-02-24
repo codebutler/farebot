@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.erg
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.classic.ClassicCard
 import com.codebutler.farebot.card.classic.DataClassicSector
@@ -92,7 +93,7 @@ open class ErgTransitInfo(
             return try {
                 ErgMetadataRecord.recordFromBytes(sector0.getBlock(2).data)
             } catch (e: Exception) {
-                println("[ERG] Failed to parse metadata record: $e")
+                Logger.withTag("ERG").w(e) { "Failed to parse metadata record" }
                 null
             }
         }

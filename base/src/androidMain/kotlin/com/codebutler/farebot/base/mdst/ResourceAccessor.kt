@@ -19,6 +19,7 @@
 
 package com.codebutler.farebot.base.mdst
 
+import co.touchlab.kermit.Logger
 import farebot.base.generated.resources.Res
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -30,7 +31,8 @@ actual object ResourceAccessor {
             runBlocking {
                 Res.readBytes("files/$dbName.mdst")
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Logger.withTag("ResourceAccessor").w(e) { "Failed to load resource: $dbName" }
             null
         }
 }

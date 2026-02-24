@@ -10,6 +10,7 @@
 
 package com.codebutler.farebot.transit.serialonly
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.FormattedString
@@ -42,7 +43,8 @@ class NorticTransitInfo(
                     val epoch = LocalDate(1997, 1, 1)
                     val expiryDate = epoch.toEpochDays() + mValidityEndDate
                     LocalDate.fromEpochDays(expiryDate).toString()
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    Logger.withTag("NorticTransitInfo").d(e) { "Failed to parse expiry date" }
                     "Day $mValidityEndDate since 1997-01-01"
                 }
 

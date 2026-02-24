@@ -19,8 +19,11 @@
 
 package com.codebutler.farebot.base.mdst
 
+import co.touchlab.kermit.Logger
 import farebot.base.generated.resources.Res
 import kotlinx.coroutines.runBlocking
+
+private val log = Logger.withTag("ResourceAccessor")
 
 actual object ResourceAccessor {
     actual fun openMdstFile(dbName: String): ByteArray? =
@@ -28,7 +31,8 @@ actual object ResourceAccessor {
             runBlocking {
                 Res.readBytes("files/$dbName.mdst")
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.w(e) { "Failed to load resource: $dbName" }
             null
         }
 }

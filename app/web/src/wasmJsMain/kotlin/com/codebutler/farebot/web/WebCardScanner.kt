@@ -1,5 +1,6 @@
 package com.codebutler.farebot.web
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -46,6 +47,8 @@ import kotlinx.coroutines.launch
  * interfaces are suspend-compatible, allowing WebUSB's async API to be
  * used seamlessly through Kotlin coroutines.
  */
+private val log = Logger.withTag("WebCardScanner")
+
 class WebCardScanner : CardScanner {
     override val requiresActiveScan: Boolean = true
 
@@ -121,7 +124,7 @@ class WebCardScanner : CardScanner {
         // Initialize PN533
         pn533.sendAck()
         val fw = pn533.getFirmwareVersion()
-        println("[WebUSB] PN53x firmware: $fw")
+        log.i { "PN53x firmware: $fw" }
         pn533.samConfiguration()
         // Use finite ATR retries on WebUSB. WebUSB's transferIn cannot be
         // cancelled, so InListPassiveTarget must self-resolve within its own
@@ -164,21 +167,22 @@ class WebCardScanner : CardScanner {
                 val rawCard = readTarget(pn533, target)
                 _readingProgress.value = null
                 _scannedCards.tryEmit(rawCard)
-                println("[WebUSB] Card read successfully")
+                log.i { "Card read successfully" }
             } catch (e: Exception) {
                 _readingProgress.value = null
-                println("[WebUSB] Read error: ${e.message}")
+                log.e(e) { "Read error" }
                 _scanErrors.tryEmit(e)
             }
 
             // Release target
             try {
                 pn533.inRelease(target.tg)
-            } catch (_: PN533Exception) {
+            } catch (e: PN533Exception) {
+                log.d(e) { "inRelease failed (expected)" }
             }
 
             // Wait for card removal
-            println("[WebUSB] Waiting for card removal...")
+            log.i { "Waiting for card removal..." }
             waitForRemoval(pn533)
         }
     }
@@ -202,11 +206,11 @@ class WebCardScanner : CardScanner {
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
-        println(
-            "[WebUSB] Type A card: type=${info.cardType}, SAK=0x${(target.sak.toInt() and 0xFF).toString(
+        log.i {
+            "Type A card: type=${info.cardType}, SAK=0x${(target.sak.toInt() and 0xFF).toString(
                 16,
-            ).padStart(2, '0')}, UID=${tagId.hex()}",
-        )
+            ).padStart(2, '0')}, UID=${tagId.hex()}"
+        }
 
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
@@ -241,7 +245,7 @@ class WebCardScanner : CardScanner {
         target: PN533.TargetInfo.FeliCa,
     ): RawCard<*> {
         val tagId = target.idm
-        println("[WebUSB] FeliCa card: IDm=${tagId.hex()}")
+        log.i { "FeliCa card: IDm=${tagId.hex()}" }
         val adapter = PN533FeliCaTagAdapter(pn533, tagId)
         return FeliCaReader.readTag(tagId, adapter, onProgress = onProgress)
     }
@@ -256,13 +260,15 @@ class WebCardScanner : CardScanner {
                             baudRate = PN533.BAUD_RATE_212_FELICA,
                             initiatorData = SENSF_REQ,
                         )
-                } catch (_: PN533Exception) {
+                } catch (e: PN533Exception) {
+                    log.d(e) { "Poll during removal check failed" }
                     null
                 }
             if (target == null) break
             try {
                 pn533.inRelease(target.tg)
-            } catch (_: PN533Exception) {
+            } catch (e: PN533Exception) {
+                log.d(e) { "inRelease during removal wait failed" }
             }
         }
     }

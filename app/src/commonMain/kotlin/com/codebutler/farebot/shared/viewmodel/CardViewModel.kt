@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.util.DateFormatStyle
 import com.codebutler.farebot.base.util.formatDate
@@ -39,6 +40,8 @@ class CardViewModel(
     private val cardSerializer: CardSerializer,
     private val cardPersister: CardPersister,
 ) : ViewModel() {
+    private val log = Logger.withTag("CardViewModel")
+
     private val _uiState = MutableStateFlow(CardUiState())
     val uiState: StateFlow<CardUiState> = _uiState.asStateFlow()
 
@@ -154,8 +157,7 @@ class CardViewModel(
                         )
                 }
             } catch (ex: Exception) {
-                println("[FareBot] Card load error: ${ex::class.simpleName}: ${ex.message}")
-                ex.printStackTrace()
+                log.e(ex) { "Card load error: ${ex::class.simpleName}: ${ex.message}" }
                 _uiState.value =
                     CardUiState(
                         isLoading = false,

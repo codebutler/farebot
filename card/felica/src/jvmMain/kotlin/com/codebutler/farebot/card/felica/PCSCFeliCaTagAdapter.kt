@@ -22,9 +22,12 @@
 
 package com.codebutler.farebot.card.felica
 
+import co.touchlab.kermit.Logger
 import javax.smartcardio.CardChannel
 import javax.smartcardio.CommandAPDU
 import javax.smartcardio.ResponseAPDU
+
+private val log = Logger.withTag("PCSCFeliCaTagAdapter")
 
 /**
  * PC/SC implementation of [FeliCaTagAdapter] for FeliCa (NFC-F) cards.
@@ -172,7 +175,7 @@ class PCSCFeliCaTagAdapter(
                 null
             }
         } catch (e: Exception) {
-            println("[PCSCFeliCa] Transceive failed: $e")
+            log.w(e) { "Transceive failed" }
             null
         }
 }

@@ -23,6 +23,7 @@
 
 package com.codebutler.farebot.transit.troika
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.card.classic.ClassicCard
@@ -39,6 +40,8 @@ import farebot.transit.troika.generated.resources.*
  * Detection uses key-hash matching on sector 1 keys, with fallback to
  * checking the header magic bytes on sector 8 and sector 4.
  */
+private val log = Logger.withTag("TroikaTransitFactory")
+
 class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
     // TroikaHybridTransitFactory is the registered factory; this is an internal helper.
     override val allCards: List<CardInfo>
@@ -66,7 +69,8 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
             val sector = card.getSector(idx) as? DataClassicSector ?: return@any false
             try {
                 TroikaBlock.check(sector.getBlock(0).data)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                log.d(e) { "Failed to check Troika header on sector $idx" }
                 false
             }
         }
@@ -80,7 +84,8 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
                 try {
                     val data = sector.readBlocks(0, 3)
                     if (TroikaBlock.check(data)) data else null
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    log.d(e) { "Failed to read Troika sector $idx for identity" }
                     null
                 }
             } ?: throw RuntimeException("No valid Troika sector found")
@@ -131,7 +136,8 @@ class TroikaTransitFactory : TransitFactory<ClassicCard, TroikaTransitInfo> {
                 val sector = card.getSector(idx) as? DataClassicSector ?: return null
                 val data = sector.readBlocks(0, 3)
                 if (!TroikaBlock.check(data)) null else TroikaBlock.parseBlock(data)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                log.d(e) { "Failed to decode Troika sector $idx" }
                 null
             }
         }

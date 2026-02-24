@@ -2,6 +2,7 @@
 
 package com.codebutler.farebot.web
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.persist.CardPersister
 import com.codebutler.farebot.persist.db.model.SavedCard
@@ -47,6 +48,8 @@ private fun lsSetItem(
     js("localStorage.setItem(key, value)")
 }
 
+private val log = Logger.withTag("LocalStorage")
+
 class LocalStorageCardPersister(
     private val json: Json,
 ) : CardPersister {
@@ -87,7 +90,7 @@ class LocalStorageCardPersister(
         return try {
             json.decodeFromString<List<SerializableSavedCard>>(raw).map { it.toSavedCard() }
         } catch (e: Exception) {
-            println("[LocalStorage] Failed to load saved cards: $e")
+            log.w(e) { "Failed to load saved cards" }
             emptyList()
         }
     }

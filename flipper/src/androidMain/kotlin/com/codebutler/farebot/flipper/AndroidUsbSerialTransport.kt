@@ -12,6 +12,7 @@ import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.os.Build
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -22,6 +23,8 @@ import kotlin.coroutines.resumeWithException
  *
  * Flipper Zero USB identifiers: VID 0x0483 (STMicroelectronics), PID 0x5740.
  */
+private val log = Logger.withTag("AndroidUsbSerialTransport")
+
 class AndroidUsbSerialTransport(
     private val context: Context,
 ) : FlipperTransport {
@@ -187,7 +190,8 @@ class AndroidUsbSerialTransport(
         cont.invokeOnCancellation {
             try {
                 context.unregisterReceiver(receiver)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                log.d(e) { "unregisterReceiver on cancel" }
             }
         }
     }

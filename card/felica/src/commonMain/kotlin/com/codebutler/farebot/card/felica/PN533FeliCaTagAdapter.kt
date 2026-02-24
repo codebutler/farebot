@@ -22,7 +22,10 @@
 
 package com.codebutler.farebot.card.felica
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.nfc.pn533.PN533
+
+private val log = Logger.withTag("PN533FeliCaTagAdapter")
 
 /**
  * PN533 implementation of [FeliCaTagAdapter] for FeliCa (NFC-F) cards.
@@ -147,7 +150,7 @@ class PN533FeliCaTagAdapter(
         try {
             pn533.inCommunicateThru(felicaFrame)
         } catch (e: Exception) {
-            println("[PN533FeliCa] Transceive failed: $e")
+            log.w(e) { "Transceive failed" }
             null
         }
 }

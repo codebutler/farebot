@@ -23,7 +23,10 @@
 
 package com.codebutler.farebot.card.iso7816
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.nfc.CardTransceiver
+
+private val log = Logger.withTag("ISO7816Protocol")
 
 /**
  * Implements communication with cards that talk over ISO7816-4 APDUs.
@@ -172,7 +175,7 @@ class ISO7816Protocol(
         } catch (e: ISO7816Exception) {
             null
         } catch (e: Exception) {
-            println("[ISO7816Protocol] Unexpected error in selectByName: $e")
+            log.w(e) { "Unexpected error in selectByName" }
             null
         }
 

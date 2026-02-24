@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.china
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.NumberUtils
 import com.codebutler.farebot.base.util.getBitsFromBufferSigned
 import com.codebutler.farebot.card.china.ChinaCard
@@ -114,7 +115,7 @@ object ChinaTransitData {
                 second = 0,
             ).toInstant(TZ)
         } catch (e: Exception) {
-            println("[ChinaTransit] Failed to parse hex date from $value: $e")
+            Logger.withTag("ChinaTransit").w(e) { "Failed to parse hex date from $value" }
             null
         }
     }

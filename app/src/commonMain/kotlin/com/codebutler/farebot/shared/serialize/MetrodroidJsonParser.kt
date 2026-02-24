@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.shared.serialize
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.ByteUtils
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.classic.raw.RawClassicBlock
@@ -60,6 +61,8 @@ import kotlin.time.Instant
  * Metrodroid JSON tree, similar to how FlipperNfcParser handles Flipper NFC dumps.
  */
 object MetrodroidJsonParser {
+    private val log = Logger.withTag("MetrodroidJsonParser")
+
     fun parse(obj: JsonObject): RawCard<*>? {
         val tagId = parseTagId(obj)
         val scannedAt = parseScannedAt(obj)
@@ -398,7 +401,7 @@ object MetrodroidJsonParser {
         return try {
             ByteUtils.hexStringToByteArray(hex)
         } catch (e: Exception) {
-            println("[MetrodroidJsonParser] Failed to parse hex string: $e")
+            log.w(e) { "Failed to parse hex string" }
             ByteArray(0)
         }
     }

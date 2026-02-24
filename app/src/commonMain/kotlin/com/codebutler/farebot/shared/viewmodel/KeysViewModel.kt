@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.persist.CardKeysPersister
 import com.codebutler.farebot.shared.ui.screen.KeyItem
 import com.codebutler.farebot.shared.ui.screen.KeysUiState
@@ -10,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+private val log = Logger.withTag("KeysViewModel")
 
 @Inject
 class KeysViewModel(
@@ -37,8 +40,7 @@ class KeysViewModel(
                     }
                 _uiState.value = KeysUiState(keys = keys, isLoading = false)
             } catch (e: Throwable) {
-                println("[KeysViewModel] Failed to load keys: $e")
-                e.printStackTrace()
+                log.e(e) { "Failed to load keys" }
                 _uiState.value = KeysUiState(isLoading = false)
             }
         }

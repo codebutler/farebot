@@ -22,12 +22,14 @@
 
 package com.codebutler.farebot.transit.bip
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.getBitsFromBufferLeBits
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Instant
 
+private val log = Logger.withTag("BipUtil")
 private val TZ = TimeZone.of("America/Santiago")
 
 internal fun parseTimestamp(raw: ByteArray): Instant? {
@@ -41,7 +43,8 @@ internal fun parseTimestamp(raw: ByteArray): Instant? {
     return try {
         LocalDateTime(year, month, day, hour, minute, second)
             .toInstant(TZ)
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+        log.d(e) { "Failed to parse timestamp" }
         null
     }
 }

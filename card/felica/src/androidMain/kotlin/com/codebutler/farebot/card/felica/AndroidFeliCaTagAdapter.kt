@@ -26,6 +26,7 @@ package com.codebutler.farebot.card.felica
 import android.nfc.Tag
 import android.nfc.TagLostException
 import android.nfc.tech.NfcF
+import co.touchlab.kermit.Logger
 import java.io.IOException
 
 /**
@@ -34,6 +35,8 @@ import java.io.IOException
  * Builds raw NFC-F command packets inline and parses responses directly,
  * replacing the old FeliCaTag/FeliCaLibAndroid wrapper classes.
  */
+private val log = Logger.withTag("AndroidFeliCaTagAdapter")
+
 class AndroidFeliCaTagAdapter(
     private val tag: Tag,
 ) : FeliCaTagAdapter {
@@ -177,8 +180,8 @@ class AndroidFeliCaTagAdapter(
     fun close() {
         try {
             nfcF?.close()
-        } catch (_: IOException) {
-            // ignore
+        } catch (e: IOException) {
+            log.d(e) { "Failed to close NfcF" }
         }
         nfcF = null
     }
@@ -187,7 +190,8 @@ class AndroidFeliCaTagAdapter(
         try {
             val f = ensureConnected()
             return f.transceive(data)
-        } catch (_: TagLostException) {
+        } catch (e: TagLostException) {
+            log.d(e) { "Tag lost during transceive" }
             return null
         } catch (e: IOException) {
             throw Exception("NFC transceive failed", e)

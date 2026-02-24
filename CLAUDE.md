@@ -112,6 +112,39 @@ Do NOT claim work is complete without verification.
 
 When continuing from a previous session, check for implementation plans and session transcripts in `~/.claude/` to recover context rather than starting from scratch.
 
+### 10. Use Kermit for all logging
+
+Use `co.touchlab.kermit.Logger` for all logging. Never use `println()`, `e.printStackTrace()`, `android.util.Log`, `NSLog`, or `console.log` in Kotlin code.
+
+```kotlin
+import co.touchlab.kermit.Logger
+
+// Create a tagged logger (use class/module name as tag)
+private val log = Logger.withTag("MyClass")
+
+// Log levels (least to most severe): v, d, i, w, e, a
+log.d { "Debug message with $variable" }     // Use lambda syntax for lazy eval
+log.w(exception) { "Warning with context" }  // Attach throwable
+log.e(exception) { "Error description" }     // Errors — replaces printStackTrace()
+
+// In catch blocks — NEVER swallow exceptions silently:
+catch (e: Exception) {
+    log.w(e) { "Descriptive message about what failed" }
+    // ... handle gracefully
+}
+
+// For expected/benign exceptions, still log at debug level:
+catch (e: SpecificException) {
+    log.d { "Expected: description" }
+}
+```
+
+Do NOT:
+- Use `println()` for logging (except in CLI tools under `tools/`)
+- Call `e.printStackTrace()` — use `log.e(e) { "msg" }` instead
+- Catch exceptions without logging them (no silent swallowing)
+- Use `catch (_: Exception)` without at least a `log.d` call
+
 ## Build Commands
 
 ```bash

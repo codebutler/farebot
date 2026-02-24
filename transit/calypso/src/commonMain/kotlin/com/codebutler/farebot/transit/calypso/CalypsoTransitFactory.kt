@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.iso7816.ISO7816Application
 import com.codebutler.farebot.card.iso7816.ISO7816Card
@@ -35,6 +36,8 @@ import com.codebutler.farebot.transit.en1545.CalypsoConstants
  * Base class for Calypso ISO 7816 transit system factories.
  * Subclasses implement [checkTenv] to match on the ticket environment data.
  */
+private val log = Logger.withTag("CalypsoTransitFactory")
+
 abstract class CalypsoTransitFactory : TransitFactory<ISO7816Card, TransitInfo> {
     override val allCards: List<CardInfo> = emptyList()
 
@@ -63,7 +66,8 @@ abstract class CalypsoTransitFactory : TransitFactory<ISO7816Card, TransitInfo> 
                 ?.value ?: return false
         return try {
             checkTenv(tenv)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.d(e) { "Failed to check ticket environment" }
             false
         }
     }

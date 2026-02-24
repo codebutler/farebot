@@ -23,6 +23,7 @@
 
 package com.codebutler.farebot.card.iso7816
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.ui.HeaderListItem
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
@@ -44,7 +45,7 @@ import farebot.card.iso7816.generated.resources.*
  * Reference: https://en.wikipedia.org/wiki/X.690#BER_encoding
  */
 object ISO7816TLV {
-    private const val TAG = "ISO7816TLV"
+    private val log = Logger.withTag("ISO7816TLV")
     private const val MAX_TLV_FIELD_LENGTH = 0xffff
 
     /**
@@ -306,7 +307,7 @@ object ISO7816TLV {
                             infoBerTLV(header + data, multihead),
                         )
                     } catch (e: Exception) {
-                        println("[ISO7816TLV] Failed to build TLV items: $e")
+                        log.w(e) { "Failed to build TLV items" }
                         ListItem(id.toHexDump(), data.toHexDump())
                     }
                 } else {
@@ -320,7 +321,7 @@ object ISO7816TLV {
             try {
                 ListItemRecursive(FormattedString("TLV"), null, infoBerTLV(buf))
             } catch (e: Exception) {
-                println("[ISO7816TLV] Failed to decode TLV node: $e")
+                log.w(e) { "Failed to decode TLV node" }
                 null
             },
         )

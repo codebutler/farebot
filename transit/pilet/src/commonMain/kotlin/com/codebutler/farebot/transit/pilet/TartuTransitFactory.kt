@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.pilet
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.readASCII
@@ -43,6 +44,8 @@ import farebot.transit.pilet.generated.resources.*
  *
  * Documentation of format: https://github.com/micolous/metrodroid/wiki/TartuBus
  */
+private val log = Logger.withTag("TartuTransitFactory")
+
 class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
     companion object {
         private const val NDEF_TYPE = "pilet.ee:ekaart:2"
@@ -142,7 +145,8 @@ class TartuTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
                 }
             }
             if (allData.isEmpty()) null else allData.toByteArray()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.d(e) { "Failed to read NDEF data" }
             null
         }
 

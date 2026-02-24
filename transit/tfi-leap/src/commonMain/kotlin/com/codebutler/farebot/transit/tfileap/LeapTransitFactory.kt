@@ -21,6 +21,7 @@
 
 package com.codebutler.farebot.transit.tfileap
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.card.CardType
@@ -35,6 +36,8 @@ import com.codebutler.farebot.transit.TransitRegion
 import farebot.transit.tfi_leap.generated.resources.*
 import kotlin.time.Instant
 
+private val log = Logger.withTag("LeapTransitFactory")
+
 class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -48,7 +51,7 @@ class LeapTransitFactory : TransitFactory<DesfireCard, TransitInfo> {
             val file6 = (app.getFile(6) as StandardDesfireFile).data
             TransitIdentity(FormattedString(Res.string.transit_leap_card_name), LeapTransitInfo.getSerial(file2, file6))
         } catch (e: Exception) {
-            println("[Leap] Failed to parse identity: $e")
+            log.w(e) { "Failed to parse identity" }
             TransitIdentity(FormattedString(Res.string.transit_leap_card_name), null)
         }
 

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.desktop
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -40,6 +41,8 @@ import com.codebutler.farebot.shared.nfc.ScannedTag
 import javax.smartcardio.CardException
 import javax.smartcardio.CommandAPDU
 import javax.smartcardio.TerminalFactory
+
+private val log = Logger.withTag("PcscReaderBackend")
 
 /**
  * PC/SC reader backend using javax.smartcardio.
@@ -69,10 +72,10 @@ class PcscReaderBackend : NfcReaderBackend {
         }
 
         val terminal = terminals.first()
-        println("[PC/SC] Using reader: ${terminal.name}")
+        log.i { "Using reader: ${terminal.name}" }
 
         while (true) {
-            println("[PC/SC] Waiting for card...")
+            log.i { "Waiting for card..." }
             terminal.waitForCardPresent(0)
 
             try {
@@ -80,7 +83,7 @@ class PcscReaderBackend : NfcReaderBackend {
                 try {
                     val atr = card.atr.bytes
                     val info = PCSCCardInfo.fromATR(atr)
-                    println("[PC/SC] Card detected: type=${info.cardType}, ATR=${atr.hex()}")
+                    log.i { "Card detected: type=${info.cardType}, ATR=${atr.hex()}" }
 
                     val channel = card.basicChannel
 
@@ -93,24 +96,25 @@ class PcscReaderBackend : NfcReaderBackend {
                         } else {
                             byteArrayOf()
                         }
-                    println("[PC/SC] Tag ID: ${tagId.hex()}")
+                    log.i { "Tag ID: ${tagId.hex()}" }
 
                     onCardDetected(ScannedTag(id = tagId, techList = listOf(info.cardType.name)))
                     val rawCard = readCard(info, channel, tagId, onProgress)
                     onCardRead(rawCard)
-                    println("[PC/SC] Card read successfully")
+                    log.i { "Card read successfully" }
                 } finally {
                     try {
                         card.disconnect(false)
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        log.d(e) { "Card disconnect failed" }
                     }
                 }
             } catch (e: Exception) {
-                println("[PC/SC] Read error: ${e.message}")
+                log.e(e) { "Read error" }
                 onError(e)
             }
 
-            println("[PC/SC] Waiting for card removal...")
+            log.i { "Waiting for card removal..." }
             terminal.waitForCardAbsent(0)
         }
     }

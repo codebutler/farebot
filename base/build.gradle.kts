@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.protobuf)
             implementation(libs.kotlincrypto.hash.md)
+            api(libs.kermit)
             api(libs.kotlinx.datetime)
             api(libs.sqldelight.runtime)
         }

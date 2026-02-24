@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.desktop
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
@@ -48,6 +49,8 @@ import kotlinx.coroutines.launch
  * the error is logged and the other backends continue scanning.
  * Results from any backend are emitted to the shared [scannedCards] flow.
  */
+private val log = Logger.withTag("DesktopCardScanner")
+
 class DesktopCardScanner : CardScanner {
     override val requiresActiveScan: Boolean = true
 
@@ -80,7 +83,7 @@ class DesktopCardScanner : CardScanner {
                     val backendJobs =
                         backends.map { backend ->
                             launch {
-                                println("[DesktopCardScanner] Starting ${backend.name} backend")
+                                log.i { "Starting ${backend.name} backend" }
                                 try {
                                     backend.scanLoop(
                                         onCardDetected = { tag ->
@@ -100,11 +103,11 @@ class DesktopCardScanner : CardScanner {
                                     )
                                 } catch (e: Exception) {
                                     if (isActive) {
-                                        println("[DesktopCardScanner] ${backend.name} backend failed: ${e.message}")
+                                        log.w(e) { "${backend.name} backend failed" }
                                     }
                                 } catch (e: Error) {
                                     // Catch LinkageError / UnsatisfiedLinkError from native libs
-                                    println("[DesktopCardScanner] ${backend.name} backend unavailable: ${e.message}")
+                                    log.w(e) { "${backend.name} backend unavailable" }
                                 }
                             }
                         }
@@ -132,7 +135,7 @@ class DesktopCardScanner : CardScanner {
             try {
                 PN533Device.openAll()
             } catch (e: UnsatisfiedLinkError) {
-                println("[DesktopCardScanner] libusb not available: ${e.message}")
+                log.w(e) { "libusb not available" }
                 emptyList()
             }
         if (transports.isEmpty()) {
@@ -144,7 +147,7 @@ class DesktopCardScanner : CardScanner {
                 val probe = PN533(transport)
                 val fw = probe.getFirmwareVersion()
                 val label = "PN53x #${index + 1}"
-                println("[DesktopCardScanner] $label firmware: $fw")
+                log.i { "$label firmware: $fw" }
                 if (fw.version >= 2) {
                     backends.add(PN533ReaderBackend(transport))
                 } else {

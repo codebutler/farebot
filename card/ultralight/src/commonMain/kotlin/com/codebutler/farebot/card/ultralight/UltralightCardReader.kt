@@ -22,9 +22,12 @@
 
 package com.codebutler.farebot.card.ultralight
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.nfc.UltralightTechnology
 import com.codebutler.farebot.card.ultralight.raw.RawUltralightCard
 import kotlin.time.Clock
+
+private val log = Logger.withTag("UltralightCardReader")
 
 object UltralightCardReader {
     @Throws(Exception::class)
@@ -35,7 +38,7 @@ object UltralightCardReader {
     ): RawUltralightCard {
         // Detect card type using protocol commands (GET_VERSION, AUTH_1)
         val detectedType = detectCardType(tech)
-        println("UltralightCardReader: Detected card type: $detectedType")
+        log.d { "Detected card type: $detectedType" }
 
         // Determine page count based on detected type
         val pageCount = detectedType.pageCount
@@ -107,7 +110,7 @@ object UltralightCardReader {
             val rawType = protocol.getCardType()
             rawType.parse()
         } catch (e: Exception) {
-            println("UltralightCardReader: Card type detection failed, falling back to UNKNOWN: $e")
+            log.w(e) { "Card type detection failed, falling back to UNKNOWN" }
             UltralightCard.UltralightType.UNKNOWN
         }
 }

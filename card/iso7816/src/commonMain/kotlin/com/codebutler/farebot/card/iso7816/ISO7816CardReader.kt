@@ -23,9 +23,12 @@
 
 package com.codebutler.farebot.card.iso7816
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.iso7816.raw.RawISO7816Card
 import com.codebutler.farebot.card.nfc.CardTransceiver
 import kotlin.time.Clock
+
+private val log = Logger.withTag("ISO7816CardReader")
 
 /**
  * Reads ISO 7816 cards by trying to SELECT BY NAME known application identifiers,
@@ -175,7 +178,7 @@ object ISO7816CardReader {
             } catch (e: ISO7816Exception) {
                 break
             } catch (e: Exception) {
-                println("[ISO7816] Record read failed at SFI $sfi, record $recordNum: $e")
+                log.w(e) { "Record read failed at SFI $sfi, record $recordNum" }
                 break
             }
         }
@@ -184,7 +187,7 @@ object ISO7816CardReader {
         try {
             binaryData = protocol.readBinary(sfi)
         } catch (e: Exception) {
-            println("[ISO7816] Binary read failed for SFI $sfi: $e")
+            log.w(e) { "Binary read failed for SFI $sfi" }
         }
 
         return if (records.isNotEmpty() || binaryData != null) {
@@ -225,7 +228,7 @@ object ISO7816CardReader {
                 } catch (e: ISOEOFException) {
                     break
                 } catch (e: Exception) {
-                    println("[ISO7816] File record read failed: $e")
+                    log.w(e) { "File record read failed" }
                     break
                 }
             }
@@ -235,7 +238,7 @@ object ISO7816CardReader {
                 try {
                     protocol.readBinary()
                 } catch (e: Exception) {
-                    println("[ISO7816] File binary read failed: $e")
+                    log.w(e) { "File binary read failed" }
                     null
                 }
 
@@ -243,7 +246,7 @@ object ISO7816CardReader {
 
             return ISO7816File(binaryData = binaryData, records = records, fci = fci)
         } catch (e: Exception) {
-            println("[ISO7816] File read failed for app: $e")
+            log.w(e) { "File read failed for app" }
             return null
         }
     }
@@ -266,7 +269,7 @@ object ISO7816CardReader {
                     )
                 balances[i] = balance
             } catch (e: Exception) {
-                println("[ISO7816] Balance read failed: $e")
+                log.w(e) { "Balance read failed" }
             }
         }
         return balances
@@ -286,7 +289,7 @@ object ISO7816CardReader {
                 4, // BALANCE_RESP_LEN
             )
         } catch (e: Exception) {
-            println("[ISO7816] KSX6924 purse info failed: $e")
+            log.w(e) { "KSX6924 purse info failed" }
             null
         }
 
@@ -309,7 +312,7 @@ object ISO7816CardReader {
                 records.add(record)
             }
         } catch (e: Exception) {
-            println("[ISO7816] KSX6924 transaction record read failed: $e")
+            log.w(e) { "KSX6924 transaction record read failed" }
         }
         return records
     }

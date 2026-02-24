@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.pilet
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.byteArrayToInt
 import com.codebutler.farebot.base.util.readASCII
@@ -40,6 +41,8 @@ import farebot.transit.pilet.generated.resources.*
  *
  * This is a serial-only reader; the card data is stored as NDEF with pilet.ee TLV records.
  */
+private val log = Logger.withTag("KievDigitalTransitFactory")
+
 class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> {
     companion object {
         private const val NDEF_TYPE = "pilet.ee:ekaart:5"
@@ -138,7 +141,8 @@ class KievDigitalTransitFactory : TransitFactory<ClassicCard, PiletTransitInfo> 
                 }
             }
             if (allData.isEmpty()) null else allData.toByteArray()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.d(e) { "Failed to read NDEF data" }
             null
         }
 

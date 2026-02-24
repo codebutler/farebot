@@ -2,6 +2,7 @@
 
 package com.codebutler.farebot.base.mdst
 
+import co.touchlab.kermit.Logger
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.js.ExperimentalWasmJsInterop
@@ -52,7 +53,8 @@ actual object ResourceAccessor {
         if (base64.isEmpty()) return null
         return try {
             Base64.decode(base64)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Logger.withTag("ResourceAccessor").w(e) { "Failed to load resource: $dbName" }
             null
         }
     }

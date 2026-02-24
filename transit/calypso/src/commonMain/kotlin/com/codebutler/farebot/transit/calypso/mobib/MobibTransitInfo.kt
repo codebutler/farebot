@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.mobib
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.ui.ListItem
 import com.codebutler.farebot.base.ui.ListItemInterface
 import com.codebutler.farebot.base.util.DateFormatStyle
@@ -133,7 +134,8 @@ class MobibTransitInfo internal constructor(
                     NumberUtils.zeroPad(NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(82 + 80, 8)), 2) +
                     " / " +
                     NumberUtils.convertBCDtoInteger(holder.getBitsFromBuffer(90 + 80, 4)).toString()
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Logger.withTag("MobibTransitInfo").d(e) { "Failed to parse serial" }
                 null
             }
         }
@@ -214,7 +216,8 @@ class MobibTransitInfo internal constructor(
                 epLoadLog?.records?.get(1)?.let {
                     try {
                         it.getBitsFromBuffer(2, 14)
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        Logger.withTag("MobibTransitInfo").d(e) { "Failed to parse purchase date" }
                         0
                     }
                 } ?: 0

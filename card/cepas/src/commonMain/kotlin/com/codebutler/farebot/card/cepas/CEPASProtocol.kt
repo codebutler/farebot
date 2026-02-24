@@ -24,8 +24,11 @@
 
 package com.codebutler.farebot.card.cepas
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.iso7816.ISO7816Exception
 import com.codebutler.farebot.card.iso7816.ISO7816Protocol
+
+private val log = Logger.withTag("CEPASProtocol")
 
 internal class CEPASProtocol(
     private val protocol: ISO7816Protocol,
@@ -42,7 +45,7 @@ internal class CEPASProtocol(
                 )
             if (result.isEmpty()) null else result
         } catch (ex: ISO7816Exception) {
-            println("[CEPAS] Failed to read purse $purseId: $ex")
+            log.w(ex) { "Failed to read purse $purseId" }
             null
         }
 
@@ -59,7 +62,7 @@ internal class CEPASProtocol(
                     byteArrayOf(0.toByte()),
                 )
         } catch (ex: ISO7816Exception) {
-            println("[CEPAS] Failed to read purse history: $ex")
+            log.w(ex) { "Failed to read purse history" }
             return null
         }
 
@@ -75,7 +78,7 @@ internal class CEPASProtocol(
                 )
             historyBuff = historyBuff + historyBuff2
         } catch (ex: ISO7816Exception) {
-            println("[CEPAS] Failed to read 2nd purse history: $ex")
+            log.w(ex) { "Failed to read 2nd purse history" }
         }
 
         return historyBuff

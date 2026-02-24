@@ -35,7 +35,7 @@ class PN533ReaderBackend(
 
     override suspend fun initDevice(pn533: PN533) {
         val fw = pn533.getFirmwareVersion()
-        println("[$name] Firmware: $fw")
+        log.i { "Firmware: $fw" }
         pn533.samConfiguration()
         pn533.setMaxRetries(passiveActivation = 0x02)
     }

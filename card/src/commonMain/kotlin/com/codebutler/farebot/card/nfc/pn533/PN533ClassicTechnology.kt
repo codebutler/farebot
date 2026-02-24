@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.card.nfc.pn533
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.nfc.ClassicTechnology
 
 /**
@@ -34,6 +35,8 @@ import com.codebutler.farebot.card.nfc.ClassicTechnology
  * The PN533 handles the MIFARE Classic crypto1 cipher internally
  * after a successful authentication.
  */
+private val log = Logger.withTag("PN533ClassicTechnology")
+
 class PN533ClassicTechnology(
     private val pn533: PN533,
     private val tg: Int,
@@ -92,7 +95,8 @@ class PN533ClassicTechnology(
             val data = byteArrayOf(authCommand, block.toByte()) + key + uidBytes
             pn533.inDataExchange(tg, data)
             true
-        } catch (_: PN533Exception) {
+        } catch (e: PN533Exception) {
+            log.d(e) { "Authentication failed for sector $sectorIndex" }
             false
         }
 

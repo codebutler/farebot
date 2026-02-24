@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.desktop
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.cepas.CEPASCardReader
@@ -51,6 +52,8 @@ import kotlinx.coroutines.delay
 abstract class PN53xReaderBackend(
     private val preOpenedTransport: Usb4JavaPN533Transport? = null,
 ) : NfcReaderBackend {
+    protected val log by lazy { Logger.withTag(name) }
+
     protected abstract suspend fun initDevice(pn533: PN533)
 
     protected open fun createTransceiver(
@@ -87,7 +90,7 @@ abstract class PN53xReaderBackend(
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ) {
         while (true) {
-            println("[$name] Polling for cards...")
+            log.i { "Polling for cards..." }
 
             // Try ISO 14443-A (106 kbps) first — covers Classic, Ultralight, DESFire
             var target = pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
@@ -122,20 +125,21 @@ abstract class PN53xReaderBackend(
             try {
                 val rawCard = readTarget(pn533, target, onProgress)
                 onCardRead(rawCard)
-                println("[$name] Card read successfully")
+                log.i { "Card read successfully" }
             } catch (e: Exception) {
-                println("[$name] Read error: ${e.message}")
+                log.e(e) { "Read error" }
                 onError(e)
             }
 
             // Release target
             try {
                 pn533.inRelease(target.tg)
-            } catch (_: PN533Exception) {
+            } catch (e: PN533Exception) {
+                log.d(e) { "inRelease failed (expected)" }
             }
 
             // Wait for card removal by polling until no target detected
-            println("[$name] Waiting for card removal...")
+            log.i { "Waiting for card removal..." }
             waitForRemoval(pn533)
         }
     }
@@ -157,7 +161,7 @@ abstract class PN53xReaderBackend(
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
-        println("[$name] Type A card: type=${info.cardType}, SAK=0x%02X, UID=${tagId.hex()}".format(target.sak))
+        log.i { "Type A card: type=${info.cardType}, SAK=0x%02X, UID=${tagId.hex()}".format(target.sak) }
 
         return when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
@@ -193,7 +197,7 @@ abstract class PN53xReaderBackend(
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
     ): RawCard<*> {
         val tagId = target.idm
-        println("[$name] FeliCa card: IDm=${tagId.hex()}")
+        log.i { "FeliCa card: IDm=${tagId.hex()}" }
         val adapter = PN533FeliCaTagAdapter(pn533, target.idm)
         return FeliCaReader.readTag(tagId, adapter, onProgress = onProgress)
     }
@@ -208,7 +212,8 @@ abstract class PN53xReaderBackend(
                             baudRate = PN533.BAUD_RATE_212_FELICA,
                             initiatorData = SENSF_REQ,
                         )
-                } catch (_: PN533Exception) {
+                } catch (e: PN533Exception) {
+                    log.d(e) { "Poll during removal check failed" }
                     null
                 }
             if (target == null) {
@@ -217,7 +222,8 @@ abstract class PN53xReaderBackend(
             // Card still present, release and keep waiting
             try {
                 pn533.inRelease(target.tg)
-            } catch (_: PN533Exception) {
+            } catch (e: PN533Exception) {
+                log.d(e) { "inRelease during removal wait failed" }
             }
         }
     }

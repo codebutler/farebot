@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.serialize.CardSerializer
 import com.codebutler.farebot.flipper.FlipperKeyDictParser
@@ -33,6 +34,8 @@ class FlipperViewModel(
     private val cardSerializer: CardSerializer,
     private val transportFactory: FlipperTransportFactory,
 ) : ViewModel() {
+    private val log = Logger.withTag("FlipperViewModel")
+
     private val _uiState = MutableStateFlow(FlipperUiState())
     val uiState: StateFlow<FlipperUiState> = _uiState.asStateFlow()
 
@@ -129,7 +132,7 @@ class FlipperViewModel(
             try {
                 transport?.close()
             } catch (e: Exception) {
-                println("[FlipperViewModel] Error closing transport: ${e.message}")
+                log.w(e) { "Error closing transport" }
             }
             rpcClient = null
             transport = null
@@ -240,7 +243,7 @@ class FlipperViewModel(
                         }
                     }
                 } catch (e: Exception) {
-                    println("[FlipperViewModel] Failed to import $path: ${e.message}")
+                    log.w(e) { "Failed to import $path" }
                 }
             }
 

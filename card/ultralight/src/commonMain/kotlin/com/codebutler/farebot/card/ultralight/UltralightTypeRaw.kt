@@ -22,7 +22,10 @@
 
 package com.codebutler.farebot.card.ultralight
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.hex
+
+private val log = Logger.withTag("UltralightTypeRaw")
 
 /**
  * Raw card type detection data from protocol commands.
@@ -40,9 +43,9 @@ internal data class UltralightTypeRaw(
     fun parse(): UltralightCard.UltralightType {
         if (versionCmd != null) {
             if (versionCmd.size != 8) {
-                println(
-                    "UltralightTypeRaw: getVersion didn't return 8 bytes, got (${versionCmd.size} instead): ${versionCmd.hex()}",
-                )
+                log.w {
+                    "getVersion didn't return 8 bytes, got (${versionCmd.size} instead): ${versionCmd.hex()}"
+                }
                 return UltralightCard.UltralightType.UNKNOWN
             }
 
@@ -55,9 +58,9 @@ internal data class UltralightTypeRaw(
                     0x11 -> UltralightCard.UltralightType.NTAG215
                     0x13 -> UltralightCard.UltralightType.NTAG216
                     else -> {
-                        println(
-                            "UltralightTypeRaw: getVersion returned unknown storage size (${versionCmd[6]}): ${versionCmd.hex()}",
-                        )
+                        log.w {
+                            "getVersion returned unknown NTAG storage size (${versionCmd[6]}): ${versionCmd.hex()}"
+                        }
                         UltralightCard.UltralightType.UNKNOWN
                     }
                 }
@@ -65,9 +68,9 @@ internal data class UltralightTypeRaw(
 
             if (versionCmd[2].toInt() != 0x03) {
                 // TODO: PM3 notes that there are a number of NTAG which respond to this command, and look similar to EV1.
-                println(
-                    "UltralightTypeRaw: getVersion got a tag response with non-EV1 product code (${versionCmd[2]}): ${versionCmd.hex()}",
-                )
+                log.w {
+                    "getVersion got a tag response with non-EV1 product code (${versionCmd[2]}): ${versionCmd.hex()}"
+                }
                 return UltralightCard.UltralightType.UNKNOWN
             }
 
@@ -80,9 +83,9 @@ internal data class UltralightTypeRaw(
                 0x0b -> UltralightCard.UltralightType.EV1_MF0UL11
                 0x0e -> UltralightCard.UltralightType.EV1_MF0UL21
                 else -> {
-                    println(
-                        "UltralightTypeRaw: getVersion returned unknown storage size (${versionCmd[6]}): ${versionCmd.hex()}",
-                    )
+                    log.w {
+                        "getVersion returned unknown EV1 storage size (${versionCmd[6]}): ${versionCmd.hex()}"
+                    }
                     UltralightCard.UltralightType.UNKNOWN
                 }
             }

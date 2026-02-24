@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.formatHumanDate
 import com.codebutler.farebot.base.util.formatTimeShort
 import com.codebutler.farebot.base.util.hex
@@ -42,6 +43,8 @@ class HistoryViewModel(
     private val versionCode: Int = 1,
     private val versionName: String = "1.0.0",
 ) : ViewModel() {
+    private val log = Logger.withTag("HistoryViewModel")
+
     private val _uiState = MutableStateFlow(HistoryUiState())
     val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
 
@@ -171,8 +174,7 @@ class HistoryViewModel(
                         groupedItems = groupedItems,
                     )
             } catch (e: Throwable) {
-                println("[HistoryViewModel] Failed to load cards: $e")
-                e.printStackTrace()
+                log.e(e) { "Failed to load cards" }
                 _uiState.value =
                     _uiState.value.copy(isLoading = false, allItems = emptyList(), groupedItems = emptyList())
             }

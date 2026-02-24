@@ -13,6 +13,9 @@ import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.FareBotApp
 import com.codebutler.farebot.shared.di.LocalAppGraph
@@ -26,6 +29,24 @@ import javax.imageio.ImageIO
 private const val ICON_PATH = "composeResources/farebot.app.generated.resources/drawable/ic_launcher.png"
 
 fun main() {
+    Logger.setLogWriters(
+        object : LogWriter() {
+            override fun log(
+                severity: Severity,
+                message: String,
+                tag: String,
+                throwable: Throwable?,
+            ) {
+                val ts = java.time.LocalTime.now()
+                val prefix = "$ts ${severity.name[0]}/$tag: "
+                println("$prefix$message")
+                throwable?.stackTraceToString()?.lineSequence()?.forEach { line ->
+                    println("$prefix$line")
+                }
+            }
+        },
+    )
+
     System.setProperty("apple.awt.application.appearance", "system")
 
     val desktop = Desktop.getDesktop()

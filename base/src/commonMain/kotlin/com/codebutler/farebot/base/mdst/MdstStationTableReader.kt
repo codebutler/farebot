@@ -23,9 +23,12 @@
 
 package com.codebutler.farebot.base.mdst
 
+import co.touchlab.kermit.Logger
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
+
+private val log = Logger.withTag("MdST")
 
 /**
  * Metrodroid Station Table (MdST) file reader.
@@ -88,7 +91,7 @@ class MdstStationTableReader private constructor(
             val (bytes, _) = readDelimitedBytes(data, absoluteOffset)
             ProtoBuf.decodeFromByteArray<MdstStation>(bytes)
         } catch (e: Exception) {
-            println("[MdST] Failed to decode station $id: $e")
+            log.w(e) { "Failed to decode station $id" }
             null
         }
     }
@@ -130,7 +133,7 @@ class MdstStationTableReader private constructor(
                 readers[dbName] = reader
                 reader
             } catch (e: Exception) {
-                println("[MdST] Failed to parse $dbName: $e")
+                log.w(e) { "Failed to parse $dbName" }
                 null
             }
         }

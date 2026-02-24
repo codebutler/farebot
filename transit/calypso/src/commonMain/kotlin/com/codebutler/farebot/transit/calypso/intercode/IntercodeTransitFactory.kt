@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.calypso.intercode
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.iso7816.ISO7816Application
@@ -38,6 +39,8 @@ import com.codebutler.farebot.transit.en1545.En1545Parsed
 import com.codebutler.farebot.transit.en1545.En1545TransitData
 import com.codebutler.farebot.transit.en1545.getBitsFromBuffer
 import farebot.transit.calypso.generated.resources.*
+
+private val log = Logger.withTag("IntercodeTransitFactory")
 
 class IntercodeTransitFactory : CalypsoTransitFactory() {
     override val allCards: List<CardInfo>
@@ -60,7 +63,8 @@ class IntercodeTransitFactory : CalypsoTransitFactory() {
         val netId =
             try {
                 tenv.getBitsFromBuffer(13, 24)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                log.d(e) { "Failed to parse netId for identity" }
                 0
             }
         val cardName = IntercodeTransitInfo.getCardName(netId, tenv)
@@ -71,7 +75,8 @@ class IntercodeTransitFactory : CalypsoTransitFactory() {
         try {
             val netId = tenv.getBitsFromBuffer(13, 24)
             IntercodeTransitInfo.isIntercode(netId)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.d(e) { "Failed to check Intercode tenv" }
             false
         }
 
@@ -88,7 +93,8 @@ class IntercodeTransitFactory : CalypsoTransitFactory() {
         val netId =
             try {
                 tenv.getBitsFromBuffer(13, 24)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                log.d(e) { "Failed to parse netId for serial" }
                 0
             }
 

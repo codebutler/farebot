@@ -2,6 +2,7 @@ package com.codebutler.farebot.shared.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
@@ -41,6 +42,8 @@ class HomeViewModel(
     private val navDataHolder: NavDataHolder,
     private val analytics: Analytics,
 ) : ViewModel() {
+    private val log = Logger.withTag("HomeViewModel")
+
     private val _uiState =
         MutableStateFlow(
             HomeUiState(
@@ -98,8 +101,7 @@ class HomeViewModel(
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
                 _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
-                println("[FareBot] Scan error: ${error::class.simpleName}: ${error.message}")
-                error.printStackTrace()
+                log.e(error) { "Scan error: ${error::class.simpleName}: ${error.message}" }
                 val scanError = categorizeError(error)
                 analytics.logEvent(
                     "scan_card_error",
@@ -167,8 +169,7 @@ class HomeViewModel(
             val key = navDataHolder.put(rawCard)
             _navigateToCard.emit(key)
         } catch (e: Exception) {
-            println("[FareBot] Process card error: ${e::class.simpleName}: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Process card error: ${e::class.simpleName}: ${e.message}" }
             _errorMessage.value =
                 ScanError(
                     title = getString(Res.string.error),

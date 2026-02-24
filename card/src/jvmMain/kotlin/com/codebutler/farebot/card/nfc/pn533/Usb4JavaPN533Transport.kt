@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.card.nfc.pn533
 
+import co.touchlab.kermit.Logger
 import org.usb4java.DeviceHandle
 import org.usb4java.LibUsb
 import java.nio.ByteBuffer
@@ -39,6 +40,8 @@ import java.nio.IntBuffer
 class Usb4JavaPN533Transport(
     private val handle: DeviceHandle,
 ) : PN533Transport {
+    private val log = Logger.withTag("Usb4JavaPN533Transport")
+
     /**
      * Drain any stale data from the USB read buffer.
      * Call after opening the device to clear leftovers from previous sessions.
@@ -62,12 +65,12 @@ class Usb4JavaPN533Transport(
         val payload = byteArrayOf(TFI_HOST_TO_PN533, code) + data
         val frame = buildFrame(payload)
 
-        if (DEBUG) println("[PN53x TX] cmd=0x%02X frame=${frame.hex()}".format(code))
+        log.d { "TX cmd=0x%02X frame=${frame.hex()}".format(code) }
         bulkWrite(frame)
         val staleResponse = readAck()
         // If readAck got a response frame instead of an ACK, use it directly
         if (staleResponse != null) {
-            if (DEBUG) println("[PN53x RX] (stale) ${staleResponse.hex()}")
+            log.d { "RX (stale) ${staleResponse.hex()}" }
             return parseFrame(staleResponse)
         }
         return readResponse(timeoutMs)
@@ -153,7 +156,7 @@ class Usb4JavaPN533Transport(
         val bytes = ByteArray(count)
         buf.rewind()
         buf.get(bytes)
-        if (DEBUG) println("[PN53x RX] ${bytes.hex()}")
+        log.d { "RX ${bytes.hex()}" }
         return parseFrame(bytes)
     }
 
@@ -229,8 +232,6 @@ class Usb4JavaPN533Transport(
                 0xFF.toByte(),
                 0x00,
             )
-
-        const val DEBUG = false
 
         private fun ByteArray.hex(): String = joinToString("") { "%02X".format(it) }
     }

@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.transit.smartrider
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.FormattedString
 import com.codebutler.farebot.base.util.HashUtils
 import com.codebutler.farebot.base.util.byteArrayToIntReversed
@@ -45,6 +46,8 @@ import farebot.transit.smartrider.generated.resources.*
  * https://github.com/micolous/metrodroid/wiki/SmartRider
  * https://github.com/micolous/metrodroid/wiki/MyWay
  */
+private val log = Logger.withTag("SmartRiderTransitFactory")
+
 class SmartRiderTransitFactory : TransitFactory<ClassicCard, SmartRiderTransitInfo> {
     override val allCards: List<CardInfo>
         get() = listOf(CARD_INFO)
@@ -109,8 +112,8 @@ class SmartRiderTransitFactory : TransitFactory<ClassicCard, SmartRiderTransitIn
                 ) {
                     return SmartRiderType.SMARTRIDER
                 }
-            } catch (_: IndexOutOfBoundsException) {
-                // If that sector number is too high, then it's not for us.
+            } catch (e: IndexOutOfBoundsException) {
+                log.d(e) { "Sector index out of bounds during SmartRider check" }
             }
 
             return SmartRiderType.UNKNOWN

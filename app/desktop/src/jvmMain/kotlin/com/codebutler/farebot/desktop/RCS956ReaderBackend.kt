@@ -62,7 +62,7 @@ class RCS956ReaderBackend(
         pn533.resetMode()
 
         val fw = pn533.getFirmwareVersion()
-        println("[$name] Firmware: $fw (RC-S956)")
+        log.i { "Firmware: $fw (RC-S956)" }
 
         // mute() = resetMode + super().mute()
         pn533.resetMode()

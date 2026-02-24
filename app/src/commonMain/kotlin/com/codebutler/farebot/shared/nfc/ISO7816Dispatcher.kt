@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.shared.nfc
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.china.ChinaRegistry
 import com.codebutler.farebot.card.desfire.DesfireCardReader
@@ -36,6 +37,8 @@ import com.codebutler.farebot.card.nfc.CardTransceiver
  * then falls back to the DESFire protocol if no known application is found.
  */
 object ISO7816Dispatcher {
+    private val log = Logger.withTag("ISO7816Dispatcher")
+
     suspend fun readCard(
         tagId: ByteArray,
         transceiver: CardTransceiver,
@@ -59,7 +62,7 @@ object ISO7816Dispatcher {
         return try {
             ISO7816CardReader.readCard(tagId, transceiver, appConfigs, onProgress)
         } catch (e: Exception) {
-            println("[ISO7816Dispatcher] ISO7816 read attempt failed: $e")
+            log.w(e) { "ISO7816 read attempt failed" }
             null
         }
     }

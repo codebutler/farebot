@@ -22,8 +22,11 @@
 
 package com.codebutler.farebot.card.ultralight
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.nfc.UltralightTechnology
+
+private val log = Logger.withTag("UltralightProtocol")
 
 /**
  * Low level commands for MIFARE Ultralight.
@@ -64,7 +67,7 @@ internal class UltralightProtocol(
         try {
             return UltralightTypeRaw(versionCmd = getVersion())
         } catch (e: Exception) {
-            println("UltralightProtocol: getVersion returned error, not EV1: $e")
+            log.d(e) { "getVersion returned error, not EV1" }
         }
 
         // Reconnect the tag
@@ -73,10 +76,10 @@ internal class UltralightProtocol(
         // Try to get a nonce for 3DES authentication with Ultralight C.
         try {
             val b2 = auth1()
-            println("UltralightProtocol: auth1 said = ${b2.hex()}")
+            log.d { "auth1 said = ${b2.hex()}" }
         } catch (e: Exception) {
             // Non-C cards will disconnect here.
-            println("UltralightProtocol: auth1 returned error, not Ultralight C: $e")
+            log.d(e) { "auth1 returned error, not Ultralight C" }
 
             // TODO: PM3 says NTAG 203 (with different memory size) also looks like this.
 
@@ -120,19 +123,17 @@ internal class UltralightProtocol(
         } catch (e: Exception) {
             // When the card halts, the tag may report an error up through the stack. This is fine.
             // Unfortunately we can't tell if the card was removed or we need to reset it.
-            println("UltralightProtocol: Discarding exception in halt, this probably expected: $e")
+            log.d(e) { "Discarding exception in halt, this is probably expected" }
         }
     }
 
     private suspend fun sendRequest(vararg data: Byte): ByteArray {
-        println("UltralightProtocol: sent card: ${data.hex()}")
+        log.d { "sent card: ${data.hex()}" }
 
         return mTagTech.transceive(data)
     }
 
     companion object {
-        private const val TAG = "UltralightProtocol"
-
         // Commands
         private const val GET_VERSION = 0x60.toByte()
         private const val AUTH_1 = 0x1a.toByte()
