@@ -149,6 +149,16 @@ fun FareBotApp(
                             onNavigateToAddKeyForCard = { tagId, cardType ->
                                 graph.keyManagerPlugin?.navigateToAddKey(navController, tagId, cardType)
                             },
+                            onNavigateToRecoverKey =
+                                if (graph.cardScanner?.supportsKeyRecovery == true) {
+                                    graph.keyManagerPlugin?.let { plugin ->
+                                        { tagId: String, cardType: CardType ->
+                                            plugin.navigateToKeyRecovery(navController, tagId, cardType)
+                                        }
+                                    }
+                                } else {
+                                    null
+                                },
                             onScanCard = { homeViewModel.startActiveScan() },
                             onCancelScan = { homeViewModel.stopActiveScan() },
                             historyUiState = historyUiState,

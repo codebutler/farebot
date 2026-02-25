@@ -32,7 +32,8 @@ import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 class PN533ReaderBackend(
     keyManagerPlugin: KeyManagerPlugin? = null,
     transport: Usb4JavaPN533Transport? = null,
-) : PN53xReaderBackend(transport, keyManagerPlugin) {
+    recoveryMode: Boolean = false,
+) : PN53xReaderBackend(transport, keyManagerPlugin, recoveryMode) {
     override val name: String = "PN533"
 
     override suspend fun initDevice(pn533: PN533) {
@@ -40,5 +41,9 @@ class PN533ReaderBackend(
         log.i { "Firmware: $fw" }
         pn533.samConfiguration()
         pn533.setMaxRetries(passiveActivation = 0x02)
+        // Reduce internal RF timeout from default (~2s) to ~205ms.
+        // Only affects how long the PN533 waits when the card doesn't respond
+        // (e.g., MIFARE auth failure). Successful operations are unaffected.
+        pn533.setTimings(retryTimeout = 0x0C)
     }
 }

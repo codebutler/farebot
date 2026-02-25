@@ -56,6 +56,12 @@ interface KeyManagerPlugin {
     /** Get all global dictionary keys. */
     fun getGlobalKeys(): List<ByteArray>
 
+    /** Save discovered keys for a card. Merges with any existing keys. */
+    fun saveCardKeys(
+        tagId: String,
+        keys: ClassicCardKeys,
+    )
+
     /** Navigate to the Keys list screen. */
     fun navigateToKeys(navController: NavHostController)
 
@@ -64,6 +70,13 @@ interface KeyManagerPlugin {
         navController: NavHostController,
         tagId: String? = null,
         cardType: CardType? = null,
+    )
+
+    /** Navigate to the Key Recovery screen. */
+    fun navigateToKeyRecovery(
+        navController: NavHostController,
+        tagId: String,
+        cardType: CardType,
     )
 
     // String resources needed by app code (resolved at call site)

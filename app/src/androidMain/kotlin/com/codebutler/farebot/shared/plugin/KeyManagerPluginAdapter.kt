@@ -19,6 +19,11 @@ fun KeyManagerPluginImpl.toKeyManagerPlugin(): KeyManagerPlugin {
 
         override fun getGlobalKeys(): List<ByteArray> = impl.getGlobalKeys()
 
+        override fun saveCardKeys(
+            tagId: String,
+            keys: ClassicCardKeys,
+        ) = impl.saveCardKeys(tagId, keys)
+
         override fun navigateToKeys(navController: NavHostController) = impl.navigateToKeys(navController)
 
         override fun navigateToAddKey(
@@ -26,6 +31,12 @@ fun KeyManagerPluginImpl.toKeyManagerPlugin(): KeyManagerPlugin {
             tagId: String?,
             cardType: CardType?,
         ) = impl.navigateToAddKey(navController, tagId, cardType)
+
+        override fun navigateToKeyRecovery(
+            navController: NavHostController,
+            tagId: String,
+            cardType: CardType,
+        ) = impl.navigateToKeyRecovery(navController, tagId, cardType)
 
         override fun NavGraphBuilder.registerKeyRoutes(
             navController: NavHostController,

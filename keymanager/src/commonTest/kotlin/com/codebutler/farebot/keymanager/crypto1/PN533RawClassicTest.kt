@@ -130,6 +130,69 @@ class PN533RawClassicTest {
     }
 
     @Test
+    fun testPackWithParityByteAligned() {
+        // 8 bytes × 9 bits = 72 bits = 9 FIFO bytes, txLastBits = 0
+        val data = ByteArray(8) { 0xFF.toByte() }
+        val parity = IntArray(8) { 1 } // all 1s
+        val (packed, txLastBits) = PN533RawClassic.packWithParity(data, parity)
+        assertEquals(9, packed.size, "8 data bytes with parity = 9 FIFO bytes")
+        assertEquals(0, txLastBits, "72 bits is byte-aligned → txLastBits=0")
+    }
+
+    @Test
+    fun testPackWithParityNonAligned() {
+        // 4 bytes × 9 bits = 36 bits = 5 FIFO bytes, txLastBits = 4
+        val data = byteArrayOf(0x60, 0x00, 0xF5.toByte(), 0x7B)
+        val parity = IntArray(4) { i -> Crypto1Auth.oddParity(data[i].toInt() and 0xFF) }
+        val (packed, txLastBits) = PN533RawClassic.packWithParity(data, parity)
+        assertEquals(5, packed.size, "4 data bytes with parity = 5 FIFO bytes")
+        assertEquals(4, txLastBits, "36 bits mod 8 = 4")
+    }
+
+    @Test
+    fun testPackUnpackRoundtrip() {
+        // Pack data with parity, then unpack — should recover original data and parity
+        val data = byteArrayOf(0x60, 0x00, 0xF5.toByte(), 0x7B)
+        val parity = intArrayOf(1, 1, 0, 0)
+
+        val (packed, _) = PN533RawClassic.packWithParity(data, parity)
+        val (unpacked, unpackedParity) = PN533RawClassic.unpackWithParity(packed, data.size)
+
+        assertContentEquals(data, unpacked, "Unpacked data should match original")
+        assertContentEquals(parity, unpackedParity, "Unpacked parity should match original")
+    }
+
+    @Test
+    fun testPackUnpackRoundtrip8Bytes() {
+        // 8 bytes (byte-aligned case)
+        val data = byteArrayOf(0x12, 0x34, 0x56, 0x78, 0xAB.toByte(), 0xCD.toByte(), 0xEF.toByte(), 0x01)
+        val parity = IntArray(8) { i -> Crypto1Auth.oddParity(data[i].toInt() and 0xFF) }
+
+        val (packed, txLastBits) = PN533RawClassic.packWithParity(data, parity)
+        assertEquals(0, txLastBits, "8 × 9 = 72 bits is byte-aligned")
+
+        val (unpacked, unpackedParity) = PN533RawClassic.unpackWithParity(packed, 8)
+        assertContentEquals(data, unpacked, "Unpacked data should match original")
+        assertContentEquals(parity, unpackedParity, "Unpacked parity should match original")
+    }
+
+    @Test
+    fun testPackUnpackRoundtrip18Bytes() {
+        // 18 bytes (16 data + 2 CRC) — MIFARE read response
+        // 18 × 9 = 162 bits = 21 FIFO bytes, txLastBits = 2
+        val data = ByteArray(18) { (it * 17 + 3).toByte() }
+        val parity = IntArray(18) { i -> Crypto1Auth.oddParity(data[i].toInt() and 0xFF) }
+
+        val (packed, txLastBits) = PN533RawClassic.packWithParity(data, parity)
+        assertEquals(21, packed.size, "18 data bytes with parity = 21 FIFO bytes")
+        assertEquals(2, txLastBits, "162 bits mod 8 = 2")
+
+        val (unpacked, unpackedParity) = PN533RawClassic.unpackWithParity(packed, 18)
+        assertContentEquals(data, unpacked, "Unpacked data should match original")
+        assertContentEquals(parity, unpackedParity, "Unpacked parity should match original")
+    }
+
+    @Test
     fun testUintToBytesRoundtrip() {
         // Convert UInt -> bytes -> UInt should be identity
         val values =

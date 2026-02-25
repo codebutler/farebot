@@ -106,7 +106,7 @@ class AddKeyViewModel(
                     .padStart(2, '0')
                     .uppercase()
             }
-        val cardType = detectCardType(tag.techList)
+        val cardType = tag.cardType
 
         if (cardType == null) {
             _uiState.value =
@@ -123,13 +123,4 @@ class AddKeyViewModel(
                 error = null,
             )
     }
-
-    private fun detectCardType(techList: List<String>): CardType? =
-        when {
-            techList.any { it.contains("MifareClassic") } -> CardType.MifareClassic
-            techList.any { it.contains("MifareUltralight") } -> CardType.MifareUltralight
-            techList.any { it.contains("IsoDep") || it.contains("NfcA") } -> CardType.MifareDesfire
-            techList.any { it.contains("NfcF") } -> CardType.FeliCa
-            else -> null
-        }
 }

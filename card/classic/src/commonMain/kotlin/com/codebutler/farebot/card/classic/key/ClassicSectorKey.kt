@@ -29,6 +29,8 @@ import kotlinx.serialization.Serializable
 data class ClassicSectorKey(
     @Contextual val keyA: ByteArray,
     @Contextual val keyB: ByteArray,
+    val hasKeyA: Boolean = true,
+    val hasKeyB: Boolean = true,
 ) {
     companion object {
         fun create(

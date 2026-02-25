@@ -22,6 +22,7 @@
 
 package com.codebutler.farebot.shared.nfc
 
+import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,15 +36,15 @@ data class ReadingProgress(
 
 data class ScannedTag(
     val id: ByteArray,
-    val techList: List<String>,
+    val cardType: CardType? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ScannedTag) return false
-        return id.contentEquals(other.id) && techList == other.techList
+        return id.contentEquals(other.id) && cardType == other.cardType
     }
 
-    override fun hashCode(): Int = id.contentHashCode() * 31 + techList.hashCode()
+    override fun hashCode(): Int = id.contentHashCode() * 31 + (cardType?.hashCode() ?: 0)
 }
 
 /**
@@ -76,12 +77,27 @@ interface CardScanner {
     val readingProgress: StateFlow<ReadingProgress?>
         get() = MutableStateFlow(null)
 
+    /** Partial card data emitted during reading for incremental transit identification. */
+    val partialCardData: StateFlow<RawCard<*>?>
+        get() = MutableStateFlow(null)
+
+    /** Whether this scanner supports MIFARE Classic key recovery (requires PN533 raw access). */
+    val supportsKeyRecovery: Boolean get() = false
+
     /**
      * Start an active scan session (e.g., iOS NFC dialog).
      * Results are emitted to [scannedCards].
      * No-op on platforms with passive scanning.
      */
     fun startActiveScan()
+
+    /**
+     * Start an active scan with MIFARE Classic key recovery enabled.
+     * Defaults to [startActiveScan] on scanners that don't support recovery.
+     */
+    fun startRecoveryScan() {
+        startActiveScan()
+    }
 
     /** Stop the active scan session. */
     fun stopActiveScan()

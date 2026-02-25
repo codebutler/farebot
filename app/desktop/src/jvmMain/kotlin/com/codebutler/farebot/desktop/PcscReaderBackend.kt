@@ -55,6 +55,7 @@ private val log = Logger.withTag("PcscReaderBackend")
  */
 class PcscReaderBackend(
     private val keyManagerPlugin: KeyManagerPlugin? = null,
+    private val recoveryMode: Boolean = false,
 ) : NfcReaderBackend {
     override val name: String = "PC/SC"
 
@@ -63,6 +64,7 @@ class PcscReaderBackend(
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)?,
     ) {
         val factory = TerminalFactory.getDefault()
         val terminals =
@@ -103,8 +105,8 @@ class PcscReaderBackend(
                         }
                     log.i { "Tag ID: ${tagId.hex()}" }
 
-                    onCardDetected(ScannedTag(id = tagId, techList = listOf(info.cardType.name)))
-                    val rawCard = readCard(info, channel, tagId, onProgress)
+                    onCardDetected(ScannedTag(id = tagId, cardType = info.cardType))
+                    val rawCard = readCard(info, channel, tagId, onProgress, onPartialCard)
                     onCardRead(rawCard)
                     log.i { "Card read successfully" }
                 } finally {
@@ -129,6 +131,7 @@ class PcscReaderBackend(
         channel: javax.smartcardio.CardChannel,
         tagId: ByteArray,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)?,
     ): RawCard<*> =
         when (info.cardType) {
             CardType.MifareDesfire, CardType.ISO7816 -> {
@@ -142,7 +145,18 @@ class PcscReaderBackend(
                 val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
                 val globalKeys = keyManagerPlugin?.getGlobalKeys()
                 // PC/SC doesn't support raw communication needed for nested attack key recovery
-                val rawCard = ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys)
+                val rawCard =
+                    ClassicCardReader.readCard(
+                        tagId,
+                        tech,
+                        cardKeys,
+                        globalKeys,
+                        onProgress = onProgress,
+                        onPartialCard = onPartialCard,
+                    )
+                rawCard.extractKeys()?.let { keys ->
+                    keyManagerPlugin?.saveCardKeys(tagIdHex, keys)
+                }
                 if (rawCard.hasUnauthorizedSectors()) {
                     throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }

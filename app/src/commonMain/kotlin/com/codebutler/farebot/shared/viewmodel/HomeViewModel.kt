@@ -14,6 +14,7 @@ import com.codebutler.farebot.shared.nfc.CardScanner
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.platform.Analytics
 import com.codebutler.farebot.shared.platform.NfcStatus
+import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
 import com.codebutler.farebot.shared.ui.screen.HomeUiState
 import dev.zacsweers.metro.Inject
 import farebot.app.generated.resources.*
@@ -41,6 +42,7 @@ class HomeViewModel(
     private val cardSerializer: CardSerializer,
     private val navDataHolder: NavDataHolder,
     private val analytics: Analytics,
+    private val transitFactoryRegistry: TransitFactoryRegistry,
 ) : ViewModel() {
     private val log = Logger.withTag("HomeViewModel")
 
@@ -80,8 +82,12 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
-            cardScanner.scannedTags.collect {
-                _uiState.value = _uiState.value.copy(isReadingCard = true)
+            cardScanner.scannedTags.collect { tag ->
+                _uiState.value =
+                    _uiState.value.copy(
+                        isReadingCard = true,
+                        detectedCardType = tag.cardType,
+                    )
             }
         }
 
@@ -92,15 +98,47 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
+            cardScanner.partialCardData.collect { rawCard ->
+                if (rawCard == null) {
+                    _uiState.value = _uiState.value.copy(identifiedTransitName = null)
+                    return@collect
+                }
+                try {
+                    val card = rawCard.parse()
+                    val identity = transitFactoryRegistry.parseTransitIdentity(card)
+                    if (identity != null) {
+                        val name = identity.name.resolveAsync()
+                        _uiState.value = _uiState.value.copy(identifiedTransitName = name)
+                    }
+                } catch (_: Exception) {
+                    // Partial data may not parse — that's expected
+                }
+            }
+        }
+
+        viewModelScope.launch {
             cardScanner.scannedCards.collect { rawCard ->
-                _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
+                _uiState.value =
+                    _uiState.value.copy(
+                        isReadingCard = false,
+                        readingProgress = null,
+                        detectedCardType = null,
+                        identifiedTransitName = null,
+                    )
                 processScannedCard(rawCard)
             }
         }
 
         viewModelScope.launch {
             cardScanner.scanErrors.collect { error ->
-                _uiState.value = _uiState.value.copy(isReadingCard = false, readingProgress = null)
+                _uiState.value =
+                    _uiState.value.copy(
+                        isReadingCard = false,
+                        readingProgress = null,
+                        detectedCardType = null,
+                        identifiedTransitName = null,
+                    )
+                cardScanner.stopActiveScan()
                 log.e(error) { "Scan error: ${error::class.simpleName}: ${error.message}" }
                 val scanError = categorizeError(error)
                 analytics.logEvent(

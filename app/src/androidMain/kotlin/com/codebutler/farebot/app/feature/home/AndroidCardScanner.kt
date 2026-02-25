@@ -4,29 +4,21 @@ import com.codebutler.farebot.app.core.nfc.NfcStream
 import com.codebutler.farebot.app.core.nfc.TagReaderFactory
 import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardType
-import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.raw.RawClassicCard
 import com.codebutler.farebot.key.CardKeys
 import com.codebutler.farebot.persist.CardKeysPersister
-import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.BaseCardScanner
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
-import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 /**
- * Android implementation of [CardScanner] that wraps [NfcStream] and [TagReaderFactory].
+ * Android implementation of [BaseCardScanner] that wraps [NfcStream] and [TagReaderFactory].
  *
  * Uses passive scanning via Android NFC foreground dispatch. Tags arrive through
  * [NfcStream] when the Activity has NFC foreground dispatch enabled.
@@ -36,25 +28,10 @@ class AndroidCardScanner(
     private val tagReaderFactory: TagReaderFactory,
     private val cardKeysPersister: CardKeysPersister,
     private val json: Json,
-) : CardScanner {
+) : BaseCardScanner() {
     override val requiresActiveScan: Boolean get() = false
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    private val _scannedCards = MutableSharedFlow<RawCard<*>>()
-    override val scannedCards: SharedFlow<RawCard<*>> = _scannedCards.asSharedFlow()
-
-    private val _scanErrors = MutableSharedFlow<Throwable>()
-    override val scanErrors: SharedFlow<Throwable> = _scanErrors.asSharedFlow()
-
-    private val _scannedTags = MutableSharedFlow<ScannedTag>()
-    override val scannedTags: SharedFlow<ScannedTag> = _scannedTags.asSharedFlow()
-
-    private val _isScanning = MutableStateFlow(false)
-    override val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
-
-    private val _readingProgress = MutableStateFlow<ReadingProgress?>(null)
-    override val readingProgress: StateFlow<ReadingProgress?> = _readingProgress.asStateFlow()
 
     private var isObserving = false
 
@@ -64,29 +41,27 @@ class AndroidCardScanner(
 
         scope.launch {
             nfcStream.observe().collect { tag ->
-                val techList = tag.techList?.toList() ?: emptyList()
-                _scannedTags.emit(ScannedTag(id = tag.id, techList = techList))
+                val detectedCardType = tag.techList?.let { cardTypeFromTechList(it) }
+                emitTag(ScannedTag(id = tag.id, cardType = detectedCardType))
 
-                _isScanning.value = true
+                setScanning(true)
                 try {
                     val cardKeys = getCardKeys(tag.id.hex())
                     val rawCard =
                         tagReaderFactory.getTagReader(tag.id, tag, cardKeys).readTag { current, total ->
-                            _readingProgress.value = ReadingProgress(current, total)
+                            emitProgress(current, total)
                         }
-                    _readingProgress.value = null
                     if (rawCard.isUnauthorized()) {
                         throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                     }
                     if (rawCard is RawClassicCard && rawCard.hasUnauthorizedSectors()) {
                         throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                     }
-                    _scannedCards.emit(rawCard)
+                    emitCard(rawCard)
                 } catch (error: Throwable) {
-                    _readingProgress.value = null
-                    _scanErrors.emit(error)
+                    emitError(error)
                 } finally {
-                    _isScanning.value = false
+                    setScanning(false)
                 }
             }
         }
@@ -99,6 +74,17 @@ class AndroidCardScanner(
     override fun stopActiveScan() {
         // No-op on Android
     }
+
+    private fun cardTypeFromTechList(techList: Array<String>): CardType? =
+        when {
+            techList.any { "MifareClassic" in it } -> CardType.MifareClassic
+            techList.any { "MifareUltralight" in it } -> CardType.MifareUltralight
+            techList.any { "IsoDep" in it } -> CardType.MifareDesfire
+            techList.any { "NfcF" in it } -> CardType.FeliCa
+            techList.any { "NfcB" in it } -> CardType.CEPAS
+            techList.any { "NfcV" in it } -> CardType.Vicinity
+            else -> null
+        }
 
     private fun getCardKeys(tagId: String): CardKeys? {
         val savedKey = cardKeysPersister.getForTagId(tagId) ?: return null

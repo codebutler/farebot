@@ -26,6 +26,8 @@ package com.codebutler.farebot.card.classic.raw
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.classic.ClassicCard
+import com.codebutler.farebot.card.classic.key.ClassicCardKeys
+import com.codebutler.farebot.card.classic.key.ClassicSectorKey
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -60,9 +62,27 @@ data class RawClassicCard(
     /** True if any sector failed authentication (card partially or fully locked). */
     fun hasUnauthorizedSectors(): Boolean = sectors.any { it.type == RawClassicSector.TYPE_UNAUTHORIZED }
 
+    /** Extract discovered keys from sectors into a [ClassicCardKeys], or null if no keys were found. */
+    fun extractKeys(): ClassicCardKeys? {
+        val hasAnyKey = sectors.any { it.keyA != null || it.keyB != null }
+        if (!hasAnyKey) return null
+        val sectorKeys =
+            sectors.map { sector ->
+                ClassicSectorKey(
+                    keyA = sector.keyA ?: ByteArray(KEY_LEN),
+                    keyB = sector.keyB ?: ByteArray(KEY_LEN),
+                    hasKeyA = sector.keyA != null,
+                    hasKeyB = sector.keyB != null,
+                )
+            }
+        return ClassicCardKeys(CardType.MifareClassic, sectorKeys)
+    }
+
     fun sectors(): List<RawClassicSector> = sectors
 
     companion object {
+        private const val KEY_LEN = 6
+
         fun create(
             tagId: ByteArray,
             scannedAt: Instant,

@@ -1,10 +1,9 @@
 /*
  * Crypto1.kt
  *
- * Copyright 2026 Eric Butler <eric@codebutler.com>
- *
- * Faithful port of crapto1 by bla <blapost@gmail.com>
+ * Port of crapto1 by bla <blapost@gmail.com>
  * Original: crypto1.c, crapto1.c, crapto1.h from mfcuk/mfoc
+ * Ported to Kotlin Multiplatform for FareBot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -275,6 +274,29 @@ class Crypto1State(
 
         even = even or (Crypto1.parity(feedback) shl 23)
 
+        return ret
+    }
+
+    /**
+     * Reverse 8 LFSR steps (one byte).
+     *
+     * Processes bits 7 downTo 0, using BIT addressing (LSB first).
+     *
+     * Faithfully ported from crapto1.c lfsr_rollback_byte().
+     */
+    fun lfsrRollbackByte(
+        input: Int,
+        isEncrypted: Boolean,
+    ): Int {
+        var ret = 0
+        for (i in 7 downTo 0) {
+            ret = ret or (
+                lfsrRollbackBit(
+                    (input shr i) and 1,
+                    isEncrypted,
+                ) shl i
+            )
+        }
         return ret
     }
 

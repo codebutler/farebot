@@ -45,6 +45,7 @@
     <string name="no_location_data">No location data available for this trip.</string>
     <string name="no_scanned_cards">You have not scanned any cards.</string>
     <string name="ok">OK</string>
+    <string name="recover_key">Recover Key</string>
     <string name="refill">Refill</string>
     <string name="save">Save</string>
     <string name="share">Share</string>
@@ -80,6 +81,7 @@
     <string name="tab_explore">Explore</string>
     <string name="scan">Scan</string>
     <string name="reading_card">Reading\u2026</string>
+    <string name="reading_card_type">Reading %1$s\u2026</string>
     <string name="hold_card_near_reader">Hold your card near the reader</string>
     <string name="search_supported_cards">Search</string>
     <string name="nfc_disabled_tap_to_enable">Enable NFC to scan cards</string>

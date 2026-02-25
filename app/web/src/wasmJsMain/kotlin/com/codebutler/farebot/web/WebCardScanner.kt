@@ -17,10 +17,9 @@ import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import com.codebutler.farebot.card.nfc.pn533.PN533UltralightTechnology
 import com.codebutler.farebot.card.nfc.pn533.WebUsbPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
-import com.codebutler.farebot.shared.nfc.CardScanner
+import com.codebutler.farebot.shared.nfc.BaseCardScanner
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
-import com.codebutler.farebot.shared.nfc.ReadingProgress
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.CancellationException
@@ -28,12 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -55,23 +48,9 @@ private val log = Logger.withTag("WebCardScanner")
 
 class WebCardScanner(
     private val keyManagerPlugin: KeyManagerPlugin? = null,
-) : CardScanner {
+) : BaseCardScanner() {
     override val requiresActiveScan: Boolean = true
-
-    private val _scannedTags = MutableSharedFlow<ScannedTag>(extraBufferCapacity = 1)
-    override val scannedTags: SharedFlow<ScannedTag> = _scannedTags.asSharedFlow()
-
-    private val _scannedCards = MutableSharedFlow<RawCard<*>>(extraBufferCapacity = 1)
-    override val scannedCards: SharedFlow<RawCard<*>> = _scannedCards.asSharedFlow()
-
-    private val _scanErrors = MutableSharedFlow<Throwable>(extraBufferCapacity = 1)
-    override val scanErrors: SharedFlow<Throwable> = _scanErrors.asSharedFlow()
-
-    private val _isScanning = MutableStateFlow(false)
-    override val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
-
-    private val _readingProgress = MutableStateFlow<ReadingProgress?>(null)
-    override val readingProgress: StateFlow<ReadingProgress?> = _readingProgress.asStateFlow()
+    override val supportsKeyRecovery: Boolean = true
 
     private var scanJob: Job? = null
     private var transport: WebUsbPN533Transport? = null
@@ -79,7 +58,7 @@ class WebCardScanner(
 
     override fun startActiveScan() {
         if (scanJob?.isActive == true) return
-        _isScanning.value = true
+        setScanning(true)
 
         scanJob =
             scope.launch {
@@ -89,7 +68,7 @@ class WebCardScanner(
 
                     val opened = webUsbTransport.openAsync()
                     if (!opened) {
-                        _scanErrors.tryEmit(
+                        emitError(
                             UnsupportedOperationException(
                                 "Could not open USB NFC reader. Make sure:\n" +
                                     "• You're using Chrome, Edge, or Opera\n" +
@@ -98,7 +77,7 @@ class WebCardScanner(
                                     "Alternatively, import card data from a JSON file.",
                             ),
                         )
-                        _isScanning.value = false
+                        setScanning(false)
                         return@launch
                     }
 
@@ -106,11 +85,11 @@ class WebCardScanner(
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    _scanErrors.tryEmit(e)
+                    emitError(e)
                 } finally {
                     transport?.close()
                     transport = null
-                    _isScanning.value = false
+                    setScanning(false)
                 }
             }
     }
@@ -120,29 +99,21 @@ class WebCardScanner(
         scanJob = null
         transport?.close()
         transport = null
-        _isScanning.value = false
-        _readingProgress.value = null
+        resetScanState()
     }
 
     private suspend fun pollLoop(transport: WebUsbPN533Transport) {
         val pn533 = PN533(transport)
 
-        // Initialize PN533
         pn533.sendAck()
         val fw = pn533.getFirmwareVersion()
         log.i { "PN53x firmware: $fw" }
         pn533.samConfiguration()
-        // Use finite ATR retries on WebUSB. WebUSB's transferIn cannot be
-        // cancelled, so InListPassiveTarget must self-resolve within its own
-        // timeout rather than relying on client-side abort. With atrRetries=2,
-        // the PN533 polls ~2 times (~300ms) then returns NbTg=0.
         pn533.setMaxRetries(atrRetries = 0x02, passiveActivation = 0x02)
 
         while (true) {
-            // Try ISO 14443-A (covers Classic, Ultralight, DESFire)
             var target = pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
 
-            // Try FeliCa (212 kbps) if no Type A found
             if (target == null) {
                 target =
                     pn533.inListPassiveTarget(
@@ -161,28 +132,25 @@ class WebCardScanner(
                     is PN533.TargetInfo.TypeA -> target.uid
                     is PN533.TargetInfo.FeliCa -> target.idm
                 }
-            val cardTypeName =
+            val detectedCardType =
                 when (target) {
-                    is PN533.TargetInfo.TypeA -> PN533CardInfo.fromTypeA(target).cardType.name
-                    is PN533.TargetInfo.FeliCa -> CardType.FeliCa.name
+                    is PN533.TargetInfo.TypeA -> PN533CardInfo.fromTypeA(target).cardType
+                    is PN533.TargetInfo.FeliCa -> CardType.FeliCa
                 }
 
-            _scannedTags.tryEmit(ScannedTag(id = tagId, techList = listOf(cardTypeName)))
+            emitTag(ScannedTag(id = tagId, cardType = detectedCardType))
 
             try {
                 val rawCard = readTarget(pn533, target)
-                _readingProgress.value = null
-                _scannedCards.tryEmit(rawCard)
+                emitCard(rawCard)
                 log.i { "Card read successfully" }
             } catch (e: PN533TransportException) {
                 throw e
             } catch (e: Exception) {
-                _readingProgress.value = null
                 log.e(e) { "Read error" }
-                _scanErrors.tryEmit(e)
+                emitError(e)
             }
 
-            // Release target
             try {
                 pn533.inRelease(target.tg)
             } catch (e: PN533TransportException) {
@@ -191,7 +159,6 @@ class WebCardScanner(
                 log.d(e) { "inRelease failed (expected)" }
             }
 
-            // Wait for card removal
             log.i { "Waiting for card removal..." }
             waitForRemoval(pn533)
         }
@@ -207,7 +174,7 @@ class WebCardScanner(
         }
 
     private val onProgress: suspend (Int, Int) -> Unit = { current, total ->
-        _readingProgress.value = ReadingProgress(current, total)
+        emitProgress(current, total)
     }
 
     private suspend fun readTypeACard(
@@ -233,10 +200,20 @@ class WebCardScanner(
                 val tagIdHex = tagId.hex()
                 val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
                 val globalKeys = keyManagerPlugin?.getGlobalKeys()
-                // Don't attempt key recovery during initial scan — that happens
-                // on the dedicated key recovery screen after user interaction.
+                val keyRecovery = if (recoveryMode) keyManagerPlugin?.classicKeyRecovery else null
                 val rawCard =
-                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, onProgress = onProgress)
+                    ClassicCardReader.readCard(
+                        tagId,
+                        tech,
+                        cardKeys,
+                        globalKeys,
+                        keyRecovery,
+                        onProgress = onProgress,
+                        onPartialCard = ::emitPartialCard,
+                    )
+                rawCard.extractKeys()?.let { keys ->
+                    keyManagerPlugin?.saveCardKeys(tagIdHex, keys)
+                }
                 if (rawCard.hasUnauthorizedSectors()) {
                     throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }

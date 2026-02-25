@@ -19,5 +19,12 @@
     <string name="nfc">NFC</string>
     <string name="no_keys">No keys added yet.</string>
     <string name="select_all">Select all</string>
+    <string name="recover_key">Recover Key</string>
+    <string name="recover_key_instructions">Place the card on the NFC reader and press Start to begin key recovery. This uses a nested attack to recover the encryption keys from the card.</string>
+    <string name="recovery_success">Keys recovered successfully!</string>
+    <string name="reading_sector_progress">Reading sector %1$d of %2$d…</string>
+    <string name="scanning_for_card">Scanning for card…</string>
+    <string name="start_recovery">Start Recovery</string>
+    <string name="unknown_error">Unknown error</string>
     <string name="tap_your_card">Tap your card</string>
 </resources>

@@ -1,9 +1,11 @@
 /*
  * NestedAttack.kt
  *
- * Copyright 2026 Eric Butler <eric@codebutler.com>
+ * Based on crapto1 by blaez and Proxmark3's nested attack implementation.
+ * https://github.com/RfidResearchGroup/proxmark3
  *
  * MIFARE Classic nested attack orchestration.
+ * Ported to Kotlin Multiplatform for FareBot.
  *
  * Coordinates the key recovery process for MIFARE Classic cards:
  * 1. Calibrate PRNG timing by collecting nonces from repeated authentications
@@ -64,6 +66,22 @@ class NestedAttack(
     private val uid: UInt,
 ) {
     /**
+     * Result of a key recovery attempt.
+     */
+    sealed class RecoverKeyResult {
+        /** Key was successfully recovered. */
+        data class Success(
+            val key: Long,
+        ) : RecoverKeyResult()
+
+        /** Card has true RNG (EV1+); standard nested attack not possible. */
+        data object TrueRng : RecoverKeyResult()
+
+        /** Recovery failed for other reasons (card lost, insufficient nonces, etc). */
+        data object Failed : RecoverKeyResult()
+    }
+
+    /**
      * Data collected during a single nested authentication attempt.
      *
      * @param encryptedNonce The encrypted 4-byte nonce received from the card
@@ -90,7 +108,7 @@ class NestedAttack(
      * @param targetKeyType 0x60 for Key A, 0x61 for Key B (key to recover)
      * @param targetBlock A block number in the target sector
      * @param onProgress Optional callback for progress reporting
-     * @return The recovered 48-bit key, or null if recovery failed
+     * @return [RecoverKeyResult] indicating success, true RNG detection, or failure
      */
     suspend fun recoverKey(
         knownKeyType: Byte,
@@ -99,7 +117,72 @@ class NestedAttack(
         targetKeyType: Byte,
         targetBlock: Int,
         onProgress: ((String) -> Unit)? = null,
-    ): Long? {
+    ): RecoverKeyResult {
+        // ---- Phase 0: Quick PRNG type detection ----
+        // Test if nonces within a single session show PRNG relationship.
+        // Authenticate, get nonce, then do nested auth to SAME sector.
+        // If the nested nonce (decrypted) is PRNG-reachable from the auth nonce,
+        // the card has a weak PRNG. If not, it has a true RNG (EV1+).
+        onProgress?.invoke("Phase 0: Detecting PRNG type...")
+        run {
+            // Use hard reselect (RF cycling) to get into a clean state.
+            // This reseeds the PRNG, but that's fine — we're testing IF the
+            // PRNG is weak, not measuring distances.
+            val reselected = rawClassic.hardReselectCard()
+            if (!reselected) {
+                onProgress?.invoke("  Could not reselect card, skipping PRNG detection")
+            } else {
+                // Get a plaintext nonce via requestAuth (incomplete handshake)
+                val nT1 = rawClassic.requestAuth(knownKeyType, knownSectorBlock)
+                if (nT1 != null) {
+                    onProgress?.invoke("  Auth nonce nT1 = 0x${nT1.toString(16).padStart(8, '0')}")
+
+                    // Now do full auth to establish cipher state
+                    // Use hard reselect since card is in weird state after incomplete auth
+                    rawClassic.hardReselectCard()
+                    val authState = rawClassic.authenticate(knownKeyType, knownSectorBlock, knownKey)
+                    if (authState != null) {
+                        // Save cipher state before nested auth
+                        val cipherCopy = authState.copy()
+
+                        // Nested auth to the SAME known sector — no reselect between
+                        // auth and nested auth, so PRNG should be continuous
+                        val nestedResult = rawClassic.nestedAuth(knownKeyType, knownSectorBlock, authState)
+                        if (nestedResult != null) {
+                            val encNonce = nestedResult.encryptedNonce
+                            // Decrypt the nested nonce using the saved cipher state
+                            val ks = cipherCopy.lfsrWord(0u, false)
+                            val nT2 = encNonce xor ks
+                            onProgress?.invoke(
+                                "  Nested nonce nT2 = 0x${nT2.toString(
+                                    16,
+                                ).padStart(8, '0')} (enc=0x${encNonce.toString(16).padStart(8, '0')})",
+                            )
+
+                            // Check if nT2 is reachable from nT1 via PRNG
+                            val dist = Crypto1Recovery.nonceDistance(nT1, nT2)
+                            val distStr = if (dist == UInt.MAX_VALUE) "UNREACHABLE" else dist.toString()
+                            onProgress?.invoke("  PRNG distance nT1→nT2 = $distStr")
+
+                            if (dist == UInt.MAX_VALUE) {
+                                onProgress?.invoke("  Card has true RNG (MIFARE Classic EV1 or later)")
+                                onProgress?.invoke("  Standard nested attack not possible on this card")
+                                return RecoverKeyResult.TrueRng
+                            } else {
+                                onProgress?.invoke("  Card has weak PRNG — nested attack possible")
+                            }
+                        } else {
+                            onProgress?.invoke("  Nested auth failed")
+                        }
+                    } else {
+                        onProgress?.invoke("  Full auth failed")
+                    }
+                } else {
+                    onProgress?.invoke("  requestAuth failed (card may need power cycle)")
+                }
+            }
+        }
+
         // ---- Phase 1: Calibrate PRNG ----
         onProgress?.invoke("Phase 1: Calibrating PRNG timing...")
 
@@ -110,8 +193,10 @@ class NestedAttack(
             if (nonce != null) {
                 nonces.add(nonce)
                 consecutiveFailures = 0
+                onProgress?.invoke("  nonce[$i] = 0x${nonce.toString(16).padStart(8, '0')}")
             } else {
                 consecutiveFailures++
+                onProgress?.invoke("  nonce[$i] = FAILED (consecutive=$consecutiveFailures)")
                 if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
                     break
                 }
@@ -130,20 +215,36 @@ class NestedAttack(
             onProgress?.invoke(
                 "Calibration failed: only ${nonces.size} nonces collected (need $MIN_CALIBRATION_NONCES)",
             )
-            return null
+            return RecoverKeyResult.Failed
         }
 
         val distances = calibratePrng(nonces)
         if (distances.isEmpty()) {
             onProgress?.invoke("Calibration failed: could not compute PRNG distances")
-            return null
+            return RecoverKeyResult.Failed
+        }
+
+        // Log all distances for debugging
+        for (i in distances.indices) {
+            val d = distances[i]
+            val dStr = if (d == UInt.MAX_VALUE) "UNREACHABLE" else d.toString()
+            // Also try mfoc-style 16-bit LFSR distance for comparison
+            val mfocD = mfocNonceDistance(nonces[i], nonces[i + 1])
+            val mfocStr = if (mfocD == UInt.MAX_VALUE) "UNREACHABLE" else mfocD.toString()
+            onProgress?.invoke(
+                "  distance[$i] = $dStr (mfoc=$mfocStr) (0x${nonces[i].toString(
+                    16,
+                ).padStart(8, '0')} -> 0x${nonces[i + 1].toString(16).padStart(8, '0')})",
+            )
         }
 
         // Get median distance
         val sortedDistances = distances.filter { it != UInt.MAX_VALUE }.sorted()
         if (sortedDistances.isEmpty()) {
-            onProgress?.invoke("Calibration failed: all distances unreachable")
-            return null
+            onProgress?.invoke(
+                "Calibration failed: all distances unreachable (card may have true RNG — nested attack not possible)",
+            )
+            return RecoverKeyResult.TrueRng
         }
         val medianDistance = sortedDistances[sortedDistances.size / 2]
         onProgress?.invoke(
@@ -174,11 +275,11 @@ class NestedAttack(
             val cipherStateCopy = authState.copy()
 
             // Perform nested auth to the target sector
-            val encNonce =
+            val nestedResult =
                 rawClassic.nestedAuth(targetKeyType, targetBlock, authState)
                     ?: continue
 
-            collectedNonces.add(NestedNonceData(encNonce, cipherStateCopy))
+            collectedNonces.add(NestedNonceData(nestedResult.encryptedNonce, cipherStateCopy))
 
             if ((i + 1) % 10 == 0) {
                 onProgress?.invoke("Collected ${collectedNonces.size} nonces ($i/$COLLECTION_ROUNDS rounds)")
@@ -187,7 +288,7 @@ class NestedAttack(
 
         if (collectedNonces.size < MIN_NONCES_FOR_RECOVERY) {
             onProgress?.invoke("Collection failed: only ${collectedNonces.size} nonces (need $MIN_NONCES_FOR_RECOVERY)")
-            return null
+            return RecoverKeyResult.Failed
         }
         onProgress?.invoke("Collected ${collectedNonces.size} encrypted nonces")
 
@@ -261,14 +362,14 @@ class NestedAttack(
                     // Verify the candidate key by attempting real authentication
                     if (verifyKey(targetKeyType, targetBlock, recoveredKey)) {
                         onProgress?.invoke("Key recovered: 0x${recoveredKey.toString(16).padStart(12, '0')}")
-                        return recoveredKey
+                        return RecoverKeyResult.Success(recoveredKey)
                     }
                 }
             }
         }
 
         onProgress?.invoke("Key recovery failed after trying all collected nonces")
-        return null
+        return RecoverKeyResult.Failed
     }
 
     /**
@@ -328,6 +429,27 @@ class NestedAttack(
                 distances.add(distance)
             }
             return distances
+        }
+
+        /**
+         * mfoc-style nonce distance using 16-bit LFSR with 8-bit partial matching.
+         *
+         * Extracts the upper 16 bits of n1 as the LFSR seed, advances the
+         * 16-bit LFSR, and compares the upper 8 bits with n2's upper 8 bits.
+         * This matches mfoc's nonce_distance() which uses a looser comparison.
+         */
+        fun mfocNonceDistance(
+            n1: UInt,
+            n2: UInt,
+        ): UInt {
+            val target = (n2 shr 24) and 0xFFu
+            var x = ((n1 shr 16) and 0xFFFFu)
+            for (i in 1u until 65536u) {
+                val feedback = (x xor (x shr 2) xor (x shr 3) xor (x shr 5)) and 1u
+                x = (x shr 1) or (feedback shl 15)
+                if ((x shr 8) and 0xFFu == target) return i
+            }
+            return UInt.MAX_VALUE
         }
     }
 }

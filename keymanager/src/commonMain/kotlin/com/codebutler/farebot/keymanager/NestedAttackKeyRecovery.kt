@@ -21,16 +21,22 @@ package com.codebutler.farebot.keymanager
 
 import com.codebutler.farebot.card.classic.ClassicKeyRecovery
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
+import com.codebutler.farebot.keymanager.crypto1.HardnestedAttack
 import com.codebutler.farebot.keymanager.crypto1.NestedAttack
 import com.codebutler.farebot.keymanager.pn533.PN533RawClassic
 
 /**
- * [ClassicKeyRecovery] implementation using the MIFARE Classic nested attack.
+ * [ClassicKeyRecovery] implementation using MIFARE Classic nested and hardnested attacks.
  *
- * Given a known key for one sector, uses [NestedAttack] to recover unknown
- * keys for other sectors by exploiting the weak PRNG and Crypto1 cipher.
+ * Given a known key for one sector, first attempts the standard [NestedAttack]
+ * (exploiting the weak PRNG). If the card has a true RNG (MIFARE Classic EV1+),
+ * falls back to the [HardnestedAttack] which uses statistical analysis of
+ * encrypted parity bits.
  */
 class NestedAttackKeyRecovery : ClassicKeyRecovery {
+    /** Once true RNG is detected, skip standard nested attack for subsequent sectors. */
+    private var cardHasTrueRng = false
+
     override suspend fun attemptRecovery(
         tech: PN533ClassicTechnology,
         sectorIndex: Int,
@@ -46,10 +52,41 @@ class NestedAttackKeyRecovery : ClassicKeyRecovery {
         val targetBlock = tech.sectorToBlock(sectorIndex)
 
         val rawClassic = PN533RawClassic(tech.rawPn533, tech.rawUid)
-        val attack = NestedAttack(rawClassic, tech.uidAsUInt)
 
+        // Try standard nested attack first (unless we already know it's a true RNG card)
+        if (!cardHasTrueRng) {
+            val attack = NestedAttack(rawClassic, tech.uidAsUInt)
+            when (
+                val result =
+                    attack.recoverKey(
+                        knownKeyType = knownKeyType,
+                        knownSectorBlock = knownBlock,
+                        knownKey = knownKey,
+                        targetKeyType = 0x60,
+                        targetBlock = targetBlock,
+                        onProgress = onProgress,
+                    )
+            ) {
+                is NestedAttack.RecoverKeyResult.Success -> {
+                    rawClassic.hardReselectCard()
+                    return verifyRecoveredKey(tech, sectorIndex, result.key)
+                }
+                is NestedAttack.RecoverKeyResult.TrueRng -> {
+                    cardHasTrueRng = true
+                    onProgress?.invoke("Card has true RNG — switching to hardnested attack")
+                }
+                is NestedAttack.RecoverKeyResult.Failed -> {
+                    onProgress?.invoke("Standard nested attack failed, trying hardnested...")
+                }
+            }
+        } else {
+            onProgress?.invoke("Card has true RNG (detected earlier) — using hardnested attack")
+        }
+
+        // Fall back to hardnested attack
+        val hardnested = HardnestedAttack(rawClassic, tech.uidAsUInt)
         val recoveredKey =
-            attack.recoverKey(
+            hardnested.recoverKey(
                 knownKeyType = knownKeyType,
                 knownSectorBlock = knownBlock,
                 knownKey = knownKey,
@@ -58,17 +95,33 @@ class NestedAttackKeyRecovery : ClassicKeyRecovery {
                 onProgress = onProgress,
             )
 
-        if (recoveredKey != null) {
-            val keyBytes = longToKeyBytes(recoveredKey)
-            // Try as Key A first
-            val authA = tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
-            if (authA) return Pair(keyBytes, true)
+        // Reset PN533 to normal mode and reselect card after the attack.
+        // The hardnested attack leaves the PN533 with parity/CRC disabled
+        // and the card may be in crypto mode from the last verify auth.
+        rawClassic.hardReselectCard()
 
-            // Try as Key B
-            val authB = tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
-            if (authB) return Pair(keyBytes, false)
+        if (recoveredKey != null) {
+            return verifyRecoveredKey(tech, sectorIndex, recoveredKey)
         }
 
+        return null
+    }
+
+    /**
+     * Verify a recovered key works for authentication and determine if it's Key A or Key B.
+     */
+    private suspend fun verifyRecoveredKey(
+        tech: PN533ClassicTechnology,
+        sectorIndex: Int,
+        key: Long,
+    ): Pair<ByteArray, Boolean>? {
+        val keyBytes = longToKeyBytes(key)
+        // Try as Key A first
+        val authA = tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
+        if (authA) return Pair(keyBytes, true)
+        // Try as Key B
+        val authB = tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
+        if (authB) return Pair(keyBytes, false)
         return null
     }
 

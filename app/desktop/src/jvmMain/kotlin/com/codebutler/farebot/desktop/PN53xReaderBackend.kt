@@ -56,6 +56,7 @@ import kotlinx.coroutines.delay
 abstract class PN53xReaderBackend(
     private val preOpenedTransport: Usb4JavaPN533Transport? = null,
     private val keyManagerPlugin: KeyManagerPlugin? = null,
+    private val recoveryMode: Boolean = false,
 ) : NfcReaderBackend {
     protected val log by lazy { Logger.withTag(name) }
 
@@ -71,6 +72,7 @@ abstract class PN53xReaderBackend(
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)?,
     ) {
         val transport =
             preOpenedTransport
@@ -81,7 +83,7 @@ abstract class PN53xReaderBackend(
         val pn533 = PN533(transport)
         try {
             initDevice(pn533)
-            pollLoop(pn533, onCardDetected, onCardRead, onError, onProgress)
+            pollLoop(pn533, onCardDetected, onCardRead, onError, onProgress, onPartialCard)
         } finally {
             pn533.close()
         }
@@ -93,6 +95,7 @@ abstract class PN53xReaderBackend(
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)?,
     ) {
         while (true) {
             log.i { "Polling for cards..." }
@@ -120,15 +123,15 @@ abstract class PN53xReaderBackend(
                     is PN533.TargetInfo.TypeA -> target.uid
                     is PN533.TargetInfo.FeliCa -> target.idm
                 }
-            val cardTypeName =
+            val detectedCardType =
                 when (target) {
-                    is PN533.TargetInfo.TypeA -> PN533CardInfo.fromTypeA(target).cardType.name
-                    is PN533.TargetInfo.FeliCa -> CardType.FeliCa.name
+                    is PN533.TargetInfo.TypeA -> PN533CardInfo.fromTypeA(target).cardType
+                    is PN533.TargetInfo.FeliCa -> CardType.FeliCa
                 }
-            onCardDetected(ScannedTag(id = tagId, techList = listOf(cardTypeName)))
+            onCardDetected(ScannedTag(id = tagId, cardType = detectedCardType))
 
             try {
-                val rawCard = readTarget(pn533, target, onProgress)
+                val rawCard = readTarget(pn533, target, onProgress, onPartialCard)
                 onCardRead(rawCard)
                 log.i { "Card read successfully" }
             } catch (e: PN533TransportException) {
@@ -157,9 +160,10 @@ abstract class PN53xReaderBackend(
         pn533: PN533,
         target: PN533.TargetInfo,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)?,
     ): RawCard<*> =
         when (target) {
-            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target, onProgress)
+            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target, onProgress, onPartialCard)
             is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target, onProgress)
         }
 
@@ -167,6 +171,7 @@ abstract class PN53xReaderBackend(
         pn533: PN533,
         target: PN533.TargetInfo.TypeA,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)?,
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
@@ -183,11 +188,21 @@ abstract class PN53xReaderBackend(
                 val tagIdHex = tagId.hex()
                 val cardKeys = keyManagerPlugin?.getCardKeysForTag(tagIdHex)
                 val globalKeys = keyManagerPlugin?.getGlobalKeys()
-                // Don't attempt key recovery during initial scan — that happens
-                // on the dedicated key recovery screen after user interaction.
+                val keyRecovery = if (recoveryMode) keyManagerPlugin?.classicKeyRecovery else null
                 val rawCard =
-                    ClassicCardReader.readCard(tagId, tech, cardKeys, globalKeys, onProgress = onProgress)
-                if (rawCard.hasUnauthorizedSectors()) {
+                    ClassicCardReader.readCard(
+                        tagId,
+                        tech,
+                        cardKeys,
+                        globalKeys,
+                        keyRecovery,
+                        onProgress = onProgress,
+                        onPartialCard = onPartialCard,
+                    )
+                rawCard.extractKeys()?.let { keys ->
+                    keyManagerPlugin?.saveCardKeys(tagIdHex, keys)
+                }
+                if (!recoveryMode && rawCard.hasUnauthorizedSectors()) {
                     throw CardUnauthorizedException(rawCard.tagId(), rawCard.cardType())
                 }
                 rawCard

@@ -1,11 +1,14 @@
 /*
  * PN533RawClassic.kt
  *
- * Copyright 2026 Eric Butler <eric@codebutler.com>
+ * Based on Proxmark3's mifare_sendcmd_short / mifare_classic_authex.
+ * PN533 register manipulation based on NXP PN533 User Manual.
+ * https://github.com/RfidResearchGroup/proxmark3
  *
  * Raw MIFARE Classic communication via PN533 InCommunicateThru,
  * bypassing the chip's built-in Crypto1 handling to expose raw
  * authentication nonces needed for key recovery attacks.
+ * Ported to Kotlin Multiplatform for FareBot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +28,23 @@ package com.codebutler.farebot.keymanager.pn533
 
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.keymanager.crypto1.Crypto1
 import com.codebutler.farebot.keymanager.crypto1.Crypto1Auth
 import com.codebutler.farebot.keymanager.crypto1.Crypto1State
 import kotlinx.coroutines.delay
+
+/**
+ * Result of a nested authentication attempt, containing the encrypted
+ * nonce and the associated encrypted parity bits.
+ *
+ * @param encryptedNonce 4-byte encrypted card nonce as UInt (big-endian)
+ * @param encryptedParity 4 encrypted parity bits, one per nonce byte.
+ *   Packed as: bit 3 = parity of byte 0, bit 0 = parity of byte 3.
+ */
+data class NestedAuthResult(
+    val encryptedNonce: UInt,
+    val encryptedParity: Int,
+)
 
 /**
  * Raw MIFARE Classic interface using PN533 InCommunicateThru.
@@ -147,6 +164,36 @@ class PN533RawClassic(
     }
 
     /**
+     * Re-select the card by cycling the RF field.
+     *
+     * Unlike [reselectCard], this turns the RF field off and on,
+     * which resets the card completely (including reseeding its PRNG).
+     * Use this when the card is in ACTIVE or HALT state and a soft
+     * reselect (REQA-based) won't work.
+     *
+     * This MUST NOT be used during PRNG calibration as it destroys
+     * the PRNG sequence continuity.
+     *
+     * @return true if the card was successfully re-selected
+     */
+    suspend fun hardReselectCard(): Boolean {
+        restoreNormalMode()
+        return try {
+            try {
+                pn533.inRelease(0)
+            } catch (_: PN533Exception) {
+            }
+            pn533.rfFieldOff()
+            delay(RF_CYCLE_DELAY_MS)
+            pn533.rfFieldOn()
+            delay(RF_CYCLE_DELAY_MS)
+            pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A) != null
+        } catch (_: PN533Exception) {
+            false
+        }
+    }
+
+    /**
      * Send a raw AUTH command and receive the card nonce.
      *
      * Prepares the CIU for raw communication (disable CRC, parity,
@@ -181,10 +228,18 @@ class PN533RawClassic(
      * Perform a full software Crypto1 authentication.
      *
      * Executes the complete three-pass mutual authentication handshake:
-     * 1. Send AUTH command, receive card nonce nT
-     * 2. Initialize cipher with key, UID, and nT
-     * 3. Compute and send encrypted {nR}{aR}
-     * 4. Receive and verify encrypted {aT}
+     * 1. Set up CIU for raw mode (CRC off, parity off, crypto1 off) upfront
+     * 2. Send AUTH command with software parity (packed bitstream)
+     * 3. Receive card nonce (packed bitstream, unpack)
+     * 4. Initialize cipher and encrypt {nR}{aR} with parity
+     * 5. Send {nR}{aR} immediately (NO register writes between nonce and response!)
+     * 6. Receive and verify encrypted {aT}
+     *
+     * Critical timing: MIFARE Classic requires the reader to respond within
+     * 5ms of the card's nonce. By disabling parity BEFORE the AUTH command
+     * (and computing parity in software for all frames), we eliminate USB
+     * register-write round-trips between receiving the nonce and sending
+     * the reader response.
      *
      * @param keyType 0x60 for Key A, 0x61 for Key B
      * @param blockIndex Block number to authenticate against
@@ -196,34 +251,81 @@ class PN533RawClassic(
         blockIndex: Int,
         key: Long,
     ): Crypto1State? {
-        // Step 1: Request auth and get card nonce (plaintext, parity enabled)
-        val nT = requestAuth(keyType, blockIndex) ?: return null
+        // Step 1: CRC off, parity ON (CIU standard parity for plaintext AUTH), crypto1 off
+        disableCrc()
+        enableParity()
+        clearCrypto1()
 
-        // Step 2: Initialize cipher with key, UID XOR nT
+        // Step 2: Send plaintext AUTH command with CIU parity → get nonce
+        val authCmd = buildAuthCommand(keyType, blockIndex)
+        val nonceResponse =
+            try {
+                pn533.inCommunicateThru(authCmd)
+            } catch (e: PN533Exception) {
+                println("[RawAuth] Step 2 FAIL: AUTH command failed: ${e.message}")
+                return null
+            }
+        if (nonceResponse.size < 4) {
+            println("[RawAuth] Step 3 FAIL: nonce response too short (${nonceResponse.size} bytes)")
+            return null
+        }
+        // Nonce is 4 bytes with CIU parity stripped (standard mode)
+        val nT = bytesToUInt(nonceResponse)
+        println("[RawAuth] Step 3 OK: nT=0x${nT.toString(16).padStart(8, '0')}")
+
+        // Step 4: Disable CIU parity for encrypted communication
+        // (single register write — card is computing its nonce successor, we have FWT budget)
+        disableParity()
+
+        // Step 5: Initialize cipher and encrypt {nR, aR} with parity
         val uidInt = bytesToUInt(uid)
         val state = Crypto1Auth.initCipher(key, uidInt, nT)
 
-        // Step 3: Compute reader response {nR}{aR}
-        // Use a fixed reader nonce (in real attacks this could be random)
         val nR = 0x01020304u
-        val (nREnc, aREnc) = Crypto1Auth.computeReaderResponse(state, nR, nT)
+        val aR = Crypto1.prngSuccessor(nT, 64u)
+        val nRBytes = uintToBytes(nR)
+        val aRBytes = uintToBytes(aR)
+        val plaintext = nRBytes + aRBytes
+        val input = nRBytes + ByteArray(4) // nR fed back for first 4 bytes, 0 for aR
+        val (encData, parityBits) = Crypto1Auth.encryptBytesWithParity(state, plaintext, input)
 
-        // Step 4: Send encrypted {nR}{aR} — disable parity (encrypted parity handled in software)
-        disableParity()
-        val readerMsg = uintToBytes(nREnc) + uintToBytes(aREnc)
+        // Step 6: Pack and send {nR}{aR} as raw bitstream
+        // 8 data bytes × 9 bits = 72 bits = 9 FIFO bytes (byte-aligned, no BitFraming needed)
+        val (packed, _) = packWithParity(encData, parityBits)
+        println("[RawAuth] Step 6: sending ${packed.size} packed bytes")
+
         val cardResponse =
             try {
-                pn533.inCommunicateThru(readerMsg)
-            } catch (_: PN533Exception) {
+                pn533.inCommunicateThru(packed)
+            } catch (e: PN533Exception) {
+                println("[RawAuth] Step 6 FAIL: ${e.message}")
                 return null
             }
 
-        // Step 5: Verify card's response {aT}
-        if (cardResponse.size < 4) return null
-        val aTEnc = bytesToUInt(cardResponse)
-        if (!Crypto1Auth.verifyCardResponse(state, aTEnc, nT)) {
+        // Step 7: Unpack card response {aT}
+        // Card sends 4 encrypted bytes + 4 parity bits = 36 bits = 5 FIFO bytes
+        println("[RawAuth] Step 7: response ${cardResponse.size} bytes")
+        val aTEnc: UInt
+        if (cardResponse.size >= 5) {
+            val (aTBytes, _) = unpackWithParity(cardResponse, 4)
+            aTEnc = bytesToUInt(aTBytes)
+        } else if (cardResponse.size >= 4) {
+            aTEnc = bytesToUInt(cardResponse)
+        } else {
+            println("[RawAuth] Step 7 FAIL: response too short (${cardResponse.size} bytes)")
             return null
         }
+
+        // Step 8: Verify card response
+        if (!Crypto1Auth.verifyCardResponse(state, aTEnc, nT)) {
+            println(
+                "[RawAuth] Step 8 FAIL: card response verification failed (aTEnc=0x${aTEnc.toString(
+                    16,
+                ).padStart(8, '0')})",
+            )
+            return null
+        }
+        println("[RawAuth] Step 8 OK: auth successful")
 
         return state
     }
@@ -231,45 +333,68 @@ class PN533RawClassic(
     /**
      * Perform a nested authentication within an existing encrypted session.
      *
-     * Sends an AUTH command encrypted with the current Crypto1 state.
-     * The card responds with an encrypted nonce. The encrypted nonce
-     * is returned raw (not decrypted) for use in key recovery attacks.
+     * Sends an AUTH command encrypted with the current Crypto1 state,
+     * including proper encrypted parity bits packed into the raw bitstream.
+     * The card responds with an encrypted nonce (also with parity).
+     * The encrypted nonce and parity bits are returned raw (not decrypted)
+     * for key recovery.
      *
      * @param keyType 0x60 for Key A, 0x61 for Key B
      * @param blockIndex Block number to authenticate against
      * @param currentState Current Crypto1 cipher state from a previous authentication
-     * @return Encrypted 4-byte card nonce as UInt (big-endian), or null on failure
+     * @return [NestedAuthResult] with encrypted nonce and parity, or null on failure
      */
     suspend fun nestedAuth(
         keyType: Byte,
         blockIndex: Int,
         currentState: Crypto1State,
-    ): UInt? {
-        // Build plaintext AUTH command (with CRC)
+    ): NestedAuthResult? {
+        // Build plaintext AUTH command (with CRC): [keyType, blockIndex, CRC_L, CRC_H]
         val plainCmd = buildAuthCommand(keyType, blockIndex)
 
-        // Encrypt the command with the current cipher state
-        val encCmd = Crypto1Auth.encryptBytes(currentState, plainCmd)
+        // Encrypt with parity (LFSR input = 0 for encrypted communication)
+        val (encCmd, parityBits) = Crypto1Auth.encryptBytesWithParity(currentState, plainCmd, null)
 
-        // Send encrypted AUTH command
+        // Pack into raw bitstream: 4 bytes × 9 bits = 36 bits = 5 FIFO bytes
+        val (packed, txLastBits) = packWithParity(encCmd, parityBits)
+        if (txLastBits != 0) {
+            pn533.writeRegister(REG_CIU_BIT_FRAMING, txLastBits)
+        }
+
         val response =
             try {
-                pn533.inCommunicateThru(encCmd)
+                pn533.inCommunicateThru(packed)
             } catch (_: PN533Exception) {
+                if (txLastBits != 0) pn533.writeRegister(REG_CIU_BIT_FRAMING, 0x00)
                 return null
             }
+        if (txLastBits != 0) {
+            pn533.writeRegister(REG_CIU_BIT_FRAMING, 0x00)
+        }
 
-        if (response.size < 4) return null
+        // Card responds with encrypted nonce: 4 bytes + parity = 36 bits = 5 FIFO bytes
+        val encNonce: UInt
+        val encParity: Int
+        if (response.size >= 5) {
+            val (nonceBytes, parBits) = unpackWithParity(response, 4)
+            encNonce = bytesToUInt(nonceBytes)
+            // Pack 4 parity bits: bit 3 = par of byte 0, bit 0 = par of byte 3
+            encParity = (parBits[0] shl 3) or (parBits[1] shl 2) or (parBits[2] shl 1) or parBits[3]
+        } else if (response.size >= 4) {
+            encNonce = bytesToUInt(response)
+            encParity = 0 // No parity available
+        } else {
+            return null
+        }
 
-        // Return the encrypted nonce (raw, for key recovery)
-        return bytesToUInt(response)
+        return NestedAuthResult(encNonce, encParity)
     }
 
     /**
      * Read a block using software Crypto1 encryption.
      *
-     * Encrypts a READ command with the current cipher state, sends it,
-     * and decrypts the 16-byte response.
+     * Encrypts a READ command with parity, packs into raw bitstream,
+     * sends it, unpacks the encrypted response, and decrypts.
      *
      * @param blockIndex Block number to read
      * @param state Current Crypto1 cipher state (from a successful authentication)
@@ -279,28 +404,43 @@ class PN533RawClassic(
         blockIndex: Int,
         state: Crypto1State,
     ): ByteArray? {
-        // Build plaintext READ command (with CRC)
+        // Build plaintext READ command (with CRC): [0x30, blockIndex, CRC_L, CRC_H]
         val plainCmd = buildReadCommand(blockIndex)
 
-        // Encrypt the command
-        val encCmd = Crypto1Auth.encryptBytes(state, plainCmd)
+        // Encrypt with parity
+        val (encCmd, parityBits) = Crypto1Auth.encryptBytesWithParity(state, plainCmd, null)
 
-        // Send via InCommunicateThru
+        // Pack: 4 bytes × 9 bits = 36 bits = 5 FIFO bytes (txLastBits = 4)
+        val (packed, txLastBits) = packWithParity(encCmd, parityBits)
+        if (txLastBits != 0) {
+            pn533.writeRegister(REG_CIU_BIT_FRAMING, txLastBits)
+        }
+
         val response =
             try {
-                pn533.inCommunicateThru(encCmd)
+                pn533.inCommunicateThru(packed)
             } catch (_: PN533Exception) {
+                if (txLastBits != 0) pn533.writeRegister(REG_CIU_BIT_FRAMING, 0x00)
                 return null
             }
+        if (txLastBits != 0) {
+            pn533.writeRegister(REG_CIU_BIT_FRAMING, 0x00)
+        }
 
-        // Response should be 16 bytes data + 2 bytes CRC = 18 bytes
-        if (response.size < 16) return null
-
-        // Decrypt the response
-        val decrypted = Crypto1Auth.decryptBytes(state, response)
-
-        // Return the 16-byte data (strip CRC if present)
-        return decrypted.copyOfRange(0, 16)
+        // Response: 18 bytes (16 data + 2 CRC) with parity = 18 × 9 = 162 bits = 21 FIFO bytes
+        // Unpack data bytes from response, then decrypt
+        val expectedBytes = 18 // 16 data + 2 CRC
+        val expectedFifoBytes = (expectedBytes * 9 + 7) / 8 // 21 bytes
+        if (response.size >= expectedFifoBytes) {
+            val (encDataBytes, _) = unpackWithParity(response, expectedBytes)
+            val decrypted = Crypto1Auth.decryptBytes(state, encDataBytes)
+            return decrypted.copyOfRange(0, 16)
+        } else if (response.size >= 16) {
+            // Fallback: no parity in response, data is still encrypted
+            val decrypted = Crypto1Auth.decryptBytes(state, response)
+            return decrypted.copyOfRange(0, 16)
+        }
+        return null
     }
 
     companion object {
@@ -313,11 +453,17 @@ class PN533RawClassic(
         /** CIU ManualRCV register — Bit 4 = parity disable */
         const val REG_CIU_MANUAL_RCV = 0x630D
 
+        /** CIU BitFraming register — Bits 2:0 = TxLastBits */
+        const val REG_CIU_BIT_FRAMING = 0x633D
+
         /** CIU Status2 register — Bit 3 = Crypto1 active */
         const val REG_CIU_STATUS2 = 0x6338
 
         /** Wait time in ms for card's auth timeout (FWT) before re-selecting */
         private const val CARD_AUTH_TIMEOUT_MS = 10L
+
+        /** Wait time in ms for RF field off/on cycle during hard reselect */
+        private const val RF_CYCLE_DELAY_MS = 25L
 
         /**
          * Build a MIFARE Classic AUTH command with CRC.
@@ -384,5 +530,89 @@ class PN533RawClassic(
                 ((value shr 8) and 0xFFu).toByte(),
                 (value and 0xFFu).toByte(),
             )
+
+        /**
+         * Pack data bytes and parity bits into a raw bitstream for PN533 FIFO.
+         *
+         * ISO 14443 transmits LSB first. Each data byte (8 bits, LSB first) is
+         * followed by one parity bit, forming a 9-bit frame. With ParityDisable=1,
+         * the PN533 CIU sends the FIFO contents as raw bits without inserting
+         * parity, so we must interleave data and parity bits ourselves.
+         *
+         * Matches libnfc's pn53x_wrap_frame() behavior.
+         *
+         * @param data Encrypted data bytes
+         * @param parity Parity bits (one per data byte, 0 or 1)
+         * @return Pair of (packed FIFO bytes, TxLastBits for BitFraming register)
+         */
+        fun packWithParity(
+            data: ByteArray,
+            parity: IntArray,
+        ): Pair<ByteArray, Int> {
+            val totalBits = data.size * 9
+            val fifoSize = (totalBits + 7) / 8
+            val fifo = ByteArray(fifoSize)
+
+            var bitPos = 0
+            for (i in data.indices) {
+                val byte = data[i].toInt() and 0xFF
+                // Emit 8 data bits, LSB first
+                for (b in 0 until 8) {
+                    if ((byte shr b) and 1 == 1) {
+                        fifo[bitPos / 8] = (fifo[bitPos / 8].toInt() or (1 shl (bitPos % 8))).toByte()
+                    }
+                    bitPos++
+                }
+                // Emit parity bit
+                if (parity[i] == 1) {
+                    fifo[bitPos / 8] = (fifo[bitPos / 8].toInt() or (1 shl (bitPos % 8))).toByte()
+                }
+                bitPos++
+            }
+
+            val txLastBits = totalBits % 8
+            return Pair(fifo, txLastBits)
+        }
+
+        /**
+         * Unpack a raw bitstream from PN533 FIFO into data bytes and parity bits.
+         *
+         * Inverse of [packWithParity]. Each 9-bit frame contains 8 data bits
+         * (LSB first) followed by 1 parity bit.
+         *
+         * Matches libnfc's pn53x_unwrap_frame() behavior.
+         *
+         * @param fifo Raw FIFO bytes from PN533
+         * @param byteCount Number of data bytes to extract
+         * @return Pair of (data bytes, parity bits)
+         */
+        fun unpackWithParity(
+            fifo: ByteArray,
+            byteCount: Int,
+        ): Pair<ByteArray, IntArray> {
+            val data = ByteArray(byteCount)
+            val parity = IntArray(byteCount)
+
+            var bitPos = 0
+            for (i in 0 until byteCount) {
+                var byte = 0
+                for (b in 0 until 8) {
+                    if (bitPos / 8 < fifo.size &&
+                        (fifo[bitPos / 8].toInt() shr (bitPos % 8)) and 1 == 1
+                    ) {
+                        byte = byte or (1 shl b)
+                    }
+                    bitPos++
+                }
+                data[i] = byte.toByte()
+                // Read parity bit
+                if (bitPos / 8 < fifo.size) {
+                    parity[i] = (fifo[bitPos / 8].toInt() shr (bitPos % 8)) and 1
+                }
+                bitPos++
+            }
+
+            return Pair(data, parity)
+        }
     }
 }

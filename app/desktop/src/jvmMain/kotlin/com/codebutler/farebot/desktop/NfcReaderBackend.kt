@@ -41,5 +41,6 @@ interface NfcReaderBackend {
         onCardRead: (RawCard<*>) -> Unit,
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
+        onPartialCard: (suspend (RawCard<*>) -> Unit)? = null,
     )
 }

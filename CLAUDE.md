@@ -60,7 +60,11 @@ Do NOT make speculative changes hoping they fix the issue. Each failed guess was
 
 Write all code in `src/commonMain/kotlin/`. Only use `androidMain`, `iosMain`, or `wasmJsMain` for code that directly interfaces with platform APIs (NFC hardware, file system, UI system dialogs, WebUSB). No Objective-C. Tests use `kotlin.test`.
 
-### 6. Use FormattedString for all user-facing strings
+### 6. Use typed data, not strings, for business logic
+
+Never use raw strings to represent structured data like card types, NFC technology names, or identifiers. Use enums, sealed classes, or data classes. Pass typed values through data flows and only convert to display strings at the UI layer. Example: `ScannedTag.cardType: CardType?` not `ScannedTag.techList: List<String>`.
+
+### 7. Use FormattedString for all user-facing strings
 
 All user-facing strings use the `FormattedString` sealed class, which defers string resolution to the UI layer (avoiding `runBlocking` that blocks the JS event loop on wasmJs).
 
@@ -86,7 +90,7 @@ HeaderListItem(Res.string.card_details)
 
 Do NOT hardcode English strings in Kotlin files.
 
-### 7. Use MDST for station lookups, not SQLite .db3
+### 8. Use MDST for station lookups, not SQLite .db3
 
 Station databases should use the MDST (protobuf) format via `MdstStationLookup`, not SQLite .db3 files with SQLDelight. All MDST files live in `base/src/commonMain/composeResources/files/` and are accessed via `MdstStationLookup.getStation(dbName, stationId)`.
 
@@ -98,7 +102,7 @@ station?.companyName  // Operator name
 station?.latitude     // GPS coordinates (if available)
 ```
 
-### 8. Verify your own work
+### 9. Verify your own work
 
 After making changes:
 - Run `./gradlew allTests` to confirm tests pass
@@ -108,7 +112,7 @@ After making changes:
 
 Do NOT claim work is complete without verification.
 
-### 9. Preserve context across sessions
+### 10. Preserve context across sessions
 
 When continuing from a previous session, check for implementation plans and session transcripts in `~/.claude/` to recover context rather than starting from scratch.
 

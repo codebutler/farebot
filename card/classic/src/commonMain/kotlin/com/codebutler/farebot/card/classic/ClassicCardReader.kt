@@ -23,6 +23,8 @@
 
 package com.codebutler.farebot.card.classic
 
+import co.touchlab.kermit.Logger
+import com.codebutler.farebot.base.util.hex
 import com.codebutler.farebot.card.CardLostException
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
 import com.codebutler.farebot.card.classic.key.ClassicSectorKey
@@ -33,6 +35,8 @@ import com.codebutler.farebot.card.nfc.ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
 import kotlin.time.Clock
+
+private val log = Logger.withTag("ClassicCardReader")
 
 object ClassicCardReader {
     private val PREAMBLE_KEY =
@@ -52,30 +56,52 @@ object ClassicCardReader {
         cardKeys: ClassicCardKeys?,
         globalKeys: List<ByteArray>? = null,
         keyRecovery: ClassicKeyRecovery? = null,
-        onProgress: ((String) -> Unit)? = null,
+        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
+        onPartialCard: (suspend (RawClassicCard) -> Unit)? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
         val sectorCount = tech.sectorCount
         val recoveredKeys = mutableMapOf<Int, Pair<ByteArray, Boolean>>()
 
         for (sectorIndex in 0 until sectorCount) {
-            onProgress?.invoke("Reading sector $sectorIndex of $sectorCount")
             try {
-                onProgress?.invoke("Reading sector $sectorIndex/${tech.sectorCount}...")
+                onProgress?.invoke(sectorIndex, sectorCount)
                 var authSuccess = false
                 var successfulKey: ByteArray? = null
                 var isKeyA = true
 
-                // Try the default keys first
-                if (!authSuccess && sectorIndex == 0) {
-                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY)
-                    if (authSuccess) {
-                        successfulKey = PREAMBLE_KEY
-                        isKeyA = true
+                // Try saved sector-specific keys first (fastest path for known cards)
+                if (cardKeys != null && !authSuccess) {
+                    val sectorKey: ClassicSectorKey? = cardKeys.keyForSector(sectorIndex)
+                    if (sectorKey != null) {
+                        if (sectorKey.hasKeyA) {
+                            log.d {
+                                "Sector $sectorIndex: trying saved keyA=${sectorKey.keyA.hex()}"
+                            }
+                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.keyA)
+                            if (authSuccess) {
+                                successfulKey = sectorKey.keyA
+                                isKeyA = true
+                            }
+                        }
+                        if (!authSuccess && sectorKey.hasKeyB) {
+                            log.d {
+                                "Sector $sectorIndex: trying saved keyB=${sectorKey.keyB.hex()}"
+                            }
+                            authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.keyB)
+                            if (authSuccess) {
+                                successfulKey = sectorKey.keyB
+                                isKeyA = false
+                            }
+                        }
                     }
                 }
 
+                // Try well-known default keys
                 if (!authSuccess) {
+                    log.d {
+                        "Sector $sectorIndex: trying default keyA=${ClassicTechnology.KEY_DEFAULT.hex()}"
+                    }
                     authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, ClassicTechnology.KEY_DEFAULT)
                     if (authSuccess) {
                         successfulKey = ClassicTechnology.KEY_DEFAULT
@@ -83,81 +109,112 @@ object ClassicCardReader {
                     }
                 }
 
-                if (cardKeys != null) {
-                    // Try with a 1:1 sector mapping on our key list first
-                    if (!authSuccess) {
-                        val sectorKey: ClassicSectorKey? = cardKeys.keyForSector(sectorIndex)
-                        if (sectorKey != null) {
-                            authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.keyA)
-                            if (authSuccess) {
-                                successfulKey = sectorKey.keyA
-                                isKeyA = true
-                            } else {
-                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.keyB)
-                                if (authSuccess) {
-                                    successfulKey = sectorKey.keyB
-                                    isKeyA = false
-                                }
-                            }
-                        }
+                if (!authSuccess) {
+                    log.d { "Sector $sectorIndex: trying preamble keyA=${PREAMBLE_KEY.hex()}" }
+                    authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, PREAMBLE_KEY)
+                    if (authSuccess) {
+                        successfulKey = PREAMBLE_KEY
+                        isKeyA = true
                     }
+                }
 
+                if (cardKeys != null) {
                     if (!authSuccess) {
                         // Be a little more forgiving on the key list.  Lets try all the keys!
                         //
                         // This takes longer, of course, but means that users aren't scratching
                         // their heads when we don't get the right key straight away.
+                        //
+                        // Deduplicate keys to avoid retrying the same key (e.g., many sectors
+                        // sharing the default key). Each failed auth is expensive (~200ms).
+                        val triedKeys = mutableSetOf(ClassicTechnology.KEY_DEFAULT.toList())
+                        if (sectorIndex == 0) triedKeys.add(PREAMBLE_KEY.toList())
+                        cardKeys.keyForSector(sectorIndex)?.let {
+                            triedKeys.add(it.keyA.toList())
+                            triedKeys.add(it.keyB.toList())
+                        }
+
                         val keys: List<ClassicSectorKey> = cardKeys.keys
 
+                        log.d {
+                            "Sector $sectorIndex: brute-forcing ${keys.size} saved keys (${triedKeys.size} already tried)"
+                        }
                         for (keyIndex in keys.indices) {
-                            if (keyIndex == sectorIndex) {
-                                // We tried this before
-                                continue
-                            }
+                            if (keyIndex == sectorIndex) continue
+                            val sectorKey = keys[keyIndex]
 
-                            authSuccess =
-                                tech.authenticateSectorWithKeyA(
-                                    sectorIndex,
-                                    keys[keyIndex].keyA,
-                                )
-
-                            if (authSuccess) {
-                                successfulKey = keys[keyIndex].keyA
-                                isKeyA = true
-                            } else {
-                                authSuccess =
-                                    tech.authenticateSectorWithKeyB(
-                                        sectorIndex,
-                                        keys[keyIndex].keyB,
-                                    )
-
+                            if (sectorKey.hasKeyA && triedKeys.add(sectorKey.keyA.toList())) {
+                                log.d {
+                                    "Sector $sectorIndex: brute keyA[$keyIndex]=${sectorKey.keyA.hex()}"
+                                }
+                                authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, sectorKey.keyA)
                                 if (authSuccess) {
-                                    successfulKey = keys[keyIndex].keyB
-                                    isKeyA = false
+                                    successfulKey = sectorKey.keyA
+                                    isKeyA = true
+                                    break
                                 }
                             }
 
-                            if (authSuccess) {
-                                // Jump out if we have the key
-                                break
+                            if (sectorKey.hasKeyB && triedKeys.add(sectorKey.keyB.toList())) {
+                                log.d {
+                                    "Sector $sectorIndex: brute keyB[$keyIndex]=${sectorKey.keyB.hex()}"
+                                }
+                                authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, sectorKey.keyB)
+                                if (authSuccess) {
+                                    successfulKey = sectorKey.keyB
+                                    isKeyA = false
+                                    break
+                                }
                             }
+                        }
+                        log.d {
+                            "Sector $sectorIndex: brute-force done, tried ${triedKeys.size} unique keys"
                         }
                     }
                 }
 
                 // Try global dictionary keys
                 if (!authSuccess && !globalKeys.isNullOrEmpty()) {
-                    for (globalKey in globalKeys) {
+                    log.d { "Sector $sectorIndex: trying ${globalKeys.size} global keys" }
+                    for ((i, globalKey) in globalKeys.withIndex()) {
+                        log.d { "Sector $sectorIndex: global[$i] keyA=${globalKey.hex()}" }
                         authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, globalKey)
                         if (authSuccess) {
                             successfulKey = globalKey
                             isKeyA = true
                             break
                         }
+                        log.d { "Sector $sectorIndex: global[$i] keyB=${globalKey.hex()}" }
                         authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, globalKey)
                         if (authSuccess) {
                             successfulKey = globalKey
                             isKeyA = false
+                            break
+                        }
+                    }
+                }
+
+                // Try previously recovered keys (avoids expensive hardnested if sectors share keys)
+                if (!authSuccess && recoveredKeys.isNotEmpty()) {
+                    log.d { "Sector $sectorIndex: trying ${recoveredKeys.size} recovered keys" }
+                    for ((fromSector, keyInfo) in recoveredKeys) {
+                        val (keyBytes, _) = keyInfo
+                        authSuccess = tech.authenticateSectorWithKeyA(sectorIndex, keyBytes)
+                        if (authSuccess) {
+                            successfulKey = keyBytes
+                            isKeyA = true
+                            log.d {
+                                "Sector $sectorIndex: recovered key from sector $fromSector works as keyA!"
+                            }
+                            break
+                        }
+                        authSuccess = tech.authenticateSectorWithKeyB(sectorIndex, keyBytes)
+                        if (authSuccess) {
+                            successfulKey = keyBytes
+                            isKeyA = false
+                            log.d {
+                                "Sector $sectorIndex: recovered key from sector $fromSector works as keyB!"
+                            }
                             break
                         }
                     }
@@ -169,7 +226,7 @@ object ClassicCardReader {
                     tech is PN533ClassicTechnology &&
                     recoveredKeys.isNotEmpty()
                 ) {
-                    onProgress?.invoke("Sector $sectorIndex: attempting key recovery...")
+                    onProgress?.invoke(sectorIndex, sectorCount)
                     val recovered = keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys, onProgress)
                     if (recovered != null) {
                         val (keyBytes, recoveredIsKeyA) = recovered
@@ -182,12 +239,15 @@ object ClassicCardReader {
                         if (authSuccess) {
                             successfulKey = keyBytes
                             isKeyA = recoveredIsKeyA
-                            onProgress?.invoke("Sector $sectorIndex: key recovered!")
+                            log.i { "Sector $sectorIndex: key recovered!" }
                         }
                     }
                 }
 
                 if (authSuccess && successfulKey != null) {
+                    log.d {
+                        "Sector $sectorIndex: AUTH OK key${if (isKeyA) "A" else "B"}=${successfulKey.hex()}"
+                    }
                     recoveredKeys[sectorIndex] = Pair(successfulKey, isKeyA)
 
                     val blocks = ArrayList<RawClassicBlock>()
@@ -211,13 +271,21 @@ object ClassicCardReader {
 
                         blocks.add(RawClassicBlock.create(blockIndex, data))
                     }
-                    sectors.add(RawClassicSector.createData(sectorIndex, blocks))
+                    sectors.add(
+                        RawClassicSector.createData(
+                            sectorIndex,
+                            blocks,
+                            keyA = if (isKeyA) successfulKey else null,
+                            keyB = if (!isKeyA) successfulKey else null,
+                        ),
+                    )
 
                     // TODO: Metrodroid enhancement - retry with alternate key if blocks are unauthorized
                     // After reading, if blocks are unauthorized, retry authentication with Key B (if we used A)
                     // or Key A (if we used B) and re-read the sector. Requires tracking unauthorized blocks
                     // in RawClassicBlock (see Metrodroid ClassicReader.kt lines 118-139).
                 } else {
+                    log.d { "Sector $sectorIndex: UNAUTHORIZED (no key found)" }
                     sectors.add(RawClassicSector.createUnauthorized(sectorIndex))
                 }
             } catch (ex: PN533TransportException) {
@@ -229,6 +297,10 @@ object ClassicCardReader {
             } catch (ex: Exception) {
                 sectors.add(RawClassicSector.createInvalid(sectorIndex, ex.message ?: "Unknown error"))
             }
+
+            onPartialCard?.invoke(
+                RawClassicCard.create(tagId, Clock.System.now(), ArrayList(sectors), isPartialRead = true),
+            )
         }
 
         return RawClassicCard.create(tagId, Clock.System.now(), sectors)

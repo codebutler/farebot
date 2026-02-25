@@ -25,6 +25,7 @@ package com.codebutler.farebot.card.nfc.pn533
 import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.nfc.ClassicTechnology
 import kotlinx.coroutines.delay
+import kotlin.time.TimeSource
 
 /**
  * PN533 implementation of [ClassicTechnology] for MIFARE Classic cards.
@@ -103,32 +104,39 @@ class PN533ClassicTechnology(
         sectorIndex: Int,
         key: ByteArray,
         authCommand: Byte,
-    ): Boolean =
-        try {
+    ): Boolean {
+        val t0 = TimeSource.Monotonic.markNow()
+        return try {
             val block = sectorToBlock(sectorIndex)
-            // MIFARE auth command: [AUTH_CMD] [BLOCK] [KEY(6)] [UID(4)]
-            // PN533 needs the first 4 bytes of the UID for auth
             val uidBytes = if (uid.size >= 4) uid.copyOfRange(0, 4) else uid
             val data = byteArrayOf(authCommand, block.toByte()) + key + uidBytes
             pn533.inDataExchange(tg, data)
+            log.d { "sector=$sectorIndex OK ${t0.elapsedNow()}" }
             true
         } catch (e: PN533Exception) {
             if (e is PN533TransportException) throw e
-            log.d(e) { "Authentication failed for sector $sectorIndex" }
+            val authTime = t0.elapsedNow()
+            val t1 = TimeSource.Monotonic.markNow()
             // After failed MIFARE auth, the card enters HALT state and won't
             // respond to subsequent commands, causing slow PN533 timeouts.
             // Cycle the RF field to reset the card, then re-select it.
             reselectCard()
+            log.d(e) { "sector=$sectorIndex FAIL auth=$authTime reselect=${t1.elapsedNow()}" }
             false
         }
+    }
 
     private suspend fun reselectCard() {
         try {
+            // After failed MIFARE auth, card enters HALT state (ISO 14443-3).
+            // HALTed cards only respond to WUPA (ALL_REQ), not REQA (SENS_REQ).
+            // Cycling the RF field resets the card to IDLE state so it responds to REQA
+            // from InListPassiveTarget.
             pn533.rfFieldOff()
             delay(RF_RESET_DELAY_MS)
             pn533.rfFieldOn()
             delay(RF_RESET_DELAY_MS)
-            pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A)
+            pn533.inListPassiveTarget(baudRate = PN533.BAUD_RATE_106_ISO14443A, timeoutMs = RESELECT_TIMEOUT_MS)
         } catch (e: PN533Exception) {
             if (e is PN533TransportException) throw e
             // Card may have been removed — caller will handle this
@@ -139,6 +147,7 @@ class PN533ClassicTechnology(
         const val MIFARE_CMD_AUTH_A: Byte = 0x60
         const val MIFARE_CMD_AUTH_B: Byte = 0x61
         const val MIFARE_CMD_READ: Byte = 0x30
-        private const val RF_RESET_DELAY_MS = 50L
+        private const val RF_RESET_DELAY_MS = 25L
+        private const val RESELECT_TIMEOUT_MS = 500
     }
 }

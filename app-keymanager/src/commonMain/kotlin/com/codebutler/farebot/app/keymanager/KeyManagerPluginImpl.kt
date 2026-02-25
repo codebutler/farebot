@@ -33,14 +33,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.savedstate.read
 import com.codebutler.farebot.app.keymanager.ui.AddKeyScreen
+import com.codebutler.farebot.app.keymanager.ui.KeyRecoveryScreen
 import com.codebutler.farebot.app.keymanager.ui.KeysScreen
 import com.codebutler.farebot.app.keymanager.viewmodel.AddKeyViewModel
+import com.codebutler.farebot.app.keymanager.viewmodel.KeyRecoveryViewModel
 import com.codebutler.farebot.app.keymanager.viewmodel.KeysViewModel
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.card.classic.ClassicKeyRecovery
 import com.codebutler.farebot.card.classic.key.ClassicCardKeys
+import com.codebutler.farebot.card.classic.key.ClassicSectorKey
 import com.codebutler.farebot.keymanager.NestedAttackKeyRecovery
 import com.codebutler.farebot.persist.CardKeysPersister
+import com.codebutler.farebot.persist.db.model.SavedKey
 import com.codebutler.farebot.shared.nfc.CardScanner
 import farebot.app_keymanager.generated.resources.Res
 import farebot.app_keymanager.generated.resources.add_key
@@ -74,6 +78,14 @@ class KeyManagerPluginImpl(
         cardType: CardType? = null,
     ) {
         navController.navigate(buildAddKeyRoute(tagId, cardType))
+    }
+
+    fun navigateToKeyRecovery(
+        navController: NavHostController,
+        tagId: String,
+        cardType: CardType,
+    ) {
+        navController.navigate(buildKeyRecoveryRoute(tagId, cardType))
     }
 
     fun NavGraphBuilder.registerKeyRoutes(
@@ -159,6 +171,38 @@ class KeyManagerPluginImpl(
                 },
             )
         }
+
+        composable(
+            route = KEY_RECOVERY_ROUTE,
+            arguments =
+                listOf(
+                    navArgument("tagId") { type = NavType.StringType },
+                    navArgument("cardType") { type = NavType.StringType },
+                ),
+        ) { backStackEntry ->
+            val recoveryViewModel = viewModel { KeyRecoveryViewModel(cardScanner) }
+            val uiState by recoveryViewModel.uiState.collectAsState()
+
+            val tagId = backStackEntry.arguments?.read { getStringOrNull("tagId") } ?: return@composable
+            val cardTypeName = backStackEntry.arguments?.read { getStringOrNull("cardType") } ?: return@composable
+            val cardType = CardType.entries.firstOrNull { it.name == cardTypeName } ?: return@composable
+
+            LaunchedEffect(tagId, cardTypeName) {
+                recoveryViewModel.init(tagId, cardType)
+            }
+
+            LaunchedEffect(Unit) {
+                recoveryViewModel.recoveryComplete.collect {
+                    navController.popBackStack()
+                }
+            }
+
+            KeyRecoveryScreen(
+                uiState = uiState,
+                onBack = { navController.popBackStack() },
+                onRetry = { recoveryViewModel.startRecovery() },
+            )
+        }
     }
 
     fun getCardKeysForTag(tagId: String): ClassicCardKeys? {
@@ -177,6 +221,50 @@ class KeyManagerPluginImpl(
             emptyList()
         }
 
+    fun saveCardKeys(
+        tagId: String,
+        keys: ClassicCardKeys,
+    ) {
+        val existingKeys = getCardKeysForTag(tagId)
+        val mergedKeys = if (existingKeys != null) mergeKeys(existingKeys, keys) else keys
+        val keyData = json.encodeToString(ClassicCardKeys.serializer(), mergedKeys)
+        val existing = cardKeysPersister.getForTagId(tagId)
+        if (existing != null) {
+            cardKeysPersister.delete(existing)
+        }
+        cardKeysPersister.insert(
+            SavedKey(
+                cardId = tagId,
+                cardType = CardType.MifareClassic,
+                keyData = keyData,
+            ),
+        )
+        println("[KeyManager] Saved keys for $tagId (${mergedKeys.keys.size} sectors)")
+    }
+
+    private fun mergeKeys(
+        existing: ClassicCardKeys,
+        discovered: ClassicCardKeys,
+    ): ClassicCardKeys {
+        val maxSectors = maxOf(existing.keys.size, discovered.keys.size)
+        val merged =
+            (0 until maxSectors).map { i ->
+                val existingKey = existing.keyForSector(i)
+                val discoveredKey = discovered.keyForSector(i)
+                ClassicSectorKey(
+                    keyA =
+                        discoveredKey?.keyA?.takeIf { !it.contentEquals(ZERO_KEY) }
+                            ?: existingKey?.keyA
+                            ?: ZERO_KEY.copyOf(),
+                    keyB =
+                        discoveredKey?.keyB?.takeIf { !it.contentEquals(ZERO_KEY) }
+                            ?: existingKey?.keyB
+                            ?: ZERO_KEY.copyOf(),
+                )
+            }
+        return ClassicCardKeys(CardType.MifareClassic, merged)
+    }
+
     val lockedCardTitle: StringResource get() = Res.string.locked_card
     val keysRequiredMessage: StringResource get() = Res.string.keys_required
     val addKeyLabel: StringResource get() = Res.string.add_key
@@ -184,8 +272,10 @@ class KeyManagerPluginImpl(
     val keysLoadedLabel: StringResource get() = Res.string.keys_loaded
 
     companion object {
+        private val ZERO_KEY = ByteArray(6)
         private const val KEYS_ROUTE = "keys"
         private const val ADD_KEY_ROUTE = "add_key?tagId={tagId}&cardType={cardType}"
+        private const val KEY_RECOVERY_ROUTE = "key_recovery/{tagId}/{cardType}"
 
         private fun buildAddKeyRoute(
             tagId: String? = null,
@@ -198,5 +288,10 @@ class KeyManagerPluginImpl(
                 if (cardType != null) params.add("cardType=${cardType.name}")
                 if (params.isNotEmpty()) append("?${params.joinToString("&")}")
             }
+
+        private fun buildKeyRecoveryRoute(
+            tagId: String,
+            cardType: CardType,
+        ): String = "key_recovery/$tagId/${cardType.name}"
     }
 }

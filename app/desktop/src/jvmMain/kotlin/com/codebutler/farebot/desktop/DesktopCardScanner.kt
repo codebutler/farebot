@@ -23,22 +23,13 @@
 package com.codebutler.farebot.desktop
 
 import co.touchlab.kermit.Logger
-import com.codebutler.farebot.card.RawCard
 import com.codebutler.farebot.card.nfc.pn533.PN533
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
-import com.codebutler.farebot.shared.nfc.CardScanner
-import com.codebutler.farebot.shared.nfc.ReadingProgress
-import com.codebutler.farebot.shared.nfc.ScannedTag
+import com.codebutler.farebot.shared.nfc.BaseCardScanner
 import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -54,30 +45,16 @@ private val log = Logger.withTag("DesktopCardScanner")
 
 class DesktopCardScanner(
     private val keyManagerPlugin: KeyManagerPlugin? = null,
-) : CardScanner {
+) : BaseCardScanner() {
     override val requiresActiveScan: Boolean = true
-
-    private val _scannedTags = MutableSharedFlow<ScannedTag>(extraBufferCapacity = 1)
-    override val scannedTags: SharedFlow<ScannedTag> = _scannedTags.asSharedFlow()
-
-    private val _scannedCards = MutableSharedFlow<RawCard<*>>(extraBufferCapacity = 1)
-    override val scannedCards: SharedFlow<RawCard<*>> = _scannedCards.asSharedFlow()
-
-    private val _scanErrors = MutableSharedFlow<Throwable>(extraBufferCapacity = 1)
-    override val scanErrors: SharedFlow<Throwable> = _scanErrors.asSharedFlow()
-
-    private val _isScanning = MutableStateFlow(false)
-    override val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
-
-    private val _readingProgress = MutableStateFlow<ReadingProgress?>(null)
-    override val readingProgress: StateFlow<ReadingProgress?> = _readingProgress.asStateFlow()
+    override val supportsKeyRecovery: Boolean = true
 
     private var scanJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun startActiveScan() {
         if (scanJob?.isActive == true) return
-        _isScanning.value = true
+        setScanning(true)
 
         scanJob =
             scope.launch {
@@ -89,9 +66,7 @@ class DesktopCardScanner(
                             // UnsatisfiedLinkError (missing libusb) or other fatal errors
                             // during backend discovery — report to UI instead of silently failing
                             log.e(e) { "Backend discovery failed" }
-                            _scanErrors.tryEmit(
-                                Exception("NFC reader initialization failed: ${e.message}", e),
-                            )
+                            emitError(Exception("NFC reader initialization failed: ${e.message}", e))
                             return@launch
                         }
                     val backendJobs =
@@ -100,20 +75,11 @@ class DesktopCardScanner(
                                 log.i { "Starting ${backend.name} backend" }
                                 try {
                                     backend.scanLoop(
-                                        onCardDetected = { tag ->
-                                            _scannedTags.tryEmit(tag)
-                                        },
-                                        onCardRead = { rawCard ->
-                                            _readingProgress.value = null
-                                            _scannedCards.tryEmit(rawCard)
-                                        },
-                                        onError = { error ->
-                                            _readingProgress.value = null
-                                            _scanErrors.tryEmit(error)
-                                        },
-                                        onProgress = { current, total ->
-                                            _readingProgress.value = ReadingProgress(current, total)
-                                        },
+                                        onCardDetected = ::emitTag,
+                                        onCardRead = ::emitCard,
+                                        onError = ::emitError,
+                                        onProgress = ::emitProgress,
+                                        onPartialCard = ::emitPartialCard,
                                     )
                                 } catch (e: Exception) {
                                     if (isActive) {
@@ -122,21 +88,18 @@ class DesktopCardScanner(
                                 } catch (e: Error) {
                                     // Catch LinkageError / UnsatisfiedLinkError from native libs
                                     log.w(e) { "${backend.name} backend unavailable" }
-                                    _scanErrors.tryEmit(
-                                        Exception("${backend.name} reader unavailable: ${e.message}", e),
-                                    )
+                                    emitError(Exception("${backend.name} reader unavailable: ${e.message}", e))
                                 }
                             }
                         }
 
                     backendJobs.forEach { it.join() }
 
-                    // All backends exited — emit error only if none ran successfully
                     if (isActive) {
-                        _scanErrors.tryEmit(Exception("All NFC reader backends failed. Is a USB NFC reader connected?"))
+                        emitError(Exception("All NFC reader backends failed. Is a USB NFC reader connected?"))
                     }
                 } finally {
-                    _isScanning.value = false
+                    setScanning(false)
                 }
             }
     }
@@ -144,10 +107,11 @@ class DesktopCardScanner(
     override fun stopActiveScan() {
         scanJob?.cancel()
         scanJob = null
+        resetScanState()
     }
 
     private suspend fun discoverBackends(): List<NfcReaderBackend> {
-        val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend(keyManagerPlugin))
+        val backends = mutableListOf<NfcReaderBackend>(PcscReaderBackend(keyManagerPlugin, recoveryMode))
         val transports =
             try {
                 PN533Device.openAll()
@@ -158,19 +122,19 @@ class DesktopCardScanner(
                 emptyList()
             }
         if (transports.isEmpty()) {
-            backends.add(PN533ReaderBackend(keyManagerPlugin))
+            backends.add(PN533ReaderBackend(keyManagerPlugin, recoveryMode = recoveryMode))
         } else {
             transports.forEachIndexed { index, transport ->
                 transport.flush()
-                transport.sendAck() // RC-S956 needs ACK before first command
+                transport.sendAck()
                 val probe = PN533(transport)
                 val fw = probe.getFirmwareVersion()
                 val label = "PN53x #${index + 1}"
                 log.i { "$label firmware: $fw" }
                 if (fw.version >= 2) {
-                    backends.add(PN533ReaderBackend(keyManagerPlugin, transport))
+                    backends.add(PN533ReaderBackend(keyManagerPlugin, transport, recoveryMode))
                 } else {
-                    backends.add(RCS956ReaderBackend(keyManagerPlugin, transport, label))
+                    backends.add(RCS956ReaderBackend(keyManagerPlugin, transport, label, recoveryMode))
                 }
             }
         }

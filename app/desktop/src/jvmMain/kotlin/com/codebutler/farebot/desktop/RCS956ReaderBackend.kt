@@ -41,7 +41,8 @@ class RCS956ReaderBackend(
     keyManagerPlugin: KeyManagerPlugin? = null,
     transport: Usb4JavaPN533Transport,
     private val deviceLabel: String = "RC-S956",
-) : PN53xReaderBackend(transport, keyManagerPlugin) {
+    recoveryMode: Boolean = false,
+) : PN53xReaderBackend(transport, keyManagerPlugin, recoveryMode) {
     override val name: String = deviceLabel
 
     override fun createTransceiver(

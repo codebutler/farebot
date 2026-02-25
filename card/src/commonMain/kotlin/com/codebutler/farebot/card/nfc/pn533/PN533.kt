@@ -80,6 +80,25 @@ class PN533(
         )
     }
 
+    /**
+     * Write multiple CIU registers in a single USB command.
+     *
+     * The PN533 WriteRegister command supports multiple address-value pairs,
+     * reducing USB round-trips when several registers must be changed atomically.
+     *
+     * @param pairs Register address-value pairs to write
+     */
+    suspend fun writeRegisters(vararg pairs: Pair<Int, Int>) {
+        val data = ByteArray(pairs.size * 3)
+        for ((i, pair) in pairs.withIndex()) {
+            val (address, value) = pair
+            data[i * 3] = ((address shr 8) and 0xFF).toByte()
+            data[i * 3 + 1] = (address and 0xFF).toByte()
+            data[i * 3 + 2] = value.toByte()
+        }
+        transport.sendCommand(CMD_WRITE_REGISTER, data)
+    }
+
     suspend fun rfConfiguration(
         item: Byte,
         data: ByteArray,
@@ -101,6 +120,26 @@ class PN533(
         )
     }
 
+    /**
+     * Configure PN533 internal timeouts for RF communication.
+     *
+     * Timeout values use exponential encoding: timeout = 100µs × 2^(n-1).
+     * Common values: 0x0B=102ms, 0x0C=205ms, 0x0D=410ms, 0x0E=819ms.
+     * 0x00 = no timeout (immediate), 0x10+ = wait forever.
+     *
+     * @param atrResTimeout Timeout for ATR_RES during target activation.
+     * @param retryTimeout Timeout for InDataExchange / InCommunicateThru commands.
+     */
+    suspend fun setTimings(
+        atrResTimeout: Byte = 0x0B,
+        retryTimeout: Byte = 0x0C,
+    ) {
+        rfConfiguration(
+            RF_CONFIG_TIMINGS,
+            byteArrayOf(0x00, atrResTimeout, retryTimeout),
+        )
+    }
+
     suspend fun rfFieldOff() {
         rfConfiguration(RF_CONFIG_RF_FIELD, byteArrayOf(0x00))
     }
@@ -113,13 +152,14 @@ class PN533(
         maxTargets: Byte = 0x01,
         baudRate: Byte,
         initiatorData: ByteArray = byteArrayOf(),
+        timeoutMs: Int = POLL_TIMEOUT_MS,
     ): TargetInfo? {
         val resp =
             try {
                 transport.sendCommand(
                     CMD_IN_LIST_PASSIVE_TARGET,
                     byteArrayOf(maxTargets, baudRate) + initiatorData,
-                    timeoutMs = POLL_TIMEOUT_MS,
+                    timeoutMs = timeoutMs,
                 )
             } catch (e: PN533CommandException) {
                 // RC-S956 returns error frame 0x7F for unsupported baud rates
@@ -260,6 +300,7 @@ class PN533(
 
         // RF configuration items
         const val RF_CONFIG_RF_FIELD: Byte = 0x01
+        const val RF_CONFIG_TIMINGS: Byte = 0x02
         const val RF_CONFIG_MAX_RETRIES: Byte = 0x05
 
         // Baud rates for InListPassiveTarget

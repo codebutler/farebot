@@ -1,9 +1,11 @@
 /*
  * Crypto1Auth.kt
  *
- * Copyright 2026 Eric Butler <eric@codebutler.com>
+ * Based on crapto1 by blaez and Proxmark3's authentication implementation.
+ * https://github.com/RfidResearchGroup/proxmark3
  *
  * MIFARE Classic authentication protocol helpers using the Crypto1 cipher.
+ * Ported to Kotlin Multiplatform for FareBot.
  *
  * Implements the three-pass mutual authentication handshake:
  *   1. Reader sends AUTH command, card responds with nonce nT
@@ -114,6 +116,55 @@ object Crypto1Auth {
         ByteArray(data.size) { i ->
             (data[i].toInt() xor state.lfsrByte(0, false)).toByte()
         }
+
+    /**
+     * Encrypt data bytes with parity for MIFARE Classic communication.
+     *
+     * For each byte, produces 8 keystream bits (via lfsrByte) for the data,
+     * then reads one more keystream bit (filter output, WITHOUT clocking LFSR)
+     * to encrypt the parity bit.
+     *
+     * This matches Proxmark3's mf_crypto1_encryptEx():
+     *   data[i] = crypto1_byte(state, input, 0) ^ plaintext[i]
+     *   par[i] = filter(state->odd) ^ oddparity8(plaintext[i])
+     *
+     * @param state Cipher state (mutated by this operation)
+     * @param plaintext The plaintext bytes to encrypt
+     * @param input Per-byte input fed to the LFSR (same length as plaintext), or null for zeros
+     * @return Pair of (encrypted data bytes, encrypted parity bits as IntArray)
+     */
+    fun encryptBytesWithParity(
+        state: Crypto1State,
+        plaintext: ByteArray,
+        input: ByteArray? = null,
+    ): Pair<ByteArray, IntArray> {
+        val encrypted = ByteArray(plaintext.size)
+        val parity = IntArray(plaintext.size)
+        for (i in plaintext.indices) {
+            val pt = plaintext[i].toInt() and 0xFF
+            val inp = if (input != null) (input[i].toInt() and 0xFF) else 0
+            val ks = state.lfsrByte(inp, false)
+            encrypted[i] = (pt xor ks).toByte()
+            // Parity: read the filter output (next keystream bit preview) WITHOUT clocking
+            val ksPar = Crypto1.filter(state.odd)
+            parity[i] = oddParity(pt) xor ksPar
+        }
+        return Pair(encrypted, parity)
+    }
+
+    /**
+     * Compute ISO 14443-3A odd parity bit for a byte.
+     *
+     * Returns 1 when the byte has an even number of set bits,
+     * 0 when odd — so that total 1-bits (data + parity) is always odd.
+     */
+    fun oddParity(b: Int): Int {
+        var x = b
+        x = x xor (x shr 4)
+        x = x xor (x shr 2)
+        x = x xor (x shr 1)
+        return (x and 1) xor 1
+    }
 
     /**
      * Decrypt data using the cipher state.
