@@ -55,7 +55,6 @@ class MetalBruteForceEngine private constructor(
 ) : BruteForceEngine {
     companion object {
         private const val EVEN_CHUNK_SIZE = 100_000
-        private const val MAX_RESULTS_PER_DISPATCH = 4096
 
         // MetalBruteForceResult struct: 4 x uint32_t = 16 bytes
         private val RESULT_STRUCT_LAYOUT: MemoryLayout =
@@ -210,6 +209,10 @@ class MetalBruteForceEngine private constructor(
         for (chunk in evenChunks) {
             val chunkEvenStates = chunk.toIntArray()
 
+            // 4-bit parity check passes ~1/16 of pairs; allocate 2x headroom, min 4096
+            val chunkPairs = oddStates.size.toLong() * chunkEvenStates.size.toLong()
+            val maxResults = (chunkPairs / 8).coerceIn(4096, 2_000_000).toInt()
+
             Arena.ofConfined().use { arena ->
                 // Allocate off-heap buffers
                 val oddBuf = arena.allocateFrom(ValueLayout.JAVA_INT, *oddStates)
@@ -220,7 +223,7 @@ class MetalBruteForceEngine private constructor(
                 val resultsBuf =
                     arena.allocate(
                         RESULT_STRUCT_LAYOUT,
-                        MAX_RESULTS_PER_DISPATCH.toLong(),
+                        maxResults.toLong(),
                     )
 
                 // Dispatch to GPU
@@ -236,8 +239,12 @@ class MetalBruteForceEngine private constructor(
                         encBytesBuf,
                         encParBitsBuf,
                         resultsBuf,
-                        MAX_RESULTS_PER_DISPATCH,
+                        maxResults,
                     ) as Int
+
+                if (survivorCount >= maxResults) {
+                    log.w { "GPU result buffer full ($survivorCount/$maxResults) — some survivors may be lost" }
+                }
 
                 // Process survivors: extract keys and verify
                 for (i in 0 until survivorCount) {
