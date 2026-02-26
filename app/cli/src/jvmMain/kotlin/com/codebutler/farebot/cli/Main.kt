@@ -36,6 +36,7 @@ import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
 import com.codebutler.farebot.keymanager.NestedAttackKeyRecovery
+import com.codebutler.farebot.keymanager.crypto1.HardnestedAttack
 import com.codebutler.farebot.persist.db.FareBotDb
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
@@ -76,6 +77,12 @@ private fun preloadBundledLibusb() {
 
 fun main(args: Array<String>) {
     val recover = args.contains("--recover")
+    val offline = args.contains("--offline")
+
+    if (offline) {
+        runBlocking { offlineRecover() }
+        return
+    }
 
     preloadBundledLibusb()
 
@@ -212,6 +219,74 @@ private suspend fun readCard(
         }
     } finally {
         pn533.close()
+    }
+}
+
+/**
+ * Offline hardnested key recovery from saved nonce files in ~/.farebot/nonces/.
+ *
+ * Loads each .bin file, creates a HardnestedAttack in offline mode,
+ * and runs the brute force phase using the GPU-accelerated engine.
+ */
+private suspend fun offlineRecover() {
+    val noncesDir = File(System.getProperty("user.home"), ".farebot/nonces")
+    if (!noncesDir.exists() || !noncesDir.isDirectory) {
+        println("[offline] No nonces directory found at ${noncesDir.absolutePath}")
+        return
+    }
+
+    val nonceFiles =
+        noncesDir
+            .listFiles { f -> f.extension == "bin" }
+            ?.sortedBy { it.name }
+            ?: emptyList()
+
+    if (nonceFiles.isEmpty()) {
+        println("[offline] No .bin nonce files found in ${noncesDir.absolutePath}")
+        return
+    }
+
+    println("[offline] Found ${nonceFiles.size} nonce file(s):")
+    for (f in nonceFiles) {
+        val numNonces = (f.length() - 6) / 5
+        println("  ${f.name} ($numNonces nonces)")
+    }
+    println()
+
+    for (nonceFile in nonceFiles) {
+        println("=== ${nonceFile.name} ===")
+        val data = nonceFile.readBytes()
+
+        if (data.size < 6) {
+            println("[offline] File too small, skipping")
+            println()
+            continue
+        }
+
+        // Parse UID from file header
+        val uid =
+            ((data[0].toInt() and 0xFF).toUInt() shl 24) or
+                ((data[1].toInt() and 0xFF).toUInt() shl 16) or
+                ((data[2].toInt() and 0xFF).toUInt() shl 8) or
+                (data[3].toInt() and 0xFF).toUInt()
+        val targetBlock = data[4].toInt() and 0xFF
+        val targetKeyType = data[5]
+        val keyTypeStr = if (targetKeyType == 0x60.toByte()) "A" else "B"
+        println("[offline] UID=${"%08X".format(uid.toInt())}, block=$targetBlock, key=$keyTypeStr")
+
+        val attack = HardnestedAttack.offline(uid)
+        val key =
+            attack.offlineRecover(
+                nonceData = data,
+                onProgress = { msg -> println("[offline] $msg") },
+            )
+
+        if (key != null) {
+            println("[offline] SUCCESS: Key $keyTypeStr = ${"%012X".format(key)}")
+        } else {
+            println("[offline] FAILED: Could not recover key")
+        }
+        println()
     }
 }
 

@@ -90,7 +90,7 @@ tasks.register<JavaExec>("run") {
             .compilations["main"]
             .output.allOutputs
     jvmArgs(
-        "-Xmx4g",
+        "-Xmx8g",
         "-Dsun.security.smartcardio.t0GetResponse=false",
         "-Dsun.security.smartcardio.t1GetResponse=false",
         "--add-modules=java.smartcardio,jdk.incubator.vector",

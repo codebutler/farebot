@@ -31,6 +31,7 @@
 
 package com.codebutler.farebot.keymanager.crypto1
 
+import co.touchlab.kermit.Logger
 import com.codebutler.farebot.card.CardLostException
 import com.codebutler.farebot.keymanager.pn533.PN533RawClassic
 import kotlinx.coroutines.Dispatchers
@@ -47,12 +48,14 @@ import kotlin.time.TimeSource
  * Faithful port of Proxmark3's cmdhfmfhard.c.
  */
 class HardnestedAttack(
-    private val rawClassic: PN533RawClassic,
-    private val uid: UInt,
+    private val rawClassic: PN533RawClassic?,
+    val uid: UInt,
 ) {
+    private val log = Logger.withTag("HardnestedAttack")
+
     private val bruteForceEngine: BruteForceEngine =
         createBruteForceEngine().also {
-            println("[HardnestedAttack] Using brute force engine: ${it::class.simpleName}")
+            log.i { "Using brute force engine: ${it::class.simpleName}" }
         }
 
     data class NonceData(
@@ -1068,6 +1071,8 @@ class HardnestedAttack(
         onProgress: ((String) -> Unit)? = null,
         onNoncesCollected: ((ByteArray) -> Unit)? = null,
     ): Long? {
+        requireNotNull(rawClassic) { "recoverKey requires a card connection — use offlineRecover for offline mode" }
+
         // Initialize bitflip tables
         onProgress?.invoke("Loading bitflip tables...")
         val tablesAvailable = initBitflipBitarrays()
@@ -1106,7 +1111,7 @@ class HardnestedAttack(
         var consecutiveFailures = 0
 
         for (round in 0 until COLLECTION_ROUNDS) {
-            val reselected = rawClassic.hardReselectCard()
+            val reselected = rawClassic!!.hardReselectCard()
             if (!reselected) {
                 consecutiveFailures++
                 if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
@@ -1115,7 +1120,7 @@ class HardnestedAttack(
                 continue
             }
 
-            val authState = rawClassic.authenticate(knownKeyType, knownSectorBlock, knownKey)
+            val authState = rawClassic!!.authenticate(knownKeyType, knownSectorBlock, knownKey)
             if (authState == null) {
                 consecutiveFailures++
                 if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
@@ -1126,7 +1131,7 @@ class HardnestedAttack(
             consecutiveFailures = 0
 
             val result =
-                rawClassic.nestedAuth(targetKeyType, targetBlock, authState)
+                rawClassic!!.nestedAuth(targetKeyType, targetBlock, authState)
                     ?: continue
 
             numAcquiredNonces += addNonce(result.encryptedNonce, result.encryptedParity)
@@ -1220,8 +1225,108 @@ class HardnestedAttack(
         }
 
         // ---- Phase 2-3: Generate candidates and brute force ----
-        // Port of lines 2619-2672 in cmdhfmfhard.c
+        return bruteForceFromNonces(targetKeyType, targetBlock, onProgress)
+    }
 
+    /**
+     * Offline key recovery from saved nonce data.
+     *
+     * Loads serialized nonces (from [serializeNonces]), rebuilds the
+     * statistical model (bitflip tables, sum properties), then runs
+     * the Phase 2-3 brute force — no card communication required.
+     *
+     * Returns the recovered key, or null if brute force is exhausted.
+     */
+    suspend fun offlineRecover(
+        nonceData: ByteArray,
+        onProgress: ((String) -> Unit)? = null,
+    ): Long? {
+        if (nonceData.size < 6) {
+            onProgress?.invoke("Invalid nonce data (too short)")
+            return null
+        }
+
+        // Parse header to get target block/key type
+        val targetBlock = nonceData[4].toInt() and 0xFF
+        val targetKeyType = nonceData[5]
+
+        // Initialize bitflip tables
+        onProgress?.invoke("Loading bitflip tables...")
+        val tablesAvailable = initBitflipBitarrays()
+        onProgress?.invoke(
+            "  Loaded ${numEffectiveBitflips[EVEN_STATE]} even + " +
+                "${numEffectiveBitflips[ODD_STATE]} odd bitflip tables",
+        )
+
+        // Initialize sum property prior
+        val pK = FloatArray(NUM_SUMS)
+        val priors = HardnestedSumProperty.sumProbabilities()
+        for (i in 0 until NUM_SUMS) pK[i] = priors[i].toFloat()
+
+        // Benchmark brute force throughput
+        onProgress?.invoke("Running brute force benchmark...")
+        bruteForcePerSecond = bruteForceBenchmark(onProgress)
+
+        // Load nonces
+        onProgress?.invoke("Loading saved nonces...")
+        val numLoaded = deserializeNonces(nonceData, uid, targetBlock, targetKeyType)
+        if (numLoaded == null) {
+            onProgress?.invoke("Nonce data header mismatch (UID/block/keytype)")
+            return null
+        }
+        if (numLoaded == 0) {
+            onProgress?.invoke("No nonces loaded from file")
+            return null
+        }
+        onProgress?.invoke("  Loaded $numLoaded unique nonces ($firstByteNum/256 first bytes)")
+
+        if (firstByteNum != 256) {
+            onProgress?.invoke("Failed: nonce data incomplete ($firstByteNum/256 first bytes)")
+            return null
+        }
+
+        // Map firstByteSum to index
+        var gotMatch = false
+        for (i in 0 until NUM_SUMS) {
+            if (firstByteSum == SUMS[i]) {
+                firstByteSum = i
+                gotMatch = true
+                break
+            }
+        }
+        if (!gotMatch) {
+            onProgress?.invoke("No match for first_byte_Sum ($firstByteSum)")
+            return null
+        }
+        onProgress?.invoke("  Sum(a0) = ${SUMS[firstByteSum]} (index $firstByteSum)")
+
+        // Apply sum_a0 and process nonce data
+        applySumA0()
+        if (tablesAvailable) {
+            checkForBitFlipProperties()
+        }
+        updateAllBitflipsArray()
+        updateSumBitarrays(EVEN_STATE)
+        updateSumBitarrays(ODD_STATE)
+        updatePK(pK)
+        estimateSumA8(pK)
+        sortBestFirstBytes(pK)
+
+        onProgress?.invoke("Nonce processing complete — starting brute force...")
+
+        // Phase 2-3: Generate candidates and brute force
+        return bruteForceFromNonces(targetKeyType, targetBlock, onProgress)
+    }
+
+    /**
+     * Phase 2-3: Generate candidate states and brute force.
+     * Shared by both online [recoverKey] and offline [offlineRecover].
+     */
+    private suspend fun bruteForceFromNonces(
+        targetKeyType: Byte,
+        targetBlock: Int,
+        onProgress: ((String) -> Unit)?,
+    ): Long? {
         // Collect all nonces for verification
         val allNonces = mutableListOf<NonceData>()
         for (i in 0 until 256) {
@@ -1297,7 +1402,8 @@ class HardnestedAttack(
                 for ((tupleIdx, sl) in candidates.withIndex()) {
                     val pairs = sl.oddStates.size.toLong() * sl.evenStates.size.toLong()
                     onProgress?.invoke(
-                        "    Tuple ${tupleIdx + 1}/${candidates.size}: ${sl.oddStates.size} x ${sl.evenStates.size} = $pairs",
+                        "    Tuple ${tupleIdx + 1}/${candidates.size}: " +
+                            "${sl.oddStates.size} x ${sl.evenStates.size} = $pairs",
                     )
 
                     val key =
@@ -1474,6 +1580,13 @@ class HardnestedAttack(
                 val uniqueKeys = allCandidates.toSet()
                 if (uniqueKeys.isEmpty()) return@coroutineScope null
 
+                // Offline mode: no card to verify against — return first candidate
+                // (multi-nonce verification in the brute force engine is very strong)
+                if (rawClassic == null) {
+                    onProgress?.invoke("      ${uniqueKeys.size} candidate(s) (offline — no card verify)")
+                    return@coroutineScope uniqueKeys.first()
+                }
+
                 if (uniqueKeys.size > MAX_CARD_VERIFY) {
                     onProgress?.invoke("      Too many candidates (${uniqueKeys.size}) — skipping card verify")
                     return@coroutineScope null
@@ -1481,10 +1594,10 @@ class HardnestedAttack(
 
                 onProgress?.invoke("      Verifying ${uniqueKeys.size} keys with card...")
                 for (candidateKey in uniqueKeys) {
-                    val reselected = rawClassic.hardReselectCard()
+                    val reselected = rawClassic!!.hardReselectCard()
                     if (!reselected) continue
-                    val authResult = rawClassic.authenticate(targetKeyType, targetBlock, candidateKey)
-                    rawClassic.restoreNormalMode()
+                    val authResult = rawClassic!!.authenticate(targetKeyType, targetBlock, candidateKey)
+                    rawClassic!!.restoreNormalMode()
                     if (authResult != null) return@coroutineScope candidateKey
                 }
                 null
@@ -1517,17 +1630,17 @@ class HardnestedAttack(
         onProgress: ((String) -> Unit)?,
     ): Boolean {
         repeat(5) { attempt ->
-            val reselected = rawClassic.hardReselectCard()
+            val reselected = rawClassic!!.hardReselectCard()
             if (!reselected) return@repeat
 
             // Authenticate to known sector
             val authState =
-                rawClassic.authenticate(knownKeyType, knownSectorBlock, knownKey)
+                rawClassic!!.authenticate(knownKeyType, knownSectorBlock, knownKey)
                     ?: return@repeat
 
             // Nested auth to the SAME sector (same key, so we can verify)
             val result =
-                rawClassic.nestedAuth(knownKeyType, knownSectorBlock, authState)
+                rawClassic!!.nestedAuth(knownKeyType, knownSectorBlock, authState)
                     ?: return@repeat
 
             val encNonce = result.encryptedNonce
@@ -1591,6 +1704,9 @@ class HardnestedAttack(
     }
 
     companion object {
+        /** Offline mode: no card communication; loads saved nonces for brute force only. */
+        fun offline(uid: UInt) = HardnestedAttack(rawClassic = null, uid = uid)
+
         private fun formatFloat(value: Float): String {
             val intPart = value.toLong()
             val fracPart = ((value - intPart) * 1000 + 0.5).toLong()

@@ -54,7 +54,7 @@ class MetalBruteForceEngine private constructor(
     val deviceName: String,
 ) : BruteForceEngine {
     companion object {
-        private const val EVEN_CHUNK_SIZE = 100_000
+        private const val EVEN_CHUNK_SIZE = 20_000
 
         // MetalBruteForceResult struct: 4 x uint32_t = 16 bytes
         private val RESULT_STRUCT_LAYOUT: MemoryLayout =
@@ -203,15 +203,21 @@ class MetalBruteForceEngine private constructor(
         val candidates = mutableListOf<Long>()
         var totalTested = 0L
 
-        // Process even states in chunks to limit buffer sizes
-        val evenChunks = evenStates.toList().chunked(EVEN_CHUNK_SIZE)
+        // Adaptive chunk size: target ~5M parity survivors per chunk (80MB result buffer).
+        // Parity check passes ~1/16 of pairs, so we want oddCount × evenChunk / 16 ≤ 5M.
+        val maxSurvivorsPerChunk = 5_000_000L
+        val evenChunkSize =
+            (maxSurvivorsPerChunk * 16 / oddStates.size.toLong())
+                .coerceIn(100, EVEN_CHUNK_SIZE.toLong())
+                .toInt()
+        val evenChunks = evenStates.toList().chunked(evenChunkSize)
 
         for (chunk in evenChunks) {
             val chunkEvenStates = chunk.toIntArray()
 
             // 4-bit parity check passes ~1/16 of pairs; allocate 2x headroom, min 4096
             val chunkPairs = oddStates.size.toLong() * chunkEvenStates.size.toLong()
-            val maxResults = (chunkPairs / 8).coerceIn(4096, 2_000_000).toInt()
+            val maxResults = (chunkPairs / 8).coerceAtLeast(4096).toInt()
 
             Arena.ofConfined().use { arena ->
                 // Allocate off-heap buffers
