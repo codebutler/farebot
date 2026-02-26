@@ -1225,7 +1225,7 @@ class HardnestedAttack(
         }
 
         // ---- Phase 2-3: Generate candidates and brute force ----
-        return bruteForceFromNonces(targetKeyType, targetBlock, onProgress)
+        return bruteForceFromNonces(targetKeyType, targetBlock, onProgress).firstOrNull()
     }
 
     /**
@@ -1240,10 +1240,10 @@ class HardnestedAttack(
     suspend fun offlineRecover(
         nonceData: ByteArray,
         onProgress: ((String) -> Unit)? = null,
-    ): Long? {
+    ): List<Long> {
         if (nonceData.size < 6) {
             onProgress?.invoke("Invalid nonce data (too short)")
-            return null
+            return emptyList()
         }
 
         // Parse header to get target block/key type
@@ -1272,17 +1272,17 @@ class HardnestedAttack(
         val numLoaded = deserializeNonces(nonceData, uid, targetBlock, targetKeyType)
         if (numLoaded == null) {
             onProgress?.invoke("Nonce data header mismatch (UID/block/keytype)")
-            return null
+            return emptyList()
         }
         if (numLoaded == 0) {
             onProgress?.invoke("No nonces loaded from file")
-            return null
+            return emptyList()
         }
         onProgress?.invoke("  Loaded $numLoaded unique nonces ($firstByteNum/256 first bytes)")
 
         if (firstByteNum != 256) {
             onProgress?.invoke("Failed: nonce data incomplete ($firstByteNum/256 first bytes)")
-            return null
+            return emptyList()
         }
 
         // Map firstByteSum to index
@@ -1296,7 +1296,7 @@ class HardnestedAttack(
         }
         if (!gotMatch) {
             onProgress?.invoke("No match for first_byte_Sum ($firstByteSum)")
-            return null
+            return emptyList()
         }
         onProgress?.invoke("  Sum(a0) = ${SUMS[firstByteSum]} (index $firstByteSum)")
 
@@ -1319,14 +1319,16 @@ class HardnestedAttack(
     }
 
     /**
-     * Phase 2-3: Generate candidate states and brute force.
-     * Shared by both online [recoverKey] and offline [offlineRecover].
+     * Phase 2-3: brute force from collected nonces.
+     *
+     * In online mode (rawClassic != null), returns a single verified key or null.
+     * In offline mode, returns all candidate keys that survive full nonce verification.
      */
     private suspend fun bruteForceFromNonces(
         targetKeyType: Byte,
         targetBlock: Int,
         onProgress: ((String) -> Unit)?,
-    ): Long? {
+    ): List<Long> {
         // Collect all nonces for verification
         val allNonces = mutableListOf<NonceData>()
         for (i in 0 until 256) {
@@ -1345,29 +1347,37 @@ class HardnestedAttack(
             onProgress?.invoke("  Best bitflip byte: 0x${bestFirstByteSmallestBitarray.toString(16).padStart(2, '0')}")
             onProgress?.invoke("  Expected brute force: ${expectedBruteForce1.toLong()}")
 
-            val candidates = addBitflipCandidates(bestFirstByteSmallestBitarray)
+            val tuples = addBitflipCandidates(bestFirstByteSmallestBitarray)
             var totalStates = 0L
-            for (sl in candidates) {
+            for (sl in tuples) {
                 totalStates += sl.oddStates.size.toLong() * sl.evenStates.size.toLong()
             }
             onProgress?.invoke("  $totalStates candidate pairs")
 
-            for (sl in candidates) {
-                val key =
+            val allKeys = mutableListOf<Long>()
+            for (sl in tuples) {
+                val keys =
                     bruteForceStateList(
                         sl.oddStates,
                         sl.evenStates,
                         bestFirstByteSmallestBitarray,
                         allNonces,
-                        targetKeyType,
-                        targetBlock,
                         onProgress,
                     )
-                if (key != null) {
-                    onProgress?.invoke("Key recovered: 0x${key.toString(16).padStart(12, '0')}")
-                    return key
+                if (keys.isNotEmpty()) {
+                    // Online mode: card-verify immediately
+                    if (rawClassic != null) {
+                        val verified = cardVerifyKeys(keys, targetKeyType, targetBlock, onProgress)
+                        if (verified != null) {
+                            onProgress?.invoke("Key recovered: 0x${verified.toString(16).padStart(12, '0')}")
+                            return listOf(verified)
+                        }
+                    } else {
+                        allKeys.addAll(keys)
+                    }
                 }
             }
+            return allKeys
         } else {
             // Sum-property approach
             val bestByte = bestFirstBytes[0]
@@ -1399,6 +1409,7 @@ class HardnestedAttack(
                 if (totalStates == 0L) continue
 
                 // Brute force each tuple
+                val allKeys = mutableListOf<Long>()
                 for ((tupleIdx, sl) in candidates.withIndex()) {
                     val pairs = sl.oddStates.size.toLong() * sl.evenStates.size.toLong()
                     onProgress?.invoke(
@@ -1406,21 +1417,28 @@ class HardnestedAttack(
                             "${sl.oddStates.size} x ${sl.evenStates.size} = $pairs",
                     )
 
-                    val key =
+                    val keys =
                         bruteForceStateList(
                             sl.oddStates,
                             sl.evenStates,
                             bestFirstBytes[0],
                             allNonces,
-                            targetKeyType,
-                            targetBlock,
                             onProgress,
                         )
-                    if (key != null) {
-                        onProgress?.invoke("Key recovered: 0x${key.toString(16).padStart(12, '0')}")
-                        return key
+                    if (keys.isNotEmpty()) {
+                        if (rawClassic != null) {
+                            val verified = cardVerifyKeys(keys, targetKeyType, targetBlock, onProgress)
+                            if (verified != null) {
+                                onProgress?.invoke("Key recovered: 0x${verified.toString(16).padStart(12, '0')}")
+                                return listOf(verified)
+                            }
+                        } else {
+                            allKeys.addAll(keys)
+                        }
                     }
                 }
+
+                if (allKeys.isNotEmpty()) return allKeys
 
                 // Failed with this sum_a8 guess — zero it out and try next
                 guess.prob = 0f
@@ -1430,7 +1448,7 @@ class HardnestedAttack(
         }
 
         onProgress?.invoke("Hardnested attack failed: exhausted all sum_a8 guesses")
-        return null
+        return emptyList()
     }
 
     /**
@@ -1487,15 +1505,20 @@ class HardnestedAttack(
 
     // ---- Brute force ----
 
+    /**
+     * Brute force a single (oddStates, evenStates) tuple.
+     *
+     * Returns all candidate keys that survive GPU parity check + multi-nonce verification.
+     * In offline mode all nonces are used for verification; in online mode only a sample of 8.
+     * Card verification (if needed) is done by the caller.
+     */
     private suspend fun bruteForceStateList(
         oddStates: IntArray,
         evenStates: IntArray,
         bestFirstByte: Int,
         nonces: List<NonceData>,
-        targetKeyType: Byte,
-        targetBlock: Int,
         onProgress: ((String) -> Unit)?,
-    ): Long? {
+    ): List<Long> {
         val primaryNonce = nonces[0]
 
         val encBytes =
@@ -1517,11 +1540,17 @@ class HardnestedAttack(
         // We roll back 1 encrypted byte to recover the initial key state.
         val rollbackInput = ((uid shr 24).toInt() and 0xFF) xor bestFirstByte
 
+        // Offline mode: use ALL nonces for verification since we can't card-verify.
+        // Online mode: sample 8 evenly-spaced nonces (GPU already checks parity for the primary).
         val verifyNonces =
-            nonces
-                .drop(1)
-                .filterIndexed { idx, _ -> idx % (nonces.size / VERIFY_NONCE_COUNT).coerceAtLeast(1) == 0 }
-                .take(VERIFY_NONCE_COUNT)
+            if (rawClassic == null) {
+                nonces.drop(1)
+            } else {
+                nonces
+                    .drop(1)
+                    .filterIndexed { idx, _ -> idx % (nonces.size / VERIFY_NONCE_COUNT).coerceAtLeast(1) == 0 }
+                    .take(VERIFY_NONCE_COUNT)
+            }
 
         val chunkSize = maxOf(1, oddStates.size / NUM_PARALLEL_CHUNKS)
         val chunks =
@@ -1532,78 +1561,80 @@ class HardnestedAttack(
         var testedTotal = 0L
         val mark = TimeSource.Monotonic.markNow()
 
-        val result =
-            coroutineScope {
-                val deferreds =
-                    chunks.map { range ->
-                        async(Dispatchers.Default) {
-                            val chunkOddStates = oddStates.copyOfRange(range.first, range.last + 1)
-                            val verifyState = Crypto1State()
-                            val candidates =
-                                bruteForceEngine.bruteForce(
-                                    oddStates = chunkOddStates,
-                                    evenStates = evenStates,
-                                    rollbackInput = rollbackInput,
-                                    inputBytes = inputBytes,
-                                    encBytes = encBytes,
-                                    encParBits = encParBits,
-                                    verifyFn = { candidateKey ->
-                                        verifyNonces.all { vn ->
-                                            verifyKeyWithNonce(
-                                                candidateKey,
-                                                vn.encryptedNonce,
-                                                vn.encryptedParity,
-                                                verifyState,
-                                            )
-                                        }
-                                    },
-                                    onProgress = null,
-                                )
-                            val tested = chunkOddStates.size.toLong() * evenStates.size.toLong()
-                            tested to candidates
-                        }
+        return coroutineScope {
+            val deferreds =
+                chunks.map { range ->
+                    async(Dispatchers.Default) {
+                        val chunkOddStates = oddStates.copyOfRange(range.first, range.last + 1)
+                        val verifyState = Crypto1State()
+                        val candidates =
+                            bruteForceEngine.bruteForce(
+                                oddStates = chunkOddStates,
+                                evenStates = evenStates,
+                                rollbackInput = rollbackInput,
+                                inputBytes = inputBytes,
+                                encBytes = encBytes,
+                                encParBits = encParBits,
+                                verifyFn = { candidateKey ->
+                                    verifyNonces.all { vn ->
+                                        verifyKeyWithNonce(
+                                            candidateKey,
+                                            vn.encryptedNonce,
+                                            vn.encryptedParity,
+                                            verifyState,
+                                        )
+                                    }
+                                },
+                                onProgress = null,
+                            )
+                        val tested = chunkOddStates.size.toLong() * evenStates.size.toLong()
+                        tested to candidates
                     }
-
-                val allCandidates = mutableListOf<Long>()
-                for ((chunkIdx, deferred) in deferreds.withIndex()) {
-                    val (tested, candidates) = deferred.await()
-                    testedTotal += tested
-                    allCandidates.addAll(candidates)
-
-                    val elapsed = mark.elapsedNow().inWholeMilliseconds / 1000.0
-                    val rate = if (elapsed > 0) (testedTotal / elapsed / 1_000_000).toLong() else 0
-                    onProgress?.invoke(
-                        "      [${chunkIdx + 1}/${chunks.size}] $testedTotal pairs (${rate}M/s), ${allCandidates.size} candidates",
-                    )
                 }
 
-                val uniqueKeys = allCandidates.toSet()
-                if (uniqueKeys.isEmpty()) return@coroutineScope null
+            val allCandidates = mutableListOf<Long>()
+            for ((chunkIdx, deferred) in deferreds.withIndex()) {
+                val (tested, candidates) = deferred.await()
+                testedTotal += tested
+                allCandidates.addAll(candidates)
 
-                // Offline mode: no card to verify against — return first candidate
-                // (multi-nonce verification in the brute force engine is very strong)
-                if (rawClassic == null) {
-                    onProgress?.invoke("      ${uniqueKeys.size} candidate(s) (offline — no card verify)")
-                    return@coroutineScope uniqueKeys.first()
-                }
-
-                if (uniqueKeys.size > MAX_CARD_VERIFY) {
-                    onProgress?.invoke("      Too many candidates (${uniqueKeys.size}) — skipping card verify")
-                    return@coroutineScope null
-                }
-
-                onProgress?.invoke("      Verifying ${uniqueKeys.size} keys with card...")
-                for (candidateKey in uniqueKeys) {
-                    val reselected = rawClassic!!.hardReselectCard()
-                    if (!reselected) continue
-                    val authResult = rawClassic!!.authenticate(targetKeyType, targetBlock, candidateKey)
-                    rawClassic!!.restoreNormalMode()
-                    if (authResult != null) return@coroutineScope candidateKey
-                }
-                null
+                val elapsed = mark.elapsedNow().inWholeMilliseconds / 1000.0
+                val rate = if (elapsed > 0) (testedTotal / elapsed / 1_000_000).toLong() else 0
+                onProgress?.invoke(
+                    "      [${chunkIdx + 1}/${chunks.size}] $testedTotal pairs (${rate}M/s), ${allCandidates.size} candidates",
+                )
             }
 
-        return result
+            allCandidates.map { it }.distinct()
+        }
+    }
+
+    /**
+     * Verify a list of candidate keys against the card.
+     * Returns the first key that successfully authenticates, or null.
+     */
+    private suspend fun cardVerifyKeys(
+        candidates: List<Long>,
+        targetKeyType: Byte,
+        targetBlock: Int,
+        onProgress: ((String) -> Unit)?,
+    ): Long? {
+        val rc = rawClassic ?: return null
+
+        if (candidates.size > MAX_CARD_VERIFY) {
+            onProgress?.invoke("      Too many candidates (${candidates.size}) — skipping card verify")
+            return null
+        }
+
+        onProgress?.invoke("      Verifying ${candidates.size} keys with card...")
+        for (candidateKey in candidates) {
+            val reselected = rc.hardReselectCard()
+            if (!reselected) continue
+            val authResult = rc.authenticate(targetKeyType, targetBlock, candidateKey)
+            rc.restoreNormalMode()
+            if (authResult != null) return candidateKey
+        }
+        return null
     }
 
     /**
