@@ -50,6 +50,8 @@ class HardnestedAttack(
     private val rawClassic: PN533RawClassic,
     private val uid: UInt,
 ) {
+    private val bruteForceEngine: BruteForceEngine = createBruteForceEngine()
+
     data class NonceData(
         val encryptedNonce: UInt,
         val encryptedParity: Int,
@@ -1426,62 +1428,29 @@ class HardnestedAttack(
                 val deferreds =
                     chunks.map { range ->
                         async(Dispatchers.Default) {
-                            var tested = 0L
-                            val candidates = mutableListOf<Long>()
-                            val state = Crypto1State()
+                            val chunkOddStates = oddStates.copyOfRange(range.first, range.last + 1)
                             val verifyState = Crypto1State()
-
-                            for (oi in range) {
-                                val oddState = oddStates[oi].toUInt()
-                                for (evenState in evenStates) {
-                                    tested++
-
-                                    // Candidates are post-byte-0 states (from sum property filtering).
-                                    // Roll back 1 byte to recover the initial key state before
-                                    // processing uid^encNonce. Port of Proxmark3's verify_key() which
-                                    // calls lfsr_rollback_byte(&pcs, (cuid>>24)^best_first_bytes[0], true).
-                                    state.odd = oddState
-                                    state.even = evenState.toUInt()
-                                    state.lfsrRollbackByte(rollbackInput, true)
-
-                                    // Now state is at the initial key state. Process uid^encNonce
-                                    // and check parity (same as original).
-                                    var parityOk = true
-                                    for (byteIdx in 0 until 4) {
-                                        val ksByte = state.lfsrByte(inputBytes[byteIdx], true)
-                                        val ksPar = Crypto1.filter(state.odd)
-                                        val plainByte = encBytes[byteIdx] xor ksByte
-                                        val expectedEncPar = Crypto1Auth.oddParity(plainByte) xor ksPar
-                                        if (expectedEncPar != encParBits[byteIdx]) {
-                                            parityOk = false
-                                            break
-                                        }
-                                    }
-                                    if (!parityOk) continue
-
-                                    // Roll back again to extract the key from the initial state.
-                                    state.odd = oddState
-                                    state.even = evenState.toUInt()
-                                    state.lfsrRollbackByte(rollbackInput, true)
-                                    val candidateKey = state.getKey()
-
-                                    var allNoncesPass = true
-                                    for (vn in verifyNonces) {
-                                        if (!verifyKeyWithNonce(
+                            val candidates =
+                                bruteForceEngine.bruteForce(
+                                    oddStates = chunkOddStates,
+                                    evenStates = evenStates,
+                                    rollbackInput = rollbackInput,
+                                    inputBytes = inputBytes,
+                                    encBytes = encBytes,
+                                    encParBits = encParBits,
+                                    verifyFn = { candidateKey ->
+                                        verifyNonces.all { vn ->
+                                            verifyKeyWithNonce(
                                                 candidateKey,
                                                 vn.encryptedNonce,
                                                 vn.encryptedParity,
                                                 verifyState,
                                             )
-                                        ) {
-                                            allNoncesPass = false
-                                            break
                                         }
-                                    }
-                                    if (!allNoncesPass) continue
-                                    candidates.add(candidateKey)
-                                }
-                            }
+                                    },
+                                    onProgress = null,
+                                )
+                            val tested = chunkOddStates.size.toLong() * evenStates.size.toLong()
                             tested to candidates
                         }
                     }
