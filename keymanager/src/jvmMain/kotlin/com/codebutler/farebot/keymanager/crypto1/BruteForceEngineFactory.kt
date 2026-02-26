@@ -4,8 +4,7 @@
  * Copyright 2026 Eric Butler <eric@codebutler.com>
  *
  * JVM actual implementation of createBruteForceEngine().
- * Returns SimdBruteForceEngine (Vector API) with fallback to
- * ScalarBruteForceEngine if the Vector API is not available.
+ * Cascade: Metal GPU → SIMD (Vector API) → Scalar fallback.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +22,27 @@
 
 package com.codebutler.farebot.keymanager.crypto1
 
-actual fun createBruteForceEngine(): BruteForceEngine =
-    try {
-        SimdBruteForceEngine()
-    } catch (_: Throwable) {
-        // Fall back to scalar if Vector API is not available (e.g., missing --add-modules)
-        ScalarBruteForceEngine()
+import co.touchlab.kermit.Logger
+
+private val log = Logger.withTag("BruteForceEngine")
+
+actual fun createBruteForceEngine(): BruteForceEngine {
+    // 1. Try Metal GPU (macOS only)
+    MetalBruteForceEngine.create()?.let {
+        log.i { "Using Metal GPU: ${it.deviceName}" }
+        return it
     }
+    // 2. Try SIMD (Vector API)
+    try {
+        val simd = SimdBruteForceEngine()
+        log.i { "Using SIMD (Vector API)" }
+        return simd
+    } catch (_: Throwable) {
+        // Vector API not available
+    }
+    // 3. Scalar fallback
+    log.i { "Using scalar engine" }
+    return ScalarBruteForceEngine()
+}
 
 actual fun availableProcessors(): Int = Runtime.getRuntime().availableProcessors()
