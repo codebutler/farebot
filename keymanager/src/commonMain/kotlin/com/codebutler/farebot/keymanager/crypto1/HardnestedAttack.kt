@@ -38,6 +38,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlin.math.exp
 import kotlin.math.ln
+import kotlin.math.log2
 import kotlin.time.TimeSource
 
 /**
@@ -828,6 +829,20 @@ class HardnestedAttack(
     /** Byte with smallest product of odd*even state counts. */
     private var bestFirstByteSmallestBitarray = 0
 
+    // ---- Adaptive termination state (port of Proxmark3 reduction rate tracking) ----
+
+    /** Sliding window of brute force estimates for linear regression. */
+    private val reductionQueue = FloatArray(QUEUE_LEN) { (1L shl 48).toFloat() }
+
+    /** Measured brute force throughput (state pairs per second). */
+    private var bruteForcePerSecond: Float = DEFAULT_BRUTE_FORCE_RATE
+
+    /** Time between consecutive shrink_key_space checks (ms), refined downward. */
+    private var samplePeriodMs: Long = 2000
+
+    /** Mark for measuring sample period. */
+    private var lastSampleMark: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
+
     /**
      * Find the first byte with smallest bitflip bitarray product.
      * Port of check_smallest_bitflip_bitarrays() lines 1033-1051.
@@ -865,6 +880,178 @@ class HardnestedAttack(
         }
     }
 
+    // ---- Adaptive termination (port of update_reduction_rate + brute_force_benchmark) ----
+
+    /**
+     * Port of update_reduction_rate() from cmdhfmfhard.c lines 1161-1200.
+     * Uses linear regression on a sliding window of the last [QUEUE_LEN] brute force estimates
+     * to compute how fast the key space is shrinking per sample period.
+     *
+     * Returns the negative slope: positive means key space is shrinking, negative means growing.
+     */
+    private fun updateReductionRate(
+        lastBruteForce: Float,
+        init: Boolean,
+    ): Float {
+        if (init) {
+            reductionQueue.fill((1L shl 48).toFloat())
+            return 0f
+        }
+
+        // Shift queue left, append new value
+        for (i in 0 until QUEUE_LEN - 1) {
+            reductionQueue[i] = reductionQueue[i + 1]
+        }
+        reductionQueue[QUEUE_LEN - 1] = lastBruteForce
+
+        // Linear regression: compute negative slope
+        var avgX = 0f
+        var avgY = 0f
+        for (i in 0 until QUEUE_LEN) {
+            avgX += i
+            avgY += reductionQueue[i]
+        }
+        avgX /= QUEUE_LEN
+        avgY /= QUEUE_LEN
+
+        var devXY = 0f
+        var devX2 = 0f
+        for (i in 0 until QUEUE_LEN) {
+            devXY += (i - avgX) * (reductionQueue[i] - avgY)
+            devX2 += (i - avgX) * (i - avgX)
+        }
+
+        return -devXY / devX2 // negative slope = reduction rate
+    }
+
+    /**
+     * Benchmark the brute force inner loop to measure throughput on this device.
+     *
+     * Port of brute_force_benchmark() from hardnested_bruteforce.c lines 485-523.
+     * Instead of reading benchmark data files, we generate synthetic states and
+     * time the parity-check inner loop.
+     */
+    private suspend fun bruteForceBenchmark(onProgress: ((String) -> Unit)?): Float {
+        val benchSize = BENCH_SIZE
+        val oddStates = IntArray(benchSize) { it * 3 } // synthetic odd states
+        val evenStates = IntArray(benchSize) { it * 5 } // synthetic even states
+
+        val mark = TimeSource.Monotonic.markNow()
+
+        // Run the parity-check inner loop (same code path as real brute force)
+        var tested = 0L
+        val state = Crypto1State()
+        for (oi in oddStates.indices) {
+            val oddState = oddStates[oi].toUInt()
+            for (evenState in evenStates) {
+                state.odd = oddState
+                state.even = evenState.toUInt()
+                state.lfsrRollbackByte(0, true)
+                // Just the parity check loop body cost
+                for (byteIdx in 0 until 4) {
+                    state.lfsrByte(0, true)
+                    Crypto1.filter(state.odd)
+                }
+                tested++
+            }
+        }
+
+        val elapsedMs = mark.elapsedNow().inWholeMilliseconds
+        if (elapsedMs <= 0) {
+            onProgress?.invoke(
+                "  Brute force benchmark: too fast to measure, using default ${(DEFAULT_BRUTE_FORCE_RATE / 1_000_000).toLong()}M/s",
+            )
+            return DEFAULT_BRUTE_FORCE_RATE
+        }
+
+        val rate = tested.toFloat() / (elapsedMs / 1000f)
+        onProgress?.invoke(
+            "  Brute force benchmark: ${(rate / 1_000_000).toLong()}M (2^${formatFloat(log2(rate))}) keys/s",
+        )
+        return rate
+    }
+
+    /**
+     * Serialize collected nonces to a byte array for persistence.
+     *
+     * Format:
+     *   [4 bytes] uid (UInt, big-endian)
+     *   [1 byte]  target block number
+     *   [1 byte]  target key type
+     *   [5 bytes × N] nonces:
+     *     [4 bytes] nt_enc (UInt, big-endian)
+     *     [1 byte]  par_enc (4-bit parity in low nibble)
+     */
+    fun serializeNonces(
+        targetBlock: Int,
+        targetKeyType: Byte,
+    ): ByteArray {
+        var totalEntries = 0
+        for (i in 0 until 256) {
+            totalEntries += nonceLists[i].entries.size
+        }
+
+        val buf = ByteArray(6 + 5 * totalEntries)
+        // Header: uid (4 bytes BE) + targetBlock (1 byte) + targetKeyType (1 byte)
+        buf[0] = (uid shr 24).toByte()
+        buf[1] = (uid shr 16).toByte()
+        buf[2] = (uid shr 8).toByte()
+        buf[3] = uid.toByte()
+        buf[4] = targetBlock.toByte()
+        buf[5] = targetKeyType
+
+        var offset = 6
+        for (i in 0 until 256) {
+            for (entry in nonceLists[i].entries) {
+                buf[offset++] = (entry.nonceEnc shr 24).toByte()
+                buf[offset++] = (entry.nonceEnc shr 16).toByte()
+                buf[offset++] = (entry.nonceEnc shr 8).toByte()
+                buf[offset++] = entry.nonceEnc.toByte()
+                buf[offset++] = (entry.parEnc and 0x0F).toByte()
+            }
+        }
+        return buf
+    }
+
+    /**
+     * Deserialize nonces from a byte array and replay them via [addNonce].
+     * Returns the number of unique nonces loaded, or null if the header doesn't match.
+     */
+    fun deserializeNonces(
+        data: ByteArray,
+        expectedUid: UInt,
+        expectedBlock: Int,
+        expectedKeyType: Byte,
+    ): Int? {
+        if (data.size < 6) return null
+
+        val fileUid =
+            ((data[0].toInt() and 0xFF).toUInt() shl 24) or
+                ((data[1].toInt() and 0xFF).toUInt() shl 16) or
+                ((data[2].toInt() and 0xFF).toUInt() shl 8) or
+                (data[3].toInt() and 0xFF).toUInt()
+        val fileBlock = data[4].toInt() and 0xFF
+        val fileKeyType = data[5]
+
+        if (fileUid != expectedUid || fileBlock != expectedBlock || fileKeyType != expectedKeyType) {
+            return null
+        }
+
+        var numLoaded = 0
+        var offset = 6
+        while (offset + 5 <= data.size) {
+            val ntEnc =
+                ((data[offset].toInt() and 0xFF).toUInt() shl 24) or
+                    ((data[offset + 1].toInt() and 0xFF).toUInt() shl 16) or
+                    ((data[offset + 2].toInt() and 0xFF).toUInt() shl 8) or
+                    (data[offset + 3].toInt() and 0xFF).toUInt()
+            val parEnc = data[offset + 4].toInt() and 0x0F
+            numLoaded += addNonce(ntEnc, parEnc)
+            offset += 5
+        }
+        return numLoaded
+    }
+
     // ---- Main attack flow ----
 
     suspend fun recoverKey(
@@ -874,6 +1061,7 @@ class HardnestedAttack(
         targetKeyType: Byte,
         targetBlock: Int,
         onProgress: ((String) -> Unit)? = null,
+        onNoncesCollected: ((ByteArray) -> Unit)? = null,
     ): Long? {
         // Initialize bitflip tables
         onProgress?.invoke("Loading bitflip tables...")
@@ -895,6 +1083,15 @@ class HardnestedAttack(
             return null
         }
         onProgress?.invoke("  Parity self-test PASSED")
+
+        // ---- Benchmark brute force throughput (port of line 2432) ----
+        onProgress?.invoke("Running brute force benchmark...")
+        bruteForcePerSecond = bruteForceBenchmark(onProgress)
+
+        // Initialize reduction rate tracker (port of line 2571)
+        updateReductionRate(0f, init = true)
+        samplePeriodMs = 2000
+        lastSampleMark = TimeSource.Monotonic.markNow()
 
         // ---- Phase 1: Collect encrypted nonces ----
         onProgress?.invoke("Phase 1: Collecting nonces...")
@@ -975,18 +1172,31 @@ class HardnestedAttack(
                 val bf1 = checkSmallestBitflipBitarrays()
                 val bf2 = if (sumA0Applied) sortBestFirstBytes(pK) else (1L shl 47).toFloat()
                 val bf = minOf(bf1, bf2)
-                onProgress?.invoke("  [$numAcquiredNonces nonces] bf=${bf.toLong()}")
 
-                if (bf < BRUTE_FORCE_THRESHOLD) {
-                    onProgress?.invoke("  State space ${bf.toLong()} below threshold — proceeding to brute force")
-                    break
-                }
+                val reductionRate = updateReductionRate(bf, init = false)
+                val bruteForcePerSample = bruteForcePerSecond * samplePeriodMs / 1000f
 
-                // After collecting enough nonces, proceed to brute force regardless.
-                // The allBitflipsMatch() filter during candidate generation reduces
-                // the actual state space well below the bitarray-based estimate.
-                if (sumA0Applied && numAcquiredNonces >= MAX_NONCES_BEFORE_BRUTE_FORCE) {
-                    onProgress?.invoke("  Collected $numAcquiredNonces nonces — proceeding to brute force")
+                // Update sample period: refine downward (port of lines 1744-1745)
+                val elapsed = lastSampleMark.elapsedNow().inWholeMilliseconds
+                if (elapsed < samplePeriodMs) samplePeriodMs = elapsed
+                lastSampleMark = TimeSource.Monotonic.markNow()
+
+                onProgress?.invoke(
+                    "  [$numAcquiredNonces nonces] bf=${bf.toLong()}, " +
+                        "reduction=${reductionRate.toLong()}/sample, " +
+                        "bf/sample=${bruteForcePerSample.toLong()}",
+                )
+
+                // Port of shrink_key_space() return condition (lines 1216-1218):
+                // Stop collecting when the key space is shrinking slower than brute force
+                // could test, OR when the absolute threshold is reached.
+                val acquisitionComplete =
+                    sumA0Applied &&
+                        reductionRate >= 0f &&
+                        (reductionRate < bruteForcePerSample || bf < BRUTE_FORCE_THRESHOLD)
+
+                if (acquisitionComplete) {
+                    onProgress?.invoke("  Acquisition complete — proceeding to brute force (bf=${bf.toLong()})")
                     break
                 }
             }
@@ -995,6 +1205,13 @@ class HardnestedAttack(
         if (!sumA0Applied) {
             onProgress?.invoke("Failed: did not observe all 256 first bytes ($firstByteNum/256)")
             return null
+        }
+
+        // ---- Save nonces for offline restart (port of nonce_file_write) ----
+        if (onNoncesCollected != null) {
+            val nonceData = serializeNonces(targetBlock, targetKeyType)
+            onNoncesCollected.invoke(nonceData)
+            onProgress?.invoke("  Saved ${(nonceData.size - 6) / 5} nonces for offline restart")
         }
 
         // ---- Phase 2-3: Generate candidates and brute force ----
@@ -1424,6 +1641,8 @@ class HardnestedAttack(
         const val NUM_PARALLEL_CHUNKS = 8
         const val SHRINK_CHECK_INTERVAL = 100
         const val BRUTE_FORCE_THRESHOLD = 0xF00000.toFloat() // Proxmark3's fixed termination threshold
-        const val MAX_NONCES_BEFORE_BRUTE_FORCE = 4000
+        const val QUEUE_LEN = 4 // sliding window size for reduction rate regression
+        const val DEFAULT_BRUTE_FORCE_RATE = 34_000_000f // fallback if benchmark fails (based on hardware tests)
+        const val BENCH_SIZE = 6000 // number of odd/even states for benchmark (matches Proxmark3 TEST_BENCH_SIZE)
     }
 }
