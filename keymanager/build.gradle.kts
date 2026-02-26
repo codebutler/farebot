@@ -42,3 +42,13 @@ kotlin {
         }
     }
 }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.add("-Xadd-modules=jdk.incubator.vector")
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    jvmArgs("--add-modules=jdk.incubator.vector")
+}

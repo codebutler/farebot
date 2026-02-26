@@ -23,7 +23,7 @@ kotlin {
 
 tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>("compileKotlinJvm") {
     compilerOptions {
-        freeCompilerArgs.add("-Xadd-modules=java.smartcardio")
+        freeCompilerArgs.add("-Xadd-modules=java.smartcardio,jdk.incubator.vector")
     }
 }
 
@@ -93,7 +93,7 @@ tasks.register<JavaExec>("run") {
         "-Xmx4g",
         "-Dsun.security.smartcardio.t0GetResponse=false",
         "-Dsun.security.smartcardio.t1GetResponse=false",
-        "--add-modules=java.smartcardio",
+        "--add-modules=java.smartcardio,jdk.incubator.vector",
         "--enable-native-access=ALL-UNNAMED",
     )
 }
