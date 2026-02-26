@@ -4,8 +4,8 @@
  * Copyright 2026 Eric Butler <eric@codebutler.com>
  *
  * JVM actual implementation of createBruteForceEngine().
- * Returns ScalarBruteForceEngine for now; will be replaced with
- * SimdBruteForceEngine (Vector API) in a later task.
+ * Returns SimdBruteForceEngine (Vector API) with fallback to
+ * ScalarBruteForceEngine if the Vector API is not available.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,4 +23,10 @@
 
 package com.codebutler.farebot.keymanager.crypto1
 
-actual fun createBruteForceEngine(): BruteForceEngine = ScalarBruteForceEngine()
+actual fun createBruteForceEngine(): BruteForceEngine =
+    try {
+        SimdBruteForceEngine()
+    } catch (_: Throwable) {
+        // Fall back to scalar if Vector API is not available (e.g., missing --add-modules)
+        ScalarBruteForceEngine()
+    }
