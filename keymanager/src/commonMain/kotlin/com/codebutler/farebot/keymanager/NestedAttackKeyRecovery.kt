@@ -37,6 +37,12 @@ class NestedAttackKeyRecovery : ClassicKeyRecovery {
     /** Once true RNG is detected, skip standard nested attack for subsequent sectors. */
     private var cardHasTrueRng = false
 
+    /**
+     * Optional callback invoked after hardnested nonce collection completes.
+     * Receives (sectorIndex, serialized nonce data) so the caller can persist to disk.
+     */
+    var onNoncesCollected: ((sectorIndex: Int, data: ByteArray) -> Unit)? = null
+
     override suspend fun attemptRecovery(
         tech: PN533ClassicTechnology,
         sectorIndex: Int,
@@ -85,6 +91,7 @@ class NestedAttackKeyRecovery : ClassicKeyRecovery {
 
         // Fall back to hardnested attack
         val hardnested = HardnestedAttack(rawClassic, tech.uidAsUInt)
+        val nonceSaver = onNoncesCollected
         val recoveredKey =
             hardnested.recoverKey(
                 knownKeyType = knownKeyType,
@@ -93,6 +100,12 @@ class NestedAttackKeyRecovery : ClassicKeyRecovery {
                 targetKeyType = 0x60,
                 targetBlock = targetBlock,
                 onProgress = onProgress,
+                onNoncesCollected =
+                    if (nonceSaver != null) {
+                        { data -> nonceSaver(sectorIndex, data) }
+                    } else {
+                        null
+                    },
             )
 
         // Reset PN533 to normal mode and reselect card after the attack.

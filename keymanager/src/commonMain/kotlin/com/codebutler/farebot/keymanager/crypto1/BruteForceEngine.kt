@@ -137,3 +137,6 @@ class ScalarBruteForceEngine : BruteForceEngine {
  * On all other platforms, returns [ScalarBruteForceEngine].
  */
 expect fun createBruteForceEngine(): BruteForceEngine
+
+/** Returns the number of available processors on the current platform. */
+expect fun availableProcessors(): Int

@@ -35,6 +35,7 @@ import com.codebutler.farebot.card.nfc.pn533.PN533CardInfo
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
+import com.codebutler.farebot.keymanager.NestedAttackKeyRecovery
 import com.codebutler.farebot.persist.db.FareBotDb
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
@@ -162,6 +163,17 @@ private suspend fun readCard(
         val cardKeys = keyManager.getCardKeysForTag(tagIdHex)
         val globalKeys = keyManager.getGlobalKeys()
         val keyRecovery = if (recover) keyManager.classicKeyRecovery else null
+
+        // Wire up nonce persistence for hardnested offline restart
+        if (keyRecovery is NestedAttackKeyRecovery) {
+            val noncesDir = File(System.getProperty("user.home"), ".farebot/nonces").apply { mkdirs() }
+            val uidHex = tagId.hex()
+            keyRecovery.onNoncesCollected = { sectorIndex, data ->
+                val file = File(noncesDir, "$uidHex-sector%02d.bin".format(sectorIndex))
+                file.writeBytes(data)
+                println("[cli] Saved ${data.size} bytes of nonce data to ${file.name}")
+            }
+        }
 
         println("[cli] Reading card${if (recover) " (with key recovery)" else ""}...")
         if (cardKeys != null) {

@@ -22,3 +22,5 @@
 package com.codebutler.farebot.keymanager.crypto1
 
 actual fun createBruteForceEngine(): BruteForceEngine = ScalarBruteForceEngine()
+
+actual fun availableProcessors(): Int = Runtime.getRuntime().availableProcessors()

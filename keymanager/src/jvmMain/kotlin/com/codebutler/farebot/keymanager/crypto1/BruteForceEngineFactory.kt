@@ -30,3 +30,5 @@ actual fun createBruteForceEngine(): BruteForceEngine =
         // Fall back to scalar if Vector API is not available (e.g., missing --add-modules)
         ScalarBruteForceEngine()
     }
+
+actual fun availableProcessors(): Int = Runtime.getRuntime().availableProcessors()

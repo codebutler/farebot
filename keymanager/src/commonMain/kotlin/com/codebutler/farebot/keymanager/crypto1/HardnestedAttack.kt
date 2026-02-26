@@ -50,7 +50,10 @@ class HardnestedAttack(
     private val rawClassic: PN533RawClassic,
     private val uid: UInt,
 ) {
-    private val bruteForceEngine: BruteForceEngine = createBruteForceEngine()
+    private val bruteForceEngine: BruteForceEngine =
+        createBruteForceEngine().also {
+            println("[HardnestedAttack] Using brute force engine: ${it::class.simpleName}")
+        }
 
     data class NonceData(
         val encryptedNonce: UInt,
@@ -1607,7 +1610,7 @@ class HardnestedAttack(
         const val MAX_CONSECUTIVE_FAILURES = 5
         const val MAX_CARD_VERIFY = 5_000
         const val VERIFY_NONCE_COUNT = 8
-        const val NUM_PARALLEL_CHUNKS = 8
+        val NUM_PARALLEL_CHUNKS = availableProcessors().coerceAtLeast(1)
         const val SHRINK_CHECK_INTERVAL = 100
         const val BRUTE_FORCE_THRESHOLD = 0xF00000.toFloat() // Proxmark3's fixed termination threshold
         const val QUEUE_LEN = 4 // sliding window size for reduction rate regression
