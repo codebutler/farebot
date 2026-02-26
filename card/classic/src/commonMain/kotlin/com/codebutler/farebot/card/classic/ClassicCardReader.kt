@@ -227,7 +227,7 @@ object ClassicCardReader {
                     recoveredKeys.isNotEmpty()
                 ) {
                     onProgress?.invoke(sectorIndex, sectorCount)
-                    val recovered = keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys, onProgress)
+                    val recovered = keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys, null)
                     if (recovered != null) {
                         val (keyBytes, recoveredIsKeyA) = recovered
                         authSuccess =
