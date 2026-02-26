@@ -612,7 +612,7 @@ object SimdBitslice {
         for (laneIdx in lanes.indices) {
             var bits = lanes[laneIdx]
             while (bits != 0L) {
-                val bitPos = java.lang.Long.numberOfTrailingZeros(bits)
+                val bitPos = bits.countTrailingZeroBits()
                 result.add(laneIdx * 64 + bitPos)
                 bits = bits and (bits - 1) // clear lowest set bit
             }
