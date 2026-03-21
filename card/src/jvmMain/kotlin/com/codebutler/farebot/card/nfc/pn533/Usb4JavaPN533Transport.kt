@@ -233,6 +233,5 @@ class Usb4JavaPN533Transport(
                 0xFF.toByte(),
                 0x00,
             )
-
     }
 }

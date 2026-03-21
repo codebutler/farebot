@@ -36,7 +36,11 @@ import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533Device
 import com.codebutler.farebot.card.nfc.pn533.PN533Exception
 import com.codebutler.farebot.keymanager.NestedAttackKeyRecovery
+import com.codebutler.farebot.keymanager.crypto1.BruteForceEngine
 import com.codebutler.farebot.keymanager.crypto1.HardnestedAttack
+import com.codebutler.farebot.keymanager.crypto1.MetalBruteForceEngine
+import com.codebutler.farebot.keymanager.crypto1.ScalarBruteForceEngine
+import com.codebutler.farebot.keymanager.crypto1.SimdBruteForceEngine
 import com.codebutler.farebot.persist.db.FareBotDb
 import com.codebutler.farebot.shared.serialize.FareBotSerializersModule
 import com.codebutler.farebot.shared.transit.TransitFactoryRegistry
@@ -47,6 +51,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.Properties
+import kotlin.time.TimeSource
 
 /**
  * Preload the bundled libusb before usb4java initializes.
@@ -80,9 +85,15 @@ fun main(args: Array<String>) {
     val recover = args.contains("--recover")
     val offline = args.contains("--offline")
     val verify = args.contains("--verify")
+    val benchmark = args.contains("--benchmark")
 
     if (offline) {
         runBlocking { offlineRecover() }
+        return
+    }
+
+    if (benchmark) {
+        runBlocking { benchmarkEngines() }
         return
     }
 
@@ -230,6 +241,9 @@ private suspend fun readCard(
     }
 }
 
+/** Convert a block number to sector index, accounting for 4K large sectors. */
+private fun blockToSector(block: Int): Int = if (block < 128) block / 4 else 32 + (block - 128) / 16
+
 /**
  * Offline hardnested key recovery from saved nonce files in ~/.farebot/nonces/.
  *
@@ -283,7 +297,7 @@ private suspend fun offlineRecover() {
         val targetBlock = data[4].toInt() and 0xFF
         val targetKeyType = data[5]
         val keyTypeStr = if (targetKeyType == 0x60.toByte()) "A" else "B"
-        val sectorIndex = targetBlock / 4
+        val sectorIndex = blockToSector(targetBlock)
         println(
             "[offline] UID=${"%08X".format(uid.toInt())}, block=$targetBlock (sector $sectorIndex), key=$keyTypeStr",
         )
@@ -325,6 +339,174 @@ private suspend fun offlineRecover() {
     candidatesFile.writeText(json.encodeToString(allResults))
     println("[offline] Saved candidates to ${candidatesFile.absolutePath}")
     println("[offline] Run with --verify to test candidates against the card")
+}
+
+/**
+ * Benchmark all available brute force engines against stored nonces.
+ *
+ * Runs each engine (Scalar, SIMD, Metal) on every nonce file, times each recovery,
+ * and writes a comparison table to ~/.farebot/nonces/benchmark.txt.
+ */
+private suspend fun benchmarkEngines() {
+    val noncesDir = File(System.getProperty("user.home"), ".farebot/nonces")
+    if (!noncesDir.exists() || !noncesDir.isDirectory) {
+        println("[benchmark] No nonces directory found at ${noncesDir.absolutePath}")
+        return
+    }
+
+    val nonceFiles =
+        noncesDir
+            .listFiles { f -> f.extension == "bin" }
+            ?.sortedBy { it.name }
+            ?: emptyList()
+
+    if (nonceFiles.isEmpty()) {
+        println("[benchmark] No .bin nonce files found")
+        return
+    }
+
+    // Build list of available engines
+    val engines = mutableListOf<Pair<String, BruteForceEngine>>()
+    engines.add("Scalar" to ScalarBruteForceEngine())
+    try {
+        engines.add("SIMD" to SimdBruteForceEngine())
+    } catch (_: Throwable) {
+        println("[benchmark] SIMD engine not available (Vector API missing)")
+    }
+    MetalBruteForceEngine.create()?.let { metal ->
+        engines.add("Metal (${metal.deviceName})" to metal)
+    } ?: println("[benchmark] Metal engine not available")
+
+    println("[benchmark] Engines: ${engines.map { it.first }.joinToString(", ")}")
+    println("[benchmark] Nonce files: ${nonceFiles.size}")
+    println()
+
+    // Results: engine name -> sector label -> time in seconds
+    val results = mutableMapOf<String, MutableMap<String, Double>>()
+    val recoveredKeys = mutableMapOf<String, MutableMap<String, String>>()
+    for ((engineName, _) in engines) {
+        results[engineName] = mutableMapOf()
+        recoveredKeys[engineName] = mutableMapOf()
+    }
+
+    for (nonceFile in nonceFiles) {
+        val data = nonceFile.readBytes()
+        if (data.size < 6) continue
+
+        val uid =
+            ((data[0].toInt() and 0xFF).toUInt() shl 24) or
+                ((data[1].toInt() and 0xFF).toUInt() shl 16) or
+                ((data[2].toInt() and 0xFF).toUInt() shl 8) or
+                (data[3].toInt() and 0xFF).toUInt()
+        val targetBlock = data[4].toInt() and 0xFF
+        val targetKeyType = data[5]
+        val keyTypeStr = if (targetKeyType == 0x60.toByte()) "A" else "B"
+        val sectorIndex = blockToSector(targetBlock)
+        val sectorLabel = "sector${sectorIndex}_$keyTypeStr"
+
+        for ((engineName, engine) in engines) {
+            println("--- $sectorLabel with $engineName ---")
+            val attack = HardnestedAttack.offline(uid, engine)
+            val clock = TimeSource.Monotonic
+            val start = clock.markNow()
+            val candidates =
+                attack.offlineRecover(
+                    nonceData = data,
+                    onProgress = { msg -> println("  $msg") },
+                )
+            val elapsed = start.elapsedNow()
+            val elapsedSec = elapsed.inWholeMilliseconds / 1000.0
+
+            results[engineName]!![sectorLabel] = elapsedSec
+            if (candidates.isNotEmpty()) {
+                recoveredKeys[engineName]!![sectorLabel] = "%012X".format(candidates.first())
+            } else {
+                recoveredKeys[engineName]!![sectorLabel] = "FAILED"
+            }
+
+            println("  Result: ${recoveredKeys[engineName]!![sectorLabel]} in %.1fs".format(elapsedSec))
+            println()
+        }
+    }
+
+    // Build comparison table
+    val allSectors =
+        results.values
+            .flatMap { it.keys }
+            .toSortedSet()
+            .toList()
+    val engineNames = engines.map { it.first }
+
+    val sb = StringBuilder()
+    sb.appendLine("Hardnested Brute Force Engine Benchmark")
+    sb.appendLine("=".repeat(80))
+    sb.appendLine("Date: ${java.time.LocalDateTime.now()}")
+    sb.appendLine("Nonce files: ${nonceFiles.size}")
+    sb.appendLine("Engines: ${engineNames.joinToString(", ")}")
+    sb.appendLine()
+
+    // Header
+    val sectorColWidth = 16
+    val engineColWidth = 14
+    sb.append("%-${sectorColWidth}s".format("Sector"))
+    for (name in engineNames) {
+        sb.append("  %-${engineColWidth}s".format(name))
+    }
+    sb.appendLine("  Key")
+    sb.appendLine("-".repeat(sectorColWidth + (engineColWidth + 2) * engineNames.size + 16))
+
+    // Data rows
+    for (sector in allSectors) {
+        sb.append("%-${sectorColWidth}s".format(sector))
+        for (name in engineNames) {
+            val time = results[name]?.get(sector)
+            if (time != null) {
+                sb.append("  %$engineColWidth.1fs".format(time))
+            } else {
+                sb.append("  %${engineColWidth}s".format("N/A"))
+            }
+        }
+        // Show key (should be same across all engines)
+        val key = recoveredKeys.values.firstNotNullOfOrNull { it[sector] } ?: "?"
+        sb.appendLine("  $key")
+    }
+
+    // Totals
+    sb.appendLine("-".repeat(sectorColWidth + (engineColWidth + 2) * engineNames.size + 16))
+    sb.append("%-${sectorColWidth}s".format("TOTAL"))
+    for (name in engineNames) {
+        val total = results[name]?.values?.sum() ?: 0.0
+        sb.append("  %$engineColWidth.1fs".format(total))
+    }
+    sb.appendLine()
+
+    // Averages
+    sb.append("%-${sectorColWidth}s".format("AVERAGE"))
+    for (name in engineNames) {
+        val times = results[name]?.values ?: emptyList()
+        val avg = if (times.isNotEmpty()) times.sum() / times.size else 0.0
+        sb.append("  %$engineColWidth.1fs".format(avg))
+    }
+    sb.appendLine()
+
+    // Speedup relative to Scalar
+    val scalarTotal = results["Scalar"]?.values?.sum() ?: 1.0
+    sb.appendLine()
+    sb.append("%-${sectorColWidth}s".format("Speedup"))
+    for (name in engineNames) {
+        val total = results[name]?.values?.sum() ?: 1.0
+        sb.append("  %$engineColWidth.1fx".format(scalarTotal / total))
+    }
+    sb.appendLine()
+
+    val tableStr = sb.toString()
+    println()
+    println(tableStr)
+
+    // Write to file
+    val benchmarkFile = File(noncesDir, "benchmark.txt")
+    benchmarkFile.writeText(tableStr)
+    println("[benchmark] Results saved to ${benchmarkFile.absolutePath}")
 }
 
 /**

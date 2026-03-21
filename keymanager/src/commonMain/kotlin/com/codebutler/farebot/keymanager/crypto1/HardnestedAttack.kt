@@ -50,11 +50,12 @@ import kotlin.time.TimeSource
 class HardnestedAttack(
     private val rawClassic: PN533RawClassic?,
     val uid: UInt,
+    bruteForceEngineOverride: BruteForceEngine? = null,
 ) {
     private val log = Logger.withTag("HardnestedAttack")
 
     private val bruteForceEngine: BruteForceEngine =
-        createBruteForceEngine().also {
+        (bruteForceEngineOverride ?: createBruteForceEngine()).also {
             log.i { "Using brute force engine: ${it::class.simpleName}" }
         }
 
@@ -1263,9 +1264,8 @@ class HardnestedAttack(
         val priors = HardnestedSumProperty.sumProbabilities()
         for (i in 0 until NUM_SUMS) pK[i] = priors[i].toFloat()
 
-        // Benchmark brute force throughput
-        onProgress?.invoke("Running brute force benchmark...")
-        bruteForcePerSecond = bruteForceBenchmark(onProgress)
+        // Skip brute force benchmark in offline mode — it's only used during online
+        // nonce collection to estimate when to stop. Saves ~15s of scalar benchmark time.
 
         // Load nonces
         onProgress?.invoke("Loading saved nonces...")
@@ -1736,7 +1736,10 @@ class HardnestedAttack(
 
     companion object {
         /** Offline mode: no card communication; loads saved nonces for brute force only. */
-        fun offline(uid: UInt) = HardnestedAttack(rawClassic = null, uid = uid)
+        fun offline(
+            uid: UInt,
+            bruteForceEngine: BruteForceEngine? = null,
+        ) = HardnestedAttack(rawClassic = null, uid = uid, bruteForceEngineOverride = bruteForceEngine)
 
         private fun formatFloat(value: Float): String {
             val intPart = value.toLong()
