@@ -224,6 +224,49 @@ Some MIFARE Classic cards require encryption keys to read. You can obtain keys u
 * Oyster
 * And most other MIFARE Classic-based cards
 
+## Built-in Key Recovery
+
+FareBot includes a built-in [hardnested attack](https://eprint.iacr.org/2015/1468) implementation (ported from [Proxmark3](https://github.com/RfidResearchGroup/proxmark3)) that can recover MIFARE Classic encryption keys without external tools. This works on all MIFARE Classic variants, including EV1 cards with hardened (true) random number generators.
+
+### Brute Force Engines
+
+The hardnested attack's brute force phase supports three backends, automatically selected in order of performance:
+
+| Engine | Platform | Speed | Description |
+|--------|----------|-------|-------------|
+| **Metal GPU** | macOS (Apple Silicon / AMD) | ~5x vs scalar | Apple Metal compute shader via Panama FFM |
+| **SIMD** | JVM (any OS) | ~2.4x vs scalar | JDK Vector API with bitsliced Crypto1 state |
+| **Scalar** | All platforms | Baseline | Portable reference implementation |
+
+Engine selection is automatic — the fastest available engine is used. On macOS with Apple Silicon, the Metal GPU engine processes ~250M state pairs/second.
+
+### Platform Support
+
+| Platform | Key Recovery | Engines Available |
+|----------|-------------|-------------------|
+| macOS (desktop) | Yes | Metal GPU, SIMD, Scalar |
+| Linux (desktop) | Yes | SIMD, Scalar |
+| Web | Yes | Scalar |
+| Android | No | N/A (uses Android NFC stack) |
+| iOS | No | N/A (no MIFARE Classic support) |
+
+Key recovery requires a PN533-based USB NFC reader (desktop/web) for raw Crypto1 command access.
+
+## CLI Tool
+
+A JVM command-line interface is available for advanced NFC operations:
+
+```bash
+./gradlew :app:cli:run                           # Scan and read cards
+./gradlew :app:cli:run --args="--recover"         # Recover MIFARE Classic keys
+./gradlew :app:cli:run --args="--benchmark"       # Benchmark brute force engines
+```
+
+The CLI supports:
+- **Key recovery** (`--recover`) — runs the hardnested attack against a MIFARE Classic card, saving nonces to `~/.farebot/nonces/` for offline recovery
+- **Benchmarking** (`--benchmark`) — compares all three brute force engines against saved nonces
+- **Offline recovery** — reprocesses saved nonces without a card present
+
 ## Flipper Zero Integration
 
 FareBot supports connecting to a [Flipper Zero](https://flipperzero.one/) to browse and import NFC card dumps and MIFARE Classic key dictionaries.
@@ -274,14 +317,17 @@ A [development container](.devcontainer/README.md) is available for sandboxed de
 - `base/` — Core utilities, MDST reader, ByteArray extensions
 - `card/` — Shared card abstractions
 - `card/*/` — Card protocol implementations (classic, desfire, felica, etc.)
+- `keymanager/` — Crypto1 key recovery: nested attack, hardnested attack, brute force engines
 - `transit/` — Shared transit abstractions (Trip, Station, TransitInfo, etc.)
 - `transit/*/` — Transit system implementations (one per system)
 - `flipper/` — Flipper Zero integration (RPC client, transport abstractions, parsers)
 - `app/` — KMP app framework (UI, ViewModels, DI, platform code)
 - `app/android/` — Android app shell (Activities, manifest, resources)
-- `app/ios/` — iOS app shell (Swift entry point, assets, config)
+- `app/cli/` — JVM command-line tool for NFC readers and key recovery
 - `app/desktop/` — macOS desktop app (experimental, PC/SC + PN533 + RC-S956 USB NFC)
+- `app/ios/` — iOS app shell (Swift entry point, assets, config)
 - `app/web/` — Web app (experimental, WebAssembly via Kotlin/Wasm)
+- `app-keymanager/` — Key management UI: key store, recovery screens, add-key flow
 
 ## License
 
