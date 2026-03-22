@@ -355,4 +355,126 @@ class MetalBruteForceTest {
                 metal.destroy()
             }
         }
+
+    /**
+     * Verify that MetalBruteForceEngine.verifyKeys() produces the same
+     * results as the CPU default (ScalarBruteForceEngine.verifyKeys()).
+     *
+     * Generates synthetic nonces for a known key by running the full
+     * Crypto1 LFSR, then checks that:
+     * - Both engines agree on which keys pass
+     * - The correct key passes verification
+     * - Wrong keys are rejected
+     */
+    @Test
+    fun testMetalVerifyKeysMatchesCpu() {
+        val metal =
+            MetalBruteForceEngine.create() ?: run {
+                println("Metal unavailable, skipping test")
+                return
+            }
+
+        try {
+            val key = 0x0A0B0C0D0E0FL
+            val uid = 0xB7164F30u
+
+            // Generate 8 synthetic nonces from the known key
+            val rng = Random(123)
+            val nonces = mutableListOf<VerifyNonceData>()
+
+            for (n in 0 until 8) {
+                val nonce = rng.nextInt().toUInt()
+
+                // Compute encrypted nonce: load key, clock uid^nonce, XOR nonce
+                val encState = Crypto1State()
+                encState.loadKey(key)
+                val ksWord = encState.lfsrWord(uid xor nonce, false)
+                val encNonce = nonce xor ksWord
+
+                // Compute encrypted parity using the same method as verifyKeyWithNonceCpu:
+                // load key, then clock through uid^encNonce with isEncrypted=true,
+                // checking parity at each 8-bit byte boundary.
+                val parState = Crypto1State()
+                parState.loadKey(key)
+                val uidXorEnc = uid xor encNonce
+
+                var encParity = 0
+                for (byteIdx in 0 until 4) {
+                    var ksByteVal = 0
+                    for (bitIdx in 0 until 8) {
+                        val i = byteIdx * 8 + bitIdx
+                        val inputBit = Crypto1.bebit(uidXorEnc, i).toInt()
+                        val ksBit = parState.lfsrBit(inputBit, true)
+                        ksByteVal = ksByteVal or (ksBit shl bitIdx)
+                    }
+                    val ksPar = Crypto1.filter(parState.odd)
+                    val encByte = ((encNonce shr ((3 - byteIdx) * 8)) and 0xFFu).toInt()
+                    val plainByte = encByte xor ksByteVal
+                    val parBit = Crypto1Auth.oddParity(plainByte) xor ksPar
+                    encParity = encParity or (parBit shl (3 - byteIdx))
+                }
+
+                nonces.add(VerifyNonceData(encNonce, encParity))
+            }
+
+            // Candidate keys: the correct key + several wrong keys
+            val candidateKeys =
+                listOf(
+                    key, // correct
+                    0xAABBCCDDEEFFL, // wrong
+                    0x112233445566L, // wrong
+                    0x000000000000L, // wrong
+                    0xFFFFFFFFFFFFL, // wrong
+                    0x0A0B0C0D0E00L, // off by one byte — wrong
+                )
+
+            // Run Metal GPU verification
+            val metalResults = metal.verifyKeys(candidateKeys, nonces, uid)
+
+            // Run CPU verification
+            val cpuResults = ScalarBruteForceEngine().verifyKeys(candidateKeys, nonces, uid)
+
+            println("Metal verifyKeys returned: $metalResults")
+            println("CPU   verifyKeys returned: $cpuResults")
+
+            // Both engines must return the same set of keys
+            assertEquals(
+                cpuResults.toSet(),
+                metalResults.toSet(),
+                "Metal and CPU verifyKeys results differ: " +
+                    "metal=$metalResults, cpu=$cpuResults",
+            )
+
+            // The correct key must pass
+            assertTrue(
+                key in metalResults,
+                "Correct key 0x${key.toString(16)} not found in Metal results: $metalResults",
+            )
+            assertTrue(
+                key in cpuResults,
+                "Correct key 0x${key.toString(16)} not found in CPU results: $cpuResults",
+            )
+
+            // Wrong keys must not pass
+            val wrongKeys = candidateKeys.filter { it != key }
+            for (wrongKey in wrongKeys) {
+                assertTrue(
+                    wrongKey !in metalResults,
+                    "Wrong key 0x${wrongKey.toString(16)} should not be in Metal results",
+                )
+                assertTrue(
+                    wrongKey !in cpuResults,
+                    "Wrong key 0x${wrongKey.toString(16)} should not be in CPU results",
+                )
+            }
+
+            println(
+                "testMetalVerifyKeysMatchesCpu PASSED: " +
+                    "${nonces.size} nonces, ${candidateKeys.size} candidates, " +
+                    "${metalResults.size} passed (Metal), ${cpuResults.size} passed (CPU)",
+            )
+        } finally {
+            metal.destroy()
+        }
+    }
 }

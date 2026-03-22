@@ -75,6 +75,31 @@ int32_t metal_brute_force(
 );
 
 /**
+ * Verify candidate keys against collected nonces on the GPU.
+ *
+ * Each candidate key is tested against ALL nonces. For each key,
+ * the Crypto1 LFSR is initialized from the 48-bit key, then
+ * the uid^encNonce is clocked through and parity is checked for
+ * all 4 bytes. A key passes only if all nonces produce correct parity.
+ *
+ * @param ctx             Metal context from metal_create().
+ * @param candidate_keys  Packed [key_lo, key_hi] uint32 pairs (2 × key_count entries).
+ * @param key_count       Number of candidate keys.
+ * @param nonces          Packed [enc_nonce, enc_parity] uint32 pairs (2 × nonce_count entries).
+ * @param nonce_count     Number of nonces to verify against.
+ * @param uid             Card UID.
+ * @param result_flags    Output: 1 if key passed all nonces, 0 otherwise (key_count entries).
+ * @return Number of keys that passed verification.
+ */
+int32_t metal_verify_keys(
+    MetalContext ctx,
+    const uint32_t* candidate_keys, int32_t key_count,
+    const uint32_t* nonces, int32_t nonce_count,
+    uint32_t uid,
+    uint32_t* result_flags
+);
+
+/**
  * Get the name of the Metal GPU device.
  *
  * @param ctx Metal context.

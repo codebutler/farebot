@@ -145,6 +145,51 @@ inline void get_key(uint odd, uint even, thread uint &key_lo, thread uint &key_h
     key_hi = (uint)(lfsr >> 32);
 }
 
+// --- Load 48-bit key into LFSR halves (port of Crypto1State.loadKey()) ---
+// Key is provided as (key_lo: lower 32 bits, key_hi: upper 16 bits).
+// Splits key into odd/even 24-bit halves using bit64(key, (i-1)^7) and bit64(key, i^7).
+inline void load_key(ulong key, thread uint &odd, thread uint &even) {
+    odd = 0;
+    even = 0;
+    int i = 47;
+    while (i > 0) {
+        odd  = (odd  << 1) | (uint)((key >> ((i - 1) ^ 7)) & 1ul);
+        even = (even << 1) | (uint)((key >> (i ^ 7)) & 1ul);
+        i -= 2;
+    }
+}
+
+// --- Nonce data layout ---
+// For each nonce: [enc_nonce (uint32), enc_parity (uint32)]
+// enc_parity is 4-bit parity packed in low nibble.
+
+// --- Verify a single candidate key against one nonce ---
+// Returns true if the key produces matching parity for all 4 bytes.
+// Port of HardnestedAttack.verifyKeyWithNonce().
+inline bool verify_key_single_nonce(ulong key, uint uid, uint enc_nonce, uint enc_parity) {
+    uint odd, even;
+    load_key(key, odd, even);
+
+    uint uid_xor_enc = uid ^ enc_nonce;
+
+    for (int byte_idx = 0; byte_idx < 4; byte_idx++) {
+        int input_byte = (uid_xor_enc >> ((3 - byte_idx) * 8)) & 0xFF;
+        int enc_byte = (enc_nonce >> ((3 - byte_idx) * 8)) & 0xFF;
+
+        uint ks_byte = lfsr_forward_byte(odd, even, input_byte, true);
+        uint ks_par = crypto1_filter(odd);
+
+        uint plain_byte = enc_byte ^ ks_byte;
+        uint expected_par = odd_parity8(plain_byte) ^ ks_par;
+        uint enc_par_bit = (enc_parity >> (3 - byte_idx)) & 1u;
+
+        if (expected_par != enc_par_bit) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // --- Params layout ---
 // params[0]  = rollback_input
 // params[1..4]  = input_bytes[0..3]
@@ -205,4 +250,46 @@ kernel void brute_force_parity(
         results[idx].key_lo     = key_lo;
         results[idx].key_hi     = key_hi;
     }
+}
+
+// ==========================================================================
+// verify_key_nonces: Verify candidate keys against all collected nonces.
+//
+// Each thread takes one candidate key and verifies it against ALL nonces.
+// A key passes only if it produces correct parity for every nonce.
+//
+// Input buffers:
+//   buffer(0): candidate_keys - packed as [key_lo, key_hi] uint32 pairs
+//   buffer(1): nonces         - packed as [enc_nonce, enc_parity] uint32 pairs
+//   buffer(2): params         - [uid (uint32), nonce_count (uint32)]
+//   buffer(3): result_flags   - output: 1 if key passed, 0 if failed (one per key)
+// ==========================================================================
+
+kernel void verify_key_nonces(
+    device const uint*  candidate_keys  [[buffer(0)]],
+    device const uint*  nonces          [[buffer(1)]],
+    constant uint*      params          [[buffer(2)]],
+    device uint*        result_flags    [[buffer(3)]],
+    uint                gid             [[thread_position_in_grid]]
+) {
+    uint uid = params[0];
+    uint nonce_count = params[1];
+
+    // Load candidate key from packed [key_lo, key_hi] pair
+    uint key_lo = candidate_keys[gid * 2];
+    uint key_hi = candidate_keys[gid * 2 + 1];
+    ulong key = ((ulong)key_hi << 32) | (ulong)key_lo;
+
+    // Verify against all nonces
+    for (uint n = 0; n < nonce_count; n++) {
+        uint enc_nonce  = nonces[n * 2];
+        uint enc_parity = nonces[n * 2 + 1];
+
+        if (!verify_key_single_nonce(key, uid, enc_nonce, enc_parity)) {
+            result_flags[gid] = 0;
+            return;
+        }
+    }
+
+    result_flags[gid] = 1;
 }

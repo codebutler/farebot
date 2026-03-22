@@ -1382,4 +1382,274 @@ class HardnestedTest {
 
         assertEquals(targetKey, recoveredKey, "Key extracted after rollback should match target key")
     }
+
+    // ---- verifyKeyWithNonceCpu / verifyKeys tests ----
+
+    @Test
+    fun testVerifyKeyWithNonceCpuMatchesReference() {
+        val correctKey = 0x0A0B0C0D0E0FL
+        val uid = 0xB7164F30u
+
+        // Generate 5 synthetic nonces with known plaintext values
+        val nonceValues = listOf(0xCAFEBABEu, 0xDEADBEEFu, 0x12345678u, 0xA5A5A5A5u, 0x01020304u)
+
+        data class SyntheticNonce(
+            val encNonce: UInt,
+            val encParity: Int,
+        )
+
+        // For each nonce, compute the encrypted nonce and encrypted parity
+        // using the same approach as testVerifyKeyWithNonceConsistency
+        val syntheticNonces =
+            nonceValues.map { nT ->
+                // Generate encrypted nonce: load key, clock through uid^nT
+                val cardState = Crypto1State()
+                cardState.loadKey(correctKey)
+                val ksWord = cardState.lfsrWord(uid xor nT, false)
+                val encNonce = nT xor ksWord
+
+                // Generate encrypted parity using byte-level clocking
+                val parState = Crypto1State()
+                parState.loadKey(correctKey)
+                var encParity = 0
+                for (byteIdx in 0 until 4) {
+                    parState.lfsrByte(
+                        ((uid xor nT).toInt() shr ((3 - byteIdx) * 8)) and 0xFF,
+                        false,
+                    )
+                    val ksPar = Crypto1.filter(parState.odd)
+                    val plainByte = ((nT shr ((3 - byteIdx) * 8)) and 0xFFu).toInt()
+                    encParity = encParity or ((Crypto1Auth.oddParity(plainByte) xor ksPar) shl (3 - byteIdx))
+                }
+
+                SyntheticNonce(encNonce, encParity)
+            }
+
+        // Verify that verifyKeyWithNonceCpu returns true for the correct key on each nonce
+        val state = Crypto1State()
+        for ((idx, sn) in syntheticNonces.withIndex()) {
+            val result = verifyKeyWithNonceCpu(correctKey, sn.encNonce, sn.encParity, uid, state)
+            assertTrue(result, "verifyKeyWithNonceCpu should return true for correct key on nonce $idx")
+        }
+
+        // Wrong keys may pass individual nonce parity checks (4-bit parity → 1/16 false positive rate),
+        // but should fail when verified against ALL nonces together via verifyKeys().
+        val wrongKeys =
+            listOf(
+                0xFFFFFFFFFFFF,
+                0x000000000000L,
+                0x0A0B0C0D0E0EL, // off by 1 bit
+                0xA0A1A2A3A4A5L,
+            )
+
+        // Also test ScalarBruteForceEngine.verifyKeys() which wraps verifyKeyWithNonceCpu
+        val verifyNonceData =
+            syntheticNonces.map { sn ->
+                VerifyNonceData(sn.encNonce, sn.encParity)
+            }
+
+        val allKeys = listOf(correctKey) + wrongKeys
+        val survivors = ScalarBruteForceEngine().verifyKeys(allKeys, verifyNonceData, uid)
+
+        assertEquals(1, survivors.size, "Only the correct key should survive verifyKeys")
+        assertEquals(correctKey, survivors[0], "The surviving key should be the correct key")
+    }
+
+    // ---- Parallel filtering correctness tests ----
+
+    /**
+     * Verify that the chunk-and-merge parallel filtering strategy used by
+     * HardnestedAttack.filterStatesParallel() produces identical results
+     * to sequential filtering.
+     *
+     * filterStatesParallel() is private, so we replicate its algorithm here:
+     *   1. Collect all set bit indices from a StateBitarray
+     *   2. Apply a deterministic filter predicate to each state
+     *   3. Compare: sequential filtering vs chunked filtering with merge
+     *
+     * This catches ordering bugs, off-by-one in chunk boundaries, and
+     * dropped/duplicated states from the chunk-merge pattern.
+     */
+    @Test
+    fun testParallelFilteringMatchesSequential() {
+        // Build a StateBitarray with well over PARALLEL_FILTER_THRESHOLD (1000) set bits.
+        // Use a deterministic pattern: set every 4th bit in a range, giving 4096 set bits.
+        val bitarray = StateBitarray()
+        for (i in 0 until 16384 step 4) {
+            bitarray.set(i)
+        }
+        val totalSet = bitarray.popcount()
+        assertEquals(4096, totalSet, "Should have 4096 set bits")
+
+        // Collect all set bit indices (same as filterStatesParallel step 1)
+        val allStates = mutableListOf<Int>()
+        bitarray.forEachSet { state -> allStates.add(state) }
+        assertEquals(totalSet, allStates.size, "forEachSet should yield all set bits")
+
+        // Define a deterministic filter predicate that accepts ~50% of states.
+        // Uses bit manipulation matching the kind of filtering allBitflipsMatch does.
+        val predicate: (Int) -> Boolean = { state ->
+            // Accept states where bit 3 XOR bit 7 XOR bit 11 equals 1
+            val bit3 = (state shr 3) and 1
+            val bit7 = (state shr 7) and 1
+            val bit11 = (state shr 11) and 1
+            (bit3 xor bit7 xor bit11) == 1
+        }
+
+        // Sequential filtering (reference result)
+        val sequentialResult = allStates.filter(predicate).toIntArray()
+
+        // Chunked filtering (mirrors filterStatesParallel's parallel path)
+        val numChunks = 4 // simulate multi-core
+        val chunkSize = (allStates.size + numChunks - 1) / numChunks
+        val chunkedResult = mutableListOf<Int>()
+        for (start in 0 until allStates.size step chunkSize) {
+            val end = minOf(start + chunkSize, allStates.size)
+            // Each chunk filters independently (as coroutines would)
+            val chunkFiltered = mutableListOf<Int>()
+            for (idx in start until end) {
+                val state = allStates[idx]
+                if (predicate(state)) {
+                    chunkFiltered.add(state)
+                }
+            }
+            // Merge in order (as filterStatesParallel does with sequential await)
+            chunkedResult.addAll(chunkFiltered)
+        }
+        val chunkedArray = chunkedResult.toIntArray()
+
+        // Verify identical results
+        assertTrue(sequentialResult.isNotEmpty(), "Filter should accept some states")
+        assertTrue(sequentialResult.size > 100, "Filter should accept a substantial number of states")
+        assertEquals(
+            sequentialResult.size,
+            chunkedArray.size,
+            "Chunked filtering should produce same count as sequential",
+        )
+        assertTrue(
+            sequentialResult.contentEquals(chunkedArray),
+            "Chunked filtering should produce identical results to sequential " +
+                "(sequential=${sequentialResult.size}, chunked=${chunkedArray.size})",
+        )
+    }
+
+    /**
+     * Verify chunked filtering correctness at chunk boundaries.
+     *
+     * Tests edge cases: state counts that don't divide evenly into chunks,
+     * very small chunks (1 element), and the transition between sequential
+     * and parallel paths at the PARALLEL_FILTER_THRESHOLD boundary.
+     */
+    @Test
+    fun testChunkedFilteringBoundaryConditions() {
+        // Test with exactly PARALLEL_FILTER_THRESHOLD states (boundary case)
+        val threshold = 1000
+        val bitarray = StateBitarray()
+        // Set exactly 'threshold' bits using a prime step to avoid alignment
+        var count = 0
+        var idx = 0
+        while (count < threshold) {
+            bitarray.set(idx)
+            count++
+            idx += 7 // prime step avoids power-of-2 alignment artifacts
+        }
+        assertEquals(threshold, bitarray.popcount())
+
+        val allStates = mutableListOf<Int>()
+        bitarray.forEachSet { state -> allStates.add(state) }
+        assertEquals(threshold, allStates.size)
+
+        // Filter: accept states where the state value mod 3 != 0
+        val predicate: (Int) -> Boolean = { state -> state % 3 != 0 }
+
+        val sequentialResult = allStates.filter(predicate).toIntArray()
+
+        // Test with various chunk counts including odd divisors
+        for (numChunks in listOf(1, 2, 3, 7, 13, 64, threshold)) {
+            val chunkSize = (allStates.size + numChunks - 1) / numChunks
+            val chunkedResult = mutableListOf<Int>()
+            for (start in 0 until allStates.size step chunkSize) {
+                val end = minOf(start + chunkSize, allStates.size)
+                for (i in start until end) {
+                    if (predicate(allStates[i])) {
+                        chunkedResult.add(allStates[i])
+                    }
+                }
+            }
+            assertTrue(
+                sequentialResult.contentEquals(chunkedResult.toIntArray()),
+                "Chunked filtering with $numChunks chunks should match sequential " +
+                    "(expected ${sequentialResult.size}, got ${chunkedResult.size})",
+            )
+        }
+    }
+
+    /**
+     * Verify that chunked filtering preserves state ordering.
+     *
+     * filterStatesParallel() awaits deferred results in chunk order (not
+     * completion order), so the output must be in the same order as sequential
+     * iteration over the bitarray. This test specifically checks ordering.
+     */
+    @Test
+    fun testChunkedFilteringPreservesOrdering() {
+        // Create a bitarray with states at irregular positions
+        val bitarray = StateBitarray()
+        val positions = mutableListOf<Int>()
+        // Use a pseudo-random but deterministic pattern
+        var pos = 17
+        for (i in 0 until 2000) {
+            bitarray.set(pos)
+            positions.add(pos)
+            pos = (pos * 31 + 97) % (1 shl 24) // LCG for deterministic pseudo-random positions
+        }
+
+        val allStates = mutableListOf<Int>()
+        bitarray.forEachSet { state -> allStates.add(state) }
+
+        // forEachSet iterates in ascending bit order, not insertion order
+        // Verify this property (which filterStatesParallel relies on)
+        for (i in 1 until allStates.size) {
+            assertTrue(
+                allStates[i] > allStates[i - 1],
+                "forEachSet should yield states in ascending order",
+            )
+        }
+
+        // Accept ~half the states with a deterministic predicate
+        val predicate: (Int) -> Boolean = { state -> (state and 0x100) != 0 }
+
+        val sequentialResult = allStates.filter(predicate)
+
+        // Chunk into 8 parts and merge
+        val numChunks = 8
+        val chunkSize = (allStates.size + numChunks - 1) / numChunks
+        val chunkedResult = mutableListOf<Int>()
+        for (start in 0 until allStates.size step chunkSize) {
+            val end = minOf(start + chunkSize, allStates.size)
+            for (i in start until end) {
+                if (predicate(allStates[i])) {
+                    chunkedResult.add(allStates[i])
+                }
+            }
+        }
+
+        // Verify same order
+        assertEquals(sequentialResult.size, chunkedResult.size)
+        for (i in sequentialResult.indices) {
+            assertEquals(
+                sequentialResult[i],
+                chunkedResult[i],
+                "State at position $i should match: sequential=${sequentialResult[i]}, chunked=${chunkedResult[i]}",
+            )
+        }
+
+        // Verify ascending order is preserved
+        for (i in 1 until chunkedResult.size) {
+            assertTrue(
+                chunkedResult[i] > chunkedResult[i - 1],
+                "Chunked result should maintain ascending order at position $i",
+            )
+        }
+    }
 }

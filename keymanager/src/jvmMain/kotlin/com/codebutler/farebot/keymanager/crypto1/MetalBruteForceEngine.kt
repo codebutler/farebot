@@ -50,9 +50,12 @@ private val log = Logger.withTag("MetalBruteForceEngine")
 class MetalBruteForceEngine private constructor(
     private val metalContext: MemorySegment,
     private val metalBruteForceHandle: MethodHandle,
+    private val metalVerifyKeysHandle: MethodHandle?,
     private val metalDestroyHandle: MethodHandle,
     val deviceName: String,
 ) : BruteForceEngine {
+    override val name: String = "Metal GPU: $deviceName"
+
     companion object {
         private const val EVEN_CHUNK_SIZE = 20_000
 
@@ -148,6 +151,27 @@ class MetalBruteForceEngine private constructor(
                         ),
                     )
 
+                // metal_verify_keys(...) -> int32
+                val verifyKeysHandle =
+                    try {
+                        linker.downcallHandle(
+                            lookup.find("metal_verify_keys").orElseThrow(),
+                            FunctionDescriptor.of(
+                                ValueLayout.JAVA_INT, // return: int32_t (pass count)
+                                ValueLayout.ADDRESS, // ctx
+                                ValueLayout.ADDRESS, // candidate_keys (packed [lo,hi] pairs)
+                                ValueLayout.JAVA_INT, // key_count
+                                ValueLayout.ADDRESS, // nonces (packed [enc_nonce, enc_parity] pairs)
+                                ValueLayout.JAVA_INT, // nonce_count
+                                ValueLayout.JAVA_INT, // uid
+                                ValueLayout.ADDRESS, // result_flags
+                            ),
+                        )
+                    } catch (e: Exception) {
+                        log.d(e) { "metal_verify_keys not available — GPU verification disabled" }
+                        null
+                    }
+
                 // Create Metal context
                 val pathStr = metallibPath.toString()
                 val pathSegment = arena.allocateFrom(pathStr)
@@ -167,7 +191,7 @@ class MetalBruteForceEngine private constructor(
 
                 log.i { "Metal GPU initialized: $devName" }
 
-                return MetalBruteForceEngine(ctx, bruteForceHandle, destroyHandle, devName)
+                return MetalBruteForceEngine(ctx, bruteForceHandle, verifyKeysHandle, destroyHandle, devName)
             } catch (e: Exception) {
                 log.d(e) { "Failed to initialize Metal engine" }
                 return null
@@ -273,6 +297,76 @@ class MetalBruteForceEngine private constructor(
         }
 
         return candidates
+    }
+
+    /**
+     * GPU-accelerated nonce verification.
+     *
+     * Dispatches all candidate keys to the GPU in a single 1D compute grid.
+     * Each thread verifies one key against ALL nonces using the Crypto1 LFSR.
+     * Falls back to CPU verification if the GPU verify pipeline is unavailable.
+     */
+    override fun verifyKeys(
+        keys: List<Long>,
+        nonces: List<VerifyNonceData>,
+        uid: UInt,
+    ): List<Long> {
+        if (metalVerifyKeysHandle == null || keys.isEmpty() || nonces.isEmpty()) {
+            return super.verifyKeys(keys, nonces, uid)
+        }
+
+        try {
+            Arena.ofConfined().use { arena ->
+                // Pack candidate keys as [key_lo, key_hi] uint32 pairs
+                val keysPacked = IntArray(keys.size * 2)
+                for (i in keys.indices) {
+                    keysPacked[i * 2] = (keys[i] and 0xFFFFFFFFL).toInt()
+                    keysPacked[i * 2 + 1] = (keys[i] ushr 32).toInt()
+                }
+                val keysBuf = arena.allocateFrom(ValueLayout.JAVA_INT, *keysPacked)
+
+                // Pack nonces as [enc_nonce, enc_parity] uint32 pairs
+                val noncesPacked = IntArray(nonces.size * 2)
+                for (i in nonces.indices) {
+                    noncesPacked[i * 2] = nonces[i].encryptedNonce.toInt()
+                    noncesPacked[i * 2 + 1] = nonces[i].encryptedParity
+                }
+                val noncesBuf = arena.allocateFrom(ValueLayout.JAVA_INT, *noncesPacked)
+
+                // Result flags: one uint32 per key
+                val flagsBuf = arena.allocate(ValueLayout.JAVA_INT, keys.size.toLong())
+
+                val passCount =
+                    metalVerifyKeysHandle.invoke(
+                        metalContext,
+                        keysBuf,
+                        keys.size,
+                        noncesBuf,
+                        nonces.size,
+                        uid.toInt(),
+                        flagsBuf,
+                    ) as Int
+
+                if (passCount < 0) {
+                    log.w { "GPU verify failed, falling back to CPU" }
+                    return super.verifyKeys(keys, nonces, uid)
+                }
+
+                // Collect keys that passed
+                val result = mutableListOf<Long>()
+                for (i in keys.indices) {
+                    if (flagsBuf.get(ValueLayout.JAVA_INT, i.toLong() * 4) != 0) {
+                        result.add(keys[i])
+                    }
+                }
+
+                log.d { "GPU verified ${keys.size} keys: $passCount passed" }
+                return result
+            }
+        } catch (e: Exception) {
+            log.w(e) { "GPU verify threw exception, falling back to CPU" }
+            return super.verifyKeys(keys, nonces, uid)
+        }
     }
 
     /** Release native Metal resources. */

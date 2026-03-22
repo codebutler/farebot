@@ -19,6 +19,7 @@ typedef struct {
     id<MTLDevice> device;
     id<MTLCommandQueue> commandQueue;
     id<MTLComputePipelineState> pipeline;
+    id<MTLComputePipelineState> verifyPipeline;
     char deviceName[256];
 } MetalContextImpl;
 
@@ -52,6 +53,18 @@ MetalContext metal_create(const char* metallib_path) {
             return NULL;
         }
 
+        // Create verify_key_nonces pipeline
+        id<MTLFunction> verifyFunction = [library newFunctionWithName:@"verify_key_nonces"];
+        id<MTLComputePipelineState> verifyPipeline = nil;
+        if (verifyFunction) {
+            verifyPipeline =
+                [device newComputePipelineStateWithFunction:verifyFunction error:&error];
+            if (!verifyPipeline) {
+                NSLog(@"metal_bridge: Failed to create verify pipeline: %@", error);
+                // Non-fatal: brute force still works, just no GPU verification
+            }
+        }
+
         id<MTLCommandQueue> queue = [device newCommandQueue];
         if (!queue) {
             NSLog(@"metal_bridge: Failed to create command queue");
@@ -62,6 +75,7 @@ MetalContext metal_create(const char* metallib_path) {
         ctx->device = device;
         ctx->commandQueue = queue;
         ctx->pipeline = pipeline;
+        ctx->verifyPipeline = verifyPipeline;
 
         const char *name = [[device name] UTF8String];
         if (name) {
@@ -72,6 +86,9 @@ MetalContext metal_create(const char* metallib_path) {
         CFRetain((__bridge CFTypeRef)device);
         CFRetain((__bridge CFTypeRef)queue);
         CFRetain((__bridge CFTypeRef)pipeline);
+        if (verifyPipeline) {
+            CFRetain((__bridge CFTypeRef)verifyPipeline);
+        }
 
         return (MetalContext)ctx;
     }
@@ -82,6 +99,9 @@ void metal_destroy(MetalContext handle) {
 
     MetalContextImpl *ctx = (MetalContextImpl *)handle;
 
+    if (ctx->verifyPipeline) {
+        CFRelease((__bridge CFTypeRef)ctx->verifyPipeline);
+    }
     CFRelease((__bridge CFTypeRef)ctx->pipeline);
     CFRelease((__bridge CFTypeRef)ctx->commandQueue);
     CFRelease((__bridge CFTypeRef)ctx->device);
@@ -186,6 +206,88 @@ int32_t metal_brute_force(
         }
 
         return (int32_t)count;
+    }
+}
+
+int32_t metal_verify_keys(
+    MetalContext handle,
+    const uint32_t* candidate_keys, int32_t key_count,
+    const uint32_t* nonces, int32_t nonce_count,
+    uint32_t uid,
+    uint32_t* result_flags
+) {
+    @autoreleasepool {
+        MetalContextImpl *ctx = (MetalContextImpl *)handle;
+
+        if (!ctx->verifyPipeline) {
+            NSLog(@"metal_bridge: verify pipeline not available");
+            return -1;
+        }
+
+        id<MTLDevice> device = ctx->device;
+
+        // Create buffers
+        // candidate_keys: packed [key_lo, key_hi] pairs = 2 * key_count uint32s
+        size_t keysSize = (size_t)key_count * 2 * sizeof(uint32_t);
+        id<MTLBuffer> keysBuf = [device newBufferWithBytes:candidate_keys
+                                                    length:keysSize
+                                                   options:MTLResourceStorageModeShared];
+
+        // nonces: packed [enc_nonce, enc_parity] pairs = 2 * nonce_count uint32s
+        size_t noncesSize = (size_t)nonce_count * 2 * sizeof(uint32_t);
+        id<MTLBuffer> noncesBuf = [device newBufferWithBytes:nonces
+                                                      length:noncesSize
+                                                     options:MTLResourceStorageModeShared];
+
+        // params: [uid, nonce_count]
+        uint32_t params[2];
+        params[0] = uid;
+        params[1] = (uint32_t)nonce_count;
+        id<MTLBuffer> paramsBuf = [device newBufferWithBytes:params
+                                                      length:sizeof(params)
+                                                     options:MTLResourceStorageModeShared];
+
+        // result_flags: one uint32 per key
+        size_t flagsSize = (size_t)key_count * sizeof(uint32_t);
+        id<MTLBuffer> flagsBuf = [device newBufferWithLength:flagsSize
+                                                     options:MTLResourceStorageModeShared];
+        memset([flagsBuf contents], 0, flagsSize);
+
+        // Encode compute command
+        id<MTLCommandBuffer> commandBuffer = [ctx->commandQueue commandBuffer];
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+
+        [encoder setComputePipelineState:ctx->verifyPipeline];
+        [encoder setBuffer:keysBuf    offset:0 atIndex:0];
+        [encoder setBuffer:noncesBuf  offset:0 atIndex:1];
+        [encoder setBuffer:paramsBuf  offset:0 atIndex:2];
+        [encoder setBuffer:flagsBuf   offset:0 atIndex:3];
+
+        // 1D dispatch: one thread per candidate key
+        NSUInteger w = ctx->verifyPipeline.threadExecutionWidth;
+        MTLSize threadgroupSize = MTLSizeMake(w, 1, 1);
+        MTLSize gridSize = MTLSizeMake((NSUInteger)key_count, 1, 1);
+
+        [encoder dispatchThreads:gridSize threadsPerThreadgroup:threadgroupSize];
+        [encoder endEncoding];
+
+        [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
+
+        if (commandBuffer.error) {
+            NSLog(@"metal_bridge: GPU verify error: %@", commandBuffer.error);
+            return -1;
+        }
+
+        // Copy results and count passes
+        uint32_t *flags = (uint32_t *)[flagsBuf contents];
+        int32_t passCount = 0;
+        for (int32_t i = 0; i < key_count; i++) {
+            result_flags[i] = flags[i];
+            if (flags[i]) passCount++;
+        }
+
+        return passCount;
     }
 }
 

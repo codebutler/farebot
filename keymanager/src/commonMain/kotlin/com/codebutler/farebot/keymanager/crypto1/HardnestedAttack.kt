@@ -56,8 +56,11 @@ class HardnestedAttack(
 
     private val bruteForceEngine: BruteForceEngine =
         (bruteForceEngineOverride ?: createBruteForceEngine()).also {
-            log.i { "Using brute force engine: ${it::class.simpleName}" }
+            log.i { "Using brute force engine: ${it.name}" }
         }
+
+    /** Human-readable name of the brute force engine in use. */
+    val engineName: String get() = bruteForceEngine.name
 
     data class NonceData(
         val encryptedNonce: UInt,
@@ -703,7 +706,7 @@ class HardnestedAttack(
      *
      * Returns list of StateList(oddStates, evenStates) tuples.
      */
-    private fun generateCandidates(
+    private suspend fun generateCandidates(
         sumA0Idx: Int,
         sumA8Idx: Int,
     ): List<StateList> {
@@ -734,26 +737,15 @@ class HardnestedAttack(
                         val evenCount = evenBitarray.popcount()
                         if (evenCount == 0) continue
 
-                        // Extract state lists with all_bitflips_match filter
-                        // Port of bitarray_to_list() which calls all_bitflips_match() per state
-                        val oddList = mutableListOf<Int>()
-                        oddBitarray.forEachSet { state ->
-                            if (allBitflipsMatch(bestByte, state, ODD_STATE)) {
-                                oddList.add(state)
-                            }
-                        }
-                        if (oddList.isEmpty()) continue
+                        // Extract state lists with all_bitflips_match filter, parallelized.
+                        // Port of bitarray_to_list() which calls all_bitflips_match() per state.
+                        // allBitflipsMatch() reads from nonceLists[].statesBitarray[] which is
+                        // immutable at this point, so parallel access is safe.
+                        val oddStates = filterStatesParallel(oddBitarray, bestByte, ODD_STATE)
+                        if (oddStates.isEmpty()) continue
 
-                        val evenList = mutableListOf<Int>()
-                        evenBitarray.forEachSet { state ->
-                            if (allBitflipsMatch(bestByte, state, EVEN_STATE)) {
-                                evenList.add(state)
-                            }
-                        }
-                        if (evenList.isEmpty()) continue
-
-                        val oddStates = oddList.toIntArray()
-                        val evenStates = evenList.toIntArray()
+                        val evenStates = filterStatesParallel(evenBitarray, bestByte, EVEN_STATE)
+                        if (evenStates.isEmpty()) continue
 
                         result.add(StateList(oddStates, evenStates))
                     }
@@ -761,6 +753,60 @@ class HardnestedAttack(
             }
         }
         return result
+    }
+
+    /**
+     * Collect set bits from [bitarray], then filter them through [allBitflipsMatch]
+     * in parallel using coroutines on Dispatchers.Default.
+     *
+     * Returns an IntArray of states that passed the filter.
+     */
+    private suspend fun filterStatesParallel(
+        bitarray: StateBitarray,
+        byte: Int,
+        oddEven: Int,
+    ): IntArray {
+        // First, collect all set bit indices (fast, no filtering)
+        val allStates = mutableListOf<Int>()
+        bitarray.forEachSet { state -> allStates.add(state) }
+        if (allStates.isEmpty()) return IntArray(0)
+
+        // For small sets, filter inline (parallelism overhead not worthwhile)
+        if (allStates.size < PARALLEL_FILTER_THRESHOLD) {
+            val filtered = mutableListOf<Int>()
+            for (state in allStates) {
+                if (allBitflipsMatch(byte, state, oddEven)) {
+                    filtered.add(state)
+                }
+            }
+            return filtered.toIntArray()
+        }
+
+        // Chunk and filter in parallel
+        val numChunks = availableProcessors().coerceIn(2, allStates.size)
+        val chunkSize = (allStates.size + numChunks - 1) / numChunks
+
+        return coroutineScope {
+            val deferreds =
+                (0 until allStates.size step chunkSize).map { start ->
+                    val end = minOf(start + chunkSize, allStates.size)
+                    async(Dispatchers.Default) {
+                        val chunkResult = mutableListOf<Int>()
+                        for (idx in start until end) {
+                            val state = allStates[idx]
+                            if (allBitflipsMatch(byte, state, oddEven)) {
+                                chunkResult.add(state)
+                            }
+                        }
+                        chunkResult
+                    }
+                }
+            val merged = mutableListOf<Int>()
+            for (deferred in deferreds) {
+                merged.addAll(deferred.await())
+            }
+            merged.toIntArray()
+        }
     }
 
     // ---- Bitflip table initialization ----
@@ -873,17 +919,21 @@ class HardnestedAttack(
      * Generate candidates using only bitflip-filtered states (no sum property).
      * Port of add_bitflip_candidates() lines 2016-2035.
      */
-    private fun addBitflipCandidates(byte: Int): List<StateList> {
-        val oddList = mutableListOf<Int>()
-        nonceLists[byte].statesBitarray[ODD_STATE].forEachSet { state ->
-            if (allBitflipsMatch(byte, state, ODD_STATE)) oddList.add(state)
-        }
-        val evenList = mutableListOf<Int>()
-        nonceLists[byte].statesBitarray[EVEN_STATE].forEachSet { state ->
-            if (allBitflipsMatch(byte, state, EVEN_STATE)) evenList.add(state)
-        }
-        return if (oddList.isNotEmpty() && evenList.isNotEmpty()) {
-            listOf(StateList(oddList.toIntArray(), evenList.toIntArray()))
+    private suspend fun addBitflipCandidates(byte: Int): List<StateList> {
+        val oddStates =
+            filterStatesParallel(
+                nonceLists[byte].statesBitarray[ODD_STATE],
+                byte,
+                ODD_STATE,
+            )
+        val evenStates =
+            filterStatesParallel(
+                nonceLists[byte].statesBitarray[EVEN_STATE],
+                byte,
+                EVEN_STATE,
+            )
+        return if (oddStates.isNotEmpty() && evenStates.isNotEmpty()) {
+            listOf(StateList(oddStates, evenStates))
         } else {
             emptyList()
         }
@@ -1552,6 +1602,9 @@ class HardnestedAttack(
                     .take(VERIFY_NONCE_COUNT)
             }
 
+        // Convert to engine-level nonce data for batch verification
+        val verifyNonceData = verifyNonces.map { VerifyNonceData(it.encryptedNonce, it.encryptedParity) }
+
         val chunkSize = maxOf(1, oddStates.size / NUM_PARALLEL_CHUNKS)
         val chunks =
             (0 until oddStates.size step chunkSize).map { start ->
@@ -1562,11 +1615,11 @@ class HardnestedAttack(
         val mark = TimeSource.Monotonic.markNow()
 
         return coroutineScope {
+            // Phase 1: Collect all parity survivors from GPU/engine (no per-key verification)
             val deferreds =
                 chunks.map { range ->
                     async(Dispatchers.Default) {
                         val chunkOddStates = oddStates.copyOfRange(range.first, range.last + 1)
-                        val verifyState = Crypto1State()
                         val candidates =
                             bruteForceEngine.bruteForce(
                                 oddStates = chunkOddStates,
@@ -1575,16 +1628,7 @@ class HardnestedAttack(
                                 inputBytes = inputBytes,
                                 encBytes = encBytes,
                                 encParBits = encParBits,
-                                verifyFn = { candidateKey ->
-                                    verifyNonces.all { vn ->
-                                        verifyKeyWithNonce(
-                                            candidateKey,
-                                            vn.encryptedNonce,
-                                            vn.encryptedParity,
-                                            verifyState,
-                                        )
-                                    }
-                                },
+                                verifyFn = { true }, // accept all parity survivors
                                 onProgress = null,
                             )
                         val tested = chunkOddStates.size.toLong() * evenStates.size.toLong()
@@ -1592,20 +1636,34 @@ class HardnestedAttack(
                     }
                 }
 
-            val allCandidates = mutableListOf<Long>()
+            val allSurvivors = mutableListOf<Long>()
             for ((chunkIdx, deferred) in deferreds.withIndex()) {
                 val (tested, candidates) = deferred.await()
                 testedTotal += tested
-                allCandidates.addAll(candidates)
+                allSurvivors.addAll(candidates)
 
                 val elapsed = mark.elapsedNow().inWholeMilliseconds / 1000.0
                 val rate = if (elapsed > 0) (testedTotal / elapsed / 1_000_000).toLong() else 0
                 onProgress?.invoke(
-                    "      [${chunkIdx + 1}/${chunks.size}] $testedTotal pairs (${rate}M/s), ${allCandidates.size} candidates",
+                    "      [${chunkIdx + 1}/${chunks.size}] $testedTotal pairs (${rate}M/s), ${allSurvivors.size} parity survivors",
                 )
             }
 
-            allCandidates.map { it }.distinct()
+            val distinctSurvivors = allSurvivors.distinct()
+
+            // Phase 2: Batch-verify survivors against all nonces
+            // Uses GPU verification on Metal, CPU on other engines.
+            if (verifyNonceData.isEmpty()) {
+                distinctSurvivors
+            } else {
+                val verifyMark = TimeSource.Monotonic.markNow()
+                val verified = bruteForceEngine.verifyKeys(distinctSurvivors, verifyNonceData, uid)
+                val verifyMs = verifyMark.elapsedNow().inWholeMilliseconds
+                onProgress?.invoke(
+                    "      Verified ${distinctSurvivors.size} survivors → ${verified.size} keys (${verifyMs}ms)",
+                )
+                verified
+            }
         }
     }
 
@@ -1766,5 +1824,6 @@ class HardnestedAttack(
         const val QUEUE_LEN = 4 // sliding window size for reduction rate regression
         const val DEFAULT_BRUTE_FORCE_RATE = 34_000_000f // fallback if benchmark fails (based on hardware tests)
         const val BENCH_SIZE = 6000 // number of odd/even states for benchmark (matches Proxmark3 TEST_BENCH_SIZE)
+        const val PARALLEL_FILTER_THRESHOLD = 1000 // minimum states before parallelizing allBitflipsMatch filtering
     }
 }

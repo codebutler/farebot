@@ -60,6 +60,9 @@ object HardnestedBitflip {
     // Tables where 99.01%+ of states are set provide negligible filtering (Proxmark3 threshold)
     private const val IGNORE_BITFLIP_THRESHOLD = 0.9901f
 
+    /** Sentinel value indicating a table was above IGNORE_BITFLIP_THRESHOLD (not worth caching). */
+    private val FILTERED_SENTINEL = StateBitarray()
+
     /** Parsed HBFT file: index + raw data for on-demand decompression. */
     private class HbftFile(
         val index: Map<Int, Pair<Int, Int>>, // bitflip_value -> (data_offset, compressed_size)
@@ -71,6 +74,20 @@ object HardnestedBitflip {
 
     /** Whether initialization has been attempted. */
     private var initialized = false
+
+    /**
+     * Cache of decompressed bitflip tables, keyed by (oddEven, bitflip) encoded as Long.
+     * Values are the canonical (immutable) StateBitarray, or [FILTERED_SENTINEL] if the
+     * table was above the IGNORE_BITFLIP_THRESHOLD (returning null to callers).
+     * Callers receive a .copy() since they mutate the arrays (AND, etc.).
+     */
+    private val decompressedCache = HashMap<Long, StateBitarray>()
+
+    /** Encode (oddEven, bitflip) into a cache key. */
+    private fun cacheKey(
+        oddEven: Int,
+        bitflip: Int,
+    ): Long = oddEven.toLong() shl 32 or bitflip.toLong()
 
     /**
      * Initialize by loading both HBFT resources. Call once before [loadBitflipTable].
@@ -91,6 +108,11 @@ object HardnestedBitflip {
     /**
      * Load a precomputed bitflip table for the given bitflip value and parity half.
      *
+     * Returns a copy of the cached decompressed table. On first call for a given
+     * (oddEven, bitflip) pair, decompresses and caches the canonical copy.
+     * Subsequent calls return .copy() from the cache, avoiding repeated LZ4
+     * decompression and bit-reversal (~5s savings per sector across 18 sectors).
+     *
      * @param bitflip XOR of two observed encrypted first bytes (1..0x3FF)
      * @param oddEven 0 for even-half states, 1 for odd-half states
      * @return StateBitarray with compatible states, or null if no table exists
@@ -99,8 +121,30 @@ object HardnestedBitflip {
         bitflip: Int,
         oddEven: Int,
     ): StateBitarray? {
-        val file = if (oddEven == 0) evenFile else oddFile
-        return file?.let { decompressTable(it, bitflip) }
+        val file = (if (oddEven == 0) evenFile else oddFile) ?: return null
+
+        val key = cacheKey(oddEven, bitflip)
+        val cached = decompressedCache[key]
+        if (cached != null) {
+            return if (cached === FILTERED_SENTINEL) null else cached.copy()
+        }
+
+        // Not in cache — decompress, cache canonical copy, return a copy
+        val result = decompressTable(file, bitflip)
+        if (result == null) {
+            decompressedCache[key] = FILTERED_SENTINEL
+            return null
+        }
+        decompressedCache[key] = result
+        return result.copy() // always return a copy since callers mutate the arrays
+    }
+
+    /**
+     * Clear the decompressed table cache.
+     * Useful for freeing memory after attack completes.
+     */
+    fun resetCache() {
+        decompressedCache.clear()
     }
 
     /**
