@@ -629,6 +629,8 @@ object SimdBitslice {
  * Survivors are extracted and verified with scalar key extraction + multi-nonce check.
  */
 class SimdBruteForceEngine : BruteForceEngine {
+    override val name: String = "SIMD (Vector API, ${SimdBitslice.BATCH_SIZE}-wide)"
+
     override suspend fun bruteForce(
         oddStates: IntArray,
         evenStates: IntArray,

@@ -57,6 +57,9 @@ abstract class BaseCardScanner : CardScanner {
     private val mutablePartialCardData = MutableStateFlow<RawCard<*>?>(null)
     override val partialCardData: StateFlow<RawCard<*>?> = mutablePartialCardData.asStateFlow()
 
+    private val mutableRecoveryProgress = MutableStateFlow<RecoveryProgressInfo?>(null)
+    override val recoveryProgress: StateFlow<RecoveryProgressInfo?> = mutableRecoveryProgress.asStateFlow()
+
     protected var recoveryMode = false
 
     override fun startRecoveryScan() {
@@ -71,6 +74,7 @@ abstract class BaseCardScanner : CardScanner {
     protected fun emitCard(rawCard: RawCard<*>) {
         mutableReadingProgress.value = null
         mutablePartialCardData.value = null
+        mutableRecoveryProgress.value = null
         mutableScannedCards.tryEmit(rawCard)
     }
 
@@ -78,6 +82,7 @@ abstract class BaseCardScanner : CardScanner {
         if (!mutableIsScanning.value) return
         mutableReadingProgress.value = null
         mutablePartialCardData.value = null
+        mutableRecoveryProgress.value = null
         mutableScanErrors.tryEmit(error)
     }
 
@@ -92,6 +97,10 @@ abstract class BaseCardScanner : CardScanner {
         mutablePartialCardData.value = card
     }
 
+    protected fun emitRecoveryProgress(info: RecoveryProgressInfo) {
+        mutableRecoveryProgress.value = info
+    }
+
     protected fun setScanning(value: Boolean) {
         mutableIsScanning.value = value
     }
@@ -101,5 +110,6 @@ abstract class BaseCardScanner : CardScanner {
         mutableIsScanning.value = false
         mutableReadingProgress.value = null
         mutablePartialCardData.value = null
+        mutableRecoveryProgress.value = null
     }
 }

@@ -23,6 +23,7 @@
 package com.codebutler.farebot.desktop
 
 import com.codebutler.farebot.card.RawCard
+import com.codebutler.farebot.shared.nfc.RecoveryProgressInfo
 import com.codebutler.farebot.shared.nfc.ScannedTag
 
 /**
@@ -42,5 +43,6 @@ interface NfcReaderBackend {
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
         onPartialCard: (suspend (RawCard<*>) -> Unit)? = null,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)? = null,
     )
 }

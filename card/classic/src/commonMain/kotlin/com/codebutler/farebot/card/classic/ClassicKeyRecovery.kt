@@ -31,7 +31,10 @@ import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
  * (e.g., nested attack via Crypto1). Implementations live in the `:keymanager`
  * module, which is excluded from iOS builds.
  */
-fun interface ClassicKeyRecovery {
+interface ClassicKeyRecovery {
+    /** Human-readable name of the engine used for key recovery, if available. */
+    val engineName: String? get() = null
+
     /**
      * Attempt to recover a key for the given sector using a known key from another sector.
      *

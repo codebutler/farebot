@@ -22,7 +22,15 @@
     <string name="recover_key">Recover Key</string>
     <string name="recover_key_instructions">Place the card on the NFC reader and press Start to begin key recovery. This uses a nested attack to recover the encryption keys from the card.</string>
     <string name="recovery_success">Keys recovered successfully!</string>
+    <string name="recovery_failed">Recovery failed</string>
     <string name="reading_sector_progress">Reading sector %1$d of %2$d…</string>
+    <string name="recovering_sector_progress">Recovering sector %1$d of %2$d</string>
+    <string name="engine_label">Engine: %1$s</string>
+    <string name="initializing_attack">Initializing attack…</string>
+    <string name="collecting_nonces">Collecting nonces…</string>
+    <string name="processing_nonces">Processing nonces…</string>
+    <string name="brute_forcing">Brute forcing…</string>
+    <string name="keys_recovered_count">%1$d keys recovered</string>
     <string name="scanning_for_card">Scanning for card…</string>
     <string name="start_recovery">Start Recovery</string>
     <string name="unknown_error">Unknown error</string>

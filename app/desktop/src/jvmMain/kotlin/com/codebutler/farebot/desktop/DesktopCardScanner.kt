@@ -80,6 +80,7 @@ class DesktopCardScanner(
                                         onError = ::emitError,
                                         onProgress = ::emitProgress,
                                         onPartialCard = ::emitPartialCard,
+                                        onRecoveryProgress = ::emitRecoveryProgress,
                                     )
                                 } catch (e: Exception) {
                                     if (isActive) {

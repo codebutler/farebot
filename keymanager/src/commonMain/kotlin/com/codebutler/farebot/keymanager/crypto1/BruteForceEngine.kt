@@ -23,6 +23,14 @@
 package com.codebutler.farebot.keymanager.crypto1
 
 /**
+ * Nonce data for key verification: encrypted nonce + encrypted parity.
+ */
+data class VerifyNonceData(
+    val encryptedNonce: UInt,
+    val encryptedParity: Int,
+)
+
+/**
  * Interface for the hardnested brute force inner loop.
  *
  * Given arrays of candidate odd/even LFSR half-states (post-byte-0),
@@ -34,6 +42,9 @@ package com.codebutler.farebot.keymanager.crypto1
  * SIMD bitsliced operations (JVM Vector API) for higher throughput.
  */
 interface BruteForceEngine {
+    /** Human-readable name of this engine (e.g., "Metal GPU: Apple M2 Max", "SIMD", "Scalar"). */
+    val name: String
+
     /**
      * Brute force all (odd, even) state pairs to find valid keys.
      *
@@ -60,6 +71,69 @@ interface BruteForceEngine {
         verifyFn: (Long) -> Boolean,
         onProgress: ((tested: Long, candidates: Int) -> Unit)?,
     ): List<Long>
+
+    /**
+     * Verify candidate keys against multiple nonces.
+     *
+     * Default implementation runs Crypto1 LFSR on CPU per key/nonce.
+     * GPU-accelerated engines can override this to dispatch verification
+     * to the GPU for much higher throughput (~35x speedup).
+     *
+     * @param keys Candidate 48-bit keys to verify.
+     * @param nonces Nonce data to verify against (encrypted nonces + parity).
+     * @param uid Card UID.
+     * @return Keys that passed verification against all nonces.
+     */
+    fun verifyKeys(
+        keys: List<Long>,
+        nonces: List<VerifyNonceData>,
+        uid: UInt,
+    ): List<Long> {
+        if (nonces.isEmpty()) return keys
+        val state = Crypto1State()
+        return keys.filter { key ->
+            nonces.all { vn ->
+                verifyKeyWithNonceCpu(key, vn.encryptedNonce, vn.encryptedParity, uid, state)
+            }
+        }
+    }
+}
+
+/**
+ * CPU-based nonce verification: loads key, clocks LFSR through uid^encNonce,
+ * checks parity for all 4 bytes.
+ *
+ * Port of HardnestedAttack.verifyKeyWithNonce(), extracted here so it can
+ * be shared by BruteForceEngine.verifyKeys() default implementation.
+ */
+internal fun verifyKeyWithNonceCpu(
+    key: Long,
+    encNonce: UInt,
+    encParity: Int,
+    uid: UInt,
+    state: Crypto1State,
+): Boolean {
+    state.loadKey(key)
+    val uidXorEnc = uid xor encNonce
+
+    for (byteIdx in 0 until 4) {
+        var ksByteVal = 0
+        for (bitIdx in 0 until 8) {
+            val i = byteIdx * 8 + bitIdx
+            val inputBit = Crypto1.bebit(uidXorEnc, i).toInt()
+            val ksBit = state.lfsrBit(inputBit, true)
+            ksByteVal = ksByteVal or (ksBit shl bitIdx)
+        }
+
+        val ksPar = Crypto1.filter(state.odd)
+        val encByte = ((encNonce shr ((3 - byteIdx) * 8)) and 0xFFu).toInt()
+        val plainByte = encByte xor ksByteVal
+        val expectedEncPar = Crypto1Auth.oddParity(plainByte) xor ksPar
+        val encParBit = (encParity shr (3 - byteIdx)) and 1
+
+        if (expectedEncPar != encParBit) return false
+    }
+    return true
 }
 
 /**
@@ -72,6 +146,8 @@ interface BruteForceEngine {
  * Extracted from HardnestedAttack.bruteForceStateList() inner loop.
  */
 class ScalarBruteForceEngine : BruteForceEngine {
+    override val name: String = "Scalar"
+
     override suspend fun bruteForce(
         oddStates: IntArray,
         evenStates: IntArray,

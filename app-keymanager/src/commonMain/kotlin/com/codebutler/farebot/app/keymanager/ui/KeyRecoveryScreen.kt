@@ -26,13 +26,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.codebutler.farebot.card.CardType
 import com.codebutler.farebot.shared.nfc.ReadingProgress
+import com.codebutler.farebot.shared.nfc.RecoveryPhase
+import com.codebutler.farebot.shared.nfc.RecoveryProgressInfo
 import farebot.app_keymanager.generated.resources.Res
 import farebot.app_keymanager.generated.resources.back
+import farebot.app_keymanager.generated.resources.brute_forcing
 import farebot.app_keymanager.generated.resources.card_id
 import farebot.app_keymanager.generated.resources.card_type
+import farebot.app_keymanager.generated.resources.collecting_nonces
+import farebot.app_keymanager.generated.resources.engine_label
+import farebot.app_keymanager.generated.resources.initializing_attack
+import farebot.app_keymanager.generated.resources.keys_recovered_count
+import farebot.app_keymanager.generated.resources.processing_nonces
 import farebot.app_keymanager.generated.resources.reading_sector_progress
 import farebot.app_keymanager.generated.resources.recover_key
 import farebot.app_keymanager.generated.resources.recover_key_instructions
+import farebot.app_keymanager.generated.resources.recovering_sector_progress
+import farebot.app_keymanager.generated.resources.recovery_failed
 import farebot.app_keymanager.generated.resources.recovery_success
 import farebot.app_keymanager.generated.resources.scanning_for_card
 import farebot.app_keymanager.generated.resources.start_recovery
@@ -45,6 +55,7 @@ data class KeyRecoveryUiState(
     val isRecovering: Boolean = false,
     val isWaitingForCard: Boolean = false,
     val readingProgress: ReadingProgress? = null,
+    val recoveryProgress: RecoveryProgressInfo? = null,
     val error: String? = null,
     val success: Boolean = false,
 )
@@ -110,8 +121,28 @@ fun KeyRecoveryScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (uiState.isRecovering) {
+                val recovery = uiState.recoveryProgress
                 val progress = uiState.readingProgress
-                if (progress != null) {
+
+                // Engine name header
+                val engineName = recovery?.engineName
+                if (engineName != null) {
+                    Text(
+                        text = stringResource(Res.string.engine_label, engineName),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
+
+                // Progress indicator
+                val currentSector = recovery?.currentSector
+                val totalSectors = recovery?.totalSectors
+                if (currentSector != null && totalSectors != null && totalSectors > 0) {
+                    LinearProgressIndicator(
+                        progress = { currentSector.toFloat() / totalSectors.toFloat() },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else if (progress != null) {
                     LinearProgressIndicator(
                         progress = { progress.current.toFloat() / progress.total.toFloat() },
                         modifier = Modifier.fillMaxWidth(),
@@ -119,8 +150,32 @@ fun KeyRecoveryScreen(
                 } else {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
-                val progressText =
+
+                // Phase / sector progress text
+                val phaseText =
                     when {
+                        recovery != null -> {
+                            val sectorText =
+                                if (currentSector != null && totalSectors != null) {
+                                    stringResource(
+                                        Res.string.recovering_sector_progress,
+                                        currentSector + 1,
+                                        totalSectors,
+                                    )
+                                } else {
+                                    null
+                                }
+                            val phaseLabel =
+                                when (recovery.phase) {
+                                    RecoveryPhase.Initializing -> stringResource(Res.string.initializing_attack)
+                                    RecoveryPhase.CollectingNonces -> stringResource(Res.string.collecting_nonces)
+                                    RecoveryPhase.ProcessingNonces -> stringResource(Res.string.processing_nonces)
+                                    RecoveryPhase.BruteForcing -> stringResource(Res.string.brute_forcing)
+                                    RecoveryPhase.KeyFound -> stringResource(Res.string.recovery_success)
+                                    RecoveryPhase.Failed -> stringResource(Res.string.recovery_failed)
+                                }
+                            if (sectorText != null) "$sectorText — $phaseLabel" else phaseLabel
+                        }
                         progress != null ->
                             stringResource(
                                 Res.string.reading_sector_progress,
@@ -130,11 +185,32 @@ fun KeyRecoveryScreen(
                         uiState.isWaitingForCard -> stringResource(Res.string.scanning_for_card)
                         else -> null
                     }
-                if (progressText != null) {
+                if (phaseText != null) {
                     Text(
-                        text = progressText,
+                        text = phaseText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                // Progress detail line
+                val detail = recovery?.progressDetail
+                if (detail != null) {
+                    Text(
+                        text = detail,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                    )
+                }
+
+                // Keys recovered count
+                val keysRecovered = recovery?.recoveredKeys ?: 0
+                if (keysRecovered > 0) {
+                    Text(
+                        text = stringResource(Res.string.keys_recovered_count, keysRecovered),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             } else if (uiState.error != null) {

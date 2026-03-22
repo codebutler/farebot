@@ -23,6 +23,7 @@ import com.codebutler.farebot.card.classic.ClassicKeyRecovery
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.keymanager.crypto1.HardnestedAttack
 import com.codebutler.farebot.keymanager.crypto1.NestedAttack
+import com.codebutler.farebot.keymanager.crypto1.createBruteForceEngine
 import com.codebutler.farebot.keymanager.pn533.PN533RawClassic
 
 /**
@@ -36,6 +37,9 @@ import com.codebutler.farebot.keymanager.pn533.PN533RawClassic
 class NestedAttackKeyRecovery : ClassicKeyRecovery {
     /** Once true RNG is detected, skip standard nested attack for subsequent sectors. */
     private var cardHasTrueRng = false
+
+    /** Human-readable name of the brute force engine that will be used. */
+    override val engineName: String by lazy { createBruteForceEngine().name }
 
     /**
      * Optional callback invoked after hardnested nonce collection completes.

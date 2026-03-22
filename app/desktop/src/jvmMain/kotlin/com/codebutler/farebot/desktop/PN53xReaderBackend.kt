@@ -43,6 +43,7 @@ import com.codebutler.farebot.card.nfc.pn533.Usb4JavaPN533Transport
 import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
+import com.codebutler.farebot.shared.nfc.RecoveryProgressInfo
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import kotlinx.coroutines.delay
@@ -73,6 +74,7 @@ abstract class PN53xReaderBackend(
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
         onPartialCard: (suspend (RawCard<*>) -> Unit)?,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)?,
     ) {
         val transport =
             preOpenedTransport
@@ -83,7 +85,7 @@ abstract class PN53xReaderBackend(
         val pn533 = PN533(transport)
         try {
             initDevice(pn533)
-            pollLoop(pn533, onCardDetected, onCardRead, onError, onProgress, onPartialCard)
+            pollLoop(pn533, onCardDetected, onCardRead, onError, onProgress, onPartialCard, onRecoveryProgress)
         } finally {
             pn533.close()
         }
@@ -96,6 +98,7 @@ abstract class PN53xReaderBackend(
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
         onPartialCard: (suspend (RawCard<*>) -> Unit)?,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)?,
     ) {
         while (true) {
             log.i { "Polling for cards..." }
@@ -131,7 +134,7 @@ abstract class PN53xReaderBackend(
             onCardDetected(ScannedTag(id = tagId, cardType = detectedCardType))
 
             try {
-                val rawCard = readTarget(pn533, target, onProgress, onPartialCard)
+                val rawCard = readTarget(pn533, target, onProgress, onPartialCard, onRecoveryProgress)
                 onCardRead(rawCard)
                 log.i { "Card read successfully" }
             } catch (e: PN533TransportException) {
@@ -161,9 +164,10 @@ abstract class PN53xReaderBackend(
         target: PN533.TargetInfo,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
         onPartialCard: (suspend (RawCard<*>) -> Unit)?,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)?,
     ): RawCard<*> =
         when (target) {
-            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target, onProgress, onPartialCard)
+            is PN533.TargetInfo.TypeA -> readTypeACard(pn533, target, onProgress, onPartialCard, onRecoveryProgress)
             is PN533.TargetInfo.FeliCa -> readFeliCaCard(pn533, target, onProgress)
         }
 
@@ -172,6 +176,7 @@ abstract class PN53xReaderBackend(
         target: PN533.TargetInfo.TypeA,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
         onPartialCard: (suspend (RawCard<*>) -> Unit)?,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)?,
     ): RawCard<*> {
         val info = PN533CardInfo.fromTypeA(target)
         val tagId = target.uid
@@ -198,6 +203,7 @@ abstract class PN53xReaderBackend(
                         keyRecovery,
                         onProgress = onProgress,
                         onPartialCard = onPartialCard,
+                        onRecoveryProgress = onRecoveryProgress,
                     )
                 rawCard.extractKeys()?.let { keys ->
                     keyManagerPlugin?.saveCardKeys(tagIdHex, keys)

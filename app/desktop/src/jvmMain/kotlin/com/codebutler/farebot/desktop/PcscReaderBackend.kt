@@ -39,6 +39,7 @@ import com.codebutler.farebot.card.ultralight.UltralightCardReader
 import com.codebutler.farebot.card.vicinity.VicinityCardReader
 import com.codebutler.farebot.shared.nfc.CardUnauthorizedException
 import com.codebutler.farebot.shared.nfc.ISO7816Dispatcher
+import com.codebutler.farebot.shared.nfc.RecoveryProgressInfo
 import com.codebutler.farebot.shared.nfc.ScannedTag
 import com.codebutler.farebot.shared.plugin.KeyManagerPlugin
 import javax.smartcardio.CardException
@@ -65,6 +66,7 @@ class PcscReaderBackend(
         onError: (Throwable) -> Unit,
         onProgress: (suspend (current: Int, total: Int) -> Unit)?,
         onPartialCard: (suspend (RawCard<*>) -> Unit)?,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)?,
     ) {
         val factory = TerminalFactory.getDefault()
         val terminals =

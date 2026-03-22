@@ -34,6 +34,8 @@ import com.codebutler.farebot.card.classic.raw.RawClassicSector
 import com.codebutler.farebot.card.nfc.ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533ClassicTechnology
 import com.codebutler.farebot.card.nfc.pn533.PN533TransportException
+import com.codebutler.farebot.shared.nfc.RecoveryPhase
+import com.codebutler.farebot.shared.nfc.RecoveryProgressInfo
 import kotlin.time.Clock
 
 private val log = Logger.withTag("ClassicCardReader")
@@ -58,6 +60,7 @@ object ClassicCardReader {
         keyRecovery: ClassicKeyRecovery? = null,
         onProgress: (suspend (current: Int, total: Int) -> Unit)? = null,
         onPartialCard: (suspend (RawClassicCard) -> Unit)? = null,
+        onRecoveryProgress: ((RecoveryProgressInfo) -> Unit)? = null,
     ): RawClassicCard {
         val sectors = ArrayList<RawClassicSector>()
         val sectorCount = tech.sectorCount
@@ -227,7 +230,26 @@ object ClassicCardReader {
                     recoveredKeys.isNotEmpty()
                 ) {
                     onProgress?.invoke(sectorIndex, sectorCount)
-                    val recovered = keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys, null)
+                    val recoveryEngineName = keyRecovery.engineName
+                    val recoveryOnProgress: ((String) -> Unit)? =
+                        if (onRecoveryProgress != null) {
+                            { msg ->
+                                val phase = parseRecoveryPhase(msg)
+                                onRecoveryProgress.invoke(
+                                    RecoveryProgressInfo(
+                                        phase = phase,
+                                        currentSector = sectorIndex,
+                                        totalSectors = sectorCount,
+                                        engineName = recoveryEngineName,
+                                        recoveredKeys = recoveredKeys.size,
+                                        progressDetail = msg,
+                                    ),
+                                )
+                            }
+                        } else {
+                            null
+                        }
+                    val recovered = keyRecovery.attemptRecovery(tech, sectorIndex, recoveredKeys, recoveryOnProgress)
                     if (recovered != null) {
                         val (keyBytes, recoveredIsKeyA) = recovered
                         authSuccess =
@@ -240,6 +262,16 @@ object ClassicCardReader {
                             successfulKey = keyBytes
                             isKeyA = recoveredIsKeyA
                             log.i { "Sector $sectorIndex: key recovered!" }
+                            onRecoveryProgress?.invoke(
+                                RecoveryProgressInfo(
+                                    phase = RecoveryPhase.KeyFound,
+                                    currentSector = sectorIndex,
+                                    totalSectors = sectorCount,
+                                    engineName = recoveryEngineName,
+                                    recoveredKeys = recoveredKeys.size + 1,
+                                    progressDetail = "Key recovered for sector $sectorIndex",
+                                ),
+                            )
                         }
                     }
                 }
@@ -304,5 +336,40 @@ object ClassicCardReader {
         }
 
         return RawClassicCard.create(tagId, Clock.System.now(), sectors)
+    }
+
+    /**
+     * Parse a recovery progress message string into a [RecoveryPhase].
+     */
+    private fun parseRecoveryPhase(message: String): RecoveryPhase {
+        val msg = message.trimStart()
+        return when {
+            msg.startsWith("Loading bitflip") ||
+                msg.startsWith("Parity self-test") ||
+                msg.startsWith("Running brute force benchmark") -> RecoveryPhase.Initializing
+            msg.startsWith("Phase 1") ||
+                msg.contains("unique nonces") ||
+                msg.contains("first bytes") ||
+                msg.contains("nonces]") ||
+                msg.startsWith("Acquisition complete") -> RecoveryPhase.CollectingNonces
+            msg.startsWith("Nonce processing") ||
+                msg.startsWith("Loading saved nonces") ||
+                msg.startsWith("Sum(a0)") ||
+                msg.startsWith("Best first byte") ||
+                msg.startsWith("Ignoring Sum") -> RecoveryPhase.ProcessingNonces
+            msg.contains("brute force") ||
+                msg.contains("Tuple") ||
+                msg.contains("candidate") ||
+                msg.contains("Verifying") ||
+                msg.contains("guess:") ||
+                msg.contains("pairs") ||
+                msg.contains("GPU brute force") ||
+                msg.contains("M/s") -> RecoveryPhase.BruteForcing
+            msg.startsWith("Key recovered") -> RecoveryPhase.KeyFound
+            msg.contains("failed") ||
+                msg.contains("FATAL") ||
+                msg.contains("Failed") -> RecoveryPhase.Failed
+            else -> RecoveryPhase.Initializing
+        }
     }
 }

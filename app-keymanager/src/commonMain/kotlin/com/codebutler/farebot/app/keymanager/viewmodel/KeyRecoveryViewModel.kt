@@ -46,6 +46,7 @@ class KeyRecoveryViewModel(
                         success = true,
                         isWaitingForCard = false,
                         readingProgress = null,
+                        recoveryProgress = null,
                     )
                 _recoveryComplete.tryEmit(Unit)
             }
@@ -60,6 +61,7 @@ class KeyRecoveryViewModel(
                         error = error.message ?: "",
                         isWaitingForCard = false,
                         readingProgress = null,
+                        recoveryProgress = null,
                     )
             }
         }
@@ -75,6 +77,18 @@ class KeyRecoveryViewModel(
                 }
             }
         }
+
+        viewModelScope.launch {
+            cardScanner.recoveryProgress.collect { recoveryInfo ->
+                if (recoveryInfo != null) {
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isWaitingForCard = false,
+                            recoveryProgress = recoveryInfo,
+                        )
+                }
+            }
+        }
     }
 
     fun startRecovery() {
@@ -86,6 +100,7 @@ class KeyRecoveryViewModel(
                 error = null,
                 success = false,
                 readingProgress = null,
+                recoveryProgress = null,
             )
         cardScanner.startRecoveryScan()
     }

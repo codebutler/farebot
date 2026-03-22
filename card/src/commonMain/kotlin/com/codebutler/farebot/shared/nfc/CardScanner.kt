@@ -34,6 +34,34 @@ data class ReadingProgress(
     val total: Int,
 )
 
+/**
+ * Structured key recovery progress info, surfaced from the hardnested attack engine.
+ */
+data class RecoveryProgressInfo(
+    /** Current recovery phase. */
+    val phase: RecoveryPhase = RecoveryPhase.Initializing,
+    /** The sector currently being recovered, if applicable. */
+    val currentSector: Int? = null,
+    /** Total number of sectors on the card. */
+    val totalSectors: Int? = null,
+    /** Name of the brute force engine in use (e.g., "Metal GPU: Apple M2 Max"). */
+    val engineName: String? = null,
+    /** Number of keys recovered so far across all sectors. */
+    val recoveredKeys: Int = 0,
+    /** Latest detail message from the attack engine. */
+    val progressDetail: String? = null,
+)
+
+/** Phases of the hardnested key recovery process. */
+enum class RecoveryPhase {
+    Initializing,
+    CollectingNonces,
+    ProcessingNonces,
+    BruteForcing,
+    KeyFound,
+    Failed,
+}
+
 data class ScannedTag(
     val id: ByteArray,
     val cardType: CardType? = null,
@@ -83,6 +111,10 @@ interface CardScanner {
 
     /** Whether this scanner supports MIFARE Classic key recovery (requires PN533 raw access). */
     val supportsKeyRecovery: Boolean get() = false
+
+    /** Key recovery progress detail — latest status message from the recovery engine. */
+    val recoveryProgress: StateFlow<RecoveryProgressInfo?>
+        get() = MutableStateFlow(null)
 
     /**
      * Start an active scan session (e.g., iOS NFC dialog).
